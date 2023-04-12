@@ -1,0 +1,340 @@
+// c-posix/rw.topo, 
+// (c) Atos-Euronext Belgium - 2001, 2002, 2003
+//
+
+// Aim:
+// ====
+// clarify "peer-2-peer" communication paradigm applicable to read() and write() system calls...
+// 
+// Starting point: we assume that read() and write() are generic functions allowing communication 
+// between two CONNECTED "peers" (*) :
+// - the 1st peer, we name "my peer", is your (POSIX) running program. "My peer", by definition,
+//   communicates with the "other peer" using read() and write() system calls.
+// - the "other peer" is the "alter ego" of my peer in the connection paradigm ; however the precise
+//   nature of the "other peer" is ABSOLUTELY NOT defined in the paradigm.
+//   Of course, the knowledge of the descriptor - more precisely, the conditions under which that
+//   descriptor has been created or opened - allows my peer's programmer to figure out more or 
+//   less precisely what the other peer corresponds to:
+//   + when descriptor is bond to a "regular file" => the programmer can easily imagine that the "os"
+//     is somewhere behind the "other peer" ;
+//   + when descriptor is bond to a pipe or a FIFO => the other peer should be a local (POSIX) 
+//     program ;
+//   + when descriptor is bond to a socket => the other peer should "resemble" a program...
+//   + Etc.
+//   => However, the nature the other peer is not supposed to affect read() and write() behavior in
+//   the paradigm.
+// (*) non "connection-oriented" communications (UDP, broadcasting, etc.) do not intervene here.
+// 
+// To make exchange happening, each peer has to play its role (we rather call a "RANK") :
+// - the peer having "MASTER" rank is the "sending" peer, => "write" action"
+// - the peer having "SLAVE" rank is the "receiving" peer => "read" action
+// 
+// The peer-2-peer communication lies on the establishment of a TRANSIENT (*) connection. 
+// (*) However, the lifespan of the connection is very variable (5 ms, 6 months,...), depending of the
+//     context...
+// Generally, the rupture of a connection is the consequence of a peer's INITIATIVE to terminate that 
+// connection.
+// - To terminate the connection, the two peers perform a simple local action : they "hang up". The 
+//   connection is directly broken as soon as ONE peer has hung up ; however that connection continues
+//   to exist till the 2ND peer hangs up in turn.
+// - Of course, it's practically impossible for peers to hang up rigorously at the same moment ; there
+//   is necessarily the 1st and THEN the 2nd peer to hang up...
+// - The "master" is devoted to initiate the termination of the connection (that's why we name the
+//   "sending" peer the "master"...)
+// Hence, the typical connection closure follows this basic sequence (in three steps):
+// step 1: The master (i.e sending peer) "hangs up" and by the way initiates the termination of the
+// connection. The connection is directly broken (note: though "broken" the connection continues to
+// exist).
+// step 2: The slave (i.e receiving peer) possibly notices the closing of the connection.
+// step 3: The slave "hangs up" in turn (and THEN, the connection has ceased to exist).
+// => We call such sequence a "smooth termination".
+// => However, it may happen that the "slave" more or less incidentally initiates the termination (i.e
+//    is the first to hang up) ; we call such sequence a "rough termination".
+// => Finally, when the rupture of the connection is not initiated by peers (i.e there's a
+//    "network problem"...), then we talk of a "connection LOSS". Peers as well "hang up" after they
+//    have noticed the connection loss (and the connection finally disappears).
+// To summarize. connection ends up:  
+// - after having being terminated by one peer
+// - after having been lost by the "network" (independently of peers)
+// 
+// We will now examine our basic termination sequence in different contexts (1. "trivial" context:
+// read/write on a regular file ; 2. "network" context: read/write on TCP/IP socket)
+// Taking "my" peer's point of view, we will then define the exact "use cases" of read() / write() and
+// close() POSIX system calls.
+// 
+// Let's firstly recapitulate the basic "use cases" of the read()/write() (+ close()) system calls (*) : 
+// - read() system call (called by the "slave" peer) : TWO distinct "use cases":
+//   + 1st use case: reading data
+//   + 2nd use case: waiting for data availability (e.g if the file is locked or the pipe is empty)
+// - write() system call (called by the "master" peer) : TWO distinct "use cases":
+//   + 1st use case: writing data 
+//   + 2nd use case: waiting for "recipient" availability (if the file is locked, etc.)
+// NOTE: close() system call : ONE "use case" : "closing" the descriptor (OK, pure truism; the 
+// semantics of that action will be clarified...) 
+// (*) Those basic use cases comes from principles exposed in c-posix/tryagain.topo
+// 
+// Now, we examine the trivial case in which the descriptor is bond to a regular file (*) (in 
+// which the "os" plays the "other" peer of the connection).
+// There are basically two possible situations:
+// - your program reading a file
+// - your program writing to a file
+// (*) for the moment, we assume working on a reliable file system, on which "I/O errors" are
+//     "unexpected" from program perspective. That point of view will be clarified later... 
+// 
+// S1 situation: "your program" is reading a file (open in "r" mode)
+// "my" peer (your program) is the "slave peer"
+// the "other" peer (the OS) is the "master peer"
+// the "smooth termination sequence" is the following:
+// - step 1 ("master" hangs up) : handled by OS (when we reach the end of the file)
+// - step 2 ("slave" notices termination) : your program calls read() and gets return value == 0;
+//   the program interprets that ret value as an "eof" event...
+// - step 3 ("slave" hangs up) : your program calls close()
+// 
+// S2 situation: "your program" is writing into a file (open in "w" mode)
+// "my" peer (your program) is the "master peer"
+// the "other" peer (the OS) is the "slave peer"
+// the "smooth termination sequence" is the following:
+// - step 1 ("master" hangs up) : your program calls close()
+// - step 2 ("slave" notices termination) : handled by OS
+// - step 3 ("slave" hangs up) : handled by OS
+// 
+// Note: the following situation is also possible.
+// S1b situation: your program reading a file provokes a "rough termination" ; in other words,
+// your program simply closes the file at an arbitrary moment before getting the "eof".
+// "my" peer (your program) is the "slave peer"
+// the "other" peer (the OS) is the "master peer"
+// the "rough" termination sequence" is the following:
+// - step 1 ("slave" hangs up) : your program calls close()
+// - step 2 ("master" notices termination) : handled by OS
+// - step 3 ("master" hangs up) : handled by OS
+// => Obviously, the use cases of the system calls (i.e close()) exactly fall into S2 scenario...
+// 
+// Note2: the situation "S2b" (rough termination with the "OS" as "slave peer") seems impossible
+// to provoke (how could we force the "os" to behave "foully" ??)... this point of view will be
+// corrected soon! 
+// 
+// Ok, if we gather S1 + S2 (S1b does not change much the picture),
+// we can now complete the different "use cases" of the read()/write() (+ close()) system calls 
+// (applicable in that context)
+// - read() system call (called by the "slave" peer) : now, we have THREE distinct "use cases":
+//   + 1st use case: reading data
+//   + 2nd use case: waiting file availability (e.g if the file is locked)
+//   + ==> 3rd use case: noticing "smooth termination" i.e "eof" (step 2)
+// - write() system call (called by the "master" peer) : still TWO distinct "use cases":
+//   + 1st use case: writing data 
+//   + 2nd use case: waiting recipient availability (if the file is locked)
+// NOTE: close() system call : we have clarified ONE UNIQUE "use case" : "hanging up" : 
+// - for the "master", smooth termination: hanging up the first (step 1) 
+// - for the "slave", smooth termination: hanging up in turn (step 3) 
+// - for the "slave", rough termination: hanging up the first (step 1)
+// 
+// So far, we have totally neglected the following "unhappy ends" :
+// - UE1: in write operation, the underlying file system is physically full, or a quota prevents
+//   from writing more data on the file, hence the write is not possible because there is "not
+//   enough room"...
+// - UE2: there is failure ON the file system (let's say "a file I/O error occurred").
+//   Usually in programs, "file I/O errors" are not expected as "nominal" situations...
+//   That is, in programs, "file I/O errors", are traditionally associated to "critical" errors;
+//   hence, programs generally report sibylline message and/or error code on the "stderr", abandon
+//   the processing (i.e crash) and voila...
+//   Historically, that behavior was acceptable given the "file I/O errors" were tacitly related
+//   to a system disk (main frame, etc.)
+//   But nowadays, the situation is different: the nature of file systems has changed. Many file
+//   systems are now "external" to the os: USB sticks, NFS mount (for which I/O errors rather 
+//   correspond to hidden "network" errors), etc.
+//   By essence, external files systems are exposed to the "nasty" world and are not reliable.
+//   For instance, with an USB stick, the program can nothing against the fool user removing 
+//   the device during operation...
+//   What we want to say is that the "paradigm" has changed (silently but) radically for the
+//   programmer: "file I/O errors" have become predictable (and banal) situations; hence "file I/O
+//   errors" should not provoke "application crash" (or undefined behavior) any more.
+// In short: in comparison with the usual approach:
+// - robust programs (designed to behave gracefully in any predictable situation) should now take a
+//   specific attention to "file I/O errors"...
+// - it's also important to understand the radical difference of NATURE between UE1 and UE2 situations ;   
+//   originating events ('file I/O' vs. 'disk full' "error") are NOT two simple variants of some 
+//   generic "read / write error"...
+// That lead us to establish the following conventions:
+// - if the connection terminates "normally" (neither UE1 nor UE2), remember, we call it a "smooth
+//   termination".
+// - in case of UE1, we say we have a "rough termination" ;
+//   hence, we assimilate "full disk" event during write operation to a "hang up of the slave peer
+//   (alias the os)". In other words, we decree that UE1 exactly corresponds to "phantom" S2b we
+//   were talking about above. The comparison may seem figurative and far removed from reality, but
+//   yet, the peer-to-peer communication model is primarily a metaphor...
+// - in case of UE2, we say we have a "connection loss" ;
+//   that is we simply say "disk I/O error" [during read/write on a regular file] corresponds [in
+//   peer-to-peer communication paradigm] to a "connection loss"...
+// 
+// We can complete the "use cases" of the POSIX read()/write() system calls:
+// - read() (called by the "slave" peer) : FOUR distinct "use cases"
+//   + 1st use case: reading data,
+//   + 2nd use case: waiting for (file) availability
+//   + 3rd use case: noticing "smooth termination" (ack hang up of "master")
+//   + ==> 4th use case: noticing "connection loss" (because of "disk I/O error") [UE2]
+// - write() (called by the "master" peer): FOUR distinct "use cases"
+//   + 1st use case: writing data 
+//   + 2nd use case: waiting for (file) availability
+//   + ==> 3rd use case: noticing "rough termination" (hang up of the "slave"), meaning
+//     a "room problem (file or file system is full)" [UE1]
+//   + ==> 4th use case: noticing "connection loss" (because of "disk I/O error" [UE2]
+// NOTE: close() system call : (still) ONE UNIQUE "use case" : "hanging up" :
+// - for the "master", smooth termination: hanging up the first (step 1) 
+// - for the "slave", smooth termination: hanging up in turn (step 3) 
+// - for the "slave", rough termination: hanging up the first (step 1)
+// - ==> for the "master", rough termination: hanging up in turn (step 3) [UE1] 
+// - ==> hanging up because of "connection loss" [UE2]
+// 
+// Examine now the cases in which two actual programs communicate via a "pipe" or over a network 
+// (TCP/IP socket).
+// 
+// If we look at the situation of a program receiving data from another program (via a PIPE or over
+// the network), here is how the connection normally terminates: 
+// S3 situation: your program was receiving data from another program 
+// "my" peer (your program) is the "slave peer"
+// the "other" peer (another program) is the "master peer"
+// the "smooth termination sequence" is the following:
+// step 1 ("master" hangs up) : the other peer performs "close()-equivalent" operation
+// step 2 ("slave" notices termination) : your program calls read() and notices "end of file"
+// event (ret == 0)
+// step 3 ("slave" hangs up) : your program calls close()
+// 
+// If we now look at the situation of a program transferring data to another program 
+// (via a PIPE or over the network), here is how termination of the connections normally happens:
+// S4 situation: your program was transferring data to another program
+// "my" peer (your program) is the "master peer"
+// the "other" peer (another program) is the "slave peer"
+// the "smooth termination sequence" is the following:
+// step 1 ("master" hangs up) your program calls close()
+// step 2 ("slave" notices termination) e.g, the other program gets "eof" while performing
+//        read()-equivalent operation.
+// step 3 ("slave" hangs up) e.g, the other program performs the close()-equivalent operation
+// 
+// Taking now "my" peer's point of view,
+// - if we compare "smooth termination sequence" in S3 situation with "smooth termination sequence"
+//   in S1 situation, we DO NOT see a difference...
+//   From "my" peer (that is, from programmer's perspective) S1 and S3 are totally transparent.
+// - if we compare "smooth termination sequence' in S4 situation with "smooth termination sequence"
+//   in S2 situation, again, we DO NOT see a difference...
+// 
+// And, as we did for "trivial" (regular file) context, we have to consider the two following 
+// "unhappy ends" :
+// UE3: (with PIPEs and in networking context): in S4 situation, the "slave" (in lieu of the
+//      "master") peer initiates the termination (closes first its pipe/socket)
+// UE4: (only in networking context): in S3 or S4 situation, the network breaks down during the
+//      exchange ("a guy" powers off all the routers).
+//      Note: another cause of UE4 is when the other peer deliberately aborts the connection (e.g
+//      ugly shutdown(-1) instead of close()). But from "my" peer's socket perspective, practical
+//      distinction is not possible...
+// 
+// "Obviously" :
+// - UE3 is a "rough termination" 
+// - UE4 is a "connection loss"
+// 
+// Then, we can see that the "use cases" of the POSIX read()/write() system calls have not changed;
+// we realize that all "networking" situations are simple "variant" of existing "use cases" :
+// - read() (called by the "slave" peer) : FOUR distinct "use cases"
+//   + 1st use case: reading data,
+//   + 2nd use case: waiting for availability (waiting till the other peer sends something...)
+//   + 3rd use case: noticing "smooth termination" (ack "master" hang up)
+//   + 4th use case: noticing "connection loss"
+//     . because of "disk I/O error" (UE2 in trivial (regular file) context)
+//     . ==> because of "network breakdown" (UE4 in tcp/ip socket communication)
+// - write() (called by the "master" peer): FOUR distinct "use cases"
+//   + 1st use case: writing data
+//   + 2nd use case: waiting for availability (waiting the other peer empties the pipe...)
+//   + 3rd use case: noticing "rough termination" ("slave" hang up):
+//     . because "file disk is full" (UE1 in genuine (regular file) context)
+//     . ==> because "slave peer unexpectedly closed the connection" (UE3)
+//   + 4th use case: noticing "connection loss"
+//     . because of "disk I/O error" (UE2 in genuine (regular file) context)
+//     . ==> because of "network breakdown" (UE4 in tcp/ip socket communication)
+// 
+// Summary:
+// - "read()" and "write()" usages can be entirely thought and described in a (generic) context of 
+//   a "communication between two connected peers"...
+// - in theory, the nature of the connection (hence the nature of the other peer...) has absolutely
+//   no incidence in the fundamental "use cases" of read() and write() system calls.
+// - The only thing we have to care about is to clearly distinguish the two possible causes of 
+//   "rupture of connection".
+// Unfortunately, the existing POSIX API is totally confusing...
+// The main problem is the anarchic proliferation of (not clearly documented) "errno codes"
+// reflecting our "use cases"...
+// Think also to the complications caused by the handling of SIGPIPE...
+// Anyway, the problem is that such a confusion is current source of shortcomings in programs...
+// => The important "added value" of ProtectedRead() and ProtectedWrite() wrappers (*) is simply to
+// highlight the actual use cases hidden behind the obscure errno values reported by the bare
+// system calls...
+// (*) : the other added value of ProtectedRead() and ProtectedWrite() is to handle temporizations 
+//       (see tryagain.topo) ; but this feature is not in the scope of that "topo"... 
+//
+// But wait...
+// The next part of the discussion is to assert that our peer-2-peer communication "paradigm"
+// remains consistent and practical in "real" networking context...
+// 
+// Indeed, in actual networking context, things are somewhat more complicated than our simplistic
+// S3 / S4 scenarios...
+// Till now, we've always assumed that 
+// 1. the feed exchange is "one way" between the two peers
+// 2. the roles repartition is fixed one for good during the connection (one peer is the master and
+//    the second peer is the slave)
+// 
+// In general networking context, however, 
+// 1. the feed exchange is "two way"
+// 2. therefore, we cannot simply establish a priori the "master" and the "slave" anymore.
+// 
+// Actually, we've simply ignored the fact that, in networking context, programs generally
+// exchange feed under control of (higher) session/application protocols (FTP, HTTP, MMTP
+// etc.).
+// One of the purposes of session/application protocols is, by a way or by another, to determine the rank of
+// each peer rank at any moment and to allow peers to swap their ranks during session.
+// 
+// Depending on the session protocol, the ranks swapping rules would be either:
+// - implicit: for example, the session protocol says that peers swap their rank after each message
+//   exchange
+// - explicit: peers swap their rank upon specific request (defined in the session protocol)
+// 
+// Clarification about effective "rank swapping": 
+// Since "synchronous" change of rank of the two peers (that would need "instantaneous"
+// communication means between the two peers) is practically not conceivable, we cannot avoid a
+// (short) transitory period of "indetermination" during swapping. However, given the
+// (well-designed) session protocol ensures that it's up to the master to initiates ranks swapping,
+// we can see that the transition happens without any hitch:
+//  peer 1     peer 2
+// -master <-> slave : "deterministic" state: rank repartition is consistent 
+// -slave  <-> slave : "indetermination" period: peer 2 is not yet "aware" that peer 1 has become
+//                     slave; but two "slave" peers cannot make something wrong...
+// -slave  <-> master : "deterministic" state: rank repartition is consistent again 
+// 
+// So to speak, our communication model does allow data exchange in both directions...
+// Yet, our main principle remains too restrictive for certain session protocols, because it IMPOSES
+// "half duplex" functioning: at a certain moment, slave peer A reads data sent by master peer B;
+// to allow peer A to send data, peers A and B must first swap their ranks. 
+// To allow "full duplex" functioning, the peers must play a symmetric role; the master / slave
+// (asymmetric) scheme is clearly no more applicable.
+// Thus, we can introduce a new rank (we call "equal" rank) to be shared by the two peers in
+// replacement of the "master" / "slave" repartition.
+// With the "equal" rank, both peers are allowed to perform read() and write() action at the same
+// time, yet no peer is normally allowed to initiate termination. 
+// In brief: 
+// - either one peer is "master" and the other peer is "slave"
+// - either the two peers are "equal"
+// To terminate (smoothly) the connection, since "equal" peers are not allowed to initiate the
+// termination, "equal" peers should first switch back to a "master" / "slave" scheme (and
+// therefore establish which peer is allowed to hang up the first).
+// 
+// Certain "full duplex" session protocols neglect such "details", and that negligence leads to
+// confusing "rough" termination situations (UE3).
+// Such protocols determine when the peers must stop exchanging data (typically after a "deconnection
+// request" / "deconnection acknowledgement" exchange), but then, just fail to specify which peer 
+// exactly is to initiate the termination, and when.
+// "Smart" peers, however, avoid such trouble by proceeding as following.
+// Let's define the "free" peer rank. 
+// To terminate the session, peers, abandon "equal" rank  (and stop data exchange). Instead of 
+// designating "master" and "slave", both peers simply become "free". 
+// "free" rank allows neither read() nor write() but allows peers to "hang up" independently.
+// 
+// => Our p2p communication paradigm remains applicable to all session protocols given we are
+// aware of the limitations of the traditional "master" / "slave" repartition ; only the "equal" /
+// "equal" repartition is applicable to "full duplex" session protocols.
+// 

@@ -1,0 +1,41 @@
+// blotcode.topo, version 1.92 (ANSI)
+// (c) Atos-Euronext Belgium - 2002
+//
+// Purpose: Dynamic construction of pages, based on templates.
+
+
+// Principles:
+
+// Blotcode parser parses a template (input) and executes "blot code" contained in the template.
+// The "side effect" of that execution is to construct a page (output)...
+// A priori, output is a verbatim copy of input (seen as opaque binary content)... 
+// Yet, the parser has the ability to discern special directives nested in input (so-called "blots").
+// Each time the parser encounters a "blot", dynamic treatment is undertaken.
+// A "blot" is something starting with "##<<" and finished by ">>".
+// A "blot" is an elementary instruction of "blot code" and may comprise:
+// - a control statement : : "loop", "endLoop", "switch", "case", etc.
+// followed by 
+// - a value or a "blot function".
+
+
+// Control statements allow to structure templates: 
+// they define conditional ("switch", "if") and
+// repetitive ("loop") blocks in a template.
+
+// "Blot functions" correspond to the dynamic part in a template:
+// - they can provide dynamic values to control statements;
+// - they can generate content: the complete "blot" found in input is replaced by the content provided by
+//   the function in the output.
+
+// Blot libraries:
+// --------------
+  
+// All "blot functions" are provided as libraries by external modules.
+// Behind each "blot function", you attach a C function to implement the logic.
+
+// All libraries are independent : own private "execution handle"
+// The communication / synchronization between libraries is ensured by two methods:
+// - libraries can share their execution handle with other libraries (by publishing an "ID") 
+// - a general, "read-only" execution context (defined at process level) is always visible to blot 
+//   functions  of all libraries
+

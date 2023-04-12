@@ -1,0 +1,51 @@
+// green.topo, version 1.93 (ANSI)
+// (c) Atos-Euronext Belgium - 2001, 2002, 2003
+
+
+// PURPOSE: Simple patterns to facilitate sober (and hence "ecological") design...
+// 
+// GREEN INSTANCE / GREEN COLLECTION...
+// ====================================
+// 
+// Principle : strict "data encapsulation" in "classes" - or similar object-oriented paradigm,
+// is a safe (and popular) approach to represent and manage various data entities.   
+// However, that approach is not very efficient when dealing with "collections" of such entities.
+// The idea is to define a specific model of data entities - the "GREEN ITEM" - that easily aggregates  
+// into collections... 
+
+// 1. GREEN ITEM
+// -------------
+// A (compound) data type is "green" if:
+// - The size of instances (in memory...) is:
+//   + a "PUBLIC" datum, 
+//   + NON NULL (> 0),
+//   + CONSTANT,
+//   + as SMALL as possible.
+// - The instances are initialized by simple ZEROIZATION
+// - During their lifespan, green instances hold two states:
+//   - "disengaged" => (initial state after ZEROIZATION) "instanced" WITHOUT associated memory 
+//     (or resource) to free
+//   - "engaged" => specific disengaging actions required BEFORE destroying the instance 
+// => a green instance is naturally referenced with an "handle", that is a pointer to the 
+//    instance's area in memory. 
+// => Since we explicitly forbid the "0 instance size" corner case, a "green" handle is necessarily
+//    distinct of the technical "NULL pointer" - which is thus usable to represent (semantic) "special"
+//    or "sentinel" values... 
+// => ULTRA-green type: a green type that ALWAYS remains in "disengaged" state (i.e NO memory/resource
+//    may be associated to ULTRA-green data) ; releasing ultra green types simply consists in freeing 
+//    the instance's area in memory...
+// => Utra but dirty green type: specific assignation of data fields necessary after zeroization... 
+// 
+// 
+// 2. GREEN COLLECTION
+// -------------------
+// => GREEN COLLECTION == collection of VARIABLE number (>= 0) of green items. The "good" (and 
+//    simple) properties of green items ease their management in "collections".  
+// => ONE-by-ONE FETCH: efficiency of green collections management is enforced by the following
+//    "principle" : green items generally only need to be fetched ONE by ONE in the collection.
+// => PULL OUT: However, if needed, the items of a collection can be visible "globally" - simply
+//    by temporarily giving access to the green items ARRAY. In such case, we simply stipulate
+//    that the items are "pulled out" of the collection. 
+// => FROZEN COLLECTION: we can also "freeze" the collection to prevent further modification. The
+//    benefit of that operation is that the collection can be then safely shared by different
+//    threads (of process)...  

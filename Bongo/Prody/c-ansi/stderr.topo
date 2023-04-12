@@ -1,0 +1,24 @@
+// c-ansi/stderr.topo, version 1.93 (ANSI)
+// (c) Atos-Euronext Belgium - 2001, 2002, 2003, 2004
+
+
+// We call "Anomaly" any UNEXPECTED problem or condition met during program execution.
+// PRINCIPLE: 
+// - UNEXPECTED (by the program) implies NEITHER manageable NOR recoverable (by the same program)
+//   (=>TINA!!!<=)
+//   => the ONLY allowed action of a program regarding an anomaly is to RAISE (and TRACK) that
+//      anomaly. Then, the program must promptly ABORT its execution...
+// - TECHNICALLY, raising an anomaly exactly consists in reporting a problem in stderr. From external
+//   perspective, a process that starts feeding its stderr must be understood as an univocal 
+//   announcement of abortion of that process - applications should NOT be allowed polluting the
+//   stderr, and then continue processing, like nothing ever happened...
+//  
+// PRACTICAL anomaly tracking: (see also in c-ansi/types.topo for the concept of "procedures" and
+// "pure functions") 
+// The practical technique we have chosen for tracking anomalies consists in breaking the "normal"
+// CONTROL FLOW and returning (recursively till application's main function) a "sentinel" value 
+// (typically: -1). 
+// Anomaly tracking is perfectly natural with "procedures". 
+// Anomaly tracking is also possible within (pure) functions formulas with small adaptations (see
+// the '_o' indicator in watermark.topo) 
+// Note: in practice, pure (calculation) functions rarely raise anomalies. 

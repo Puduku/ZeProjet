@@ -1,0 +1,60 @@
+// c-ansi/types.topo, version 1.93
+// (c) Atos-Euronext Belgium - 2001, 2002, 2003
+//
+// Purpose: defining very usual data types - or PSEUDO-data types... 
+// =======
+
+
+// 1. "Undefined" sentinel value
+// --
+// aim: simple disposition against "non deterministic" behaviour (due to uninitialized variable) ;
+// at least make bugs systematic (to facilitate detection and correction).
+//
+//
+// 2. booleans
+// --
+// See watermarks.topo
+//
+// 
+// 3. "procedures" - return "status" 
+// --
+// 3.A : "status" versus "value"
+// - "status" ==  C-value intended to build logical expressions for the FLOW CONTROL ; 
+//   a "status" is NOT meant to be passed (directly or indirectly) in FUNCTIONS ARGUMENTS.
+//   (in other words, a "status" is a short information allowing to "take immediate decisions")
+// - "(pure) value" == C-value that is NOT a "status" ; hence "(pure) values" are present in
+//   general expressions such as ASSIGNATIONS and FUNCTION ARGUMENTS. Of course, "pure values" are
+//   de facto present WITHIN logical expressions (for the FLOW CONTROL) that use comparator(s)...
+//
+// NOTE: "state" versus "status"...
+// Semantically, the notion of "state" is very close to that of "status"... But we can stress ONE 
+// difference. 
+// Our "principle": the "state" is the "pure value" that is the exact semantic counterpart of a
+// "status".
+// Summary: 
+// - Contrary to a "status", a "state" is a "pure value", hence PASSABLE in FUNCTIONS ARGUMENTS
+// - it's the only distinction between a "state" and a "status"... 
+// Morality:
+// A "status", it's just like a "state", excepted that it's just the contrary...
+//
+// 3.B : "procedures" and "(pure) functions"
+// - "procedure" <=> C-function returning a "status"
+//   Hence, a procedure's return status directly serves in FLOW CONTROL (following the procedure
+//   call). 
+//   Procedures are NOT DESIGNED to be called in "synthetic formulas" (in which function calls are
+//   placed as arguments of other function calls).
+//   NB: "true procedure" <=> C-function returning "unary" status : a typical "true procedure" returns 
+//   invariable "RETURNED" (unary) status.   
+// - "pure (calculation) function" (also called "true function") <=> C-function returning a "pure value".
+//   Hence, (pure) functions are the "good candidates" to build "synthetic formulas"...
+// - "false function" <=> C-function returning a status HIDDEN in a value.
+//   A "false function" is actually a "procedure". That is, false function's calls take place in
+//   FLOW CONTROL rather than within "synthetic formulas".
+//   Trivial example: c-function returning positive count (like "number of items in some
+//   stuff") can be hold as a true procedure : the boolean evaluation (count >= 0) is the "hidden"
+//   unary status returned by that "true procedure". 
+//   But, attention: most of c-functions returning a number (like min(x,y) ) are... "true 
+//   functions" (WITHOUT "hidden status") that CANNOT be held as "procedures". 
+// => Beyond the "conceptual" clarification, the clear distinction between "procedures" and "(pure)
+// functions" is needed regarding the techniques we adopted to deal with program's ANOMALIES (see
+// c-ansi/stderr.topo). 

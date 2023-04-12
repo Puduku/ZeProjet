@@ -1,0 +1,18 @@
+// c-ansi/g-string.topo, version 1.93 (ANSI)
+// (c) Atos-Euronext Belgium - 2001, 2002, 2003
+
+// => g-string: "Green type" (see c-ansi/green.topo)
+// Aim: facilitate handling of plain character strings...
+// 
+// => g-string set: contiguous array of "g-string" elements ;
+//    The number of elements of a g-string set is called "cardinality"
+// As of this generic type definition, the following usual types have been identified:
+// - "g-string" type is actually a "g-string set" of cardinality 1...
+// - "g-param" type is a "g-string set" of cardinality 2 
+//   + 1st g-string element represents param's name
+//   + 2nd g-string element represents param's value
+//
+// => "g-string set collections" (variable collections of g-string sets).
+// As of this generic type definition, the following usual types have been identified:
+// - "g-strings" type: g-strings collection  
+// - "g-params" type: g-params  collection 

@@ -1,0 +1,62 @@
+// c-posix/rwf.topo, version 1.93
+// (c) Atos-Euronext Belgium - 2001, 2002, 2003
+//
+// PURPOSE: Enhance handling of regular files (and FIFOS...) with POSIX standard functions...
+// 
+// I. Opening a regular file
+// ========================= 
+// 
+// Principle: ProtectedOpenFile() function wraps open() system call ; ProtectedOpenFile() is focused
+// on REGULAR files... 
+// => EXTENDED principle: with ad hoc "file opening" flags, function ProtectedOpenFile() is equally suitable
+// for "named pipes" (alias "fifo's")
+// 
+// Definition of "basic open flags"
+// -------------------------------
+// Motivation: Rationalize usage of O_... flags passed to open() via ProtectedOpenFile()... 
+// Principle : "OR-ize" one ...__BASIC_OPEN_FILE_MODE with specific O_... flags 
+// Example: READ__BASIC_OPEN_FILE_MODE | O_BINARY | O_NONBLOCK
+// 
+// Choosing the good basic open mode is just a matter of taking the good "temperature"...
+// => Use COLD modes when
+//    the "application" is in COLD (that is "init" / "configuration"...) phase; there is no
+//    concurrent access (by other process) to the file.
+// => Use HOT modes when
+//    the "application" is now in a HOT phase (i.e "running stage"...) ; other processes may
+//    concurrently access to the file ; the file MUST have been created during prior COLD phase of
+//    the application.
+// => Use WARM modes when
+//    other processes may concurrently access to the file, but there is NO dedicated COLD phase of 
+//    the application ; the file will be created "on the fly" if not yet exists, but the file is
+//    never truncated. 
+//    => please note that, in such disposition, the physical size of the file can only increase over
+//    time!
+// 
+// NOTE: In pure READ open mode, the temperature does NOT matter... 
+// 
+// 
+// "b_OPEN_ERRNO_MEANS_..." macros
+// -------------------------------
+// These macros help to interpret errno raised by open() vis-a-vis a (supposed) regular file...
+// 
+// Notion of "bad candidate" file:  
+// - the file is not of the good type - neither "regular" nor a "named pipe (alias fifo)" (EXTENDED
+//   principle) 
+// - the file is of good type but is not in "adequate" state:
+//   + "regular" file : impossible to truncate a file locked by a "mandatory" lock
+//   + "named pipe (alias fifo)": in non blocking mode, there is no reader 
+// 
+// Hence, by "good candidate" we mean the file is 
+// - regular (EXTENDED principle: or a "named pipe")
+// - In O_WRONLY or O_RDWR ("write only" or "read and write)" mode, when the truncation flag (O_TRUNC)
+//   is set, the file must NOT have been locked with a mandatory lock, by a "concurrent" process.
+// 
+// 
+// II. Locking a regular file
+// ==========================
+// TBC: locking a FIFO ??? What's the point ???
+// 
+// II.1 POSIX Locks
+// record locks (also known as file-segment or file-region locks...)
+// 
+// II.2 "BSD" (advisory) locks

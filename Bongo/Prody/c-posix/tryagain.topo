@@ -1,0 +1,70 @@
+// c-posix/tryagain.topo
+// (c) Atos-Euronext Belgium - 2001, 2002, 2003
+
+// Purpose: temporization support for POSIX system calls
+// =======
+// 
+// (Resource access) "waiting plans"
+// ---------------------------------
+// Principle: a "potentially" blocking POSIX system call can block ACTIVELY the process / thread
+// when TRYING to obtain some "RESTRICTED" resource.
+// This module is meant to help building "wrappers" onto such system calls ; the aim is to enforce
+// (timeout-based) control of the system call accessing the resource.
+// => Important to understand: Real Access vs. Ideal Access 
+//    ---------                ----            -----
+// IDEAL access = the system call has IMMEDIATE "knowledge" of the resource's availability
+// REAL access = INDEPENDENTLY of the resource state, a "system latency" PRECEEDS the simple 
+// "knowledge" of current resource's availability. 
+// Example : file lock: an "access to the resource" corresponds to an "open lock".
+// - If the lock is based on a local file, we can reasonably consider the system call will perform 
+//   "ideal" access.
+//   => in particular: if we ask for an "open lock" in "non blocking" mode, we can assume the system 
+//      call will not block the process / thread (i.e returns "immediately").
+// - If the lock is based on a "remote" file (NFS...), the system call depends on the network latency.
+//   => in particular: even if we ask for an "open lock" in "non blocking" mode, the
+//      system call may block the process / thread (for a limited, but NOT controllable, period)
+// => Programmatic point of view: simply be aware of (and accept) the fact that "non blocking"
+//    waiting plan still may indiscriminately block your process / thread (that remark does NOT
+//    contradict the general philosophy of POSIX which only "warrants" a time-sharing system) 
+// 
+// 
+// Wrapping system calls
+// ---------------------
+// Principle:
+// - <primitive> = the primitive / system call we want to wrap
+// - <function> = the function wrapping the system call we want to design
+// 
+// HOW-TO wrap a <primitive> ? >>>>>>>>>>>>>>>>
+// In addition of propagating the "native" <status> of the <primitive>, the wrapping <function> can
+// also synthesize specific "try again!" <status> (corresponding to an actual "timeout" regarding 
+// "waiting plan" chosen to access to the resource...)
+// The body of the wrapping <function> should resemble this:
+//   ==> call PdSetDeadline() (*) before the "wrapping loop"
+//            ---------------
+//   while <status> is unknown
+//     ==> call PdSetAlarm() before the <primitive> call (*)
+//              ------------
+//     call <primitive> (*)
+//     if <primitive> returned "untimely" (errno == EGAIN/EWOULDBLOCK, EINTR,...)
+//       ==> call PdCheckTimeout()
+//                ----------------
+//       if timeout is confirmed
+//         <status> = "try again!"
+//       (end if)
+//     else 
+//       check for "native" <status> of <primitive>
+//       ensure not hogging the CPU (**)
+//     (end if)
+//   (end while)
+//   ==> call PdClearAlarm() 
+//            --------------
+//   return <status>
+// 
+// (*) see also SynchronizeONonblock() function 
+// (**) see b_ERRNO_MAY_CORRESPOND_TO_CPU_HOGGING_CONDITION() macro 
+// >>>>>>>>>>>>>>>>
+// 
+// 
+// Preserve the CPU!!
+// ------------------
+// Let's fight against processes that suddenly hog the CPU(s) and "freeze" your system!!!

@@ -1,0 +1,48 @@
+#!/bin/bash
+#Prody/hans.sh
+. mama.env
+
+##########################
+plan="Building PRODUCTION"
+##########################
+cleaning=s
+
+. katzenjammer.env
+. lena.env
+
+#### Creek functions:
+
+CommandCompilePrody () {
+  CC_INCS=(./)     
+
+  local _lib=$1
+  if [ $_lib = c-ansi ] ;then
+    CC_DEPS=(c-ansi)
+  else
+    CC_DEPS=(c-ansi c-posix)
+  fi
+  li="$garden/lib$_lib.a"
+  if IsTarget "$li" ;then
+    Step "Build production library : $li"
+    for src in $_lib/*.c ;do
+      obj=$garden/$(ObjectFlatName "$src" "")
+      CommandCC "$src" "$obj" "$li"
+    done
+  fi
+}
+
+######### Register or execute creek functions #######
+CreekFunctions CommandCompilePrody 
+
+######### Execute full plan #######
+CommandClean
+
+MainStage "(Re)compile c-ansi and c-posix production objects."
+
+CommandCreek CommandCompilePrody c-ansi 
+CommandCreek CommandCompilePrody c-posix 
+
+EndMainStage
+
+
+Success
