@@ -1,0 +1,9 @@
+#######################################################
+# FLINT : ELEMENTARY ENVIRONMENT FOR C POSIX PROGRAMS #
+#######################################################
+ 
+content:
+- FLINT.TXT : that file
+- GENESEE.TXT : files and directories naming conventions
+- flint/ : environment for C programs
+ 

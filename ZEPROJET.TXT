@@ -1,0 +1,30 @@
+ZE PROJET...
+ 
+A tous les Papy Mougeot de la Terre...
+ 
+Julie traisnat "ZE MEMOIRE" 11 annedes durant - je pense... Elle avait dus trop
+procrastiner, et clairement, cca la gavait...En tous cas, elle ne baissa pas les bras, et sa
+persedvedrance finit par "payer"... Son paved - "Ze finale version", donc - occupe une place de choix,
+parmi les ouvrages des grands sociologues, psychologues et autres philosophes, de la bibliothegque
+du salon.
+Et son prestigieux diplosme de Maistrise L'Unniversited de Montreal est bien mis en valeur dans le
+joli cadre accroché au mur dans le couloir (*).
+Quant ad "ZE PROJET", devrais-je dire "ZE BOULET" ?, cca lambine depuis 20 piges - au moins...
+Et dire que que je ne suis toujours pas certain d'aboutir ag "kek'chose" de vraiment concret...
+En tout edtat de cause, mon inspiratrice, vrai "cicedrone", celle qui disait "je ne suis pas
+intelligente mais juste DEDBROUILLARDE", c'est elle, essentiellement, qui me susurre toujours (je
+ne sais pas comment) les moyens de me dedpatouiller...
+Alors, tel le Schmilblick, "on avance"...
+
+(*) Bon, il y a quelques annedes, le cadre, en tombant s'est cassed ; je vais bien susr le
+remplaccer "incessamment sous peu"... 
+ 
+Main pieces :
+-------------
+
+- FlintFactory/ : building elementary development environement
+  See in particular "IMPORTANT CONVENTIONS" in Flint/GENESEE.TXT
+
+- MamaFactory/ : building your "Mama" developement environment (needs "Flint" environment)
+
+- Bongo/ : main development project - so-called "island"... (needs "Mama" environement)

@@ -1,0 +1,13 @@
+
+#define ANSI_BLUE_SEQ "\033[0;34;1m"
+#define ANSI_YELLOW_SEQ "\033[0;33;1m"
+#define ANSI_NC_SEQ   "\033[0m"
+
+#define ANSI_REVERSE_VIDEO "\033[?5h"
+#define ANSI_NORMAL_VIDEO "\033[?5h"
+
+#define ANSI_PINK "\033[38;5;206;48;5;57m"
+
+#define LOCKED_CHAR_SYMBOL "*"
+#define LOCKED_PATTERN ">" LOCKED_CHAR_SYMBOL "<"
+
