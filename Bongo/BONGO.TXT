@@ -1,0 +1,32 @@
+################
+# BONGO ISLAND #
+################
+
+This project is based on Mama framework.
+To check Mama installation, simply type 
+$ miss-ross.sh 
+(This command can be executed anywhere) 
+If the command is not found, then Mama framework is not properly installed.
+Otherwise, check Miss Ross's status ; verify in particular that "Flint" environment is properly 
+detected...
+Find also some "good advices" in "$MAMA/MAMA.TXT" and "$FLINT/GENESEE.TXT" files 
+
+Bongo Island overview:
+---------------------
+<Bongo Island>
+  Prody/ : "production" source files 
+    c-ansi/ : Pure Ansi C source files 
+    c-posix/ : POSIX C source files
+    hans.sh : Production compiling (exclusive script) 
+    der-inspector.sh : Enhance production source files documentation (exclusive script) 
+  Diggy/ : Debug & testing framework
+    diggy/ : source files
+    hans.sh : Diggy source files compiling (exclusive script) 
+    der-inspector.sh : Enhance (Diggy) source files documentation (exclusive script) 
+  Testy/ : Testing of Prody code
+    hans.sh : Tests compiling 
+    fritz.sh : Tests execution
+    testy/ : Testing utils source files
+    c-ansi/ : Ansi C tests source files
+    c-posix/ : POSIX C tests source files
+    data/ : testing data
