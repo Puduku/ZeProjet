@@ -1,0 +1,196 @@
+// programming.topo, version 1.93
+// (c) Atos-Euronext Belgium - 2001, 2002, 2003
+//
+// INTRO: question of perspective...
+// Programming perspective (P-level)
+// >Versus<
+// C-Language perspective (L-level)
+ 
+// 'P'rogramming perspective is a tiny but necessary "abstraction" built above the 'L'anguage
+// ("grass roots") perspective.
+// Our idea is to NOT "reason" directly with C language features, but above "ad hoc" programming
+// abstractions...
+
+// This 'P' layer follows very classical "procedural programming" orientation (*) on which we
+// elaborate (programming) patterns...
+//
+// (*) "Structured programming" is obviously C's most natural programming orientation. Yet, the
+// language is quite versatile (some people would rather say "poor" or "lax" ...) to support other
+// paradigms (like "functional" paradigm)
+
+// This table shows main cases of correspondence between 'L' and 'P' concepts.
+// What must be understood is that the "P" concepts derived from a given "L" concept are usually
+// very different "P" concepts. For example, from the point of view of 'P', 'functional macros' have
+// little to do with 'pure macros' - and yet both are just ordinary macros of the C preprocessor...
+// +----------------------------------------------+----------------------------------------------+
+// | L : preprocessor / compiler                  | P: programming layer ("procedural            |
+// |                                              | programming" orientation)                    |
+// +----------------------------------------------+----------------------------------------------+
+// | preprocessor macros                          | - constants & functional macros              |
+// |                                              | - pure macros                                |
+// +----------------------------------------------+----------------------------------------------+
+// | c-values (basic types)                       | - values (integers & floating points)        |
+// |                                              | - statuses (int C type)                      |
+// |                                              | - sentinel values                            |
+// +----------------------------------------------+----------------------------------------------+
+// | non void returning c-functions               | - (pure) functions                           |
+// |                                              | - procedures                                 |
+// +----------------------------------------------+----------------------------------------------+
+// | void returning c-functions                   | technical routines (1)                       |
+// +----------------------------------------------+----------------------------------------------+
+// | typedef                                      | used as simple alias definition for:         |
+// | (2)                                          | - custom function types                      |
+// |                                              | - handle types                               |
+// |                                              | - basic types aliasing (2)                   |
+// +----------------------------------------------+----------------------------------------------+
+// | enum                                         | - statuses (unary, binary,...)               |
+// |                                              | - states representations                     |
+// |                                              | - standard values                            |
+// +----------------------------------------------+----------------------------------------------+
+// | struct (union)                               | - private instances                          |
+// |                                              | - compound parameters (3)                    |
+// |                                              | - description of data formats (4)            |
+// +----------------------------------------------+----------------------------------------------+
+// | pointer (entity on which * operator is       | - address variables                          |
+// | applicable) (5)                              |   + single entity address (a_ indicator)     |
+// |                                              |   + array address: (s_ indicator)            |
+// |                                              | - generic (r_ indicator) parameter           |
+// |                                              | - handles                                    |
+// +----------------------------------------------+----------------------------------------------+
+// | logical expressions                          | only boolean typeless VALUES exist - boolean |
+// |                                              | "type" MUST NOT be artificially "defined"    |
+// +----------------------------------------------+----------------------------------------------+
+// (1) Like 'P' procedures and functions, 'P' technical routines are code CONTAINERS. But
+//     contrary to procedures and functions, technical routines are NOT (directly) CALLABLE.
+// (2) Thus, from 'P'rogramming perspective, types abstractions are somewhat more subtle than
+//     rudimentary "typedef" constructions - that are actually simple names aliasing (*).
+//     By the way, we question the (in)famous "<type name>_t" types naming convention (like size_t,
+//     pthread_t, bool_t, etc.) which confines in fact the principle of data abstraction to a
+//     simple renomination of type.
+//     Extra comment: The motivation at that time was probably a vain attempt to "modernize" C
+//     framework vis-a-vis the new programming languages (those offering full-fledged type systems)
+//     of the epoch. Hence, the "initiative" was totally clumsy, and by the way largely
+//     counter-productive...
+//     (*) to emphasize our point of view, "typedef" is a CARICATURE of type definition ; the point
+//     is just to understand and keep in mind the limitations (from 'P' perspective) of that
+//     'L'-level mechanism.
+// (3) Maybe a regret in C is that it's not possible to pass constant struct-based compound
+//     parameters to C functions.
+// (4) that is representation of "shared" data structures (protocol messages, EDI, etc.).
+//     The method imposes STRICT control of data alignment, structure padding and packing in memory.
+//     The techniques "of course" exist (#pragma) in C, but generally have very bad impact on
+//     process performance, and, above all, are not portable - what is quite paradoxical when your
+//     purpose is to represent "open" specifications...
+//     Morality: from our point of view, this technique of data format representation is a "good"
+//     example of "false good idea"...  Finally, it's less complicated to rely on "grassroots"
+//     methods - those based on explicit "offset" and  "data length" definitions and
+//     manipulations...
+// (5) That pointer definition given at L-level is disputable. Fortunately, our P-abstraction
+//     let us NOT having to deal with such philosophical (and somewhat vain) questions...
+
+
+// Programming patterns:
+// - modules: "modular design" is an inalienable principle.
+//   Modules (as designation of "code containers" that are source files) REMAIN the fundamental
+//   conceptual units of software development. That ancestral "Modular design" was NEVER obsoleted
+//   by more recent concepts, such as "class models" once elaborated in object-oriented
+//   programming. Modules remain the "essence" of preliminary software design (*).
+//   Classes may only make sense far later in the "detailed" design process...
+//   => Practical pattern: one module <mod> exactly corresponds to:
+//   - single <mod>.h header file OR
+//   - <mod>.h header and <mod>.c source files (most common case) OR
+//   - single <mod>.c source file if and only if it implements main() function.
+//   (*) "Preliminary" does not just mean "draft" - immediatly forgotten when the "real"
+//       developement starts. "Preliminary" really means "fundamental"...  
+// - C-Ansi / C-Posix split: the sources are splitted between "c-posix" and "c-ansi"
+//   sub-directories.
+//   Initially, the motivation was practical: such split eases recuperation of modules usable to
+//   write stand-alone C-Ansi programs (reminder: pure C-Ansi programs have limitations but offer
+//   the great advantage to run almost "anywhere")
+//   And even if now C-Ansi programs are less in our "focus", we've realized that such a split
+//   "inducts" a good separation between pure business logic (code that can be written in Ansi-C)
+//   with "technical", low level code (that is "by essence" Posix-C) 
+//   NB: final extra, empiric, but real, advantage : this separation lets us directly identifying 
+//   our own headers (#include "c-ansi/xxx" and "c-posix/xxx") 
+// - particular APIs:
+//   + "kitchen" paradigm: allows to maintain primal simplicity of "enriched" API.
+//     Analogy with some (contemporary) restaurants in which clients have an open view inside the
+//     kitchen...
+//     The public API is split in two levels :
+//     . the "lower" level is the "kitchen view" : define the complete API. Like the kitchen of the
+//       restaurant, the decoration and the beauty of the place does not really matter; but the
+//       neatness of that place must be irreproachable.
+//     . the "upper" level is like the "menu of the diner room" : is a simplification of the API,
+//       and is focused on most common usages.
+//     Example: conditional declarations (#if / #ifdef) quickly make public interfaces difficult to
+//     read and should be placed in the "ad hoc" kitchen interface.
+//   + "glue" paradigm: dedicated API meant to fix the approximations and inconsistencies of
+//     "standards" - that we MUST get along with...
+//     Notice: "universal glue" is an ANTI-PATTERN! (we are deeply engaged against "catchall" design
+//     syndrom)
+//   + "freeloader": a free-loader is a simple "technique" suitable for very light "singleton"
+//     modules. It consists to define the functions directly in the header (.h) file so that we
+//     formally get rid of the implementation (.c) file. Such modules are of course to be included
+//     in unique and specific place (the main module in general) of application.
+//     NB: example of freeloader can be found in "Flint" project...
+//
+// - instances and handles ; data encapsulation
+//   + Nothing should exist but objects' instances !!! (*) (**) that "fundamental" programming
+//     concept - i.e association principle of code and data (so-called "methods" and "attributes")
+//     can be easily implemented in C by means of "instances" and "handles".
+//     . An "instance" is simply an allocation in memory (generally heap) of some data structure.
+//       An "instance" is defined in the private part of modules.   
+//     . A "handle" is nothing but a pointer variable pointing to the "instance". A "handle" is the
+//       only public definition related to data instance. 
+//       The fundamental, and natural, property of "handles" is that multiple "handles" can be
+//       "attached" to one instance (exactly like a luggage may have several handles...)
+//     (*) As usual, that idealistic and holistic vision is a good basic principle, but, the
+//     assumption must sometimes be nuanced if we want to avoid nightmarish pitfalls and
+//     complications...
+//     (**) Hands (and fingers), for instance, would be a better metaphor than objects (and
+//     methods) to figurate those associations between data and code; but ok, let's not worsen the
+//     existing confusion ; hence we stick with "objects and methods" denominations and we just
+//     forget our "hands and fingers"...
+//   + object virtualization. This principle replaces the METHOD virtualization of "classes-based"
+//     programming languages. Advantages:
+//     . easily implementable in simple C
+//     . NO compilation/execution overhead
+//     . does NOT undermine the encapsulation principle
+//     . more accurate "objects" modelling (NO NEED for hazy "inheritance" principle(s)...)
+//     (Drawbacks: NONE)
+//   + unique instance: also known as "singleton" principle... Emphases that even "global"
+//     instances (that are unique per process) MUST be formalized as regular instances.
+//     (that is referenced via explicit handle)
+//     This ensures respect of clear (instanciation and) initialization / execution / destruction
+//     cycle.
+//   + factories: a "factory" instance is dedicated to create "product" instances.
+//     In most cases, we do not distinguish "factory" with "product" instances as objects; the
+//     instance creation procedure is an ordinary method of the object itself.
+//     The factory paradigm is usefull to make easier arbitrary instance creation internally by
+//     other instances. That is, the factory mainly provides an "abstraction" of the paramaters
+//     used for the creation of product instances...
+//     Our strong recommandation is to resort to the factory paradigm only when necessary...
+//
+// - proto-objects: allow to split complex objects into formal objects within one module.
+//   Let's reason on plain example. Suppose that when designing CO "complex object" within eponymous
+//   module, we identify SO "simple object" as an independent "sub-responsibility" within CO...
+//   + If SO usage can be easily generalized (and resuable by other objets) there is no question ;
+//     we simply extract SO (of CO module) and design a real SO object (in a dedicated module)...
+//   + otherwise, that is, if SO usage is specific to CO (i.e without potential interest out of
+//     CO), we can decide keeping SO inside CO module. Then, again, we make a choice: 
+//     . We can design SO exactly like a real object (with strict encapsulation of data). However,
+//       since SO and CO are defined in the same module, such encapsulation is technically imperfect
+//       (i.e we cannot avoid the 2nd object defined in the module to have knowledge and access to
+//       all internals of 1st object defined in the same module)...
+//     . We design SO formally as an object (instance and "methods"), but we do not care about real
+//       encapsulation (in particular, hidding the instance with handles)... "Public" methods of SO
+//       (used by CO) can be even made of single macros instead of functions. Technically, SO
+//       instance is not encapsulated; all SO's internals are accessible to CO. However, the point
+//       is that formally, we do have encapsulation - the responsibilities of CO and SO are clearly
+//       separated in the code...
+//
+// - green items and collections:
+//   The green item is an intermediate concept of compound data between the bare struct-based data
+//   and the encapsulated data (in "object instance") (*)
+//   See also c-ansi/green.topo
+//   (*) : as amendment of "everything is object" holistic vision...

@@ -1,0 +1,22 @@
+// README.topo, version 1.93
+// (c) Atos-Euronext Belgium - 2001, 2002, 2003
+ 
+// => ".topo" files are raw (ASCII) text files. 
+// The purpose is to provide CONTEXTUAL information to sources (C programming) files. 
+// The main use case is to "discharge" ".h" header files of contextual description and to
+// have a clear separation between CONTEXTUAL and TECHNICAL information.
+// Hence, comments present in ".h" are focused on technical usage of the module (classical
+// description of public functions parameters, etc.)
+// As part of source files bundle, ".topo" files are to be referenced (with #include directive) by
+// the other source files - in particular, by the affiliated ".h" header file.
+// => though ".topo" files should never contain source code, such files must be "parsable" by the C
+//    compiler/macro-processor ; hence all text must be wrapped in "C comments"...
+//
+// SUMMARY: Given module called BROL, you want...
+// ...contextual information (What is the purpose of BROL ?) => see "BROL.topo" file 
+//    (if "BROL.topo" does not exist, the context is supposed to be "obvious" ; the name of 
+//    of module + the very small intro phrase at the begin of the ".h" is supposed to provide 
+//    "context" enough...)
+// ...base technical information (How to use BROL ?) => see "BROL.h" header file
+// (Of course, for "deeper" technical information (How does BROL work (or doesn't work) ?) => see
+// "BROL.c" source file)

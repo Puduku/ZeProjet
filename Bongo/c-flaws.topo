@@ -1,0 +1,233 @@
+// c-flaws.topo version 1.93
+// (c) Atos-Euronext Belgium - 2001, 2002, 2003
+
+// "Top ten (+ two)" C's REAL flaws
+// ================================
+
+// Idea: Ok, we admit it : C is NOT a fault free programming language...
+// However, our belief is that:
+// - Once understood, these flaws can be neatly "neutralized". Unfortunetely, do not expect any
+//   "miracle": acceptable software quality is reacheable with C programming, but remains laborious
+//   to achieve; as soon as we release our efforts and are not careful enough - or too
+//   overconfident, C-code "quality" degenerates very quickly... 
+// - Finding a new "accurate" language and getting rid of C for good would be certainly a big
+//   progress in software industry... if and only if we FIRST carefully identify what is exact
+//   responsiblity of C in the "SHIT" of C programs - and do NOT UNDERESTIMATE our OWN part in that
+//   SHIT.
+//   That is: 
+//   + Just switching to "newer" language will NEVER improve the situation. 
+//   + We must deeply QUESTION our programming as well as the language itself.  
+//   That way, we hope real PROGRESS - in lieu of huge REGRESSION (cf. C++). In brief, we must
+//   absolutely AVOID programming languages that: 
+//   + reproduce the same flaws that C. 
+//   + or even WORSE, introduce IRRELEVANT (and thus COUNTER-PRODUCTIVE) features. 
+// Note: portability problems are marked with (P)
+
+// Number 10: impossibility to specify directly the values of the fields of a 'struct' parameter in
+// the function calls.
+// Suppose the function DisplayPoint (int x, int y) ; we can easily call the function with
+// explicit coordinates values like DisplayPoint(10,69);
+// We now consider using compound parameter (based on simple 'struct' definition) for the
+// coordinates...
+// However, we hesitate to take the decision, because we know well that in C, we could not call
+// the function with explicit coordinates values (like above) anymore.
+// Eg. with  struct coord { int x, int y };  DisplayPoint(struct coord *a_p); declaration, 
+// we cannot make direct call like  DisplayPoint({10,69}) ;
+// we must define a (constant) structure and then make the call with (pointer to) that constant.
+// This is of course not a big deal, but that loss of flexibility may be frustating...
+
+
+// Number 9: impossibility to indicate directly for which "typedef'ed" function ("pointer") an 
+// ordinary function is defined.
+// Suppose the following declaration: (NB: example has been stolen on Internet)
+//
+//   typedef int (*add_integer_t)(int, int); //declaration of function pointer
+//
+// The (ordinary) function 
+//
+//   int add(int a, int b) {
+//      return (a+b);
+//   }
+//
+// can be used to assign some add_integer_t function pointer, like below:
+// 
+// int main() {
+//    add_integer_t addition = add; //typedef assigns a new variable i.e. "addition" to original
+//                                  //function "add"
+//    int c = addition(11, 11);   //calling function via new variable
+//    printf("%d",c);
+//    return 0;
+// }
+// 
+// The pity is that if "add" function is not "homegeneous" (i.e assignable to) "add_integer_t" 
+// pointers, the compiler will only complain further during the assignation of the function to the
+// pointer.
+// Thus, the regret is that there is no way to tell the compiler in "add" definition that the
+// function must be homegeneous to "add_integer_t".
+// Of course, a very simple (good) disposition consists in reminding in a comment line the function
+// pointer type against which the function is supposed to be assigned... E.g: 
+//
+//   // add_integer_t function:
+//   int add(int a, int b) {
+//      return (a+b);
+//   }
+
+
+// Number 8: (P) missed standardization for alignment, padding and packaging of structured data (#pragma...)
+// The original purpose of structures and unions in C is to define "logical" compound data types;
+// The physical aspects were simply not specified with these structure definitions...
+// However, some physical properties deserve to be clarified:
+// - aligned (unpacked) data: such organization favors the CPU but creates a waste of memory.
+// - packed (unpacked) data: optimizes memory consumption, but may decrease CPU performance.
+// Ad hoc directives (notably #pragma) were therefore introduced with compilers, but here again,
+// there is a big lack of standardization in the language (P).
+// The problem arises as soon as we use packed structures to represent "normalized" formats for
+// data exchange (protocol message format, etc.) because we absolutely must use these non-standard
+// directives. In other words, it's like a snake biting its own tail. 
+
+
+// Number 7: 'typedef' is a very "poor" type definition... 
+// 'typedef' is rather a simple type aliasing than a type definition. The mechanism is not
+// defective in itself, but the misleading meaning of this keyword 'typedef' is unfortunate and
+// source of profound confusion...
+// Personal interpretation: 'typedef' doesn't look very natural in C and gives the impression of
+// having been added to the language in a hurry; probably a clumsy response to the competing
+// languages of the time - those providing real type definitions (in particular, sub-types and
+// abstractions) ...
+
+
+// Number 6: "Pointer, what pointer ?..." The numerous ambivalences of the pointer concept.
+// "Pointers" are hiding everywhere in C ; however, WHAT is EXACTLY a pointer in C ? Actually, a
+// lot of different answers are possible... 'Pointer' is a "phantom" concept in C. 
+// Examples of pitfalls caused by that ambivalence:
+// Ex1: pf() vs. *pf() 
+// Suppose 'pf' is a (valid!) "function pointer"... To call the function pointed by pf, do we type
+// '*pf();' or simply 'pf();' ?
+// Modern compilers accept both notations (which are totally equivalent). However, your favour for
+// one of the forms is actually linked with your own "instinctive" conception of C pointer. The
+// fact is that the language "refuses" to tell which representation is the good one!    
+// Ex2: the nature of entities declared with [] notations. Basically, one say : "When I want to
+// declare a pointer p, I can use *p or p[] notations, which are equivalent - I just have
+// not to confuse p[<some size>] with p[] which are indeed totally different declarations..."
+// Actually, both parts of the proposition are not true (i.e *p and p[] are not always equivalent
+// in declarations AND p[] and p[<some size>] are sometimes equivalent (to *p) in declarations).
+// And as usual, the real complications are caused by absence of portability. (P)
+// Some concrete pitfalls : we define char p[] = "blabla"; in the .c (private) source. We report
+// the extern char p[]; declaration in the .h header. Some time later, a guy replaces in the .h the
+// extern char p[];  with the (supposed equivalent) extern char *p; declaration (guy's possible
+// motivation: "let's be more homogeneous with the other declarations", "in conformance with MY
+// nomenclature", etc.) ...
+// If there is an inconsistency between the definition and the declaration, the compiler will
+// normally warn us... Unless the source code is not recompiled ; in such case, the linker alone is
+// not capable to detect the inconsistency, and the application will crash... 
+// 2nd pitfall: Given function declaration f(char p[256]); , what is the value of sizeof(p) in f ?
+// Some compilers give the size of a pointer (ah?) instead of 256...  (P)
+// Worse, among compilers giving the size of a pointer, certain ones however give well 256 with the
+// following declaration : typedef char t256[256]; f(t256 p) ; (P)
+// This is of course in relation with flaw Number 7 : typedef just looking like very straightfoward
+// aliasing mechanism... with a few (non portable) subtilities, just there to confuse the "average"
+// programmer...  
+
+// Number 5: (P) 'printf' format specifiers (%d %lu %s, etc.) are linked to bare data types (%d for
+// int, etc.) 
+// Of course, that was not a problem in the early times of C - when I was even not sure 'typedef'
+// was existing at that epoch... (See flaw Number 7)
+// But as soon as, for good or bad reasons, we begin to play with typedef-based data types
+// "abstractions", it becomes rapidly complicated to construct and maintain consistent 'printf
+// clauses'. 
+// Fortunately, modern C compilers detect 99.9% of the problems...
+// However, a problem remain: as long as we use a type 'abstraction' in the arguments, such clause
+// is not portable... (P)
+// Example: time_t t; ... printf("t=%d\n", t); is adapted to "signed" time_t, but actually time_t
+// is not always signed. To avoid compiler complaining, you can of course 'cast' the "abstracted"
+// parameters to "good" 'raw type', like :
+// printf("t=%d\n", (int)t);
+// But it's NOT so a satisfactory solution : on "wrong" platforms, program will provide "wrong"
+// display... 
+
+
+// Number 4: ambiguity of 'void*' data type that can represent a "pure address" OR a "generic"
+// parameter.
+// Often, generic data indeed represent a generic address (pointer of entity of unspecified 
+// type...) but that is not always the case : sometimes, we need that "generic" data represent
+// plain integer values - not address. 
+// Actually, the situation is even more complicated, because we also have to consider the "generic"
+// conversion of floating values...
+// The result is that "generic" data management is not truely transparent in C... (P)
+// which, again, is quite paradoxal... 
+// Morality: we really miss true "generic data type" (other that 'void*' ersatz) in C.
+
+
+// Number 3:
+// 'const' may make code more... fragile! (in fact, it's 'cast' operator's fault)
+// 'const' type qualifier's intention is of course to make the code more robust. In many cases,
+// 'const' is indeed an improvement. An obvious example is the protection against modifications of
+// char strings parameters passed to functions. (e.g char *strcpy(char *dest, char *src); => 
+// char *strcpy(char *dest, const char *src);)
+// In some cases, however, the advantage is less evident... Actually, programmer must be AWARE that
+// (s)he has to do a TRADE OFF...
+// The "Cornelian choice" may arise with record data fields. Depending on the context, 
+// some data field should be or not protected with a 'const'. For instance, a 'name' data
+// field should be protected excepted during the 'initialization'...
+// The natural "solution" seems to set the 'const' to the data field, and to 'cast' it into the
+// "without const"-equivalent data type when necessary (that is, during initialization).
+// But, that's the point : casting operations are by essence dangerous dispositions (remember, 
+// 'cast' DISABLES any data type consistency CONTROL of the compiler, and hence potentially
+// transforms simple compilation problem into execution crash) that must be avoided. (*) (**)  
+// So generally, the wiser is simply to abandon the 'const' protection...
+// Morality : 'const' may be useful, but is NOT the Panacea.
+// (*) This is a perfect illustration of the idiom "Being between Scylla and Charybdis".
+// (**) Ideally, C would propose an "intelligent" casting that would just remove the 'constancy'
+// constraint (for one time, C++ marks a real point over C :p)...
+
+
+// Number 2: Silent overflows. There is NO bullet-proof means in C to detect basic integer 
+// overflows !... (*)
+// Initially, that limitation was consistent with the language's philosophy: it's up to the
+// programmer to anticipate. Such approach remains reasonable and applicable while programmers keep
+// fair control on the nature of the integer data (size and  signedness). However, inopportune
+// typedefs (which "opacify" without reason - just for the pleasure - the data types) complicate
+// the situation...
+// (*) That (grave) problem remains in C++. C++ does provide a mechanism that mimics ADA's
+// exceptions, but that mechanism is actually useless regarding numbers' OVERFLOWS. The problem is
+// that, though the overflow_error is well defined the C++ standard, we still have to raise it
+// "manually" in the code if we want to handle it as exception. It's just like you have a rutilant
+// car in hands, but there is no engine under the hood - you still have to pedal if you want to
+// move... 
+
+
+// Number 1: Unreadable C interface headers - mess with portability flags. 
+// This is not an originel flaw of the language. But now, after more than forty years of (often
+// benevolent) "cow-boys" interventions, all standard and system (.h) headers - which directly
+// affect the quality of the C programming environment - have ended up looking like nothing and are
+// totally unreadable... 
+
+
+// Number 0: Mediocrity of standard C libraries (strings management, etc...) => quite dishonest argument 
+// (against C LANGUAGE) of C++ bigots.
+
+
+// Number -1: '\0'-terminated strings convention (inheritance from 8-bits CPUs assemblers ?) 
+// Practical issue in a nutshell: crappy strings representation => crappy "strings"-related
+// libraries APIs (<string.h>, etc.) => crappy code related to strings manipulations => crappy code
+// of C applications "in general"...  
+// '\0'-terminated strings convention is fairly accepted by programmers because it seems so simple
+// and efficient. In specific cases (that is: 'early' programs developped in the 70's, device
+// drivers, embedded apps for 'IoT' and so on), this representation is indeed, by far, the most
+// effective one can imagine. 
+// Unfortunately, there is a huge DRAWBACK: that representation become unmanageable as long as we
+// have to manipulate PORTIONS of such strings... 
+
+
+// Moralited:
+// C, qualified (ag l'edpoque du moins) de langage "edvolued", est en redalited passablement
+// rustique. Nous sommes toujours surpris par ses notations edtranges et sa syntaxe archaitque..
+// En dedpit de ses imperfections origineles et d'une edvolution parfois cahotique - voire
+// contre-productive, C a "su" rester, dans l'ensemble, raisonnablement cohedrent et conserve son
+// "statut" de meilleur intermeddiaire de programmation edxistant entre l'humain (qui "voit" le
+// code source) et la machine (qui "voit" le code exedcutable)...
+// En l'attente de son vedritable digne successeur - celui qui gommera ses vrais dedfauts - C
+// demeure "aujourd'hui" le langage de "redfedrence" pour la production d'applications dans un
+// langage compiled. C est au logiciel:
+// - ce que Louis XI fut ag l'Histoire de France...
+// - ce que le Tampon JEX est au mednage: "Je suis MOCHE, mais qu'est-ce-que je BOSSE !!!"

@@ -1,0 +1,54 @@
+// diggy/diggy.topo, version 1.93
+// (c) Atos-Euronext Belgium - 2001, 2002, 2003
+ 
+// Purpose: Digging into code ; TWO main use cases:
+// + => plain testing (of individual modules) 
+// + => debugging traces : DIGGY has been especially conceived for programmers who feel more at
+//      ease to debug code with trash "printf" lines rather than using the full-fledged debugger...
+
+// Principle: The following macros are the ONLY "diggy" artifacts allowed to pollute
+// "production" code: 
+// - m_DIGGY_BOLLARD(): to be placed at begin of PUBLIC functions body
+// - m_DIGGY_BOLLARD_S(): to be placed at begin of PRIVATE (i.e STATIC) functions body
+// - m_DIGGY_RETURN() : replaces each 'return' in code (for functions with "bollard") 
+//
+// - When "DIGGY" compile flag is OFF (=> "production" code) : 
+//   + m_DIGGY_BOLLARD() / m_DIGGY_BOLLARD_S() are expanded to NOTHING
+//   +  m_DIGGY_RETURN(ret) is expanded as 'return ret;'
+//   => in short, the "diggy" pollution is strictly limited to presence of these macros in the
+//      production source code; however, these macros have absolutely NO INPACT on the production
+//      executable code.
+// - When "DIGGY" compile flag is ON (=> "debug"/"test" code) : 
+//   + m_DIGGY_BOLLARD() / m_DIGGY_BOLLARD_S() are expanded as "function push" notification in 
+//     "diggy system"
+//   +  m_DIGGY_RETURN(ret) is expanded as "function pop" notification in the "diggy system",
+//      FOLLOWED by actual function return. 
+//   The stack of function calls (push / pop) is automatically displayed in 'stdout'.
+//   NOTICE: if the placement of "diggy" macros is NOT consistent...
+//   - In case of "orphan" m_DIGGY_RETURN() in function (i.e without bollard), the source code is not 
+//     compilable.
+//   - When missing m_DIGGY_RETURN() (that is bare 'return' statement in function with bollard), the
+//     source code is compilable. At execution, the 'diggy system' tries to reconstitutes the 
+//     rigorous calls stack. Aberrant calls stacks are normally detected and rectified to something
+//     reasonable. In any case, the "diggy system" indicates if displayed function call or return is
+//     real or reconstituted - reconstituted calls and returns have simply NO line number. 
+
+// Fully diggy: when you want to dig into a specific module (mainly debugging purposes), you enable 
+// "fully diggy" by #include of "c-ansi/fully-diggy.h" or "c-posix/fully-diggy.h" in the source.
+// The effects of that #include are the following:
+// 1. Extra m_DIGGY_INFO() macro is available, allowing to log generic info lines in the "diggy
+//    system"
+// 2. Enable stack logging of static functions (those with "S" bollard)
+// 3. All m_DIGGY_VAR*() macros are available ; purpose is display of VARIABLES in the "diggy
+//    system".
+// RULE: "fully-diggy" mode is TEMPORARY. 
+// By removing (or commenting out) #include of "c-ansi/fully-diggy.h" or "c-posix/fully-diggy.h",
+// you ensure the source code is clean of unwanted diggy traces - otherwise, the code cannot
+// compile.
+// NOTE. In testing environments, all DIGGY traces can of course stay permanently in the code.
+//
+// Final note: dependency of diggy's C code vis-a-vis production C code.
+// Diggy C code is totally independent of Prody (production) C code. 
+// The two "exceptions" are :
+// - the presence of diggy macros in production code (see above)
+// - the "Flint" C code that is included in production AND diggy C-code.
