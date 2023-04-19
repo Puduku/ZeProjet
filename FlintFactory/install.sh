@@ -1,21 +1,45 @@
 #!/bin/bash
+
+trap 'echo ABORTED AT LINE=$LINENO ; exit -1' ERR
  
 Help () {
   echo "$@"
-  echo "USAGE: $0 <Flint position (directory)>
-Ret status:
- - 0: OK - installation is successful
- - 100: please check your parameters - installation not done
- - other value: unexpected problem - Flint is not properly installed"
+  echo "Operation is cancelled ; please check your parameters." 
+  echo "USAGE: $0 ( <Flint position (directory)> | --back )"
   exit 100 
 }
 
 if [ -z "$1" ]; then
   Help "Missing Flint position parameter."
 fi
-bDir="$(dirname "$0")"
-posArg="$1"
 
+typeset -r FLINT_LIST="crash-freeloader.h flags.h tid-kitchen.h types-kitchen.h crash.h flint.topo tid.h types.h" 
+typeset -r ROOT_LIST="FLINT.TXT GENESEE.TXT" 
+
+bDir="$(dirname "$0")"
+
+if [ "$1" = "--back" ]; then
+  if [ ! -f ~/.flintrc ] ;then 
+    Help "Flint environment is not installed."
+  fi
+  if [ -z "$FLINT" ] ;then 
+    . ~/.flintrc
+  fi
+  if [ -z "$FLINT" -o ! -d "$FLINT" ] ;then
+    Help "Flint is not properly installed."
+  fi
+  cd "$bDir"
+  flintInstallPosition="$PWD"
+  cd "$FLINT"
+  echo -n "Put back $FLINT modifications in $flintInstallPosition..."
+  cp $ROOT_LIST "$flintInstallPosition"
+  cd flint
+  cp $FLINT_LIST "$flintInstallPosition/flint"
+  echo "OK."
+  exit 0
+fi
+
+posArg="$1"
 
 if [ -f ~/.flintrc ] ;then 
   Help "Flint environment is already installed."
@@ -24,19 +48,22 @@ fi
 if [ -e "$posArg" ] ;then 
   Help "$posArg file or directory already exist and cannot be used as Flint position."
 fi
-
 mkdir -p "$posArg"
+if [ $? -ne 0 ] ;then
+  Help "$posArg cannot be used as Flint position."
+fi
+
 cd "$posArg"
-flintPosition=$PWD
+flintPosition="$PWD"
 cd - > /dev/null
 cd "$bDir"
 
 echo -n "Creating $flintPosition content..."
 mkdir -p "$flintPosition/flint"
 cd flint
-cp crash-freeloader.h flags.h tid-kitchen.h types-kitchen.h crash.h flint.topo tid.h types.h "$flintPosition/flint"
+cp $FLINT_LIST "$flintPosition/flint"
 cd ../
-cp FLINT.TXT GENESEE.TXT "$flintPosition"
+cp $ROOT_LIST "$flintPosition"
 echo OK.
 
 echo -n "Creating ~/.flintrc configuration file..."

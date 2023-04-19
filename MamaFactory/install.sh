@@ -1,35 +1,57 @@
 #!/bin/bash
  
+trap 'echo ABORTED AT LINE=$LINENO ; exit -1' ERR
+
 Help () {
   echo "$@"
-  echo "USAGE: $0 <mama position (directory)>
-Ret status:
- - 0: OK - installation is successful
- - 100: please check your parameters - installation not done
- - other value: unexpected problem - Mama is not properly installed"
-  exit 100
+  echo "Operation is cancelled ; please check your parameters." 
+  echo "USAGE: $0 ( <Mama position (directory)> | --back )"
+  exit 100 
 }
 
 if [ -z "$1" ]; then
   Help "Missing Mama position parameter."
 fi
+
 bDir="$(dirname "$0")"
-posArg="$1"
- 
+
+typeset -r ROOT_LIST="MAMA.TXT fritz.sh.mod hans.sh.mod der-inspector.sh.mod"
+typeset -r BIN_LIST="adolf.env der-captain.sh dummy.sh mama.env bye.env der-inspector.env katzenjammer.env \
+mama.sh der-captain.env dirks.env lena.env miss-ross.sh"
+
 if [ ! -f ~/.flintrc ] ;then
   Help "Flint is not installed."
+fi
+if [ -z "$FLINT" -o -z "$MAMA" ] ;then
+  . ~/.flintrc
 fi
 if [ -z "$FLINT" -o ! -d "$FLINT" ] ;then
   Help "Flint is not properly installed."
 fi
 
-if [ -z "$MAMA" ] ;then 
-  . ~/.flintrc
+if [ "$1" = "--back" ]; then 
+  if [ -z "$MAMA" ] ;then 
+    Help "Mama is not installed."
+  fi
+  if [ ! -d "$MAMA" ] ;then
+    Help "Mama is not properly installed."
+  fi  
+  cd "$bDir"
+  mamaInstallPosition="$PWD"
+  cd "$MAMA"
+  echo -n "Put back $MAMA modifications in $mamaInstallPosition..."
+  cp $ROOT_LIST "$mamaInstallPosition" 
+  cd bin/
+  cp $BIN_LIST "$mamaInstallPosition/bin"
+  echo "OK."
+  exit 0
 fi
+
 if [ -n "$MAMA" ] ;then 
   Help "Mama is already installed."
 fi
 
+posArg="$1"
 if [ -e "$posArg" ] ;then 
   Help "$posArg (file or) directory already exists and cannot be used as Mama position."
 fi
@@ -71,6 +93,10 @@ while [ "$REPLY" -ne "OK" ] ;do
 done
 }
 
+if [ -z "$1" ]; then
+  Help "Missing Flint position parameter."
+fi
+
 MLog "Installing Mama environment"
 
 mkdir -p "$mamaPosition/bin"
@@ -89,16 +115,16 @@ Concon () {
 Concon coco
 Concon loquet
 Concon progress
-realpath 2> /dev/null
-if [ $? -eq 127 ] ;then
+if realpath 2> /dev/null ;then
+  SLog "realpath command is directly available on platform."
+else
   SLog "realpath command is not available on platform."
   Concon realpath
 fi 
 
-cp MAMA.TXT fritz.sh.mod hans.sh.mod der-inspector.sh.mod "$mamaPosition" 
+cp $ROOT_LIST "$mamaPosition" 
 cd bin/
-cp adolf.env der-captain.sh dummy.sh mama.env bye.env der-inspector.env	katzenjammer.env \
-  mama.sh der-captain.env dirks.env lena.env miss-ross.sh "$mamaPosition/bin"
+cp $BIN_LIST "$mamaPosition/bin"
 cd ..
  
 SLog "Update ~/.flintrc Flint configuration file..."
