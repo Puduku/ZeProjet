@@ -3,7 +3,7 @@
 . mama.env
 
 #########################################################################
-plan="Valorize Prody header files' documentation (pick all COde COmments' NUTS...) 
+plan="Valorize Prody header files' documentation (pick all COde COmments' NUTS...)"
 #########################################################################
 
 . der-inspector.env
