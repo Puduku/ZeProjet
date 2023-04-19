@@ -1,32 +1,55 @@
 #!/bin/bash
  
+trap 'echo ABORTED AT LINE=$LINENO ; exit -1' ERR 
+
 Help () {
   echo "$@"
-  echo "USAGE: $0 <'working' Bongo position (directory)>
-Ret status:
- - 0: OK - post installation is successful
- - 100: please check your parameters - post installation not done
- - other value: unexpected problem - 'working' Bongo is not properly installed"
+  echo "Operation is cancelled ; please check your parameters." 
+  echo "USAGE: $0 ( <'working' Bongo position (directory)> | --back )"
   exit 100
 }
 
 if [ -z "$1" ]; then
   Help "Missing 'working' Bongo position parameter."
 fi
+
 bDir="$(dirname "$0")"
-posArg="$1"
- 
+
 if [ ! -f ~/.flintrc ] ;then
   Help "Flint is not installed."
+fi
+if [ -z "$FLINT" -o -z "$MAMA" -o -z "$BONGO" ] ;then
+  . ~/.flintrc
 fi
 if [ -z "$FLINT" -o ! -d "$FLINT" ] ;then
   Help "Flint is not properly installed."
 fi
-
-if [ -z "$MAMA" -o ! -d "$MAMA" ] ;then 
-  Help "Mame is not properly installed."
+if [ -z "$MAMA" -o ! -d "$MAMA" ] ;then
+  Help "Mama is not properly installed."
 fi
 
+
+if [ "$1" = "--back" ]; then 
+  if [ -z "$BONGO" ] ;then 
+    Help "'working' Bongo is not installed."
+  fi  
+  if [ ! -d "$BONGO" ] ;then
+    Help "'working' Bongo is not properly installed."
+  fi  
+  cd "$bDir"
+  bongoInstallPosition="$PWD"
+  cd "$BONGO"
+  echo -n "Put back $BONGO modifications in $bongoInstallPosition..."
+  find . -name "*.sh" -exec cp {} "$bongoInstallPosition/{}" \; 
+  find . -name "*.[ch]" -exec cp {} "$bongoInstallPosition/{}" \; 
+  find . -name "*.topo" -exec cp {} "$bongoInstallPosition/{}" \; 
+  find . -name "*.TXT" -exec cp {} "$bongoInstallPosition/{}" \; 
+  echo "OK."
+  exit 0
+fi
+
+posArg="$1"
+ 
 if [ -n "$BONGO" ] ;then 
   Help "'working' Bongo  is already installed."
 fi
@@ -43,11 +66,13 @@ cd "$bDir"
 
 echo "Installing 'working' Bongo"
 
+echo -n "Copying files..."
 cp -r * "$bongoPosition" 
 rm "$bongoPosition/install.sh"
 rm "$bongoPosition/README-INSTALL.TXT"
+echo "OK." 
 
-echo "Update ~/.flintrc Flint configuration file..."
+echo -n "Update ~/.flintrc Flint configuration file..."
 echo "export BONGO=\"$bongoPosition\"" >> ~/.flintrc
 echo "OK." 
 
