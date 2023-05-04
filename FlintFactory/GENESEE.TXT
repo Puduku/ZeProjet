@@ -1,6 +1,6 @@
-=============================================================================
-GENESEE - (teeny tiny) bits of tips : files and directories naming convetions
-=============================================================================
+==============================================================================
+GENESEE - (teeny tiny) bits of tips : files and directories naming conventions
+==============================================================================
 
 Notice: the following principles have been conceived for "UNIXes" family files systems. In
 particular, the principles are not applicable to "MS-DOS/Windozes" family files systems ;
@@ -141,4 +141,4 @@ environ variable.
 So, such shell scripts extension files may "cohabit" with true executables in bin/ structure 
 directories. To help distinction of "shell imports" with executables, observe the following :
 - remove 'x' permission to "shell extension" files (that permission is not necessary)  
-- use a suffix - in our case, we are used to using '.imp' or '.sh.imp' convention...
+- use a suffix - in our case, we are used to using '.imp' or '.env' convention...
