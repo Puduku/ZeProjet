@@ -17,19 +17,19 @@
 
 // Legend : (?) => relevance of the indicator is still not clear... 
 
-// a_ / s_ indicators - "address": the variable is a pointer.
-//   a_ address of "single" data ; pointer variable can only be "depointed" with '*' operator ;
+// a_ / s_ indicators - "address": the variable is a "pointer".
+//   a_ address of "single" data ; pointer variable can only be "dereferenced" with '*' operator ;
 //     typical usage : parameter modified by function
 //   s_ address of "multiple" data (i.e array) ; 
 //     pointers' arithmetic ('++', etc.) is applicable to such pointer variables (which can also
-//     be "depointed" with '[]' operator).
-//     typical usage : loop's control (or "accompanying") variable ; array passing in function
+//     be "dereferenced" with '[]' operator).
+//     typical usage : loop's control (or "accompanying") variable ; array passing in functions
 //   => Example: (to understand well, see also 'n_' indicator  below)
 //     int s_tab1[10]; // s_ indicator is here not indispensable; we see well that tab1 is an
 //     array !
-//     int sn_tab2[10]; // the 'n' is after the 's'; the nullability applies on each array item 
-//     int *ns_tab = s_tab1; // the 'n' is before the 's'; the nullability applies on the array 
-//       // variable pointer 
+//     int sn_tab2[10]; // the 'n' follows the 's'; the nullability applies on all array elements. 
+//     int *ns_tab = s_tab1; // the 'n' precedes the 's'; the nullability applies on the array
+//       // variable pointer. 
 // b_ indicator - "boolean": indicates a variable used to host a boolean value (or a function that
 //   returns a boolean value) ; reminds that:
 //   - "boolean data type" does NOT exist - and HAS NOT to be artificially defined ; boolean
@@ -82,7 +82,8 @@
 //   function of the module). The idea is to stress that this function does not correspond to
 //   real "factorization" in the code, but is only defined to reduce the size (and "cyclomatic 
 //   complexity") of the calling function...
-// m_ "pure macro" indicator. Indicates that the macro is a "pure" macro of the pre-processor.
+// m_ 1. (original meaning) : "pure macro" indicator. Indicates that the macro is a "pure" macro of
+//   the pre-processor.
 //   A pure macro can exploit without restriction all the (portable) features of the C
 //   pre-processor. Yet, pure macros, by nature, "break" the syntax of the C language...
 //   Absence of that indicator means that the macro is a "soft" (or "functional") macro,
@@ -90,6 +91,7 @@
 //   (and thus replaceable by) a function (*). Hence, a "soft" macro CANNOT break the syntax of C
 //   language. 
 //   (*) excepted side effects due to parameters expansion ; see u_ indicator
+//   2. (extended meaning) : inline function (simple discriminant with "regular" functions...)   
 // n_ / c_ indicators
 //   n_ indicator - "nullability" : the variable may take a "special value" (generally -1 or NULL)
 //     to convey the "nullability" of the value.  
