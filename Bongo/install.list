@@ -1,0 +1,6 @@
+island
+Testy/data/*
+BONGO.TXT
+:*.topo
+:*.[ch]
+:*.sh

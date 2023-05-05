@@ -1,7 +1,7 @@
 // flint/tid.h, version 1.93
 // (c) Atos-Euronext Belgium - 2001, 2002, 2003
 //
-// Purpose: provide support for plain thread id 
+// Purpose: provide support for plain threads ids 
 // =======
 
 #ifndef __FLINT_TID_H_INCLUDED__
