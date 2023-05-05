@@ -163,6 +163,9 @@
 //     (that is referenced via explicit handle)
 //     This ensures respect of clear (instanciation and) initialization / execution / destruction
 //     cycle.
+//   + pure constructors and destructors. (TODO:reddiger proprement) surtout pas de "fonctionnel" dans
+//     les constructeurs et destructeurs => focus 100% "technique" ; logique de "bourrin" !!! => toujours
+//     ret status unaire RETURNED
 //   + factories: a "factory" instance is dedicated to create "product" instances.
 //     In most cases, we do not distinguish "factory" with "product" instances as objects; the
 //     instance creation procedure is an ordinary method of the object itself.
