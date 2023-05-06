@@ -30,7 +30,7 @@ else
 fi 
 
 echo -n "Update ~/.flintrc configuration file..."
-if [ "${MAMA:?}" -ne "${PROJVAL:?}" ] -then
+if [ "${MAMA:?}" != "${PROJVAL:?}" ] ;then
   echo "FAILED: [${MAMA}] != [${PROJVAL}]" > /dev/stderr
   exit -1
 fi

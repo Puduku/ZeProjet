@@ -3,6 +3,7 @@
 #######################################################
  
 content:
+- install.env : basic installer util (bash script extension)
 - FLINT.TXT : that file
 - GENESEE.TXT : files and directories naming conventions
 - flint/ : environment for C programs

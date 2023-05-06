@@ -15,7 +15,7 @@ if [ -z "${MAMA}" ] ;then
   ReportProblem Mama "MAMA env var not set" 
 else
   if [ ! -d "${MAMA}" ] ;then
-    ReportProblem Mama "MAMA ($MAMA) location not found"
+    ReportProblem Mama "MAMA ($MAMA) position not found"
   fi
 fi   
 if [ $ret -ne 0 ] ;then
@@ -28,7 +28,7 @@ for util in coco progress loquet realpath ;do
   fi
 done
 if [ $ret -eq 0 ] ;then
-  echo "Mama is detected and configured (Location : $MAMA)."
+  echo "Mama is detected and configured (Position : $MAMA)."
 else
   exit $ret
 fi
@@ -38,9 +38,9 @@ if [ -z "${FLINT}" ] ;then
   echo "Flint is not configured (FLINT env var not set)" 
 else
   if [ -d "${FLINT}" ] ;then
-    echo "Flint is detected and configured (Location : $FLINT)."
+    echo "Flint is detected and configured (Position : $FLINT)."
   else
-    ReportProblem Flint "FLINT ($FLINT) location not found"
+    ReportProblem Flint "FLINT ($FLINT) position not found"
   fi
 fi   
 
