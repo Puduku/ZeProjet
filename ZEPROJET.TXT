@@ -22,9 +22,9 @@ remplaccer "incessamment sous peu"...
 Main pieces :
 -------------
 
-- FlintFactory/ : building elementary development environement
+- FlintBase/ : Installing Flint elementary environement
   See in particular "IMPORTANT CONVENTIONS" in Flint/GENESEE.TXT
 
-- MamaFactory/ : building your "Mama" developement environment (needs "Flint" environment)
+- MamaBase/ : Installing Mama and the Katzenjammer kids' (developement) framework (needs "Flint" environment)
 
-- Bongo/ : main development project - so-called "island"... (needs "Mama" environement)
+- BongoBase/ : Installing "Bongo" island - Katzenjammer kids' main project place... (needs "Mama" framework)
