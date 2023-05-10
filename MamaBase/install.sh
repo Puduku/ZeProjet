@@ -9,25 +9,23 @@ if [ -z "$FLINT" ] ;then
 fi
  
 typeset -r PROJVAR=MAMA
-. "$FLINT/install.env" 
 
 #PRE: in base position
 Concon () {
-  echo -n "Install $1 utility..."
+  echo -n "(Re-)Install $1 utility..."
   gcc -D_GNU_SOURCE -I$FLINT src/$1.c -o "$PROJVAL/bin/$1"
   echo "OK."
 }
 
-cd "$basePosition"
-Concon coco
-Concon loquet
-Concon progress
-if realpath 2> /dev/null ;then
-  echo "realpath command is directly available on platform."
-else
-  echo "realpath command is not available on platform (must be recompiled)."
+ExtraInstallOrUpdate () {
+  cd "$basePosition"
+  Concon coco
+  Concon loquet
+  Concon progress
   Concon realpath
-fi 
+}
+
+. "$FLINT/install.env" 
 
 echo -n "Update ~/.flintrc configuration file..."
 if [ "${MAMA:?}" != "${PROJVAL:?}" ] ;then
@@ -37,7 +35,7 @@ fi
 echo "export PATH=\"\$PATH:\$MAMA/bin\"" >> ~/.flintrc
 echo "OK." 
 
-echo -n "Verification..."
+echo -n "Final verification..."
 . ~/.flintrc
 miss-ross.sh
 if [ $? -ne 0 ] ;then
