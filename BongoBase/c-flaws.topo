@@ -11,17 +11,17 @@
 //   "miracle": acceptable software quality is reacheable with C programming, but remains laborious
 //   to achieve; as soon as we release our efforts and are not careful enough - or too
 //   overconfident, C-code "quality" degenerates very quickly... 
-// - Finding a more adequate, up to par, language and getting rid of C for good would be certainly a
-//   big progress in software industry... if and only if we FIRST carefully identify what is exact
-//   responsiblity of C in the "SHIT" of C programs - and do NOT UNDERESTIMATE our OWN part in that
-//   SHIT.
-//   That is: 
-//   + Just switching to whatever "brand new" language will NEVER improve the situation. 
-//   + We must deeply QUESTION our own programming as well as the language itself.  
-//   Only in this way can we hope for real PROGRESS - and avoid the everlasting FIASCOS of the C++ genre...
-//   In brief, if we sincerely want to move ahead, whatever you are "conservative" (keeping C) or
-//   "innovative" (throwing C away), we must first point out C's real flaws...   
-// Note: portability problems are marked with (P)
+// - Finding a more adequate language, up to par, and getting rid of C for good would certainly be a
+//   great progress in the software industry... if and only if we first carefully identify what is
+//   correct C's responsibility in the "SHIT" of C programs - and DON'T UNDERESTIMATE our own role
+//   as programmers in this shit.
+//   That's to say:
+//   + Simply switching to a "brand new" language will NEVER improve the situation.
+//   + We must deeply QUESTION our own programming as well as the language itself.
+//   Only then can we hope for real PROGRESS - and avoid the eternal FIASCOS of the C++ genre...
+// In short, if we sincerely want to move forward, whether we are "conservative" (keep C) or
+// "innovative" (throwing C), we must first point out the real flaws of C...
+// Note: Portability issues are marked with (P)
 
 // Number 10: impossibility to specify directly the values of the fields of a 'struct' parameter in
 // the function calls.
