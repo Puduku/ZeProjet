@@ -203,8 +203,8 @@
 // totally unreadable... 
 
 
-// Number 0: Desesperatly poor makeup of many standard C libraries (string handling, etc...) => rather dishonest argument
-// (against the C LANGUAGE) C++ bigots.
+// Number 0: Desesperatly poor makeup of many standard C libraries (string handling, etc...) => rather
+// dishonest argument (against the C LANGUAGE) C++ bigots.
 
 
 // Number -1: '\0'-terminated strings convention (inheritance from 8-bits CPUs assemblers ?) 
