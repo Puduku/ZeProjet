@@ -1,6 +1,6 @@
 // watermarks.topo, version 1.93
 // (c) Atos-Euronext Belgium - 2001, 2002, 2003
-//
+// (c) Puduku - 2023
 
 // "Watermark" indicators
 // ======================
@@ -50,8 +50,7 @@
 //   expected.   
 //   When used in function parameter, indicates that the function "expects" that the lifespan 
 //   of the that parameter (more precisely the resource pointed by the parameter) is not limited
-//   to that function call, and will be used further. In most cases, such parameter should even 
-//   NOT be directly used by the the function (is thus dedicated for further usage...)    
+//   to that function call, and will be used "later".    
 //   => Example :
 //   // fp_name: this string must remain available till "Brol" is destroyed 
 //   int InitBrol (BROL brol, const char *fp_name ,...) ;
