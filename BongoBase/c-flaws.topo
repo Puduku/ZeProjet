@@ -1,5 +1,6 @@
 // c-flaws.topo version 1.93
 // (c) Atos-Euronext Belgium - 2001, 2002, 2003
+// (c) Puduku - 2023
 
 // "Top ten (+ two)" C's REAL flaws
 // ================================
@@ -215,8 +216,8 @@
 // and efficient. In specific cases (that is: 'early' programs developped in the 70's, device
 // drivers, embedded apps for 'IoT' and so on), this representation is indeed, by far, the most
 // effective one can imagine. 
-// Unfortunately, there is a huge DRAWBACK: that representation become unmanageable as long as we
-// have to manipulate PORTIONS of such strings... 
+// Unfortunately, there is a huge DRAWBACK: that representation just does NOT allow to manipulate
+// PORTIONS of such strings... 
 
 
 // Moralited:
