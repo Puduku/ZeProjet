@@ -203,19 +203,18 @@
 // totally unreadable... 
 
 
-// Number 0: Mediocrity of standard C libraries (strings management, etc...) => quite dishonest argument 
-// (against C LANGUAGE) of C++ bigots.
+// Number 0: Poor makeup of many standard C libraries (string handling, etc...) => rather dishonest argument
+// (against the C LANGUAGE) C++ bigots.
 
 
 // Number -1: '\0'-terminated strings convention (inheritance from 8-bits CPUs assemblers ?) 
-// Practical issue in a nutshell: crappy strings representation => crappy "strings"-related
-// libraries APIs (<string.h>, etc.) => crappy code related to strings manipulations => crappy code
-// of C applications "in general"...  
-// '\0'-terminated strings convention is fairly accepted by programmers because it seems so simple
-// and efficient. In specific cases (that is: 'early' programs developped in the 70's, device
-// drivers, embedded apps for 'IoT' and so on), this representation is indeed, by far, the most
-// effective one can imagine. 
-// Unfortunately, there is a huge DRAWBACK: that representation just does NOT allow to manipulate
+// Practical problem in brief: crappy representation of strings => crappy code and functions manipulating
+// strings => presence of a lot of crappy code in C programs "in general"...
+// The convention of strings terminated with '\0' is quite well accepted by programmers because it seems
+// so simple and efficient. In specific cases - "early" programs developed in the 70s (as with my videopac
+// toy "computer" from the year 1978), device drivers, etc., this representation is indeed, by far, the most
+// effective one can imagine...
+// ...Unfortunately, there is a huge DRAWBACK: that representation just does NOT allow to manipulate
 // PORTIONS of such strings... 
 
 
