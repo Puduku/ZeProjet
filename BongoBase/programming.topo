@@ -192,6 +192,7 @@
 //       is that formally, we do have encapsulation - the responsibilities of CO and SO are clearly
 //       separated in the code...
 //
+// - data value type vs. data content type TODO : reddiger blabla...
 // - green items and collections:
 //   The green item is an intermediate concept of compound data between the bare struct-based data
 //   and the encapsulated data (in "object instance") (*)
