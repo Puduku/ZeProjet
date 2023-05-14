@@ -1,5 +1,6 @@
 // flint/flags.h, version 1.93
 // (c) Atos-Euronext Belgium - 2001, 2002, 2003
+// (c) Puduku - 2023
 //
 // Purpose: flags "management" ...
 // =======
