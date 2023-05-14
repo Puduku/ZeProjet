@@ -8,7 +8,8 @@
 #define __FLINT_TYPES_H_INCLUDED__
 
 
-#include "flint/types-kitchen.h"
+#include "flint/images.h"
+#include "flint/ct-asserts.h"
 #include <stdlib.h>
 
 
@@ -32,29 +33,7 @@
 #define b_TRUE  (!b_FALSE0)
 
 
-// 2. Checks at "Compile time" (CT) 
-// --------------------------------
-
-// Verify assertion at "Compile Time"... 
-// 
-// Passed:
-// - u_assertion: (once evaluated) assertion to verify 
-#define m_CT_ASSERT(u_assertion) m_K_CT_ASSERT(__LINE__,u_assertion)
-
-// See https://stackoverflow.com/questions/6280055/how-do-i-check-if-a-variable-is-of-a-certain-type-compare-two-types-in-c
-// Check at compile time that some value is of a particular type.
-//
-// Passed: 
-// - m_type: expected value type
-// - p_val: some value 
-#define m_CT_CHECK_VAL_TYPE(m_type,p_val) {\
-  m_type em_dummyVar1; \
-  typeof(p_val) em_dummyVar2; \
-  (void)(&em_dummyVar1 == &em_dummyVar2); \
-}
-
-
-// 3. Generic integers
+// 2. Generic integers
 // ------------------- 
 
 // Use that int type to transport safely common integers via "void *"
@@ -65,7 +44,7 @@ typedef long GENERIC_INTEGER ;
 m_CT_ASSERT(sizeof(GENERIC_INTEGER)==sizeof(void *))
 
 
-// 4. Safe casts
+// 3. Safe casts
 // -------------
 
 // "Safe" assignation between pointers (seen as "data addresses") requiring a "cast" operation,
@@ -89,103 +68,7 @@ m_lPtrType mep_lPtr = (m_lPtrType) p_rPtr;
 // TODO: #define EP_PTR__SAFE_CAST(m_epPtrType,  p_ptr)
 
 
-// 5. Image functions (for enums...)
-// ------------------
-
-// #REF Enum-type-image-function
-// static inline const char* <Enum type image function name>(int value)
- 
-// Simple macro to define unary enum types with their image function...
-//
-// Passed: 
-// - m_enumImageInlineFunction: 
-// - m_case1:
-// - m_val1:
-#define m_DEFINE_UNARY_ENUM(m_enumImageInlineFunction, m_case1, m_val1) \
-enum {\
-  m_case1 m_val1,\
-} ;\
-static inline const char* m_enumImageInlineFunction(int value) {\
-  m_ENUM_IMAGE_FUNCTION__OUTSET(value)\
-  m_ENUM_IMAGE_FUNCTION__BODY_CASE(m_case1)\
-  m_ENUM_IMAGE_FUNCTION__BUTT()\
-} 
-
-// Simple macro to define binary enum types with their image function...
-//
-// Passed: 
-// - m_enumImageInlineFunction:
-// - m_case1:
-// - m_val1:
-// - m_case2:
-// - m_val2:
-#define m_DEFINE_BINARY_ENUM(m_enumImageInlineFunction, m_case1, m_val1, \
-  m_case2, m_val2) \
-enum {\
-  m_case1 m_val1,\
-  m_case2 m_val2,\
-} ;\
-static inline const char* m_enumImageInlineFunction(int value) {\
-  m_ENUM_IMAGE_FUNCTION__OUTSET(value)\
-  m_ENUM_IMAGE_FUNCTION__BODY_CASE(m_case1)\
-  m_ENUM_IMAGE_FUNCTION__BODY_CASE(m_case2)\
-  m_ENUM_IMAGE_FUNCTION__BUTT()\
-} 
-
-// Simple macro to define ternary enum types with their image function...
-//
-// Passed: 
-// - m_enumImageInlineFunction:
-// - m_case1:
-// - m_val1:
-// - m_case2:
-// - m_val2:
-// - m_case3:
-// - m_val3:
-#define m_DEFINE_TERNARY_ENUM(m_enumImageInlineFunction, m_case1, m_val1, \
-  m_case2, m_val2, m_case3, m_val3) \
-enum {\
-  m_case1 m_val1,\
-  m_case2 m_val2,\
-  m_case3 m_val3,\
-} ;\
-static inline const char* m_enumImageInlineFunction(int value) {\
-  m_ENUM_IMAGE_FUNCTION__OUTSET(value)\
-  m_ENUM_IMAGE_FUNCTION__BODY_CASE(m_case1)\
-  m_ENUM_IMAGE_FUNCTION__BODY_CASE(m_case2)\
-  m_ENUM_IMAGE_FUNCTION__BODY_CASE(m_case3)\
-  m_ENUM_IMAGE_FUNCTION__BUTT()\
-} 
-
-// Simple macro to define quaternary enum types with their image function...
-//
-// Passed: 
-// - m_enumImageInlineFunction:
-// - m_case1:
-// - m_val1:
-// - m_case2:
-// - m_val2:
-// - m_case3:
-// - m_val3:
-#define m_DEFINE_QUATERNARY_ENUM(m_enumImageInlineFunction, m_case1, m_val1, \
-  m_case2, m_val2, m_case3, m_val3, m_case4, m_val4) \
-enum {\
-  m_case1 m_val1,\
-  m_case2 m_val2,\
-  m_case3 m_val3,\
-  m_case4 m_val4,\
-} ;\
-static inline const char* m_enumImageInlineFunction(int value) {\
-  m_ENUM_IMAGE_FUNCTION__OUTSET(value)\
-  m_ENUM_IMAGE_FUNCTION__BODY_CASE(m_case1)\
-  m_ENUM_IMAGE_FUNCTION__BODY_CASE(m_case2)\
-  m_ENUM_IMAGE_FUNCTION__BODY_CASE(m_case3)\
-  m_ENUM_IMAGE_FUNCTION__BODY_CASE(m_case4)\
-  m_ENUM_IMAGE_FUNCTION__BUTT()\
-} 
-
-
-// 6. Basic enums
+// 4. Basic enums
 // -------------- 
 
 // Programs' exit status
