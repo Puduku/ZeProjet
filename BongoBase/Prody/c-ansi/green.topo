@@ -26,8 +26,8 @@
 //   - "disengaged" => (initial state after ZEROIZATION) "instanced" WITHOUT associated memory 
 //     (or resource) to free
 //   - "engaged" => specific disengaging actions required BEFORE destroying the instance 
-// => a green instance is naturally referenced with an "handle" - we rather call a "stuff", that
-//.   is a pointer to the instance's area in memory. 
+// => a green instance is naturally referenced with an "handle" - we rather call a "stuff", that 
+//    is a pointer to the instance's area in memory. 
 // => Since we explicitly forbid the "0 instance size" corner case, a "green" handle is necessarily
 //    distinct of the technical "NULL pointer" - which is thus usable to represent (semantic) "special"
 //    or "sentinel" values... 
