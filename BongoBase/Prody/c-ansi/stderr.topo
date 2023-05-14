@@ -15,7 +15,7 @@
 //  
 // PRACTICAL anomaly tracking: (see also in c-ansi/types.topo for the concept of "procedures" and
 // "pure functions") 
-// The practical technique we have chosen for tracking anomalies consists in breaking the "normal"
+// The practical technique we chose for tracking anomalies consists in breaking the "normal"
 // CONTROL FLOW and returning (recursively till application's main function) a "sentinel" value 
 // (typically: -1). 
 // Anomaly tracking is perfectly natural with "procedures". 
