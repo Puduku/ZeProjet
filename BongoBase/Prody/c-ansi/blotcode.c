@@ -686,7 +686,7 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
     // Stage 1: Locate new blotinst "sequence" 
 
     m_ASSIGN_C_STRING_PORTION(token, "##<<") 
-    m_GET_STRING_PORTION_LENGTH(token,tokenLength)
+    tokenLength = m_StringPortionLength(&token);
     m_PARSE_TILL_MATCH(fp_template,token,NULL,  &decor);
     if (!b_EMPTY_STRING_PORTION(decor)) {
       v_templatePartitionEntry = GreenCollectionFetch(handle->h_templatePartitionsHandle, -1,
@@ -700,7 +700,7 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
     m_PARSE_OFFSET(fp_template,tokenLength, NULL);
 
     m_ASSIGN_C_STRING_PORTION(token, ">>")
-    m_GET_STRING_PORTION_LENGTH(token,tokenLength)
+    tokenLength = m_StringPortionLength(&token);
     m_PARSE_TILL_MATCH(fp_template,token,NULL, &blotinstSequence);
     if (b_EMPTY_STRING_PORTION(fp_template)) { // ending ">>" not located 
       m_REPORT_ERROR(NULL,"Missing " DELIMITOR__FMT_STRING_PORTION, m_STRING_PORTION_2_FMT_ARGS(token))

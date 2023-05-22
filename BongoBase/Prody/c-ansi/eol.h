@@ -66,11 +66,11 @@ typedef struct LINE_DELIMITOR* LINE_DELIMITOR_STUFF;
 // - m_lineDelimitor:
 // 
 // Changed:
-// - physicalLength:
+// - m_physicalLength:
 #define m_GET_LINE_DELIMITOR_PHYSICAL_LENGTH(/*struct LINE_DELIMITOR*/m_lineDelimitor,\
-  /*int*/physicalLength) {\
-  m_GET_STRING_PORTION_LENGTH((m_lineDelimitor).practicalLine,physicalLength)\
-  (physicalLength) += (m_lineDelimitor).eolLength;\
+  /*int*/m_physicalLength) {\
+  m_physicalLength = m_StringPortionLength(&(m_lineDelimitor).practicalLine);\
+  (m_physicalLength) += (m_lineDelimitor).eolLength;\
 }
 
 // "LINES PARTITION" :

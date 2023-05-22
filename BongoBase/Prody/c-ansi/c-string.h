@@ -150,17 +150,6 @@ static inline int m_StringPortionLength(const struct STRING_PORTION *ap_stringPo
 #define b_EMPTY_STRING_PORTION(/*const struct STRING_PORTION*/p_stringPortion) \
   (m_StringPortionLength(&(p_stringPortion)) <= 0)
 
-// Get length of a string portion  
-// TODO: ag virer ???
-//
-// Passed:
-// - p_stringPortion: 
-// 
-// Changed:
-// - m_length: (ALWAYS >= 0)
-#define m_GET_STRING_PORTION_LENGTH(/*const struct STRING_PORTION*/p_stringPortion, m_length) {\
-  m_ASSERT( ((m_length) = m_StringPortionLength(&(p_stringPortion))) >= 0 ) \
-}
 
 // Provide buffer / length function parameters corresponding to string portion.
 // 
@@ -212,29 +201,13 @@ int VerifyCStringPortion(struct STRING_PORTION *a_stringPortion);
   ((srcStringPortionLength) + 1) 
 
 
-// Establish the optimal size for destination string buffer in string copy operation. 
-// 
-// Passed:
-// - p_srcStringPortion : 'string' source string #SEE struct-STRING_PORTION 
-//
-// Changed:
-// - m_optimalBufferSize: optimal buffer size (> 0)
-// TODO: replace with m_OptimalBufferSize4StringPortionCopy()
-#define m_GET_OPTIMAL_BUFFER_SIZE_4_STRING_PORTION_COPY(\
-  /*const struct STRING_PORTION*/p_srcStringPortion, /*int*/m_optimalBufferSize) {\
-  (m_optimalBufferSize) = OPTIMAL_BUFFER_SIZE_4_STRING_PORTION_COPY(m_StringPortionLength(\
-    &(p_srcStringPortion))) ;\
-  m_ASSERT((m_optimalBufferSize) > 0)\
-}
-
-
 // Same purpose as standard "strcpy" function, except that this function takes care never to
 // overflow the target string.
 //
 // Passed:
 // - dstRawString : target string (buffer address)
 // - dstBufferSize : target string's buffer size; > 0 (CANNOT be == 0) ; see 
-//   m_GET_OPTIMAL_BUFFER_SIZE_4_STRING_PORTION_COPY() macro above.
+//   OPTIMAL_BUFFER_SIZE_4_STRING_PORTION_COPY() macro above.
 // - ap_srcStringPortion : source string portion 
 //
 // Modified:
@@ -533,8 +506,8 @@ int ParanoidConvertStringPortion(struct STRING_PORTION *aep_stringPortion, char 
 #define m_HIJACK_STRING_PORTION(/*struct STRING_PORTION*/m_stringPortion) \
   char emc_localString_ ## m_stringPortion [LOCAL_STRING_AUTO_BUFFER_SIZE] ;\
   char *emnh_heapString_ ## m_stringPortion = NULL;\
-  int em_requiredBufferSize = UNDEFINED;\
-  m_GET_OPTIMAL_BUFFER_SIZE_4_STRING_PORTION_COPY(m_stringPortion,em_requiredBufferSize) \
+  int em_requiredBufferSize = OPTIMAL_BUFFER_SIZE_4_STRING_PORTION_COPY(m_StringPortionLength(\
+    &(m_stringPortion))); \
   char* emep_string = (char*)UNDEFINED; \
   if (em_requiredBufferSize > LOCAL_STRING_AUTO_BUFFER_SIZE) {\
     m_MALLOC(emep_string = emnh_heapString_ ## m_stringPortion,  em_requiredBufferSize)\

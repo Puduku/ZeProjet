@@ -167,7 +167,7 @@ static int CheckReadFtpCommandStatus (void * r_virtualHandle,
 
   if (n_lastLineDelimitorStuff != NULL) {
     int practicalLength = UNDEFINED;
-    m_GET_STRING_PORTION_LENGTH(n_lastLineDelimitorStuff->practicalLine,practicalLength)
+    practicalLength = m_StringPortionLength(&n_lastLineDelimitorStuff->practicalLine);
     if (practicalLength >= 4 && isdigit(n_lastLineDelimitorStuff->practicalLine.string[0]) && 
       isdigit(n_lastLineDelimitorStuff->practicalLine.string[1]) && 
       isdigit(n_lastLineDelimitorStuff->practicalLine.string[2]) &&
