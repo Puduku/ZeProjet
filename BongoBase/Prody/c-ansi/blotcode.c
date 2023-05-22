@@ -234,8 +234,8 @@ int BlotcodeCreateInstance (BLOTCODE_HANDLE *azh_handle) {
   BLOTCODE_HANDLE handle = *azh_handle;
 
   m_TRACK_IF(G_STRINGS_CREATE_INSTANCE(&handle->h_blotkeywsHandle, BLOTKEYW_IDS_NUMBER) != RETURNED)
-  m_ASSERT(G_STRINGS_ADD_INDEX(handle->h_blotkeywsHandle, STRING__G_KEYS_COMPARISON, NULL, NULL,
-    (STRING_PORTION_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED)
+  m_ASSERT(G_STRINGS_ADD_INDEX(handle->h_blotkeywsHandle, STRING_PORTION__G_KEYS_COMPARISON, NULL,
+    NULL, (STRING_PORTION_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED)
     == INDEX_LABEL0)
   m_G_STRINGS_IMPORT_TOKENS(handle->h_blotkeywsHandle, p_blotkeywsTokenDefinitions,
     BLOTKEYW_IDS_NUMBER)
@@ -270,7 +270,7 @@ static int BlotcodeFindBlotkeyw (BLOTCODE_HANDLE p_handle,
   G_STRING_STUFF t_blotkeywStuff = (G_STRING_STUFF) UNDEFINED;
 
   struct G_KEY gKey;
-  m_ASSIGN_G_KEY__STRING(gKey, *ap_litteralKeyw); 
+  m_ASSIGN_G_KEY__STRING_PORTION(gKey, *ap_litteralKeyw); 
 
   int result = G_STRINGS_INDEX_FETCH(p_handle->h_blotkeywsHandle,  indexIteratorAutomaticBuffer,
     INDEX_LABEL0,  INDEX_FETCH__READ_ONLY, INDEX_SEEK__KEY,  &t_blotkeywStuff,

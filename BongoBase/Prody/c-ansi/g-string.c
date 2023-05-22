@@ -18,17 +18,23 @@
 // ========
 
 
-// #SEE Not-copied-Empty-Equivalence @ c-ansi/g-string.h
+// Ensure presence of "physical" buffer 
 // POST: stuff in copied state
-#define m_G_STRING_SET_INITIAL_BUFFER(/*G_STRING_STUFF*/stuff, /*int*/optimalInitialGStringBufferSize) {\
-  if (stuff->nh_string == NULL) {\
-    m_MALLOC((stuff)->nh_string, (stuff)->c_bufferSize = (optimalInitialGStringBufferSize))\
-    stuff->nh_string[0] = '\0';\
-    stuff->c_copiedLength = 0;\
+// POST: stuff's "logical" value NOT changed
+#define m_G_STRING_SET_INITIAL_BUFFER(/*G_STRING_STUFF*/stuff, /*int*/u_minimalInitialBufferSize) {\
+  if (stuff->nhi_string == NULL) {\
+    int em_initialBufferSize = u_minimalInitialBufferSize; \
+    int em_stringPortionLength = m_StringPortionLength(&stuff->cv_stringPortion);\
+    if (em_initialBufferSize < OPTIMAL_BUFFER_SIZE_4_STRING_PORTION_COPY(em_stringPortionLength)) \
+      em_initialBufferSize = OPTIMAL_BUFFER_SIZE_4_STRING_PORTION_COPY(em_stringPortionLength);\
+    m_MALLOC((stuff)->nhi_string, (stuff)->c_bufferSize = em_initialBufferSize)\
+    stuff->c_copiedLength = CopyStringPortion(stuff->nhi_string,(stuff)->c_bufferSize,\
+      &(stuff)->cv_stringPortion);\
+    m_TRACK_IF(stuff->c_copiedLength < 0) \
   } \
 }
 
-// PRE: stuff in copied state
+// PRE: stuff in copied state (implies "logical" value == "physical" value)
 // POST: offset is adjusted (mn_offset >= 0)
 #define m_G_STRING_ADJUST_COPY_OFFSET(/*G_STRING_STUFF*/stuff,mn_offset) {\
   if (mn_offset == -1 || mn_offset > (stuff)->c_copiedLength) {\
@@ -41,30 +47,43 @@
 int GStringCopy(G_STRING_STUFF stuff, int n_offset, const struct STRING_PORTION *ap_stringPortion) {
   m_DIGGY_BOLLARD()
 
-  int optimalInitialBufferSize = UNDEFINED;
-  m_GET_OPTIMAL_BUFFER_SIZE_4_STRING_PORTION_COPY(*ap_stringPortion,optimalInitialBufferSize)
-  m_G_STRING_SET_INITIAL_BUFFER(stuff, optimalInitialBufferSize)
+  int requiredBufferSize = OPTIMAL_BUFFER_SIZE_4_STRING_PORTION_COPY(m_StringPortionLength(
+    ap_stringPortion));
+  m_G_STRING_SET_INITIAL_BUFFER(stuff, requiredBufferSize)
   m_G_STRING_ADJUST_COPY_OFFSET(stuff,n_offset) 
-  int em_requiredBufferSize = (n_offset) + optimalInitialBufferSize;
-  if (em_requiredBufferSize >= stuff->c_bufferSize) {
-    m_REALLOC(stuff->nh_string, stuff->c_bufferSize = (em_requiredBufferSize))
+  requiredBufferSize += n_offset;
+  if (requiredBufferSize >= stuff->c_bufferSize) {
+    m_REALLOC(stuff->nhi_string, stuff->c_bufferSize = requiredBufferSize)
   } 
-  stuff->c_copiedLength = CopyStringPortion(stuff->nh_string + (n_offset),
+  stuff->c_copiedLength = CopyStringPortion(stuff->nhi_string + (n_offset),
     stuff->c_bufferSize - (n_offset),  ap_stringPortion) + (n_offset);
 
-  m_ASSIGN_STRING_PORTION(stuff->stringPortion,stuff->nh_string,stuff->c_copiedLength)
+  m_ASSIGN_STRING_PORTION(stuff->cv_stringPortion,stuff->nhi_string,stuff->c_copiedLength)
 
   m_DIGGY_RETURN(stuff->c_copiedLength)
-} // GStringCCopy
+} // GStringCopy
 
+// Public function : see .h
+int GStringImport(G_STRING_STUFF stuff, int tokenId, const struct STRING_PORTION *afp_stringPortion) {
+  m_DIGGY_BOLLARD()
+  
+  stuff->tokenId = tokenId;
+  if (stuff->nhi_string == NULL) {
+    stuff->cv_stringPortion = *afp_stringPortion;
+    m_DIGGY_RETURN(COMPLETED__OK)
+  } // if
+  int ret = GStringCopy(stuff,0,afp_stringPortion);
+  m_TRACK_IF(ret < 0) 
+  m_DIGGY_RETURN(COMPLETED__BUT)
+} // GStringImport
 
-#define PRINTF_OPTIMAL_INITIAL_G_STRING_BUFFER_SIZE 8
+#define PRINTF_MINIMAL_INITIAL_G_STRING_BUFFER_SIZE 8
 
 // Public function : see .h
 int GStringPrintf(G_STRING_STUFF stuff,  int n_offset,  const char *p_format, ...) {
   m_DIGGY_BOLLARD()
 
-  m_G_STRING_SET_INITIAL_BUFFER(stuff,PRINTF_OPTIMAL_INITIAL_G_STRING_BUFFER_SIZE)
+  m_G_STRING_SET_INITIAL_BUFFER(stuff,PRINTF_MINIMAL_INITIAL_G_STRING_BUFFER_SIZE)
   m_G_STRING_ADJUST_COPY_OFFSET(stuff,n_offset)
 
   int ret = -1 ;
@@ -72,11 +91,11 @@ int GStringPrintf(G_STRING_STUFF stuff,  int n_offset,  const char *p_format, ..
   for (; try == 1 || ret >= stuff->c_bufferSize - n_offset; try++) {
     m_ASSERT(try <= 2)
     if (try == 2) {
-      m_REALLOC(stuff->nh_string, stuff->c_bufferSize = ret + n_offset + 1)
+      m_REALLOC(stuff->nhi_string, stuff->c_bufferSize = ret + n_offset + 1)
     } // if
     { va_list arguments;
       va_start(arguments,p_format);
-      ret = vsnprintf(stuff->nh_string + n_offset,stuff->c_bufferSize - n_offset,
+      ret = vsnprintf(stuff->nhi_string + n_offset,stuff->c_bufferSize - n_offset,
         p_format,arguments);
       va_end(arguments);
     } // arguments
@@ -84,7 +103,7 @@ int GStringPrintf(G_STRING_STUFF stuff,  int n_offset,  const char *p_format, ..
   } // for
   stuff->c_copiedLength = n_offset + ret;
 
-  m_ASSIGN_STRING_PORTION(stuff->stringPortion,stuff->nh_string,stuff->c_copiedLength)
+  m_ASSIGN_STRING_PORTION(stuff->cv_stringPortion,stuff->nhi_string,stuff->c_copiedLength)
   m_DIGGY_RETURN(stuff->c_copiedLength)
 } // GStringPrintf
 
@@ -94,12 +113,11 @@ int GStringConvert(G_STRING_STUFF stuff,  IS_CHAR_FUNCTION n_isNeutralCharFuncti
   TO_CHAR_FUNCTION toCharFunction) {
   m_DIGGY_BOLLARD()
 
-  m_ASSIGN_LOCAL_STRING_PORTION__G_STRING(stringPortion,stuff)
-  stuff->c_copiedLength = ConvertStringPortion(&stringPortion,b_C_TERMINATED,
+  m_G_STRING_SET_INITIAL_BUFFER(stuff, 1)
+  stuff->c_copiedLength = ConvertStringPortion(&stuff->cv_stringPortion,b_C_TERMINATED,
     n_isNeutralCharFunction,toCharFunction);
   m_TRACK_IF(stuff->c_copiedLength < 0) 
   m_ASSERT(stuff->c_copiedLength < stuff->c_bufferSize) 
-  m_ASSIGN_STRING_PORTION(stuff->stringPortion,stuff->nh_string,stuff->c_copiedLength)
   m_DIGGY_RETURN(stuff->c_copiedLength);
 } // GStringConvert
 
@@ -124,9 +142,9 @@ static int GStringSetDisengage(G_STRING_SET_STUFF stuff,  int cardinality) {
   int i = 0;
 
   for (; i < cardinality; i++, stuff++) {
-    if (stuff->nh_string != NULL) {
-      free(stuff->nh_string) ;
-      stuff->nh_string = NULL;
+    if (stuff->nhi_string != NULL) {
+      free(stuff->nhi_string) ;
+      stuff->nhi_string = NULL;
     } // if
   } // for
 
@@ -153,7 +171,7 @@ struct KEY_SETTINGS {
   int gStringSetElement;
   int gKeysComparison;
 // TODO: union
-  // Only significant with STRING__G_KEYS_COMPARISON:
+  // Only significant with STRING_PORTION__G_KEYS_COMPARISON:
   IS_CHAR_FUNCTION cn_isNeutralCharFunction;
   TO_CHAR_FUNCTION cn_toCharFunction;
   // Only significant with VALUE__G_KEYS_COMPARISON:
@@ -199,6 +217,28 @@ static int GStringsDisengage(void *r_handle,  char *r_greenItemStuff) {
   m_bareGKey = ap_gKey->bare;\
 } 
 
+// Passed:
+// - m_bareGKey:
+// - m_gKeysComparison:
+// - ap_gKey:
+#define m_ASSIGN_BARE_G_KEY__G_STRING(/*union BARE_G_KEY*/m_bareGKey, /*int*/gKeysComparison,\
+  /*G_STRING_STUFF*/ p_gStringStuff,\
+  /*STRING_PORTION_VALUE_FUNCTION*/c_stringPortionValueFunction,\
+  /*void* */c_stringPortionValueFunctionHandle) {\
+  switch (gKeysComparison) {\
+  case STRING_PORTION__G_KEYS_COMPARISON: \
+    (m_bareGKey).cp_stringPortion = (p_gStringStuff)->cv_stringPortion;\
+  break; case TOKEN_ID__G_KEYS_COMPARISON:\
+    (m_bareGKey).c_tokenId = (p_gStringStuff)->tokenId;\
+  break; case VALUE__G_KEYS_COMPARISON:\
+    (m_bareGKey).c_value = (c_stringPortionValueFunction)\
+      (c_stringPortionValueFunctionHandle,&(p_gStringStuff)->cv_stringPortion);\
+  break; default:\
+    m_RAISE(ANOMALY__VALUE__FMT_D,gKeysComparison)\
+  }\
+}
+
+
 // #SEE GREEN_ITEM_HANDLER__KEYS_COMPARE_FUNCTION @ c-ansi/green.h
 static int GStringsKeysCompare(void *cpr_handle,  char b_frozen, int indexLabel,  int keyRank,
   char *pr_aGreenItemStuff,  char *npr_bGreenItemStuff,  void *cpr_bKeys) {
@@ -238,7 +278,7 @@ static int GStringsKeysCompare(void *cpr_handle,  char b_frozen, int indexLabel,
   // Compare bare keys:
   int comparison = UNDEFINED;
   switch (ap_keySettings->gKeysComparison) {
-  case STRING__G_KEYS_COMPARISON:
+  case STRING_PORTION__G_KEYS_COMPARISON:
 m_DIGGY_INFO("aBareGKey.cp_stringPortion.string=[%s] bBareGKey.cp_stringPortion.string=[%s]",
 aBareGKey.cp_stringPortion.string,bBareGKey.cp_stringPortion.string)
 m_DIGGY_INFO("ap_keySettings->cn_isNeutralCharFunction=%p, ap_keySettings->cn_toCharFunction=%p toupper=%p",

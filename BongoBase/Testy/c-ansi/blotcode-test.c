@@ -136,10 +136,10 @@ m_DIGGY_VAR_GEN(p_template,s)
     m_TRACK_IF(blotcodeConstructionStatus < 0)
     m_ASSERT(blotcodeConstructionStatus == c_expectedBlotcodeConstructionStatus)
     if (blotcodeConstructionStatus == BLOTCODE_CONSTRUCTION_STATUS__OK) {
-m_DIGGY_VAR_STRING(outputGStringStuff->nh_string)
+m_DIGGY_VAR_STRING(outputGStringStuff->nhi_string)
 m_DIGGY_VAR_STRING(ccp_expectedOutput)
       m_ASSERT(outputGStringStuff->c_copiedLength == strlen(ccp_expectedOutput));
-      m_ASSERT(strcmp(outputGStringStuff->nh_string,ccp_expectedOutput) == 0);
+      m_ASSERT(strcmp(outputGStringStuff->nhi_string,ccp_expectedOutput) == 0);
     } // if
   } // if
 

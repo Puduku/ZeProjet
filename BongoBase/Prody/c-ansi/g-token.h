@@ -31,8 +31,14 @@ struct TOKEN_DEFINITION {
   int entry = UNDEFINED;\
   for (; i < tokensNumber; i++) {\
     m_TRACK_IF((entry = GStringsFetch(handle,-1,&gStringStuff)) < 0);\
-    m_G_STRING_C_IMPORT(gStringStuff,  mp_tokenDefinitions[i].tokenId,\
-      mp_tokenDefinitions[i].p_litteral)\
+    switch (m_GStringCImport(gStringStuff, mp_tokenDefinitions[i].tokenId,\
+      mp_tokenDefinitions[i].p_litteral)) {\
+    case COMPLETED__OK: \
+    break; case COMPLETED__BUT: \
+      m_RAISE(ANOMALY__NON_PURE_LOGICAL_G_STRING)\
+    break; default: \
+      m_TRACK()\
+    }\
   } \
 } 
 

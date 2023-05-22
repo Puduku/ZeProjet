@@ -18,38 +18,37 @@
 // structure of g-string instance (GREEN item) :
 struct G_STRING { // #REF struct-G_STRING
   // GREEN conventions for g-string:
-  // "disengaged" state <=> nh_string == NULL
-  // "engaged" state (also called "copied" state) <=> nh_string != NULL
-  char *nh_string; // ALWAYS '\0'-terminated string (when "copied")
+  // "disengaged" state <=> nhi_string == NULL
+  // "engaged" state (also called "copied" state) <=> nhi_string != NULL
+  char *nhi_string; // ALWAYS '\0'-terminated string (when "copied")
   int c_bufferSize; // only significant in "copied" (alias "engaged") state (>= 1)
   int c_copiedLength; // idem ; (>= 0) ACTUAL string length (NOT taking into account ending '\0': 
   // ALWAYS < c_bufferSize ;
-  // ALWAYS >= strlen(nh_string) ;
-  // WHEN == strlen(nh_string), this "empiric" check asserts the string contains NO '\0' char
+  // ALWAYS >= strlen(nhi_string) ;
+  // WHEN == strlen(nhi_string), this "empiric" check asserts the string contains NO '\0' char
   // (excepted the ending '\0').
-  struct STRING_PORTION stringPortion; // g-string's "logical" value 
+  struct STRING_PORTION cv_stringPortion; // g-string's "logical" string portion 
+    // -when g-string is "copied" (nhi_string != NULL) : corresponds to g-string "physical" value
+    // -when g-string is not "copied" (nhi_string == NULL) : pure "logical" string portion 
   int tokenId; // Default value: 0 
 } ;
+// NOTICE: In initial ("zeroified") state, a g-string is "logically" an empty string... 
 
 // Formal g-string stuff :
 typedef struct G_STRING *G_STRING_STUFF;
 
-// #REF Not-copied-Empty-Equivalence 
-// CONVENTION: a non-"copied" g-string (NULL nh_string) is supposed strictly
-// EQUIVALENT to EMPTY (like "") string. 
 
-
-// "Fundamental" macro to "convert" a g-string into string portion. 
+// Assign a string portion with g-string's "logical" value. 
 //
 // Passed:
 // - m_stringPortion: string portion to assign
-// - p_gStringStuff: #SEE  Not-copied-Empty-Equivalence 
+// - p_gStringStuff: 
 // 
 // Updated:
 // - m_stringPortion
 #define m_ASSIGN_STRING_PORTION__G_STRING(/*struct STRING_PORTION*/m_stringPortion,\
   /*G_STRING_STUFF*/p_gStringStuff) {\
-  (m_stringPortion) = (p_gStringStuff)->stringPortion;\
+  (m_stringPortion) = (p_gStringStuff)->cv_stringPortion;\
 }
 
 // See m_ASSIGN_STRING_PORTION__G_STRING() macro above
@@ -59,32 +58,11 @@ typedef struct G_STRING *G_STRING_STUFF;
   m_ASSIGN_STRING_PORTION__G_STRING(m_localStringPortion,  p_gStringStuff)
 
 
-// Directly import a string portion in a g-string WITHOUT creating (or updating) a string
-// copy.
-// 
-// Passed:
-// - stuff:
-// - tokenId:
-// - fp_stringPortion:
-#define m_G_STRING_IMPORT(/*G_STRING_STUFF*/stuff, /*int*/m_tokenId,\
-  /*const struct STRING_PORTION*/ fp_stringPortion) {\
-  (stuff)->tokenId = (m_tokenId);\
-  (stuff)->stringPortion = fp_stringPortion;\
-} 
-
-// Directly import a C-string in a g-string. 
-// See m_G_STRING_IMPORT() above
-#define m_G_STRING_C_IMPORT(/*G_STRING_STUFF*/stuff, /*int*/tokenId, /*const char* */ fp_cString) {\
-  m_ASSIGN_LOCAL_C_STRING_PORTION(em_stringPortion,fp_cString)\
-  m_G_STRING_IMPORT(stuff,tokenId,em_stringPortion)\
-}
-
-
 // #REF GStringCopy
 // Copy (or concatenate...) a string portion into a "g-string".
 // Note1: (*) mark useful values for  neutral operation  - i.e do not alter "destination" g-string; 
-// unless of course "destination" was "disengaged" (nh_string == NULL) ; in such case, an empty
-// string is copied in destination (SEE Not-copied-Empty-Equivalence) 
+// unless of course "destination" was "disengaged" (nhi_string == NULL) ; in such case, an empty
+// string is copied in destination. 
 // Note2: the token id is NOT updated.
 //
 // Passed:
@@ -97,7 +75,7 @@ typedef struct G_STRING *G_STRING_STUFF;
 //   (*) empty string for neutral operation
 //
 // Modified:
-// - stuff: ALWAYS in "copied" state (i.e nh_string != NULL, whatever!)
+// - stuff: ALWAYS in "copied" state (i.e nhi_string != NULL, whatever!)
 //
 // Returned:
 // - >= 0: OK, copied (copied length of dest string)
@@ -132,6 +110,38 @@ static inline int m_GStringClone(G_STRING_STUFF stuff,  G_STRING_STUFF p_gString
 } // m_GStringClone
 
 
+// Import "logically" a string portion in a g-string ; the string portion is not physically copied
+// if g-string is purely "logical". 
+// copy.
+// TODO: edviter appel ag vraie fonction si la g-string est "purement logique"...
+// 
+// Passed:
+// - stuff:
+// - tokenId:
+// - afp_stringPortion:
+// 
+// Changed:
+// - stuff: remains pure "logical" if possible
+//
+// Returned:
+// - COMPLETED__OK: imported as "pure" logical string portion 
+// - COMPLETED__BUT: imported, but "physical" copy was needed ; if it's not normal, don't
+//   hesitate to raise ANOMALY__NON_PURE_LOGICAL_G_STRING ...
+// - -1: unexpected problem
+int GStringImport(G_STRING_STUFF stuff, int tokenId, const struct STRING_PORTION *afp_stringPortion);
+
+// Import a '\0'-terminated C string g into a "g-string"
+// See GStringImport() above
+static inline int m_GStringCImport(G_STRING_STUFF stuff, int tokenId, const char* fp_cString) {
+  m_DIGGY_BOLLARD()
+  m_ASSIGN_LOCAL_C_STRING_PORTION(stringPortion, fp_cString)
+  m_DIGGY_RETURN(GStringImport(stuff, tokenId, &stringPortion))
+} // m_GStringCImport
+
+// See GStringImport() / m_GStringCImport() above...
+#define ANOMALY__NON_PURE_LOGICAL_G_STRING "NOT a pure logical g-string"
+
+
 // #REF GStringPrintf
 // Produce formatted output "alla printf" for a "g-string" (recipient)
 //
@@ -163,33 +173,23 @@ int GStringPrintf(G_STRING_STUFF stuff,  int n_offset,  const char *p_format, ..
 // - stuff : converted g-string 
 //
 // Ret:
-// - >=0: Returned: string length after conversion (>= 0) 
+// - COMPLETED_OK: g-string succesfully converted 
+// - COMPLETED_BUT: g-string is a pure "logical" g-string => NOT converted 
 // - -1: unexpected problem
 int GStringConvert(G_STRING_STUFF stuff,  IS_CHAR_FUNCTION n_isNeutralCharFunction,
   TO_CHAR_FUNCTION toCharFunction) ;
                    
 
-// #SEE Not-copied-Empty-Equivalence 
+// "Clear" a g-string 
 // 
 // Passed:
 // - stuff : "destination" g-string
 //
 // Modified:
-// - stuff: "logically" empty string 
+// - stuff: "logically" empty string with "anonymous" token id  
 #define m_G_STRING_CLEAR(/*G_STRING_STUFF*/stuff) {\
-  m_ASSIGN_LOCAL_EMPTY_STRING_PORTION(em_emptyStringPortion)\
-  m_G_STRING_IMPORT(stuff,ANONYMOUS_TOKEN_ID0,em_emptyStringPortion)\
-  if (stuff->nh_string != NULL) {\
-    m_TRACK_IF(GStringCopy(stuff, 0, &em_emptyStringPortion) < 0)\
-  }\
+  m_TRACK_IF(m_GStringCImport(stuff,ANONYMOUS_TOKEN_ID0,GOOD_OLD_EMPTY_C_STRING) < 0)\
 }  
-
-#if 0
-EXEMPLE VA_ARGS avec macros
-#define /*int*/ G_STRING_PRINTF(/*G_STRING_STUFF*/ stuff,  /*int*/ n_offset,\
-                  /*const char* */ p_format, ...) \
-GStringPrintf(stuff,n_offset,p_format, ##__VA_ARGS__)
-#endif
 
 // "g-string set"
 // --------------
@@ -289,9 +289,9 @@ int GStringsGetCount (G_STRINGS_HANDLE cp_handle,  G_STRING_SET_STUFF *navnt_gSt
 
 
 enum { // #REF enum-G_KEYS_COMPARISON 
-   STRING__G_KEYS_COMPARISON, //
- TOKEN_ID__G_KEYS_COMPARISON, //
-    VALUE__G_KEYS_COMPARISON, //
+ STRING_PORTION__G_KEYS_COMPARISON, //
+       TOKEN_ID__G_KEYS_COMPARISON, //
+          VALUE__G_KEYS_COMPARISON, //
 } ;
 
 
@@ -313,10 +313,10 @@ typedef long int (*STRING_PORTION_VALUE_FUNCTION) (void *r_handle,
 // - key1GStringSetElement: between [0 ; <g-string set cardinality>[ ; the g-string set's
 //   element serving as first key of the index
 // - key1GKeysComparison: #see enum-G_KEYS_COMPARISON
-// - cn_key1IsNeutralCharFunction: only significant with STRING__G_KEYS_COMPARISON 
+// - cn_key1IsNeutralCharFunction: only significant with STRING_PORTION__G_KEYS_COMPARISON 
 //   + NULL: DO NOT eliminate neutral chars before comparison 
 //   + non NULL: eliminate neutral chars before comparison 
-// - cn_key1ToCharFunction: only significant with STRING__G_KEYS_COMPARISON 
+// - cn_key1ToCharFunction: only significant with STRING_PORTION__G_KEYS_COMPARISON 
 //   + NULL: NO conversion applied before comparison 
 //   + non NULL: conversion applied before comparison 
 // - c_key1StringPortionValueFunction: only significant with VALUE__G_KEYS_COMPARISON
@@ -341,47 +341,15 @@ int GStringsAddIndex(G_STRINGS_HANDLE handle,  int keysNumber,
 
 // (Internal use)
 union BARE_G_KEY {
-  struct STRING_PORTION cp_stringPortion; // with STRING__G_KEYS_COMPARISON
+  struct STRING_PORTION cp_stringPortion; // with STRING_PORTION__G_KEYS_COMPARISON
   int c_tokenId; // with TOKEN_ID__G_KEYS_COMPARISON
   long int c_value; // with VALUE___G_KEYS_COMPARISON
 }; 
 
-// (Internal use)
-#define m_ASSIGN_BARE_G_KEY__STRING(/*struct G_KEY*/m_bareGKey,\
-  /*const struct STRING_PORTION*/p_stringPortion) \
-  (m_bareGKey).cp_stringPortion = (p_stringPortion);
-
-// (Internal use)
-#define m_ASSIGN_BARE_G_KEY__TOKEN_ID(/*struct G_KEY*/m_bareGKey, /*int*/tokenId) \
-  (m_bareGKey).c_tokenId = tokenId; 
-
-// (Internal use)
-#define m_ASSIGN_BARE_G_KEY__VALUE(/*struct G_KEY*/m_bareGKey,/*long int*/u_value) \
-  (m_bareGKey).c_value = u_value;
-
-
-// (Internal use)
-#define m_ASSIGN_BARE_G_KEY__G_STRING(/*union BARE_G_KEY*/m_bareGKey, /*int*/gKeysComparison,\
-  /*G_STRING_STUFF*/ p_gStringStuff,\
-  /*STRING_PORTION_VALUE_FUNCTION*/c_stringPortionValueFunction,\
-  /*void* */c_stringPortionValueFunctionHandle) {\
-  switch (gKeysComparison) {\
-  case STRING__G_KEYS_COMPARISON: \
-    m_ASSIGN_BARE_G_KEY__STRING(m_bareGKey,(p_gStringStuff)->stringPortion)\
-  break; case TOKEN_ID__G_KEYS_COMPARISON:\
-    m_ASSIGN_BARE_G_KEY__TOKEN_ID(m_bareGKey,(p_gStringStuff)->tokenId)\
-  break; case VALUE__G_KEYS_COMPARISON:\
-    m_ASSIGN_BARE_G_KEY__VALUE(m_bareGKey, (c_stringPortionValueFunction)\
-      (c_stringPortionValueFunctionHandle,&(p_gStringStuff)->stringPortion));\
-  break; default:\
-    m_RAISE(ANOMALY__VALUE__FMT_D,gKeysComparison)\
-  }\
-}
-
 // #REF struct-G_KEY
 struct G_KEY { //
   int gKeysComparison ; // #SEE enum-G_KEYS_COMPARISON
-  union BARE_G_KEY bare ;//
+  union BARE_G_KEY bare ;// bare g-key 
 }; 
 
 // Assign a g-key for string (lexical) comparison
@@ -389,10 +357,10 @@ struct G_KEY { //
 // Passed:
 // - m_gKey: 
 // - p_stringPortion:
-#define m_ASSIGN_G_KEY__STRING(/*struct G_KEY*/ m_gKey, \
+#define m_ASSIGN_G_KEY__STRING_PORTION(/*struct G_KEY*/ m_gKey, \
   /*const struct STRING_PORTION*/p_stringPortion) {\
-  (m_gKey).gKeysComparison = STRING__G_KEYS_COMPARISON;\
-  m_ASSIGN_BARE_G_KEY__STRING((m_gKey).bare, p_stringPortion)\
+  (m_gKey).gKeysComparison = STRING_PORTION__G_KEYS_COMPARISON;\
+  (m_gKey).bare.cp_stringPortion = p_stringPortion ; \
 } 
 
 // Assign a g-key for token id comparison
@@ -402,7 +370,7 @@ struct G_KEY { //
 // - tokenId:
 #define m_ASSIGN_G_KEY__TOKEN_ID(/*struct G_KEY*/ m_gKey, /*int*/ tokenId) {\
   (m_gKey).gKeysComparison = TOKEN_ID__G_KEYS_COMPARISON;\
-  m_ASSIGN_BARE_G_KEY__TOKEN_ID((m_gKey).bare,tokenId) \
+  (m_gKey).bare.c_tokenId = tokenId; \
 } 
 
 // Assign a g-key for value comparison
@@ -410,26 +378,10 @@ struct G_KEY { //
 // Passed:
 // - m_gKey: 
 // - u_value:
-#define m_ASSIGN_G_KEY__VALUE(/*struct G_KEY*/ m_gKey, /*long int*/ u_value) {\
+#define m_ASSIGN_G_KEY__VALUE(/*struct G_KEY*/m_gKey, /*long int*/u_value) {\
   (m_gKey).gKeysComparison = VALUE__G_KEYS_COMPARISON;\
-  m_ASSIGN_BARE_G_KEY__VALUE((m_gKey).bare,u_value) \
+  (m_gKey).bare.c_value = u_value; \
 } 
-
-// Assign a g-key based on "external" g-string
-//
-// Passed:
-// - m_gKey: 
-// - gKeysComparison: #SEE enum-G_KEYS_COMPARISON 
-// - p_gStringStuff: g-string used for comparison - must NOT be part of the collection 
-//   #SEE fetched-item-notices @ c-ansi/green.h
-#define m_ASSIGN_G_KEY__G_STRING(/*struct G_KEY*/ m_gKey,  /*int*/ gKeysComparison,\
-  /*G_STRING_STUFF*/ p_gStringStuff,\
-  /*STRING_PORTION_VALUE_FUNCTION*/c_stringPortionValueFunction,\
-  /*void* */c_stringPortionValueFunctionHandle) {\
-  (m_gKey).gKeysComparison = gKeysComparison;\
-  m_ASSIGN_BARE_G_KEY__G_STRING(m_gKey.bare, (m_gKey).gKeysComparison, p_gStringStuff,\
-    c_stringPortionValueFunction,c_stringPortionValueFunctionHandle)\
-}
 
 
 // #REF GStringsIndexFetch <gStringSet>

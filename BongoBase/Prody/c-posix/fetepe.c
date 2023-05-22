@@ -1039,7 +1039,7 @@ int FetepePut (FETEPE_HANDLE handle, const char *p_localFilePathname, const char
 // - -1 : unexpected problem
 static int CorrectFilename (G_STRING_STUFF fileName, unsigned int corrections) {
   m_DIGGY_BOLLARD_S()
-  if (fileName->nh_string == NULL) {
+  if (fileName->nhi_string == NULL) {
     m_DIGGY_RETURN(RETURNED)
   } // if
 
@@ -1049,7 +1049,7 @@ static int CorrectFilename (G_STRING_STUFF fileName, unsigned int corrections) {
     if (fileName->c_copiedLength >= 2) {
       char *ptr ;
 
-      ptr = fileName->nh_string + fileName->c_copiedLength - 2 ;
+      ptr = fileName->nhi_string + fileName->c_copiedLength - 2 ;
       if (*ptr == ';' && *(ptr+1) == '1') {
         fileName->c_copiedLength -= 2 ;
         *ptr = '\0' ;

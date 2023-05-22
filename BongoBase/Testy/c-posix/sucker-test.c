@@ -43,7 +43,7 @@ int main (int argc, char** argv) {
   int rwStatus = UNDEFINED;
   int openErrno = UNDEFINED;
 
-  ret = SuckerCopy(h_handle,h_dummySFilePathnameStuff->nh_string,dummyDFilePathname,
+  ret = SuckerCopy(h_handle,h_dummySFilePathnameStuff->nhi_string,dummyDFilePathname,
     ALL_FLAGS_OFF0,&suckedLength,&rwStatus,&openErrno) ;
   m_TRACK_IF(ret < 0)
   m_RAISE_VERBATIM_IF(ret != SUCKER_STATUS__OK)

@@ -205,15 +205,28 @@ int VerifyCStringPortion(struct STRING_PORTION *a_stringPortion);
 // Establish the optimal size for destination string buffer in string copy operation. 
 // 
 // Passed:
+// - srcStringPortionLength : 'string' source string length 
+// 
+// Ret: optimal buffer size (> 0)
+#define /*int*/OPTIMAL_BUFFER_SIZE_4_STRING_PORTION_COPY(/*int*/srcStringPortionLength) \
+  ((srcStringPortionLength) + 1) 
+
+
+// Establish the optimal size for destination string buffer in string copy operation. 
+// 
+// Passed:
 // - p_srcStringPortion : 'string' source string #SEE struct-STRING_PORTION 
 //
 // Changed:
 // - m_optimalBufferSize: optimal buffer size (> 0)
+// TODO: replace with m_OptimalBufferSize4StringPortionCopy()
 #define m_GET_OPTIMAL_BUFFER_SIZE_4_STRING_PORTION_COPY(\
   /*const struct STRING_PORTION*/p_srcStringPortion, /*int*/m_optimalBufferSize) {\
-  (m_optimalBufferSize) = (m_StringPortionLength(&(p_srcStringPortion)) + 1);\
+  (m_optimalBufferSize) = OPTIMAL_BUFFER_SIZE_4_STRING_PORTION_COPY(m_StringPortionLength(\
+    &(p_srcStringPortion))) ;\
   m_ASSERT((m_optimalBufferSize) > 0)\
 }
+
 
 // Same purpose as standard "strcpy" function, except that this function takes care never to
 // overflow the target string.
