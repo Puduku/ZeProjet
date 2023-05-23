@@ -249,7 +249,7 @@ typedef int (*TO_CHAR_FUNCTION) (int c) ;
 
 
 // #REF CompareStringPortions
-// Comparison of raw strings:
+// Lexical comparison of raw strings:
 // - "binary" comparison when possible (i.e memcmp()-based => more efficient) 
 // - otherwize, "char to char" comparison of raw strings.
 //
