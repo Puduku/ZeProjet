@@ -163,9 +163,11 @@
 //     (that is referenced via explicit handle)
 //     This ensures respect of clear (instanciation and) initialization / execution / destruction
 //     cycle.
-//   + pure constructors and destructors. (TODO:reddiger proprement) surtout pas de "fonctionnel" dans
-//     les constructeurs et destructeurs => focus 100% "technique" ; logique de "bourrin" !!! => toujours
-//     ret status unaire RETURNED
+//   + pure constructors and destructors. Constructors and destructors are really the two "special" 
+//     methods of our objects; their "focus" is purely (and simply) technical; it's important to 
+//     distinguish them from the other, "functional" methods of our objects. Therefore, from a
+//     functional point of view, these methods never fail. In practice, this means that the
+//     C functions which implement them can only return the unary status "RETURNED"...
 //   + factories: a "factory" instance is dedicated to create "product" instances.
 //     In most cases, we do not distinguish "factory" with "product" instances as objects; the
 //     instance creation procedure is an ordinary method of the object itself.
