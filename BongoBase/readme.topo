@@ -3,7 +3,11 @@
 // (c) 2023 - Puduku
  
 // => ".topo" files are raw (ASCII) text files. 
-// The purpose is to provide CONTEXTUAL information to sources (C programming) files. 
+// The purpose is to :
+// - present some general considerations on various topics ("c-flaws.topo" etc.); having 
+//   these "motivations" in mind, one should have a better understanding of the design of
+//   the C code in the project...
+// - provide CONTEXTUAL information to sources (C code) files. 
 // The main use case is to "discharge" ".h" header files of contextual description and to
 // have a clear separation between CONTEXTUAL and TECHNICAL information.
 // Hence, comments present in ".h" are focused on technical usage of the module (classical
@@ -15,7 +19,7 @@
 //
 // SUMMARY: Given module called BROL, you want...
 // ...contextual information (What is the purpose of BROL ?) => see "BROL.topo" file 
-//    (when the context is supposedly "obvious" enough, "BROL.topo" does not exist; then look for 
+//    (If there is no "BROL.topo" does not exist; then look for 
 //    the abstract in the ".h"...)
 // ...base technical information (How to use BROL ?) => see "BROL.h" header file
 // (Of course, for "deeper" technical information (How does BROL work (or doesn't work) ?) => see
