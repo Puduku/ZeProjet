@@ -194,7 +194,11 @@
 //       is that formally, we do have encapsulation - the responsibilities of CO and SO are clearly
 //       separated in the code...
 //
-// - data value type vs. data content type TODO : reddiger blabla...
+// - data value type vs. data content type TODO : reddiger blabla... le but ici est de compendre que 
+//   les data types qui nous intedressent (requestes SQL ou autre...) sont avant tout des types de
+//   VALEUR de donnedes - et que un certain type de valeur peut estre matedrialised par une multitude
+//   de types de contenus diffedrents...
+//
 // - green items and collections:
 //   The green item is an intermediate concept of compound data between the bare struct-based data
 //   and the encapsulated data (in "object instance") (*)
