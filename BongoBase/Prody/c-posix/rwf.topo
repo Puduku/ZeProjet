@@ -54,7 +54,7 @@
 // 
 // II. Locking a regular file
 // ==========================
-// TBC: locking a FIFO ??? What's the point ???
+// TODO: TBC: locking a FIFO ??? What's the point ???
 // 
 // II.1 POSIX Locks
 // record locks (also known as file-segment or file-region locks...)
