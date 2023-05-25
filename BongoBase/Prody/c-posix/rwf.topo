@@ -8,8 +8,8 @@
 // 
 // Principle: ProtectedOpenFile() function wraps open() system call ; ProtectedOpenFile() is focused
 // on REGULAR files... 
-// => EXTENDED principle: with ad hoc "file opening" flags, function ProtectedOpenFile() is equally suitable
-// for "named pipes" (alias "fifo's")
+// => EXTENDED principle: with ad hoc "file opening" flags, function ProtectedOpenFile() is suitable
+// for opening "named pipes" (alias "fifo's")
 // 
 // Definition of "basic open flags"
 // -------------------------------
