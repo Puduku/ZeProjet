@@ -22,6 +22,9 @@
 // Passed:
 // - muzh_ptr: the pointer to initialize
 // - u_size: the memory size to allocate.
+//
+// Changed:
+// - muzh_ptr: the pointer is initialized
 #define m_MALLOC(muzh_ptr, /*int*/ u_size)  m_PERROR_IF((muzh_ptr = malloc(u_size)) == NULL,\
   BLAME__MALLOC)
 
@@ -35,6 +38,9 @@
 //   + NULL special value: pure initialization (same result than m_MALLOC() macro)
 //   + non NULL: pointer to current memory block (to resize)
 // - u_size: the memory size to allocate or to reallocate
+//
+// Changed:
+// - mnh_ptr: the pointer is (re-)initialized
 #define m_REALLOC(mnh_ptr, /*int*/ u_size)  m_PERROR_IF((mnh_ptr = realloc(mnh_ptr, u_size)) ==\
   NULL, BLAME__REALLOC)
 
