@@ -9,7 +9,9 @@ $ miss-ross.sh
 If the command is not found, then Mama framework is not properly installed.
 Otherwise, check Miss Ross's status ; verify in particular that "Flint" environment is properly 
 detected...
-Find also some "good advices" in "$MAMA/MAMA.TXT" and "$FLINT/GENESEE.TXT" files 
+Find also some "good advices" in the following files :
+- "$MAMA/MAMA.TXT" : see (in particular) "User guide" paragraph...
+- "$FLINT/GENESEE.TXT" : may help to understand file names' convention...  
 
 Bongo Island overview:
 ---------------------
