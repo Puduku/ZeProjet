@@ -222,11 +222,12 @@
 // C, qualified (ag l'edpoque du moins) de langage "edvolued", est en redalited passablement
 // rustique. Nous sommes toujours surpris par ses notations edtranges et sa syntaxe archaitque..
 // En dedpit de ses imperfections origineles et d'une edvolution parfois cahotique - voire
-// contre-productive, C a "su" rester, dans l'ensemble, raisonnablement cohedrent et conserve son
-// "statut" de meilleur intermeddiaire de programmation edxistant entre l'humain (qui "voit" le
-// code source) et la machine (qui "voit" le code exedcutable)...
-// En l'attente de son vedritable digne successeur - celui qui gommera ses vrais dedfauts - C
+// contre-productive, C reste, dans l'ensemble, raisonnablement cohedrent et conserve son
+// "statut" de meilleur intermeddiaire de programmation edxistant entre l'humain (qui "lit" le
+// code source) et la machine (qui "lit" le code exedcutable)...
+// En l'attente de son vedritable digne successeur - celui qui corrigera ses vrais dedfauts - C
 // demeure "aujourd'hui" le langage de "redfedrence" pour la production d'applications dans un
-// langage compiled. C est au logiciel:
+// langage compiled. C est ag l'industrie du logiciel:
 // - ce que Louis XI fut ag l'Histoire de France...
-// - ce que le Tampon JEX est au mednage: "Je suis MOCHE, mais qu'est-ce-que je BOSSE !!!"
+// - ce que le Tampon JEX est au mednage: 
+// "Je suis MOCHE, mais qu'est-ce-que je BOSSE !!!"
