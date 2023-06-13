@@ -1,5 +1,6 @@
 // c-posix/rwn.c, version 1.93
 // (c) Atos-Euronext Belgium - 2001, 2002, 2003
+// (c) Puduku - 2023
 
 #include <stdio.h>
 #include <unistd.h>
@@ -28,27 +29,22 @@
 
 
 // Public function : see description in .h
-int ProtectedConnect (int tcpIpSocketDescriptor,
-                      in_addr_t hostInetAddr, in_port_t inetPort,
-                      int *na_connectErrno) {
+int ProtectedConnect (int tcpIpSocketDescriptor, in_addr_t hostInetAddr, in_port_t inetPort,
+  int *na_connectErrno) {
   m_DIGGY_BOLLARD()
   struct sockaddr_in tcpIpSocketPeerAddr ;
   int rwnConnectStatus = RWN_CONNECT_STATUS__CURRENTLY_NOT_POSSIBLE ; // not possible a priori
 
-  if (na_connectErrno == NULL) {
-    *na_connectErrno = 0 ;
-  } // if
+  if (na_connectErrno == NULL) *na_connectErrno = 0 ;
 
   memset(&tcpIpSocketPeerAddr,0,sizeof(tcpIpSocketPeerAddr)) ;
   tcpIpSocketPeerAddr.sin_family = AF_INET ;
   tcpIpSocketPeerAddr.sin_port = inetPort ;
   tcpIpSocketPeerAddr.sin_addr.s_addr = hostInetAddr ;
 
-  if (connect(tcpIpSocketDescriptor,
-              (struct sockaddr *)&tcpIpSocketPeerAddr, sizeof(tcpIpSocketPeerAddr)) == -1) {
-    if (na_connectErrno != NULL) {
-      *na_connectErrno = errno ;
-    } // if
+  if (connect(tcpIpSocketDescriptor, (struct sockaddr *)&tcpIpSocketPeerAddr,
+    sizeof(tcpIpSocketPeerAddr)) == -1) {
+    if (na_connectErrno != NULL) *na_connectErrno = errno ;
 
     switch (errno) {
     case EINPROGRESS:  // The socket is non-blocking and the connection cannot be completed 
@@ -82,9 +78,8 @@ int ProtectedConnect (int tcpIpSocketDescriptor,
 
 
 // Public function : see description in .h
-int CreateAndConnect (int *aczh_connectedTcpIpSocketDescriptor,
-                      in_addr_t hostInetAddr, in_port_t inetPort,
-                      int *na_connectErrno) {
+int CreateAndConnect (int *aczh_connectedTcpIpSocketDescriptor, in_addr_t hostInetAddr, 
+  in_port_t inetPort, int *na_connectErrno) {
   m_DIGGY_BOLLARD()
   int h_descriptor = UNDEFINED;
   int attempt = ATTEMPT__SUCCESSFUL ; // a priori
@@ -116,9 +111,8 @@ int CreateAndConnect (int *aczh_connectedTcpIpSocketDescriptor,
 
 
 // Public function : see description in .h
-int BindAndListen (int tcpIpSocketDescriptor,
-                   in_port_t inetPort, int backlog,
-                   int *na_bindOrListenErrno) {
+int BindAndListen (int tcpIpSocketDescriptor, in_port_t inetPort, int backlog,
+  int *na_bindOrListenErrno) {
   m_DIGGY_BOLLARD()
   struct sockaddr_in tcpIpSocketLocalAddr ;
 
@@ -128,10 +122,8 @@ int BindAndListen (int tcpIpSocketDescriptor,
   tcpIpSocketLocalAddr.sin_addr.s_addr = INADDR_ANY ;
 
   if (bind(tcpIpSocketDescriptor,(struct sockaddr *) &tcpIpSocketLocalAddr,
-           sizeof(tcpIpSocketLocalAddr)) == -1) {
-    if (na_bindOrListenErrno != NULL) {
-      *na_bindOrListenErrno = errno;
-    } // if
+    sizeof(tcpIpSocketLocalAddr)) == -1) {
+    if (na_bindOrListenErrno != NULL) *na_bindOrListenErrno = errno;
     switch (errno) {
     case EADDRINUSE: // The given address is already in use 
     case EACCES: // The address is protected, and the user is not the superuser 
@@ -143,9 +135,7 @@ int BindAndListen (int tcpIpSocketDescriptor,
   } // if
 
   if (listen(tcpIpSocketDescriptor,backlog) < 0) {
-    if (na_bindOrListenErrno != NULL) {
-      *na_bindOrListenErrno = errno;
-    } // if
+    if (na_bindOrListenErrno != NULL) *na_bindOrListenErrno = errno;
     switch (errno) {
     case EADDRINUSE: // Another socket is already listening on the same port 
       // TBC: <=> bind() ???? 
@@ -160,9 +150,8 @@ int BindAndListen (int tcpIpSocketDescriptor,
 
 
 // Public function : see description in .h
-int CreateBindAndListen (int *aczh_listeningTcpIpSocketDescriptor,
-                         in_port_t inetPort , int backlog,
-                         int *na_bindOrListenErrno) {
+int CreateBindAndListen (int *aczh_listeningTcpIpSocketDescriptor, in_port_t inetPort,
+  int backlog, int *na_bindOrListenErrno) {
   m_DIGGY_BOLLARD()
   int h_descriptor = UNDEFINED;
 
@@ -191,26 +180,23 @@ int CreateBindAndListen (int *aczh_listeningTcpIpSocketDescriptor,
 
 
 // Public function : see description in .h
-int ProtectedAccept (int listeningTcpIpSocketDescriptor,
-                     PD_HANDLE pdHandle, const struct WAITING_PLAN *ap_waitingPlan,
-                     int *aczh_slaveTcpIpSocketDescriptor,
-                     in_addr_t *nac_clientInetAddr, in_port_t *nac_clientInetPort,
-					 int *na_acceptErrno) {
+int ProtectedAccept (int listeningTcpIpSocketDescriptor, PD_HANDLE pdHandle, 
+  const struct WAITING_PLAN *ap_waitingPlan, int *aczh_slaveTcpIpSocketDescriptor,
+  in_addr_t *nac_clientInetAddr, in_port_t *nac_clientInetPort, int *na_acceptErrno) {
   m_DIGGY_BOLLARD()
   m_TRACK_IF(SynchronizeONonblock(listeningTcpIpSocketDescriptor,ap_waitingPlan) != RETURNED)
 
   struct sockaddr_in slaveTcpIpSocketPeerAddr ;
   socklen_t size = sizeof(slaveTcpIpSocketPeerAddr) ;
-  int n_rwnAcceptStatus = - 1; // Unknown
+  int n_rwnAcceptStatus = -1; // Unknown
 
   m_TRACK_IF(PdSetDeadline(pdHandle,ap_waitingPlan) < 0)
 
   while (n_rwnAcceptStatus == -1) {
     m_TRACK_IF(PdSetAlarm(pdHandle) != RETURNED)
 
-    if ((*aczh_slaveTcpIpSocketDescriptor = 
-         accept(listeningTcpIpSocketDescriptor,
-                (struct sockaddr*)&slaveTcpIpSocketPeerAddr,&size)) == -1) {
+    if ((*aczh_slaveTcpIpSocketDescriptor =  accept(listeningTcpIpSocketDescriptor,
+      (struct sockaddr*)&slaveTcpIpSocketPeerAddr,&size)) == -1) {
       // System call failed or interrupted
       if (na_acceptErrno != NULL) {
         *na_acceptErrno = errno;
