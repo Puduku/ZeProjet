@@ -1,5 +1,6 @@
 // c-posix/rw.h, version 1.93
 // (c) Atos-Euronext Belgium - 2001, 2002, 2003
+// (c) Puduku - 2023
 //
 // Purpose: Facilitate design of POSIX programs based on read() and write() system calls...
 // =======
@@ -105,19 +106,13 @@ enum {
 //   to a "ROUGH" termination.
 // - RW_STATUS__CONNECTION_LOST: #SEE RW_STATUS__CONNECTION_LOST
 // - -1 : unexpected problem ; anomaly is raised
-int ProtectedRead (int descriptor,
-                   PD_HANDLE pdHandle, const struct WAITING_PLAN *ap_waitingPlan,
-                   char *readBuffer, int readBufferSize,
-                   int *ac_readLength) ;
+int ProtectedRead (int descriptor, PD_HANDLE pdHandle, const struct WAITING_PLAN *ap_waitingPlan,
+  char *readBuffer, int readBufferSize, int *ac_readLength) ;
 
 
 // Same function but DO NOT synchronize O_NONBLOCK flag of the descriptor...
-int ProtectedRead2 (int descriptor,
-                    PD_HANDLE pdHandle, const struct WAITING_PLAN *ap_waitingPlan,
-                    char *readBuffer, int readBufferSize,
-                    int *ac_readLength) ;
-
-
+int ProtectedRead2 (int descriptor, PD_HANDLE pdHandle, const struct WAITING_PLAN *ap_waitingPlan,
+  char *readBuffer, int readBufferSize, int *ac_readLength) ;
 
 
 // write() wrapper
@@ -165,7 +160,6 @@ int BrokenPipeFixCreateInstance (BROKEN_PIPE_FIX_HANDLE *azdh_handle) ;
 int BrokenPipeFixDestroyInstance (BROKEN_PIPE_FIX_HANDLE xdh_handle) ;
 
 
-
 // This function wraps write() POSIX system call:
 // - protects against signal interruption in blocking waiting plan (with timeout)
 // - Normalize "error" handling according to "peer-to-peer" connection paradigm described in
@@ -202,20 +196,15 @@ int BrokenPipeFixDestroyInstance (BROKEN_PIPE_FIX_HANDLE xdh_handle) ;
 //     has closed the connection (or the pipe)
 // - RW_STATUS__CONNECTION_LOST: #SEE RW_STATUS__CONNECTION_LOST
 // - -1 : unexpected problem ; anomaly is raised
-int ProtectedWrite (BROKEN_PIPE_FIX_HANDLE brokenPipeFixHandle,
-                    int descriptor,
-                    PD_HANDLE pdHandle, const struct WAITING_PLAN *ap_waitingPlan,
-                    const char *p_writeBuffer, int writeLength,
-                    int *ac_writtenLength) ;
+int ProtectedWrite (BROKEN_PIPE_FIX_HANDLE brokenPipeFixHandle, int descriptor,
+  PD_HANDLE pdHandle, const struct WAITING_PLAN *ap_waitingPlan,
+  const char *p_writeBuffer, int writeLength, int *ac_writtenLength) ;
 
 
 // Same function but DO NOT synchronize O_NONBLOCK flag of the descriptor...
-int ProtectedWrite2 (BROKEN_PIPE_FIX_HANDLE brokenPipeFixHandle,
-                     int descriptor,
-                     PD_HANDLE pdHandle, const struct WAITING_PLAN *ap_waitingPlan,
-                     const char *p_writeBuffer, int writeLength,
-                     int *ac_writtenLength) ;
-
+int ProtectedWrite2 (BROKEN_PIPE_FIX_HANDLE brokenPipeFixHandle, int descriptor,
+  PD_HANDLE pdHandle, const struct WAITING_PLAN *ap_waitingPlan,
+  const char *p_writeBuffer, int writeLength, int *ac_writtenLength) ;
 
 
 // close() wrapper
