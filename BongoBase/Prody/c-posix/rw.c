@@ -1,5 +1,6 @@
 // c-posix/rw.c, version 1.93
 // (c) Atos-Euronext Belgium - 2001, 2002, 2003
+// (c) Puduku - 2023
 
 #include <string.h>
 #include <errno.h>
@@ -17,10 +18,8 @@
 
 
 // Public function : see .h
-int ProtectedRead2 (int descriptor,
-                    PD_HANDLE pdHandle, const struct WAITING_PLAN *ap_waitingPlan,
-                    char *readBuffer, int readBufferSize,
-                    int *ac_readLength) {
+int ProtectedRead2 (int descriptor, PD_HANDLE pdHandle, const struct WAITING_PLAN *ap_waitingPlan,
+  char *readBuffer, int readBufferSize, int *ac_readLength) {
   m_DIGGY_BOLLARD()
 
   m_RAISE_VERBATIM_IF(readBufferSize == 0)
@@ -75,10 +74,8 @@ int ProtectedRead2 (int descriptor,
 
 
 // Public function : see .h
-int ProtectedRead (int descriptor,
-                   PD_HANDLE pdHandle, const struct WAITING_PLAN *ap_waitingPlan,
-                   char *readBuffer, int readBufferSize,
-                   int *ac_readLength) {
+int ProtectedRead (int descriptor, PD_HANDLE pdHandle, const struct WAITING_PLAN *ap_waitingPlan,
+  char *readBuffer, int readBufferSize, int *ac_readLength) {
   m_DIGGY_BOLLARD()
   m_TRACK_IF(SynchronizeONonblock(descriptor,ap_waitingPlan) != RETURNED)
 
@@ -121,11 +118,9 @@ int BrokenPipeFixDestroyInstance (BROKEN_PIPE_FIX_HANDLE xdh_handle) {
 
 
 // Public function : see description in .h
-int ProtectedWrite2 (BROKEN_PIPE_FIX_HANDLE brokenPipeFixHandle,
-                     int descriptor,
-                     PD_HANDLE pdHandle, const struct WAITING_PLAN *ap_waitingPlan,
-                     const char *p_writeBuffer, int writeLength,
-                     int *ac_writtenLength) {
+int ProtectedWrite2 (BROKEN_PIPE_FIX_HANDLE brokenPipeFixHandle, int descriptor,
+  PD_HANDLE pdHandle, const struct WAITING_PLAN *ap_waitingPlan,
+  const char *p_writeBuffer, int writeLength, int *ac_writtenLength) {
   m_DIGGY_BOLLARD()
   m_TRACK_IF(PdSetDeadline(pdHandle,ap_waitingPlan) < 0) 
 
@@ -181,17 +176,15 @@ int ProtectedWrite2 (BROKEN_PIPE_FIX_HANDLE brokenPipeFixHandle,
 } // ProtectedWrite2
 
 // Public function: see .h
-int ProtectedWrite (BROKEN_PIPE_FIX_HANDLE brokenPipeFixHandle,
-                    int descriptor,
-                    PD_HANDLE pdHandle, const struct WAITING_PLAN *ap_waitingPlan,
-                    const char *p_writeBuffer, int writeLength,
-                    int *ac_writtenLength) {
+int ProtectedWrite (BROKEN_PIPE_FIX_HANDLE brokenPipeFixHandle, int descriptor,
+  PD_HANDLE pdHandle, const struct WAITING_PLAN *ap_waitingPlan,
+  const char *p_writeBuffer, int writeLength, int *ac_writtenLength) {
   m_DIGGY_BOLLARD()
   m_TRACK_IF(SynchronizeONonblock(descriptor,ap_waitingPlan) != RETURNED)
 
   int rwStatus =
   ProtectedWrite2(brokenPipeFixHandle,descriptor,pdHandle,ap_waitingPlan,
-                  p_writeBuffer,writeLength,ac_writtenLength);
+    p_writeBuffer,writeLength,ac_writtenLength);
   switch (rwStatus) {
   case RW_STATUS__OK :
   case RW_STATUS__TRY_AGAIN:
