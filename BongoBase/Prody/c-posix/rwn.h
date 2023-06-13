@@ -1,5 +1,6 @@
 // c-posix/rwn.h, version 1.93
 // (c) Atos-Euronext Belgium - 2001, 2002, 2003
+// (c) Puduku - 2023
 //
 // Purpose: 
 // --------
@@ -39,7 +40,7 @@
 //
 // Ret: inet address
 #define /*in_addr_t*/ RWN_INET_ADDR(/*uint8_t*/ msb, /*uint8_t*/ mib,\
-                                    /*uint8_t*/ lib, /*uint8_t*/ lsb) \
+  /*uint8_t*/ lib, /*uint8_t*/ lsb) \
 (in_addr_t) htonl( ((msb)<<24) + ((mib)<<16) + ((lib)<<8) + (lsb) )
 
 
@@ -144,9 +145,8 @@ enum {
 //   Reminder: by default, a socket is "blocking" (hence, that situation cannot occur unless you
 //   "trick" the mode of the socket descriptor...)
 // - -1: unexpected problem ; anomaly is raised
-int ProtectedConnect (int tcpIpSocketDescriptor,
-                      in_addr_t hostInetAddr, in_port_t inetPort,
-                      int *na_connectErrno);
+int ProtectedConnect (int tcpIpSocketDescriptor, in_addr_t hostInetAddr, in_port_t inetPort,
+  int *na_connectErrno);
 
 // If you get RWN_CONNECT_STATUS__IN_PROGRESS whereas you are certain not using an non blocking
 // socket, you can raise that anomaly...
@@ -175,9 +175,8 @@ int ProtectedConnect (int tcpIpSocketDescriptor,
 // - ATTEMPT__TRY_AGAIN: cannot connect (ProtectedConnect() returned "NOT POSSIBLE") ; created
 //   socket has been automatically destroyed...
 // - -1: unexpected problem ; anomaly is raised
-int CreateAndConnect (int *aczh_connectedTcpIpSocketDescriptor,
-                      in_addr_t hostInetAddr, in_port_t inetPort,
-                      int *na_connectErrno) ;
+int CreateAndConnect (int *aczh_connectedTcpIpSocketDescriptor, in_addr_t hostInetAddr, 
+  in_port_t inetPort, int *na_connectErrno) ;
 
 
 #define RWN_BACKLOG 16
@@ -207,9 +206,8 @@ int CreateAndConnect (int *aczh_connectedTcpIpSocketDescriptor,
 //      (II) in order to avoid hogging cpu, always observe a small delay if you want to undertake a
 //      new attempt (on that port)...
 // - -1: unexpected problem ; anomaly is raised
-int BindAndListen (int tcpIpSocketDescriptor,
-                   in_port_t inetPort, int backlog,
-                   int *na_bindOrListenErrno);
+int BindAndListen (int tcpIpSocketDescriptor, in_port_t inetPort, int backlog,
+  int *na_bindOrListenErrno);
 
 
 // Wraps BindAndListen() function above.
@@ -238,9 +236,8 @@ int BindAndListen (int tcpIpSocketDescriptor,
 //      (II) in order to avoid hogging cpu, always observe a small delay if you want to undertake a
 //      new attempt (on that port)...
 // - -1: unexpected problem ; anomaly is raised
-int CreateBindAndListen (int *aczh_listeningTcpIpSocketDescriptor,
-                         in_port_t inetPort , int backlog,
-                         int *na_bindOrListenErrno) ;
+int CreateBindAndListen (int *aczh_listeningTcpIpSocketDescriptor, in_port_t inetPort ,
+  int backlog, int *na_bindOrListenErrno) ;
 
 
 // Maximun length (in characters) of IP addresses based on "IPV4 dotted-decimal" notation:
@@ -288,21 +285,14 @@ enum {
 //   tries to connect behind a firewall).
 //   => you can still consult "errno" to get the details on that "error"...
 // - -1: unexpected problem ; anomaly is raised
-int ProtectedAccept (int listeningTcpIpSocketDescriptor,
-                     PD_HANDLE pdHandle, const struct WAITING_PLAN *ap_waitingPlan,
-                     int *aczh_slaveTcpIpSocketDescriptor,
-                     in_addr_t *nac_clientInetAddr, in_port_t *nac_clientInetPort,
-                     int *na_acceptErrno) ;
+int ProtectedAccept (int listeningTcpIpSocketDescriptor, PD_HANDLE pdHandle, 
+  const struct WAITING_PLAN *ap_waitingPlan, int *aczh_slaveTcpIpSocketDescriptor,
+  in_addr_t *nac_clientInetAddr, in_port_t *nac_clientInetPort, int *na_acceptErrno) ;
 
 
 // Same function but DO NOT synchronize O_NONBLOCK flag of the descriptor...
-int ProtectedAccept2 (int listeningTcpIpSocketDescriptor,
-                      PD_HANDLE pdHandle, const struct WAITING_PLAN *ap_waitingPlan,
-                      int *aczh_slaveTcpIpSocketDescriptor,
-                      in_addr_t *nac_clientInetAddr, in_port_t *nac_clientInetPort,
-                      int *na_acceptErrno) ;
-
-
-
+int ProtectedAccept2 (int listeningTcpIpSocketDescriptor, PD_HANDLE pdHandle,
+  const struct WAITING_PLAN *ap_waitingPlan, int *aczh_slaveTcpIpSocketDescriptor,
+  in_addr_t *nac_clientInetAddr, in_port_t *nac_clientInetPort, int *na_acceptErrno) ;
 
 #endif // __C_POSIX_RWN_H_INCLUDED__
