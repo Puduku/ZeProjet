@@ -160,11 +160,11 @@
 // char *strcpy(char *dest, const char *src);)
 // In some cases, however, the advantage is less evident... Actually, programmer must be AWARE that
 // (s)he has to do a TRADE OFF...
-// The "Cornelian choice" may arise with record data fields. Depending on the context, 
-// some data field should be or not protected with a 'const'. For instance, a 'name' data
-// field should be protected excepted during the 'initialization'...
-// The natural "solution" seems to set the 'const' to the data field, and to 'cast' it into the
-// "without const"-equivalent data type when necessary (that is, during initialization).
+// Such "Conelian choices" arise with record data fields, because the need for "const" protection is
+// context-dependent. For example, the 'name' data field must be protected (from intenptive
+// modifications) except during ''initialization'' (of the data structure)...
+// The natural "solution" seems to be: let's apply the "const" qualifier on the data field and "cast"
+// it to the equivalent "constless" data type when needed (i.e. when initialization).
 // But, that's the point : casting operations are by essence dangerous dispositions (remember, 
 // 'cast' DISABLES any data type consistency CONTROL of the compiler, and hence potentially
 // transforms simple compilation problem into execution crash) that must be avoided. (*) (**)  
