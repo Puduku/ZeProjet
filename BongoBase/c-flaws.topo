@@ -13,7 +13,7 @@
 //   overconfident, C-code "quality" degenerates very quickly... 
 // - Finding a more adequate language, up to par, and getting rid of C for good would certainly be a
 //   great progress in the software industry... if and only if we first carefully identify what is
-//   correct C's responsibility in the "SHIT" of C programs - and DON'T UNDERESTIMATE our own role
+//   actual C's responsibility in the "SHIT" of C programs - and DON'T UNDERESTIMATE our own role
 //   as programmers in this shit.
 //   That's to say:
 //   + Simply switching to a "brand new" language will NEVER improve the situation.
