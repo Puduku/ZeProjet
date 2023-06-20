@@ -36,7 +36,6 @@
 // we must define a (constant) structure and then make the call with (pointer to) that constant.
 // This is of course not a big deal, but that loss of flexibility may be frustating...
 
-
 // Number 9: impossibility to indicate directly for which "typedef'ed" function ("pointer") an 
 // ordinary function is defined.
 // Suppose the following declaration: (NB: example has been stolen on Internet)
@@ -72,7 +71,6 @@
 //      return (a+b);
 //   }
 
-
 // Number 8: (P) missed standardization for alignment, padding and packaging of structured data (#pragma...)
 // The original purpose of structures and unions in C is to define "logical" compound data types;
 // The physical aspects were simply not specified with these structure definitions...
@@ -85,7 +83,6 @@
 // data exchange (protocol message format, etc.) because we absolutely must use these non-standard
 // directives. In other words, it's like a snake biting its own tail. 
 
-
 // Number 7: 'typedef' is a very "poor" type definition... 
 // 'typedef' is rather a simple type aliasing than a type definition. The mechanism is not
 // defective in itself, but the misleading meaning of this keyword 'typedef' is unfortunate and
@@ -94,7 +91,6 @@
 // having been added to the language in a hurry; probably a clumsy response to the competing
 // languages of the time - those providing real type definitions (in particular, sub-types and
 // abstractions) ...
-
 
 // Number 6: "Pointer, what pointer ?..." The numerous ambivalences of the pointer concept.
 // "Pointers" are hiding everywhere in C ; however, WHAT is EXACTLY a pointer in C ? Actually, a
@@ -145,7 +141,6 @@
 // But it's NOT so a satisfactory solution : on "wrong" platforms, program will provide "wrong"
 // display... 
 
-
 // Number 4: ambiguity of 'void*' data type that can represent a "pure address" OR a "generic"
 // parameter.
 // Often, generic data indeed represent a generic address (pointer of entity of unspecified 
@@ -156,7 +151,6 @@
 // The result is that "generic" data management is not truely transparent in C... (P)
 // which, again, is quite paradoxal... 
 // Morality: we really miss true "generic data type" (other that 'void*' ersatz) in C.
-
 
 // Number 3:
 // 'const' may make code more... fragile! (in fact, it's 'cast' operator's fault)
@@ -180,7 +174,6 @@
 // (**) Ideally, C would propose an "intelligent" casting that would just remove the 'constancy'
 // constraint (for one time, C++ marks a real point over C :p)...
 
-
 // Number 2: Silent overflows. There is NO bullet-proof means in C to detect basic integer 
 // overflows !... (*)
 // Initially, that limitation was consistent with the language's philosophy: it's up to the
@@ -195,17 +188,14 @@
 // car in hands, but there is no engine under the hood - you still have to pedal if you want to
 // move... 
 
-
 // Number 1: Unreadable C interface headers - mess with portability flags. 
 // This is not an originel flaw of the language. But now, after more than forty years of (often
 // benevolent) "cow-boys" interventions, all standard and system (.h) headers - which directly
 // affect the quality of the C programming environment - have ended up looking like nothing and are
 // totally unreadable... 
 
-
 // Number 0: Desesperatly poor makeup of many standard C libraries (string handling, etc...) => rather
 // dishonest argument (against the C LANGUAGE) C++ bigots.
-
 
 // Number -1: '\0'-terminated strings convention (inheritance from 8-bits CPUs assemblers ?) 
 // Practical problem in brief: crappy representation of strings => crappy code and functions manipulating
