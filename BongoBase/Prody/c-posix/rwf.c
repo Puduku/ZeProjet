@@ -21,6 +21,11 @@
 #define BLAME__FCNTL	"fcntl()"
 #define BLAME__FLOCK	"flock()"
 
+const struct WAITING_PLAN p_fileStreamSimpleWaitingPlan = { 
+  .waitingPlan = DEEPLY_BLOCKING__WAITING_PLAN ,
+  .c_deadline = 30 ,
+} ;
+
 
 // Public function : see .h
 int ProtectedOpenFile (const char *p_filePathname, int flags, mode_t creationMode,

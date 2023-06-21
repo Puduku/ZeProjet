@@ -38,25 +38,10 @@ struct G_STRING { // #REF struct-G_STRING
 typedef struct G_STRING *G_STRING_STUFF;
 
 
-// Assign a string portion with g-string's "logical" value. 
-//
-// Passed:
-// - m_stringPortion: string portion to assign
-// - p_gStringStuff: 
-// 
-// Updated:
-// - m_stringPortion
-#define m_ASSIGN_STRING_PORTION__G_STRING(/*struct STRING_PORTION*/m_stringPortion,\
-  /*G_STRING_STUFF*/p_gStringStuff) {\
-  (m_stringPortion) = (p_gStringStuff)->cv_stringPortion;\
-}
-
-// See m_ASSIGN_STRING_PORTION__G_STRING() macro above
-#define m_ASSIGN_LOCAL_STRING_PORTION__G_STRING(\
-  /*struct STRING_PORTION*/m_localStringPortion,  /*G_STRING_STUFF*/p_gStringStuff) \
-  struct STRING_PORTION m_localStringPortion;\
-  m_ASSIGN_STRING_PORTION__G_STRING(m_localStringPortion,  p_gStringStuff)
-
+// Get g-string's "logical" value. 
+static inline struct STRING_PORTION m_GStringGetLogicalStringPortion(G_STRING_STUFF stuff) {
+  return stuff->cv_stringPortion; 
+} // m_GStringGetLogicalStringPortion 
 
 // #REF GStringCopy
 // Copy (or concatenate...) a string portion into a "g-string".
@@ -95,7 +80,7 @@ static inline int m_GStringCCopy(G_STRING_STUFF stuff, int n_offset, const char*
 // See GStringCopy() above
 static inline int m_GStringGCopy(G_STRING_STUFF stuff, int n_offset, G_STRING_STUFF p_gStringStuff) {
   m_DIGGY_BOLLARD()
-  m_ASSIGN_LOCAL_STRING_PORTION__G_STRING(stringPortion,p_gStringStuff)
+  struct STRING_PORTION stringPortion =  m_GStringGetLogicalStringPortion(p_gStringStuff);
   m_DIGGY_RETURN(GStringCopy(stuff,n_offset,&stringPortion))
 } // m_GStringGCopy
 
@@ -104,7 +89,7 @@ static inline int m_GStringGCopy(G_STRING_STUFF stuff, int n_offset, G_STRING_ST
 // See GStringCopy() above
 static inline int m_GStringClone(G_STRING_STUFF stuff,  G_STRING_STUFF p_gStringStuff) {
   m_DIGGY_BOLLARD()
-  m_ASSIGN_LOCAL_STRING_PORTION__G_STRING(stringPortion,p_gStringStuff)
+  struct STRING_PORTION stringPortion = m_GStringGetLogicalStringPortion(p_gStringStuff);
   stuff->tokenId = p_gStringStuff->tokenId;
   m_DIGGY_RETURN(GStringCopy(stuff,0,&stringPortion))
 } // m_GStringClone

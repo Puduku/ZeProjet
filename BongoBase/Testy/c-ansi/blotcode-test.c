@@ -224,8 +224,9 @@ int main (int argc, char** argv) {
   m_TRACK_IF(BrokenPipeFixCreateInstance(&brokenPipeFixHandle) != RETURNED)
 
   SUCKER_HANDLE h_outputSuckerHandle = (SUCKER_HANDLE)UNDEFINED;
-  m_TRACK_IF(SuckerCreateInstance(&h_outputSuckerHandle,  (ALARM_SYSTEM_HANDLE)NULL,
-    brokenPipeFixHandle,  BATEAU__S_STREAM_READ_BUFFER_SIZE,  0) != RETURNED)
+//  m_TRACK_IF(SuckerCreateInstance(&h_outputSuckerHandle,  (ALARM_SYSTEM_HANDLE)NULL,
+//    brokenPipeFixHandle, BATEAU__FILE_BUTT_SPOTTER__READ_BUFFER_SIZE,  0) != RETURNED)
+  m_TRACK_IF(SuckerCreateInstance(&h_outputSuckerHandle, 0) != RETURNED)
 
   BLOTCODE_EXECUTOR_HANDLE h_blotcodeExecutorHandle = (BLOTCODE_EXECUTOR_HANDLE)UNDEFINED;
   m_TRACK_IF(BlotcodeExecutorCreateInstance(&h_blotcodeExecutorHandle,  h_blotcodeHandle) !=
@@ -234,7 +235,12 @@ int main (int argc, char** argv) {
   G_STRING_STUFF h_outputGStringStuff = (G_STRING_STUFF)UNDEFINED;
   m_TRACK_IF(G_STRING_CREATE_INSTANCE(&h_outputGStringStuff) != RETURNED)
 
-  m_TRACK_IF(m_SuckerPlugDButt_GString(h_outputSuckerHandle, h_outputGStringStuff) != RETURNED) 
+  //m_TRACK_IF(m_SuckerPlugDButt_GString(h_outputSuckerHandle, h_outputGStringStuff) != RETURNED) 
+  G_STRING_BUTT_SPOTTER_HANDLE h_gStringButtSpotterHandle = (G_STRING_BUTT_SPOTTER_HANDLE)UNDEFINED; 
+  m_TRACK_IF(GStringButtSpotterCreateInstance(&h_gStringButtSpotterHandle,h_outputGStringStuff) !=
+     RETURNED)
+  m_TRACK_IF(SuckerPlugSDButts(h_outputSuckerHandle, NULL, (void*)UNDEFINED,
+    GStringButtSpotterFill,h_gStringButtSpotterHandle) != RETURNED) 
 
   m_TRACK_IF(BlotcodeExecutorTest(1,h_blotcodeExecutorHandle, h_outputSuckerHandle,
     h_outputGStringStuff, DUMMY_TEMPLATE, ANSWER__YES,  BLOTCODE_CONSTRUCTION_STATUS__OK,
@@ -278,6 +284,7 @@ int main (int argc, char** argv) {
 
   m_TRACK_IF(G_STRING_DESTROY_INSTANCE(h_outputGStringStuff) != RETURNED)
 
+  m_TRACK_IF(GStringButtSpotterDestroyInstance(h_gStringButtSpotterHandle) != RETURNED)
   m_TRACK_IF(BlotcodeExecutorDestroyInstance(h_blotcodeExecutorHandle) != RETURNED)
   m_TRACK_IF(SuckerDestroyInstance(h_outputSuckerHandle) != RETURNED)
   m_TRACK_IF(BrokenPipeFixDestroyInstance(brokenPipeFixHandle) != RETURNED)

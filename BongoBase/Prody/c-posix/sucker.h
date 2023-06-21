@@ -1,7 +1,7 @@
 // c-posix/sucker.h, version 1.93
 // (c) Atos-Euronext Belgium - 2001, 2002, 2003
 //
-// Purpose: "universal" transfer agent
+// Purpose: "universal" transfer agent: stream butt spotter
 // =======
 
 #ifndef __C_POSIX_SUCKER_H_INCLUDED__
@@ -18,184 +18,77 @@
 #include "c-posix/rw.h"
 #include "c-posix/rwf.h"
 
-// Sucker...
-// ------
 
-struct SUCKER ; // private...
-typedef struct SUCKER *SUCKER_HANDLE ;
+// STREAM_BUTT_SPOTTER : handle "stream"
+
+struct STREAM_BUTT_SPOTTER ; // Private
+typedef struct STREAM_BUTT_SPOTTER *STREAM_BUTT_SPOTTER_HANDLE; // Public handle
 
 
-#define BATEAU__S_STREAM_READ_BUFFER_SIZE 4096
-
-// Create a sucker...
-//
 // Passed:
-// - azh_handle: address of sucker handle to initialize
+// - azh_handle:
 // - nf_alarmSystemHandle : alarm system used for temporizations (see c-posix/alarm.h)
 //   + NULL special pointer (not provided) ; limited functionality ; no temporization is possible ;
 //     blocking deadlines are de facto indefinite...
 //   + non NULL pointer: actual alarm system ; full temporization support
 // - f_brokenPipeFixHandle: see BrokenPipeFixCreateInstance() in c-posix/rw.h
-// - sStreamReadBufferSize: >0 ; size (in bytes) of read buffer (for stream source butt). If you 
-//   have no idea, specify BATEAU__S_STREAM_READ_BUFFER_SIZE...
-// - suckingLimit: limit (in bytes) of data volume that can be sucked (0 for no limit)
-//
+// - waitingPlan: #SEE struct-WAITING_PLAN <butt> ; if the openDescriptor is a regular file,
+//   you can take p_fileStreamSimpleWaitingPlan... 
+// - n_readBufferSize: 
+//   +  -1 special value: 'd' butt
+//   +  >0: 's'(sucked) butt; size (in bytes) of read buffer. If you have no idea, you can specify
+//      BATEAU__FILE_BUTT_SPOTTER__READ_BUFFER_SIZE...
+// - nf_openDescriptor: 
+//   + -1 special value: not provided
+//   + >=0: connected socket / open regular file,
+// 
 // Changed:
-// - *azh_handle: "sucker" handle initialized.
+// - *azh_handle: new instance's "head" handle... 
 //
 // Ret:
-// - RETURNED: OK
+// - RETURNED: Ok
 // - -1 : unexpected problem; anomaly is raised
-int SuckerCreateInstance (SUCKER_HANDLE *azh_handle, ALARM_SYSTEM_HANDLE nf_alarmSystemHandle,
-  BROKEN_PIPE_FIX_HANDLE f_brokenPipeFixHandle, int sStreamReadBufferSize, int suckingLimit) ;
+int StreamButtSpotterCreateInstance(STREAM_BUTT_SPOTTER_HANDLE *azh_handle,
+  ALARM_SYSTEM_HANDLE nf_alarmSystemHandle, BROKEN_PIPE_FIX_HANDLE f_brokenPipeFixHandle,
+  struct WAITING_PLAN waitingPlan, int n_readBufferSize, int nf_openDescriptor) ;
 
 
-// #SEE SuckerGetSuckingLimit @ c-ansi/sucker.h
-int SuckerGetSuckingLimit (SUCKER_HANDLE handle) ;
+// Kick spotter's "stream" butt (that is provide "fresh" stream)
+//
+// Passed: 
+// - handle:
+// - f_openDescriptor: connected socket / open regular file,
+//
+// Ret:
+// - RETURNED: Ok
+// - -1 : unexpected problem; anomaly is raised
+int StreamButtSpotterKick(STREAM_BUTT_SPOTTER_HANDLE handle, int f_openDescriptor) ;
 
 
-enum {
-// #REF enum-SUCKER_BUTT
-    STREAM__SUCKER_BUTT, // any "connected" descriptor...
-  G_STRING__SUCKER_BUTT, // g-string used as "buffer"
-};
-
-
-// #REF STREAM_WAITING_PLAN 
-// int waitingPlan; => choose your plan. If connected descriptor is currently not available,
-//  sucker...
-//  - NON_BLOCKING__WAITING_PLAN: ...flops "immediately" !
-//  - LIGHTLY_BLOCKING__WAITING_PLAN: ...blocks till stream is available, BUT
-//    flops directly if the process / thread is "interrupted"
-//  - DEEPLY_BLOCKING__WAITING_PLAN: ...blocks till stream is available ;
-//    flops after a STRICT deadline expiration.
-//  int c_deadline; => Only significant for blocking waiting plan ;
-//  delay, in seconds of timeout (0 for infinite, that is "no deadline")
-
-
-struct SUCKER_BUTT {
-  // #REF struct-SUCKER_BUTT
-  int suckerButt ;  // #SEE enum-SUCKER_BUTT
-  union { //
-    struct { // [[ With STREAM__SUCKER_BUTT ]]
-      int descriptor ; // e.g. connected socket
-      struct WAITING_PLAN waitingPlan ; // #SEE STREAM_WAITING_PLAN
-    } c_stream ; //
-    G_STRING_STUFF c_gStringStuff; // [[ With G_STRING__SUCKER_BUTT ]]
-  } select; //
+enum { // #REF STREAM_FLOP_CAUSE-enum 
+  STREAM_FLOP_CAUSE__NONE0 = FLOP_CAUSE__NONE0,
+  STREAM_FLOP_CAUSE__NOT_CONNECTED, // or could not open file 
+  STREAM_FLOP_CAUSE__TIMEOUT, // corresponds to RW_STATUS__TRY_AGAIN 
+  STREAM_FLOP_CAUSE__BROKEN_PIPE, // corresponds to RW_STATUS__TERMINATING 
+  STREAM_FLOP_CAUSE__CONNECTION_LOST, // corresponds to RW_STATUS__CONNECTION_LOST 
 } ;
 
 
-// Initialize a stream sucker butt.
-// 
-// Passed:
-// - m_suckerButt: structure to initialize
-// - m_descriptor: any connected descriptor
-// - streamWaitingPlan: 
-//   #SEE STREAM_WAITING_PLAN
-#define m_ASSIGN_SUCKER_BUTT__STREAM(/*struct SUCKER_BUTT*/ m_suckerButt,\
-  /*int*/m_descriptor, /*struct WAITING_PLAN*/p_streamWaitingPlan) {\
-  (m_suckerButt).suckerButt = STREAM__SUCKER_BUTT;\
-  (m_suckerButt).select.c_stream.descriptor = m_descriptor;\
-  (m_suckerButt).select.c_stream.waitingPlan = p_streamWaitingPlan;\
-}
-
-extern const struct WAITING_PLAN p_suckerFileStreamWaitingPlan; 
-
-// Initialize a "file" stream sucker butt.
-// 
-// Passed:
-// - m_suckerButt: structure to initialize
-// - fileDescriptor: descriptor, supposed a regular open file (see c-posix/rw.h)
-//   must stay open while butt is in use...
-#define m_ASSIGN_SUCKER_BUTT__FILE_STREAM(/*struct SUCKER_BUTT*/m_suckerButt,\
-  /*int*/fileDescriptor) \
-m_ASSIGN_SUCKER_BUTT__STREAM(m_suckerButt, fileDescriptor, p_suckerFileStreamWaitingPlan)
+// #SEE BUTT_SPOTTER_SUCK_FUNCTION@c-ansi/sucker.h <stream>
+// #SEE STREAM_FLOP_CAUSE-enum
+int StreamButtSpotterSuck(void *r_handle,  char b_kickButt, struct STRING_PORTION *ac_chunk,
+   int *nar_flopCause) ;
 
 
-// Initialize a g-string sucker butt.
-// 
-// Passed:
-// - m_suckerButt: structure to initialize
-// - gStringStuff: g-string used as buffer
-#define m_ASSIGN_SUCKER_BUTT__G_STRING(/*struct SUCKER_BUTT*/ m_suckerButt,\
-  /*G_STRING_STUFF*/ gStringStuff) {\
-  (m_suckerButt).suckerButt = G_STRING__SUCKER_BUTT;\
-  (m_suckerButt).select.c_gStringStuff = gStringStuff;\
-}
-
-#define m_ASSIGN_LOCAL_SUCKER_BUTT__G_STRING(/*struct SUCKER_BUTT*/ m_localSuckerButt,\
-  /*G_STRING_STUFF*/ gStringStuff) \
-  struct SUCKER_BUTT m_localSuckerButt;\
-  m_ASSIGN_SUCKER_BUTT__G_STRING(m_localSuckerButt,gStringStuff)
+// #SEE BUTT_SPOTTER_FILL_FUNCTION@c-ansi/sucker.h <stream>
+// #SEE STREAM_FLOP_CAUSE-enum
+int StreamButtSpotterFill(void *r_handle, struct STRING_PORTION chunk, int *nar_flopCause);
 
 
-// #SEE SuckerPlugSButt@c-ansi/sucker.h
-int SuckerPlugSButt(SUCKER_HANDLE handle, const struct SUCKER_BUTT *af_sSuckerButt);
-
-
-// #SEE SuckerPlugDButt@c-ansi/sucker.h
-int SuckerPlugDButt(SUCKER_HANDLE handle, const struct SUCKER_BUTT *af_dSuckerButt);
-
-// Wraps SuckerPlugDButt() 
-// Plug g-string destination butt...
-static inline int m_SuckerPlugDButt_GString(SUCKER_HANDLE handle, G_STRING_STUFF f_dGStringStuff) {
-  m_ASSIGN_LOCAL_SUCKER_BUTT__G_STRING(dSuckerButt,f_dGStringStuff) 
-  return SuckerPlugDButt(handle,&dSuckerButt) ;
-} // SuckerPlugDButtGString 
-
-
-
-// #SEE SuckerSuckSButt @ c-ansi/sucker.h <RW status>
-// Note: "flop" can only occur with "stream" butt ; the possible RW status is:
-// RW_STATUS__TRY_AGAIN or RW_STATUS__CONNECTION_LOST
-int SuckerSuckSButt(SUCKER_HANDLE handle, struct STRING_PORTION *ac_chunk,
-  int *na_flopCauseRwStatus);
-
-
-// #SEE SuckerFillDButt @ c-ansi/sucker.h <RW status>
-// Note: "flop" can only occur with "stream" butt ; the possible RW status is:
-// RW_STATUS__TRY_AGAIN, RW_STATUS__TERMINATING or RW_STATUS__CONNECTION_LOST
-int SuckerFillDButt(SUCKER_HANDLE handle, struct STRING_PORTION chunk, int *na_flopCauseRwStatus);
-
-
-// Just a declaration (actual implementation in c-ansi/sucker)
-// #SEE SuckerSuckOut @ c-ansi/sucker.h <RW status>
-// Note: "flop" can only occur with "stream" butt ; the possible RW status is:
-// RW_STATUS__TRY_AGAIN, RW_STATUS__TERMINATING or RW_STATUS__CONNECTION_LOST
-int SuckerSuckOut (SUCKER_HANDLE handle, const struct SUCKER_BUTT *ap_sSuckerButt,
-  const struct SUCKER_BUTT *ap_dSuckerButt,  int *na_suckedOutLength, int *na_flopCauseRwStatus) ;
-
-
-// Copy source file into destination file. This function simply wraps SuckerSuckOut() with two
-// "FILE" butts...
+// Destroy stream butt spotter...
 //
 // Passed: 
-// - handle: see SuckerCreateInstance()
-// - p_sFilePathname: source (regular) file's pathname
-// - p_dFilePathname: destination (regular) file's pathname
-// - nonPosixOpenFlags: see c-posix/rwf.h
-// - na_copiedLength: NULL pointer if not used
-// - na_flopCauseRwStatus: NULL pointer if not used
-// - na_openErrno: NULL pointer if not used
-//
-// Modified:
-// - *na_copiedLength: (if asked) amount of data copied (in bytes)
-// - *na_flopCauseRwStatus: (if asked) : in case of "flop", != RW_STATUS__OK value indicates
-//   problem during file reading or writing (see c-posix/rw.h)... 
-// - *na_openErrno: reflects underlying open()'errno status in case of "flop" during "file opening"
-//
-// Return:
-// #SEE enum-SUCKER_STATUS @ c-ansi/sucker.h
-// - -1 : unexpected problem; anomaly is raised
-int SuckerCopy (SUCKER_HANDLE handle, const char *p_sFilePathname, const char *p_dFilePathname,
-  int nonPosixOpenFlags, int *na_copiedLength, int *na_flopCauseRwStatus, int *na_openErrno) ;
-
-
-// Destroy sucker...
-//
-// Passed: 
-// -  xh_handle: the sucker to liquidate
+// -  xh_handle: the stream butt spooter to liquidate
 //
 // Changed:
 // - xh_handle: this handle is no more usable
@@ -203,7 +96,38 @@ int SuckerCopy (SUCKER_HANDLE handle, const char *p_sFilePathname, const char *p
 // Ret:
 // - RETURNED: OK
 // - -1 : unexpected problem; anomaly is raised
-int SuckerDestroyInstance (SUCKER_HANDLE xh_handle) ;
+int StreamButtSpotterDestroyInstance(STREAM_BUTT_SPOTTER_HANDLE xh_handle);
+
+
+// Sucker: stream-based file copy
+// -------
+
+// Copy source file into destination file. This function simply wraps SuckerSuckOut() with two
+// "stream" butts (open regular files). That is, this function is a C-Posix implementation of
+// C-Ansi's SuckerFCopy()... 
+//
+// Passed: 
+// - handle: see SuckerCreateInstance()
+// - n_alarmSystemHandle:
+// - brokenPipeFixHandle:
+// - p_sFilePathname: source (regular) file's pathname
+// - p_dFilePathname: destination (regular) file's pathname
+// - na_copiedLength: NULL pointer if not used
+// - na_streamFlopCause: NULL pointer if not used
+//
+// Modified:
+// - *na_copiedLength: (if asked) amount of data copied (in bytes)
+// - *na_streamFlopCause: (if asked) : in case of "flop", indicates problem during file reading or
+//   writing ; #SEE STREAM_FLOP_CAUSE
+//
+// Return:
+// #SEE enum-SUCKER_STATUS @ c-ansi/sucker.h
+// - -1 : unexpected problem; anomaly is raised
+int SuckerCopy (SUCKER_HANDLE handle,  ALARM_SYSTEM_HANDLE n_alarmSystemHandle,
+   BROKEN_PIPE_FIX_HANDLE brokenPipeFixHandle,  
+   const char *p_sFilePathname, const char *p_dFilePathname,
+   int *na_copiedLength, int *na_streamFlopCause) ;
+
 
 
 #endif // __C_POSIX_SUCKER_H_INCLUDED__

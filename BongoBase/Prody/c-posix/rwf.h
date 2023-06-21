@@ -158,6 +158,12 @@ int ProtectedOpenFile (const char *p_filePathname, int flags, mode_t creationMod
   int *aczh_fileDescriptor, int *na_openErrno) ;
 
 
+// Typical waiting plan 
+// --------------------
+
+// (for regular files)
+extern const struct WAITING_PLAN p_fileStreamSimpleWaitingPlan;
+
 
 // II. Locking a regular file
 // ==========================

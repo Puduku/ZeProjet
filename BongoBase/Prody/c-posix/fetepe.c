@@ -118,16 +118,19 @@ struct FETEPE {
       struct {
         int localOpenErrno;
         int suckerStatus;
-        int rwStatus;
+        int r_flopCause;
         int sButtIs; // #SEE S_BUTT-enum
       } sucker ;
     } outline;
     PD_HANDLE h_listeningSocketPdHandle ;
     SUCKER_HANDLE h_suckerHandle ;
     int nonPosixOpenFlags;
-    int nh_streamDescriptor;
-    GREEN_COLLECTION_HANDLE h_lsLines ;
+    int nh_streamDescriptor; // >= 0 => open stream
+    STREAM_BUTT_SPOTTER_HANDLE h_streamButtSpotterHandle; 
+    STREAM_BUTT_SPOTTER_HANDLE h_localStreamButtSpotterHandle; 
     G_STRING_STUFF h_lsOutput ;
+    G_STRING_BUTT_SPOTTER_HANDLE h_lsOutputButtSpotterHandle; 
+    GREEN_COLLECTION_HANDLE h_lsLines ;
   } data ;
 } ;
 
@@ -142,17 +145,14 @@ struct FETEPE {
   (handle)->data.outline.b_closeConnectionLost = b_FALSE0;\
   (handle)->data.outline.sucker.localOpenErrno = 0;\
   (handle)->data.outline.sucker.sButtIs = S_BUTT_IS__UNKNOWN;\
-  (handle)->data.outline.sucker.rwStatus = RW_STATUS__OK;\
+  (handle)->data.outline.sucker.r_flopCause = FLOP_CAUSE__NONE0;\
   (handle)->data.outline.sucker.suckerStatus = SUCKER_STATUS__OK;\
 }
 
 
 // custom function (see CHECK_READ_FUNCTION @ c-posix/erw.h)
-static int CheckReadFtpCommandStatus (void * r_virtualHandle,
-                                      const char *p_readBuffer,
-                                      int readLength,
-                                      int attemptsCount,
-                                      int *ac_messageLength) {
+static int CheckReadFtpCommandStatus (void * r_virtualHandle, const char *p_readBuffer,
+  int readLength, int attemptsCount, int *ac_messageLength) {
   m_DIGGY_BOLLARD_S() ;
   GREEN_COLLECTION_HANDLE linesPartitionHandle = (GREEN_COLLECTION_HANDLE) r_virtualHandle ;
   int answer = ANSWER__NO; // a priori 
@@ -185,12 +185,10 @@ static const struct WAITING_PLAN p_fetepeWaitingPlan = {
   
 
 // Public function: see .h
-int FetepeCreateInstance (FETEPE_HANDLE *azh_handle,
-                          ALARM_SYSTEM_HANDLE nf_alarmSystemHandle,
-                          BROKEN_PIPE_FIX_HANDLE f_brokenPipeFixHandle,
-                          int transferSizeLimit,
-                          FETEPE_LOG_COMMAND_STATUS_FUNCTION n_logCommandStatusFunction,
-                          void *cfr_logCommandStatusFunctionHandle) {
+int FetepeCreateInstance (FETEPE_HANDLE *azh_handle, ALARM_SYSTEM_HANDLE nf_alarmSystemHandle,
+  BROKEN_PIPE_FIX_HANDLE f_brokenPipeFixHandle, int transferSizeLimit,
+  FETEPE_LOG_COMMAND_STATUS_FUNCTION n_logCommandStatusFunction,
+  void *cfr_logCommandStatusFunctionHandle) {
   m_DIGGY_BOLLARD()
   m_MALLOC_INSTANCE(*azh_handle)
   FETEPE_HANDLE handle = *azh_handle;
@@ -204,23 +202,28 @@ int FetepeCreateInstance (FETEPE_HANDLE *azh_handle,
   } // if
   m_TRACK_IF(G_STRING_CREATE_INSTANCE(&handle->command.status.h_line) != RETURNED)
   m_TRACK_IF(LINES_PARTITION_CREATE_INSTANCE(&handle->command.status.h_linesPartitionHandle,10,
-                                             NULL,(void *)UNDEFINED) != RETURNED)
+    NULL,(void *)UNDEFINED) != RETURNED)
   handle->command.socket.nh_connectedDescriptor = -1;
-  m_TRACK_IF(ErwCreateInstance(&handle->command.socket.h_erwHandle,
-                               f_brokenPipeFixHandle,
-                               nf_alarmSystemHandle,
-                               256,NULL,
-                               CheckReadFtpCommandStatus,
-                               (void *) handle->command.status.h_linesPartitionHandle) != RETURNED)
+  m_TRACK_IF(ErwCreateInstance(&handle->command.socket.h_erwHandle, f_brokenPipeFixHandle,
+    nf_alarmSystemHandle, 256,NULL, CheckReadFtpCommandStatus,
+    (void *) handle->command.status.h_linesPartitionHandle, NULL) != RETURNED)
 
   // data:
+  handle->data.nh_streamDescriptor = -1;
+  m_TRACK_IF(StreamButtSpotterCreateInstance(&handle->data.h_streamButtSpotterHandle,
+    nf_alarmSystemHandle, f_brokenPipeFixHandle,
+    p_fetepeWaitingPlan, BATEAU__FILE_BUTT_SPOTTER__READ_BUFFER_SIZE, -1) != RETURNED)
+  m_TRACK_IF(StreamButtSpotterCreateInstance(&handle->data.h_localStreamButtSpotterHandle,
+    nf_alarmSystemHandle, f_brokenPipeFixHandle,
+    p_fetepeWaitingPlan, BATEAU__FILE_BUTT_SPOTTER__READ_BUFFER_SIZE, -1) != RETURNED)
   handle->data.nonPosixOpenFlags = 0;
   m_TRACK_IF(PdCreateInstance(&handle->data.h_listeningSocketPdHandle,nf_alarmSystemHandle) != RETURNED)
-  m_TRACK_IF(SuckerCreateInstance(&handle->data.h_suckerHandle,nf_alarmSystemHandle,
-                                  f_brokenPipeFixHandle,4096,transferSizeLimit) != RETURNED)
-  m_TRACK_IF(LINES_PARTITION_CREATE_INSTANCE(&handle->data.h_lsLines,100,
-                                             NULL,(void *)UNDEFINED) != RETURNED)
+  m_TRACK_IF(SuckerCreateInstance(&handle->data.h_suckerHandle, transferSizeLimit) != RETURNED)
+  m_TRACK_IF(LINES_PARTITION_CREATE_INSTANCE(&handle->data.h_lsLines,100, NULL,(void *)UNDEFINED)
+    != RETURNED)
   m_TRACK_IF(G_STRING_CREATE_INSTANCE(&handle->data.h_lsOutput) != RETURNED)
+  m_TRACK_IF(GStringButtSpotterCreateInstance(&handle->data.h_lsOutputButtSpotterHandle,
+    handle->data.h_lsOutput) != RETURNED)
 
   m_DIGGY_RETURN(RETURNED)
 } // FetepeCreateInstance
@@ -228,7 +231,7 @@ int FetepeCreateInstance (FETEPE_HANDLE *azh_handle,
 
 // Public function: see .h
 int FetepeGetLastFtpCommandStatus (FETEPE_HANDLE handle, int *a_ftpCommandStatus,
-                                   int *na_localOpenErrno) {
+  int *na_localOpenErrno) {
   m_DIGGY_BOLLARD()
   *a_ftpCommandStatus = handle->command.outline.ftpCommandStatus ;
 
@@ -325,7 +328,7 @@ const char *FetepeGetClue (FETEPE_HANDLE handle) {
   } else {
     char b_clearClue = b_TRUE ; // a priori
     int flopOrigin = GetFlopOrigin(handle->data.outline.sucker.suckerStatus,
-                                   handle->data.outline.sucker.sButtIs);
+      handle->data.outline.sucker.sButtIs);
     m_RAISE_VERBATIM_IF_V(NULL, flopOrigin < 0)
 
     switch (handle->data.outline.sucker.suckerStatus) {
@@ -335,19 +338,19 @@ const char *FetepeGetClue (FETEPE_HANDLE handle) {
       clue = "Volume of copied data exceeds allowed limit.";
     break; case SUCKER_STATUS__S_FLOP:
     case SUCKER_STATUS__D_FLOP:
-      if (handle->data.outline.sucker.rwStatus == RW_STATUS__TRY_AGAIN) {
+      if (handle->data.outline.sucker.r_flopCause == STREAM_FLOP_CAUSE__TIMEOUT) {
         if (flopOrigin == FLOP_ORIGIN__REMOTE) {
           clue = "Timeout while transferring data - REMOTE server hanged.";
         } else { // FLOP_ORIGIN__LOCAL
           clue = "Timeout while transferring data - LOCAL stream hanged.";
         } // if
-      } else if (handle->data.outline.sucker.rwStatus == RW_STATUS__TERMINATING) {
+      } else if (handle->data.outline.sucker.r_flopCause == STREAM_FLOP_CAUSE__BROKEN_PIPE) {
         if (flopOrigin == FLOP_ORIGIN__REMOTE) {
           clue = "FTP server unexpectedly closed the data channel.";
         } else { // FLOP_ORIGIN__LOCAL
           clue = "LOCAL stream closed unexpectedly; LOCAL file system may be full.";
         } // if
-      } else if (handle->data.outline.sucker.rwStatus == RW_STATUS__CONNECTION_LOST) {
+      } else if (handle->data.outline.sucker.r_flopCause ==  STREAM_FLOP_CAUSE__CONNECTION_LOST) {
         if (flopOrigin == FLOP_ORIGIN__REMOTE) {
           clue = "Data channel with FTP server broken.";
         } else { // FLOP_ORIGIN__LOCAL
@@ -504,8 +507,7 @@ static int FetepeReadCommandStatus (FETEPE_HANDLE handle, int *a_fetepeStatus,
 // - RETURNED:
 // - -1 : unexpected problem
 static int FetepeWriteCommandV (struct FETEPE *handle, int *a_fetepeStatus,
-                                const char *p_commandFormat, 
-                                va_list commandArguments) {
+  const char *p_commandFormat, va_list commandArguments) {
   m_DIGGY_BOLLARD_S()
   if (handle->command.socket.nh_connectedDescriptor == -1) {
     *a_fetepeStatus = FETEPE_STATUS__NO_COMMAND_CHANNEL;
@@ -520,9 +522,8 @@ static int FetepeWriteCommandV (struct FETEPE *handle, int *a_fetepeStatus,
   length = strlen(command) ;
   command[length++] = '\r' ;
   command[length++] = '\n' ;
-  switch (handle->command.outline.rwStatus =
-          ErwWrite2(handle->command.socket.h_erwHandle,
-                    NULL,command,length,NULL)) {
+  switch (handle->command.outline.rwStatus = ErwWrite2(handle->command.socket.h_erwHandle,
+    NULL,command,length,NULL)) {
   case RW_STATUS__OK: 
   break; case RW_STATUS__TRY_AGAIN:
   case RW_STATUS__TERMINATING : 
@@ -549,7 +550,7 @@ static int FetepeWriteCommandV (struct FETEPE *handle, int *a_fetepeStatus,
 // - RETURNED:
 // - -1 : unexpected problem
 static int FetepeWriteCommand (struct FETEPE *handle, int *a_fetepeStatus,
-                               const char *p_commandFormat,...) {
+  const char *p_commandFormat,...) {
   m_DIGGY_BOLLARD_S()
   va_list commandArguments ;
   va_start(commandArguments,p_commandFormat) ;
@@ -561,9 +562,8 @@ static int FetepeWriteCommand (struct FETEPE *handle, int *a_fetepeStatus,
 
 
 // Public function ; see description in .h
-int FetepeConnect (FETEPE_HANDLE handle,
-                   const char *p_hostIpAddress, const char *p_user, const char *np_password,
-                   int *na_connectErrno) {
+int FetepeConnect (FETEPE_HANDLE handle, const char *p_hostIpAddress, const char *p_user,
+  const char *np_password, int *na_connectErrno) {
   m_DIGGY_BOLLARD()
   int fetepeStatus = FETEPE_STATUS__OK ; // a priori
   m_RESET_OUTLINE(handle)
@@ -572,8 +572,7 @@ int FetepeConnect (FETEPE_HANDLE handle,
   m_RAISE_VERBATIM_IF(handle->command.socket.nh_connectedDescriptor != -1)
 
   switch (CreateAndConnect(&handle->command.socket.nh_connectedDescriptor,
-                           inet_addr(p_hostIpAddress), htons(21),
-                           &handle->command.outline.connectErrno)) {
+    inet_addr(p_hostIpAddress), htons(21), &handle->command.outline.connectErrno)) {
   case ATTEMPT__SUCCESSFUL: 
   break; case ATTEMPT__TRY_AGAIN: 
     handle->command.socket.nh_connectedDescriptor = -1 ; // not connected
@@ -588,8 +587,7 @@ int FetepeConnect (FETEPE_HANDLE handle,
     fetepeStatus = FETEPE_STATUS__NO_COMMAND_CHANNEL;
   } else {
     switch (ErwReset(handle->command.socket.h_erwHandle,
-                     handle->command.socket.nh_connectedDescriptor,
-                     &p_fetepeWaitingPlan)) {
+      handle->command.socket.nh_connectedDescriptor, &p_fetepeWaitingPlan)) {
     case COMPLETED__OK:
     case COMPLETED__BUT:
     break; default :
@@ -601,7 +599,7 @@ int FetepeConnect (FETEPE_HANDLE handle,
 
       size = sizeof(sockaddrIn) ;
       m_PERROR_VERBATIM_IF(getsockname(handle->command.socket.nh_connectedDescriptor,
-                                       (struct sockaddr *)&sockaddrIn,&size) < 0)
+        (struct sockaddr *)&sockaddrIn,&size) < 0)
 
       handle->command.socket.c_inetAddr = sockaddrIn.sin_addr.s_addr ;
     } // sockaddrIn 
@@ -618,7 +616,7 @@ int FetepeConnect (FETEPE_HANDLE handle,
     if (fetepeStatus == FETEPE_STATUS__OK &&
         handle->command.outline.ftpCommandStatus == ASK_FOR_PASSWORD__FTP_COMMAND_STATUS) {
        m_TRACK_IF(FetepeWriteCommand(handle,&fetepeStatus,PASS__FTP_COMMAND__FMT_S,
-                                    np_password != NULL? np_password: p_user) != RETURNED)
+         np_password != NULL? np_password: p_user) != RETURNED)
        m_TRACK_IF(FetepeReadCommandStatus(handle,&fetepeStatus,-1) != RETURNED)
     } // if
     m_CHECK_COMMAND_STATUS(fetepeStatus, SESSION_IS_OPEN__FTP_COMMAND_STATUS)
@@ -733,9 +731,8 @@ int FetepeRename (FETEPE_HANDLE handle, const char *oldName, const char *newName
   m_RESET_OUTLINE(handle)
 
   m_TRACK_IF(FetepeWriteCommand(handle,&fetepeStatus,RNFR__FTP_COMMAND__FMT_S,oldName) != RETURNED)
-  m_TRACK_IF(FetepeReadCommandStatus(
-               handle,&fetepeStatus,
-               FILE_SERVICE_WAITING_FOR_COMPLEMENTARY_INFORMATION__FTP_COMMAND_STATUS) != RETURNED)
+  m_TRACK_IF(FetepeReadCommandStatus(handle,&fetepeStatus,
+    FILE_SERVICE_WAITING_FOR_COMPLEMENTARY_INFORMATION__FTP_COMMAND_STATUS) != RETURNED)
 
   if (fetepeStatus == FETEPE_STATUS__OK) {
     m_TRACK_IF(FetepeWriteCommand(handle,&fetepeStatus,RNTO__FTP_COMMAND__FMT_S,newName) != RETURNED)
@@ -793,7 +790,6 @@ static int FetepeOpenDataStream (FETEPE_HANDLE handle, int *a_fetepeStatus,
   int nh_listeningSocketDescriptor = -1 ;
 
   m_ASSERT(handle->data.nh_streamDescriptor == -1)
-  handle->data.nh_streamDescriptor = -1 ;
 
   if (handle->b_passive) {
     m_TRACK_IF(FetepeWriteCommand(handle,a_fetepeStatus,PASV__FTP_COMMAND__FMT) != RETURNED)
@@ -812,20 +808,16 @@ static int FetepeOpenDataStream (FETEPE_HANDLE handle, int *a_fetepeStatus,
       ret = SScanfStringPortion(lastLineDelimitorStuff->practicalLine, 
         ENTERING_PASSIVE_MODE_STATUS__FMT_6U, &h1,&h2,&h3,&h4, &p1,&p2); 
       m_TRACK_IF(ret < 0)
-
-      if (ret == 6) {
-        switch (CreateAndConnect(&(handle->data.nh_streamDescriptor), RWN_INET_ADDR(h1,h2,h3,h4),
-          RWN_INET_PORT(p1,p2), &handle->data.outline.bindOrListenOrConnectErrno)) {
-        case ATTEMPT__SUCCESSFUL: 
-        break; case ATTEMPT__TRY_AGAIN: 
-          handle->data.nh_streamDescriptor = -1 ; // not connected
-          *a_fetepeStatus = FETEPE_STATUS__REFUSED;
-        break; default :
-          m_TRACK()
-        } // switch
-      } else {
-        m_RAISE(ANOMALY__UNEXPECTED_CASE) // TODO: what else ??
-      } // if
+      m_ASSERT(ret == 6)
+      switch (CreateAndConnect(&(handle->data.nh_streamDescriptor), RWN_INET_ADDR(h1,h2,h3,h4),
+        RWN_INET_PORT(p1,p2), &handle->data.outline.bindOrListenOrConnectErrno)) {
+      case ATTEMPT__SUCCESSFUL: 
+      break; case ATTEMPT__TRY_AGAIN: 
+        handle->data.nh_streamDescriptor = -1 ; // not connected
+        *a_fetepeStatus = FETEPE_STATUS__REFUSED;
+      break; default :
+        m_TRACK()
+      } // switch
     } // if
 
   } else {
@@ -897,6 +889,10 @@ static int FetepeOpenDataStream (FETEPE_HANDLE handle, int *a_fetepeStatus,
     } // switch
   } // if
 
+  if (handle->data.nh_streamDescriptor >= 0) {
+    m_TRACK_IF(StreamButtSpotterKick(handle->data.h_streamButtSpotterHandle,
+      handle->data.nh_streamDescriptor) != RETURNED) 
+  } // if
   if (nh_listeningSocketDescriptor >= 0) {
     m_PROTECTED_CLOSE(nh_listeningSocketDescriptor, m_RAISE(ANOMALY__CONNECTION_LOST))
   } // if
@@ -936,7 +932,7 @@ static int FetepeCloseDataStream(struct FETEPE *handle, int *a_fetepeStatus) {
 
 // Public function ; see description in .h
 int FetepePut3Open (FETEPE_HANDLE handle, const char *p_remoteFileName,
-  struct SUCKER_BUTT *a_remoteButt) {
+  int *ac_remoteDescriptor) {
   m_DIGGY_BOLLARD()
   int fetepeStatus = FETEPE_STATUS__OK;
   m_RESET_OUTLINE(handle)
@@ -946,7 +942,7 @@ int FetepePut3Open (FETEPE_HANDLE handle, const char *p_remoteFileName,
 
   if (handle->data.nh_streamDescriptor != -1) {
     m_ASSERT(fetepeStatus == FETEPE_STATUS__OK)
-    m_ASSIGN_SUCKER_BUTT__STREAM(*a_remoteButt,handle->data.nh_streamDescriptor,p_fetepeWaitingPlan)
+    *ac_remoteDescriptor = handle->data.nh_streamDescriptor;
   } else {
     m_ASSERT(fetepeStatus != FETEPE_STATUS__OK)
   } // if
@@ -967,10 +963,9 @@ int FetepePut3Close (FETEPE_HANDLE handle) {
 
 
 // Public function ; see description in .h
-int FetepePut2 (FETEPE_HANDLE handle,
-                const struct SUCKER_BUTT *ap_localButt,
-                const char *p_remoteFileName,
-                int *na_putLength) {
+int FetepePut2 (FETEPE_HANDLE handle, //const struct SUCKER_BUTT *ap_localButt,
+  BUTT_SPOTTER_SUCK_FUNCTION localButtSpotterSuckFunction, void *r_localButtSpotterSuckHandle,
+  const char *p_remoteFileName, int *na_putLength) {
   m_DIGGY_BOLLARD()
   int fetepeStatus = FETEPE_STATUS__OK;
   m_RESET_OUTLINE(handle)
@@ -979,20 +974,18 @@ int FetepePut2 (FETEPE_HANDLE handle,
     == -1)
 
   if (handle->data.nh_streamDescriptor != -1) {
-    struct SUCKER_BUTT remoteButt ;
-
     m_ASSERT(fetepeStatus == FETEPE_STATUS__OK)
-    m_ASSIGN_SUCKER_BUTT__STREAM(remoteButt,handle->data.nh_streamDescriptor,p_fetepeWaitingPlan)
+    m_TRACK_IF(SuckerPlugSDButts(handle->data.h_suckerHandle, 
+      localButtSpotterSuckFunction,r_localButtSpotterSuckHandle,
+      StreamButtSpotterFill, handle->data.h_streamButtSpotterHandle) != RETURNED)
     handle->data.outline.sucker.sButtIs = S_BUTT_IS__LOCAL;
 
     switch (handle->data.outline.sucker.suckerStatus = SuckerSuckOut(handle->data.h_suckerHandle,
-      ap_localButt,&remoteButt, na_putLength, &handle->data.outline.sucker.rwStatus)) {
+      na_putLength, &handle->data.outline.sucker.r_flopCause)) {
     case SUCKER_STATUS__OK:
     break; case SUCKER_STATUS__S_FLOP:
     case SUCKER_STATUS__D_FLOP:
-      if (fetepeStatus == FETEPE_STATUS__OK) {
-        fetepeStatus = FETEPE_STATUS__REFUSED;
-      } // if
+      if (fetepeStatus == FETEPE_STATUS__OK) fetepeStatus = FETEPE_STATUS__REFUSED;
     break; default :
       m_TRACK()
     } // switch
@@ -1012,15 +1005,16 @@ int FetepePut (FETEPE_HANDLE handle, const char *p_localFilePathname, const char
   int *na_putLength) {
   m_DIGGY_BOLLARD()
   int fetepeStatus = FETEPE_STATUS__REFUSED ; // a priori
-  struct SUCKER_BUTT localButt ;
   int ch_localFileDescriptor = UNDEFINED;
 
   switch (ProtectedOpenFile(p_localFilePathname, READ__BASIC_OPEN_FILE_MODE |
     handle->data.nonPosixOpenFlags, 0, &ch_localFileDescriptor,
     &handle->data.outline.sucker.localOpenErrno)) {
   case ANSWER__YES: 
-    m_ASSIGN_SUCKER_BUTT__FILE_STREAM(localButt, ch_localFileDescriptor)
-    fetepeStatus = FetepePut2(handle,&localButt,p_remoteFileName,na_putLength);
+    m_TRACK_IF(StreamButtSpotterKick(handle->data.h_localStreamButtSpotterHandle,
+      ch_localFileDescriptor) != RETURNED)
+    fetepeStatus = FetepePut2(handle,StreamButtSpotterSuck,
+      handle->data.h_localStreamButtSpotterHandle, p_remoteFileName,na_putLength);
     m_TRACK_IF(fetepeStatus < 0)
     m_PROTECTED_CLOSE(ch_localFileDescriptor,
       if (fetepeStatus == FETEPE_STATUS__OK) fetepeStatus = FETEPE_STATUS__REFUSED;
@@ -1061,7 +1055,7 @@ static int CorrectFilename (G_STRING_STUFF fileName, unsigned int corrections) {
     // Convert name to upper case
     m_TRACK_IF(GStringConvert(fileName,  (IS_CHAR_FUNCTION)NULL,toupper) < 0)
   } // if
-       
+
   m_DIGGY_RETURN(RETURNED)
 } // CorrectFileName 
 
@@ -1095,29 +1089,26 @@ static int FetepeNListDir (FETEPE_HANDLE handle, const char *p_cmd, const char *
   } // if
 
   if (handle->data.nh_streamDescriptor != -1) {
-    struct SUCKER_BUTT sButt, dButt ;
-
     m_ASSERT(fetepeStatus == FETEPE_STATUS__OK)
-    m_ASSIGN_SUCKER_BUTT__STREAM(sButt,handle->data.nh_streamDescriptor,p_fetepeWaitingPlan)
-    m_ASSIGN_SUCKER_BUTT__G_STRING(dButt,handle->data.h_lsOutput)
+    m_TRACK_IF(SuckerPlugSDButts(handle->data.h_suckerHandle, 
+      StreamButtSpotterSuck, handle->data.h_streamButtSpotterHandle,
+      GStringButtSpotterFill, handle->data.h_lsOutputButtSpotterHandle) != RETURNED)
 
     handle->data.outline.sucker.sButtIs = S_BUTT_IS__REMOTE;
     m_G_STRING_CLEAR(handle->data.h_lsOutput)
     switch (handle->data.outline.sucker.suckerStatus = SuckerSuckOut(handle->data.h_suckerHandle,
-      &sButt,&dButt, NULL, &handle->data.outline.sucker.rwStatus)) {
+      NULL, &handle->data.outline.sucker.r_flopCause)) {
     case SUCKER_STATUS__OK:
     break; case SUCKER_STATUS__S_FLOP:
     case SUCKER_STATUS__D_FLOP:
-      if (fetepeStatus == FETEPE_STATUS__OK) {
-        fetepeStatus = FETEPE_STATUS__REFUSED;
-      } // if
+      if (fetepeStatus == FETEPE_STATUS__OK) fetepeStatus = FETEPE_STATUS__REFUSED; 
     break; default :
       m_TRACK()
     } // switch
 
     m_TRACK_IF(GreenCollectionClear(handle->data.h_lsLines) != RETURNED)
-    m_ASSIGN_LOCAL_STRING_PORTION__G_STRING(localLsOutput,handle->data.h_lsOutput)
-    m_TRACK_IF(ParseAsciiLines(localLsOutput, -1,NULL, handle->data.h_lsLines) < 0)
+    m_TRACK_IF(ParseAsciiLines(m_GStringGetLogicalStringPortion(handle->data.h_lsOutput), -1,NULL,
+      handle->data.h_lsLines) < 0)
     int count = LINES_PARTITION_GET_COUNT(handle->data.h_lsLines,NULL);
     m_TRACK_IF(count < 0)
     GStringsClear(list, b_TRUE) ;
@@ -1172,10 +1163,9 @@ int FetepeDir (FETEPE_HANDLE handle, const char *n_filter, G_STRINGS_HANDLE dirL
 
 
 // Public function ; see description in .h
-int FetepeGet2 (FETEPE_HANDLE handle,
-                const char *p_remoteFileName,
-                const struct SUCKER_BUTT *ap_localButt,
-                int *na_getLength) {
+int FetepeGet2 (FETEPE_HANDLE handle, const char *p_remoteFileName, //const struct SUCKER_BUTT *ap_localButt,
+  BUTT_SPOTTER_FILL_FUNCTION localButtSpotterFillFunction, void *r_localButtSpotterFillHandle,
+  int *na_getLength) {
   m_DIGGY_BOLLARD()
   int fetepeStatus = FETEPE_STATUS__OK; 
   m_RESET_OUTLINE(handle)
@@ -1184,19 +1174,18 @@ int FetepeGet2 (FETEPE_HANDLE handle,
     != RETURNED)
  
   if (handle->data.nh_streamDescriptor != -1) {
-    struct SUCKER_BUTT remoteButt ;
     m_ASSERT(fetepeStatus == FETEPE_STATUS__OK)
-    m_ASSIGN_SUCKER_BUTT__STREAM(remoteButt,handle->data.nh_streamDescriptor,p_fetepeWaitingPlan)
     handle->data.outline.sucker.sButtIs = S_BUTT_IS__REMOTE;
+    m_TRACK_IF(SuckerPlugSDButts(handle->data.h_suckerHandle, 
+      StreamButtSpotterSuck, handle->data.h_streamButtSpotterHandle,
+      localButtSpotterFillFunction, r_localButtSpotterFillHandle) != RETURNED)
 
     switch (handle->data.outline.sucker.suckerStatus = SuckerSuckOut(handle->data.h_suckerHandle,
-      &remoteButt,ap_localButt,  na_getLength, &handle->data.outline.sucker.rwStatus)) {
+      na_getLength, &handle->data.outline.sucker.r_flopCause)) {
     case SUCKER_STATUS__OK:
     break; case SUCKER_STATUS__S_FLOP:
     case SUCKER_STATUS__D_FLOP:
-      if (fetepeStatus == FETEPE_STATUS__OK) {
-        fetepeStatus = FETEPE_STATUS__REFUSED;
-      } // if
+      if (fetepeStatus == FETEPE_STATUS__OK) fetepeStatus = FETEPE_STATUS__REFUSED;
     break; default :
       m_TRACK()
     } // switch
@@ -1211,20 +1200,20 @@ int FetepeGet2 (FETEPE_HANDLE handle,
 
 
 // Public function ; see description in .h
-int FetepeGet (FETEPE_HANDLE handle,
-               const char *p_remoteFileName,
-               const char *p_localFilePathname,
-               int *na_getLength) {
+int FetepeGet (FETEPE_HANDLE handle, const char *p_remoteFileName, const char *p_localFilePathname,
+  int *na_getLength) {
   m_DIGGY_BOLLARD()
   int fetepeStatus = UNDEFINED ;
-  struct SUCKER_BUTT localButt ;
   int ch_localFileDescriptor = UNDEFINED;
 
-  switch (ProtectedOpenFile(p_localFilePathname, COLD_READ_WRITE__BASIC_OPEN_FILE_MODE | handle->data.nonPosixOpenFlags, 0,
-                            &ch_localFileDescriptor, &handle->data.outline.sucker.localOpenErrno)) {
+  switch (ProtectedOpenFile(p_localFilePathname, 
+    COLD_READ_WRITE__BASIC_OPEN_FILE_MODE | handle->data.nonPosixOpenFlags, 0,
+    &ch_localFileDescriptor, &handle->data.outline.sucker.localOpenErrno)) {
   case ANSWER__YES: 
-    m_ASSIGN_SUCKER_BUTT__FILE_STREAM(localButt, ch_localFileDescriptor)
-    fetepeStatus = FetepeGet2(handle,p_remoteFileName,&localButt,na_getLength);
+    m_TRACK_IF(StreamButtSpotterKick(handle->data.h_localStreamButtSpotterHandle,
+      ch_localFileDescriptor) != RETURNED)
+    fetepeStatus = FetepeGet2(handle,p_remoteFileName, StreamButtSpotterFill,
+      handle->data.h_localStreamButtSpotterHandle, na_getLength);
     m_TRACK_IF(fetepeStatus < 0)
     m_PROTECTED_CLOSE(ch_localFileDescriptor,
       if (fetepeStatus == FETEPE_STATUS__OK) fetepeStatus = FETEPE_STATUS__REFUSED;
@@ -1259,7 +1248,7 @@ int FetepeDestroyInstance (FETEPE_HANDLE xh_handle) {
   m_DIGGY_BOLLARD()
   m_TRACK_IF(G_STRING_DESTROY_INSTANCE(xh_handle->command.status.h_line) != RETURNED)
   m_TRACK_IF(GreenCollectionDestroyInstance(xh_handle->command.status.h_linesPartitionHandle) !=
-             RETURNED)
+    RETURNED)
 
   m_TRACK_IF(ErwDestroyInstance(xh_handle->command.socket.h_erwHandle) != RETURNED)
   m_TRACK_IF(FetepeCloseCommandChannel(xh_handle) != RETURNED)
@@ -1268,6 +1257,12 @@ int FetepeDestroyInstance (FETEPE_HANDLE xh_handle) {
   m_TRACK_IF(SuckerDestroyInstance(xh_handle->data.h_suckerHandle) != RETURNED)
   m_TRACK_IF(GreenCollectionDestroyInstance(xh_handle->data.h_lsLines) != RETURNED)
   m_TRACK_IF(G_STRING_DESTROY_INSTANCE(xh_handle->data.h_lsOutput) != RETURNED)
+  m_TRACK_IF(GStringButtSpotterDestroyInstance(xh_handle->data.h_lsOutputButtSpotterHandle) != 
+    RETURNED)
+  m_TRACK_IF(StreamButtSpotterDestroyInstance(xh_handle->data.h_streamButtSpotterHandle) !=
+     RETURNED)
+  m_TRACK_IF(StreamButtSpotterDestroyInstance(xh_handle->data.h_localStreamButtSpotterHandle) !=
+     RETURNED)
 
   free(xh_handle) ;
 

@@ -322,7 +322,8 @@ int FetepePut (FETEPE_HANDLE handle, const char *p_localFilePathname, const char
 //
 // Passed:
 // - handle: connection handle, see FetepeCreateInstance()
-// - ap_localButt: #SEE struct-SUCKER_BUTT@c-posix/sucker.h
+// - n_localButtSpotterSuckFunction:
+// - r_localButtSpotterSuckHandle:
 // - p_remoteFileName:
 // - na_putLength: NULL (special) pointer if not used
 //
@@ -335,18 +336,18 @@ int FetepePut (FETEPE_HANDLE handle, const char *p_localFilePathname, const char
 //   #SEE FETEPE_STATUS__REFUSED
 // - FETEPE_STATUS__NO_COMMAND_CHANNEL : #see FETEPE_STATUS__NO_COMMAND_CHANNEL
 // - -1 : unexpected problem; anomaly is raised
-int FetepePut2 (FETEPE_HANDLE handle, const struct SUCKER_BUTT *ap_localButt,
+int FetepePut2 (FETEPE_HANDLE handle, //const struct SUCKER_BUTT *ap_localButt,
+  BUTT_SPOTTER_SUCK_FUNCTION localButtSpotterSuckFunction, void *r_localButtSpotterSuckHandle,
   const char *p_remoteFileName, int *na_putLength);
 
-// Transfer "local" content into "destination" file : provide "destination" sucker butt 
+// Allow Transfer "local" content into "destination" file : provide "destination" stream
 //
 // Passed:
 // - handle: connection handle, see FetepeCreateInstance()
 // - p_remoteFileName:
 //
 // Modified:
-// - a_remoteButt: #SEE struct-SUCKER_BUTT@c-posix/sucker.h
-//   sucker butt allowing to feed "destination" file
+// - *ac_remoteDescriptor: (only sigificant with "OK" status) allows to feed "remote" file
 //
 // Returned:
 // - FETEPE_STATUS__OK : OK
@@ -355,7 +356,7 @@ int FetepePut2 (FETEPE_HANDLE handle, const struct SUCKER_BUTT *ap_localButt,
 // - FETEPE_STATUS__NO_COMMAND_CHANNEL : #see FETEPE_STATUS__NO_COMMAND_CHANNEL
 // - -1 : unexpected problem; anomaly is raised
 int FetepePut3Open (FETEPE_HANDLE handle, const char *p_remoteFileName, 
-  struct SUCKER_BUTT *a_remoteButt);
+  int *ac_remoteDescriptor) ;
 
 // Transfer "local" content into "destination" file : terminate transfer 
 //
@@ -464,18 +465,17 @@ int FetepeDir(FETEPE_HANDLE handle, const char *n_filter, G_STRINGS_HANDLE dirLi
 //   #SEE FETEPE_STATUS__REFUSED
 // - FETEPE_STATUS__NO_COMMAND_CHANNEL : #see FETEPE_STATUS__NO_COMMAND_CHANNEL
 // - -1 : unexpected problem; anomaly is raised
-int FetepeGet (FETEPE_HANDLE handle,
-               const char *p_remoteFileName, 
-               const char *p_localFilePathname,
-               int *na_getLength);
+int FetepeGet (FETEPE_HANDLE handle, const char *p_remoteFileName, const char *p_localFilePathname,
+  int *na_getLength);
 
 
-// Same as FetepeGet() function above, but do not open the "local" dest...
+// Same as FetepeGet() function above, but use "local" (dest) sucker butt...
 //
 // Passed:
 // - handle: connection handle, see FetepeCreateInstance()
 // - p_remoteFileName:
-// - ap_localButt: #SEE struct-SUCKER_BUTT@c-posix/sucker.h
+// - localButtSpotterFillFunction:
+// - r_localButtSpotterFillHandle:
 //
 // Modified:
 //
@@ -485,8 +485,9 @@ int FetepeGet (FETEPE_HANDLE handle,
 //   #SEE FETEPE_STATUS__REFUSED
 // - FETEPE_STATUS__NO_COMMAND_CHANNEL : #see FETEPE_STATUS__NO_COMMAND_CHANNEL
 // - -1 : unexpected problem; anomaly is raised
-int FetepeGet2(FETEPE_HANDLE handle, const char *p_remoteFileName,
-  const struct SUCKER_BUTT *ap_localButt, int *na_getLength);
+int FetepeGet2(FETEPE_HANDLE handle, const char *p_remoteFileName, //const struct SUCKER_BUTT *ap_localButt,
+  BUTT_SPOTTER_FILL_FUNCTION localButtSpotterFillFunction, void *r_localButtSpotterFillHandle,
+  int *na_getLength);
 
 
 // Log off and disconnect "physically".

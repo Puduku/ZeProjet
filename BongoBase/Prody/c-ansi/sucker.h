@@ -13,10 +13,7 @@
 #include "c-ansi/g-string.h"
 
 
-// This C-Ansi version is "conceptual" : most of declarations
-// (excepted SuckerSuckOut() "core" function) have no definition (in that "naked" c-ansi module). 
-// See c-posix/sucker for "complete" implementation... 
-// TODO: "pure" C-Ansi (G-strings-based) implementation 
+// This C-Ansi version is "limited" : only "c-posix/sucker" supports "stream"-based butts...
 
 // Sucker...
 // ------
@@ -24,41 +21,33 @@
 struct SUCKER ; // private...
 typedef struct SUCKER *SUCKER_HANDLE ;
 
-struct SUCKER_BUTT ; // defined in c-posix/sucker...
 
-
-// Just a declaration (see actual implementation in c-posix/sucker)
-// Plug a "source" butt ; 
+// Create a sucker...
 //
 // Passed:
-// - handle: sucker 
-// - af_sSuckerButt: "source" butt 
+// - azh_handle: address of sucker handle to initialize
+// - nf_alarmSystemHandle : alarm system used for temporizations (see c-posix/alarm.h)
+//   + NULL special pointer (not provided) ; limited functionality ; no temporization is possible ;
+//     blocking deadlines are de facto indefinite...
+//   + non NULL pointer: actual alarm system ; full temporization support
+// - f_brokenPipeFixHandle: see BrokenPipeFixCreateInstance() in c-posix/rw.h
+// - suckingLimit: limit (in bytes) of data volume that can be sucked (0 for no limit)
 //
-// Return:
-// - RETURNED: Ok
+// Changed:
+// - *azh_handle: "sucker" handle initialized.
+//
+// Ret:
+// - RETURNED: OK
 // - -1 : unexpected problem; anomaly is raised
-int SuckerPlugSButt(SUCKER_HANDLE handle, const struct SUCKER_BUTT *af_sSuckerButt);
+int SuckerCreateInstance(SUCKER_HANDLE *azh_handle, int suckingLimit);
 
 
-// Just a declaration (see actual implementation in c-posix/sucker)
-// Plug a "destination butt" 
-//
-// Passed:
-// - handle: sucker 
-// - af_dSuckerButt: "destination" butt ; 
-//
-// Return:
-// - RETURNED: Ok
-// - -1 : unexpected problem; anomaly is raised
-int SuckerPlugDButt(SUCKER_HANDLE handle, const struct SUCKER_BUTT *af_dSuckerButt);
-
-
-// Just a declaration (see actual implementation in c-posix/sucker)
-// #REF SuckerSuckSButt <generic status>
+// #REF BUTT_SPOTTER_SUCK_FUNCTION <generic status>
 // Suck content of the "plugged" source
 // 
 // Passed:
-// - handle: sucker (with plugged "source butt" - see SuckerPlugSButt() above)
+// - handle: (private) handle
+// - b_kickButt: "TRUE" => "prime the pump"... 
 // - nar_flopCause: NULL pointer if not used
 // - *nar_flopCause: (if used) default value
 //
@@ -72,16 +61,75 @@ int SuckerPlugDButt(SUCKER_HANDLE handle, const struct SUCKER_BUTT *af_dSuckerBu
 // - ANSWER__YES: OK - "empty" data chunk indicates "end of input" 
 // - ANSWER__NO: "flop" during sucking 
 // - -1 : unexpected problem; anomaly is raised
-int SuckerSuckSButt(SUCKER_HANDLE handle, struct STRING_PORTION *ac_chunk, int *nar_flopCause);
+typedef int (*BUTT_SPOTTER_SUCK_FUNCTION) (void *r_handle, char b_kickButt,
+  struct STRING_PORTION *ac_chunk, int *nar_flopCause);
 
 
-// Just a declaration (see actual implementation in c-posix/sucker)
+// #REF BUTT_SPOTTER_FILL_FUNCTION <generic status>
+// Fill "destination butt" with content
+//
+// Passed:
+// - r_handle: (private) handle
+// - chunk: (length >= 0) 
+// - nar_flopCause: NULL pointer if not used
+// - *nar_flopCause: (if used) default value
+//
+// Changed:
+// - *nar_flopCause: cause of "flop"
+//
+// Ret: padded to output ? 
+// - ANSWER__YES: passed chunk is empty or chunk successully padded  
+// - ANSWER__NO: "flop" during padding 
+// - -1 : unexpected problem; anomaly is raised
+typedef int (*BUTT_SPOTTER_FILL_FUNCTION) (void *r_handle, struct STRING_PORTION chunk,
+   int *nar_flopCause);
+
+
+// Plug "source" and "destination" butts 
+//
+// Passed:
+// - handle: sucker 
+// - n_sButtSpotterSuckFunction:
+// - cfr_sButtSpotterSuckHandle:
+// - n_dButtSpotterFillFunction: 
+// - cfr_dButtSpotterFillHandle:
+//
+// Return:
+// - RETURNED: Ok
+// - -1 : unexpected problem; anomaly is raised
+int SuckerPlugSDButts(SUCKER_HANDLE handle, 
+  BUTT_SPOTTER_SUCK_FUNCTION n_sButtSpotterSuckFunction, void *cfr_sButtSpotterSuckHandle,
+  BUTT_SPOTTER_FILL_FUNCTION n_dButtSpotterFillFunction,  void *cfr_dButtSpotterFillHandle);
+
+
+// Suck content of the "plugged" source
+// 
+// Passed:
+// - handle: sucker (with plugged "source butt" - see SuckerPlugSDButts() above)
+// - b_kickButt: "TRUE" => "prime the pump" 
+// - nar_flopCause: NULL pointer if not used
+// - *nar_flopCause: (if used) default value
+//
+// Changed:
+// - *ac_chunk: sucked data: not significant in case of "flop"
+//   + empty portion (length == 0): end of input ; no more can be sucked
+//   + non empty portion (length > 0): sucked data 
+// - *nar_flopCause: (if asked) <generic status> ; cause of "flop"
+//
+// Ret: sucked OK ? 
+// - ANSWER__YES: OK - "empty" data chunk indicates "end of input" 
+// - ANSWER__NO: "flop" during sucking 
+// - -1 : unexpected problem; anomaly is raised
+int SuckerSuckSButt(SUCKER_HANDLE handle, char b_kickButt, struct STRING_PORTION *ac_chunk,
+  int *nar_flopCause);
+
+
 // #REF SuckerFillDButt <generic status>
 // feed "destination butt" with content
 //
 // Passed:
-// - handle: sucker (with plugged "destination butt" - see SuckerPlugDButt() above)
-// - ap_chunk:  
+// - handle: sucker (with plugged "destination butt" - see SuckerPlugSDButts() above)
+// - chunk:  
 // - nar_flopCause: NULL pointer if not used
 // - *nar_flopCause: (if used) default value
 //
@@ -94,26 +142,6 @@ int SuckerSuckSButt(SUCKER_HANDLE handle, struct STRING_PORTION *ac_chunk, int *
 // - -1 : unexpected problem; anomaly is raised
 int SuckerFillDButt(SUCKER_HANDLE handle, struct STRING_PORTION chunk, int *nar_flopCause);
 
-// Wraps SuckerFillDButt() above
-// 
-// Passed: 
-// - p_chunkGStringStuff: g-string containing the chunk
-static inline int m_SuckerFillDButt_GString(SUCKER_HANDLE handle, G_STRING_STUFF p_chunkGStringStuff,
-  int *nar_flopCause) {
-  m_ASSIGN_LOCAL_STRING_PORTION__G_STRING(chunk, p_chunkGStringStuff) 
-  return SuckerFillDButt(handle, chunk, nar_flopCause);
-} // SuckerFillDButt_GString
-
-
-
-// Just a declaration (see actual implementation in c-posix/sucker)
-// #REF SuckerGetSuckingLimit
-//
-// Return: 
-// - >= 0: allowed limit for sucking data (0 for no limit)
-// - -1 : unexpected problem; anomaly is raised
-int SuckerGetSuckingLimit (SUCKER_HANDLE handle) ;
-
 
 enum { // #REF enum-SUCKER_STATUS
   SUCKER_STATUS__OK, // 100% sucked
@@ -122,13 +150,13 @@ enum { // #REF enum-SUCKER_STATUS
   SUCKER_STATUS__D_FLOP, // "flop" occurred on destination
 } ;
 
-// The "Core" function of that "C-ansi" module...
-// Plug "source" & "destination" butts and suck up content of "source butt" into "destination butt".
+#define FLOP_CAUSE__NONE0 0
+
+// Suck up content of "plugged source butt" into "plugged destination butt".
+// See SuckerPlugSDButts() above for "plugging butts"...
 //
 // Passed:
 // - handle: sucker 
-// - ap_sSuckerButt: (address of) "source" butt to plug 
-// - ap_dSuckerButt: (address of) "destination" butt to plug 
 // - na_suckedOutLength: NULL pointer if not used
 // - nar_flopCause: NULL pointer if not used
 // - *nar_flopCause: (if used) default value
@@ -140,8 +168,148 @@ enum { // #REF enum-SUCKER_STATUS
 // Return:
 // #SEE enum-SUCKER_STATUS
 // - -1 : unexpected problem; anomaly is raised
-int SuckerSuckOut (SUCKER_HANDLE handle, const struct SUCKER_BUTT *ap_sSuckerButt,
-  const struct SUCKER_BUTT *ap_dSuckerButt,  int *na_suckedOutLength, int *nar_flopCause) ;
+int SuckerSuckOut (SUCKER_HANDLE handle, int *na_suckedOutLength, int *nar_flopCause);
+
+
+// Copy source file into destination file. This function simply wraps SuckerSuckOut() with two
+// "FILE" butts...
+//
+// Passed: 
+// - handle: see SuckerCreateInstance()
+// - p_sFilePathname: source (regular) file's pathname
+// - p_dFilePathname: destination (regular) file's pathname
+// - na_copiedLength: NULL pointer if not used
+// - na_fileFlopCause: NULL pointer if not used
+//
+// Modified:
+// - *na_copiedLength: (if asked) amount of data copied (in bytes)
+// - *na_fileFlopCause: (if asked) : in case of "flop", indicates
+//   problem during file reading or writing #SEE FILE_FLOP_CAUSE-enum 
+//
+// Return:
+// #SEE enum-SUCKER_STATUS
+// - -1 : unexpected problem; anomaly is raised
+int SuckerFCopy (SUCKER_HANDLE handle, const char *p_sFilePathname, const char *p_dFilePathname,
+  int *na_copiedLength, int *na_fileFlopCause) ;
+
+
+// Destroy sucker...
+//
+// Passed: 
+// -  xh_handle: the sucker to liquidate
+//
+// Changed:
+// - xh_handle: this handle is no more usable
+//
+// Ret:
+// - RETURNED: OK
+// - -1 : unexpected problem; anomaly is raised
+int SuckerDestroyInstance (SUCKER_HANDLE xh_handle) ;
+
+
+// G_STRING_BUTT_SPOTTER : handle g-string butts
+//----------------------
+
+struct G_STRING_BUTT_SPOTTER ; // Private
+typedef struct G_STRING_BUTT_SPOTTER *G_STRING_BUTT_SPOTTER_HANDLE; // Public handle
+
+
+// Create "file" butt spotter instance.
+//
+// Passed:
+// - azh_handle:
+// - f_gStringStuff: 
+// 
+// Changed:
+// - *azh_handle: initialized
+//
+// Ret:
+// - RETURNED: Ok
+// - -1 : unexpected problem; anomaly is raised
+int GStringButtSpotterCreateInstance(G_STRING_BUTT_SPOTTER_HANDLE *azh_handle,
+  G_STRING_STUFF f_gStringStuff) ;
+
+
+// BUTT_SPOTTER_SUCKER_FUNCTION
+// #SEE BUTT_SPOTTER_SUCK_FUNCTION <g-string>
+int GStringButtSpotterSuck(void *r_handle,  char b_kickButt, struct STRING_PORTION *ac_chunk,
+  int *na_flopCause) ;
+
+// BUTT_SPOTTER_FILLER_FUNCTION
+// #SEE BUTT_SPOTTER_FILL_FUNCTION <g-string>
+int GStringButtSpotterFill(void *r_handle, struct STRING_PORTION chunk, int *na_flopCause);
+
+
+// Destroy g-string butt spotter instance.
+//
+// Passed:
+// - xh_handle: instance to liquidate...
+//
+// Changed:
+// - xh_handle: this handle is no more valid
+//
+// Ret:
+// - RETURNED: Ok
+// - -1 : unexpected problem; anomaly is raised
+int GStringButtSpotterDestroyInstance(G_STRING_BUTT_SPOTTER_HANDLE xh_handle);
+
+
+// FILE_BUTT_SPOTTER: handle "file" butts 
+//------------------
+
+struct FILE_BUTT_SPOTTER ; // Private
+typedef struct FILE_BUTT_SPOTTER *FILE_BUTT_SPOTTER_HANDLE; // Public handle
+
+#define BATEAU__FILE_BUTT_SPOTTER__READ_BUFFER_SIZE 4096
+
+// Create "file" butt spotter instance.
+//
+// Passed:
+// - azh_handle:
+// - filePathname:
+// - n_readBufferSize: 
+//   +  -1 special value: 'd' butt
+//   +  >0: 's'(sucked) butt; size (in bytes) of read buffer. If you have no idea, you can specify
+//      BATEAU__FILE_BUTT_SPOTTER__READ_BUFFER_SIZE...
+// 
+// Changed:
+// - *azh_handle: initialized
+//
+// Ret:
+// - RETURNED: Ok
+// - -1 : unexpected problem; anomaly is raised
+int FileButtSpotterCreateInstance(FILE_BUTT_SPOTTER_HANDLE *azh_handle,
+  const char *p_filePathname, int n_readBufferSize) ;
+
+
+enum { // #REF FILE_FLOP_CAUSE-enum 
+  FILE_FLOP_CAUSE__NONE0 = FLOP_CAUSE__NONE0,
+  FILE_FLOP_CAUSE__COULD_NOT_OPEN_FILE, 
+} ;
+
+// #see BUTT_SPOTTER_SUCK_FUNCTION
+// #see FILE_FLOP_CAUSE-enum 
+int FileButtSpotterSuck(void *r_handle,  char b_kickButt, struct STRING_PORTION *ac_chunk,
+  int *na_flopCause) ;
+
+// #see BUTT_SPOTTER_FILL_FUNCTION
+// #see FILE_FLOP_CAUSE-enum 
+int FileButtSpotterFill(void *r_handle, struct STRING_PORTION chunk, int *na_flopCause);
+
+
+// Destroy "file" butt spotter instance.
+//
+// Passed:
+// - xh_handle: instance to liquidate...
+//
+// Changed:
+// - xh_handle: this handle is no more valid
+//
+// Ret:
+// - RETURNED: Ok
+// - -1 : unexpected problem; anomaly is raised
+int FileButtSpotterDestroyInstance(FILE_BUTT_SPOTTER_HANDLE xh_handle);
+
 
 
 #endif // __C_ANSI_SUCKER_H_INCLUDED__
