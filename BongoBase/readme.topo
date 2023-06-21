@@ -9,7 +9,7 @@
 //   the C code in the project...
 // - provide CONTEXTUAL information to sources (C code) files. 
 // The advantage of the maneuver is to lighten the ".h" header files of all the contextual
-// descriptions and thus offer a clear separation between the CONTEXTUAL and TECHNICAL information.
+// ruminations and thus offer a clear separation between the CONTEXTUAL and TECHNICAL information.
 // Hence, all comments present in ".h" are focused on technical usage of the module (classical
 // description of public functions parameters, etc.)
 // As part of source files "bundle", ".topo" files are to be referenced (with #include directive) by
