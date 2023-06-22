@@ -1,7 +1,8 @@
 // c-posix/sucker.h, version 1.93
 // (c) Atos-Euronext Belgium - 2001, 2002, 2003
+// (c) Puduku - 2023
 //
-// Purpose: "universal" transfer agent: stream butt spotter
+// Purpose: "universal" transfer agent: stream butt adept
 // =======
 
 #ifndef __C_POSIX_SUCKER_H_INCLUDED__
@@ -19,10 +20,10 @@
 #include "c-posix/rwf.h"
 
 
-// STREAM_BUTT_SPOTTER : handle "stream"
+// STREAM_BUTT_ADEPT : handle "stream"
 
-struct STREAM_BUTT_SPOTTER ; // Private
-typedef struct STREAM_BUTT_SPOTTER *STREAM_BUTT_SPOTTER_HANDLE; // Public handle
+struct STREAM_BUTT_ADEPT ; // Private
+typedef struct STREAM_BUTT_ADEPT *STREAM_BUTT_ADEPT_HANDLE; // Public handle
 
 
 // Passed:
@@ -37,7 +38,7 @@ typedef struct STREAM_BUTT_SPOTTER *STREAM_BUTT_SPOTTER_HANDLE; // Public handle
 // - n_readBufferSize: 
 //   +  -1 special value: 'd' butt
 //   +  >0: 's'(sucked) butt; size (in bytes) of read buffer. If you have no idea, you can specify
-//      BATEAU__FILE_BUTT_SPOTTER__READ_BUFFER_SIZE...
+//      BATEAU__FILE_BUTT_ADEPT__READ_BUFFER_SIZE...
 // - nf_openDescriptor: 
 //   + -1 special value: not provided
 //   + >=0: connected socket / open regular file,
@@ -48,12 +49,12 @@ typedef struct STREAM_BUTT_SPOTTER *STREAM_BUTT_SPOTTER_HANDLE; // Public handle
 // Ret:
 // - RETURNED: Ok
 // - -1 : unexpected problem; anomaly is raised
-int StreamButtSpotterCreateInstance(STREAM_BUTT_SPOTTER_HANDLE *azh_handle,
+int StreamButtAdeptCreateInstance(STREAM_BUTT_ADEPT_HANDLE *azh_handle,
   ALARM_SYSTEM_HANDLE nf_alarmSystemHandle, BROKEN_PIPE_FIX_HANDLE f_brokenPipeFixHandle,
   struct WAITING_PLAN waitingPlan, int n_readBufferSize, int nf_openDescriptor) ;
 
 
-// Kick spotter's "stream" butt (that is provide "fresh" stream)
+// Kick adept's "stream" butt (that is provide "fresh" stream)
 //
 // Passed: 
 // - handle:
@@ -62,7 +63,7 @@ int StreamButtSpotterCreateInstance(STREAM_BUTT_SPOTTER_HANDLE *azh_handle,
 // Ret:
 // - RETURNED: Ok
 // - -1 : unexpected problem; anomaly is raised
-int StreamButtSpotterKick(STREAM_BUTT_SPOTTER_HANDLE handle, int f_openDescriptor) ;
+int StreamButtAdeptKick(STREAM_BUTT_ADEPT_HANDLE handle, int f_openDescriptor) ;
 
 
 enum { // #REF STREAM_FLOP_CAUSE-enum 
@@ -74,18 +75,18 @@ enum { // #REF STREAM_FLOP_CAUSE-enum
 } ;
 
 
-// #SEE BUTT_SPOTTER_SUCK_FUNCTION@c-ansi/sucker.h <stream>
+// #SEE BUTT_ADEPT_SUCK_FUNCTION@c-ansi/sucker.h <stream>
 // #SEE STREAM_FLOP_CAUSE-enum
-int StreamButtSpotterSuck(void *r_handle,  char b_kickButt, struct STRING_PORTION *ac_chunk,
+int StreamButtAdeptSuck(void *r_handle,  char b_kickButt, struct STRING_PORTION *ac_chunk,
    int *nar_flopCause) ;
 
 
-// #SEE BUTT_SPOTTER_FILL_FUNCTION@c-ansi/sucker.h <stream>
+// #SEE BUTT_ADEPT_FILL_FUNCTION@c-ansi/sucker.h <stream>
 // #SEE STREAM_FLOP_CAUSE-enum
-int StreamButtSpotterFill(void *r_handle, struct STRING_PORTION chunk, int *nar_flopCause);
+int StreamButtAdeptFill(void *r_handle, struct STRING_PORTION chunk, int *nar_flopCause);
 
 
-// Destroy stream butt spotter...
+// Destroy stream butt adept...
 //
 // Passed: 
 // -  xh_handle: the stream butt spooter to liquidate
@@ -96,7 +97,7 @@ int StreamButtSpotterFill(void *r_handle, struct STRING_PORTION chunk, int *nar_
 // Ret:
 // - RETURNED: OK
 // - -1 : unexpected problem; anomaly is raised
-int StreamButtSpotterDestroyInstance(STREAM_BUTT_SPOTTER_HANDLE xh_handle);
+int StreamButtAdeptDestroyInstance(STREAM_BUTT_ADEPT_HANDLE xh_handle);
 
 
 // Sucker: stream-based file copy

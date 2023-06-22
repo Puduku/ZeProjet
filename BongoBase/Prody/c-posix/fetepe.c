@@ -126,10 +126,10 @@ struct FETEPE {
     SUCKER_HANDLE h_suckerHandle ;
     int nonPosixOpenFlags;
     int nh_streamDescriptor; // >= 0 => open stream
-    STREAM_BUTT_SPOTTER_HANDLE h_streamButtSpotterHandle; 
-    STREAM_BUTT_SPOTTER_HANDLE h_localStreamButtSpotterHandle; 
+    STREAM_BUTT_ADEPT_HANDLE h_streamButtAdeptHandle; 
+    STREAM_BUTT_ADEPT_HANDLE h_localStreamButtAdeptHandle; 
     G_STRING_STUFF h_lsOutput ;
-    G_STRING_BUTT_SPOTTER_HANDLE h_lsOutputButtSpotterHandle; 
+    G_STRING_BUTT_ADEPT_HANDLE h_lsOutputButtAdeptHandle; 
     GREEN_COLLECTION_HANDLE h_lsLines ;
   } data ;
 } ;
@@ -210,19 +210,19 @@ int FetepeCreateInstance (FETEPE_HANDLE *azh_handle, ALARM_SYSTEM_HANDLE nf_alar
 
   // data:
   handle->data.nh_streamDescriptor = -1;
-  m_TRACK_IF(StreamButtSpotterCreateInstance(&handle->data.h_streamButtSpotterHandle,
+  m_TRACK_IF(StreamButtAdeptCreateInstance(&handle->data.h_streamButtAdeptHandle,
     nf_alarmSystemHandle, f_brokenPipeFixHandle,
-    p_fetepeWaitingPlan, BATEAU__FILE_BUTT_SPOTTER__READ_BUFFER_SIZE, -1) != RETURNED)
-  m_TRACK_IF(StreamButtSpotterCreateInstance(&handle->data.h_localStreamButtSpotterHandle,
+    p_fetepeWaitingPlan, BATEAU__FILE_BUTT_ADEPT__READ_BUFFER_SIZE, -1) != RETURNED)
+  m_TRACK_IF(StreamButtAdeptCreateInstance(&handle->data.h_localStreamButtAdeptHandle,
     nf_alarmSystemHandle, f_brokenPipeFixHandle,
-    p_fetepeWaitingPlan, BATEAU__FILE_BUTT_SPOTTER__READ_BUFFER_SIZE, -1) != RETURNED)
+    p_fetepeWaitingPlan, BATEAU__FILE_BUTT_ADEPT__READ_BUFFER_SIZE, -1) != RETURNED)
   handle->data.nonPosixOpenFlags = 0;
   m_TRACK_IF(PdCreateInstance(&handle->data.h_listeningSocketPdHandle,nf_alarmSystemHandle) != RETURNED)
   m_TRACK_IF(SuckerCreateInstance(&handle->data.h_suckerHandle, transferSizeLimit) != RETURNED)
   m_TRACK_IF(LINES_PARTITION_CREATE_INSTANCE(&handle->data.h_lsLines,100, NULL,(void *)UNDEFINED)
     != RETURNED)
   m_TRACK_IF(G_STRING_CREATE_INSTANCE(&handle->data.h_lsOutput) != RETURNED)
-  m_TRACK_IF(GStringButtSpotterCreateInstance(&handle->data.h_lsOutputButtSpotterHandle,
+  m_TRACK_IF(GStringButtAdeptCreateInstance(&handle->data.h_lsOutputButtAdeptHandle,
     handle->data.h_lsOutput) != RETURNED)
 
   m_DIGGY_RETURN(RETURNED)
@@ -890,7 +890,7 @@ static int FetepeOpenDataStream (FETEPE_HANDLE handle, int *a_fetepeStatus,
   } // if
 
   if (handle->data.nh_streamDescriptor >= 0) {
-    m_TRACK_IF(StreamButtSpotterKick(handle->data.h_streamButtSpotterHandle,
+    m_TRACK_IF(StreamButtAdeptKick(handle->data.h_streamButtAdeptHandle,
       handle->data.nh_streamDescriptor) != RETURNED) 
   } // if
   if (nh_listeningSocketDescriptor >= 0) {
@@ -964,7 +964,7 @@ int FetepePut3Close (FETEPE_HANDLE handle) {
 
 // Public function ; see description in .h
 int FetepePut2 (FETEPE_HANDLE handle, //const struct SUCKER_BUTT *ap_localButt,
-  BUTT_SPOTTER_SUCK_FUNCTION localButtSpotterSuckFunction, void *r_localButtSpotterSuckHandle,
+  BUTT_ADEPT_SUCK_FUNCTION localButtAdeptSuckFunction, void *r_localButtAdeptSuckHandle,
   const char *p_remoteFileName, int *na_putLength) {
   m_DIGGY_BOLLARD()
   int fetepeStatus = FETEPE_STATUS__OK;
@@ -976,8 +976,8 @@ int FetepePut2 (FETEPE_HANDLE handle, //const struct SUCKER_BUTT *ap_localButt,
   if (handle->data.nh_streamDescriptor != -1) {
     m_ASSERT(fetepeStatus == FETEPE_STATUS__OK)
     m_TRACK_IF(SuckerPlugSDButts(handle->data.h_suckerHandle, 
-      localButtSpotterSuckFunction,r_localButtSpotterSuckHandle,
-      StreamButtSpotterFill, handle->data.h_streamButtSpotterHandle) != RETURNED)
+      localButtAdeptSuckFunction,r_localButtAdeptSuckHandle,
+      StreamButtAdeptFill, handle->data.h_streamButtAdeptHandle) != RETURNED)
     handle->data.outline.sucker.sButtIs = S_BUTT_IS__LOCAL;
 
     switch (handle->data.outline.sucker.suckerStatus = SuckerSuckOut(handle->data.h_suckerHandle,
@@ -1011,10 +1011,10 @@ int FetepePut (FETEPE_HANDLE handle, const char *p_localFilePathname, const char
     handle->data.nonPosixOpenFlags, 0, &ch_localFileDescriptor,
     &handle->data.outline.sucker.localOpenErrno)) {
   case ANSWER__YES: 
-    m_TRACK_IF(StreamButtSpotterKick(handle->data.h_localStreamButtSpotterHandle,
+    m_TRACK_IF(StreamButtAdeptKick(handle->data.h_localStreamButtAdeptHandle,
       ch_localFileDescriptor) != RETURNED)
-    fetepeStatus = FetepePut2(handle,StreamButtSpotterSuck,
-      handle->data.h_localStreamButtSpotterHandle, p_remoteFileName,na_putLength);
+    fetepeStatus = FetepePut2(handle,StreamButtAdeptSuck,
+      handle->data.h_localStreamButtAdeptHandle, p_remoteFileName,na_putLength);
     m_TRACK_IF(fetepeStatus < 0)
     m_PROTECTED_CLOSE(ch_localFileDescriptor,
       if (fetepeStatus == FETEPE_STATUS__OK) fetepeStatus = FETEPE_STATUS__REFUSED;
@@ -1091,8 +1091,8 @@ static int FetepeNListDir (FETEPE_HANDLE handle, const char *p_cmd, const char *
   if (handle->data.nh_streamDescriptor != -1) {
     m_ASSERT(fetepeStatus == FETEPE_STATUS__OK)
     m_TRACK_IF(SuckerPlugSDButts(handle->data.h_suckerHandle, 
-      StreamButtSpotterSuck, handle->data.h_streamButtSpotterHandle,
-      GStringButtSpotterFill, handle->data.h_lsOutputButtSpotterHandle) != RETURNED)
+      StreamButtAdeptSuck, handle->data.h_streamButtAdeptHandle,
+      GStringButtAdeptFill, handle->data.h_lsOutputButtAdeptHandle) != RETURNED)
 
     handle->data.outline.sucker.sButtIs = S_BUTT_IS__REMOTE;
     m_G_STRING_CLEAR(handle->data.h_lsOutput)
@@ -1164,7 +1164,7 @@ int FetepeDir (FETEPE_HANDLE handle, const char *n_filter, G_STRINGS_HANDLE dirL
 
 // Public function ; see description in .h
 int FetepeGet2 (FETEPE_HANDLE handle, const char *p_remoteFileName, //const struct SUCKER_BUTT *ap_localButt,
-  BUTT_SPOTTER_FILL_FUNCTION localButtSpotterFillFunction, void *r_localButtSpotterFillHandle,
+  BUTT_ADEPT_FILL_FUNCTION localButtAdeptFillFunction, void *r_localButtAdeptFillHandle,
   int *na_getLength) {
   m_DIGGY_BOLLARD()
   int fetepeStatus = FETEPE_STATUS__OK; 
@@ -1177,8 +1177,8 @@ int FetepeGet2 (FETEPE_HANDLE handle, const char *p_remoteFileName, //const stru
     m_ASSERT(fetepeStatus == FETEPE_STATUS__OK)
     handle->data.outline.sucker.sButtIs = S_BUTT_IS__REMOTE;
     m_TRACK_IF(SuckerPlugSDButts(handle->data.h_suckerHandle, 
-      StreamButtSpotterSuck, handle->data.h_streamButtSpotterHandle,
-      localButtSpotterFillFunction, r_localButtSpotterFillHandle) != RETURNED)
+      StreamButtAdeptSuck, handle->data.h_streamButtAdeptHandle,
+      localButtAdeptFillFunction, r_localButtAdeptFillHandle) != RETURNED)
 
     switch (handle->data.outline.sucker.suckerStatus = SuckerSuckOut(handle->data.h_suckerHandle,
       na_getLength, &handle->data.outline.sucker.r_flopCause)) {
@@ -1210,10 +1210,10 @@ int FetepeGet (FETEPE_HANDLE handle, const char *p_remoteFileName, const char *p
     COLD_READ_WRITE__BASIC_OPEN_FILE_MODE | handle->data.nonPosixOpenFlags, 0,
     &ch_localFileDescriptor, &handle->data.outline.sucker.localOpenErrno)) {
   case ANSWER__YES: 
-    m_TRACK_IF(StreamButtSpotterKick(handle->data.h_localStreamButtSpotterHandle,
+    m_TRACK_IF(StreamButtAdeptKick(handle->data.h_localStreamButtAdeptHandle,
       ch_localFileDescriptor) != RETURNED)
-    fetepeStatus = FetepeGet2(handle,p_remoteFileName, StreamButtSpotterFill,
-      handle->data.h_localStreamButtSpotterHandle, na_getLength);
+    fetepeStatus = FetepeGet2(handle,p_remoteFileName, StreamButtAdeptFill,
+      handle->data.h_localStreamButtAdeptHandle, na_getLength);
     m_TRACK_IF(fetepeStatus < 0)
     m_PROTECTED_CLOSE(ch_localFileDescriptor,
       if (fetepeStatus == FETEPE_STATUS__OK) fetepeStatus = FETEPE_STATUS__REFUSED;
@@ -1257,11 +1257,11 @@ int FetepeDestroyInstance (FETEPE_HANDLE xh_handle) {
   m_TRACK_IF(SuckerDestroyInstance(xh_handle->data.h_suckerHandle) != RETURNED)
   m_TRACK_IF(GreenCollectionDestroyInstance(xh_handle->data.h_lsLines) != RETURNED)
   m_TRACK_IF(G_STRING_DESTROY_INSTANCE(xh_handle->data.h_lsOutput) != RETURNED)
-  m_TRACK_IF(GStringButtSpotterDestroyInstance(xh_handle->data.h_lsOutputButtSpotterHandle) != 
+  m_TRACK_IF(GStringButtAdeptDestroyInstance(xh_handle->data.h_lsOutputButtAdeptHandle) != 
     RETURNED)
-  m_TRACK_IF(StreamButtSpotterDestroyInstance(xh_handle->data.h_streamButtSpotterHandle) !=
+  m_TRACK_IF(StreamButtAdeptDestroyInstance(xh_handle->data.h_streamButtAdeptHandle) !=
      RETURNED)
-  m_TRACK_IF(StreamButtSpotterDestroyInstance(xh_handle->data.h_localStreamButtSpotterHandle) !=
+  m_TRACK_IF(StreamButtAdeptDestroyInstance(xh_handle->data.h_localStreamButtAdeptHandle) !=
      RETURNED)
 
   free(xh_handle) ;

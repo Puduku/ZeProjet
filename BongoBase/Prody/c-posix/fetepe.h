@@ -322,8 +322,8 @@ int FetepePut (FETEPE_HANDLE handle, const char *p_localFilePathname, const char
 //
 // Passed:
 // - handle: connection handle, see FetepeCreateInstance()
-// - n_localButtSpotterSuckFunction:
-// - r_localButtSpotterSuckHandle:
+// - n_localButtAdeptSuckFunction:
+// - r_localButtAdeptSuckHandle:
 // - p_remoteFileName:
 // - na_putLength: NULL (special) pointer if not used
 //
@@ -337,7 +337,7 @@ int FetepePut (FETEPE_HANDLE handle, const char *p_localFilePathname, const char
 // - FETEPE_STATUS__NO_COMMAND_CHANNEL : #see FETEPE_STATUS__NO_COMMAND_CHANNEL
 // - -1 : unexpected problem; anomaly is raised
 int FetepePut2 (FETEPE_HANDLE handle, //const struct SUCKER_BUTT *ap_localButt,
-  BUTT_SPOTTER_SUCK_FUNCTION localButtSpotterSuckFunction, void *r_localButtSpotterSuckHandle,
+  BUTT_ADEPT_SUCK_FUNCTION localButtAdeptSuckFunction, void *r_localButtAdeptSuckHandle,
   const char *p_remoteFileName, int *na_putLength);
 
 // Allow Transfer "local" content into "destination" file : provide "destination" stream
@@ -474,8 +474,8 @@ int FetepeGet (FETEPE_HANDLE handle, const char *p_remoteFileName, const char *p
 // Passed:
 // - handle: connection handle, see FetepeCreateInstance()
 // - p_remoteFileName:
-// - localButtSpotterFillFunction:
-// - r_localButtSpotterFillHandle:
+// - localButtAdeptFillFunction:
+// - r_localButtAdeptFillHandle:
 //
 // Modified:
 //
@@ -486,7 +486,7 @@ int FetepeGet (FETEPE_HANDLE handle, const char *p_remoteFileName, const char *p
 // - FETEPE_STATUS__NO_COMMAND_CHANNEL : #see FETEPE_STATUS__NO_COMMAND_CHANNEL
 // - -1 : unexpected problem; anomaly is raised
 int FetepeGet2(FETEPE_HANDLE handle, const char *p_remoteFileName, //const struct SUCKER_BUTT *ap_localButt,
-  BUTT_SPOTTER_FILL_FUNCTION localButtSpotterFillFunction, void *r_localButtSpotterFillHandle,
+  BUTT_ADEPT_FILL_FUNCTION localButtAdeptFillFunction, void *r_localButtAdeptFillHandle,
   int *na_getLength);
 
 
