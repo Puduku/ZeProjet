@@ -1,3 +1,7 @@
+// c-ansi/att.c, version 1.93 (ANSI)
+// (c) Atos-Euronext Belgium - 2001, 2002, 2003
+// (c) Puduku - 2023
+
 #include <stdlib.h>
 
 #include "c-ansi/stderr.h"
@@ -95,9 +99,9 @@ int AlarmTimetableProgram (ALARM_TIMETABLE_HANDLE handle, g_ATT_ID_unsigned_int 
     b_newAlarm ? INDEX_FETCH__FETCH: INDEX_FETCH__REMOVE, INDEX_SEEK__KEY,
     (char **)&tc_timelineStuff, NULL, (void *)(GENERIC_INTEGER)attId)) {
   case RESULT__FOUND:
-	if (nac_ancientAttTime != NULL) {
-	  *nac_ancientAttTime = tc_timelineStuff->attTime;
-	} // if
+    if (nac_ancientAttTime != NULL) {
+      *nac_ancientAttTime = tc_timelineStuff->attTime;
+    } // if
   break; case RESULT__NOT_FOUND: // Not found
   break; default:
     m_TRACK()

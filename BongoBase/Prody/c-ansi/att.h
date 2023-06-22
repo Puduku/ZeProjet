@@ -1,5 +1,6 @@
 // c-ansi/att.h, version 1.93
 // (c) Atos-Euronext Belgium - 2001, 2002, 2003
+// (c) Puduku - 2023
 //
 // Purpose:
 // --------
@@ -64,9 +65,8 @@ int AlarmTimetableCreateInstance (ALARM_TIMETABLE_HANDLE *azh_handle) ;
 // - RESULT__FOUND: "updated" => *nac_ancientAttTime indicates ancient alarm time
 // - RESULT__NOT_FOUND: "no update" (new alarm) => *nac_ancientAttTime NOT significant
 // - -1: unexpected problem ; anomaly is raised
-int AlarmTimetableProgram (ALARM_TIMETABLE_HANDLE handle,
-                           g_ATT_ID_unsigned_int attId, char b_newAlarm, gen_ATT_TIME_long c_newAttTime,
-                           gen_ATT_TIME_long *nac_ancientAttTime) ;
+int AlarmTimetableProgram (ALARM_TIMETABLE_HANDLE handle, g_ATT_ID_unsigned_int attId,
+  char b_newAlarm, gen_ATT_TIME_long c_newAttTime, gen_ATT_TIME_long *nac_ancientAttTime) ;
  
 
 // Search "next" alarm in the timetable,
@@ -83,7 +83,7 @@ int AlarmTimetableProgram (ALARM_TIMETABLE_HANDLE handle,
 // - RESULT__NOT_FOUND: timetable is empty
 // - -1: unexpected problem ; anomaly is raised
 int AlarmTimetableGetRefreshTime (ALARM_TIMETABLE_HANDLE handle,
-                                  gen_ATT_TIME_long *ac_refreshAttTime) ;
+  gen_ATT_TIME_long *ac_refreshAttTime) ;
 
 
 // #REF RING_ALARM_FUNCTION - Custom function: called for each "expired" alarm...
@@ -96,7 +96,8 @@ int AlarmTimetableGetRefreshTime (ALARM_TIMETABLE_HANDLE handle,
 // Returned:
 // - RETURNED:
 // - -1: unexpected problem ; anomaly is raised
-typedef int (RING_ALARM_FUNCTION) (void *r_handle, g_ATT_ID_unsigned_int attId, unsigned long delay) ;
+typedef int (RING_ALARM_FUNCTION) (void *r_handle, g_ATT_ID_unsigned_int attId,
+  unsigned long delay) ;
 
 
 // For each expired alarm:
@@ -114,10 +115,8 @@ typedef int (RING_ALARM_FUNCTION) (void *r_handle, g_ATT_ID_unsigned_int attId, 
 // Returned:
 // - >= 0: number of "rung" alarms... 
 // - -1: unexpected problem ; anomaly is raised
-int AlarmTimetableRefresh (ALARM_TIMETABLE_HANDLE handle,
-                           gen_ATT_TIME_long refreshAttTime,
-                           RING_ALARM_FUNCTION ringAlarmFunction,
-                           void *r_ringAlarmFunctionHandle) ;
+int AlarmTimetableRefresh (ALARM_TIMETABLE_HANDLE handle, gen_ATT_TIME_long refreshAttTime,
+  RING_ALARM_FUNCTION ringAlarmFunction, void *r_ringAlarmFunctionHandle) ;
 
 
 // Liquidate the timetable and release the memory.
