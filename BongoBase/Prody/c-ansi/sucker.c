@@ -1,5 +1,6 @@
 // c-ansi/sucker.c, version 1.93
 // (c) Atos-Euronext Belgium - 2001, 2002, 2003
+// (c) Puduku - 2023
 
 #include <stdio.h>
 #include <string.h>
@@ -18,10 +19,10 @@
 
 
 
-// 1. FILE_BUTT_SPOTTER 
+// 1. FILE_BUTT_ADEPT 
 
-struct FILE_BUTT_SPOTTER {
-  m_DECLARE_MAGIC_FIELD(FILE_BUTT_SPOTTER_HANDLE)
+struct FILE_BUTT_ADEPT {
+  m_DECLARE_MAGIC_FIELD(FILE_BUTT_ADEPT_HANDLE)
   int n_readBufferSize; 
   char *ch_readBuffer; // Only significant if n_readBufferSize >= 0  
   FILE *nh_file;
@@ -29,14 +30,14 @@ struct FILE_BUTT_SPOTTER {
 
 
 // Public function: see .h
-int FileButtSpotterCreateInstance(FILE_BUTT_SPOTTER_HANDLE *azh_handle,
+int FileButtAdeptCreateInstance(FILE_BUTT_ADEPT_HANDLE *azh_handle,
   const char *p_filePathname, int n_readBufferSize) {
   m_DIGGY_BOLLARD()
 
   m_MALLOC_INSTANCE(*azh_handle) 
-  FILE_BUTT_SPOTTER_HANDLE handle = *azh_handle;
+  FILE_BUTT_ADEPT_HANDLE handle = *azh_handle;
 
-  m_ASSIGN_MAGIC_FIELD(FILE_BUTT_SPOTTER_HANDLE,handle)
+  m_ASSIGN_MAGIC_FIELD(FILE_BUTT_ADEPT_HANDLE,handle)
   const char* openFlags = "w"  ;
   if ((handle->n_readBufferSize = n_readBufferSize) > 0) {
     openFlags = "r"; 
@@ -45,16 +46,16 @@ int FileButtSpotterCreateInstance(FILE_BUTT_SPOTTER_HANDLE *azh_handle,
   handle->nh_file = fopen(p_filePathname,openFlags);
 
   m_DIGGY_RETURN(RETURNED)
-} // FileButtSpotterCreateInstance
+} // FileButtAdeptCreateInstance
 
 
-// BUTT_SPOTTER_SUCK_FUNCTION
+// BUTT_ADEPT_SUCK_FUNCTION
 // Public function: see .h
-int FileButtSpotterSuck(void *r_handle,  char b_kickButt, struct STRING_PORTION *ac_chunk,
+int FileButtAdeptSuck(void *r_handle,  char b_kickButt, struct STRING_PORTION *ac_chunk,
   int *nar_flopCause) {
   m_DIGGY_BOLLARD()
-  FILE_BUTT_SPOTTER_HANDLE handle = (FILE_BUTT_SPOTTER_HANDLE)r_handle;
-  m_CHECK_MAGIC_FIELD(FILE_BUTT_SPOTTER_HANDLE,handle)
+  FILE_BUTT_ADEPT_HANDLE handle = (FILE_BUTT_ADEPT_HANDLE)r_handle;
+  m_CHECK_MAGIC_FIELD(FILE_BUTT_ADEPT_HANDLE,handle)
 
   m_ASSERT(handle->n_readBufferSize > 0)
 
@@ -70,15 +71,15 @@ int FileButtSpotterSuck(void *r_handle,  char b_kickButt, struct STRING_PORTION 
   m_ASSIGN_STRING_PORTION(*ac_chunk,handle->ch_readBuffer,ret) 
 
   m_DIGGY_RETURN(ANSWER__YES)
-} // FileButtSpotterSuck
+} // FileButtAdeptSuck
 
 
-// BUTT_SPOTTER_FILL_FUNCTION
+// BUTT_ADEPT_FILL_FUNCTION
 // Public function: see .h
-int FileButtSpotterFill(void *r_handle,  struct STRING_PORTION chunk, int *nar_flopCause) {
+int FileButtAdeptFill(void *r_handle,  struct STRING_PORTION chunk, int *nar_flopCause) {
   m_DIGGY_BOLLARD()
-  FILE_BUTT_SPOTTER_HANDLE handle = (FILE_BUTT_SPOTTER_HANDLE)r_handle;
-  m_CHECK_MAGIC_FIELD(FILE_BUTT_SPOTTER_HANDLE,handle)
+  FILE_BUTT_ADEPT_HANDLE handle = (FILE_BUTT_ADEPT_HANDLE)r_handle;
+  m_CHECK_MAGIC_FIELD(FILE_BUTT_ADEPT_HANDLE,handle)
 
   m_ASSERT(handle->n_readBufferSize < 0)
 
@@ -93,10 +94,10 @@ int FileButtSpotterFill(void *r_handle,  struct STRING_PORTION chunk, int *nar_f
   m_ASSERT(ret == m_StringPortionLength(&chunk)) 
 
   m_DIGGY_RETURN(ANSWER__YES)
-} // FileButtSpotterFill  
+} // FileButtAdeptFill  
 
 // Public function: see .h
-int FileButtSpotterDestroyInstance(FILE_BUTT_SPOTTER_HANDLE xh_handle) {
+int FileButtAdeptDestroyInstance(FILE_BUTT_ADEPT_HANDLE xh_handle) {
   m_DIGGY_BOLLARD()
 
   if (xh_handle->n_readBufferSize >= 0) free(xh_handle->ch_readBuffer);
@@ -104,37 +105,37 @@ int FileButtSpotterDestroyInstance(FILE_BUTT_SPOTTER_HANDLE xh_handle) {
   free(xh_handle);
   
   m_DIGGY_RETURN(RETURNED)
-} // FileButtSpotterDestroyInstance
+} // FileButtAdeptDestroyInstance
 
 
-// 2. G_STRING_BUTT_SPOTTER 
+// 2. G_STRING_BUTT_ADEPT 
 
-struct G_STRING_BUTT_SPOTTER {
-  m_DECLARE_MAGIC_FIELD(G_STRING_BUTT_SPOTTER_HANDLE)
+struct G_STRING_BUTT_ADEPT {
+  m_DECLARE_MAGIC_FIELD(G_STRING_BUTT_ADEPT_HANDLE)
   G_STRING_STUFF gStringStuff;  
 } ; 
-typedef struct G_STRING_BUTT_SPOTTER *G_STRING_BUTT_SPOTTER_HANDLE; // Public handle
+typedef struct G_STRING_BUTT_ADEPT *G_STRING_BUTT_ADEPT_HANDLE; // Public handle
 
 // Public function: see .h
-int GStringButtSpotterCreateInstance(G_STRING_BUTT_SPOTTER_HANDLE *azh_handle,
+int GStringButtAdeptCreateInstance(G_STRING_BUTT_ADEPT_HANDLE *azh_handle,
   G_STRING_STUFF f_gStringStuff) {
   m_DIGGY_BOLLARD()
 
   m_MALLOC_INSTANCE(*azh_handle) 
   (*azh_handle)->gStringStuff = f_gStringStuff;
-  m_ASSIGN_MAGIC_FIELD(G_STRING_BUTT_SPOTTER_HANDLE,(*azh_handle))
+  m_ASSIGN_MAGIC_FIELD(G_STRING_BUTT_ADEPT_HANDLE,(*azh_handle))
 
   m_DIGGY_RETURN(RETURNED)
-} // GStringButtSpotterCreateInstance
+} // GStringButtAdeptCreateInstance
   
 
-// BUTT_SPOTTER_SUCKER_FUNCTION
+// BUTT_ADEPT_SUCKER_FUNCTION
 // Public function: see .h
-int GStringButtSpotterSuck(void *r_handle,  char b_kickButt, struct STRING_PORTION *ac_chunk,
+int GStringButtAdeptSuck(void *r_handle,  char b_kickButt, struct STRING_PORTION *ac_chunk,
   int *nar_flopCause) {
   m_DIGGY_BOLLARD()
-  G_STRING_BUTT_SPOTTER_HANDLE handle = (G_STRING_BUTT_SPOTTER_HANDLE)r_handle;
-  m_CHECK_MAGIC_FIELD(G_STRING_BUTT_SPOTTER_HANDLE,handle)
+  G_STRING_BUTT_ADEPT_HANDLE handle = (G_STRING_BUTT_ADEPT_HANDLE)r_handle;
+  m_CHECK_MAGIC_FIELD(G_STRING_BUTT_ADEPT_HANDLE,handle)
 
   if (b_kickButt) {
     *ac_chunk = handle->gStringStuff->cv_stringPortion;
@@ -143,52 +144,52 @@ int GStringButtSpotterSuck(void *r_handle,  char b_kickButt, struct STRING_PORTI
   } // if
 
   m_DIGGY_RETURN(ANSWER__YES)
-} // GStringButtSpotterSuck
+} // GStringButtAdeptSuck
 
-// BUTT_SPOTTER_FILLER_FUNCTION
+// BUTT_ADEPT_FILLER_FUNCTION
 // Public function: see .h
-int GStringButtSpotterFill(void *r_handle, struct STRING_PORTION chunk, int *nar_flopCause){
+int GStringButtAdeptFill(void *r_handle, struct STRING_PORTION chunk, int *nar_flopCause){
   m_DIGGY_BOLLARD()
-  G_STRING_BUTT_SPOTTER_HANDLE handle = (G_STRING_BUTT_SPOTTER_HANDLE)r_handle;
-  m_CHECK_MAGIC_FIELD(G_STRING_BUTT_SPOTTER_HANDLE,handle)
+  G_STRING_BUTT_ADEPT_HANDLE handle = (G_STRING_BUTT_ADEPT_HANDLE)r_handle;
+  m_CHECK_MAGIC_FIELD(G_STRING_BUTT_ADEPT_HANDLE,handle)
 
   m_TRACK_IF(GStringCopy(handle->gStringStuff, -1, &chunk) < 0) 
 
   m_DIGGY_RETURN(ANSWER__YES)
-} // GStringButtSpotterFill
+} // GStringButtAdeptFill
 
 
 // Public function: see .h
-int GStringButtSpotterDestroyInstance(G_STRING_BUTT_SPOTTER_HANDLE xh_handle) {
+int GStringButtAdeptDestroyInstance(G_STRING_BUTT_ADEPT_HANDLE xh_handle) {
   m_DIGGY_BOLLARD()
 
   free(xh_handle);
 
   m_DIGGY_RETURN(RETURNED)
-} // GStringButtSpotterDestroyInstance
+} // GStringButtAdeptDestroyInstance
 
 
 // 3. SUCKER
 
 struct SUCKER {
-  BUTT_SPOTTER_SUCK_FUNCTION sButtSpotterSuckFunction;
-  void *r_sButtSpotterSuckHandle;
-  BUTT_SPOTTER_FILL_FUNCTION dButtSpotterFillFunction;
-  void *r_dButtSpotterFillHandle;
+  BUTT_ADEPT_SUCK_FUNCTION sButtAdeptSuckFunction;
+  void *r_sButtAdeptSuckHandle;
+  BUTT_ADEPT_FILL_FUNCTION dButtAdeptFillFunction;
+  void *r_dButtAdeptFillHandle;
   int suckingLimit ;
 } ;
 
 
-// BUTT_SPOTTER_SUCK_FUNCTION
-static int DummyButtSpotterSuck(void *r_handle,  char b_kickButt, struct STRING_PORTION *ac_chunk,
+// BUTT_ADEPT_SUCK_FUNCTION
+static int DummyButtAdeptSuck(void *r_handle,  char b_kickButt, struct STRING_PORTION *ac_chunk,
   int *nar_flopCause) {
   m_RAISE(ANOMALY__SHOULD_NOT_BE_HERE)
-} // DummyButtSpotterSuck
+} // DummyButtAdeptSuck
 
-// BUTT_SPOTTER_FILL_FUNCTION
-int DummyButtSpotterFill(void *r_handle, struct STRING_PORTION chunk, int *nar_flopCause) {
+// BUTT_ADEPT_FILL_FUNCTION
+int DummyButtAdeptFill(void *r_handle, struct STRING_PORTION chunk, int *nar_flopCause) {
   m_RAISE(ANOMALY__SHOULD_NOT_BE_HERE)
-} // DummyButtSpotterFill
+} // DummyButtAdeptFill
 
 // Public function: see .h
 int SuckerCreateInstance (SUCKER_HANDLE *azh_handle,  int suckingLimit) {
@@ -196,8 +197,8 @@ int SuckerCreateInstance (SUCKER_HANDLE *azh_handle,  int suckingLimit) {
 
   m_MALLOC_INSTANCE(*azh_handle) 
 
-  (*azh_handle)->sButtSpotterSuckFunction = DummyButtSpotterSuck;
-  (*azh_handle)->dButtSpotterFillFunction = DummyButtSpotterFill;
+  (*azh_handle)->sButtAdeptSuckFunction = DummyButtAdeptSuck;
+  (*azh_handle)->dButtAdeptFillFunction = DummyButtAdeptFill;
 
   (*azh_handle)->suckingLimit = suckingLimit ;
 
@@ -207,17 +208,17 @@ int SuckerCreateInstance (SUCKER_HANDLE *azh_handle,  int suckingLimit) {
 
 // Public function ; see .h
 int SuckerPlugSDButts(SUCKER_HANDLE handle, 
-  BUTT_SPOTTER_SUCK_FUNCTION n_sButtSpotterSuckFunction, void *cfr_sButtSpotterSuckHandle,
-  BUTT_SPOTTER_FILL_FUNCTION n_dButtSpotterFillFunction,  void *cfr_dButtSpotterFillHandle) {
+  BUTT_ADEPT_SUCK_FUNCTION n_sButtAdeptSuckFunction, void *cfr_sButtAdeptSuckHandle,
+  BUTT_ADEPT_FILL_FUNCTION n_dButtAdeptFillFunction,  void *cfr_dButtAdeptFillHandle) {
   m_DIGGY_BOLLARD()
 
-  if (n_sButtSpotterSuckFunction != NULL) {
-    handle->sButtSpotterSuckFunction = n_sButtSpotterSuckFunction;
-    handle->r_sButtSpotterSuckHandle = cfr_sButtSpotterSuckHandle;
+  if (n_sButtAdeptSuckFunction != NULL) {
+    handle->sButtAdeptSuckFunction = n_sButtAdeptSuckFunction;
+    handle->r_sButtAdeptSuckHandle = cfr_sButtAdeptSuckHandle;
   } // if
-  if (n_dButtSpotterFillFunction != NULL) {
-    handle->dButtSpotterFillFunction = n_dButtSpotterFillFunction;
-    handle->r_dButtSpotterFillHandle = cfr_dButtSpotterFillHandle;
+  if (n_dButtAdeptFillFunction != NULL) {
+    handle->dButtAdeptFillFunction = n_dButtAdeptFillFunction;
+    handle->r_dButtAdeptFillHandle = cfr_dButtAdeptFillHandle;
   } // if
 
   m_DIGGY_RETURN(RETURNED)
@@ -228,7 +229,7 @@ int SuckerPlugSDButts(SUCKER_HANDLE handle,
 int SuckerSuckSButt(SUCKER_HANDLE handle, char b_kickButt, struct STRING_PORTION *ac_chunk,
   int *nar_flopCause) {
   m_DIGGY_BOLLARD()
-  int answer = handle->sButtSpotterSuckFunction(handle->r_sButtSpotterSuckHandle,b_kickButt,
+  int answer = handle->sButtAdeptSuckFunction(handle->r_sButtAdeptSuckHandle,b_kickButt,
     ac_chunk, nar_flopCause);
   m_TRACK_IF(answer < 0) 
   m_DIGGY_RETURN(answer)  
@@ -237,7 +238,7 @@ int SuckerSuckSButt(SUCKER_HANDLE handle, char b_kickButt, struct STRING_PORTION
 
 int SuckerFillDButt(SUCKER_HANDLE handle, struct STRING_PORTION chunk, int *nar_flopCause) {
   m_DIGGY_BOLLARD()
-  int answer = handle->dButtSpotterFillFunction(handle->r_dButtSpotterFillHandle,
+  int answer = handle->dButtAdeptFillFunction(handle->r_dButtAdeptFillHandle,
     chunk, nar_flopCause);
   m_TRACK_IF(answer < 0) 
   m_DIGGY_RETURN(answer)  
@@ -254,7 +255,7 @@ int SuckerSuckOut (SUCKER_HANDLE handle, int *na_suckedOutLength, int *nar_flopC
   while (n_suckerStatus == -1) {
     int suckedLength = 0;
 
-    switch (handle->sButtSpotterSuckFunction(handle->r_sButtSpotterSuckHandle, suckedOutLength==0,
+    switch (handle->sButtAdeptSuckFunction(handle->r_sButtAdeptSuckHandle, suckedOutLength==0,
        &c_chunk, nar_flopCause)) {
     case ANSWER__YES:
       suckedLength = m_StringPortionLength(&c_chunk);
@@ -263,7 +264,7 @@ int SuckerSuckOut (SUCKER_HANDLE handle, int *na_suckedOutLength, int *nar_flopC
       } else if (handle->suckingLimit > 0 && suckedOutLength + suckedLength > handle->suckingLimit) {
         n_suckerStatus = SUCKER_STATUS__LIMIT_BREACHED;
       } else { 
-        switch (handle->dButtSpotterFillFunction(handle->r_dButtSpotterFillHandle, c_chunk,
+        switch (handle->dButtAdeptFillFunction(handle->r_dButtAdeptFillHandle, c_chunk,
           nar_flopCause)) {
         case ANSWER__YES:
           suckedOutLength += suckedLength ;
@@ -293,20 +294,20 @@ int SuckerFCopy (SUCKER_HANDLE handle, const char *p_sFilePathname, const char *
   int *na_copiedLength, int *na_fileFlopCause) {
   m_DIGGY_BOLLARD() 
 
-  FILE_BUTT_SPOTTER_HANDLE sFileButtSpotterHandle = (FILE_BUTT_SPOTTER_HANDLE)UNDEFINED;
-  FILE_BUTT_SPOTTER_HANDLE dFileButtSpotterHandle = (FILE_BUTT_SPOTTER_HANDLE)UNDEFINED;
+  FILE_BUTT_ADEPT_HANDLE sFileButtAdeptHandle = (FILE_BUTT_ADEPT_HANDLE)UNDEFINED;
+  FILE_BUTT_ADEPT_HANDLE dFileButtAdeptHandle = (FILE_BUTT_ADEPT_HANDLE)UNDEFINED;
   
-  m_TRACK_IF(FileButtSpotterCreateInstance(&sFileButtSpotterHandle,p_sFilePathname,
-    BATEAU__FILE_BUTT_SPOTTER__READ_BUFFER_SIZE) != RETURNED) 
-  m_TRACK_IF(FileButtSpotterCreateInstance(&dFileButtSpotterHandle,p_sFilePathname, -1) != RETURNED)
+  m_TRACK_IF(FileButtAdeptCreateInstance(&sFileButtAdeptHandle,p_sFilePathname,
+    BATEAU__FILE_BUTT_ADEPT__READ_BUFFER_SIZE) != RETURNED) 
+  m_TRACK_IF(FileButtAdeptCreateInstance(&dFileButtAdeptHandle,p_sFilePathname, -1) != RETURNED)
 
-  m_TRACK_IF(SuckerPlugSDButts(handle, FileButtSpotterSuck,sFileButtSpotterHandle,
-    FileButtSpotterFill, dFileButtSpotterHandle) != RETURNED)
+  m_TRACK_IF(SuckerPlugSDButts(handle, FileButtAdeptSuck,sFileButtAdeptHandle,
+    FileButtAdeptFill, dFileButtAdeptHandle) != RETURNED)
   int suckerStatus = SuckerSuckOut(handle,na_copiedLength,na_fileFlopCause);
   m_TRACK_IF(suckerStatus < 0)
 
-  m_TRACK_IF(FileButtSpotterDestroyInstance(sFileButtSpotterHandle) != RETURNED)
-  m_TRACK_IF(FileButtSpotterDestroyInstance(dFileButtSpotterHandle) != RETURNED)
+  m_TRACK_IF(FileButtAdeptDestroyInstance(sFileButtAdeptHandle) != RETURNED)
+  m_TRACK_IF(FileButtAdeptDestroyInstance(dFileButtAdeptHandle) != RETURNED)
 
   m_DIGGY_RETURN(suckerStatus)
 } // SuckerFCopy

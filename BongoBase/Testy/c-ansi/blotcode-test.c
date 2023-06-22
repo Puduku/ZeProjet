@@ -1,3 +1,7 @@
+// c-ansi/blotcode-test.c, version 1.93 (ANSI)
+// (c) Atos-Euronext Belgium - 2001, 2002, 2003, 2004
+// (c) Puduku - 2023
+
 #include <stdio.h>
 
 #include "c-ansi/blotcode.h"
@@ -224,8 +228,6 @@ int main (int argc, char** argv) {
   m_TRACK_IF(BrokenPipeFixCreateInstance(&brokenPipeFixHandle) != RETURNED)
 
   SUCKER_HANDLE h_outputSuckerHandle = (SUCKER_HANDLE)UNDEFINED;
-//  m_TRACK_IF(SuckerCreateInstance(&h_outputSuckerHandle,  (ALARM_SYSTEM_HANDLE)NULL,
-//    brokenPipeFixHandle, BATEAU__FILE_BUTT_SPOTTER__READ_BUFFER_SIZE,  0) != RETURNED)
   m_TRACK_IF(SuckerCreateInstance(&h_outputSuckerHandle, 0) != RETURNED)
 
   BLOTCODE_EXECUTOR_HANDLE h_blotcodeExecutorHandle = (BLOTCODE_EXECUTOR_HANDLE)UNDEFINED;
@@ -236,11 +238,11 @@ int main (int argc, char** argv) {
   m_TRACK_IF(G_STRING_CREATE_INSTANCE(&h_outputGStringStuff) != RETURNED)
 
   //m_TRACK_IF(m_SuckerPlugDButt_GString(h_outputSuckerHandle, h_outputGStringStuff) != RETURNED) 
-  G_STRING_BUTT_SPOTTER_HANDLE h_gStringButtSpotterHandle = (G_STRING_BUTT_SPOTTER_HANDLE)UNDEFINED; 
-  m_TRACK_IF(GStringButtSpotterCreateInstance(&h_gStringButtSpotterHandle,h_outputGStringStuff) !=
+  G_STRING_BUTT_ADEPT_HANDLE h_gStringButtAdeptHandle = (G_STRING_BUTT_ADEPT_HANDLE)UNDEFINED; 
+  m_TRACK_IF(GStringButtAdeptCreateInstance(&h_gStringButtAdeptHandle,h_outputGStringStuff) !=
      RETURNED)
   m_TRACK_IF(SuckerPlugSDButts(h_outputSuckerHandle, NULL, (void*)UNDEFINED,
-    GStringButtSpotterFill,h_gStringButtSpotterHandle) != RETURNED) 
+    GStringButtAdeptFill,h_gStringButtAdeptHandle) != RETURNED) 
 
   m_TRACK_IF(BlotcodeExecutorTest(1,h_blotcodeExecutorHandle, h_outputSuckerHandle,
     h_outputGStringStuff, DUMMY_TEMPLATE, ANSWER__YES,  BLOTCODE_CONSTRUCTION_STATUS__OK,
@@ -284,7 +286,7 @@ int main (int argc, char** argv) {
 
   m_TRACK_IF(G_STRING_DESTROY_INSTANCE(h_outputGStringStuff) != RETURNED)
 
-  m_TRACK_IF(GStringButtSpotterDestroyInstance(h_gStringButtSpotterHandle) != RETURNED)
+  m_TRACK_IF(GStringButtAdeptDestroyInstance(h_gStringButtAdeptHandle) != RETURNED)
   m_TRACK_IF(BlotcodeExecutorDestroyInstance(h_blotcodeExecutorHandle) != RETURNED)
   m_TRACK_IF(SuckerDestroyInstance(h_outputSuckerHandle) != RETURNED)
   m_TRACK_IF(BrokenPipeFixDestroyInstance(brokenPipeFixHandle) != RETURNED)

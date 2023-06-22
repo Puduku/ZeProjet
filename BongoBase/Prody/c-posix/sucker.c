@@ -1,5 +1,6 @@
 // c-posix/sucker.c, version 1.93
 // (c) Atos-Euronext Belgium - 2001, 2002, 2003
+// (c) Puduu - 2023
 
 #include <stdarg.h>
 #include <string.h>
@@ -18,20 +19,20 @@
 #include "c-ansi/testy-diggy.h"
 
 
-struct STREAM_BUTT_SPOTTER {
-  m_DECLARE_MAGIC_FIELD(STREAM_BUTT_SPOTTER_HANDLE)
+struct STREAM_BUTT_ADEPT {
+  m_DECLARE_MAGIC_FIELD(STREAM_BUTT_ADEPT_HANDLE)
   ERW_HANDLE h_erwHandle;
 } ;
 
 // Public function: see .h
-int StreamButtSpotterCreateInstance(STREAM_BUTT_SPOTTER_HANDLE *azh_handle,
+int StreamButtAdeptCreateInstance(STREAM_BUTT_ADEPT_HANDLE *azh_handle,
   ALARM_SYSTEM_HANDLE nf_alarmSystemHandle, BROKEN_PIPE_FIX_HANDLE f_brokenPipeFixHandle,
   struct WAITING_PLAN waitingPlan, int n_readBufferSize, int nf_openDescriptor) { 
   m_DIGGY_BOLLARD()
 
   m_MALLOC_INSTANCE(*azh_handle) 
-  STREAM_BUTT_SPOTTER_HANDLE handle = *azh_handle;
-  m_ASSIGN_MAGIC_FIELD(STREAM_BUTT_SPOTTER_HANDLE,handle)
+  STREAM_BUTT_ADEPT_HANDLE handle = *azh_handle;
+  m_ASSIGN_MAGIC_FIELD(STREAM_BUTT_ADEPT_HANDLE,handle)
   m_TRACK_IF(ErwCreateInstance(&handle->h_erwHandle, f_brokenPipeFixHandle,
     nf_alarmSystemHandle, n_readBufferSize, NULL, NULL, (void *)UNDEFINED, &waitingPlan) != RETURNED)
   
@@ -46,11 +47,11 @@ int StreamButtSpotterCreateInstance(STREAM_BUTT_SPOTTER_HANDLE *azh_handle,
   } // switch
 
   m_DIGGY_RETURN(RETURNED)
-} // StreamButtSpotterCreateInstance
+} // StreamButtAdeptCreateInstance
 
 
 // Public function: see .h
-int StreamButtSpotterKick(STREAM_BUTT_SPOTTER_HANDLE handle, int f_openDescriptor) {
+int StreamButtAdeptKick(STREAM_BUTT_ADEPT_HANDLE handle, int f_openDescriptor) {
   m_DIGGY_BOLLARD()
   switch (ErwReset(handle->h_erwHandle, f_openDescriptor, NULL)) {
   case COMPLETED__OK:
@@ -61,16 +62,16 @@ int StreamButtSpotterKick(STREAM_BUTT_SPOTTER_HANDLE handle, int f_openDescripto
   } // switch
   
   m_DIGGY_RETURN(RETURNED)
-} // StreamButtSpotterKick 
+} // StreamButtAdeptKick 
 
 
-// BUTT_SPOTTER_SUCKER_FUNCTION
+// BUTT_ADEPT_SUCKER_FUNCTION
 // Public function: see .h
-int StreamButtSpotterSuck(void *r_handle,  char b_kickButt, struct STRING_PORTION *ac_chunk,
+int StreamButtAdeptSuck(void *r_handle,  char b_kickButt, struct STRING_PORTION *ac_chunk,
   int *nar_flopCause) {
   m_DIGGY_BOLLARD()
-  STREAM_BUTT_SPOTTER_HANDLE handle = (STREAM_BUTT_SPOTTER_HANDLE)r_handle;
-  m_CHECK_MAGIC_FIELD(STREAM_BUTT_SPOTTER_HANDLE,handle)
+  STREAM_BUTT_ADEPT_HANDLE handle = (STREAM_BUTT_ADEPT_HANDLE)r_handle;
+  m_CHECK_MAGIC_FIELD(STREAM_BUTT_ADEPT_HANDLE,handle)
 
   // b_kickButt: not used
 
@@ -94,15 +95,15 @@ int StreamButtSpotterSuck(void *r_handle,  char b_kickButt, struct STRING_PORTIO
   } // switch 
 
   m_DIGGY_RETURN(answer)
-} // StreamButtSpotterSuck
+} // StreamButtAdeptSuck
 
 
-// BUTT_SPOTTER_FILLER_FUNCTION
+// BUTT_ADEPT_FILLER_FUNCTION
 // Public function: see .h
-int StreamButtSpotterFill(void *r_handle, struct STRING_PORTION chunk, int *nar_flopCause) { 
+int StreamButtAdeptFill(void *r_handle, struct STRING_PORTION chunk, int *nar_flopCause) { 
   m_DIGGY_BOLLARD()
-  STREAM_BUTT_SPOTTER_HANDLE handle = (STREAM_BUTT_SPOTTER_HANDLE)r_handle;
-  m_CHECK_MAGIC_FIELD(STREAM_BUTT_SPOTTER_HANDLE,handle)
+  STREAM_BUTT_ADEPT_HANDLE handle = (STREAM_BUTT_ADEPT_HANDLE)r_handle;
+  m_CHECK_MAGIC_FIELD(STREAM_BUTT_ADEPT_HANDLE,handle)
 
   int answer = ANSWER__YES; // A priori
   switch (ErwWrite2(handle->h_erwHandle,NULL, m_STRING_PORTION_2_BUFFER_LENGTH(chunk), NULL)) {
@@ -121,18 +122,18 @@ int StreamButtSpotterFill(void *r_handle, struct STRING_PORTION chunk, int *nar_
   } // switch
 
   m_DIGGY_RETURN(answer)
-} // StreamButtSpotterFill
+} // StreamButtAdeptFill
 
 
 // Public function: see .h
-int StreamButtSpotterDestroyInstance(STREAM_BUTT_SPOTTER_HANDLE xh_handle) {
+int StreamButtAdeptDestroyInstance(STREAM_BUTT_ADEPT_HANDLE xh_handle) {
   m_DIGGY_BOLLARD()
 
   m_TRACK_IF(ErwDestroyInstance(xh_handle->h_erwHandle) != RETURNED)
   free(xh_handle);
 
   m_DIGGY_RETURN(RETURNED)
-} // StreamButtSpotterDestroyInstance
+} // StreamButtAdeptDestroyInstance
 
 
 
@@ -143,8 +144,8 @@ int SuckerCopy (SUCKER_HANDLE handle, ALARM_SYSTEM_HANDLE n_alarmSystemHandle,
    int *na_copiedLength, int *na_streamFlopCause) {
   m_DIGGY_BOLLARD()
 
-  STREAM_BUTT_SPOTTER_HANDLE sSreamButtSpotterHandle = (STREAM_BUTT_SPOTTER_HANDLE)UNDEFINED;
-  STREAM_BUTT_SPOTTER_HANDLE dSreamButtSpotterHandle = (STREAM_BUTT_SPOTTER_HANDLE)UNDEFINED;
+  STREAM_BUTT_ADEPT_HANDLE sSreamButtAdeptHandle = (STREAM_BUTT_ADEPT_HANDLE)UNDEFINED;
+  STREAM_BUTT_ADEPT_HANDLE dSreamButtAdeptHandle = (STREAM_BUTT_ADEPT_HANDLE)UNDEFINED;
   
   int h_sOpenDescriptor = UNDEFINED; // TODO: what about BINARY__NON_POSIX_OPEN_FLAG ? 
   switch (ProtectedOpenFile(p_sFilePathname, READ__BASIC_OPEN_FILE_MODE,
@@ -168,18 +169,18 @@ int SuckerCopy (SUCKER_HANDLE handle, ALARM_SYSTEM_HANDLE n_alarmSystemHandle,
     m_TRACK()
   } // switch
 
-  m_TRACK_IF(StreamButtSpotterCreateInstance(&sSreamButtSpotterHandle,n_alarmSystemHandle,brokenPipeFixHandle,
-    p_fileStreamSimpleWaitingPlan,BATEAU__FILE_BUTT_SPOTTER__READ_BUFFER_SIZE,h_sOpenDescriptor) !=
+  m_TRACK_IF(StreamButtAdeptCreateInstance(&sSreamButtAdeptHandle,n_alarmSystemHandle,brokenPipeFixHandle,
+    p_fileStreamSimpleWaitingPlan,BATEAU__FILE_BUTT_ADEPT__READ_BUFFER_SIZE,h_sOpenDescriptor) !=
     RETURNED) 
 
-  m_TRACK_IF(StreamButtSpotterCreateInstance(&dSreamButtSpotterHandle,n_alarmSystemHandle,brokenPipeFixHandle,
+  m_TRACK_IF(StreamButtAdeptCreateInstance(&dSreamButtAdeptHandle,n_alarmSystemHandle,brokenPipeFixHandle,
     p_fileStreamSimpleWaitingPlan,-1,h_dOpenDescriptor) != RETURNED) 
 
   int suckerStatus = SuckerSuckOut(handle,na_copiedLength,na_streamFlopCause);
   m_TRACK_IF(suckerStatus < 0)
 
-  m_TRACK_IF(StreamButtSpotterDestroyInstance(sSreamButtSpotterHandle) != RETURNED)
-  m_TRACK_IF(StreamButtSpotterDestroyInstance(dSreamButtSpotterHandle) != RETURNED)
+  m_TRACK_IF(StreamButtAdeptDestroyInstance(sSreamButtAdeptHandle) != RETURNED)
+  m_TRACK_IF(StreamButtAdeptDestroyInstance(dSreamButtAdeptHandle) != RETURNED)
 
   m_DIGGY_RETURN(suckerStatus)
 } // SuckerCopy

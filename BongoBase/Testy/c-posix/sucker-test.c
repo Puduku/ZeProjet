@@ -1,6 +1,6 @@
 // c-ansi/sucker-test.c, version 1.93 (ANSI)
 // (c) Atos-Euronext Belgium - 2001, 2002, 2003
-
+// (c) Puduku - 2023
 
 #include <stdio.h>
 
@@ -36,8 +36,6 @@ int main (int argc, char** argv) {
   m_TRACK_IF(StandardAlarmSystemCreateInstance(&h_alarmSystemHandle) != RETURNED)
   //m_TRACK_IF(PthreadAlarmSystemCreateInstance(&h_alarmSystemHandle) != RETURNED)
   m_TRACK_IF(BrokenPipeFixCreateInstance(&h_brokenPipeFixHandle) != RETURNED)
-  //m_TRACK_IF(SuckerCreateInstance(&h_handle,h_alarmSystemHandle,h_brokenPipeFixHandle, 1024,
-  //  10000000) != RETURNED)
   m_TRACK_IF(SuckerCreateInstance(&h_handle, 10000000) != RETURNED)
 
   int suckedLength = UNDEFINED;
@@ -54,19 +52,15 @@ int main (int argc, char** argv) {
   int answer = ProtectedOpenFile(dummyCopyFilePathname, READ__BASIC_OPEN_FILE_MODE,
     BATEAU__FILE_CREATION_MODE, &dummyCopyFile, &openErrno);
   m_RAISE_VERBATIM_IF(answer != ANSWER__YES)
-  //struct SUCKER_BUTT sSuckerButt;
-  //m_ASSIGN_SUCKER_BUTT__FILE_STREAM(sSuckerButt,dummyCopyFile)
-  STREAM_BUTT_SPOTTER_HANDLE h_streamSButtSpotterHandle = (STREAM_BUTT_SPOTTER_HANDLE)UNDEFINED;
-  m_TRACK_IF(StreamButtSpotterCreateInstance(&h_streamSButtSpotterHandle,
+  STREAM_BUTT_ADEPT_HANDLE h_streamSButtAdeptHandle = (STREAM_BUTT_ADEPT_HANDLE)UNDEFINED;
+  m_TRACK_IF(StreamButtAdeptCreateInstance(&h_streamSButtAdeptHandle,
     h_alarmSystemHandle, h_brokenPipeFixHandle,
     p_fileStreamSimpleWaitingPlan, 1024, dummyCopyFile) != RETURNED)
 
   G_STRING_STUFF h_gStringStuff = (G_STRING_STUFF) UNDEFINED;
   m_TRACK_IF(G_STRING_CREATE_INSTANCE(&h_gStringStuff) != RETURNED)
-  //struct SUCKER_BUTT dSuckerButt;
-  //m_ASSIGN_SUCKER_BUTT__G_STRING(dSuckerButt,h_gStringStuff)
-  G_STRING_BUTT_SPOTTER_HANDLE h_gStringButtSpotterHandle = (G_STRING_BUTT_SPOTTER_HANDLE)UNDEFINED;
-  m_TRACK_IF(GStringButtSpotterCreateInstance(&h_gStringButtSpotterHandle,h_gStringStuff) != RETURNED)
+  G_STRING_BUTT_ADEPT_HANDLE h_gStringButtAdeptHandle = (G_STRING_BUTT_ADEPT_HANDLE)UNDEFINED;
+  m_TRACK_IF(GStringButtAdeptCreateInstance(&h_gStringButtAdeptHandle,h_gStringStuff) != RETURNED)
 
   ret = SuckerSuckOut(h_handle,&suckedLength,&r_flopCause) ;
   m_TRACK_IF(ret < 0)
@@ -81,8 +75,8 @@ int main (int argc, char** argv) {
   //m_TRACK_IF(PthreadAlarmSystemDestroyInstance(h_alarmSystemHandle) != RETURNED)
 
   m_TRACK_IF(G_STRING_DESTROY_INSTANCE(h_dummySFilePathnameStuff) != RETURNED)
-  m_TRACK_IF(StreamButtSpotterDestroyInstance(h_streamSButtSpotterHandle) != RETURNED)
-  m_TRACK_IF(GStringButtSpotterDestroyInstance(h_gStringButtSpotterHandle) != RETURNED)
+  m_TRACK_IF(StreamButtAdeptDestroyInstance(h_streamSButtAdeptHandle) != RETURNED)
+  m_TRACK_IF(GStringButtAdeptDestroyInstance(h_gStringButtAdeptHandle) != RETURNED)
   
   m_DIGGY_RETURN(SUCCESS__EXECUTIVE__EXIT_STATUS)
 } // main
