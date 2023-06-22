@@ -44,7 +44,7 @@ int SuckerCreateInstance(SUCKER_HANDLE *azh_handle, int suckingLimit);
 
 
 // #REF BUTT_ADEPT_SUCK_FUNCTION <generic status>
-// Suck content of the "plugged" source
+// Suck butt content - one "chunk" at the time...
 // 
 // Passed:
 // - handle: (private) handle
@@ -53,9 +53,9 @@ int SuckerCreateInstance(SUCKER_HANDLE *azh_handle, int suckingLimit);
 // - *nar_flopCause: (if used) default value
 //
 // Changed:
-// - *ac_chunk: sucked data: not significant in case of "flop"
-//   + empty portion (length == 0): end of input ; no more can be sucked
-//   + non empty portion (length > 0): sucked data 
+// - *ac_chunk: sucked stuff: not significant in case of "flop"
+//   + empty portion (length == 0): end of input ; no more stuff can be sucked
+//   + non empty portion (length > 0): sucked stuff 
 // - *nar_flopCause: (if asked) <generic status> ; cause of "flop"
 //
 // Ret: sucked OK ? 
@@ -67,20 +67,20 @@ typedef int (*BUTT_ADEPT_SUCK_FUNCTION) (void *r_handle, char b_kickButt,
 
 
 // #REF BUTT_ADEPT_FILL_FUNCTION <generic status>
-// Fill "destination butt" with content
+// Fill butt with some content...
 //
 // Passed:
 // - r_handle: (private) handle
-// - chunk: (length >= 0) 
+// - chunk: (length > 0 ; MAY NOT be "empty"...)
 // - nar_flopCause: NULL pointer if not used
 // - *nar_flopCause: (if used) default value
 //
 // Changed:
 // - *nar_flopCause: cause of "flop"
 //
-// Ret: padded to output ? 
-// - ANSWER__YES: passed chunk is empty or chunk successully padded  
-// - ANSWER__NO: "flop" during padding 
+// Ret: "filled" OK ? 
+// - ANSWER__YES: chunk successully introduced in butt 
+// - ANSWER__NO: "flop" occured during introduction...
 // - -1 : unexpected problem; anomaly is raised
 typedef int (*BUTT_ADEPT_FILL_FUNCTION) (void *r_handle, struct STRING_PORTION chunk,
    int *nar_flopCause);
@@ -130,7 +130,7 @@ int SuckerSuckSButt(SUCKER_HANDLE handle, char b_kickButt, struct STRING_PORTION
 //
 // Passed:
 // - handle: sucker (with plugged "destination butt" - see SuckerPlugSDButts() above)
-// - chunk:  
+// - chunk: (length > 0 ; MAY NOT be "empty"...)
 // - nar_flopCause: NULL pointer if not used
 // - *nar_flopCause: (if used) default value
 //
@@ -138,8 +138,8 @@ int SuckerSuckSButt(SUCKER_HANDLE handle, char b_kickButt, struct STRING_PORTION
 // - *nar_flopCause: cause of "flop"
 //
 // Ret: padded to output ? 
-// - ANSWER__YES: passed chunk is empty or chunk successully padded  
-// - ANSWER__NO: "flop" during padding 
+// - ANSWER__YES: chunk successully introduced in butt 
+// - ANSWER__NO: "flop" occured during introduction...
 // - -1 : unexpected problem; anomaly is raised
 int SuckerFillDButt(SUCKER_HANDLE handle, struct STRING_PORTION chunk, int *nar_flopCause);
 
