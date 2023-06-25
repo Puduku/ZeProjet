@@ -13,6 +13,7 @@ cleaning=s
 #### Creek functions:
 
 CommandCompilePrody () {
+  local _localGarden="$(Location "$garden")"
   CC_INCS=(./)     
 
   local _lib=$1
@@ -21,11 +22,11 @@ CommandCompilePrody () {
   else
     CC_DEPS=(c-ansi c-posix)
   fi
-  li="$garden/lib$_lib.a"
+  li="$_localGarden/lib$_lib.a"
   if IsTarget "$li" ;then
     Step "Build production library : $li"
     for src in $_lib/*.c ;do
-      obj=$garden/$(ObjectFlatName "$src" "")
+      obj=$_localGarden/$(ObjectFlatName "$src" "")
       CommandCC "$src" "$obj" "$li"
     done
   fi

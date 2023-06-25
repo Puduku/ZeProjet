@@ -37,8 +37,9 @@ CommandCompileTestyUtils () {
 }
 
 CommandCompileDiggyPrody () {
+  local _localGarden="$(Location "$garden")"
   CommandVisitGarden "$prodyGarden" s
-  CC_INCS=(./ "$(Location "$diggyGarden")" "$(Location "$garden")")     
+  CC_INCS=(./ "$(Location "$diggyGarden")" "$_localGarden")     
   CC_OPTS=(-DDIGGY)
   local _lib="$1"
   if [ $_lib = c-ansi ] ;then
@@ -46,10 +47,10 @@ CommandCompileDiggyPrody () {
   else
     CC_DEPS=(c-ansi c-posix)
   fi
-  local _lili="$(Location "$garden/lib${_lib}-diggy.a")"
+  local _lili="$_localGarden/lib${_lib}-diggy.a"
   local _src
   for _src in $_lib/*.c ;do
-    local _obj=$garden/$(ObjectFlatName "$_src" "-diggy")
+    local _obj=$_localGarden/$(ObjectFlatName "$_src" "-diggy")
     CommandCC "$_src" "$_obj" "$_lili"
   done
   CommandQuitGarden 
