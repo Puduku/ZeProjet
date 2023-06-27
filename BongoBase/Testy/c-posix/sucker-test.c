@@ -10,7 +10,6 @@
 #include "c-posix/s-alarm.h"
 //#include "c-posix/t-alarm.h"
 #include "c-posix/rwf.h"
-#include "c-posix/pathname.h"
 
 #include "diggy/diggy.h"
 #include "testy/getopts.h"
@@ -24,7 +23,10 @@
 
 int main (int argc, char** argv) {
   unsigned int dgFlags = ParseTestyCommandArguments(argc,argv,SANDBOX__TESTY_FLAG | DATADIR__TESTY_FLAG) ;
-  m_CREATE_FILE_PATHNAME_G_STRING(h_dummySFilePathnameStuff,p_testyDatadirPath,DUMMY_ORIG_FILENAME)
+  G_STRING_STUFF h_dummySFilePathnameStuff = (G_STRING_STUFF)UNDEFINED;
+  m_TRACK_IF(G_STRING_CREATE_INSTANCE(&h_dummySFilePathnameStuff) != RETURNED)
+  m_TRACK_IF(GStringPrintf(h_dummySFilePathnameStuff,0,"%s/%s", p_testyDatadirPath,
+    DUMMY_ORIG_FILENAME) < 0)
   const char *dummyCopyFilePathname = DUMMY_COPY_FILENAME;
   m_DIGGY_INIT_BOLLARD(dgFlags)
 
