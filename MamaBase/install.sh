@@ -22,7 +22,7 @@ ExtraInstallOrUpdate () {
   Concon coco
   Concon loquet
   Concon progress
-  Concon realpath
+  Concon _realpath
 }
 
 . "$FLINT/install.env" 

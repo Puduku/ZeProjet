@@ -22,7 +22,7 @@ if [ $ret -ne 0 ] ;then
   exit $ret
 fi
 
-for util in coco progress loquet realpath ;do
+for util in coco progress loquet _realpath ;do
   if ! which "$util" > /dev/null ;then
     ReportProblem Mama "$util command not found"     
   fi

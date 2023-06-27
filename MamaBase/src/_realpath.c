@@ -136,13 +136,16 @@ int main (int argc, const char **argv) {
   } else {
     fputs("Invalid argument(s)\n",stderr);
     fputs(argv[0],stderr);
-    fputs(" is supposed to behave exaclty like standard realpath command present in LINUX/Ubuntu\n",stderr);
-    fputs("Actually, only TWO specific modes are supported:\n",stderr);
-    fputs("1. Basic mode (NO options) ; unique argument : <pathname>\n",stderr);
-    fputs("   => construct RCA (real canonicalized absolute) pathname.\n",stderr);
-    fputs("2. Enhanced mode (NO options) ; three arguments - in that order : \n",stderr);
-    fputs("   " REL_BASE_SWITCH "<base pathname> " REL_TO_SWITCH "<relative to pathname> <pathname>\n",stderr);
-    fputs("   => construct \"smart location\" pathname.\n",stderr);
+    fputs(" is supposed to replace 'realpath' command present in LINUX/Ubuntu\n"
+      "But attention, only these TWO specific modes are supported:\n"
+      " 1. Basic mode ; unique argument : <pathname>\n"
+      "   => construct RCA (real canonicalized absolute) pathname.\n"
+      " 2. Enhanced mode ; three arguments - in that order :\n"
+      "    " REL_BASE_SWITCH " <base pathname> " REL_TO_SWITCH " <relative to pathname> <pathname>\n"
+      "   => construct 'smart location' pathname.\n"
+      "And please note that important difference vis-a-vis LINUX/Ubuntu implementation:\n"
+      "single file names are systematically replaced with equivalent relative pathnames ; for instance,\n"
+      "'toto' single name would be replaced  with './toto' relative pathname...\n",stderr); 
     return 100;
   } // if 
 
