@@ -22,11 +22,11 @@ enum {
 
 // TODO: add indexes
 
-extern const struct TOKEN_DEFINITION p_commonMimeTypes ;
+extern const struct TOKEN_DEFINITION p_commonMimeTypes[] ;
 
 static inline int m_MarcelCreateInstance(G_STRINGS_HANDLE *azh_handle) {
   m_TRACK_IF(G_STRINGS_CREATE_INSTANCE( azh_handle,COMMON_MIME_TYPES_NUMBER) != RETURNED)
-  m_G_STRINGS_IMPORT_TOKENS(*azh_handle,p_commonMimeTypes,  COMMON_MIME_TYPES_NUMBER)
+  m_G_STRINGS_IMPORT_TOKENS((*azh_handle),p_commonMimeTypes,  COMMON_MIME_TYPES_NUMBER)
   m_TRACK_IF(GStringsFreeze(*azh_handle,NULL) != RETURNED)
   return RETURNED;
 } // m_MarcelCreateInstance
