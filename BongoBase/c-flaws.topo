@@ -79,11 +79,13 @@
 // However, some physical properties deserve to be clarified:
 // - aligned (unpacked) data: such organization favors the CPU but creates a waste of memory.
 // - packed (unpacked) data: optimizes memory consumption, but may decrease CPU performance.
-// Ad hoc directives (notably #pragma) were therefore introduced with compilers, but here again,
-// there is a big lack of standardization in the language (P).
-// The problem arises as soon as we use packed structures to represent "normalized" formats for
-// data exchange (protocol message format, etc.) because we absolutely must use these non-standard
-// directives. In other words, it's like a snake biting its own tail. 
+// Ad hoc directives (in particular #pragma) were therefore added in the various compilers, but,
+// alas, this happened without real consultation, from which arise new problems of standardization
+// in the language (P).
+// The problem becomes glaring as soon as one uses "packed" structures to represent any kind of
+// "normalized" data formats used for data exchange (protocol message format, etc.) because we
+// absolutely need to use those non-standard directives to represent these standardized data. In
+// other words, it's like a snake biting its own tail.
 
 // Number 7: 'typedef' is a very "poor" type definition... 
 // 'typedef' is rather a simple type aliasing than a type definition. The mechanism is not
@@ -196,18 +198,19 @@
 // affect the quality of the C programming environment - have ended up looking like nothing and are
 // totally unreadable... 
 
-// Number 0: Desesperatly poor makeup of many standard C libraries (string handling, etc...) => rather
-// dishonest argument (against the C LANGUAGE) C++ bigots.
+// Number 0: Desesperatly poor makeup of many standard C libraries (string handling, etc...) =>
+// rather dishonest argument (against the C LANGUAGE) of C++ bigots.
 
 // Number -1: '\0'-terminated strings convention (inheritance from 8-bits CPUs assemblers ?) 
-// Practical problem in brief: crappy representation of strings => crappy code and functions manipulating
-// strings => presence of a lot of crappy code in C programs "in general"...
-// The convention of strings terminated with '\0' is quite well accepted by programmers because it seems
-// so simple and efficient. In specific cases - "early" programs developed in the 70s (as with my videopac
-// toy "computer" from the year 1978), device drivers, etc., this representation is indeed, by far, the most
-// effective one can imagine...
+// Practical problem in brief: crappy representation of strings => crappy code and functions
+// manipulating strings => presence of a lot of crappy code in C programs "in general"...
+// The convention of strings terminated with '\0' is quite well accepted by programmers because it
+// seems so simple and efficient. In specific cases - "early" programs developped in the 70s (as
+// with my videopac toy "computer" from the year 1978), device drivers, etc., this representation
+// is indeed, by far, the most effective one can imagine...
 // ...Unfortunately, there is a huge DRAWBACK: that representation just does NOT allow to manipulate
-// PORTIONS of such strings... 
+// PORTIONS of such strings... However, most of the actual processing of strings is precisely
+// related to the manipulation of strings PORTIONS...
 
 
 // Moralited:
