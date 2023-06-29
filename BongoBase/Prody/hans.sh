@@ -3,7 +3,7 @@
 . mama.env
 
 ##########################
-plan="Building PRODUCTION"
+plot="Building PRODUCTION"
 ##########################
 cleaning=s
 
@@ -35,7 +35,7 @@ CommandCompilePrody () {
 ######### Register or execute creek functions #######
 CreekFunctions CommandCompilePrody 
 
-######### Execute full plan #######
+######### Execute full plot #######
 CommandClean
 
 MainStage "(Re)compile c-ansi and c-posix production objects."

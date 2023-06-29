@@ -3,7 +3,7 @@
 . mama.env
 
 #############################
-plan="Building DIGGY objects"
+plot="Building DIGGY objects"
 #############################
 cleaning=s
 
@@ -13,7 +13,7 @@ cleaning=s
 
 CreekFunctions
 
-######### Execute plan #######
+######### Execute plot #######
 CommandClean
 
 Stage "Compile diggy sources files"

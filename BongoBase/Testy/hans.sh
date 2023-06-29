@@ -3,7 +3,7 @@
 . mama.env
 
 #################################
-plan="Building Testy executables"
+plot="Building Testy executables"
 #################################
 cleaning=s
 
@@ -115,7 +115,7 @@ CommandCompileTests () {
 
 CreekFunctions CommandCompileDiggyPrody CommandCompileTestyUtils CommandCompileTests 
 
-#### Execute plan... 
+#### Execute plot... 
 CommandClean "${cAnsiTestExes[@]}" "${cPosixTestExes[@]}"
 
 MainStage "1. (Re)compile prody, diggy and testy objects and libraries" 

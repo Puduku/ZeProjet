@@ -3,7 +3,7 @@
 . mama.env
 
 #################################
-plan="Running Testy executables "
+plot="Running Testy executables "
 #################################
 
 specificUsage='[ <special options to Testy executables> ]'
@@ -24,7 +24,7 @@ SpecificInstructionsOutline () {
 . katzenjammer.env
 . der-captain.env
 
-#### Execute plan...
+#### Execute plot...
 
 CommandPrepareSandbox
 

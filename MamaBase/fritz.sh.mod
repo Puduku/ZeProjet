@@ -1,15 +1,15 @@
 #### BEGIN OF REMOVABLE CARTRIDGE
 ####  fritz.sh scripts MODEL ; tags to adapt are: 
 ####  <<GARDEN>>                 : garden's name
-####  <<TESTS PLAN DESCRIPTION>> : (tests execution) plan's short description (one single line)
-####  <<CODE 4 PLAN EXECUTION>>  : bash code for executing the plan
+####  <<TESTS PLAN DESCRIPTION>> : (tests execution) plot's short description (one single line)
+####  <<CODE 4 PLAN EXECUTION>>  : bash code for executing the plot
 #### END OF REMOVABLE CARTRIDGE
 #!/bin/bash
 # <<GARDEN>>/fritz.sh
 . mama.env
 
 #################################
-plan="<<TESTS PLAN DESCRIPTION>>"
+plot="<<TESTS PLAN DESCRIPTION>>"
 #################################
 
 specificUsage='[ <special options to <<GARDEN>> executables> ]'
@@ -30,7 +30,7 @@ SpecificInstructionsOutline () {
 . katzenjammer.env
 . der-captain.env
 
-#### Execute plan...
+#### Execute plot...
 
 CommandPrepareSandbox
 

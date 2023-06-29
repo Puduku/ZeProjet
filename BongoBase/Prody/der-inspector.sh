@@ -3,12 +3,12 @@
 . mama.env
 
 #########################################################################
-plan="Valorize Prody header files' documentation (pick all COde COmments' NUTS...)"
+plot="Valorize Prody header files' documentation (pick all COde COmments' NUTS...)"
 #########################################################################
 
 . der-inspector.env
 
-##### Execute plan ##### 
+##### Execute plot ##### 
 
 CommandPrepareSandbox
 

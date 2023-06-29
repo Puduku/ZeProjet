@@ -8,12 +8,12 @@
 . mama.env
 
 #########################################################################
-plan="Valorize <<GARDEN>> header files' documentation (pick all COde COmments' NUTS...) 
+plot="Valorize <<GARDEN>> header files' documentation (pick all COde COmments' NUTS...) 
 #########################################################################
 
 . der-inspector.env
 
-##### Execute plan ##### 
+##### Execute plot ##### 
 
 CommandPrepareSandbox
 

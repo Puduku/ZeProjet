@@ -3,12 +3,12 @@
 . mama.env
 
 ########################################################################
-plan="Pick up Diggy's coconuts (aka valorize Diggy's API documentation)"
+plot="Pick up Diggy's coconuts (aka valorize Diggy's API documentation)"
 ########################################################################
 
 . der-inspector.env
 
-##### Execute plan  ##### 
+##### Execute plot  ##### 
 
 CommandPrepareSandbox
 
