@@ -206,11 +206,11 @@
 // manipulating strings => presence of a lot of crappy code in C programs "in general"...
 // The convention of strings terminated with '\0' is quite well accepted by programmers because it
 // seems so simple and efficient. In specific cases - "early" programs developped in the 70s (as
-// with my videopac toy "computer" from the year 1978), device drivers, etc., this representation
+// with my videopac toy "computer" from the year 1978), device drivers, etc. - this representation
 // is indeed, by far, the most effective one can imagine...
 // ...Unfortunately, there is a huge DRAWBACK: that representation just does NOT allow to manipulate
-// PORTIONS of such strings... However, most of the actual processing of strings is precisely
-// related to the manipulation of strings PORTIONS...
+// PORTIONS of such strings... However - what bad luck! -, most of the actual processing of strings
+// in applications is precisely related to the manipulation of strings PORTIONS...
 
 
 // Moralited:
