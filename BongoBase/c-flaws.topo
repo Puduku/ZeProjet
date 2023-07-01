@@ -210,7 +210,7 @@
 // is indeed, by far, the most effective one can imagine...
 // ...Unfortunately, there is a huge DOWNSIDE: this representation simply does NOT allow you to handle
 // ORDINARY PORTIONS of such strings... Now, - what bad luck! -, in applications, MOST strings
-// processings precisely manipulates PORTIONS of strings.
+// processings precisely manipulate PORTIONS of strings.
 
 
 // Moralited:
@@ -225,4 +225,4 @@
 // langage compiled. C est ag l'industrie du logiciel:
 // - ce que Louis XI fut ag l'Histoire de France...
 // - ce que le Tampon JEX est au mednage: 
-// "Je suis MOCHE, mais qu'est-ce-que je BOSSE !!!"
+// "Je suis MOCHE, mais [qu'est-ce-que] je BOSSE !!!"
