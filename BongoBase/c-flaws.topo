@@ -208,9 +208,9 @@
 // seems so simple and efficient. In specific cases - "early" programs developped in the 70s (as
 // with my videopac toy "computer" from the year 1978), device drivers, etc. - this representation
 // is indeed, by far, the most effective one can imagine...
-// ...Unfortunately, there is a huge DRAWBACK: that representation just does NOT allow to manipulate
-// PORTIONS of such strings... However - what bad luck! -, most of the actual processing of strings
-// in applications is precisely related to the manipulation of strings PORTIONS...
+// ...Unfortunately, there is a huge DOWNSIDE: this representation simply does NOT allow you to handle
+// ORDINARY PORTIONS of such strings... Now, - what bad luck! -, in applications, MOST strings
+// processings precisely manipulates PORTIONS of strings.
 
 
 // Moralited:
