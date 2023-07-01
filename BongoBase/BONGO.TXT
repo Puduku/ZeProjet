@@ -19,16 +19,16 @@ Bongo Island overview:
   Prody/ : "production" source files 
     c-ansi/ : Pure Ansi C source files 
     c-posix/ : POSIX C source files
-    hans.sh : Production compiling (exclusive script) 
-    der-inspector.sh : Enhance production source files documentation (exclusive script) 
+    hans.sh : compile all "production" source files (exclusive script) 
+    der-inspector.sh : valorize "enclosed" documentation in sources files (exclusive script) 
   Diggy/ : Debug & testing framework
     diggy/ : source files
-    hans.sh : Diggy source files compiling (exclusive script) 
-    der-inspector.sh : Enhance (Diggy) source files documentation (exclusive script) 
-  Testy/ : Testing of Prody code
-    hans.sh : Tests compiling 
-    fritz.sh : Tests execution
-    testy/ : Testing utils source files
+    hans.sh : compile diggy "system" (exclusive script) 
+    der-inspector.sh : valorize "enclosed" documentation" in Diggy sources files (exclusive script) 
+  Testy/ : Plain testing (of "production" code)
+    testy/ : Tests utils (source files)
     c-ansi/ : Ansi C tests source files
     c-posix/ : POSIX C tests source files
-    data/ : testing data
+    data/ : all tests data
+    hans.sh : compile all tests (exclusive script)
+    fritz.sh : execute all tests (exclusive script)
