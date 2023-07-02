@@ -10,8 +10,7 @@
 
 
 // Parse program arguments and update DG flags accordingly...
-// Note: only executive args are parsed - non executive flags like -h help 
-// request are not handled by the function
+// #SEE dg-flags @ diggy/diggy-kitchen.h
 //
 // Passed:
 // - argc:
@@ -22,18 +21,22 @@
 // Modified:
 // - optind: (global variable) args position after parsing (== argc => all args parsed)
 // - *a_dgFlags: only useful if DIGGY program execution is confirmed (ret 0)
-//               #SEE dg-flags @ diggy/diggy-wings.h
 // - info256: 
 //   + DIGGY arguments parsed => recap of options
 //   + DIGGY bad option(s) argument(s) => explanation 
 //
 // Returned:
-// - 0 : OK, executive DG flags updated 
-// - 100 : bad option(s) argument(s) 
-int ParseDgFlags (int argc, char **p_argv, unsigned int *a_dgFlags, char *info256) ;
+// - TRUE : OK, executive DG flags updated 
+// - FALSE: bad option(s) argument(s) / help request
+char b_ParseDgFlags(int argc, char **p_argv, unsigned int *a_dgFlags, char *info256) ;
 
 #define DG_FLAGS_EXECUTIVE_ARGS_SUMMARY \
 "[ -d (a|a+|p) ] [ -T ] [ -p ] [ -t ] [ -s (s|l) ]"
+
+#define HELP_ARGS_SUMMARY  "[ -h ]"
+
+#define HELP_ARGS_DETAILS \
+" -h    => display that help and exit\n" 
 
 #define DG_FLAGS_EXECUTIVE_ARGS_DETAILS \
 " -d a  => functions calls display adapted to monothread process (condensed form)\n" \

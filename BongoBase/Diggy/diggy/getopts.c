@@ -10,8 +10,8 @@
 #include "flint/types.h"
 
 // Description: see .h 
-int ParseDgFlags (int argc, char **p_argv, unsigned int *a_dgFlags, char *info256) {
-  int ret = 0;
+char b_ParseDgFlags (int argc, char **p_argv, unsigned int *a_dgFlags, char *info256) {
+  char b_ok = b_TRUE;
 
   info256[0] = '\0';
   
@@ -31,7 +31,7 @@ int ParseDgFlags (int argc, char **p_argv, unsigned int *a_dgFlags, char *info25
         snprintf(info256,256,"%s; multi-thread display",info256);
       } else {
         snprintf(info256,256,"bad optarg=[%s] with opt -%c",optarg,opt);
-        ret = NON_EXECUTIVE__EXIT_STATUS;
+        b_ok = b_FALSE0;
       } // if
     break; case 's':
       if (strcmp(optarg,"s") == 0) {
@@ -42,7 +42,7 @@ int ParseDgFlags (int argc, char **p_argv, unsigned int *a_dgFlags, char *info25
         snprintf(info256,256,"%s; LONG stack display",info256);
       } else {
         snprintf(info256,256,"bad optarg=[%s] with opt -%c",optarg,opt);
-        ret = NON_EXECUTIVE__EXIT_STATUS;
+        b_ok = b_FALSE0;
       } // if
 
     break; case 'p':
@@ -56,14 +56,14 @@ int ParseDgFlags (int argc, char **p_argv, unsigned int *a_dgFlags, char *info25
       *a_dgFlags &= ~DATE_TIME_DISPLAY__DG_FLAG;
      snprintf(info256,256,"%s; TIME only display",info256);
     break; case 'h':
-      ret = 101;
+      b_ok = b_FALSE0;
       snprintf(info256,256,"help display request");
     break; default: /* '?' */
       snprintf(info256,256,"bad opt -%c (%c)",optopt,opt);
-      ret = NON_EXECUTIVE__EXIT_STATUS;
+      b_ok = b_FALSE0;
     } // switch
   } // while
 
-  return ret;
-} // ParseDgArgs
+  return b_ok;
+} // b_ParseDgArgs
 

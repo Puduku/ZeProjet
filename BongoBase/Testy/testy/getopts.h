@@ -13,7 +13,7 @@
 #define          DATADIR__TESTY_FLAG 0x04
 
 // Parse command options for general TESTY program.
-// Automatically exit process with 100 status when necessary (in such a case,
+// Automatically exit process with NON_EXECUTIVE__EXIT_STATUS when necessary (in such a case,
 // the explanation is displayed in standard error before exiting)
 // If sandbox is required, automatically set the sandbox as process's working directory. 
 // 
