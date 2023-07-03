@@ -1,5 +1,6 @@
 // diggy/vars.h, version 1.93 (ANSI)
 // (c) Atos-Euronext Belgium - 2001, 2002, 2003
+// (c) Puduku - 2023
 
 #ifndef __DIGGY_VARS_H_INCLUDED
 #define __DIGGY_VARS_H_INCLUDED
@@ -31,9 +32,6 @@
 // #REF DIGGY_PRINT_IMAGE_FUNCTION
 // Simple function allowing to build DIGGY_PRINT_IMAGE_ACTION
 
-// #REF DIGGY_PRINT_FIELD_IMAGE_MACRO
-// DIGGY_PRINT_IMAGE_ACTION macro for struct/union "vars"... 
-
 // Display variable name and content using "ad hoc" image display action.
 // Allows to build  different m_DIGGY_VAR_<XXX> macros...
 //
@@ -47,38 +45,11 @@
   DiggyBrickEnd();\
 }
 
-// Usefull for designing DIGGY_PRINT_FIELD_IMAGE_MACRO macros..
-// Print field name (and useful 'field separator'...)
-// Passed:
-// m_field: 
-#define m_DIGGY_PRINT_FIELD_NAME(m_field)  fputs(" " #m_field ":",stdout);\
-
 
 // II. Usable m_DIGGY_VAR_<XXX>() macros 
 // ------------------------------------- 
 
 // 1. Digging in "general" variables
-
-// #SEE DIGGY_PRINT_FIELD_IMAGE_MACRO
-// Print struct/enum "general" field's content... 
-//
-// Passed:
-// - m_var: struct or union
-// - m_field: "general" type field
-// - m_specifier: "printf() 's family function specifier : d for int; s for string, etc.
-#define m_DIGGY_PRINT_FIELD_GEN(m_var, m_field, m_specifier) {\
-  m_DIGGY_PRINT_FIELD_NAME(m_field)\
-  printf("%" #m_specifier, (m_var).m_field); \
-}
-
-// #SEE DIGGY_PRINT_FIELD_IMAGE_MACRO
-// Wraps m_DIGGY_PRINT_FIELD_GEN() above.
-// Print struct/enum "int type" field's content... 
-//
-// Passed:
-// - m_var: struct or union
-// - m_field: "int" type field
-#define m_DIGGY_PRINT_FIELD_D(m_var, m_field)  m_DIGGY_PRINT_FIELD_GEN(m_var,m_field,d)
 
 
 // #SEE DIGGY_VAR_XXX_MACRO
@@ -108,16 +79,6 @@
 // -np_string
 void DiggyPrintStringImage(const char *np_string);
 
-// #SEE DIGGY_PRINT_FIELD_IMAGE_MACRO
-// Print struct/enum field's c-string type... 
-//
-// Passed:
-// - m_var: struct or union
-// - m_field: ('\0'-terminated) C-string type field
-#define m_DIGGY_PRINT_FIELD_STRING(m_var, m_field) {\
-  m_DIGGY_PRINT_FIELD_NAME(m_field)\
-  DiggyPrintStringImage((m_var).m_field); \
-}
 
 // #SEE DIGGY_VAR_XXX_MACRO
 // Simple "C-string" var display
@@ -137,17 +98,6 @@ void DiggyPrintStringImage(const char *np_string);
 // - p_data: data start pointer
 void DiggyPrintDataImage(const char *p_data, int length);
 
-// #SEE DIGGY_PRINT_FIELD_IMAGE_MACRO
-// Print struct/enum field's data type... 
-//
-// Passed:
-// - m_var: struct or union
-// - m_field: "byte pointer" type field 
-// - length: data length (in bytes)
-#define m_DIGGY_PRINT_FIELD_DATA(m_var, m_field, length) {\
-  m_DIGGY_PRINT_FIELD_NAME(m_field)\
-  DiggyPrintDataImage((m_var).m_field,length); \
-}
 
 // #SEE DIGGY_VAR_XXX_MACRO
 // Simple "data" var display
@@ -168,6 +118,87 @@ void DiggyPrintDataImage(const char *p_data, int length);
 // - p_image 
 void DiggyPrintValueImage(int value, const char *p_image);
 
+
+// #SEE DIGGY_VAR_XXX_MACRO
+// Display variable name and content using ad hoc image display function.
+//
+// Passed
+// - m_var:
+// - m_valueImageInlineFunction: #SEE Enum-type-image-function @ flint/types.h
+#define m_DIGGY_VAR_VALUE(m_var, m_valueImageInlineFunction) {\
+  const char *emp_image = m_valueImageInlineFunction(m_var);\
+  m_DIGGY_VAR(m_var, DiggyPrintValueImage(m_var,emp_image);) \
+}
+
+
+// III.  DIGGY__PRINT_FIELD_<XXX>() macros 
+// ------------------------------------- 
+
+
+// #REF DIGGY_PRINT_FIELD_IMAGE_MACRO
+// DIGGY_PRINT_IMAGE_ACTION macro for struct/union "vars"... 
+
+// Usefull for designing DIGGY_PRINT_FIELD_IMAGE_MACRO macros..
+// Print field name (and useful 'field separator'...)
+// Passed:
+// m_field: 
+#define m_DIGGY_PRINT_FIELD_NAME(m_field)  fputs(" " #m_field ":",stdout);\
+
+
+// 1. Digging in "general" fields
+
+// #SEE DIGGY_PRINT_FIELD_IMAGE_MACRO
+// Print struct/enum "general" field's content... 
+//
+// Passed:
+// - m_var: struct or union
+// - m_field: "general" type field
+// - m_specifier: "printf() 's family function specifier : d for int; s for string, etc.
+#define m_DIGGY_PRINT_FIELD_GEN(m_var, m_field, m_specifier) {\
+  m_DIGGY_PRINT_FIELD_NAME(m_field)\
+  printf("%" #m_specifier, (m_var).m_field); \
+}
+
+// #SEE DIGGY_PRINT_FIELD_IMAGE_MACRO
+// Wraps m_DIGGY_PRINT_FIELD_GEN() above.
+// Print struct/enum "int type" field's content... 
+//
+// Passed:
+// - m_var: struct or union
+// - m_field: "int" type field
+#define m_DIGGY_PRINT_FIELD_D(m_var, m_field)  m_DIGGY_PRINT_FIELD_GEN(m_var,m_field,d)
+
+
+// 2. Digging in "C-string" fields
+
+// #SEE DIGGY_PRINT_FIELD_IMAGE_MACRO
+// Print struct/enum field's c-string type... 
+//
+// Passed:
+// - m_var: struct or union
+// - m_field: ('\0'-terminated) C-string type field
+#define m_DIGGY_PRINT_FIELD_STRING(m_var, m_field) {\
+  m_DIGGY_PRINT_FIELD_NAME(m_field)\
+  DiggyPrintStringImage((m_var).m_field); \
+}
+
+
+// 3. Digging in generic "DATA" fields
+
+// #SEE DIGGY_PRINT_FIELD_IMAGE_MACRO
+// Print struct/enum field's data type... 
+//
+// Passed:
+// - m_var: struct or union
+// - m_field: "byte pointer" type field 
+// - length: data length (in bytes)
+#define m_DIGGY_PRINT_FIELD_DATA(m_var, m_field, length) {\
+  m_DIGGY_PRINT_FIELD_NAME(m_field)\
+  DiggyPrintDataImage((m_var).m_field,length); \
+}
+
+// 4. Digging in "value" (aka. "enum") fields
+
 // #SEE DIGGY_PRINT_FIELD_IMAGE_MACRO
 // Print struct/enum field's (enum) value... 
 //
@@ -180,17 +211,6 @@ void DiggyPrintValueImage(int value, const char *p_image);
   const char *emp_image = m_valueImageInlineFunction((m_var).m_field);\
   m_DIGGY_PRINT_FIELD_NAME(m_field)\
   DiggyPrintValueImage((m_var).m_field,emp_image); \
-}
-
-// #SEE DIGGY_VAR_XXX_MACRO
-// Display variable name and content using ad hoc image display function.
-//
-// Passed
-// - m_var:
-// - m_valueImageInlineFunction: #SEE Enum-type-image-function @ flint/types.h
-#define m_DIGGY_VAR_VALUE(m_var, m_valueImageInlineFunction) {\
-  const char *emp_image = m_valueImageInlineFunction(m_var);\
-  m_DIGGY_VAR(m_var, DiggyPrintValueImage(m_var,emp_image);) \
 }
 
 
