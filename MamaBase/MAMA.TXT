@@ -7,8 +7,8 @@
 1.a The original story - more or less... 
 Help the katzenjammer kids to carry out their cunning plans...
 Landscape:
-- garden: place where the katzenjammer kids execute their ploys (directory position)
-- creek: specific path within garden (regarding ploy execution) 
+- garden: place where the katzenjammer kids execute their plots (directory position)
+- creek: specific path within garden (regarding plot execution) 
 - island: all gardens' place (main directory position)
   The island is not so huge. It is easy to find your way around - especially when moving from one
   garden to another.
@@ -18,7 +18,7 @@ Landscape:
 Characters:
 - Mama: she is the real "boss"... 
 - Hans & Fritz: (the katzenjammer kids) are the stars of the series. These two rascals have all
-  sorts of ploys for the pranks (done to the whole family) they carry out in the gardens.
+  sorts of plans for the pranks (done to the whole family) they carry out in the gardens.
 - Lena: she is a nice little girl who often helps Hans and Fritz to get back at der Captain and der
   Inspector...
 - Adolf (Rollo) : he is a hypocritical, boastful, and prankster boy who likes to put the blame on
@@ -92,8 +92,8 @@ $ chmod u+x hans.sh
 
 3. User guide
 -------------
-To execute a "ploy", run the corresponding exclusive script of the garden. The script must be referenced
-by its location. For instance, in island of § 1.b, to execute Fritz's ploy of Garden4 :
+To execute a "plot", run the corresponding exclusive script of the garden. The script must be referenced
+by its location. For instance, in island of § 1.b, to execute Fritz's plot of Garden4 :
 $ cd $BONGO/OtherGarden/Garden4
 $ ./fritz.sh
 or
