@@ -1,4 +1,4 @@
-// diggy/vars.h, version 1.93 (ANSI)
+// diggy/vars-fields.h, version 1.93 (ANSI)
 // (c) Atos-Euronext Belgium - 2001, 2002, 2003
 // (c) Puduku - 2023
 
