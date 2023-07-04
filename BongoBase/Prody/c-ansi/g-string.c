@@ -245,13 +245,13 @@ static int GStringsKeysCompare(void *cpr_handle,  char b_frozen, int indexLabel,
   m_DIGGY_BOLLARD()
   G_STRINGS_HANDLE p_handle = (G_STRINGS_HANDLE) cpr_handle;
   m_CHECK_MAGIC_FIELD(G_STRINGS_HANDLE,p_handle)
-  m_RAISE_VERBATIM_IF(indexLabel >= p_handle->indexesNumber)
+  m_ASSERT(indexLabel < p_handle->indexesNumber)
 
   // Key settings:
   struct KEY_SETTINGS *ap_keySettings = (struct KEY_SETTINGS *)UNDEFINED;
   { struct INDEX_PROPERTIES *ap_indexProperties = p_handle->vnhs_indexesProperties + indexLabel;
 
-    m_RAISE_VERBATIM_IF(keyRank >= ap_indexProperties->keysNumber)
+    m_ASSERT(keyRank < ap_indexProperties->keysNumber)
     ap_keySettings = ap_indexProperties->hs_keysSettings + keyRank;
   } // struct INDEX_PROPERTIES
 
@@ -371,7 +371,7 @@ int GStringsAddIndex (G_STRINGS_HANDLE handle,  int keysNumber,
       cfr_key1StringPortionValueFunctionHandle = va_arg(ap,void *);
       
     } // if
-    m_RAISE_VERBATIM_IF(key1GStringSetElement >= handle->gStringSetCardinality)
+    m_ASSERT(key1GStringSetElement < handle->gStringSetCardinality)
     s_keysSettings->gStringSetElement = key1GStringSetElement;
     s_keysSettings->gKeysComparison = key1GKeysComparison;
     s_keysSettings->cn_isNeutralCharFunction = cn_key1IsNeutralCharFunction;
@@ -398,7 +398,7 @@ int GStringsIndexFetch(G_STRINGS_HANDLE cp_handle,
   const struct G_KEY* ccsap_keys[cp_handle->gStringSetCardinality] ; 
 
   if (b_SIGNIFICANT_GREEN_COLLECTION_INDEX_KEYS(indexFetch,c_indexSeek)) {
-    m_RAISE_VERBATIM_IF(cp_handle->indexesNumber <= indexLabel)
+    m_ASSERT(cp_handle->indexesNumber > indexLabel)
     struct INDEX_PROPERTIES *a_indexProperties = cp_handle->vnhs_indexesProperties + indexLabel ;
     va_list ap ;
     va_start(ap,ccap_key1) ;
@@ -437,7 +437,7 @@ int GStringsVerifyIndexes(G_STRINGS_HANDLE handle) {
 int GStringsPullOut(G_STRINGS_HANDLE handle,  G_STRINGS_ARRAY *at_gStringsArray) {
   m_DIGGY_BOLLARD()
   int count = GreenCollectionPullOut(handle->h_greenCollectionHandle, (char**)at_gStringsArray) ;
-  m_RAISE_VERBATIM_IF(count <= 0)
+  m_ASSERT(count > 0)
 
   m_DIGGY_RETURN(count)
 } // GStringsPullOut

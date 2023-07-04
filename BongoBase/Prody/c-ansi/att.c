@@ -38,7 +38,7 @@ static int AlarmTimetableKeysCompare (void *nr_privateHandle, char b_frozen, int
 m_DIGGY_INFO("indexLabel=%d",indexLabel)
   ALARM_TIMETABLE_HANDLE handle = (ALARM_TIMETABLE_HANDLE) nr_privateHandle;
   m_CHECK_MAGIC_FIELD(ALARM_TIMETABLE_HANDLE,handle)
-  m_RAISE_VERBATIM_IF(keyRank != 0)
+  m_ASSERT(keyRank == 0)
 
   TIMELINE_STUFF p_aTimelineStuff = (TIMELINE_STUFF) pr_aGreenItemStuff;
   TIMELINE_STUFF np_bTimelineStuff = (TIMELINE_STUFF) npr_bGreenItemStuff;
@@ -79,8 +79,8 @@ int AlarmTimetableCreateInstance(ALARM_TIMETABLE_HANDLE *azh_handle) {
   m_TRACK_IF(GreenCollectionCreateInstance(&handle->h_timelinesHandle, 50, sizeof(struct TIMELINE),
     (GREEN_HANDLER__DISENGAGE_FUNCTION)NULL, AlarmTimetableKeysCompare, handle) != RETURNED)
 
-  m_RAISE_VERBATIM_IF(GreenCollectionAddIndex(handle->h_timelinesHandle,1) != ID_INDEX_LABEL)
-  m_RAISE_VERBATIM_IF(GreenCollectionAddIndex(handle->h_timelinesHandle,1) != TIME_INDEX_LABEL)
+  m_ASSERT(GreenCollectionAddIndex(handle->h_timelinesHandle,1) == ID_INDEX_LABEL)
+  m_ASSERT(GreenCollectionAddIndex(handle->h_timelinesHandle,1) == TIME_INDEX_LABEL)
   
   m_DIGGY_RETURN(RETURNED)
 } // AlarmTimetableCreateInstance
@@ -151,7 +151,7 @@ int AlarmTimetableRefresh (ALARM_TIMETABLE_HANDLE handle, gen_ATT_TIME_long refr
       INDEX_FETCH__REMOVE, INDEX_SEEK__TOP_UP, (char**)&tc_timelineStuff, NULL,
       (void*)refreshAttTime)) {
     case RESULT__FOUND:
-      m_RAISE_VERBATIM_IF(refreshAttTime < tc_timelineStuff->attTime)
+      m_ASSERT(refreshAttTime >= tc_timelineStuff->attTime)
       delay = (unsigned long) (refreshAttTime - tc_timelineStuff->attTime);
       m_TRACK_IF(ringAlarmFunction(r_ringAlarmFunctionHandle,tc_timelineStuff->attId,delay) !=
         RETURNED)

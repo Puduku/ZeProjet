@@ -352,7 +352,7 @@ static int GreenIndexVerify(struct GREEN_INDEX *a_index,
     m_GREEN_INDEX_COMPARE(a_index, entriesCompareFunction,r_entriesCompareHandle, indexLabel,j,
       a_index->hsc_array[j-1],(void *)(GENERIC_INTEGER) UNDEFINED, comparison)
     if (comparison != GREATER_THAN__COMPARISON) {
-      m_RAISE_VERBATIM_IF(comparison == EQUAL_TO__COMPARISON)
+      m_ASSERT(comparison != EQUAL_TO__COMPARISON)
       break;
     } // if
   } // for
@@ -542,7 +542,7 @@ static int GreenIndexesSeek (struct GREEN_INDEXES* a_indexes,
   INDEX_ITERATOR_AUTOMATIC_BUFFER nf_indexIteratorAutomaticBuffer, int indexLabel,
   int n_indexSeek, void *ccr_keys, int *an_entry) {
   m_DIGGY_BOLLARD_S()
-  m_RAISE_VERBATIM_IF(indexLabel >= a_indexes->indexesNumber) 
+  m_ASSERT(indexLabel < a_indexes->indexesNumber) 
   struct GREEN_INDEX *a_index = a_indexes->vnhs_indexes + indexLabel;
   
   struct INDEX_ITERATOR *indexIteratorPtr = (nf_indexIteratorAutomaticBuffer != NULL?
@@ -613,7 +613,7 @@ static int GreenIndexesVerify (struct GREEN_INDEXES *a_indexes) {
 // - -1: anomaly is raised
 static int GreenIndexesVerifyCount (struct GREEN_INDEXES *a_indexes,int *ac_commonCount) {
   m_DIGGY_BOLLARD_S()
-  m_RAISE_VERBATIM_IF(a_indexes->indexesNumber == 0)
+  m_ASSERT(a_indexes->indexesNumber > 0)
 
   *ac_commonCount = UNDEFINED; 
   int n_lastCount = -1;
@@ -628,7 +628,7 @@ static int GreenIndexesVerifyCount (struct GREEN_INDEXES *a_indexes,int *ac_comm
     } // if 
     n_lastCount = thatCount ;
   } // for
-  m_RAISE_VERBATIM_IF(n_lastCount < 0)
+  m_ASSERT(n_lastCount >= 0)
   if (completed == COMPLETED__OK) *ac_commonCount = n_lastCount;
  
   m_DIGGY_RETURN(completed)
@@ -714,7 +714,7 @@ struct GAPS_STACK {
 // - m_gaps:
 // - m_poppedEntry:
 #define m_GAPS_STACK_POP(/*struct GAPS_STACK*/m_gaps,  /*int*/m_poppedEntry) {\
-  m_RAISE_VERBATIM_IF((m_gaps).count == 0)\
+  m_ASSERT((m_gaps).count > 0)\
   m_poppedEntry = (m_gaps).hsc_stack[--((m_gaps).count)];\
 }
 
@@ -734,7 +734,7 @@ struct GAPS_STACK {
 // - itemsPhysicalNumber:
 #define m_GAPS_STACK_PUSH(/*struct GAPS_STACK*/m_gaps,  /*int*/pushedEntry,\
   /*int*/itemsPhysicalNumber) {\
-  m_RAISE_VERBATIM_IF((m_gaps).count >= itemsPhysicalNumber)\
+  m_ASSERT((m_gaps).count < itemsPhysicalNumber)\
   (m_gaps).hsc_stack[((m_gaps).count)++] = pushedEntry;\
 }
 
@@ -936,8 +936,8 @@ int GreenCollectionCreateInstance (GREEN_COLLECTION_HANDLE *azh_handle, int expe
 // - increase: >0 (actually  the increment is handle->expectedItemsNumber)
 static int GreenCollectionResize(GREEN_COLLECTION_HANDLE handle, int increase) {
   m_DIGGY_BOLLARD_S()
-  m_RAISE_VERBATIM_IF(increase <= 0)
-  m_RAISE_VERBATIM_IF(handle->b_frozen)
+  m_ASSERT(increase > 0)
+  m_ASSERT(!handle->b_frozen)
 
   increase = ((increase-1)/handle->expectedItemsNumber + 1) * handle->expectedItemsNumber;
 
@@ -977,7 +977,7 @@ static int GreenCollectionRefreshIndexesInternal(GREEN_COLLECTION_HANDLE handle,
     m_DIGGY_RETURN(RETURNED)
   } // if
 
-  m_RAISE_VERBATIM_IF(handle->b_frozen)
+  m_ASSERT(!handle->b_frozen)
 
   // MICROMONITOR: ... ALIEN / ALIVE (fetched 4 change) ...
   m_ASSERT(b_ALL_FLAGS_OK(handle->hsc_flags[handle->nv_fetched4ChangeEntry],ALIEN_ALIVE__FLAGS))
