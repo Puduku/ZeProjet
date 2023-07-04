@@ -45,7 +45,7 @@ int ParseAsciiLines (struct STRING_PORTION input, int n_trueLinesParsingLimit,
     int physicalLengh = UNDEFINED;
     m_GET_LINE_DELIMITOR_PHYSICAL_LENGTH(*nt_lineDelimitorStuff, physicalLengh)
     ptr = nt_lineDelimitorStuff->practicalLine.string + physicalLengh ;
-    m_RAISE_VERBATIM_IF(ptr <input.string || ptr >input.stop)
+    m_ASSERT(ptr >= input.string && ptr <= input.stop)
   } // if
 
   while (ptr < stopPtr && (n_trueLinesParsingLimit <= 0 || parsedLinesCount <
