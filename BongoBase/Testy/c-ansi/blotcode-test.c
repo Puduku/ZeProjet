@@ -48,7 +48,7 @@ static int Blotlib1ExecutorExecuteC(void *r_handle, const struct BLOTFUNC *ap_bl
   BLOTLIB1_EXECUTOR_HANDLE handle = (BLOTLIB1_EXECUTOR_HANDLE)r_handle;
   
   m_DIGGY_BOLLARD()
-  //m_RAISE_VERBATIM_IF(r_handle != DUMMY_BLOTLIB_EXECUTOR_HANDLE)
+  //m_ASSERT(r_handle == DUMMY_BLOTLIB_EXECUTOR_HANDLE)
   if (ap_blotfunc->entry.localBlotfuncNameEntry == 1) { // InitUnDeuxTrois function 
     int answer = ReadBlotval(ap_blotfunc->call.arguments, &handle->nbIters,  (int*)NULL);
     m_TRACK_IF(answer < 0)
@@ -68,7 +68,7 @@ m_DIGGY_INFO("blot value=%d (TRUE=0 FALSE=1)",*ac_blotval)
 static int Blotlib1ExecutorDestroyInstance(void *xhr_handle) {
   m_DIGGY_BOLLARD()
   free(xhr_handle);
-  //m_RAISE_VERBATIM_IF(xhr_handle != DUMMY_BLOTLIB_EXECUTOR_HANDLE)
+  //m_ASSERT(xhr_handle == DUMMY_BLOTLIB_EXECUTOR_HANDLE)
   m_DIGGY_RETURN(RETURNED)
 } // Blotlib1ExecutorDestroyInstance 
 

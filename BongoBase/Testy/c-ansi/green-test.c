@@ -22,7 +22,7 @@ static int testNumber = 0;
 static int TestItemHandlerKeysCompare(void *cpr_handle,  char b_frozen,  int indexLabel,
   int keyRank, char *pr_aGreenItemStuff,  char *npr_bGreenItemStuff, void *cpr_bKeys) {
   m_DIGGY_BOLLARD()
-  m_RAISE_VERBATIM_IF(keyRank != 0)
+  m_ASSERT(keyRank == 0)
 
   TEST_ITEM_STUFF aTestItemStuff = (TEST_ITEM_STUFF) pr_aGreenItemStuff;
   TEST_ITEM_STUFF n_bTestItemStuff = (TEST_ITEM_STUFF) npr_bGreenItemStuff;
@@ -42,23 +42,23 @@ static int TestItemHandlerKeysCompare(void *cpr_handle,  char b_frozen,  int ind
 static int TestFetch(int expectedTestNumber,  GREEN_COLLECTION_HANDLE handle,  int n_entry, 
   int expectedEntry,  int n_expectedId, int c_newId) {
   m_DIGGY_BOLLARD()
-  m_RAISE_VERBATIM_IF(expectedTestNumber != ++testNumber)
+  m_ASSERT(expectedTestNumber == ++testNumber)
   m_DIGGY_VAR_D(testNumber)
   if (n_entry >= 0) { 
-    m_RAISE_VERBATIM_IF(expectedEntry != n_entry) 
+    m_ASSERT(expectedEntry == n_entry) 
   } else {
-    m_RAISE_VERBATIM_IF(n_expectedId == -1) 
+    m_ASSERT(n_expectedId != -1) 
   } // if
   TEST_ITEM_STUFF nt_testItemStuff = (TEST_ITEM_STUFF)UNDEFINED;
   int entry = GreenCollectionFetch(handle, n_entry, (char **)&nt_testItemStuff);
   m_TRACK_IF(entry < 0)
-  m_RAISE_VERBATIM_IF(entry != expectedEntry) 
+  m_ASSERT(entry == expectedEntry) 
   if (n_expectedId >= 0) {
-    m_RAISE_VERBATIM_IF(nt_testItemStuff == NULL) 
-    m_RAISE_VERBATIM_IF(nt_testItemStuff->id != n_expectedId) 
+    m_ASSERT(nt_testItemStuff != NULL) 
+    m_ASSERT(nt_testItemStuff->id == n_expectedId) 
     nt_testItemStuff->id = c_newId ; 
   } else {
-    m_RAISE_VERBATIM_IF(nt_testItemStuff != NULL) 
+    m_ASSERT(nt_testItemStuff == NULL) 
   } // if
 
   int completed = UNDEFINED;
@@ -73,18 +73,18 @@ static int TestFetch(int expectedTestNumber,  GREEN_COLLECTION_HANDLE handle,  i
 static int TestCount(int expectedTestNumber,  GREEN_COLLECTION_HANDLE handle,  int expectedCount,
   int n_expectedId) {
   m_DIGGY_BOLLARD()
-  m_RAISE_VERBATIM_IF(expectedTestNumber != ++testNumber)
+  m_ASSERT(expectedTestNumber == ++testNumber)
   m_DIGGY_VAR_D(testNumber)
-  m_RAISE_VERBATIM_IF(expectedCount == 0 && n_expectedId != -1) 
+  m_ASSERT(expectedCount != 0 || n_expectedId == -1) 
   TEST_ITEM_STUFF nt_testItemStuff = (TEST_ITEM_STUFF)UNDEFINED;
   int count = GreenCollectionGetCount(handle,(char **)&nt_testItemStuff);
   m_TRACK_IF(count < 0)
-  m_RAISE_VERBATIM_IF(count != expectedCount) 
+  m_ASSERT(count == expectedCount) 
   if (n_expectedId >= 0) {
-    m_RAISE_VERBATIM_IF(nt_testItemStuff == NULL) 
-    m_RAISE_VERBATIM_IF(nt_testItemStuff->id != n_expectedId) 
+    m_ASSERT(nt_testItemStuff != NULL) 
+    m_ASSERT(nt_testItemStuff->id == n_expectedId) 
   } else {
-    m_RAISE_VERBATIM_IF(nt_testItemStuff != NULL) 
+    m_ASSERT(nt_testItemStuff == NULL) 
   } // if
 
   m_DIGGY_RETURN(RETURNED)
@@ -98,12 +98,12 @@ static int TestIndexFetch(int expectedTestNumber,  GREEN_COLLECTION_HANDLE handl
   int indexFetch, int c_indexSeek, int cc_idKey,  int expectedResult,
   int n_expectedId, int c_expectedEntry, int cc_newId) {
   m_DIGGY_BOLLARD()
-  m_RAISE_VERBATIM_IF(expectedTestNumber != ++testNumber)
+  m_ASSERT(expectedTestNumber == ++testNumber)
   m_DIGGY_VAR_D(testNumber)
 
   if (n_expectedId == -1) {
-    m_RAISE_VERBATIM_IF(indexFetch == INDEX_FETCH__FETCH) 
-    m_RAISE_VERBATIM_IF(expectedResult == RESULT__FOUND) 
+    m_ASSERT(indexFetch != INDEX_FETCH__FETCH) 
+    m_ASSERT(expectedResult != RESULT__FOUND) 
   } // if
 
   TEST_ITEM_STUFF nt_testItemStuff = (TEST_ITEM_STUFF)UNDEFINED;
@@ -111,18 +111,18 @@ static int TestIndexFetch(int expectedTestNumber,  GREEN_COLLECTION_HANDLE handl
   int result = GreenCollectionIndexFetch(handle,  (INDEX_ITERATOR_AUTOMATIC_BUFFER)NULL,
     INDEX_LABEL0, indexFetch,c_indexSeek,  (char **)&nt_testItemStuff,  &n_entry,
     (void *)(GENERIC_INTEGER)cc_idKey);
-  m_RAISE_VERBATIM_IF(result != expectedResult)
+  m_ASSERT(result == expectedResult)
   if (n_expectedId >= 0) {
-    m_RAISE_VERBATIM_IF(n_entry == -1) 
-    m_RAISE_VERBATIM_IF(n_entry != c_expectedEntry) 
-    m_RAISE_VERBATIM_IF(nt_testItemStuff == NULL) 
-    m_RAISE_VERBATIM_IF(nt_testItemStuff->id != n_expectedId) 
+    m_ASSERT(n_entry != -1) 
+    m_ASSERT(n_entry == c_expectedEntry) 
+    m_ASSERT(nt_testItemStuff != NULL) 
+    m_ASSERT(nt_testItemStuff->id == n_expectedId) 
     if (indexFetch != INDEX_FETCH__READ_ONLY && indexFetch != INDEX_FETCH__READ_NEXT) { 
       nt_testItemStuff->id = cc_newId ; 
     } // if
   } else {
-    m_RAISE_VERBATIM_IF(nt_testItemStuff != NULL) 
-    m_RAISE_VERBATIM_IF(n_entry != -1) 
+    m_ASSERT(nt_testItemStuff == NULL) 
+    m_ASSERT(n_entry == -1) 
   } // if
 
   int completed = UNDEFINED;
@@ -146,7 +146,7 @@ int main (int argc, char **argv) {
 
 
   m_TRACK_IF((ret = GreenCollectionAddIndex(handle,1)) < 0) 
-  m_RAISE_VERBATIM_IF(ret != INDEX_LABEL0) 
+  m_ASSERT(ret == INDEX_LABEL0) 
 
   m_TRACK_IF(TestFetch(1, handle,-1,0,0,1969) < 0)
   m_TRACK_IF(TestCount(2, handle,1,1969) < 0)

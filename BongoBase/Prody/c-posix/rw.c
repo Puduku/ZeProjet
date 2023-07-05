@@ -22,7 +22,7 @@ int ProtectedRead2 (int descriptor, PD_HANDLE pdHandle, const struct WAITING_PLA
   char *readBuffer, int readBufferSize, int *ac_readLength) {
   m_DIGGY_BOLLARD()
 
-  m_RAISE_VERBATIM_IF(readBufferSize == 0)
+  m_ASSERT(readBufferSize != 0)
 
   m_TRACK_IF(PdSetDeadline(pdHandle,ap_waitingPlan) < 0)
 
@@ -99,7 +99,7 @@ int BrokenPipeFixCreateInstance (BROKEN_PIPE_FIX_HANDLE *azdh_handle) {
   m_DIGGY_BOLLARD()
   static struct BROKEN_PIPE_FIX uniqueBrokenPipeFix = { .dummy = UNDEFINED } ;
  
-  m_RAISE_VERBATIM_IF(n_uniqueBrokenFixHandle != NULL)
+  m_ASSERT(n_uniqueBrokenFixHandle == NULL)
 
   m_PERROR_VERBATIM_IF(signal(SIGPIPE,SIG_IGN) == SIG_ERR)
 
@@ -124,7 +124,7 @@ int ProtectedWrite2 (BROKEN_PIPE_FIX_HANDLE brokenPipeFixHandle, int descriptor,
   m_DIGGY_BOLLARD()
   m_TRACK_IF(PdSetDeadline(pdHandle,ap_waitingPlan) < 0) 
 
-  m_RAISE_VERBATIM_IF(writeLength == 0)
+  m_ASSERT(writeLength != 0)
 
   int n_rwStatus = -1; // unknown status for the moment...
   while (n_rwStatus == -1) {

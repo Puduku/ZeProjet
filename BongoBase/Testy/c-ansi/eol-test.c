@@ -24,19 +24,19 @@ int main (int argc, char **argv) {
 
   LINE_DELIMITOR_STUFF lineDelimitor;
   m_TRACK_IF((ret = LINES_PARTITION_GET_COUNT(linesPartition,&lineDelimitor)) < 0)
-  m_RAISE_VERBATIM_IF(ret != 0)
+  m_ASSERT(ret == 0)
   
   struct STRING_PORTION stringPortion ;
   m_ASSIGN_C_STRING_PORTION(stringPortion,p_s) 
   m_TRACK_IF((ret2 = ParseAsciiLines(stringPortion,-1, &parsedLength, linesPartition)) < 0)
-  m_RAISE_VERBATIM_IF(ret2 != 3)
+  m_ASSERT(ret2 == 3)
 
   m_TRACK_IF((ret = LINES_PARTITION_GET_COUNT(linesPartition,&lineDelimitor)) < 0)
-  m_RAISE_VERBATIM_IF(ret != 3)
+  m_ASSERT(ret == 3)
   
   int i = 0;
   for (; i < 4; i++) {
-    m_RAISE_VERBATIM_IF(LINES_PARTITION_FETCH(linesPartition,i,&lineDelimitor) != i)
+    m_ASSERT(LINES_PARTITION_FETCH(linesPartition,i,&lineDelimitor) == i)
   } // for
 
 
@@ -45,7 +45,7 @@ int main (int argc, char **argv) {
   m_ASSIGN_C_STRING_PORTION(stringPortion,p_s2) 
   ret2 = ParseAsciiLines(stringPortion, 0,&parsedLength, linesPartition) ;
   m_TRACK_IF((ret = LINES_PARTITION_GET_COUNT(linesPartition,&lineDelimitor)) < 0)
-  m_RAISE_VERBATIM_IF(ret != 2)
+  m_ASSERT(ret == 2)
 
   for (i = 0; i < 3; i++) {
     m_TRACK_IF(LINES_PARTITION_FETCH(linesPartition,i,&lineDelimitor) != i)

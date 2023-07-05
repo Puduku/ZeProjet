@@ -402,7 +402,7 @@ static int FetepeCloseCommandChannel (FETEPE_HANDLE handle) {
   commandStatusLinesCount = LINES_PARTITION_GET_COUNT((handle)->command.status.h_linesPartitionHandle,\
     &lastLineDelimitorStuff) ;\
   m_TRACK_IF(commandStatusLinesCount < 0)\
-  m_RAISE_VERBATIM_IF(lastLineDelimitorStuff == NULL)\
+  m_ASSERT(lastLineDelimitorStuff != NULL)\
   m_action \
 }
 
@@ -456,7 +456,7 @@ static int FetepeReadCommandStatus (FETEPE_HANDLE handle, int *a_fetepeStatus,
       int commandStatusLinesCount = LINES_PARTITION_GET_COUNT(
         handle->command.status.h_linesPartitionHandle, &t_lineDelimitorStuff); 
       m_TRACK_IF(commandStatusLinesCount < 0)\
-      m_RAISE_VERBATIM_IF(t_lineDelimitorStuff == NULL)
+      m_ASSERT(t_lineDelimitorStuff != NULL)
       switch (SScanfStringPortion(t_lineDelimitorStuff->practicalLine,"%3d",
         &handle->command.outline.ftpCommandStatus))  {
       case 1:
@@ -569,7 +569,7 @@ int FetepeConnect (FETEPE_HANDLE handle, const char *p_hostIpAddress, const char
   m_RESET_OUTLINE(handle)
 
   m_TRACK_IF(FetepeCloseCommandChannel(handle) != RETURNED)
-  m_RAISE_VERBATIM_IF(handle->command.socket.nh_connectedDescriptor != -1)
+  m_ASSERT(handle->command.socket.nh_connectedDescriptor == -1)
 
   switch (CreateAndConnect(&handle->command.socket.nh_connectedDescriptor,
     inet_addr(p_hostIpAddress), htons(21), &handle->command.outline.connectErrno)) {
@@ -804,7 +804,7 @@ static int FetepeOpenDataStream (FETEPE_HANDLE handle, int *a_fetepeStatus,
       int commandStatusLinesCount = LINES_PARTITION_GET_COUNT(
         handle->command.status.h_linesPartitionHandle, &lastLineDelimitorStuff);
       m_TRACK_IF(commandStatusLinesCount < 0)
-      m_RAISE_VERBATIM_IF(lastLineDelimitorStuff == NULL)
+      m_ASSERT(lastLineDelimitorStuff != NULL)
       ret = SScanfStringPortion(lastLineDelimitorStuff->practicalLine, 
         ENTERING_PASSIVE_MODE_STATUS__FMT_6U, &h1,&h2,&h3,&h4, &p1,&p2); 
       m_TRACK_IF(ret < 0)

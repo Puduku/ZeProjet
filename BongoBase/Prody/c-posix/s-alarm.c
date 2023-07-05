@@ -37,7 +37,7 @@ int StandardAlarmSystemCreateInstance (ALARM_SYSTEM_HANDLE *azdh_handle) {
     .sa_flags = SA_RESTART ,
   } ;
 
-  m_RAISE_VERBATIM_IF(n_uniqueAlarmSystemHandle != NULL)
+  m_ASSERT(n_uniqueAlarmSystemHandle == NULL)
 
   m_PERROR_VERBATIM_IF(sigaction(SIGALRM,&sigAction,NULL) < 0)
 
@@ -64,7 +64,7 @@ int SetAlarm (ALARM_SYSTEM_HANDLE handle, int seconds) {
 // Public function ; see description in .h
 int StandardAlarmSystemDestroyInstance (ALARM_SYSTEM_HANDLE xh_handle) {
   m_DIGGY_BOLLARD()
-  m_RAISE_VERBATIM_IF(n_uniqueAlarmSystemHandle != xh_handle)
+  m_ASSERT(n_uniqueAlarmSystemHandle == xh_handle)
   n_uniqueAlarmSystemHandle = NULL;
 
   m_DIGGY_RETURN(RETURNED)

@@ -127,7 +127,7 @@ static int RdhPrepareRead (RDH_HANDLE handle, char **anf_newReadBuffer, int *ac_
   if (handle->checkedReadLength == handle->readLength) { // Need to read new data
     // Ensure there is free room in buffer...
     if (handle->readLength == handle->bufferCurrentSize) {
-      m_RAISE_VERBATIM_IF(handle->nih_resizableBuffer == NULL)
+      m_ASSERT(handle->nih_resizableBuffer != NULL)
       m_REALLOC(handle->nih_resizableBuffer, handle->bufferCurrentSize += handle->c_resizableBufferSizeIncrement)
       handle->cv_buffer = handle->nih_resizableBuffer;
     } // if
@@ -152,7 +152,7 @@ static int RdhPrepareRead (RDH_HANDLE handle, char **anf_newReadBuffer, int *ac_
 // - -1: unexpected problem
 static int RdhUpdateRead (RDH_HANDLE handle, int newReadLength) {
   m_DIGGY_BOLLARD_S()
-  m_RAISE_VERBATIM_IF((handle->readLength += newReadLength) > handle->bufferCurrentSize)
+  m_ASSERT((handle->readLength += newReadLength) <= handle->bufferCurrentSize)
   
   m_DIGGY_RETURN(RETURNED)
 } // RdhUpdateRead 
@@ -318,7 +318,7 @@ static int WrhSynchronizeNextMessagePart (WRH_HANDLE handle, const char *fp_mess
   int messagePartLength) {
   m_DIGGY_BOLLARD_S()
   int i = handle->messagePartsNumber++ ;
-  m_RAISE_VERBATIM_IF(i >= MAX_MESSAGE_PARTS_NUMBER)
+  m_ASSERT(i < MAX_MESSAGE_PARTS_NUMBER)
   handle->sp_messagePartsBuffer[i] = fp_messagePartBuffer ;
   handle->s_messagePartsLength[i] = messagePartLength ;
 
@@ -332,8 +332,8 @@ static int WrhSynchronizeNextMessagePart (WRH_HANDLE handle, const char *fp_mess
 static int WrhPrepareWrite (WRH_HANDLE handle, const char **ap_writeBuffer, int *a_writeLength) {
   m_DIGGY_BOLLARD_S()
   int i = handle->writtenMessagePartsCount ;
-  m_RAISE_VERBATIM_IF(i < 0 || i >= handle->messagePartsNumber ||
-    handle->messagePartWrittenLength > handle->s_messagePartsLength[i])
+  m_ASSERT(i >= 0 && i < handle->messagePartsNumber && 
+    handle->messagePartWrittenLength <= handle->s_messagePartsLength[i])
 
   *ap_writeBuffer = handle->sp_messagePartsBuffer[i] + handle->messagePartWrittenLength ;
   *a_writeLength = handle->s_messagePartsLength[i] - handle->messagePartWrittenLength;
@@ -511,7 +511,7 @@ int ErwReset (ERW_HANDLE handle, int f_descriptor,
 int ErwRead (ERW_HANDLE handle, const struct WAITING_PLAN *nap_waitingPlan,
   char **na_messageBuffer, int *a_messageLength) {
   m_DIGGY_BOLLARD()
-  m_RAISE_VERBATIM_IF(handle->nh_rdhHandle == NULL)
+  m_ASSERT(handle->nh_rdhHandle != NULL)
 
   m_CHECK_O_NONBLOCK_SYNCHRONIZATION()
 

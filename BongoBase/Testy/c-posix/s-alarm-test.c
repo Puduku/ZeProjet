@@ -19,16 +19,16 @@ int main (int argc, char** argv) {
 
   ret = SetAlarm(h_handle,5);
   m_TRACK_IF(ret < 0)
-  m_RAISE_VERBATIM_IF(ret != 0)
+  m_ASSERT(ret == 0)
 
   ret = SetAlarm(h_handle,1);
   m_TRACK_IF(ret < 0)
-  m_RAISE_VERBATIM_IF(ret == 0)
+  m_ASSERT(ret != 0)
 
   m_DIGGY_INFO("sleep(10)...")
   ret = sleep(10);
   m_DIGGY_VAR_D(ret)
-  m_RAISE_VERBATIM_IF(ret < 8)
+  m_ASSERT(ret >= 8)
 
   ret = StandardAlarmSystemDestroyInstance(h_handle);
   m_TRACK_IF(ret != RETURNED)

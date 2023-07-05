@@ -63,15 +63,15 @@ int ProtectedGethostbynameR (const char *p_host,
     case 0: // function call "succeeded"...
       n_count = 0;
       if (hostentPtr != NULL) { // Hostname found
-        m_RAISE_VERBATIM_IF(sizeof(*cs_hostInetAddr) != hostentPtr->h_length)
-        m_RAISE_VERBATIM_IF(hostentPtr != &hostent)
+        m_ASSERT(sizeof(*cs_hostInetAddr) == hostentPtr->h_length)
+        m_ASSERT(hostentPtr == &hostent)
         for (; n_count < maxNumber && hostentPtr->h_addr_list[n_count] != NULL; n_count++) {
           memcpy(cs_hostInetAddr + n_count, hostentPtr->h_addr_list[n_count], sizeof(*cs_hostInetAddr)) ;
         } // for
       } // if
     break; case ERANGE: // buffer is too small
       bufSize *= 2 ;
-      m_RAISE_VERBATIM_IF(bufSize > 0x4000) // TODO: what reasonable max size ???
+      m_ASSERT(bufSize <= 0x4000) // TODO: what reasonable max size ???
       // Let's go for new try:
       m_REALLOC(h_buf,bufSize)
     break; default:
@@ -100,7 +100,7 @@ int ProtectedGethostbyname (const char *p_host,
 
   hostentPtr = gethostbyname(p_host);
   if (hostentPtr != NULL) { // function call "succeeded"...
-    m_RAISE_VERBATIM_IF(sizeof(*cs_hostInetAddr) != hostentPtr->h_length)
+    m_ASSERT(sizeof(*cs_hostInetAddr) == hostentPtr->h_length)
     for (; count < maxNumber && hostentPtr->h_addr_list[count] != NULL; count++) {
       memcpy(cs_hostInetAddr + count, hostentPtr->h_addr_list[count], sizeof(*cs_hostInetAddr)) ;
     } // for

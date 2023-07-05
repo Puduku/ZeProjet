@@ -31,42 +31,42 @@ int main (int argc, char **argv) {
   int i = UNDEFINED;
   for (i = 0; i < 10; i++) {
     m_TRACK_IF((ret = AlarmTimetableProgram(handle,69+i,b_NEW_ALARM,1969+i,&ancientAttTime)) < 0)
-    m_RAISE_VERBATIM_IF(ret != RESULT__NOT_FOUND)
+    m_ASSERT(ret == RESULT__NOT_FOUND)
   } // for
 
   m_DIGGY_INFO("Cancelling alarms 1974:74 => 1978:78..")
   for (i = 5; i < 10; i++) {
     m_TRACK_IF((ret = AlarmTimetableProgram(handle,69+i,b_REMOVE_ALARM,UNDEFINED,&ancientAttTime)) 
                < 0)
-    m_RAISE_VERBATIM_IF(ret != RESULT__FOUND)
-    m_RAISE_VERBATIM_IF(ancientAttTime != 1969+i)
+    m_ASSERT(ret == RESULT__FOUND)
+    m_ASSERT(ancientAttTime == 1969+i)
   } // for
   m_TRACK_IF((ret = AlarmTimetableGetRefreshTime(handle,&attTime)) < 0)
-  m_RAISE_VERBATIM_IF(ret != RESULT__FOUND)
-  m_RAISE_VERBATIM_IF(attTime != 1969)
+  m_ASSERT(ret == RESULT__FOUND)
+  m_ASSERT(attTime == 1969)
   
   m_TRACK_IF((ret = AlarmTimetableRefresh(handle,1967,RingRing,NULL)) < 0) 
-  m_RAISE_VERBATIM_IF(ret != 0)
+  m_ASSERT(ret == 0)
   m_TRACK_IF((ret = AlarmTimetableGetRefreshTime(handle,&attTime)) < 0)
-  m_RAISE_VERBATIM_IF(ret != RESULT__FOUND)
-  m_RAISE_VERBATIM_IF(attTime != 1969)
+  m_ASSERT(ret == RESULT__FOUND)
+  m_ASSERT(attTime == 1969)
   
   m_TRACK_IF((ret = AlarmTimetableRefresh(handle,1971,RingRing,NULL)) < 0)
-  m_RAISE_VERBATIM_IF(ret != 3)
+  m_ASSERT(ret == 3)
   m_TRACK_IF((ret = AlarmTimetableGetRefreshTime(handle,&attTime)) < 0)
-  m_RAISE_VERBATIM_IF(ret != RESULT__FOUND)
-  m_RAISE_VERBATIM_IF(attTime != 1972)
+  m_ASSERT(ret == RESULT__FOUND)
+  m_ASSERT(attTime == 1972)
 
   m_TRACK_IF((ret = AlarmTimetableRefresh(handle,1971,RingRing,NULL)) < 0) 
-  m_RAISE_VERBATIM_IF(ret != 0)
+  m_ASSERT(ret == 0)
 
   m_TRACK_IF((ret = AlarmTimetableRefresh(handle,ULTIMATE_ATT_TIME,RingRing,NULL)) < 0)
-  m_RAISE_VERBATIM_IF(ret != 2)
+  m_ASSERT(ret == 2)
   m_TRACK_IF((ret = AlarmTimetableGetRefreshTime(handle,&attTime)) < 0)
-  m_RAISE_VERBATIM_IF(ret != RESULT__NOT_FOUND)
+  m_ASSERT(ret == RESULT__NOT_FOUND)
 
   m_TRACK_IF((ret = AlarmTimetableRefresh(handle,ULTIMATE_ATT_TIME,RingRing,NULL)) <0)
-  m_RAISE_VERBATIM_IF(ret != 0)
+  m_ASSERT(ret == 0)
 
   m_TRACK_IF(AlarmTimetableDestroyInstance(handle) != RETURNED)
 

@@ -15,12 +15,12 @@ int main (int argc, char** argv) {
   tid_t tid = (tid_t) UNDEFINED ; 
   int ret = TidGlueSelfPthread2Tid(handle, &tid) ;
   m_TRACK_IF(ret < 0)
-  m_RAISE_VERBATIM_IF(ret != RETURNED)
+  m_ASSERT(ret == RETURNED)
   m_DIGGY_VAR_D(tid)
   ret = TidGlueTid2Pthread(handle, tid, &pthread2) ;
   m_TRACK_IF(ret < 0)
-  m_RAISE_VERBATIM_IF(ret != RETURNED)
-  m_RAISE_VERBATIM_IF(! pthread_equal(selfPthread,pthread2))
+  m_ASSERT(ret == RETURNED)
+  m_ASSERT(pthread_equal(selfPthread,pthread2))
   m_TRACK_IF(TidGlueDestroyInstance(handle) != RETURNED)
 
   m_DIGGY_RETURN(0)

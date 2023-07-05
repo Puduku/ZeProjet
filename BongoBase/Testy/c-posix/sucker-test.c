@@ -48,12 +48,12 @@ int main (int argc, char** argv) {
     h_dummySFilePathnameStuff->nhi_string,dummyCopyFilePathname,
     &suckedLength,&r_flopCause) ;
   m_TRACK_IF(ret < 0)
-  m_RAISE_VERBATIM_IF(ret != SUCKER_STATUS__OK)
+  m_ASSERT(ret == SUCKER_STATUS__OK)
 
   int dummyCopyFile = UNDEFINED;
   int answer = ProtectedOpenFile(dummyCopyFilePathname, READ__BASIC_OPEN_FILE_MODE,
     BATEAU__FILE_CREATION_MODE, &dummyCopyFile, &openErrno);
-  m_RAISE_VERBATIM_IF(answer != ANSWER__YES)
+  m_ASSERT(answer == ANSWER__YES)
   STREAM_BUTT_ADEPT_HANDLE h_streamSButtAdeptHandle = (STREAM_BUTT_ADEPT_HANDLE)UNDEFINED;
   m_TRACK_IF(StreamButtAdeptCreateInstance(&h_streamSButtAdeptHandle,
     h_alarmSystemHandle, h_brokenPipeFixHandle,
@@ -66,9 +66,9 @@ int main (int argc, char** argv) {
 
   ret = SuckerSuckOut(h_handle,&suckedLength,&r_flopCause) ;
   m_TRACK_IF(ret < 0)
-  m_RAISE_VERBATIM_IF(ret != SUCKER_STATUS__OK)
-  m_RAISE_VERBATIM_IF(suckedLength != h_gStringStuff->c_copiedLength) 
-  m_RAISE_VERBATIM_IF(suckedLength != 1668) // data/prout-orig file size 
+  m_ASSERT(ret == SUCKER_STATUS__OK)
+  m_ASSERT(suckedLength == h_gStringStuff->c_copiedLength) 
+  m_ASSERT(suckedLength == 1668) // data/prout-orig file size 
 
   m_TRACK_IF(SuckerDestroyInstance(h_handle) != RETURNED)
   m_TRACK_IF(G_STRING_DESTROY_INSTANCE(h_gStringStuff) != RETURNED)

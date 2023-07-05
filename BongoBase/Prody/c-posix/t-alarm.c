@@ -184,7 +184,7 @@ int PthreadAlarmSystemCreateInstance (ALARM_SYSTEM_HANDLE *azdh_handle) {
     .sa_flags = SA_RESTART ,
    } ;
 
-  m_RAISE_VERBATIM_IF(n_uniqueAlarmSystemHandle != NULL)
+  m_ASSERT(n_uniqueAlarmSystemHandle == NULL)
 
   m_PERROR_VERBATIM_IF(sigaction(SIGALRM,&sigAction,NULL) < 0);
 
@@ -274,7 +274,7 @@ static int RingAlarm (void *pr_handle, unsigned int attId, unsigned long delay) 
   int result = TidGlueTid2Pthread(p_handle->c_shared.h_tidGlueHandle,
     ATT_ID_2_TID(p_handle->c_shared.h_attGlueHande,attId),&pthread);
   m_TRACK_IF(result < 0)
-  m_RAISE_VERBATIM_IF(result != RESULT__FOUND)
+  m_ASSERT(result == RESULT__FOUND)
 
   int ret = pthread_kill(pthread,SIGALRM) ;
 

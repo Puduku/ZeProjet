@@ -1144,9 +1144,8 @@ int GreenCollectionGetCount (GREEN_COLLECTION_HANDLE cp_handle, char **navntr_gr
       int ret = GreenCollectionFetchInternal(cp_handle, cp_handle->i_itemsCount - 1,
         cp_handle->b_frozen? FETCH_4__READ: FETCH_4__CHANGE,  navntr_greenItemStuff); 
       m_TRACK_IF(ret < 0) 
-      m_RAISE_VERBATIM_IF(ret != cp_handle->i_itemsCount - 1)
-      m_RAISE_VERBATIM_IF(cp_handle->nv_fetched4ChangeEntry != -1 && cp_handle->nv_fetched4ChangeEntry
-        != ret) 
+      m_ASSERT(ret == cp_handle->i_itemsCount - 1)
+      m_ASSERT(cp_handle->nv_fetched4ChangeEntry == -1 || cp_handle->nv_fetched4ChangeEntry == ret)
       // MICROMONITOR: ... ALIEN / ALIVE (fetched 4 change) ...
       //               or [NADA] (if the collection is "frozen" or item is not fetchable)
     } else *navntr_greenItemStuff = NULL;
@@ -1172,8 +1171,8 @@ int GreenCollectionFetch (GREEN_COLLECTION_HANDLE cp_handle, int n_entry,
   int entry = GreenCollectionFetchInternal(cp_handle,n_entry,
     cp_handle->b_frozen? FETCH_4__READ: FETCH_4__CHANGE, acntr_greenItemStuff);
   m_TRACK_IF(entry < 0)
-  m_RAISE_VERBATIM_IF(cp_handle->nv_fetched4ChangeEntry != -1 && cp_handle->nv_fetched4ChangeEntry != 
-    entry)
+  m_ASSERT(cp_handle->nv_fetched4ChangeEntry == -1 || cp_handle->nv_fetched4ChangeEntry == entry)
+
   // MICROMONITOR: ... ALIEN / ALIVE (fetched 4 change) ...
   //               or [NADA] (if the collection is "frozen" or item is not fetchable)
 
@@ -1184,7 +1183,7 @@ int GreenCollectionFetch (GREEN_COLLECTION_HANDLE cp_handle, int n_entry,
 // Public function; see description in .h
 int GreenCollectionClear (GREEN_COLLECTION_HANDLE handle) {
   m_DIGGY_BOLLARD()
-  m_RAISE_VERBATIM_IF(handle->b_frozen)
+  m_ASSERT(!handle->b_frozen)
   // MICROMONITOR: ... ALIEN / ALIVE (fetched 4 change) ...
   //               or [NADA]
 
@@ -1201,16 +1200,16 @@ int GreenCollectionClear (GREEN_COLLECTION_HANDLE handle) {
 // Public function; see description in .h
 int GreenCollectionAddIndex (GREEN_COLLECTION_HANDLE handle, int keysNumber) {
   m_DIGGY_BOLLARD()
-  m_RAISE_VERBATIM_IF(handle->b_frozen)
+  m_ASSERT(!handle->b_frozen)
   // MICROMONITOR: ... ALIEN / ALIVE (fetched 4 change) ...
   //               or [NADA]
   m_TRACK_IF(GreenCollectionRefreshIndexesInternal(handle,b_TRUE) != RETURNED)
   // MICROMONITOR: [NADA]
 
   // TODO: permettre d'ajouter des indexes ag chaud...
-  m_RAISE_VERBATIM_IF(handle->i_itemsCount > 0)
+  m_ASSERT(handle->i_itemsCount == 0)
 
-  m_RAISE_VERBATIM_IF(keysNumber == 0)
+  m_ASSERT(keysNumber > 0)
 
   int newIndexLabel = GreenIndexesAddIndex(&handle->indexes, handle->itemsPhysicalNumber,
     keysNumber);
@@ -1230,7 +1229,7 @@ int GreenCollectionIndexFetch (GREEN_COLLECTION_HANDLE cp_handle,
   //               or [NADA]
   m_TRACK_IF(GreenCollectionRefreshIndexesInternal(cp_handle,b_TRUE) != RETURNED)
   // MICROMONITOR: [NADA]
-  m_RAISE_VERBATIM_IF(nf_indexIteratorAutomaticBuffer == NULL && cp_handle->b_frozen) 
+  m_ASSERT(nf_indexIteratorAutomaticBuffer != NULL || !cp_handle->b_frozen) 
 
   int n_entry = UNDEFINED;
   m_TRACK_IF(GreenIndexesSeek(&cp_handle->indexes, nf_indexIteratorAutomaticBuffer, indexLabel,
@@ -1247,10 +1246,10 @@ int GreenCollectionIndexFetch (GREEN_COLLECTION_HANDLE cp_handle,
   break; case INDEX_FETCH__SEEK_ONLY:
     if (n_entry >= 0) n_fetch4 = (cp_handle->b_frozen? FETCH_4__READ: FETCH_4__CHANGE);
   break; case INDEX_FETCH__REMOVE:
-    m_RAISE_VERBATIM_IF(cp_handle->b_frozen)
+    m_ASSERT(!cp_handle->b_frozen)
     if (n_entry >= 0) n_fetch4 = FETCH_4__REMOVE; 
   break; case INDEX_FETCH__FETCH:
-    m_RAISE_VERBATIM_IF(cp_handle->b_frozen)
+    m_ASSERT(!cp_handle->b_frozen)
     n_fetch4 = FETCH_4__CHANGE; // Note: fetch 4 change is implicit with "smart fetch" but n_fetch4
       // var MUST be explicitly set here even if n_entry == -1 because nullability is used in the
       // flow control below (X)   
@@ -1263,10 +1262,9 @@ int GreenCollectionIndexFetch (GREEN_COLLECTION_HANDLE cp_handle,
     // MICROMONITOR: [NADA]
     n_fetchedEntry = GreenCollectionFetchInternal(cp_handle,n_entry,n_fetch4,acvntr_greenItemStuff);
     m_TRACK_IF(n_fetchedEntry < 0)
-    m_RAISE_VERBATIM_IF(*acvntr_greenItemStuff == NULL)
+    m_ASSERT(*acvntr_greenItemStuff != NULL)
     // See (X) above :
-    m_RAISE_VERBATIM_IF(n_fetch4 == FETCH_4__CHANGE && cp_handle->nv_fetched4ChangeEntry !=
-      n_fetchedEntry)
+    m_ASSERT(n_fetch4 != FETCH_4__CHANGE || cp_handle->nv_fetched4ChangeEntry == n_fetchedEntry)
     // MICROMONITOR: ... ALIEN / ALIVE (fetched 4 change) ...
     //               or [NADA] (if the collection is "frozen", etc.)
   } else *acvntr_greenItemStuff = NULL; 
