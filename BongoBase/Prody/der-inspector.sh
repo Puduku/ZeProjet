@@ -3,7 +3,7 @@
 . mama.env
 
 #########################################################################
-plot="Valorize Prody header files' documentation (pick all COde COmments' NUTS...)"
+plot="Valorize 'enclosed' documentation in Prody header files (pick all COde COmments' NUTS...)"
 #########################################################################
 
 . der-inspector.env
