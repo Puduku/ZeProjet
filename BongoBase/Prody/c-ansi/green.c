@@ -1039,16 +1039,16 @@ enum {
 } ;
 
 
-// Obtain or retrieve emplacement for a green set (in the collection's array).
+// Obtain or retrieve emplacement for a green item (in the collection's array).
 //
 // Passed:
-// - cp_handle: green set array's handle ; protected instance if the collection is frozen
+// - cp_handle: green colletion's handle ; protected instance if the collection is frozen
 // - n_entry: entry in the list
 //   + -1 special value: (smart fetch) find emplacement in the array : if gap(s) exist(s), re-use a
 //     gap, otherwise, reserve a new emplacement at the end of the array....
 //     (not allowed if the collection is frozen)
-//   + >= 0: entry for the <set> in the list (0 == 1st entry) (direct fetch) ; if that position
-//     either exceeds that reflected by formal <set>s count, or designate a gap, then the entry is
+//   + >= 0: entry for the <item> in the list (0 == 1st entry) (direct fetch) ; if that position
+//     either exceeds that reflected by formal <item>s count, or designate a gap, then the entry is
 //     NOT fetched
 // - c_fetch4: only significant with "direct fetch" (n_entry >= 0) : 
 //   note1: "smart fetch" is tacitly a "fetch 4 change" 
@@ -1066,17 +1066,17 @@ enum {
 static int GreenCollectionFetchInternal (GREEN_COLLECTION_HANDLE cp_handle, int n_entry, int c_fetch4,
   char **acntr_greenItemStuff) {
   m_DIGGY_BOLLARD_S()
-  m_RAISE_VERBATIM_IF(cp_handle->nv_fetched4ChangeEntry >= 0)
+  m_ASSERT(cp_handle->nv_fetched4ChangeEntry < 0)
   // MICROMONITOR: [NADA]
   if (n_entry == -1) { // Smart fetch
-    m_RAISE_VERBATIM_IF(cp_handle->b_frozen) 
+    m_ASSERT(!cp_handle->b_frozen) 
     if ((n_entry = n_GAPS_STACK_GET_FIRST(cp_handle->gaps)) < 0) { // No gap
       n_entry = cp_handle->i_itemsCount ;
       // Ensure physical arrays are large enough vis-a-vis fetched entry
       if (n_entry >= cp_handle->itemsPhysicalNumber) {
-        m_RAISE_VERBATIM_IF(n_entry > cp_handle->itemsPhysicalNumber)
+        m_ASSERT(n_entry <= cp_handle->itemsPhysicalNumber)
         m_TRACK_IF(GreenCollectionResize(cp_handle,1) < 0)
-        m_RAISE_VERBATIM_IF(n_entry >= cp_handle->itemsPhysicalNumber)
+        m_ASSERT(n_entry < cp_handle->itemsPhysicalNumber)
       } // if
       // New item
       m_SET_ALL_FLAGS(cp_handle->hsc_flags[n_entry],ALIEN_ALIVE__FLAGS)
@@ -1084,7 +1084,7 @@ static int GreenCollectionFetchInternal (GREEN_COLLECTION_HANDLE cp_handle, int 
         cp_handle->i_itemsCount;
       // MICROMONITOR: |-- ALIEN / ALIVE ...
     } else { // Use existing gap 
-      m_RAISE_VERBATIM_IF(n_entry >= cp_handle->i_itemsCount)
+      m_ASSERT(n_entry < cp_handle->i_itemsCount)
       m_ASSERT(b_ALL_FLAGS_OK(cp_handle->hsc_flags[n_entry],ALIEN_DEAD__FLAGS))
       // MICROMONITOR: |-- ALIEN / DEAD ...
       m_GAPS_STACK_POP(cp_handle->gaps,n_entry)
@@ -1101,7 +1101,7 @@ static int GreenCollectionFetchInternal (GREEN_COLLECTION_HANDLE cp_handle, int 
       m_ASSERT(b_ALL_FLAGS_OK(cp_handle->hsc_flags[n_entry],FAMED_ALIVE__FLAGS))
       // MICROMONITOR: |-- FAMED / ALIVE ...
       if (c_fetch4 != FETCH_4__READ) { 
-        m_RAISE_VERBATIM_IF(cp_handle->b_frozen) 
+        m_ASSERT(!cp_handle->b_frozen) 
         m_GREEN_INDEXES_REMOVE(cp_handle->indexes,n_entry)
         m_SET_FLAG_ON(cp_handle->hsc_flags[n_entry],ALIEN_FLAG)
         // MICROMONITOR: ... ALIEN / ALIVE ...
@@ -1252,8 +1252,8 @@ int GreenCollectionIndexFetch (GREEN_COLLECTION_HANDLE cp_handle,
   break; case INDEX_FETCH__FETCH:
     m_RAISE_VERBATIM_IF(cp_handle->b_frozen)
     n_fetch4 = FETCH_4__CHANGE; // Note: fetch 4 change is implicit with "smart fetch" but n_fetch4
-                                // var MUST be explicitly set here even if n_entry == -1 because
-                                // nullability is used in the flow control below (X)   
+      // var MUST be explicitly set here even if n_entry == -1 because nullability is used in the
+      // flow control below (X)   
   break; default:
     m_RAISE(ANOMALY__VALUE__FMT_D,indexFetch)
   } // switch
@@ -1361,10 +1361,9 @@ int GreenCollectionDestroyInstance (GREEN_COLLECTION_HANDLE xh_handle) {
   if (xh_handle->n_greenHandlerDisengageFunction != NULL) {
     char *r_greenItemStuff = xh_handle->h_greenArray;
     int i = 0;
-    for (; i < xh_handle->v_maxItemsCount ;
-         i++, r_greenItemStuff += xh_handle->greenItemSize) {
-      m_TRACK_IF(xh_handle->n_greenHandlerDisengageFunction(
-        xh_handle->cr_greenHandlerHandle, r_greenItemStuff) != RETURNED)
+    for (; i < xh_handle->v_maxItemsCount ; i++, r_greenItemStuff += xh_handle->greenItemSize) {
+      m_TRACK_IF(xh_handle->n_greenHandlerDisengageFunction(xh_handle->cr_greenHandlerHandle,
+        r_greenItemStuff) != RETURNED)
     } // for
   } // if
   free(xh_handle->h_greenArray) ;
