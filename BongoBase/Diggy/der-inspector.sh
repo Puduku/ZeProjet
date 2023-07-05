@@ -3,7 +3,7 @@
 . mama.env
 
 ########################################################################
-plot="Pick up Diggy's coconuts (aka valorize Diggy's API documentation)"
+plot="Valorize 'enclosed' documentation in Diggy's header files (pick all COde COmments' NUTS...)"
 ########################################################################
 
 . der-inspector.env
