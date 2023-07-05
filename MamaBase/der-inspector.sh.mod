@@ -8,7 +8,7 @@
 . mama.env
 
 #########################################################################
-plot="Valorize <<GARDEN>> header files' documentation (pick all COde COmments' NUTS...) 
+plot="Valorize 'enclosed' documentation in <<GARDEN>> header files (pick all COde COmments' NUTS...)"
 #########################################################################
 
 . der-inspector.env
