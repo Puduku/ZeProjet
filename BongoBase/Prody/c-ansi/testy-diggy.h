@@ -42,9 +42,11 @@
 
 // m_DIGGY_VAR_<XXX>() placeholders from Testy:
 
-#define m_DIGGY_VAR_STRING_PORTION(m_var)
+#define m_DIGGY_VAR_ANSWER(m_var)
 
 #define m_DIGGY_VAR_COMPARISON(m_var)
+
+#define m_DIGGY_VAR_STRING_PORTION(m_var)
 
 #endif
 
