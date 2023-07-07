@@ -341,8 +341,8 @@ int ReadCLongCString(const char *p_cString,  long *ac_value,
   char *endptr = (char*)UNDEFINED;
   
   errno = 0;
-  if ((*ac_value = strtol(p_cString,&endptr,0)) == 0 && errno != 0) answer = 
-    ANSWER__NO;
+  *ac_value = strtol(p_cString,&endptr,0);
+  if (errno != 0 || endptr == p_cString) answer = ANSWER__NO;
   else if (nac_parsedLength != NULL) *nac_parsedLength = (endptr - p_cString); 
 
   m_DIGGY_RETURN(answer)

@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <errno.h>
+#include <stdint.h>
 
 #include "c-ansi/types.h"
 #include "c-ansi/alloc.h"
