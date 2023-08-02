@@ -113,11 +113,11 @@
 // in declarations AND p[] and p[<some size>] are sometimes equivalent (to *p) in declarations).
 // And as usual, the real complications are caused by absence of portability. (P)
 // Some concrete pitfalls : we define char p[] = "blabla"; in the .c (private) source. We report
-// the extern char p[]; declaration in the .h header. Some time later, a guy replaces in the .h the
-// extern char p[];  with the (supposed equivalent) extern char *p; declaration (guy's possible
-// motivation: "let's be more homogeneous with the other declarations", "in conformance with MY
-// nomenclature", etc.) ...
-// If there is an inconsistency between the definition and the declaration, the compiler will
+// the extern char p[]; declaration in the .h header. Some time later, some "zealous" guy decides
+// to replace in the .h the extern char p[];  with the (supposed equivalent) extern char *p;
+// declaration (guy's possible  motivation: "let's be more homogeneous with the other 
+/  declarations", "in conformance with MY nomenclature", etc.) ...
+// If there is an inconsistency between the definition and the declaration of p, the compiler will
 // normally warn us... Unless the source code is not recompiled ; in such case, the linker alone is
 // not capable to detect the inconsistency, and the application will crash... 
 // 2nd pitfall: Given function declaration f(char p[256]); , what is the value of sizeof(p) in f ?
@@ -169,15 +169,15 @@
 // be protected from intenptive modifications... Yet, that "name" data field needs first to be
 // set up - and thus modified - during the "initialization" phase... 
 // The natural "solution" seems to be: let's put the 'const' qualifier on the data field ; during
-// "initialization", we just have to "cast" that field into equivalent "constless" data type... 
+// "initialization", we just have to cast that field into equivalent "constless" data type... 
 // But, that's the point : 'cast' operations are by essence dangerous dispositions (remember, 
 // 'cast' operator DISABLES any data type consistency CONTROL of the compiler, and hence potentially
 // transforms simple compilation problem into execution crash) that must be avoided. (*) (**)  
 // So generally, the wiser is simply to abandon the 'const' protection...
 // Morality : 'const' may be useful, but is FAR to be the Panacea.
 // (*) This is a perfect illustration of the idiom "Being between Scylla and Charybdis".
-// (**) Ideally, C would propose an "intelligent" casting that would just remove the 'constancy'
-// constraint (for one time, C++ marks a real point over C :p)...
+// (**) Ideally, C would propose an "intelligent" casting operator that would just remove the
+// 'constancy' constraint (for one time, C++ marks a real point over C :p)...
 
 // Number 2: Silent overflows. There is NO bullet-proof means in C to detect basic integer 
 // overflows !... (*)
