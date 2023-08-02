@@ -91,17 +91,19 @@
 
 // Programming patterns:
 // - modules: "modular design" is an inalienable principle.
-//   Modules (as designation of "code containers" that are source files) REMAIN the fundamental
-//   conceptual units of software development. That ancestral "Modular design" was NEVER obsoleted
-//   by more recent concepts, such as "class models" once elaborated in object-oriented
-//   programming. Modules remain the "essence" of preliminary software design (*).
-//   Classes may only make sense far later in the "detailed" design process...
+//   Modules (as designation of "code containers" that are source files) remain the FUNDAMENTAL
+//   conceptual "units" of software development. That "modular design", although "ancestral", is
+/    not obsolete with respect to more recent concepts, such as "class models" developed in
+//   so-called "object-oriented" programming... Modules remain the "essence" of preliminary
+//   software design (*).
+//   "Classes" may only make sense far later, during the "detailed" design process...
 //   => Practical pattern: one module <mod> exactly corresponds to:
 //   - single <mod>.h header file OR
 //   - <mod>.h header and <mod>.c source files (most common case) OR
 //   - single <mod>.c source file if and only if it implements main() function.
 //   (*) "Preliminary" does not just mean "draft" - immediatly forgotten when the "real"
-//       developement starts. "Preliminary" really means "fundamental"...  
+//       developement starts. "Preliminary" really means "fundamental"...
+//
 // - C-Ansi / C-Posix split: the sources are splitted between "c-posix" and "c-ansi"
 //   sub-directories.
 //   Initially, the motivation was practical: such split eases recuperation of modules usable to
@@ -111,7 +113,8 @@
 //   "inducts" a good separation between pure business logic (code that can be written in Ansi-C)
 //   with "technical", low level code (that is "by essence" Posix-C) 
 //   NB: final extra, empiric, but real, advantage : this separation lets us directly identifying 
-//   our own headers (#include "c-ansi/xxx" and "c-posix/xxx") 
+//   our own headers (#include "c-ansi/xxx" and "c-posix/xxx")
+//
 // - particular APIs:
 //   + "kitchen" paradigm: allows to maintain primal simplicity of "enriched" API.
 //     Analogy with some (contemporary) restaurants in which clients have an open view inside the
