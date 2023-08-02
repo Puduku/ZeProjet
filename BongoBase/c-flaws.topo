@@ -78,7 +78,7 @@
 // The physical aspects were simply not specified with these structure definitions...
 // However, some physical properties deserve to be clarified:
 // - aligned (unpacked) data: such organization favors the CPU but creates a waste of memory.
-// - packed (unpacked) data: optimizes memory consumption, but may decrease CPU performance.
+// - packed data: optimizes memory consumption, but may decrease CPU performance.
 // Ad hoc directives (in particular #pragma) were therefore added in the various compilers, but,
 // alas, this happened without real consultation, from which arise new problems of standardization
 // in the language (P).
