@@ -38,8 +38,8 @@ m_DEFINE_BINARY_ENUM(CompletedImage,
   COMPLETED__BUT,)// procedure completed, but we want to point something...
 
 m_DEFINE_BINARY_ENUM(ResultImage,
-  RESULT__FOUND,,    // "search" completed... result is found" 
-  RESULT__NOT_FOUND,)// "search" completed... result is not found...  
+  RESULT__FOUND,,    // "research" completed and is fruitful 
+  RESULT__NOT_FOUND,)// "research" completed, but is UNfruitful  
 
 
 // Ternary "comparison" status...
