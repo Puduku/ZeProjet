@@ -14,15 +14,11 @@
 #include "flint/types.h"
 //#include "c-ansi/diggy.h"
 
-// Simple "universal" macro to compare 2 integral values...
-// Prerequisites: a and b are rigorously of same type.
-#define /*int*/ GET_DIFFERENCE(m_integralA,m_integralB) ((m_integralA) > (m_integralB)? 1 :\
-  ((m_integralA) == (m_integral)? 0: -1))
 
+// Generic statuses (returned by "Procedures")
+// -------------------------------------------
 
-// "procedures" & return "statuses"
-
-// Unary status...
+// Generic Unary status...
 // This is actually the ONLY possible return status of a "true" procedure
 m_DEFINE_UNARY_ENUM(ReturnedImage,
   RETURNED, )// return from procedure (tacitly "completed")
@@ -37,26 +33,44 @@ m_DEFINE_BINARY_ENUM(AttemptImage,
   ATTEMPT__SUCCESSFUL,,// this try is successful
   ATTEMPT__TRY_AGAIN,) // this try was not lucky
 
-
 m_DEFINE_BINARY_ENUM(CompletedImage,
   COMPLETED__OK,, // procedure completed,
   COMPLETED__BUT,)// procedure completed, but we want to point something...
-
 
 m_DEFINE_BINARY_ENUM(ResultImage,
   RESULT__FOUND,,    // "search" completed... result is found" 
   RESULT__NOT_FOUND,)// "search" completed... result is not found...  
 
 
-// Trinary status(es)...
+// Ternary "comparison" status...
 
 m_DEFINE_TERNARY_ENUM(ComparisonImage,
      LESS_THAN__COMPARISON,,
       EQUAL_TO__COMPARISON,,
   GREATER_THAN__COMPARISON,)
 
+
+// Handling differences and comparisons status
+// -------------------------------------------
+
+// Simple "universal" macro to compare 2 integral values...
+// Prerequisites: A and B are rigorously of same type.
+// 
 // Passed:
-// - difference:
+// - m_integralA: A
+// - m_integralB: B
+//
+// Ret: "trivial" difference (int type)
+// - -1: A < B
+// - 0: A == B
+// - +1: A > B
+#define /*int*/ GET_DIFFERENCE(m_integralA,m_integralB) ((m_integralA) > (m_integralB)? 1 :\
+  ((m_integralA) == (m_integral)? 0: -1))
+
+// Get comparison status corresponding to difference
+//
+// Passed:
+// - difference: (int type)
 //
 // Returned:
 // - LESS_THAN__COMPARISON: difference < 0
@@ -66,7 +80,16 @@ m_DEFINE_TERNARY_ENUM(ComparisonImage,
   ((difference) > 0? GREATER_THAN__COMPARISON: EQUAL_TO__COMPARISON))
 
 // Simple "universal" macro to compare 2 integral values...
-// Prerequisites: a and b are rigorously of same type.
+// Prerequisites: A and B are rigorously of same type.
+// 
+// Passed:
+// - m_integralA: A
+// - m_integralB: B
+//
+// Ret: comparison status
+// - LESS_THAN__COMPARISON: A < B
+// - EQUAL_TO__COMPARISON: A == B
+// - GREATER_THAN__COMPARISON: A > B
 #define /*int*/ GET_COMPARISON(m_integralA,m_integralB) ( (m_integralA) > (m_integralB)?\
   GREATER_THAN__COMPARISON: ((m_integralA) == (m_integralB)? EQUAL_TO__COMPARISON:\
   LESS_THAN__COMPARISON) )
@@ -78,10 +101,11 @@ m_DEFINE_TERNARY_ENUM(ComparisonImage,
 //   + EQUAL_TO__COMPARISON
 //   + GREATER_THAN__COMPARISON
 //
-// Returned:
-// - -1: LESS_THAN__COMPARISON
-// - 0: EQUAL_TO__COMPARISON
-// - 1: GREATER_THAN__COMPARISON:
+// Changed: 
+// - m_difference:
+//   + -1: LESS_THAN__COMPARISON
+//   + 0: EQUAL_TO__COMPARISON
+//   + 1: GREATER_THAN__COMPARISON:
 #define m_COMPARISON_2_DIFFERENCE(/*int*/comparison, /*int*/m_difference)  switch (comparison) {\
 case LESS_THAN__COMPARISON:\
   m_difference = -1;\
@@ -92,7 +116,6 @@ break; case GREATER_THAN__COMPARISON:\
 break; default:\
   m_RAISE(ANOMALY__VALUE__FMT_D,comparison)\
 } 
-
 
 
 #endif // __C_ANSI_TYPES_H_INCLUDED__
