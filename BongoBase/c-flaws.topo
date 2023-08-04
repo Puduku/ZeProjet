@@ -85,7 +85,7 @@
 // The problem becomes glaring as soon as one uses "packed" structures to represent any kind of
 // "normalized" data formats used for data exchange (protocol message format, etc.) because we
 // absolutely need to use those non-standard directives to represent these standardized data. In
-// other words, it's like a snake biting its own tail.
+// other words, we are in the situation of a snake biting its own tail.
 
 // Number 7: 'typedef' is a very "poor" type definition... 
 // 'typedef' is rather a simple type aliasing than a type definition. The mechanism is not
@@ -170,7 +170,7 @@
 // set up - and thus modified - during the "initialization" phase... 
 // The natural "solution" seems to be: let's put the 'const' qualifier on the data field ; during
 // "initialization", we just have to cast that field into equivalent "constless" data type... 
-// But, that's the point : 'cast' operations are by essence dangerous dispositions (remember, 
+// But, that's the point : casting operations are by essence dangerous dispositions (remember, 
 // 'cast' operator DISABLES any data type consistency CONTROL of the compiler, and hence potentially
 // transforms simple compilation problem into execution crash) that must be avoided. (*) (**)  
 // So generally, the wiser is simply to abandon the 'const' protection...
@@ -188,7 +188,7 @@
 // the situation...
 // (*) That (grave) problem remains in C++. C++ does provide a mechanism that mimics ADA's
 // exceptions, but that mechanism is actually useless regarding numbers' OVERFLOWS. The problem is
-// that, though the overflow_error is well defined the C++ standard, we still have to raise it
+// that, though the overflow_error is well defined with the C++ standard, we still have to raise it
 // "manually" in the code if we want to handle it as exception. It's just like you have a rutilant
 // car in hands, but there is no engine under the hood - you still have to pedal if you want to
 // move... 
@@ -209,9 +209,9 @@
 // seems so simple and efficient. In specific cases - "early" programs developped in the 70s (as
 // with my videopac toy "computer" from the year 1978), device drivers, etc. - this representation
 // is indeed, by far, the most effective one can imagine...
-// ...Unfortunately, there is a huge DOWNSIDE: this representation simply does NOT allow you to handle
-// ORDINARY PORTIONS of such strings... Now, - what bad luck! -, in applications, MOST strings
-// processings precisely manipulate PORTIONS of strings.
+// ...Unfortunately, there is a huge DOWNSIDE: this representation simply does NOT allow you to
+// handle ORDINARY PORTIONS of such strings... Now, - what bad luck! -, in applications, MOST
+// strings processings precisely manipulate strings PORTIONS.
 
 
 // Moralited:

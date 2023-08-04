@@ -90,7 +90,7 @@
 
 
 // Programming patterns:
-// - modules: "modular design" is an inalienable principle.
+// - "Modular design" : THE (inalienable) principle...
 //   Modules (as designation of "code containers" that are source files) remain the FUNDAMENTAL
 //   conceptual "units" of software development. That "modular design", although "ancestral", is
 /    not obsolete with respect to more recent concepts, such as "class models" developed in
@@ -154,24 +154,25 @@
 //     methods) to figurate those associations between data and code; but ok, let's not worsen the
 //     existing confusion ; hence we stick with "objects and methods" denominations and we just
 //     forget our "hands and fingers"...
-//   + object virtualization. This principle replaces the METHOD virtualization of "classes-based"
+//   + Object virtualization. This principle replaces the METHOD virtualization of "classes-based"
 //     programming languages. Advantages:
 //     . easily implementable in simple C
 //     . NO compilation/execution overhead
 //     . does NOT undermine the encapsulation principle
 //     . more accurate "objects" modelling (NO NEED for hazy "inheritance" principle(s)...)
 //     (Drawbacks: NONE)
-//   + unique instance: also known as "singleton" principle... Emphases that even "global"
+//   + Unique instance: also known as "singleton" principle... Emphases that even "global"
 //     instances (that are unique per process) MUST be formalized as regular instances.
 //     (that is referenced via explicit handle)
 //     This ensures respect of clear (instanciation and) initialization / execution / destruction
 //     cycle.
-//   + pure constructors and destructors. Constructors and destructors are really the two "special" 
-//     methods of our objects; their "focus" is purely (and simply) technical; it's important to 
-//     distinguish them from the other, "functional" methods of our objects. Therefore, from a
-//     functional point of view, these methods never fail. In practice, this means that the
-//     C functions which implement them can only return the unary status "RETURNED"...
-//   + factories: a "factory" instance is dedicated to create "product" instances.
+//   + Pure constructors and destructors. Constructors and destructors are two "special" methods of
+//     our objects; their objective is purely "technical" and must be clearly distinguished from
+//     other "functional" methods.... Therefore, from a functional point of view, such constructors
+//     and destructor may not fail. In practice, this means that the C functions which implement
+//     them always return the unary status "RETURNED"; any "technical" problem would give rise of
+//     an ANOMALY...
+//   + Factories: a "factory" instance is dedicated to create "product" instances.
 //     In most cases, we do not distinguish "factory" with "product" instances as objects; the
 //     instance creation procedure is an ordinary method of the object itself.
 //     The factory paradigm is usefull to make easier arbitrary instance creation internally by
