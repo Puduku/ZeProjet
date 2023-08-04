@@ -172,15 +172,16 @@
 //     and destructor may not fail. In practice, this means that the C functions which implement
 //     them always return the unary status "RETURNED"; any "technical" problem would give rise of
 //     an ANOMALY...
-//   + Factories: a "factory" instance is dedicated to create "product" instances.
+//   + Factories: a "factory" instance is meant to create "product" instances.
 //     In most cases, we do not distinguish "factory" with "product" instances as objects; the
-//     instance creation procedure is an ordinary method of the object itself.
-//     The factory paradigm is usefull to make easier arbitrary instance creation internally by
-//     other instances. That is, the factory mainly provides an "abstraction" of the paramaters
-//     used for the creation of product instances...
+//     "product" instance constructor remains a method of the "product" object. With the factory,
+//     paradidm, the "product" constructor just becomes an "functional" method of the "factory"
+//     object. The factory paradigm is usefull to make easier arbitrary instance creation
+//     internally by other objects. That is, the factory mainly provides an "abstraction" of the
+//     paramaters used for the creation of product instances...
 //     Our strong recommandation is to resort to the factory paradigm only when necessary...
 //
-// - proto-objects: allow to split complex objects into formal objects within one module.
+// - Proto-objects: allow to split complex objects into formal objects within one module.
 //   Let's reason on plain example. Suppose that when designing CO "complex object" within eponymous
 //   module, we identify SO "simple object" as an independent "sub-responsibility" within CO...
 //   + If SO usage can be easily generalized (and resuable by other objets) there is no question ;
@@ -198,12 +199,12 @@
 //       is that formally, we do have encapsulation - the responsibilities of CO and SO are clearly
 //       separated in the code...
 //
-// - data value type vs. data content type TODO : reddiger blabla... le but ici est de compendre que 
+// - Data value type vs. data content type TODO : reddiger blabla... le but ici est de compendre que 
 //   les data types qui nous intedressent (requestes SQL ou autre...) sont avant tout des types de
 //   VALEUR de donnedes - et que un certain type de valeur peut estre matedrialised par une multitude
 //   de types de contenus diffedrents...
 //
-// - green items and collections:
+// - Green items and collections:
 //   The green item is an intermediate concept of compound data between the bare struct-based data
 //   and the encapsulated data (in "object instance") (*)
 //   See also c-ansi/green.topo
