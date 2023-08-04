@@ -15,7 +15,7 @@ The purpose is to allow making clear distinction between
 AND 
 - structure directories 
 
-The tactic consists in proposing a distinctive sign for position directories.
+The tactic consists in defining a distinctive sign for position directories.
 Hence:
 - Structure directories just follows ordinary (tacit) UNIXes file naming convention, that is pure
   lower-case names.

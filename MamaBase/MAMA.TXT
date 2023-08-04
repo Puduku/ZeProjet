@@ -80,7 +80,7 @@ If you need to compile some code of the garden, you can create "hans.sh" exclusi
 $ cp "$MAMA/hans.sh.mod" hans.sh
 If you need to run tests in the garden, you can create "fritz.sh" exclusive script from model :
 $ cp "$MAMA/fritz.sh.mod" fritz.sh
-If you need to maintain code's documentation comments (with coco tool), you can create
+If want to maintain "enclosed" documentation in sources files (with 'coco' tool), you can create
 "der-inspector.sh" exclusive script from model:
 $ cp "$MAMA/der-inspector.sh.mod" der-inspector.sh
 Then edit and adapt your exclusive script(s). The following command shows the environment (bash
@@ -104,6 +104,5 @@ $ cd $BONGO
 $ ./OtherGardens/Garden4/fritz
 etc.
 Hint1: any katzenjammer script recognizes the -h (help display) option.
-Hint2: at any time, you can issue "miss-ross.sh" command to verify 'Mama's  installation ;
-if that command is not recognized, then your 'Mama' installation is not correct; please check
-$MAMA/insall.log file.
+Hint2: at any time, you can issue "miss-ross.sh" command to verify your 'Mama' installation ;
+if that command is not recognized, then your 'Mama' installation is not correct.

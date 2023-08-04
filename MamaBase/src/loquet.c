@@ -122,14 +122,15 @@ static void UsageAndExit (const char *p_argv0) {
     " -r => set Read loquet (shared)\n"
     " -w => set Write loquet (exclusive)\n"
     " -u => unset loquet\n"
-    " -x => break loquet\n"
+    " -x => break loquet (test purpose)\n"
     " <section id> => between [1-%d] (0 for all sections)\n"
     " -t r => non-blocking test mode; real op.\n"
     " -t d => non-blocking test mode; dry run\n"
+    " -p <pid> => specify process with exclusive loquet"
     "Exit status: \n"
     " 0: OK\n"
-    " 1: permanent refusal (loquet file is definitely broken and must be recreated) \n"
-    " 2: temporary refusal (loquet is just locked; try later)\n"
+    " 1: permanent refusal (loquet file is out of order and must be recreated) \n"
+    " 2: temporary refusal (locked; try later)\n"
     " 3: incompatible loquet file (loquet file was created with a different number of sections)\n"
     " 4: loquet file not found (loquet file must be created)\n" 
     " 100: invalid parameter(s); display this help\n"
@@ -324,7 +325,7 @@ int main (int argc, char * const *argv) {
           case ESRCH: // No process or process group can be found...
             m_JASE("Loquet file is locked by dead process (pid %d).",c_pid); 
             n_exitStatus = 1; // "permanent" refusal
-          break; case EPERM: // effective user id does not match the effective user-id... 
+          break; case EPERM: // The calling process does not have permission to send the signal...
           break; default:
             m_PERROR("kill()")
           } // switch
