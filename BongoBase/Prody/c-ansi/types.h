@@ -102,7 +102,7 @@ m_DEFINE_TERNARY_ENUM(ComparisonImage,
 //   + GREATER_THAN__COMPARISON
 //
 // Changed: 
-// - m_difference:
+// - m_difference: trivial difference
 //   + -1: LESS_THAN__COMPARISON
 //   + 0: EQUAL_TO__COMPARISON
 //   + 1: GREATER_THAN__COMPARISON:
