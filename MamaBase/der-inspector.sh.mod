@@ -7,9 +7,9 @@
 # <<GARDEN>>/der-inspector.sh
 . mama.env
 
-#########################################################################
-plot="Valorize 'enclosed' documentation in <<GARDEN>> header files (pick all COde COmments' NUTS...)"
-#########################################################################
+###################################################################################################
+plot="Collect all the coconuts in <<GARDEN>>'s garden (i.e. highlight doc in <<GARDEN>>'s header files)
+###################################################################################################
 
 . der-inspector.env
 

@@ -11,6 +11,7 @@ cleaning=s
 . lena.env
 
 #### "Global" variables:
+
 typeset -r prodyGarden="$(Garden "Prody")"
 typeset -r diggyGarden="${island:?}/Diggy"
 typeset -r diggyGardenLocation=$(Location "$diggyGarden")
@@ -116,6 +117,7 @@ CommandCompileTests () {
 CreekFunctions CommandCompileDiggyPrody CommandCompileTestyUtils CommandCompileTests 
 
 #### Execute plot... 
+
 CommandClean "${cAnsiTestExes[@]}" "${cPosixTestExes[@]}"
 
 MainStage "1. (Re)compile prody, diggy and testy objects and libraries" 

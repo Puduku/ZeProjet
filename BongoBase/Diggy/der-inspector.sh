@@ -2,9 +2,9 @@
 # Diggy/der-inspector.sh
 . mama.env
 
-########################################################################
-plot="Valorize 'enclosed' documentation in Diggy's header files (pick all COde COmments' NUTS...)"
-########################################################################
+##############################################################################################
+plot="Collect all the coconuts in Diggy's garden (i.e. highlight doc in Diggy's header files)"
+##############################################################################################
 
 . der-inspector.env
 

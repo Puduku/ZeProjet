@@ -2,9 +2,9 @@
 # Prody/der-inspector.sh
 . mama.env
 
-#########################################################################
-plot="Valorize 'enclosed' documentation in Prody header files (pick all COde COmments' NUTS...)"
-#########################################################################
+##############################################################################################
+plot="Collect all the coconuts in Prody's garden (i.e. highlight doc in Prody's header files)"
+##############################################################################################
 
 . der-inspector.env
 

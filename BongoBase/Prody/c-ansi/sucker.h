@@ -27,11 +27,6 @@ typedef struct SUCKER *SUCKER_HANDLE ;
 //
 // Passed:
 // - azh_handle: address of sucker handle to initialize
-// - nf_alarmSystemHandle : alarm system used for temporizations (see c-posix/alarm.h)
-//   + NULL special pointer (not provided) ; limited functionality ; no temporization is possible ;
-//     blocking deadlines are de facto indefinite...
-//   + non NULL pointer: actual alarm system ; full temporization support
-// - f_brokenPipeFixHandle: see BrokenPipeFixCreateInstance() in c-posix/rw.h
 // - suckingLimit: limit (in bytes) of data volume that can be sucked (0 for no limit)
 //
 // Changed:
