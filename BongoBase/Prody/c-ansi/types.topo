@@ -1,5 +1,6 @@
 // c-ansi/types.topo, version 1.93
 // (c) Atos-Euronext Belgium - 2001, 2002, 2003
+// (c) Puduku - 2023
 //
 // Purpose: defining very usual data types - or PSEUDO-data types... 
 // =======
@@ -46,15 +47,15 @@
 //   NB: "true procedure" <=> C-function returning "unary" status : a typical "true procedure" returns 
 //   invariable "RETURNED" (unary) status.   
 // - "pure (calculation) function" (also called "true function") <=> C-function returning a "pure value".
-//   Hence, (pure) functions are the "good candidates" to build "synthetic formulas"...
+//   Hence, "synthetic formulas" are made of true/pure functions only...
 // - "false function" <=> C-function returning a status HIDDEN in a value.
 //   A "false function" is actually a "procedure". That is, false function's calls take place in
 //   FLOW CONTROL rather than within "synthetic formulas".
 //   Trivial example: c-function returning positive count (like "number of items in some
 //   stuff") can be hold as a true procedure : the boolean evaluation (count >= 0) is the "hidden"
 //   unary status returned by that "true procedure". 
-//   But, attention: most of c-functions returning a number (like min(x,y) ) are... "true 
-//   functions" (WITHOUT "hidden status") that CANNOT be held as "procedures". 
+//   But, of course, most of c-functions returning a number (like min(x,y) ) are... "true 
+//   functions" (WITHOUT "hidden status") and CANNOT be held as "procedures". 
 // => Beyond the "conceptual" clarification, the clear distinction between "procedures" and "(pure)
 // functions" is needed regarding the techniques we adopted to deal with program's ANOMALIES (see
 // c-ansi/stderr.topo). 

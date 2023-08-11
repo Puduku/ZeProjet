@@ -1,5 +1,6 @@
 // c-ansi/stderr.topo, version 1.93 (ANSI)
 // (c) Atos-Euronext Belgium - 2001, 2002, 2003, 2004
+// (c) Puduku - 2023
 
 
 // We call "Anomaly" any UNEXPECTED problem or condition met during program execution.
@@ -18,7 +19,7 @@
 // The practical technique we chose for tracking anomalies consists in breaking the "normal"
 // CONTROL FLOW and returning (recursively till application's main function) a "sentinel" value 
 // (typically: -1). 
-// Anomaly tracking is perfectly natural with "procedures". 
-// Anomaly tracking is also possible within (pure) functions formulas with small adaptations (see
-// the '_o' indicator in watermark.topo) 
-// Note: in practice, pure (calculation) functions rarely raise anomalies. 
+// The escalation of anomalies takes place very naturally with "procedures".
+// The escalation of anomalies is also possible in the "pure functions" with small adaptations (see
+// the '_o' indicator in watermark.topo).
+// Note that in practice, anomalies are quite rare in "pure functions"...
