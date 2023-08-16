@@ -197,9 +197,11 @@
 // Blotval (if not abandonned):
 // 0 ("true") : 
 //
-// b. IndexRead (<index>,<mainKeyBlotvar>,<itemBlotvar>)
-//    ---------
-// Read the index (sorted by main key, item)
+// b. Read ([ <blotvar> := ] Register(<blotreg name>,<blotvar name>,<strex>)
+//    Read (var := Register(recettes, == "*bolo*")
+//    Read (var := Register(recettes, >= )
+//    ------------
+// Read the register (sorted by main key, item)
 // NOTE: if the index does not exist, it is not considered as an error.
 //
 // Possible abandonment reasons:
