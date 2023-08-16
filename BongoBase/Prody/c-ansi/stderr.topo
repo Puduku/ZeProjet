@@ -19,7 +19,7 @@
 // The practical technique we chose for tracking anomalies consists in breaking the "normal"
 // CONTROL FLOW and returning (recursively till application's main function) a "sentinel" value 
 // (typically: -1). 
-// The escalation of anomalies takes place very naturally with "procedures".
+// That technique of anomalies escalation takes place very easily with "procedures".
 // The escalation of anomalies is also possible in the "pure functions" with small adaptations (see
 // the '_o' indicator in watermark.topo).
-// Note that in practice, anomalies are quite rare in "pure functions"...
+// Notice that, in practice, anomalies are quite rare in "pure functions"...
