@@ -199,7 +199,14 @@
 //
 // b. Read ([ <blotvar> := ] Register(<blotreg name>,<blotvar name>,<strex>)
 //    Read (var := Register(recettes, == "*bolo*")
-//    Read (var := Register(recettes, >= )
+//    Eval (ResetRegister(recettes))
+//    Eval (var := ReadRegister(recettes, == "*bolo*" || >= "c*", ^ ))
+//    ResetRegister(<blotreg name> [ , <request> ])
+//    Eval (recettes?: == "*bolo*" || >= "c*", ^ :?)  
+//    Eval (recettes?:=:?)  
+//    Eval (var := recettes?+) => fetch next one
+//    Eval (var := recettes?=) => read current 
+
 //    ------------
 // Read the register (sorted by main key, item)
 // NOTE: if the index does not exist, it is not considered as an error.
