@@ -8,37 +8,40 @@
 // NOTE: blotex lib provides "script-like programming" capabilites to blot code.
 // Advantage: enhance flexibility of blot code, BUT keep in mind the drawback:
 // scripting features means natural tendency to produce complex (or tricky) code (solely
-// maintenable by programmers), yet the initial (laudable) intention of blot code was to
-// remain fairly legible by non computer experts... 
+// maintenable by programmers), yet the initial (laudable) intention of blot code is to the
+// contrary to remain fairly legible by non computer experts. 
+// So the drawback is a lack of consistency between the two paradigms... 
+// If you want to maintain a bit of consistency in the whole thing, observe the following. 
+// In real world, programming tricks are of course sometimes inevitable... simply don't take 
+// blotex for the panacea; be instead reluctant and thrifty to resorting blotex; limit the
+// pollution in blot code and outline blotex technic to specific cases. 
+// 
 
 
-// Using blotex in blot code
-// =========================
+// How to use blotex in blot code
+// ==============================
+//
+// Blot expressions (blotex) are usable with those blot functions...
 //
 // I. Blot expressions (blotex) 
-// ----------------------------
-//
+
+
 // There two types of blot expressions: 
 // - "string" blotex => "strex" type
 // - "blotval" blotex: signed integer (aka C's "int" type) => "intex" type
 // <blotex> ::= <intex> | <strex> 
 //
-// Blot expressions are made of "atoms" :
-// <intex> ::= <int atom> ( <int 2op> <intex> )*  
-// <strex> ::= <str atom> ( <str 2op> <strex> )*  
+// Blot expressions are made of blot "atoms" :
+// <intex> ::= <intat> [ <intbop> <intex> ]*  
+// <strex> ::= <strat> [ <strbop> <strex> ]*  
 //
-// The atoms are made of constants, variables and "register operations".
-// <int atom> ::= [ <int 1op> ] ( <int constant> | <blotvar> | <blotvar entry> | <blotvar id> |
-//   <int blotreg op> ) 
-// <str atom> ::= <str constant> | <blotvar strex> | <blotvar name> | <str blotreg read op> 
+// Blot atoms are made of constants and variables
+// <intat> ::= [ <intuop> ] ( <constant intex> | <blotvar> | <blotvar entry> | <blotvar id> ) 
+// <strat> ::= <constant strex> | <blotvar strex> | <blotvar name> 
 //
 // Constant expressions
-// <int constant> ::= <decimal int constant> | <hexadecimal int constant> 
-// <decimal int constant> ::= [ '-' ] ( <decimal digit> )+
-// <hexadecimal int constant> ::= ( '0x' | '0X' ) ( <hexadecimal digit> )+
-// <str constant> ::= '"' ( <single char> )* '"'
-// String example: "Julie" 
-// Integer example: 69 
+// <constant intex> : following C conventions ; examples  69 -69 0x69
+// <constant strex> : following C conventions ; ex. "Julie" 
 // Reminder: blotval's convention : 
 // - 0 : represents "true" boolean value
 // - !=0 : represents "false" boolean value
@@ -82,50 +85,44 @@
 // recettes.bolo!# => index (entry) of "bolo" blotvar in "recettes" register
 // .toto!# => index (entry) of "toto" global blotvar 
 //
-// Register operations 
-// <int blotreg op> ::= <blotreg name> '?' <int blotreg op details>  
-// <int blotreg op details> ::= <blotreg init> | <blotreg reset> | <blotreg fetch> |
-//   <blotreg read int> 
-// <str blotreg read op> ::= <blotreg name> '?=$'  
-// <blotreg init> ::= ':' <blot request> ':?'
-// <blotreg reset> ::= '^'
-// <blotreg fetch> ::= '+'
-// <blotreg read int> ::= '='
-//
 // Operators 
 // operators allows to combine expressions together 
-// <int 1op> ::= '!' 
-// <int 2op> ::= '+' | '-' | '*' | '/' | '&&' | '!!'
+// <intuop> ::= '+' | '-' | '!' 
+// <intbop> ::= '+' | '-' | '*' | '/' | '&&' | '!!'
 // Logical operators ('!', '&&' and '!!') combine integer expressions together, "seen" as booleans.
-// <str 2op> ::= '+' 
+// <strbop> ::= '+' 
 // ('+' operator applied on strings is a concatenation)
 // 
+// Blotex functions
+// <
+// blotex (built-in) functions (not to be confused with blotexlib's functions (see below) allow to 
+// build and calculate complex blotex expressions.
+// -STRCHR(<strex>,<oneCharStrex)) is strex type function
 //
-// II. "blotex" library's functions (those to be placed in blot code)
-// --------------------------------
 //
-// Eval ([ <blotvar> := ] <intex>)
-// Eval ([ <blotvar strex> := ] <strex>)
-// ---- 
+// II. Available "blotex lib" functions (those to be placed in blot code)
 //
-// Evaluate the blotex and eventually assign the result into a blotvar.
+// 1. Blot expressions and variables
+//
+// a.  Eval ([ <blotvar> := ] <intex>)
+//     Eval ([ <blotvar strex> := ] <strex>)
+//     ---- 
+// Evaluate the blotex and eventually assign the result into a blotvar
 //
 // Passed:
 // - blotvar: variable name (if passed)
-//   If the blotvar was not existing, it is automatically allocated by the function
-// - intex: blotex integer expression
-// - strex: blotex string expression
+//   + If the blotvar was not existing, it is automatically allocated by the function (with the
+//     ad hoc type)
+//   + If the blotvar was existing, the blotex type must correspond to that of the blotvar (type
+//     error)
+// - blotex: blot expression
 //
 // Possible abandonment reasons:
-// - assignement error:
-//   + mismatch between blotvar and blotex types
-// - blotex evaluation error:
-//   + syntax error / type error in blotex
-//   + (syntax error) problem in arguments passed to be blot function 
-//   + (type error) type mismatch between blotvar and blotex arguments of be blot function 
-//   + unknown blotvar / blotex function in blotex expression 
-//   + value error in blotex expression
-//   + overflow error : 
+// - syntax error / type error in blotex
+// - (syntax error) problem in arguments passed to be blot function 
+// - (type error) type mismatch between blotvar and blotex arguments of be blot function 
+// - unknown blotvar / blotex function in blotex expression 
+// - value error in blotex expression
 //
 // Blotval:
 // - blotex is a strex => always 0 ("true" blotval)
@@ -133,60 +130,95 @@
 //
 // Surrogate: None 
 //
-// Examples:
-//   Eval (recettes?: == "*bolo*" || >= "c*", ^ :?)  
-//   Eval (recettes?^) => single reset 
-//   Eval (recettes?+) => fetch next one
-//   Eval (var := recettes?=) => read current int value 
-//   Eval (var$ := recettes?=$) => read current str value 
-//
-//
-// OutputF (<format> <blotex> ) 
-// -------
-//
-// Replace blot with content, following format
-//
-// Passed:
-// - format
-//   <format> ::= '%' [ <modifiers> ] ( <alla c specifier> | <binary specifier> )
-//   <alla c specifier> ::= ( 'd' | 's' | 'x' | 'X' ) 
-//   <binary specifier> ::= ( 'LE' | 'BE' )
-//     Binary specifier : output intex in raw binary
-//     + 'LE' : little endian (Intel) order 
-//     + 'BE' : big endian (Internet) order 
-//     (see examples below) 
-//     Reminder: intex type handles signed values (2 complement)
-// - blotex: 
-//   strex for 's' specifier 
-//   intex otherwise 
+// b. Output (<blotex>)
+//    ------
+// Replace blot code with blotex content
+// - strex type: verbatim content
+// - int4ex type: displayed in decimal 
 //
 // Possible abandonment reasons:
-// - formatting error:
-//   + wrong format 
-//   + truncation error: 
-// - blotex evaluation error:
-//   + syntax error / type error in blotex
-//   + (syntax error) problem in arguments passed to be blot function 
-//   + (type error) type mismatch between blotvar and blotex arguments of be blot function 
-//   + unknown blotvar / blotex function in blotex expression 
-//   + value error in blotex expression
-//   + overflow error : 
+// - (syntax error) problem in arguments passed to be blot function 
+// - unknown blotvar 
 //
 // Blotval (if not abandonned):
-// 0 ("true") 
+// 0 ("true") :  
 //
-// Surrogate: output content as specified in parameters... 
+// c. OutputLittleEndian (<int4ex>)
+//    ------------------
+//    OutputBigEndian (<int4e>)
+//    ---------------
+// Replace blot code with binary content corresponding to int4ex, following little endian (resp.
+// big endian) convention 
+// Note:
+// - little endian (less significant byte at lowest address) is compliant with X86 (Intel) hardware 
+// - big endian (most significant byte at lowest address) is compliant with historical UNIX
+//   hardware (Motorola 68000, Sun SPARC); big endian corresponds to the (Internet) network byte
+//   order. 
+// Reminder: int4ex type handles signed values (2 complement)
 //
-// Examples:
-//   OutputF (%d, var) 
-//   OutputF (%03d, var) 
-//   OutputF (%04X, var) 
-//   OutputF (%4LE, var) => little endian, four bytes 
-//    little endian (less significant byte at lowest address) is compliant with X86 (Intel) hardware 
-//   OutputF (%8BE, var) => big endian (network order), four bytes 
-//    big endian (most significant byte at lowest address) is compliant with historical UNIX
-//    hardware (Motorola 68000, Sun SPARC); big endian corresponds to the (Internet) network byte
-//    order. 
-//   OutputF (%s, var$) 
-//   OutputF (%.10s, var$) 
-
+// Possible abandonment reasons:
+// - (syntax error) problem in arguments passed to be blot function 
+// - (type error) passed blotex is not an int4ex
+// - unknown blotvar 
+//
+// Blotval (if not abandonned):
+// 0 ("true") :  
+//
+// 3. Registers management
+//
+// a. BlotregAdd (<blotreg name>,<mainKeyBlotex>,<itemBlotex>)
+//    --------
+// Add an element into an index
+//
+// Passed:
+// - index:
+//   + If the index was not existing, it is automatically created by the function 
+//   + If the index was existing, the main key and item type must correspond to that of the index 
+// - mainKeyBlotEx: the sorting key: may be 
+//   + strex 
+//   + int4ex: 
+// - itemBlotex: the value corresponding to main key; may be:
+//   + strex 
+//   + int4ex: 
+//   in simpler cases, you use main key as the identifier of your item, yet the item itself is
+//   considered as the second part of key, meaning that
+//   you may attribute two (distinct) items to the same main key  
+//   ##<< Add2Index(myIndex,"TOTO",1) >>
+//   ##<< Add2Index(myIndex,"TOTO",2) >>
+//
+// Possible abandonment reasons:
+// - syntax error / type error in main key or item blotex
+// - (type error) main key or item type is not compatible with index 
+// - (syntax error) problem in arguments passed to be blot function 
+// - unknown blotvar / blotex function in main key or item blotex 
+// - value error in main key or item blotex
+// - such (main key / item) entry yet exists in index
+//
+// Blotval (if not abandonned):
+// 0 ("true") : 
+//
+// b. IndexRead (<index>,<mainKeyBlotvar>,<itemBlotvar>)
+//    ---------
+// Read the index (sorted by main key, item)
+// NOTE: if the index does not exist, it is not considered as an error.
+//
+// Possible abandonment reasons:
+// - (syntax error) problem in arguments passed to be blot function 
+// - (type error) incompatible main key or item blotvar type with index
+//
+// Blot value (if not abandonned):
+// - 0 ("true"): OK, main key and item blotvars updated with next index entry 
+// - 1 ("false"): index does not exist OR
+//   no more entry in index (main key and item blotvars not updated)
+//
+// c. RegisterReset (<blotreg name>)
+//    -------------
+// Reset the register's index to first entry
+// (do not remove the blotvars of the register)
+// NOTE: if the register does not exist, it is not considered as an error.
+//
+// Possible abandonment reasons:
+// - (syntax error) problem in arguments passed to be blot function 
+//
+// Blotval (if not abandonned):
+// 0 ("true") : 
