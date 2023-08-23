@@ -23,39 +23,59 @@ struct BLOTEXLIB_EXECUTOR_FACTORY {
  
 // Public function; see .h
 int BlotexlibExecutorFactoryCreateInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE *azh_handle) {
+  m_DIGGY_BOLLARD()
   m_MALLOC_INSTANCE(*azh_handle)
   m_ASSIGN_MAGIC_FIELD(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE,*azh_handle)
   m_DIGGY_RETURN(RETURNED)
 } // BlotexlibExecutorFactoryCreateInstance
 
+struct BLOTEXLIB_EXECUTOR {
+  m_DECLARE_MAGIC_FIELD(BLOTEXLIB_EXECUTOR_HANDLE)
+} ;  
+typedef struct BLOTEXLIB_EXECUTOR *BLOTEXLIB_EXECUTOR_HANDLE;
 
 // #SEE BLOTLIB_EXECUTOR_FACTORY__CREATE_PRODUCT_INSTANCE_FUNCTION <blotex>
+// Public function; see .h
 int BlotexlibExecutorFactoryCreateProductInstance(void *pr_handle,
   void **azhr_blotlibExecutorHandle) {
+  m_DIGGY_BOLLARD()
   BLOTEXLIB_EXECUTOR_FACTORY_HANDLE p_handle = (BLOTEXLIB_EXECUTOR_FACTORY_HANDLE)pr_handle;
-  m_CHECK_MAGIC_FIELD(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE,*azh_handle)
+  m_CHECK_MAGIC_FIELD(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE,p_handle)
+
+  m_MALLOC_INSTANCE(*(BLOTEXLIB_EXECUTOR_HANDLE*)azhr_blotlibExecutorHandle) {
+  m_ASSIGN_MAGIC_FIELD(BLOTEXLIB_EXECUTOR_HANDLE,
+    *(BLOTEXLIB_EXECUTOR_HANDLE*)azhr_blotlibExecutorHandle)
+  m_DIGGY_RETURN(RETURNED)
 } // BlotexlibExecutorFactoryCreateProductInstance
   
 
-
-
 // #SEE BLOTLIB_EXECUTOR__EXECUTE_C_FUNCTION <blotex>
+// Public function; see .h
 int BlotexlibExecutorExecuteCFunction(void *r_handle, const struct BLOTFUNC *ap_blotfunc,
-  G_STRING_STUFF c_surrogate, gen_BLOTVAL *ac_blotval, G_STRING_STUFF nc_abandonmentInfo) ;
+  G_STRING_STUFF c_surrogate, gen_BLOTVAL *ac_blotval, G_STRING_STUFF nc_abandonmentInfo) {
+  m_DIGGY_BOLLARD()
+  BLOTEXLIB_EXECUTOR_HANDLE handle = (BLOTEXLIB_EXECUTOR_HANDLE)r_handle;
+  m_CHECK_MAGIC_VALUE(BLOTEXLIB_EXECUTOR_HANDLE,handle)
+  int answer = ANSWER__YES; // a priori
+  *ac_blotval = TRUE__BLOTVAL0; // a priori
+  m_DIGGY_RETURN(answer)
+} // BlotexlibExecutorExecuteCFunction
 
 // #SEE BLOTLIB_EXECUTOR__DESTROY_INSTANCE_FUNCTION <blotex>
-int BlotexlibExecutorDestroyInstance (void *xhr_handle) ;
+// Public function; see .h
+int BlotexlibExecutorDestroyInstance (void *xhr_handle) {
+  m_DIGGY_BOLLARD()
+  BLOTEXLIB_EXECUTOR_HANDLE xh_handle = (BLOTEXLIB_EXECUTOR_HANDLE)xhr_handle;
+  m_CHECK_MAGIC_VALUE(BLOTEXLIB_EXECUTOR_HANDLE,xh_handle)
+  free(xh_handle);
+  m_DIGGY_RETURN(RETURNED)
+} // BlotexlibExecutorDestroyInstance
 
-
-// Destroy blotex library executor factory
-//
-// Passed:
-// - xh_handle: 
-//
-// Returned:
-// - RETURNED: OK, destroyed 
-// - -1: unexpected problem ; anomaly is raised
-int BlotexlibExecutorFactoryDestroyInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE xh_handle) ;
+int BlotexlibExecutorFactoryDestroyInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE xh_handle) {
+  m_DIGGY_BOLLARD()
+  free(xh_handle);
+  m_DIGGY_RETURN(RETURNED)
+} // BlotexlibExecutorFactoryDestroyInstance
 
 
 // Interface with other blotlibs

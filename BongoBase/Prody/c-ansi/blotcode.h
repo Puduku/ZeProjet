@@ -37,8 +37,8 @@ typedef struct BLOTCODE *BLOTCODE_HANDLE;
 int BlotcodeCreateInstance(BLOTCODE_HANDLE *azh_handle); 
 
 
-// #REF BLOTLIB_EXECUTOR_FACTORY__CREATE_PRODUCT_INSTANCE_FUNCTION
-// BLOT library executor constructor (virtual function)
+// #REF BLOTLIB_EXECUTOR_FACTORY__CREATE_PRODUCT_INSTANCE_FUNCTION <blotlib>
+//  <blotlib> library executor constructor (virtual function)
 // 
 // 
 // Passed:
@@ -72,7 +72,7 @@ struct BLOTFUNC {
 } ;
 
 
-typedef int32_t gen_BLOTVAL; 
+typedef gen_INT gen_BLOTVAL; 
 
 
 #define  TRUE__BLOTVAL0 0
@@ -82,7 +82,8 @@ typedef int32_t gen_BLOTVAL;
 #define   BREAK_LOOP__BLOTVAL  FALSE__BLOTVAL
 
 
-// #REF BLOTLIB_EXECUTOR__EXECUTE_C_FUNCTION - C function implementing the blot function.
+// #REF BLOTLIB_EXECUTOR__EXECUTE_C_FUNCTION <blotlib>
+// C function implementing the <blotlib> function.
 //
 // Passed:
 // - r_handle:
