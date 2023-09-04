@@ -166,8 +166,8 @@
 // (s)he has to do a TRADE OFF...
 // Such "Conelian choices" arise with record data fields, because the need for 'const' protection is
 // context-dependent. Suppose, for example, we want to protect the "name" data field (of some data
-// structure from inopportune modifications... Yet, that "name" data field needs first to be set-up
-// - and thus modified - during some "initialization" phase... 
+// structure) from inopportune modifications... Yet, that "name" data field needs first to be set-up
+// - and thus modified - during an "initialization" phase... 
 // The natural "solution" seems to be: let's set the 'const' qualifier on the data field ; during
 // the "initialization", we "just have" to cast the field with SUPPOSED equivalent "constless" data
 // type... (*) 
@@ -175,7 +175,7 @@
 // 'cast' operator DISABLES any data type consistency CONTROLS made by the compiler, and by the
 // way transform simple compilation problems into application crashes that must, of course, be
 // avoided).  
-// So, 'const' does provides effective protection against invalid data changes, which is a special
+// So, 'const' does provides effective protection against invalid data changes, which is a specific
 // form of data corruption, but the price to pay for this protection is a real risk of causing
 // application crashes, which are "generalized" forms of data corruption... (**)
 // So, in such circumstances, the wisest course is to simply forego the "protection" offered by
@@ -183,7 +183,7 @@
 // Morality : 'const' qualifier may be useful, but is FAR to be the Panacea.
 // (*) Ideally, C would propose an "intelligent" casting operator that would just remove the
 // 'constancy' constraint (for one time, C++ marks a real point over C :p)...
-// (*) As illustration of the idiom "Being between Scylla and Charybdis".
+// (**) As illustration of the idiom "Being between Scylla and Charybdis".
 
 // Number 2: Silent overflows. There is NO bullet-proof means in C to detect basic integer 
 // overflows !... (*)
