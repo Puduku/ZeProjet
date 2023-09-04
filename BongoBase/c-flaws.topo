@@ -182,7 +182,7 @@
 // "const"..
 // Morality : 'const' qualifier may be useful, but is FAR to be the Panacea.
 // (*) Ideally, C would propose an "intelligent" casting operator that would just remove the
-// 'constancy' constraint (for one time, C++ marks a real point over C :p)...
+// 'constness' constraint (for one time, C++ marks a real point over C :p)...
 // (**) As illustration of the idiom "Being between Scylla and Charybdis".
 
 // Number 2: Silent overflows. There is NO bullet-proof means in C to detect basic integer 
