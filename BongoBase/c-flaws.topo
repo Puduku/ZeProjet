@@ -157,7 +157,7 @@
 // Morality: we really miss true "generic data type" (other that 'void*' ersatz) in C.
 
 // Number 3:
-// 'const' type qualifier may make code more... fragile! (in fact, it's 'cast' operator's fault)
+// 'const' type qualifier may make code more... fragile! (in fact, it's casting operator's fault)
 // 'const' type qualifier's intention is of course to make the code more robust. In many cases,
 // 'const' is indeed an improvement. An obvious example is the protection against modifications of
 // char strings parameters passed to functions. (e.g char *strcpy(char *dest, char *src); => 
@@ -165,19 +165,25 @@
 // In some cases, however, the advantage is less evident... Actually, programmer must be AWARE that
 // (s)he has to do a TRADE OFF...
 // Such "Conelian choices" arise with record data fields, because the need for 'const' protection is
-// context-dependent. For example, suppose that some "name" data field (of some data structure) must
-// be protected from inopportune modifications... Yet, that "name" data field needs first to be
-// set up - and thus modified - during the "initialization" phase... 
-// The natural "solution" seems to be: let's put the 'const' qualifier on the data field ; during
-// "initialization", we just have to cast that field into equivalent "constless" data type... 
-// But, that's the point : casting operations are by essence dangerous dispositions (remember, 
-// 'cast' operator DISABLES any data type consistency CONTROL of the compiler, and hence potentially
-// transforms simple compilation problem into execution crash) that must be avoided. (*) (**)  
-// So usually the wisest thing is to simply forgo the 'const' protection...
-// Morality : 'const' may be useful, but is FAR to be the Panacea.
-// (*) This is a perfect illustration of the idiom "Being between Scylla and Charybdis".
-// (**) Ideally, C would propose an "intelligent" casting operator that would just remove the
+// context-dependent. Suppose, for example, we want to protect the "name" data field (of some data
+// structure from inopportune modifications... Yet, that "name" data field needs first to be set-up
+// - and thus modified - during some "initialization" phase... 
+// The natural "solution" seems to be: let's set the 'const' qualifier on the data field ; during
+// the "initialization", we "just have" to cast the field with SUPPOSED equivalent "constless" data
+// type... (*) 
+// But, that's the point : casting operations are by essence dangerous dispositions (remember,
+// 'cast' operator DISABLES any data type consistency CONTROLS made by the compiler, and by the
+// way transform simple compilation problems into application crashes that must, of course, be
+// avoided).  
+// So, 'const' does provides effective protection against invalid data changes, which is a special
+// form of data corruption, but the price to pay for this protection is a real risk of causing
+// application crashes, which are "generalized" forms of data corruption... (**)
+// So, in such circumstances, the wisest course is to simply forego the "protection" offered by
+// "const"..
+// Morality : 'const' qualifier may be useful, but is FAR to be the Panacea.
+// (*) Ideally, C would propose an "intelligent" casting operator that would just remove the
 // 'constancy' constraint (for one time, C++ marks a real point over C :p)...
+// (*) As illustration of the idiom "Being between Scylla and Charybdis".
 
 // Number 2: Silent overflows. There is NO bullet-proof means in C to detect basic integer 
 // overflows !... (*)
