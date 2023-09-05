@@ -236,9 +236,9 @@ int BlotcodeCreateInstance (BLOTCODE_HANDLE *azh_handle) {
 
   m_TRACK_IF(G_STRINGS_CREATE_INSTANCE(&handle->h_blotkeywsHandle, BLOTKEYW_IDS_NUMBER) != RETURNED)
   m_ASSERT(G_STRINGS_ADD_INDEX(handle->h_blotkeywsHandle, STRING_PORTION__G_KEYS_COMPARISON, NULL,
-    NULL, (STRING_PORTION_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED)
+    NULL, (STRING_PORTION_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED)
     == INDEX_LABEL0)
-  m_G_STRINGS_IMPORT_TOKENS(handle->h_blotkeywsHandle, p_blotkeywsTokenDefinitions,
+  m_G_TOKENS_IMPORT(handle->h_blotkeywsHandle, p_blotkeywsTokenDefinitions,
     BLOTKEYW_IDS_NUMBER)
   m_ASSERT(GStringsFreeze(handle->h_blotkeywsHandle, NULL) >= BLOTKEYW_IDS_NUMBER)
 
@@ -278,7 +278,7 @@ static int BlotcodeFindBlotkeyw (BLOTCODE_HANDLE p_handle,
     &gKey); 
   switch(result) { 
   case RESULT__FOUND:
-    *ac_blotkeywId = t_blotkeywStuff->tokenId ;
+    *ac_blotkeywId = t_blotkeywStuff->acolyt.cen_value ;
   break; case RESULT__NOT_FOUND:
   break; default: 
     m_TRACK()
@@ -1070,11 +1070,10 @@ int BlotcodeExecutorConstructPage (BLOTCODE_EXECUTOR_HANDLE handle,
     break; default: 
       m_RAISE(ANOMALY__VALUE__FMT_D, blotinstPtr->blotkeywId)
     } // switch 
-  } // while 
+  } // for 
   if (n_blotcodeConstructionStatus == -1) {
     n_blotcodeConstructionStatus = BLOTCODE_CONSTRUCTION_STATUS__OK; 
   } // if
-
   m_DIGGY_RETURN(n_blotcodeConstructionStatus)
 } // BlotcodeExecutorConstructPage
 

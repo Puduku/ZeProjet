@@ -30,7 +30,11 @@ struct G_STRING { // #REF struct-G_STRING
   struct STRING_PORTION cv_stringPortion; // g-string's "logical" string portion 
     // -when g-string is "copied" (nhi_string != NULL) : corresponds to g-string "physical" value
     // -when g-string is not "copied" (nhi_string == NULL) : pure "logical" string portion 
-  int tokenId; // Default value: 0 
+  union { // according to g-string's conveyance:
+    int c_tokenId; // 'token' : its id ; default value is 0
+    GENERIC_INTEGER cen_value; // 'valued string' : its acolyt value ; default value is 0
+    void *cnhr_handle; // 'named object' : its head handle ; NULL means no head handle 
+  } acolyt; 
 } ;
 // NOTICE: In initial ("zeroified") state, a g-string is "logically" an empty string... 
 
@@ -38,7 +42,7 @@ struct G_STRING { // #REF struct-G_STRING
 typedef struct G_STRING *G_STRING_STUFF;
 
 
-// Get g-string's "logical" value. 
+// Get g-string's "logical" string. 
 static inline struct STRING_PORTION m_GStringGetLogicalStringPortion(G_STRING_STUFF stuff) {
   return stuff->cv_stringPortion; 
 } // m_GStringGetLogicalStringPortion 
@@ -48,7 +52,7 @@ static inline struct STRING_PORTION m_GStringGetLogicalStringPortion(G_STRING_ST
 // Note1: (*) mark useful values for  neutral operation  - i.e do not alter "destination" g-string; 
 // unless of course "destination" was "disengaged" (nhi_string == NULL) ; in such case, an empty
 // string is copied in destination. 
-// Note2: the token id is NOT updated.
+// Note2: the acolyt is NOT changed.
 //
 // Passed:
 // - stuff : "destination" g-string
@@ -76,7 +80,7 @@ static inline int m_GStringCCopy(G_STRING_STUFF stuff, int n_offset, const char*
 } // m_GStringCCopy
 
 // Copy (or concatenate...) a g-string into a "g-string"
-// Note1: the token id is NOT copied
+// Note1: the acolyt is NOT copied
 // See GStringCopy() above
 static inline int m_GStringGCopy(G_STRING_STUFF stuff, int n_offset, G_STRING_STUFF p_gStringStuff) {
   m_DIGGY_BOLLARD()
@@ -84,25 +88,14 @@ static inline int m_GStringGCopy(G_STRING_STUFF stuff, int n_offset, G_STRING_ST
   m_DIGGY_RETURN(GStringCopy(stuff,n_offset,&stringPortion))
 } // m_GStringGCopy
 
-// Clone a g-string. 
-// Note: the token id is copied.
-// See GStringCopy() above
-static inline int m_GStringClone(G_STRING_STUFF stuff,  G_STRING_STUFF p_gStringStuff) {
-  m_DIGGY_BOLLARD()
-  struct STRING_PORTION stringPortion = m_GStringGetLogicalStringPortion(p_gStringStuff);
-  stuff->tokenId = p_gStringStuff->tokenId;
-  m_DIGGY_RETURN(GStringCopy(stuff,0,&stringPortion))
-} // m_GStringClone
 
-
-// Import "logically" a string portion in a g-string ; the string portion is not physically copied
-// if g-string is purely "logical". 
+// Import "logically" a string portion in a g-string ; the string portion is not physically
+// copied if g-string is purely "logical". 
 // copy.
 // TODO: edviter appel ag vraie fonction si la g-string est "purement logique"...
 // 
 // Passed:
 // - stuff:
-// - tokenId:
 // - afp_stringPortion:
 // 
 // Changed:
@@ -113,14 +106,14 @@ static inline int m_GStringClone(G_STRING_STUFF stuff,  G_STRING_STUFF p_gString
 // - COMPLETED__BUT: imported, but "physical" copy was needed ; if it's not normal, don't
 //   hesitate to raise ANOMALY__NON_PURE_LOGICAL_G_STRING ...
 // - -1: unexpected problem
-int GStringImport(G_STRING_STUFF stuff, int tokenId, const struct STRING_PORTION *afp_stringPortion);
+int GStringImport(G_STRING_STUFF stuff, const struct STRING_PORTION *afp_stringPortion);
 
-// Import a '\0'-terminated C string g into a "g-string"
+// Import a '\0'-terminated C string g into a "g-string" token
 // See GStringImport() above
-static inline int m_GStringCImport(G_STRING_STUFF stuff, int tokenId, const char* fp_cString) {
+static inline int m_GStringCImport(G_STRING_STUFF stuff, const char* fp_cString) {
   m_DIGGY_BOLLARD()
   m_ASSIGN_LOCAL_C_STRING_PORTION(stringPortion, fp_cString)
-  m_DIGGY_RETURN(GStringImport(stuff, tokenId, &stringPortion))
+  m_DIGGY_RETURN(GStringImport(stuff, &stringPortion))
 } // m_GStringCImport
 
 // See GStringImport() / m_GStringCImport() above...
@@ -171,10 +164,14 @@ int GStringConvert(G_STRING_STUFF stuff,  IS_CHAR_FUNCTION n_isNeutralCharFuncti
 // - stuff : "destination" g-string
 //
 // Modified:
-// - stuff: "logically" empty string with "anonymous" token id  
+// - stuff: "logically" empty string with "initial" acolyt
 #define m_G_STRING_CLEAR(/*G_STRING_STUFF*/stuff) {\
-  m_TRACK_IF(m_GStringCImport(stuff,ANONYMOUS_TOKEN_ID0,GOOD_OLD_EMPTY_C_STRING) < 0)\
-}  
+  m_TRACK_IF(m_GStringCImport(stuff,GOOD_OLD_EMPTY_C_STRING) < 0)\
+  memset(&(stuff)->acolyt,0,sizeof((stuff)->acolyt));\
+}
+  
+
+
 
 // "g-string set"
 // --------------
@@ -209,22 +206,23 @@ GStringSetCreateInstance(azh_stuff,1)
 
 // #REF GStringSetDestroyInstance <g-string set>
 // (Disengage and) free <g-string set> instance...
+// ATTENTION: this function is NOT SUITABLE for g-strings conveyed as 'named objects'.
 //
 // Passed:
-// - xh_stuff:  
+// - xh_notNamedObjectStuff: 
 // - cardinality: see GStringSetCreateInstance() 
 //
 // Modifed ;
-// - xh_stuff: this stuff is no more valid 
+// - xh_notNamedObjectStuff: this stuff is no more valid 
 // 
 // Returned
 // - RETURNED
 // - -1: unexpected problem ; anomaly is raised
-int GStringSetDestroyInstance(G_STRING_SET_STUFF xh_stuff,  int cardinality);
+int GStringSetDestroyInstance(G_STRING_SET_STUFF xh_notNamedObjectStuff,  int cardinality);
 
 // #SEE GStringSetDestroyInstance <g-string>
-#define /*int*/ G_STRING_DESTROY_INSTANCE(/*G_STRING_STUFF*/ xh_stuff) \
-GStringSetDestroyInstance(xh_stuff,1)
+#define /*int*/ G_STRING_DESTROY_INSTANCE(/*G_STRING_STUFF*/ xh_notNamedObjectStuff) \
+GStringSetDestroyInstance(xh_notNamedObjectStuff,1)
 
 
 #define G_PARAM_NAME_ELEMENT    0
@@ -238,6 +236,14 @@ GStringSetDestroyInstance(xh_stuff,1)
 struct G_STRINGS ; // Private structure !
 typedef struct G_STRINGS * G_STRINGS_HANDLE; // Public handle
 
+// #REF enum-G_STRING_CONVEYANCE
+enum { //
+          TOKEN__G_STRING_CONVEYANCE, // acolyt is token id
+  VALUED_STRING__G_STRING_CONVEYANCE, // acolyt is value
+   NAMED_OBJECT__G_STRING_CONVEYANCE, // acolyt is object handle
+} ;
+
+typedef int (*NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION) (void *rx_handle) ;
 
 // #REF GStringsCreateInstance <g-string set>
 // Creation and initialization of a "<g-string set> collection".
@@ -247,6 +253,9 @@ typedef struct G_STRINGS * G_STRINGS_HANDLE; // Public handle
 // - expectedItemsNumber:
 //   #SEE GreenCollectionCreateInstance-expectedItemsNumber@c-ansi/green.h <<g-string set>>
 // - gStringSetCardinality: number of elements in a set (>0 ; 0 value is taken for a BUG) #SKIP
+// - gStringConveyance: #see enum-G_STRING_CONVEYANCE 
+//   TODO: conveyance per g-string set ELEMENT..
+// - c_namedObjectDestroyInstanceFunction: only significant with NAMED_OBJECT__G_STRING_CONVEYANCE
 // 
 // Modified:
 // - *azh_handle:
@@ -255,12 +264,22 @@ typedef struct G_STRINGS * G_STRINGS_HANDLE; // Public handle
 // - RETURNED: Ok, <g-string set> collection is instancied
 // - -1: unexpected problem; anomaly is raised 
 int GStringsCreateInstance(G_STRINGS_HANDLE* azh_handle,  int expectedItemsNumber,
-  int gStringSetCardinality);
+  int gStringSetCardinality, int gStringConveyance,
+  NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION c_namedObjectDestroyInstanceFunction);
 
+// #REF G_STRINGS_CREATE_INSTANCE <g-string>
 // #SEE GStringsCreateInstance <g-string>
+// Note: TOKEN__G_STRING_CONVEYANCE => token id acolyt 
 #define /*int*/ G_STRINGS_CREATE_INSTANCE(/*G_STRINGS_HANDLE*/ azh_handle,\
-  /*int*/ expectedItemsNumber) \
-GStringsCreateInstance(azh_handle,  expectedItemsNumber,1)
+  /*int*/ expectedItemsNumber)  GStringsCreateInstance(azh_handle, expectedItemsNumber,1,\
+  TOKEN__G_STRING_CONVEYANCE, (NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION)UNDEFINED)
+
+// #REF NAMED_OBJECTS_CREATE_INSTANCE <g-string>
+// #SEE GStringsCreateInstance <g-string>
+// Note: TOKEN__G_STRING_CONVEYANCE => token id acolyt 
+#define /*int*/ NAMED_OBJECTS_CREATE_INSTANCE(/*G_STRINGS_HANDLE*/ azh_handle,\
+  /*int*/ expectedItemsNumber)  GStringsCreateInstance(azh_handle, expectedItemsNumber,1,\
+  NAMED_OBJECT__G_STRING_CONVEYANCE, (NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION)UNDEFINED)
 
 
 // #REF GStringsFetch <gStringSet> 
@@ -274,9 +293,11 @@ int GStringsGetCount (G_STRINGS_HANDLE cp_handle,  G_STRING_SET_STUFF *navnt_gSt
 
 
 enum { // #REF enum-G_KEYS_COMPARISON 
- STRING_PORTION__G_KEYS_COMPARISON, //
-       TOKEN_ID__G_KEYS_COMPARISON, //
-          VALUE__G_KEYS_COMPARISON, //
+  STRING_PORTION__G_KEYS_COMPARISON, //
+ INTRINSIC_VALUE__G_KEYS_COMPARISON, //
+ ACOLYT_TOKEN_ID__G_KEYS_COMPARISON, // mutually exclusive with other ACOLYT_*__G_KEYS_COMPARISON 
+    ACOLYT_VALUE__G_KEYS_COMPARISON, // mutually exclusive with other ACOLYT_*__G_KEYS_COMPARISON
+   ACOLYT_HANDLE__G_KEYS_COMPARISON, // mutually exclusive with other ACOLYT_*__G_KEYS_COMPARISON
 } ;
 
 
@@ -286,8 +307,8 @@ enum { // #REF enum-G_KEYS_COMPARISON
 // - ap_stringPortion: 
 // 
 // Ret:
-// Value corresponding to string portion
-typedef long int (*STRING_PORTION_VALUE_FUNCTION) (void *r_handle,
+// (Intrinsic) value corresponding to string portion
+typedef GENERIC_INTEGER (*STRING_PORTION_INTRINSIC_VALUE_FUNCTION) (void *r_handle,
   const struct STRING_PORTION *ap_stringPortion);
 
 
@@ -298,37 +319,43 @@ typedef long int (*STRING_PORTION_VALUE_FUNCTION) (void *r_handle,
 // - key1GStringSetElement: between [0 ; <g-string set cardinality>[ ; the g-string set's
 //   element serving as first key of the index
 // - key1GKeysComparison: #see enum-G_KEYS_COMPARISON
+//   ACOLYT_TOKEN_ID__G_KEYS_COMPARISON : only possible with TOKEN__G_STRING_CONVEYANCE
+//   ACOLYT_VALUE__G_KEYS_COMPARISON : only possible with VALUED_STRING__G_STRING_CONVEYANCE
+//   ACOLYT_HANDLE__G_KEYS_COMPARISON : only possible with NAMED_OBJECT__G_STRING_CONVEYANCE
+//   
 // - cn_key1IsNeutralCharFunction: only significant with STRING_PORTION__G_KEYS_COMPARISON 
 //   + NULL: DO NOT eliminate neutral chars before comparison 
 //   + non NULL: eliminate neutral chars before comparison 
 // - cn_key1ToCharFunction: only significant with STRING_PORTION__G_KEYS_COMPARISON 
 //   + NULL: NO conversion applied before comparison 
 //   + non NULL: conversion applied before comparison 
-// - c_key1StringPortionValueFunction: only significant with VALUE__G_KEYS_COMPARISON
-// - cfr_key1StringPortionValueFunctionHandle: only significant with VALUE__G_KEYS_COMPARISON
+// - c_key1StringPortionIntrinsicValueFunction: only significant with INTRINSIC_VALUE__G_KEYS_COMPARISON
+// - cfr_key1StringPortionIntrinsicValueFunctionHandle: only significant with INTRINSIC_VALUE__G_KEYS_COMPARISON
 // - ... : g-string set(s element for second key (etc.) if any ...
 int GStringsAddIndex(G_STRINGS_HANDLE handle,  int keysNumber,
   int key1GStringSetElement,  int key1GKeysComparison,
   IS_CHAR_FUNCTION cn_key1IsNeutralCharFunction,  TO_CHAR_FUNCTION cn_key1ToCharFunction,
-  STRING_PORTION_VALUE_FUNCTION c_key1StringPortionValueFunction,
-  void *cr_stringPortionValueFunctionHandle,  ...);
+  STRING_PORTION_INTRINSIC_VALUE_FUNCTION c_key1StringPortionIntrinsicValueFunction,
+  void *cr_stringPortionIntrinsicValueFunctionHandle,  ...);
 
 // #SEE GStringsAddIndex <g-string> <key>
 // Nb: Plain index => one key
 #define /*int*/ G_STRINGS_ADD_INDEX(/*G_STRINGS_HANDLE*/ handle,  /*int*/ keyGKeysComparison,\
   /*IS_CHAR_FUNCTION*/ cn_keyIsNeutralCharFunction,  /*TO_CHAR_FUNCTION*/ cn_keyToCharFunction, \
-  /*STRING_PORTION_VALUE_FUNCTION*/ c_keyStringPortionValueFunction,\
-  /*void* */cfr_keyStringPortionValueFunctionHandle, ...) \
+  /*STRING_PORTION_INTRINSIC_VALUE_FUNCTION*/ c_keyStringPortionIntrinsicValueFunction,\
+  /*void* */cfr_keyStringPortionIntrinsicValueFunctionHandle, ...) \
   GStringsAddIndex(handle,  1,  0,  keyGKeysComparison,\
   cn_keyIsNeutralCharFunction, cn_keyToCharFunction,\
-  c_keyStringPortionValueFunction,cfr_keyStringPortionValueFunctionHandle) 
+  c_keyStringPortionIntrinsicValueFunction,cfr_keyStringPortionIntrinsicValueFunctionHandle) 
 
 
 // (Internal use)
 union BARE_G_KEY {
   struct STRING_PORTION cp_stringPortion; // with STRING_PORTION__G_KEYS_COMPARISON
-  int c_tokenId; // with TOKEN_ID__G_KEYS_COMPARISON
-  long int c_value; // with VALUE___G_KEYS_COMPARISON
+  GENERIC_INTEGER cen_intrinsicValue; // with INTRINSIC_VALUE___G_KEYS_COMPARISON
+  int c_acolytTokenId; // with ACOLYT_TOKEN_ID__G_KEYS_COMPARISON
+  GENERIC_INTEGER cen_acolytValue; // with ACOLYT_VALUE__G_KEYS_COMPARISON 
+  void *cnr_acolytHandle; // with ACOLYT_HANDLE__G_KEYS_COMPARISON
 }; 
 
 // #REF struct-G_KEY
@@ -341,31 +368,54 @@ struct G_KEY { //
 //
 // Passed:
 // - m_gKey: 
-// - p_stringPortion:
+// - up_stringPortion:
 #define m_ASSIGN_G_KEY__STRING_PORTION(/*struct G_KEY*/ m_gKey, \
-  /*const struct STRING_PORTION*/p_stringPortion) {\
+  /*const struct STRING_PORTION*/up_stringPortion) {\
   (m_gKey).gKeysComparison = STRING_PORTION__G_KEYS_COMPARISON;\
-  (m_gKey).bare.cp_stringPortion = p_stringPortion ; \
+  (m_gKey).bare.cp_stringPortion = up_stringPortion ; \
 } 
 
-// Assign a g-key for token id comparison
-//
-// Passed:
-// - m_gKey: 
-// - tokenId:
-#define m_ASSIGN_G_KEY__TOKEN_ID(/*struct G_KEY*/ m_gKey, /*int*/ tokenId) {\
-  (m_gKey).gKeysComparison = TOKEN_ID__G_KEYS_COMPARISON;\
-  (m_gKey).bare.c_tokenId = tokenId; \
-} 
-
-// Assign a g-key for value comparison
+// Assign a g-key for 'intrinsic values' comparison
 //
 // Passed:
 // - m_gKey: 
 // - u_value:
-#define m_ASSIGN_G_KEY__VALUE(/*struct G_KEY*/m_gKey, /*long int*/u_value) {\
-  (m_gKey).gKeysComparison = VALUE__G_KEYS_COMPARISON;\
-  (m_gKey).bare.c_value = u_value; \
+#define m_ASSIGN_G_KEY__INTRINSIC_VALUE(/*struct G_KEY*/m_gKey,\
+  /*GENERIC_INTEGER*/uen_intrinsicValue) {\
+  (m_gKey).gKeysComparison = INTRINSIC_VALUE__G_KEYS_COMPARISON;\
+  (m_gKey).bare.cen_intrinsicValue = uen_intrinsicValue; \
+} 
+
+// Assign a g-key for 'token ids' comparison
+//
+// Passed:
+// - m_gKey: 
+// - uen_value:
+#define m_ASSIGN_G_KEY__ACOLYT_TOKEN_ID(/*struct G_KEY*/m_gKey, /*int*/u_tokenId) {\
+  (m_gKey).gKeysComparison = ACOLYT_TOKEN_ID__G_KEYS_COMPARISON;\
+  (m_gKey).bare.c_acolytTokenId = u_tokenId; \
+} 
+
+// Assign a g-key for 'acolyt values' comparison
+//
+// Passed:
+// - m_gKey: 
+// - uen_value:
+#define m_ASSIGN_G_KEY__ACOLYT_VALUE(/*struct G_KEY*/m_gKey,\
+  /*GENERIC_INTEGER*/uen_acolytValue) {\
+  (m_gKey).gKeysComparison = ACOLYT_VALUE__G_KEYS_COMPARISON;\
+  (m_gKey).bare.cen_acolytValue = uen_acolytValue; \
+} 
+
+// Assign a g-key for 'acolyt handle' comparison
+//
+// Passed:
+// - m_gKey: 
+// - uen_value:
+#define m_ASSIGN_G_KEY__ACOLYT_HANDLE(/*struct G_KEY*/m_gKey,\
+  /*void* */unr_acolytHandle) {\
+  (m_gKey).gKeysComparison = ACOLYT_HANDLE__G_KEYS_COMPARISON;\
+  (m_gKey).bare.cnr_acolytHandle = unr_acolytHandle; \
 } 
 
 
@@ -446,6 +496,86 @@ int GStringsFreeze(G_STRINGS_HANDLE handle, G_STRINGS_ARRAY **nap_gStringsArray)
 int GStringsClear(G_STRINGS_HANDLE handle, char b_fullClear);
 
 
+// Handling g-strings conveyance...
+// -----------------------------
+
+// Retrieve g-strings conveyance of the collection.
+// 
+// Passed:
+// - handle: gtrings collection handle 
+//
+// Ret:
+// >= 0: conveyance 
+// -1: unexpected problem; anomaly is raised
+int GStringsGetConveyance(G_STRINGS_HANDLE handle) ;
+
+// Check if g-string's conveyance is "okay" vis-a-vis a collection...
+//
+// Passed:
+// - n_gStringsHandle: (NULL special value: not provided => NO check)  
+// - c_expectedGStringConveyance: (only significant if g-strings collection is provided) 
+#define m_CHECK_G_STRINGS_COLLECTION_CONVEYANCE(/*G_STRING_HANDLE*/n_gStringsHandle,\
+  /*int*/c_expectedGStringConveyance) {\
+  if (n_gStringsHandle != NULL) {\
+    int collectionGStringConveyance = GStringsGetConveyance(n_gStringsHandle) ;\
+    m_TRACK_IF(collectionGStringConveyance < 0) \
+    m_ASSERT(collectionGStringConveyance == c_expectedGStringConveyance) \
+  } \
+} 
+  
+
+// Manipulate g-string as 'token'
+// 
+// Passed
+// - stuff:
+// - tokenId:
+// - n_gStringsHandle:
+// 
+// Ret:
+// - RETURNED: OK
+// - -1: unexpected problem; anomaly is raised...
+static inline int m_GStringAsToken(G_STRING_STUFF stuff, int tokenId, 
+  G_STRINGS_HANDLE n_gStringsHandle) {
+  m_CHECK_G_STRINGS_COLLECTION_CONVEYANCE(n_gStringsHandle,TOKEN__G_STRING_CONVEYANCE)
+  stuff->acolyt.c_tokenId = tokenId;
+  return RETURNED;
+} // m_GStringAsNamedObject 
+
+// Manipulate g-string as 'valued string'
+// 
+// Passed
+// - stuff:
+// - acolytValue:
+// - n_gStringsHandle:
+// 
+// Ret:
+// - RETURNED: OK
+// - -1: unexpected problem; anomaly is raised...
+static inline int m_GStringAsValuedString(G_STRING_STUFF stuff, GENERIC_INTEGER en_value, 
+  G_STRINGS_HANDLE n_gStringsHandle) {
+  m_CHECK_G_STRINGS_COLLECTION_CONVEYANCE(n_gStringsHandle,VALUED_STRING__G_STRING_CONVEYANCE)
+  stuff->acolyt.cen_value = en_value;
+  return RETURNED;
+} // m_GStringAsValuedString
+
+// Manipulate g-string as 'named object'
+// 
+// Passed
+// - stuff:
+// - nhr_handle: object's (head) handle
+// - n_gStringsHandle:
+// 
+// Ret:
+// - RETURNED: OK
+// - -1: unexpected problem; anomaly is raised...
+static inline int m_GStringAsNamedObject(G_STRING_STUFF stuff, void *nhr_handle, 
+  G_STRINGS_HANDLE n_gStringsHandle) {
+  m_CHECK_G_STRINGS_COLLECTION_CONVEYANCE(n_gStringsHandle,NAMED_OBJECT__G_STRING_CONVEYANCE)
+  stuff->acolyt.cnhr_handle = nhr_handle;
+  return RETURNED;
+} // m_GStringAsNamedObject 
+
+
 // #REF GStringsDestroyInstance <g-string set> 
 // Disengage and destroy <g-string set>s collection.
 //
@@ -453,6 +583,5 @@ int GStringsClear(G_STRINGS_HANDLE handle, char b_fullClear);
 // - RETURNED: OK...
 // - -1: unexpected problem ; anomaly is raised
 int GStringsDestroyInstance(G_STRINGS_HANDLE xh_handle);
-
 
 #endif // __C_ANSI_G_STRING_H_INCLUDED

@@ -24,16 +24,17 @@ struct TOKEN_DEFINITION {
 // - handle:
 // - mp_tokenDefinitionsArray:
 // - expectedTokensNumber:
-#define m_G_STRINGS_IMPORT_TOKENS(/*G_STRINGS_HANDLE*/ handle,\
+#define m_G_TOKENS_IMPORT(/*G_STRINGS_HANDLE*/ handle,\
   /*const struct TOKEN_DEFINITION*/ mp_tokenDefinitions /*[]*/,  /*int*/ tokensNumber) {\
   int i = 0;\
   G_STRING_STUFF gStringStuff = (G_STRING_STUFF)UNDEFINED; \
   int entry = UNDEFINED;\
   for (; i < tokensNumber; i++) {\
     m_TRACK_IF((entry = GStringsFetch(handle,-1,&gStringStuff)) < 0);\
-    switch (m_GStringCImport(gStringStuff, mp_tokenDefinitions[i].tokenId,\
-      mp_tokenDefinitions[i].p_litteral)) {\
+    switch (m_GStringCImport(gStringStuff, mp_tokenDefinitions[i].p_litteral)) {\
     case COMPLETED__OK: \
+      m_TRACK_IF(m_GStringAsToken(gStringStuff, mp_tokenDefinitions[i].tokenId, handle) !=\
+        RETURNED)\
     break; case COMPLETED__BUT: \
       m_RAISE(ANOMALY__NON_PURE_LOGICAL_G_STRING)\
     break; default: \

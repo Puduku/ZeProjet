@@ -72,7 +72,7 @@ struct BLOTFUNC {
 } ;
 
 
-typedef gen_INT gen_BLOTVAL; 
+typedef int gen_BLOTVAL; 
 
 
 #define  TRUE__BLOTVAL0 0

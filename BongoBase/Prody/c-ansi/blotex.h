@@ -1,6 +1,6 @@
 // blotex.h, version 1.92 (ANSI)
 // (c) Atos-Euronext Belgium - 2008
-// c) Puduku - 2023
+// (c) Puduku - 2023
 
 //
 // 
@@ -11,11 +11,12 @@
 #ifndef __C_ANSI_BLOTEX_H_INCLUDED__
 #define __C_ANSI_BLOTEX_H_INCLUDED__
 
-//////////////////////
+/////////////////////////////
 #include "c-ansi/blotex.topo"
-//////////////////////
+/////////////////////////////
 
 #include "c-ansi/blotcode.h"
+#include "c-ansi/g-string.h"
 
 
 // blotex library executor 
@@ -81,21 +82,23 @@ int BlotexlibExecutorCheckHandle(void *r_handle) ;
 
 #define GLOBAL_BLOTREG_NAME GOOD_OLD_EMPTY_C_STRING
 
+struct BLOTEXLIB_EXECUTOR; // Private structure 
+typedef struct BLOTEXLIB_EXECUTOR *BLOTEXLIB_EXECUTOR_HANDLE; // Public handle
 
 // Ret:
 // - RESULT__FOUND: OK
 // - RESULT__NOT_FOUND: 
 // - -1: unexpected problem; anomaly is raised
 int BlotexlibExecutorGetBlotreg (BLOTEXLIB_EXECUTOR_HANDLE handle,
-  const char* p_blotregName, *G_STRINGS_HANDLE *ac_blotregHandle) ;
+  struct STRING_PORTION blotregName, G_STRINGS_HANDLE *ac_blotregHandle) ;
 
 
 // Ret:
 // - COMPLETED__OK: OK
-// - COMPLETED__BUT: the register alread exists 
+// - COMPLETED__BUT: the register already exists 
 // - -1: unexpected problem; anomaly is raised
 int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  const char* p_blotregName, *G_STRINGS_HANDLE *cac_blotregHandle);
+  const char* p_blotregName, G_STRINGS_HANDLE *na_blotregHandle);
 
 #define BLOTVAR_NAME_ELEMENT G_PARAM_NAME_ELEMENT
 #define BLOTVAR_VALUE_ELEMENT G_PARAM_VALUE_ELEMENT 
