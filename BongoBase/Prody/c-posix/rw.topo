@@ -334,7 +334,7 @@
 // designating "master" and "slave", both peers simply become "free". 
 // "free" rank allows neither read() nor write() but allows peers to "hang up" independently.
 // 
-// => Our p2p communication paradigm remains applicable to all session protocols given we are
-// aware of the limitations of the traditional "master" / "slave" repartition ; only the "equal" /
+// => Our p2p communication paradigm remains applicable to all session/application protocols given we
+// are aware of the limitations of the traditional "master" / "slave" repartition ; only the "equal" /
 // "equal" repartition is applicable to "full duplex" session protocols.
 // 
