@@ -2,6 +2,6 @@
 
 typeset -r PROJVAR=FLINT
 
-. "$(dirname "$0")/install.env" 
+. "$(dirname "$0")/install.esh" 
 
 Success
