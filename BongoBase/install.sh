@@ -13,6 +13,6 @@ if [ -z "$MAMA" ] ;then
 fi
  
 typeset -r PROJVAR=BONGO
-. "$FLINT/install.env" 
+. "$FLINT/install.esh" 
  
 Success
