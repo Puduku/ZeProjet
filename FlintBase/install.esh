@@ -1,4 +1,4 @@
-#install.env - bash script extension
+#install.esh - bash script extension
 #PRE: PROJVAR variable is set (project var name)
 #     ExtraInstallOrUpdate (optional) function is defined if extra update operations are required;
 #     ExtraInstallOrUpdate function's PRE are: see POST below 
