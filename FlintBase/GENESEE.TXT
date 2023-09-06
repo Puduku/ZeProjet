@@ -135,12 +135,12 @@ However, from our point of view, it is not necessary to use distinct suffixes fo
 'flavors' of shell scripts (for instance, '.bash' suffix for bash shell script). That is, in that
 point of view, '.sh' is simple generic contraction for 'shell script'...
 
-Shell scripts "imports"
------------------------
-Note: shell script "imports" (that is, the "pieces of shell commands" that one executes with
-'.' or 'source' builtin command in shells) are localizable - like executable files - by PATH
-environ variable.
-So, such shell scripts extension files may "cohabit" with true executables in bin/ structure 
-directories. To help distinction of "shell imports" with executables, observe the following :
+Shell scripts "extensions"
+--------------------------
+We call shell script "extension" any file containing shell commands that one executes with
+'.' or 'source' builtin command. Such scripts extentions are localizable - like executable files -
+by PATH environment variable.
+Thus, these shell script extension files usually “coexist” with real executables inside bin/ structure
+directories. To make it easier to distinguish "shell extensions" from executables, observe the following:
 - remove 'x' permission to "shell extension" files (that permission is not necessary)  
-- use a suffix - in our case, we are used to using '.imp' or '.env' convention...
+- define a specific suffix - in our case, we are used to using '.esh' convention...
