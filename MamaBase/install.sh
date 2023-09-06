@@ -25,7 +25,7 @@ ExtraInstallOrUpdate () {
   Concon _realpath
 }
 
-. "$FLINT/install.env" 
+. "$FLINT/install.esh" 
 
 echo -n "Update ~/.flintrc configuration file..."
 if [ "${MAMA:?}" != "${PROJVAL:?}" ] ;then
