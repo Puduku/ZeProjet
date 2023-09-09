@@ -409,6 +409,20 @@ const char *ParanoidScanStringPortionTillMatch(const struct STRING_PORTION *ap_s
   m_PARSE_SEQUENCE(m_sequence,em_scanPtr, na_lexeme)\
 }
 
+// Parse a string portion sequence : pass all white spaces... 
+//
+// Passed:
+// - m_sequence: 
+// - na_lexeme: NULL if not used
+//
+// Changed:
+// - m_sequence: parsed lexeme removed in the sequence 
+// - *na_lexeme: (if used) parsed lexeme (aka white spaces) 
+#define m_PARSE_PASS_SPACES(/*struct STRING_PORTION*/m_sequence, \
+  /*struct STRING_PORTION* */na_lexeme)  m_PARSE_PASS_CHARS(m_sequence,b_REGULAR_SCAN,\
+  b_PASS_CHARS_WHILE,isspace,UNDEFINED, na_lexeme)
+
+
 // Parse a string portion sequence according to sub string scanned by ScanStringPortionTillMatch()
 // function. 
 //

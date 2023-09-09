@@ -12,6 +12,7 @@
 #include "c-ansi/blotex.h"
 #include "c-ansi/alloc.h"
 #include "c-ansi/g-string.h"
+#include "c-ansi/stderr.h"
 
 
 // blotex library executor 
@@ -36,8 +37,7 @@ struct BLOTEXLIB_EXECUTOR {
 } ;  
 
 // #SEE BLOTLIB_EXECUTOR_FACTORY__CREATE_PRODUCT_INSTANCE_FUNCTION <blotex>
-// Public function; see .h
-int BlotexlibExecutorFactoryCreateProductInstance(void *pr_handle,
+static int BlotexlibExecutorFactoryCreateProductInstance(void *pr_handle,
   void **azhr_blotlibExecutorHandle) {
   m_DIGGY_BOLLARD()
   BLOTEXLIB_EXECUTOR_FACTORY_HANDLE p_handle = (BLOTEXLIB_EXECUTOR_FACTORY_HANDLE)pr_handle;
@@ -90,29 +90,87 @@ int BlotexlibExecutorGetBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
 
 // Public function; see .h
 int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  const char* p_blotregName, G_STRINGS_HANDLE *na_blotregHandle) {
+  struct STRING_PORTION blotregName, G_STRINGS_HANDLE *na_blotregHandle) {
   m_DIGGY_BOLLARD()
-  m_DIGGY_RETURN(-1)
+
+  G_STRING_STUFF t_namedBlotregStuff = (G_STRING_STUFF)UNDEFINED; 
+  struct G_KEY gKey ;
+  m_ASSIGN_G_KEY__STRING_PORTION(gKey,blotregName)
+  int result = G_STRINGS_INDEX_FETCH(handle->h_blotregsHandle,NULL,INDEX_LABEL0,
+    INDEX_FETCH__FETCH, INDEX_SEEK__KEY,  &t_namedBlotregStuff, &gKey);
+  switch (result) {
+  case RESULT__FOUND:
+    m_ASSERT(t_namedBlotregStuff->acolyt.cnhr_handle != NULL)
+  break; case RESULT__NOT_FOUND: {
+    G_STRINGS_HANDLE h_blotregHandle = (G_STRINGS_HANDLE)UNDEFINED ;
+    m_TRACK_IF(GStringsCreateInstance(&h_blotregHandle,BATEAU__EXPECTED_ITEMS_NUMBER,
+      VALUED_STRING__G_STRING_CONVEYANCE,G_PARAM_CARDINALITY,
+      (NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION)UNDEFINED) != RETURNED) 
+    t_namedBlotregStuff->acolyt.cnhr_handle = h_blotregHandle;
+  } // RESULT__NOT_FOUND
+  break; default:
+    m_TRACK()
+  } // switch
+  if (na_blotregHandle != NULL) *na_blotregHandle = t_namedBlotregStuff->acolyt.cnhr_handle;
+
+  m_DIGGY_RETURN(result)
 } // BlotexlibExecutorCreateBlotreg
 
-#define BLOTVAR_NAME_ELEMENT G_PARAM_NAME_ELEMENT
-#define BLOTVAR_VALUE_ELEMENT G_PARAM_VALUE_ELEMENT 
+enum {
+      EVAL__BLOTEXLIB_LOCAL_BLOTFUNC_NAME_ENTRY = 0,
+  OUTPUT_F__BLOTEXLIB_LOCAL_BLOTFUNC_NAME_ENTRY,
+  BLOTEXLIB_LOCAL_BLOTFUNC_NAMES_NUMBER = OUTPUT_F__BLOTEXLIB_LOCAL_BLOTFUNC_NAME_ENTRY,
+} ;
+
+static const char* localBlotfuncNames[] = { "Eval" , "OutputF" } ; 
+
+
+// Ret:
+// - RESULT__FOUND:
+// - RESULT__NOT_FOUND:
+// - -1: unexpected problem
+static int ParseBlotvarSequence (struct STRING_PORTION blotvarSequence) {
+  m_DIGGY_BOLLARD_S()
+  int result = RESULT__FOUND; // a priori 
+
+  m_PARSE_PASS_SPACES(blotvarSequence,NULL)
+  
+  if (b_EMPTY_STRING_PORTION(blotvarSequence)) {
+    result = RESULT__FOUND;
+  } // if 
+
+  m_DIGGY_RETURN(result) ;
+} // ParseBlotvarSequence
 
 // #SEE BLOTLIB_EXECUTOR__EXECUTE_C_FUNCTION <blotex>
-// Public function; see .h
-int BlotexlibExecutorExecuteCFunction(void *r_handle, const struct BLOTFUNC *ap_blotfunc,
+static int BlotexlibExecutorExecuteCFunction(void *r_handle, const struct BLOTFUNC *ap_blotfunc,
   G_STRING_STUFF c_surrogate, gen_BLOTVAL *ac_blotval, G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
   BLOTEXLIB_EXECUTOR_HANDLE handle = (BLOTEXLIB_EXECUTOR_HANDLE)r_handle;
   m_CHECK_MAGIC_FIELD(BLOTEXLIB_EXECUTOR_HANDLE,handle)
   int answer = ANSWER__YES; // a priori
   *ac_blotval = TRUE__BLOTVAL0; // a priori
+
+  m_ASSIGN_LOCAL_C_STRING_PORTION(token, ":=")
+  struct STRING_PORTION sequence = ap_blotfunc->call.arguments; 
+  switch (ap_blotfunc->entry.localBlotfuncNameEntry) {
+  case EVAL__BLOTEXLIB_LOCAL_BLOTFUNC_NAME_ENTRY: {
+    struct STRING_PORTION blotvarSequence; //UNDEFINED;
+    m_PARSE_TILL_MATCH(sequence,token,NULL, &blotvarSequence)
+    int result = ParseBlotvarSequence(blotvarSequence);
+    m_TRACK_IF(result < 0)
+  } break; case OUTPUT_F__BLOTEXLIB_LOCAL_BLOTFUNC_NAME_ENTRY:
+    //m_PARSE_PASS_CHARS(sequence,b_REGULAR_SCAN,b_PASS_CHARS_TILL,NULL,'.',&(blotfuncKeyName.prefix))
+  break; default:
+    m_RAISE(ANOMALY__VALUE__FMT_D,ap_blotfunc->entry.localBlotfuncNameEntry)
+  } // switch
+  
   m_DIGGY_RETURN(answer)
 } // BlotexlibExecutorExecuteCFunction
 
+
 // #SEE BLOTLIB_EXECUTOR__DESTROY_INSTANCE_FUNCTION <blotex>
-// Public function; see .h
-int BlotexlibExecutorDestroyInstance (void *xhr_handle) {
+static int BlotexlibExecutorDestroyInstance (void *xhr_handle) {
   m_DIGGY_BOLLARD()
   BLOTEXLIB_EXECUTOR_HANDLE xh_handle = (BLOTEXLIB_EXECUTOR_HANDLE)xhr_handle;
   m_CHECK_MAGIC_FIELD(BLOTEXLIB_EXECUTOR_HANDLE,xh_handle)
@@ -122,10 +180,24 @@ int BlotexlibExecutorDestroyInstance (void *xhr_handle) {
   m_DIGGY_RETURN(RETURNED)
 } // BlotexlibExecutorDestroyInstance
 
+
+// Public function; see .h
+int BlotcodeLinkBlotexlib(BLOTCODE_HANDLE ep_handle, const char* nfp_blotlibPrefix,
+  BLOTEXLIB_EXECUTOR_FACTORY_HANDLE fp_blotexlibExecutorFactoryHandle) {
+
+  int entry = BlotcodeLinkBlotlib(ep_handle, nfp_blotlibPrefix,
+    BLOTEXLIB_LOCAL_BLOTFUNC_NAMES_NUMBER, localBlotfuncNames, 
+    BlotexlibExecutorFactoryCreateProductInstance, fp_blotexlibExecutorFactoryHandle,
+    BlotexlibExecutorExecuteCFunction, BlotexlibExecutorDestroyInstance) ;
+  m_TRACK_IF(entry < 0)
+
+  m_DIGGY_RETURN(entry)
+} // BlotcodeLinkBlotexlib
+
+
+// Public function; see .h
 int BlotexlibExecutorFactoryDestroyInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE xh_handle) {
   m_DIGGY_BOLLARD()
   free(xh_handle);
   m_DIGGY_RETURN(RETURNED)
 } // BlotexlibExecutorFactoryDestroyInstance
-
-

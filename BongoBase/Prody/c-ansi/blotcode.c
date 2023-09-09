@@ -399,12 +399,12 @@ static int BlotcodeFindBlotfunc(BLOTCODE_HANDLE p_handle, struct STRING_PORTION 
   m_ASSERT(p_handle->b_frozen) 
   m_INDEX_ITERATOR_AUTOMATIC_BUFFER(indexIteratorAutomaticBuffer)
 
-  m_PARSE_PASS_CHARS(referral,b_REGULAR_SCAN,b_PASS_CHARS_TILL,NULL,'.',&(blotfuncKeyName.prefix)) ;
+  m_PARSE_PASS_CHARS(referral,b_REGULAR_SCAN,b_PASS_CHARS_TILL,NULL,'.',&(blotfuncKeyName.prefix))
   if (b_EMPTY_STRING_PORTION(referral)) {
     blotfuncKeyName.name = blotfuncKeyName.prefix; 
     m_ASSIGN_EMPTY_STRING_PORTION(blotfuncKeyName.prefix)
   } else {
-    m_PARSE_OFFSET(referral,1,NULL);
+    m_PARSE_OFFSET(referral,1,NULL)
     blotfuncKeyName.name = referral;
   } // if
      
@@ -672,7 +672,7 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
 
     m_ASSIGN_C_STRING_PORTION(token, "##<<") 
     tokenLength = m_StringPortionLength(&token);
-    m_PARSE_TILL_MATCH(fp_template,token,NULL,  &decor);
+    m_PARSE_TILL_MATCH(fp_template,token,NULL, &decor)
     if (!b_EMPTY_STRING_PORTION(decor)) {
       v_templatePartitionEntry = GreenCollectionFetch(handle->h_templatePartitionsHandle, -1,
         (char**)&ti_templatePartitionStuff);
@@ -682,15 +682,15 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
     if (b_EMPTY_STRING_PORTION(fp_template)) { // "##<<' NOT located 
       continue;
     } // if
-    m_PARSE_OFFSET(fp_template,tokenLength, NULL);
+    m_PARSE_OFFSET(fp_template,tokenLength, NULL)
 
     m_ASSIGN_C_STRING_PORTION(token, ">>")
     tokenLength = m_StringPortionLength(&token);
-    m_PARSE_TILL_MATCH(fp_template,token,NULL, &blotinstSequence);
+    m_PARSE_TILL_MATCH(fp_template,token,NULL, &blotinstSequence)
     if (b_EMPTY_STRING_PORTION(fp_template)) { // ending ">>" not located 
       m_REPORT_ERROR(NULL,"Missing " DELIMITOR__FMT_STRING_PORTION, m_STRING_PORTION_2_FMT_ARGS(token))
     } // if
-    m_PARSE_OFFSET(fp_template,tokenLength, NULL);
+    m_PARSE_OFFSET(fp_template,tokenLength, NULL)
 
     // blotinstSequence: complete blotinst "sequence"
 
@@ -698,27 +698,27 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
     // Parsing <basic token 1> [ <basic token 2> ] [ '(' <arguments> ')' ]
     char b_arguments = b_FALSE0; // No arguments lexeme a priori
     struct STRING_PORTION basicToken1, basicToken2, c_arguments ;
-    m_PARSE_PASS_CHARS(blotinstSequence,b_REGULAR_SCAN, b_PASS_CHARS_WHILE,isspace,UNDEFINED, NULL);
+    m_PARSE_PASS_SPACES(blotinstSequence, NULL)
     m_PARSE_PASS_CHARS(blotinstSequence,b_REGULAR_SCAN, b_PASS_CHARS_WHILE,IsBasicTokenChar,
-      UNDEFINED, &basicToken1);
+      UNDEFINED, &basicToken1)
 
-    m_PARSE_PASS_CHARS(blotinstSequence,b_REGULAR_SCAN, b_PASS_CHARS_WHILE,isspace,UNDEFINED, NULL);
+    m_PARSE_PASS_SPACES(blotinstSequence, NULL)
     m_PARSE_PASS_CHARS(blotinstSequence,b_REGULAR_SCAN, b_PASS_CHARS_WHILE,IsBasicTokenChar,
-      UNDEFINED, &basicToken2);
+      UNDEFINED, &basicToken2)
 
-    m_PARSE_PASS_CHARS(blotinstSequence,b_REGULAR_SCAN, b_PASS_CHARS_WHILE,isspace,UNDEFINED, NULL);
+    m_PARSE_PASS_SPACES(blotinstSequence, NULL)
     m_PARSE_PASS_CHARS(blotinstSequence,b_REGULAR_SCAN, b_PASS_CHARS_TILL,NULL,'(', &dummy)
     if (!b_EMPTY_STRING_PORTION(dummy)) {
       m_REPORT_ERROR(&dummy,"Unexpected content before " DELIMITOR__FMT_C,'(')
     } // if
     if ((b_arguments = !b_EMPTY_STRING_PORTION(blotinstSequence))) {
-      m_PARSE_OFFSET(blotinstSequence,1, NULL);
+      m_PARSE_OFFSET(blotinstSequence,1, NULL)
       m_PARSE_PASS_CHARS(blotinstSequence,b_REVERTED_SCAN, b_PASS_CHARS_TILL,NULL,')', &c_arguments)
       if (b_EMPTY_STRING_PORTION(blotinstSequence)) {
         m_REPORT_ERROR(&c_arguments,"Missing " DELIMITOR__FMT_C, ')')
       } // if
-      m_PARSE_OFFSET(blotinstSequence,1, NULL);
-      m_PARSE_PASS_CHARS(blotinstSequence,b_REGULAR_SCAN, b_PASS_CHARS_WHILE,isspace,UNDEFINED, NULL);
+      m_PARSE_OFFSET(blotinstSequence,1, NULL)
+      m_PARSE_PASS_SPACES(blotinstSequence, NULL)
       if (!b_EMPTY_STRING_PORTION(blotinstSequence)) {
         m_REPORT_ERROR(&blotinstSequence,"Trailing content after " DELIMITOR__FMT_C, ')')
       } // if

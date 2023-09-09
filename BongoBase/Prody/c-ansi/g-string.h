@@ -171,8 +171,6 @@ int GStringConvert(G_STRING_STUFF stuff,  IS_CHAR_FUNCTION n_isNeutralCharFuncti
 }
   
 
-
-
 // "g-string set"
 // --------------
 
