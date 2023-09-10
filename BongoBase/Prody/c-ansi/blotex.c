@@ -125,22 +125,60 @@ enum {
 static const char* localBlotfuncNames[] = { "Eval" , "OutputF" } ; 
 
 
-// Ret:
-// - RESULT__FOUND:
-// - RESULT__NOT_FOUND:
+#define b_STREX b_TRUE
+
+struct BLOTVAR {
+  G_STRINGS_HANDLE n_blotregHandle; // NULL special value => 'not found' 
+  int c_entry;
+  char b_strex;
+} ;
+
+// Changed:
+// - ac_blotvar: possibly 'not found' 
+//
+// Ret: Good syntax ? 
+// - ANSWER__YES:
+// - ANSWER__NO:
 // - -1: unexpected problem
-static int ParseBlotvarSequence (struct STRING_PORTION blotvarSequence) {
+static int BlotexlibExecutorRetrieveBlotvar(BLOTEXLIB_EXECUTOR_HANDLE handle,
+  struct STRING_PORTION blotvarLexeme, struct BLOTVAR *ac_blotvar) {
   m_DIGGY_BOLLARD_S()
-  int result = RESULT__FOUND; // a priori 
+ 
+  int answer = ANSWER__YES; // good syntax a priori
+  ac_blotvar->n_blotregHandle = NULL; // not found a priori
+  struct STRING_PORTION lexeme2;
 
-  m_PARSE_PASS_SPACES(blotvarSequence,NULL)
-  
-  if (b_EMPTY_STRING_PORTION(blotvarSequence)) {
-    result = RESULT__FOUND;
-  } // if 
+  m_PARSE_PASS_CHARS(blotvarLexeme,b_REGULAR_SCAN,b_PASS_CHARS_TILL,NULL,'.',&lexeme2)
+  if (b_EMPTY_STRING_PORTION(blotvarLexeme)) { // '.' not found
+    blotvarLexeme = lexeme2; 
+    m_PARSE_PASS_CHARS(blotvarLexeme,b_REGULAR_SCAN,b_PASS_CHARS_TILL,NULL,'[',&lexeme2)
+    if (b_EMPTY_STRING_PORTION(blotvarLexeme)) { // '[' not found
+      blotvarLexeme = lexeme2; 
+      m_PARSE_PASS_CHARS(blotvarLexeme,b_REGULAR_SCAN,b_PASS_CHARS_TILL,NULL,'{',&lexeme2)
+      if (b_EMPTY_STRING_PORTION(blotvarLexeme)) { // '{' not found
+        answer = ANSWER__NO; 
+      } else { // found '{' 
+      } // if
+    } else { // found '[' 
+    } // if
+  } else { // found '.' 
+  } // if
 
-  m_DIGGY_RETURN(result) ;
-} // ParseBlotvarSequence
+  m_DIGGY_RETURN(answer) ;
+} // BlotexlibExecutorRetrieveBlotvar 
+
+struct BLOTEX_VALUE {
+  char b_strex;
+} ;
+
+static int BlotexlibExecutorComputeBlotex(BLOTEXLIB_EXECUTOR_HANDLE handle,
+  struct STRING_PORTION blotexLexeme, struct BLOTEX_VALUE *ac_blotexValue) {
+  m_DIGGY_BOLLARD_S()
+
+  int answer = ANSWER__YES; // good syntax a priori
+  m_DIGGY_RETURN(answer) ;
+} // BlotexlibExecutorComputeBlotex 
+
 
 // #SEE BLOTLIB_EXECUTOR__EXECUTE_C_FUNCTION <blotex>
 static int BlotexlibExecutorExecuteCFunction(void *r_handle, const struct BLOTFUNC *ap_blotfunc,
@@ -152,15 +190,27 @@ static int BlotexlibExecutorExecuteCFunction(void *r_handle, const struct BLOTFU
   *ac_blotval = TRUE__BLOTVAL0; // a priori
 
   m_ASSIGN_LOCAL_C_STRING_PORTION(token, ":=")
+  int tokenLength = m_StringPortionLength(&token);
   struct STRING_PORTION sequence = ap_blotfunc->call.arguments; 
   switch (ap_blotfunc->entry.localBlotfuncNameEntry) {
   case EVAL__BLOTEXLIB_LOCAL_BLOTFUNC_NAME_ENTRY: {
-    struct STRING_PORTION blotvarSequence; //UNDEFINED;
+    struct STRING_PORTION blotvarSequence; // UNDEFINED
     m_PARSE_TILL_MATCH(sequence,token,NULL, &blotvarSequence)
-    int result = ParseBlotvarSequence(blotvarSequence);
-    m_TRACK_IF(result < 0)
+    if (b_EMPTY_STRING_PORTION(sequence)) { // NO ':=' 
+      sequence = blotvarSequence;
+    } else { // <blotvar> [ '$' ] ':=' <blotex>
+      struct STRING_PORTION blotvarLexeme; // UNDEFINED
+      m_PARSE_STRIP_SPACES(blotvarSequence,&blotvarLexeme)
+      struct BLOTVAR c_blotvar; // UNDEFINED 
+      answer = BlotexlibExecutorRetrieveBlotvar(handle,blotvarLexeme,&c_blotvar);
+      m_TRACK_IF(answer < 0)
+      m_PARSE_OFFSET(sequence,tokenLength,NULL)
+    } // if
+    if (answer == ANSWER__YES) {
+      struct BLOTEX_VALUE c_blotexValue; // UNDEFINED
+      answer = BlotexlibExecutorComputeBlotex(handle,sequence,&c_blotexValue);
+    } // if
   } break; case OUTPUT_F__BLOTEXLIB_LOCAL_BLOTFUNC_NAME_ENTRY:
-    //m_PARSE_PASS_CHARS(sequence,b_REGULAR_SCAN,b_PASS_CHARS_TILL,NULL,'.',&(blotfuncKeyName.prefix))
   break; default:
     m_RAISE(ANOMALY__VALUE__FMT_D,ap_blotfunc->entry.localBlotfuncNameEntry)
   } // switch
