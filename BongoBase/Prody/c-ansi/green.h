@@ -337,15 +337,15 @@ char m_indexIteratorAutomaticBuffer[p_indexIteratorAutomaticBufferSize] ;
 //   not significant with INDEX_SEEK__UP / INDEX_SEEK__DOWN 
 //
 // Changed:
-// - *acvntr_<greenItem>Stuff: (if used) :
+// - *acvntr_<greenItem>Stuff:
 //   + status RESULT__FOUND: (never NULL) corresponding green item "stuff" (=> ready for "update")
 //   + status RESULT__NOT_FOUND: 
 //     . with INDEX_FETCH__FETCH: new item is at your disposal ; note that item MAY BE yet in
 //       "engaged" state when the emplacement corresponded to a gap that has been "recycled"...
 //     . otherwise (INDEX_FETCH__SEEK_ONLY/READ_ONLY/READ_NEXT/REMOVE): set to NULL special value
 //   #SEE fetched-item-notices
-// - *nacvn_entry:
-//   + status RESULT__FOUND: corresponding item entry 
+// - *nacvn_entry: (if used): 
+//   + status RESULT__FOUND: corresponding item entry (always >= 0)
 //   + status RESULT__NOT_FOUND: 
 //     . with INDEX_FETCH__FETCH: entry of new item at your disposal 
 //     . otherwise (INDEX_FETCH__SEEK_ONLY/READ_ONLY/READ_NEXT/REMOVE): set to -1 special value
