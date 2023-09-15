@@ -18,6 +18,15 @@ struct TOKEN_DEFINITION {
 } ; 
 
 
+// #REF NAMED_OBJECTS_CREATE_INSTANCE <named-object>
+// #SEE G_STRINGS_CREATE_INSTANCE <named-object>
+// Note: TOKEN__G_STRING_CONVEYANCE => token id acolyt 
+#define /*int*/ G_TOKENS_CREATE_INSTANCE(/*G_STRINGS_HANDLE*/ azh_handle,\
+  /*int*/ expectedItemsNumber)  GStringsCreateInstance(azh_handle, expectedItemsNumber, 1,\
+  TOKEN__G_STRING_CONVEYANCE, (NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION)UNDEFINED)
+
+
+
 // Import g-tokens in one shot...
 //
 // Passed:

@@ -234,7 +234,7 @@ int BlotcodeCreateInstance (BLOTCODE_HANDLE *azh_handle) {
   m_MALLOC_INSTANCE(*azh_handle) 
   BLOTCODE_HANDLE handle = *azh_handle;
 
-  m_TRACK_IF(G_STRINGS_CREATE_INSTANCE(&handle->h_blotkeywsHandle, BLOTKEYW_IDS_NUMBER) != RETURNED)
+  m_TRACK_IF(G_TOKENS_CREATE_INSTANCE(&handle->h_blotkeywsHandle, BLOTKEYW_IDS_NUMBER) != RETURNED)
   m_ASSERT(G_STRINGS_ADD_INDEX(handle->h_blotkeywsHandle, STRING_PORTION__G_KEYS_COMPARISON, NULL,
     NULL, (STRING_PORTION_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED)
     == INDEX_LABEL0)
@@ -655,24 +655,20 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
   }\
 }
 
-#define DELIMITOR__FMT_STRING_PORTION "**" FMT_STRING_PORTION "** delimitor"
+#define DELIMITOR__FMT_S "**%s** delimitor"
 #define DELIMITOR__FMT_C "**%c** delimitor"
 
   TEMPLATE_PARTITION_STUFF ti_templatePartitionStuff = (TEMPLATE_PARTITION_STUFF) UNDEFINED;
   int v_templatePartitionEntry = UNDEFINED; 
   struct BLOTINST *vc_blotinstPtr = (struct BLOTINST *) UNDEFINED;
   struct STRING_PORTION decor; // UNDEFINED 
-  struct STRING_PORTION token; // UNDEFINED 
   struct STRING_PORTION dummy; // UNDEFINED 
-  int tokenLength = UNDEFINED;
 
   while (answer == ANSWER__YES && !b_EMPTY_STRING_PORTION(fp_template)) {
 
     // Stage 1: Locate new blotinst "sequence" 
 
-    m_ASSIGN_C_STRING_PORTION(token, "##<<") 
-    tokenLength = m_StringPortionLength(&token);
-    m_PARSE_TILL_MATCH(fp_template,token,NULL, &decor)
+    m_PARSE_TILL_MATCH_C(fp_template,"##<<",NULL, &decor)
     if (!b_EMPTY_STRING_PORTION(decor)) {
       v_templatePartitionEntry = GreenCollectionFetch(handle->h_templatePartitionsHandle, -1,
         (char**)&ti_templatePartitionStuff);
@@ -682,15 +678,13 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
     if (b_EMPTY_STRING_PORTION(fp_template)) { // "##<<' NOT located 
       continue;
     } // if
-    m_PARSE_OFFSET(fp_template,tokenLength, NULL)
+    m_PARSE_OFFSET(fp_template,4, NULL)
 
-    m_ASSIGN_C_STRING_PORTION(token, ">>")
-    tokenLength = m_StringPortionLength(&token);
-    m_PARSE_TILL_MATCH(fp_template,token,NULL, &blotinstSequence)
+    m_PARSE_TILL_MATCH_C(fp_template,">>",NULL, &blotinstSequence)
     if (b_EMPTY_STRING_PORTION(fp_template)) { // ending ">>" not located 
-      m_REPORT_ERROR(NULL,"Missing " DELIMITOR__FMT_STRING_PORTION, m_STRING_PORTION_2_FMT_ARGS(token))
+      m_REPORT_ERROR(NULL,"Missing " DELIMITOR__FMT_S, ">>")
     } // if
-    m_PARSE_OFFSET(fp_template,tokenLength, NULL)
+    m_PARSE_OFFSET(fp_template,2, NULL)
 
     // blotinstSequence: complete blotinst "sequence"
 

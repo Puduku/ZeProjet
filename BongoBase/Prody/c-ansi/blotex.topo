@@ -94,7 +94,7 @@
 //
 // Operators 
 // operators allows to combine expressions together 
-// <int 1op> ::= '!' 
+// <int 1op> ::= '!' | '+' | '-' 
 // <int 2op> ::= '+' | '-' | '*' | '/' | '&&' | '!!'
 // Logical operators ('!', '&&' and '!!') combine integer expressions together, "seen" as booleans.
 // <str 2op> ::= '+' 
@@ -134,11 +134,18 @@
 // Surrogate: None 
 //
 // Examples:
-//   Eval (recettes?: == "*bolo*" || >= "c*", ^ :?)  
-//   Eval (recettes?^) => single reset 
+//   Eval (recettes?: == "*bolo*" || >= "c*" :?) => new register selection 
+//   Eval (recettes?^) => single reset, ascending 
 //   Eval (recettes?+) => fetch next one
 //   Eval (var := recettes?=) => read current int value 
 //   Eval (var$ := recettes?=$) => read current str value 
+//   Eval (^recettes2?: name == "*bolo*" || >= "c*" or price < 10 :?) => new table selection 
+//   Eval (recettes?^) => single reset, ascending 
+//   Eval (^recettes2?+) => fetch next one 
+//   Eval (var$ := ^recettes?=name) => read current name 
+//   Eval (^recettes2?=price := 15) => update current price 
+//   Eval (^recettes2?@) => insert new table record  
+//   Eval (^recettes2?=name := "craboutchas") => new record name 
 //
 //
 // OutputF (<format> <blotex> ) 

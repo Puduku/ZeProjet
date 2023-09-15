@@ -241,7 +241,13 @@ enum { //
    NAMED_OBJECT__G_STRING_CONVEYANCE, // acolyt is object handle
 } ;
 
-typedef int (*NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION) (void *rx_handle) ;
+// Passed:
+// -xhr_handle: head handle of instance to liquidate 
+//
+// Ret:
+// - RETURNED: OK
+// - -1: unexpected problem; anomaly is raised 
+typedef int (*NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION) (void *xhr_handle) ;
 
 // #REF GStringsCreateInstance <g-string set>
 // Creation and initialization of a "<g-string set> collection".
@@ -251,7 +257,7 @@ typedef int (*NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION) (void *rx_handle) ;
 // - expectedItemsNumber:
 //   #SEE GreenCollectionCreateInstance-expectedItemsNumber@c-ansi/green.h <<g-string set>>
 // - gStringSetCardinality: number of elements in a set (>0 ; 0 value is taken for a BUG) #SKIP
-// - gStringConveyance: #see enum-G_STRING_CONVEYANCE 
+// - n_gStringConveyance: (-1 special value: not used) #see enum-G_STRING_CONVEYANCE 
 //   TODO: conveyance per g-string set ELEMENT..
 // - c_namedObjectDestroyInstanceFunction: only significant with NAMED_OBJECT__G_STRING_CONVEYANCE
 // 
@@ -262,22 +268,23 @@ typedef int (*NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION) (void *rx_handle) ;
 // - RETURNED: Ok, <g-string set> collection is instancied
 // - -1: unexpected problem; anomaly is raised 
 int GStringsCreateInstance(G_STRINGS_HANDLE* azh_handle,  int expectedItemsNumber,
-  int gStringSetCardinality, int gStringConveyance,
+  int gStringSetCardinality, int n_gStringConveyance,
   NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION c_namedObjectDestroyInstanceFunction);
 
 // #REF G_STRINGS_CREATE_INSTANCE <g-string>
 // #SEE GStringsCreateInstance <g-string>
-// Note: TOKEN__G_STRING_CONVEYANCE => token id acolyt 
 #define /*int*/ G_STRINGS_CREATE_INSTANCE(/*G_STRINGS_HANDLE*/ azh_handle,\
-  /*int*/ expectedItemsNumber)  GStringsCreateInstance(azh_handle, expectedItemsNumber,1,\
-  TOKEN__G_STRING_CONVEYANCE, (NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION)UNDEFINED)
+  /*int*/ expectedItemsNumber)  GStringsCreateInstance(azh_handle, expectedItemsNumber,1, -1,\
+  (NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION)UNDEFINED)
 
-// #REF NAMED_OBJECTS_CREATE_INSTANCE <g-string>
+// #REF NAMED_OBJECTS_CREATE_INSTANCE <named-object>
 // #SEE GStringsCreateInstance <g-string>
-// Note: TOKEN__G_STRING_CONVEYANCE => token id acolyt 
+// Note: NAMED_OBJECT__G_STRING_CONVEYANCE => object handle acolyt 
 #define /*int*/ NAMED_OBJECTS_CREATE_INSTANCE(/*G_STRINGS_HANDLE*/ azh_handle,\
-  /*int*/ expectedItemsNumber)  GStringsCreateInstance(azh_handle, expectedItemsNumber,1,\
-  NAMED_OBJECT__G_STRING_CONVEYANCE, (NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION)UNDEFINED)
+  /*int*/ expectedItemsNumber,\
+  /*NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION*/namedObjectDestroyInstanceFunction)\
+  GStringsCreateInstance(azh_handle, expectedItemsNumber,1, NAMED_OBJECT__G_STRING_CONVEYANCE,\
+  namedObjectDestroyInstanceFunction)
 
 
 // #REF GStringsFetch <gStringSet> 
@@ -427,19 +434,18 @@ struct G_KEY { //
 // - ... (variadic parameters) : for "compound" keys: key2, key3, etc.
 int GStringsIndexFetch(G_STRINGS_HANDLE cp_handle,
   INDEX_ITERATOR_AUTOMATIC_BUFFER nf_indexIteratorAutomaticBuffer,  int indexLabel,
-  int indexFetch, int c_indexSeek,  G_STRING_SET_STUFF *acvnt_gStringSetStuff,
+  int indexFetch, int c_indexSeek,  G_STRING_SET_STUFF *acvnt_gStringSetStuff, int *nacvn_entry,
   const struct G_KEY *ccap_key1, ...);
 
 
 // Fetch g-string item based on plain index 
 // #SEE GStringsIndexFetch @ c-ansi/g-string.h <gString>
-#define /*int*/ G_STRINGS_INDEX_FETCH(/*G_STRINGS_HANDLE*/ handle,\
-  /*INDEX_ITERATOR_AUTOMATIC_BUFFER*/ nf_indexIteratorAutomaticBuffer,\
-  /*int*/ indexLabel,  /*int*/ indexFetch, /*int*/ c_indexSeek,\
-  /*G_STRING_STUFF* */ acvnt_gStringStuff,\
-  /*const struct G_KEY* */ ccap_key) \
-GStringsIndexFetch(handle,  nf_indexIteratorAutomaticBuffer,  indexLabel,\
-  indexFetch,c_indexSeek,  acvnt_gStringStuff,  ccap_key)
+#define /*int*/ G_STRINGS_INDEX_FETCH(/*G_STRINGS_HANDLE*/handle,\
+  /*INDEX_ITERATOR_AUTOMATIC_BUFFER*/nf_indexIteratorAutomaticBuffer,\
+  /*int*/indexLabel,  /*int*/indexFetch, /*int*/c_indexSeek,\
+  /*G_STRING_STUFF* */acvnt_gStringStuff,  /*const struct G_KEY* */ccap_key) \
+  GStringsIndexFetch(handle, nf_indexIteratorAutomaticBuffer, indexLabel,indexFetch,c_indexSeek,\
+  acvnt_gStringStuff,NULL, ccap_key)
 
 
 // #REF GStringsVerifyIndexes <g-string set>

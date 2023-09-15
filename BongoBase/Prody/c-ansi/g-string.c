@@ -311,14 +311,15 @@ m_DIGGY_VAR_COMPARISON(comparison)
 
 // Public function : see .h
 int GStringsCreateInstance(G_STRINGS_HANDLE* azh_handle,  int expectedItemsNumber,
-  int gStringSetCardinality, int gStringConveyance,
+  int gStringSetCardinality, int n_gStringConveyance,
   NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION c_namedObjectDestroyInstanceFunction) {
   m_DIGGY_BOLLARD()
   m_MALLOC_INSTANCE(*azh_handle)
   G_STRINGS_HANDLE handle = *azh_handle;
 
   handle->gStringSetCardinality = gStringSetCardinality;
-  handle->gStringConveyance = gStringConveyance; 
+  handle->gStringConveyance = (n_gStringConveyance < 0? TOKEN__G_STRING_CONVEYANCE :
+    n_gStringConveyance); 
   m_ASSERT(handle->gStringConveyance != NAMED_OBJECT__G_STRING_CONVEYANCE ||
     handle->gStringSetCardinality == 1)
   handle->c_namedObjectDestroyInstanceFunction = c_namedObjectDestroyInstanceFunction;
@@ -419,7 +420,7 @@ int GStringsAddIndex (G_STRINGS_HANDLE handle,  int keysNumber,
 // Public function : see .h
 int GStringsIndexFetch(G_STRINGS_HANDLE cp_handle,
   INDEX_ITERATOR_AUTOMATIC_BUFFER nf_indexIteratorAutomaticBuffer,  int indexLabel,
-  int indexFetch, int c_indexSeek,  G_STRING_SET_STUFF *acvnt_gStringSetStuff,
+  int indexFetch, int c_indexSeek,  G_STRING_SET_STUFF *acvnt_gStringSetStuff, int *nacvn_entry,
   const struct G_KEY *ccap_key1, ...) {
   m_DIGGY_BOLLARD()
   const struct G_KEY* ccsap_keys[cp_handle->gStringSetCardinality] ; 
@@ -443,7 +444,7 @@ int GStringsIndexFetch(G_STRINGS_HANDLE cp_handle,
 
   int result = GreenCollectionIndexFetch(cp_handle->h_greenCollectionHandle,
     nf_indexIteratorAutomaticBuffer,  indexLabel,  indexFetch,  c_indexSeek,
-    (char **)acvnt_gStringSetStuff,  NULL,  ccsap_keys) ;
+    (char **)acvnt_gStringSetStuff, nacvn_entry,  ccsap_keys) ;
   m_TRACK_IF(result < 0)
   m_DIGGY_RETURN(result)
 } // GStringsIndexFetch
@@ -504,6 +505,7 @@ int GStringsClear(G_STRINGS_HANDLE handle, char b_fullClear) {
   m_DIGGY_RETURN(RETURNED)
 } // GStringsClear
 
+// Public function : see .h
 int GStringsGetConveyance(G_STRINGS_HANDLE handle) {
   m_DIGGY_BOLLARD()
 

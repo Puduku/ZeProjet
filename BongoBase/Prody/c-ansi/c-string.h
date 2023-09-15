@@ -389,7 +389,7 @@ const char *ParanoidScanStringPortionTillMatch(const struct STRING_PORTION *ap_s
 // - m_sequence: as passed to (and updated by) ScanStringPortion*() function
 // - b_regularScan 
 //   + b_REGULAR_SCAN (TRUE) :
-//   + b_REVERSED_SCAN (FALSE) :
+//   + b_REVERTED_SCAN (FALSE) :
 // - b_passCharsTill:  
 //   + b_PASS_CHARS_TILL (TRUE) : seek 1st character HAVING the property
 //   + b_PASS_CHARS_WHILE (FALSE) : seek 1st character NOT HAVING the property
@@ -453,13 +453,21 @@ const char *ParanoidScanStringPortionTillMatch(const struct STRING_PORTION *ap_s
 // - m_sequence: parsed lexeme removed in the sequence 
 // - *na_lexeme: (if used) parsed lexeme (aka token) 
 #define m_PARSE_TILL_MATCH(/*struct STRING_PORTION*/m_sequence, \
-  /*struct STRING_PORTION*/p_subStringPortion, /*TO_CHAR_FUNCTION*/ n_toCharFunction,\
+  /*struct STRING_PORTION*/p_subStringPortion, /*TO_CHAR_FUNCTION*/n_toCharFunction,\
   /*struct STRING_PORTION* */na_lexeme) {\
   const char *em_scanPtr = ScanStringPortionTillMatch(&m_sequence,&p_subStringPortion,\
     n_toCharFunction);\
   m_TRACK_IF(em_scanPtr == NULL)\
   m_PARSE_SEQUENCE(m_sequence,em_scanPtr, na_lexeme)\
 }
+
+// Wrap m_PARSE_TILL_MATCH above
+#define m_PARSE_TILL_MATCH_C(/*struct STRING_PORTION*/m_sequence, \
+  /*const char* */p_subCString, /*TO_CHAR_FUNCTION*/n_toCharFunction,\
+  /*struct STRING_PORTION* */na_lexeme) {\
+  m_ASSIGN_LOCAL_C_STRING_PORTION(em_localSubStringPortion,p_subCString) \
+  m_PARSE_TILL_MATCH(m_sequence,em_localSubStringPortion,n_toCharFunction,na_lexeme) \
+}   
 
 // Parse a string portion sequence according to offset (as if was "scanned" position) 
 //
