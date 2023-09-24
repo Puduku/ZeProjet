@@ -1,8 +1,8 @@
 ###################
-# der-inspector.env
+# der-inspector.esh
 ###################
 # Bash script extension for katzenjammer (kids) scripts 
-#### USES mama.env #### 
+#### USES mama.esh #### 
 
 
 # Testing utilities...
@@ -52,6 +52,6 @@ SpecificInstructionsOutline () {
   echo "max procession step:$maxStep ; pruning:$pruning"
 }
 
-. katzenjammer.env
+. katzenjammer.esh
 
-. der-captain.env
+. der-captain.esh

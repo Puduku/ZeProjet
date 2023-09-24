@@ -6,7 +6,7 @@
 #### END OF REMOVABLE CARTRIDGE
 #!/bin/bash
 # <<GARDEN>>/fritz.sh
-. mama.env
+. mama.esh
 
 #################################
 plot="<<TESTS PLAN DESCRIPTION>>"
@@ -27,8 +27,8 @@ SpecificInstructionsOutline () {
   fi
 }
 
-. katzenjammer.env
-. der-captain.env
+. katzenjammer.esh
+. der-captain.esh
 
 #### Execute plot...
 

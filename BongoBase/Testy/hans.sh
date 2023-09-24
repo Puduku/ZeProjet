@@ -1,14 +1,14 @@
 #!/bin/bash
 #Testy/hans.sh
-. mama.env
+. mama.esh
 
 #################################
 plot="Building Testy executables"
 #################################
 cleaning=s
 
-. katzenjammer.env
-. lena.env
+. katzenjammer.esh
+. lena.esh
 
 #### "Global" variables:
 

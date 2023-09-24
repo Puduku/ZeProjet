@@ -1,4 +1,4 @@
 MAMA.TXT
 *.sh.mod
-bin/*.env
+bin/*.esh
 bin/*.sh

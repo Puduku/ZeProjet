@@ -1,8 +1,8 @@
 #################
-# der-captain.env 
+# der-captain.esh 
 #################
 # Bash script extension for katzenjammer (kids) scripts 
-#### USES "katzenjammer.env ####
+#### USES "katzenjammer.esh ####
 
 # Testing utilities...
 # See <PUB> labels 

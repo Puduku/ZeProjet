@@ -1,6 +1,6 @@
 #!/bin/bash
 #Testy/fritz.sh
-. mama.env
+. mama.esh
 
 #################################
 plot="Running Testy executables "
@@ -21,8 +21,8 @@ SpecificInstructionsOutline () {
   fi
 }
 
-. katzenjammer.env
-. der-captain.env
+. katzenjammer.esh
+. der-captain.esh
 
 #### Execute plot...
 

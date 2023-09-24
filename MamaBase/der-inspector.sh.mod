@@ -5,13 +5,13 @@
 #### END OF REMOVABLE CARTRIDGE
 #!/bin/bash
 # <<GARDEN>>/der-inspector.sh
-. mama.env
+. mama.esh
 
-###################################################################################################
-plot="Collect all the coconuts in <<GARDEN>>'s garden (i.e. highlight doc in <<GARDEN>>'s header files)
-###################################################################################################
+#########################################################################
+plot="Valorize <<GARDEN>> header files' documentation (pick all COde COmments' NUTS...) 
+#########################################################################
 
-. der-inspector.env
+. der-inspector.esh
 
 ##### Execute plot ##### 
 

@@ -9,15 +9,15 @@
 #### END OF REMOVABLE CARTRIDGE
 #!/bin/bash
 # <<GARDEN>>/hans.sh
-. mama.env
+. mama.esh
 
 #######################################
 plot="<<COMPILATION PLAN DESCRIPTION>>"
 #######################################
 cleaning=s
 
-. katzenjammer.env
-. lena.env
+. katzenjammer.esh
+. lena.esh
 
 #### Creek functions: 
 

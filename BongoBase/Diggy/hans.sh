@@ -1,14 +1,14 @@
 #!/bin/bash
 #Diggy/hans.sh
-. mama.env
+. mama.esh
 
 #############################
 plot="Building DIGGY objects"
 #############################
 cleaning=s
 
-. katzenjammer.env
-. lena.env
+. katzenjammer.esh
+. lena.esh
 
 
 CreekFunctions

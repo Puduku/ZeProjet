@@ -1,14 +1,14 @@
 #!/bin/bash
 #Prody/hans.sh
-. mama.env
+. mama.esh
 
 ##########################
 plot="Building PRODUCTION"
 ##########################
 cleaning=s
 
-. katzenjammer.env
-. lena.env
+. katzenjammer.esh
+. lena.esh
 
 #### Creek functions:
 

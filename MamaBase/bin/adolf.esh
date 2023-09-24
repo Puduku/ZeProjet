@@ -1,4 +1,4 @@
-# adolf.env : (bash) extension for hans & fritz (*) scripts
+# adolf.esh : (bash) extension for hans & fritz (*) scripts
 
 # "Nasty" utilities for scripts (working around parsing problems with dynamic generation of args
 # arrays containing white spaces...)
@@ -6,7 +6,7 @@
 
 # <PUB> Adolf - Construct a list a arguments for evaluation
 # Typical use cases:
-# - command construction (see <PUB> EvalCommand of "mama.env" extension)
+# - command construction (see <PUB> EvalCommand of "mama.esh" extension)
 # - dynamic array initialization via "eval"   
 # Note: at first glance, the mechanism looks like needless complication ("re-builds" a list of 
 # parameters from an array) but is finally indispensable to construct dynamically list of 
@@ -18,7 +18,7 @@
 #    containing white spaces
 # 2. Adolf contructs dynamically a list of parameters, but that list must be "evaluated".
 #    That is Adolf's output need be "passed" to "eval" builtin - or to function thar evaluates its
-#    arguments like EvalCommand (see mama.env).
+#    arguments like EvalCommand (see mama.esh).
 # 3. Adolf materializes white spaces individually (with back-slash) in lieu of wrapping each
 #    argument within double quotes. As consequence, empty arguments cannot be "materialized" ;
 #    empty arguments "vanish" in the list of arguments recreated by Adolf... 

@@ -1,10 +1,10 @@
-# bye.env
+# bye.esh
 # Abstract: "Polite" commands:
 # - "Welcome" new incomers... 
 # - say "Hello" when we "Welcome" them... 
 # - say "Bye" before exiting.
 
-# Uses "dirks.env" bash extension 
+# Uses "dirks.esh" bash extension 
 
 
 # 1. Handling of "polite" commands...

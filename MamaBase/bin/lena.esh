@@ -2,7 +2,7 @@
 # THE KATZENJAMMER KIDS : LENA #
 ################################
 # Bash script extension for katzenjammer (kids) scripts 
-# Uses "katzenjammer.env" bash extension (formerly read and executed in the script) 
+# Uses "katzenjammer.esh" bash extension (formerly read and executed in the script) 
 
 # Compilation utilities...
 # See <PUB> labels 

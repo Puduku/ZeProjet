@@ -1,14 +1,14 @@
-# katzenjammer.env : (bash) extension for katzenjammer (kids) scripts
+# katzenjammer.esh : (bash) extension for katzenjammer (kids) scripts
    
-# Uses "mama.env" bash extension (formerly read and executed in the katzenjammmer (kids) script) 
+# Uses "mama.esh" bash extension (formerly read and executed in the katzenjammmer (kids) script) 
 
 # Notice: <EXT> and <PUB> info labels:
 # - <PUB> label indicates "public" features (offered by script extensions). 
 # - <EXT> label indicates "external" definitions (claimed by script extensions)
 # => For completed info, type command: $ mama.sh -i  
   
-. bye.env
-. adolf.env
+. bye.esh
+. adolf.esh
 
 # (internal) working vars...
 typeset -i _katzenjammer_i=-1

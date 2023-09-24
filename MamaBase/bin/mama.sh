@@ -1,7 +1,7 @@
 #!/bin/bash
 # mama.sh : general script for 'Katzenjammer Kids' Island(s) 
 
-. mama.env
+. mama.esh
 
 
 while getopts :hi _o; do
@@ -54,13 +54,13 @@ MAMA_SH_HELP
   else
     cat >> /dev/stderr << MAMA_SH_INFO
 Index of PUBlic and EXTernal features for "Katzenjammer Kids" scripts :  
-All these features are described in bash extension files (.env) of $MAMA/bin/
+All these features are described in bash extension files (.esh) of $MAMA/bin/
 
 Public features (available to katzenjammer scripts):  
-$(cd "$MAMA/bin" && grep '# *<PUB>' *.env)
+$(cd "$MAMA/bin" && grep '# *<PUB>' *.esh)
 
 External features (defined in katzenjammer scripts):  
-$(cd "$MAMA/bin" && grep '# *<EXT>' *.env)
+$(cd "$MAMA/bin" && grep '# *<EXT>' *.esh)
 
 MAMA_SH_INFO
   fi

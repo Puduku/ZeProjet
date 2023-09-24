@@ -1,12 +1,12 @@
 #!/bin/bash
 # Prody/der-inspector.sh
-. mama.env
+. mama.esh
 
 ##############################################################################################
 plot="Collect all the coconuts in Prody's garden (i.e. highlight doc in Prody's header files)"
 ##############################################################################################
 
-. der-inspector.env
+. der-inspector.esh
 
 ##### Execute plot ##### 
 

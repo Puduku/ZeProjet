@@ -1,5 +1,5 @@
-# mama.env : basic bash extension for 'Katzenjammer Kids' scripts
-. dirks.env 
+# mama.esh : basic bash extension for 'Katzenjammer Kids' scripts
+. dirks.esh 
 
 
 #TODO: is this trap useful ?
