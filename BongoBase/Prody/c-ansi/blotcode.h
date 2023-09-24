@@ -72,7 +72,7 @@ struct BLOTFUNC {
 } ;
 
 
-typedef int gen_BLOTVAL; 
+typedef GENERIC_INTEGER gen_BLOTVAL; 
 
 
 #define  TRUE__BLOTVAL0 0
@@ -112,28 +112,6 @@ typedef int (*BLOTLIB_EXECUTOR__EXECUTE_C_FUNCTION) (void *r_handle,
   const struct BLOTFUNC *ap_blotfunc, G_STRING_STUFF c_surrogate, gen_BLOTVAL *ac_blotval,
   G_STRING_STUFF nc_abandonmentInfo) ;
 
-
-// Util function to handle blot values...
-// Recognize 32 bits signed integral numbers expressed according to C conventions (like 0x prefix
-// for hexadecimal base). NOTE: this function wraps strtol() ; check man page for exact conventions.
-//
-// Passed:
-// - p_stringPortion : string portion containing the integral number expression
-//   #SEE struct-STRING_PORTION
-// - nac_parsedLength: NULL special value: not used
-//
-// Changed:
-// - *ac_blotval:
-// - *nac_parsedLength: (when asked) only significant is case of successful parsing ;
-//    actual number of parsed chars corresponding to the integral number. 
-//
-// Ret: Succeeded to parse a "blot value" number ?
-// - ANSWER__YES : successfully parsed (note: check *nac_parsedLength to see if some trailing
-//   characters have been ignored) 
-// - ANSWER__NO : C number not recognized or too big for blot value 
-// - -1: unexpected problem ; anomaly is raised
-int ReadBlotval(struct STRING_PORTION p_stringPortion,  gen_BLOTVAL *ac_blotval,
-  int *nac_parsedLength) ;
 
 
 // #REF BLOTLIB_EXECUTOR__DESTROY_INSTANCE_FUNCTION 

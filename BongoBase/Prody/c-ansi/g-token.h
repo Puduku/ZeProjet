@@ -26,6 +26,24 @@ struct TOKEN_DEFINITION {
   TOKEN__G_STRING_CONVEYANCE, (NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION)UNDEFINED)
 
 
+// Manipulate g-string as 'token'
+// 
+// Passed
+// - stuff:
+// - tokenId:
+// - n_gStringsHandle:
+// 
+// Ret:
+// - RETURNED: OK
+// - -1: unexpected problem; anomaly is raised...
+static inline int m_GStringAsToken(G_STRING_STUFF stuff, int tokenId, 
+  G_STRINGS_HANDLE n_gStringsHandle) {
+  m_CHECK_G_STRINGS_COLLECTION_CONVEYANCE(n_gStringsHandle,TOKEN__G_STRING_CONVEYANCE)
+  stuff->acolyt.c_tokenId = tokenId;
+  return RETURNED;
+} // m_GStringAsToken
+
+
 
 // Import g-tokens in one shot...
 //

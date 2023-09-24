@@ -333,24 +333,26 @@ int SScanfStringPortion(struct STRING_PORTION stringPortion, const char *p_forma
 } // SScanfStringPortion
 
 // Public function : see .h
-int ReadCLongCString(const char *p_cString,  long *ac_value,
+int ReadGenericIntegerCString(const char *p_cString,  GENERIC_INTEGER *ac_value,
   int *nac_parsedLength) {
   m_DIGGY_BOLLARD()
 
   int answer = ANSWER__YES; // a priori
   char *endptr = (char*)UNDEFINED;
   
+  m_CT_ASSERT(sizeof(GENERIC_INTEGER)==sizeof(long int))
+
   errno = 0;
   *ac_value = strtol(p_cString,&endptr,0);
   if (errno != 0 || endptr == p_cString) answer = ANSWER__NO;
   else if (nac_parsedLength != NULL) *nac_parsedLength = (endptr - p_cString); 
 
   m_DIGGY_RETURN(answer)
-} // ReadCLongCString
+} // ReadGenericIntegerCString
 
 
 // Public function : see .h
-int ReadCLongStringPortion(struct STRING_PORTION stringPortion,  long *ac_value,
+int ReadGenericIntegerStringPortion(struct STRING_PORTION stringPortion,  GENERIC_INTEGER *ac_value,
   int *nac_parsedLength) {
   m_DIGGY_BOLLARD()
 
@@ -358,10 +360,10 @@ int ReadCLongStringPortion(struct STRING_PORTION stringPortion,  long *ac_value,
 
   int answer = ANSWER__YES; // a priori
 
-  answer = ReadCLongCString(stringPortion.string,ac_value,nac_parsedLength) ;
+  answer = ReadGenericIntegerCString(stringPortion.string,ac_value,nac_parsedLength) ;
   m_TRACK_IF(answer < 0)
 
   m_RELEASE_HIJACKED_STRING_PORTION(stringPortion)
 
   m_DIGGY_RETURN(answer)
-} // ReadCLongStringPortion
+} // ReadGenericIntegerStringPortion

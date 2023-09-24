@@ -389,18 +389,18 @@ static int TestsConvertStringPortion(void) {
 // Ret: 
 // - RETURNED: Ok
 // - -1: anomaly is raised
-static int TestsReadCLongStringPortion(void) {
+static int TestsReadGenericIntegerStringPortion(void) {
 #define m_TEST_READ_C_LONG_STRING_PORTION(/*const char* */p_string, /*int*/n_length,\
   /*int*/expectedAnswer, /*long*/c_expectedValue, /*int*/c_expectedParsedLength) {\
   m_ASSIGN_LOCAL_STRING_PORTION(stringPortion,p_string,n_length)\
-  answer = ReadCLongStringPortion(stringPortion,&c_value,&c_parsedLength);\
+  answer = ReadGenericIntegerStringPortion(stringPortion,&c_value,&c_parsedLength);\
   m_ASSERT(answer == expectedAnswer) \
   if (answer == ANSWER__YES) { \
     m_ASSERT(c_value == c_expectedValue) \
     m_ASSERT(c_parsedLength == c_expectedParsedLength) \
   } \
   if (n_length < 0) {\
-    answer = ReadCLongCString(p_string,&c_value,&c_parsedLength);\
+    answer = ReadGenericIntegerCString(p_string,&c_value,&c_parsedLength);\
     m_ASSERT(answer == expectedAnswer) \
     if (answer == ANSWER__YES) { \
       m_ASSERT(c_value == c_expectedValue) \
@@ -424,7 +424,7 @@ static int TestsReadCLongStringPortion(void) {
   m_DIGGY_RETURN(RETURNED)
 #undef m_TEST_READ_C_LONG_STRING_PORTION
 #undef m_TEST_READ_C_LONG_STRING_PORTION
-} // TestsReadCLongStringPortion
+} // TestsReadGenericIntegerStringPortion
 
 
 int main(int argc, char** argv) {
@@ -446,7 +446,7 @@ int main(int argc, char** argv) {
   m_TRACK_IF(TestsScanStringPortion() != RETURNED)
   m_TRACK_IF(TestsScanStringPortionTillMatch() != RETURNED)
   m_TRACK_IF(TestsConvertStringPortion() != RETURNED)
-  m_TRACK_IF(TestsReadCLongStringPortion() != RETURNED)
+  m_TRACK_IF(TestsReadGenericIntegerStringPortion() != RETURNED)
 
   m_DIGGY_RETURN(0)
 } // main

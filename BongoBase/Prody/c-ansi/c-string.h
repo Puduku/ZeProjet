@@ -146,10 +146,10 @@ static inline int m_StringPortionLength(const struct STRING_PORTION *ap_stringPo
 // - p_stringPortion: 
 // 
 // Ret:
-// - TRUE: the stringPortion is empty (length <= 0)
+// - TRUE: the stringPortion is empty (length == 0)
 // - FALSE: the stringPortion is not empty (length > 0)
 #define b_EMPTY_STRING_PORTION(/*const struct STRING_PORTION*/p_stringPortion) \
-  (m_StringPortionLength(&(p_stringPortion)) <= 0)
+  (m_StringPortionLength(&(p_stringPortion)) == 0)
 
 
 // Provide buffer / length function parameters corresponding to string portion.
@@ -289,8 +289,8 @@ int ParanoidCompareStringPortions(const struct STRING_PORTION *ap_stringPortion1
   IS_CHAR_FUNCTION n_isNeutralCharFunction,  TO_CHAR_FUNCTION n_toCharFunction) ; 
 
 
-// Parsing string portions
-// ----------------------- 
+// Scanning string portions
+// ------------------------ 
 
 #define b_REGULAR_SCAN b_TRUE
 #define b_REVERTED_SCAN b_FALSE0
@@ -362,131 +362,6 @@ const char *ParanoidScanStringPortionTillMatch(const struct STRING_PORTION *ap_s
 #define b_SCAN_STRING_PORTION_LOCATED(/*const struct STRING_PORTION*/p_stringPortion,\
   /*const char* */u_scanPtr)  ( (u_scanPtr) < (p_stringPortion).stop ) 
 
-// Parse a string portion sequence according to scan pointer returned by ScanStringPortion*()
-// functions. The scan pointer is the delimitation of the parsed lexeme (aka token) in the 
-// sequence...
-//
-// Passed:
-// - m_sequence: as passed to (and updated by) ScanStringPortion*() function
-// - scanPtr: scan positon (returned by ScanStringPortion*()...)
-// - na_lexeme: NULL if not used
-//
-// Changed:
-// - m_sequence: parsed lexeme removed in the sequence 
-// - *na_lexeme: (if used) parsed lexeme (aka token) 
-#define m_PARSE_SEQUENCE(/*struct STRING_PORTION*/m_sequence, /*const char* */scanPtr,\
-  /*struct STRING_PORTION* */na_lexeme) {\
-  if ((na_lexeme) != NULL) {\
-    ((struct STRING_PORTION*)na_lexeme)->string = (m_sequence).string;\
-    ((struct STRING_PORTION*)na_lexeme)->stop = scanPtr;\
-  }\
-  (m_sequence).string = scanPtr ;\
-}
-
-// Parse a string portion sequence according to chars scanned by ScanStringPortion() function. 
-//
-// Passed:
-// - m_sequence: as passed to (and updated by) ScanStringPortion*() function
-// - b_regularScan 
-//   + b_REGULAR_SCAN (TRUE) :
-//   + b_REVERTED_SCAN (FALSE) :
-// - b_passCharsTill:  
-//   + b_PASS_CHARS_TILL (TRUE) : seek 1st character HAVING the property
-//   + b_PASS_CHARS_WHILE (FALSE) : seek 1st character NOT HAVING the property
-// - n_isCharFunction: property evaluation function (see IS_CHAR_FUNCTION) (NULL if not used) 
-// - c_char: only significant if n_isCharFunction == NULL 
-// - na_lexeme: NULL if not used
-//
-// Changed:
-// - m_sequence: parsed lexeme removed in the sequence 
-// - *na_lexeme: (if used) parsed lexeme (aka token) 
-#define m_PARSE_PASS_CHARS(/*struct STRING_PORTION*/m_sequence, \
-  b_regularScan, b_passCharsTill, /*IS_CHAR_FUNCTION*/n_isCharFunction, /*char*/c_char,\
-  /*struct STRING_PORTION* */na_lexeme) {\
-  const char *em_scanPtr = ScanStringPortion(&m_sequence,b_regularScan,b_passCharsTill,\
-    n_isCharFunction,c_char);\
-  m_TRACK_IF(em_scanPtr == NULL)\
-  m_PARSE_SEQUENCE(m_sequence,em_scanPtr, na_lexeme)\
-}
-
-// Parse a string portion sequence : pass all white spaces... 
-//
-// Passed:
-// - m_sequence: 
-// - na_lexeme: NULL if not used
-//
-// Changed:
-// - m_sequence: parsed lexeme removed in the sequence 
-// - *na_lexeme: (if used) parsed lexeme (aka white spaces) 
-#define m_PARSE_PASS_SPACES(/*struct STRING_PORTION*/m_sequence, \
-  /*struct STRING_PORTION* */na_lexeme)  m_PARSE_PASS_CHARS(m_sequence,b_REGULAR_SCAN,\
-  b_PASS_CHARS_WHILE,isspace,UNDEFINED, na_lexeme)
-
-// Parse twice a string portion sequence :
-// 1. pass all (leading) white spaces... 
-// 2. remove ending white space of sequence 
-//
-// Passed:
-// - m_sequence: 
-// - na_lexeme: NULL if not used
-//
-// Changed:
-// - m_sequence: points to ending white spaces of initial sequence 
-// - *na_lexeme: (if used) parsed lexeme (stripped of ending and leading white spaces) 
-#define m_PARSE_STRIP_SPACES(/*struct STRING_PORTION*/m_sequence, \
-  /*struct STRING_PORTION* */na_lexeme) {\
-  m_PARSE_PASS_SPACES(m_sequence,NULL)\
-  m_PARSE_PASS_CHARS(m_sequence,b_REGULAR_SCAN,b_PASS_CHARS_TILL,isspace,UNDEFINED,na_lexeme)\
-}
-
-
-// Parse a string portion sequence according to sub string scanned by ScanStringPortionTillMatch()
-// function. 
-//
-// Passed:
-// - m_sequence: as passed to (and updated by) ScanStringPortion*() function
-// - a_subStringPortion:
-// - n_toCharFunction:
-// - na_lexeme: NULL if not used
-//
-// Changed:
-// - m_sequence: parsed lexeme removed in the sequence 
-// - *na_lexeme: (if used) parsed lexeme (aka token) 
-#define m_PARSE_TILL_MATCH(/*struct STRING_PORTION*/m_sequence, \
-  /*struct STRING_PORTION*/p_subStringPortion, /*TO_CHAR_FUNCTION*/n_toCharFunction,\
-  /*struct STRING_PORTION* */na_lexeme) {\
-  const char *em_scanPtr = ScanStringPortionTillMatch(&m_sequence,&p_subStringPortion,\
-    n_toCharFunction);\
-  m_TRACK_IF(em_scanPtr == NULL)\
-  m_PARSE_SEQUENCE(m_sequence,em_scanPtr, na_lexeme)\
-}
-
-// Wrap m_PARSE_TILL_MATCH above
-#define m_PARSE_TILL_MATCH_C(/*struct STRING_PORTION*/m_sequence, \
-  /*const char* */p_subCString, /*TO_CHAR_FUNCTION*/n_toCharFunction,\
-  /*struct STRING_PORTION* */na_lexeme) {\
-  m_ASSIGN_LOCAL_C_STRING_PORTION(em_localSubStringPortion,p_subCString) \
-  m_PARSE_TILL_MATCH(m_sequence,em_localSubStringPortion,n_toCharFunction,na_lexeme) \
-}   
-
-// Parse a string portion sequence according to offset (as if was "scanned" position) 
-//
-// Passed:
-// - m_sequence: as passed to (and updated by) ScanStringPortion*() function
-// - offset: typically , lenght of a token we want to "skip" in the sequence.
-// TODO: what is exactly a valid offset  ? 
-// - na_lexeme: NULL if not used
-//
-// Changed:
-// - m_sequence: parsed lexeme removed in the sequence 
-// - *na_lexeme: (if used) parsed lexeme (aka token) 
-#define m_PARSE_OFFSET(/*struct STRING_PORTION*/m_sequence,  /*int*/offset,\
-  /*struct STRING_PORTION* */na_lexeme) {\
-  const char *em_scanPtr = (m_sequence).string + offset;\
-  m_TRACK_IF(em_scanPtr == NULL)\
-  m_ASSERT(em_scanPtr >= (m_sequence).string)\
-  m_PARSE_SEQUENCE(m_sequence,em_scanPtr, na_lexeme)\
-}
 
 // Converting string portions
 // --------------------------
@@ -595,16 +470,17 @@ int SScanfStringPortion(struct STRING_PORTION stringPortion, const char *p_forma
 //   characters have been ignored) 
 // - ANSWER__NO : C number not recognized or too big for long integer 
 // - -1: unexpected problem ; anomaly is raised
-int ReadCLongCString(const char *p_cString,  long *ac_value, int *nac_parsedLength);
+int ReadGenericIntegerCString(const char *p_cString,  GENERIC_INTEGER *ac_value, int *nac_parsedLength);
 
 
-// Wraps ReadCLongCString() above ;
+// Wraps ReadGenericIntegerCString() above ;
 // Allows parsing any kind of string portion (in lieu of '\0'-terminated C-string)...
 //
 // Passed:
 // stringPortion : 
-// (Other params : see ReadCLongCString() above)   
-int ReadCLongStringPortion(struct STRING_PORTION stringPortion,  long *ac_value,
+// (Other params : see ReadGenericIntegerCString() above)   
+int ReadGenericIntegerStringPortion(struct STRING_PORTION stringPortion,  GENERIC_INTEGER *ac_value,
   int *nac_parsedLength);
+
 
 #endif // __C_ANSI_C_STRING_H_INCLUDED

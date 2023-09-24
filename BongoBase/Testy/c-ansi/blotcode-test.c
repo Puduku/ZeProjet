@@ -50,14 +50,14 @@ static int Blotlib1ExecutorExecuteC(void *r_handle, const struct BLOTFUNC *ap_bl
   m_DIGGY_BOLLARD()
   //m_ASSERT(r_handle == DUMMY_BLOTLIB_EXECUTOR_HANDLE)
   if (ap_blotfunc->entry.localBlotfuncNameEntry == 1) { // InitUnDeuxTrois function 
-    int answer = ReadBlotval(ap_blotfunc->call.arguments, &handle->nbIters,  (int*)NULL);
+    int answer = ReadGenericIntegerStringPortion(ap_blotfunc->call.arguments, &handle->nbIters,  (int*)NULL);
     m_TRACK_IF(answer < 0)
-m_DIGGY_VAR_D(handle->nbIters)
+//m_DIGGY_VAR_D(handle->nbIters)
     if (answer == ANSWER__NO) m_DIGGY_RETURN(ANSWER__NO)
   } else if (ap_blotfunc->entry.localBlotfuncNameEntry == 2) { // UnDeuxTrois function 
     if (handle->nbIters-- > 0) *ac_blotval = ITERATE_LOOP__BLOTVAL0;
     else *ac_blotval = BREAK_LOOP__BLOTVAL; 
-m_DIGGY_INFO("blot value=%d (TRUE=0 FALSE=1)",*ac_blotval)
+//m_DIGGY_INFO("blot value=%d (TRUE=0 FALSE=1)",*ac_blotval)
   } else {
     *ac_blotval = 0;
   } // if
@@ -102,9 +102,9 @@ static int Blotlib2ExecutorExecuteC(void *r_handle, const struct BLOTFUNC *ap_bl
     } // comparison 
     m_ASSERT(m_GStringCCopy(c_surrogate,0,"sait") >= 0)
   break; case 2: // Nombre
-    answer = ReadBlotval(ap_blotfunc->call.arguments, ac_blotval,(int*)NULL);
+    answer = ReadGenericIntegerStringPortion(ap_blotfunc->call.arguments, ac_blotval,(int*)NULL);
     m_TRACK_IF(answer < 0)
-m_DIGGY_VAR_D(*ac_blotval)
+//m_DIGGY_VAR_D(*ac_blotval)
   break; default: ;
   } // switch
   m_DIGGY_RETURN(answer)

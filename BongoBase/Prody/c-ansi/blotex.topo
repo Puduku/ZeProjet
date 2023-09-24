@@ -43,11 +43,19 @@
 // - 0 : represents "true" boolean value
 // - !=0 : represents "false" boolean value
 //
+// Entities
+// - blotreg
+// - blotvar
+// - blot table
+// are identified by their name (may be empty).
+//
+// <entity name> ::= ( <letter> | <digit> | '_' )*
+//
 // Variables and registers
 // A Blot variable (blotvar) stores a blotex value.
 // A register (blotreg) is a collection of blovars
 // (the register with empty name is called the global register)
-// <blotvar> ::= <blotreg name> ( '.' <blotvar name>  | '[' <intex> ']' | '{' <intex> '}' ) 
+// <blotvar> ::= <entity name> ( '.' <entity name>  | '[' <intex> ']' | '{' <intex> '}' ) 
 // Blotvar examples: 
 // .toto => "toto" blotvar of global register
 // recettes.bolo => "bolo" blotvar of "recettes" register
@@ -83,10 +91,10 @@
 // .toto!# => index (entry) of "toto" global blotvar 
 //
 // Register operations 
-// <int blotreg op> ::= <blotreg name> '?' <int blotreg op details>  
+// <int blotreg op> ::= <entity name> '?' <int blotreg op details>  
 // <int blotreg op details> ::= <blotreg init> | <blotreg reset> | <blotreg fetch> |
 //   <blotreg read int> 
-// <str blotreg read op> ::= <blotreg name> '?=$'  
+// <str blotreg read op> ::= <entity name> '?=$'  
 // <blotreg init> ::= ':' <blot request> ':?'
 // <blotreg reset> ::= '^'
 // <blotreg fetch> ::= '+'

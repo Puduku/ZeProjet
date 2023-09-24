@@ -14,34 +14,13 @@
 #include "c-ansi/c-stack.h"
 #include "c-ansi/blotcode.h"
 #include "c-ansi/c-string.h"
+#include "c-ansi/c-parse.h"
 #include "c-ansi/g-string.h"
 #include "c-ansi/g-token.h"
 
 #include "c-ansi/testy-diggy.h"
 #include "c-ansi/diggy.h"
 
-
-// BLOTVALs (blot values)
-// ----------------------
-
-// Public function: see .h
-int ReadBlotval (struct STRING_PORTION p_stringPortion,  gen_BLOTVAL *ac_blotval,
-  int *nac_parsedLength) {
-  m_DIGGY_BOLLARD()
-
-  long c_longValue = (long)UNDEFINED;
-  int answer = ReadCLongStringPortion(p_stringPortion,&c_longValue,nac_parsedLength);
-  switch (answer) { 
-  case ANSWER__YES:
-    if (c_longValue > INT32_MAX || c_longValue < INT32_MIN) answer = ANSWER__NO;
-    else *ac_blotval = (gen_BLOTVAL) c_longValue; 
-  break; case ANSWER__NO:
-  break; default:
-    m_TRACK()
-  } // switch
-
-  m_DIGGY_RETURN(answer) 
-} // ReadBlotval
 
 
 // BLOTKEYWs (blot keywords)
@@ -772,7 +751,8 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
 
     if (!b_EMPTY_STRING_PORTION(litteralBlotval)) {
       int parsedLength = UNDEFINED;
-      switch (ReadBlotval(litteralBlotval,  &vc_blotinstPtr->c_blotval, &parsedLength)) {
+      switch (ReadGenericIntegerStringPortion(litteralBlotval,  &vc_blotinstPtr->c_blotval,
+        &parsedLength)) {
       case ANSWER__YES: 
         vc_blotinstPtr->b_blotval = b_TRUE;
         if (parsedLength < m_StringPortionLength(&litteralBlotval)) {
