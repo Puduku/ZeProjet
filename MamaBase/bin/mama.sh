@@ -53,13 +53,14 @@ Exit status :
 MAMA_SH_HELP
   else
     cat >> /dev/stderr << MAMA_SH_INFO
-Index of PUBlic and EXTernal features for "Katzenjammer Kids" scripts :  
-All these features are described in bash extension files (.esh) of $MAMA/bin/
+Index of PUBlic and EXTernal variables and functions for "katzenjammer (kids)" scripts 
+See full features documentation in corresponding (.esh) script extension files
+(present in $MAMA/bin/ directory)
 
-Public features (available to katzenjammer scripts):  
+Public variables and functions (usable by your katzenjammer script):  
 $(cd "$MAMA/bin" && grep '# *<PUB>' *.esh)
 
-External features (defined in katzenjammer scripts):  
+External variables and functions (to be implemented in your katzenjammer script):  
 $(cd "$MAMA/bin" && grep '# *<EXT>' *.esh)
 
 MAMA_SH_INFO
