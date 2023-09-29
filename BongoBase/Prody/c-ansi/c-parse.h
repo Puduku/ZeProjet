@@ -197,14 +197,14 @@
 //
 // Changed:
 // - m_sequence: parsed lexeme removed in the sequence 
-// - m_anwser: ANSWER__YES if succesfully parsed
-// - mc_value: only significant if succesfully parsed 
+// - mc_value: only significant if succesfully parsed (lexeme's length > 0) 
 // - *na_lexeme: (if used) parsed lexeme (aka token) 
-#define m_PARSE_GENERIC_INTEGER(/*struct STRING_PORTION*/m_sequence, /*int*/m_answer,\
-  /*GENERIC_INTEGER*/mc_value, /*struct STRING_PORTION* */na_lexeme) {\
+#define m_PARSE_GENERIC_INTEGER(/*struct STRING_PORTION*/m_sequence, /*GENERIC_INTEGER*/mc_value,\
+  /*struct STRING_PORTION* */na_lexeme) {\
   const char *em_scanPtr = (m_sequence).string;\
   int emc_parsedLength;\
-  switch ((m_answer) = ReadGenericIntegerStringPortion(m_sequence, &(mc_value),&emc_parsedLength)) {\
+  int em_answer;\
+  switch (em_answer = ReadGenericIntegerStringPortion(m_sequence, &(mc_value),&emc_parsedLength)) {\
   case ANSWER__YES:\
     em_scanPtr += emc_parsedLength;\
   break; case ANSWER__NO:\

@@ -49,6 +49,7 @@ static inline struct STRING_PORTION m_GStringGetLogicalStringPortion(G_STRING_ST
 
 // #REF GStringCopy
 // Copy (or concatenate...) a string portion into a "g-string".
+// ATTENTION: source and destination MAY NOT overlap
 // Note1: (*) mark useful values for  neutral operation  - i.e do not alter "destination" g-string; 
 // unless of course "destination" was "disengaged" (nhi_string == NULL) ; in such case, an empty
 // string is copied in destination. 
@@ -220,7 +221,7 @@ int GStringSetDestroyInstance(G_STRING_SET_STUFF xh_notNamedObjectStuff,  int ca
 
 // #SEE GStringSetDestroyInstance <g-string>
 #define /*int*/ G_STRING_DESTROY_INSTANCE(/*G_STRING_STUFF*/ xh_notNamedObjectStuff) \
-GStringSetDestroyInstance(xh_notNamedObjectStuff,1)
+  GStringSetDestroyInstance(xh_notNamedObjectStuff,1)
 
 
 // "g-strings collections"

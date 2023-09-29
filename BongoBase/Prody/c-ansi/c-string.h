@@ -204,6 +204,8 @@ int VerifyCStringPortion(struct STRING_PORTION *a_stringPortion);
 
 // Same purpose as standard "strcpy" function, except that this function takes care never to
 // overflow the target string.
+// ATTENTION: source and destination MAY NOT overlap
+// TODO: MoveStringPortion()
 //
 // Passed:
 // - dstRawString : target string (buffer address)
@@ -463,7 +465,7 @@ int SScanfStringPortion(struct STRING_PORTION stringPortion, const char *p_forma
 // Changed:
 // - *ac_value: only significant if parsing is successful (ANSWER__YES)
 // - *nac_parsedLength: (when used) ; with ANSWER__YES, actual number of parsed chars corresponding
-//   to the integral number. 
+//   to the integral number (> 0). 
 //
 // Ret: Succeeded to parse a "long C" number ?
 // - ANSWER__YES : successfully parsed (note: check *nac_parsedLength to see if some trailing
