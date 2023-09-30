@@ -384,6 +384,19 @@ enum {
   OR__INT_2OP,
 } ;
 
+// IS_CHAR_FUNCTION:
+static int IsIntBlotregOpPrefix(int c) {
+  return (c == ':' || c == '^' || c == '+' ||  c == '=');
+} // IsIntBlotregOpPrefix
+
+// Prefix terminal symbols (of <int blotreg op details> non terminal symbol)
+enum {
+  INIT__INT_BLOTREG_OP_PREFIX,
+  RESET__INT_BLOTREG_OP_PREFIX,
+  FETCH__INT_BLOTREG_OP_PREFIX,
+  READ__INT_BLOTREG_OP_PREFIX,
+} ;
+
 // Parse <intex> | <strex> 
 //
 // Passed:
@@ -433,14 +446,45 @@ static int BlotexlibExecutorComputeBlotex(BLOTEXLIB_EXECUTOR_HANDLE handle,
         m_PARSE_OFFSET(*a_blotexSequence,1,NULL)
       } // if
     } else { // Not <str constant> 
+      struct STRING_PORTION nonConstantCasesBlotexSequence = *a_blotexSequence;
+      // Pass <entity name> :
+      struct STRING_PORTION entityNameLexeme; // UNDEFINED
       m_PARSE_PASS_CHARS(*a_blotexSequence,b_REGULAR_SCAN,b_PASS_CHARS_WHILE,IsEntityNameChar,
-        UNDEFINED,&lexeme) // try <entity name>...
+        UNDEFINED,&entityNameLexeme) 
       m_PARSE_PASS_SINGLE_CHAR(*a_blotexSequence,NULL,'?',&lexeme)
       if (!b_EMPTY_STRING_PORTION(lexeme)) { // '?' terminal symbol 
-        // <entity name> '?' expect: <int blotreg op> | <str blotreg read op> 
-        // TODO: parsing 
+        // <entity name> '?' => expect: <int blotreg op> | <str blotreg read op> 
+        G_STRINGS_HANDLE blotregHandle = (G_STRINGS_HANDLE)UNDEFINED; 
+        switch (BlotexlibExecutorGetBlotreg(handle,entityNameLexeme,&blotregHandle)) {
+        case RESULT__FOUND:
+        break; case RESULT__NOT_FOUND:
+          m_ABANDON(UNKNOWN_BLOTREG__ABANDONMENT_INFO) 
+        break; default:
+          m_TRACK()
+        } // switch
+        m_PARSE_MATCH_C(*a_blotexSequence,"=$",NULL, &lexeme) // Try <str blotreg read op> ...
+        if ((atomBlotexValue.b_strex = !b_EMPTY_STRING_PORTION(lexeme))) { // <str blotreg read op> 
+        } else { // <int blotreg op>
+          m_PARSE_PASS_SPACES(*a_blotexSequence,NULL) // Try <int blotreg op details> ...
+          m_PARSE_PASS_SINGLE_CHAR(*a_blotexSequence,IsIntBlotregOpPrefix,UNDEFINED,&lexeme)
+          if (b_EMPTY_STRING_PORTION(lexeme)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_INFO) 
+          int intBlotregOpPrefix = UNDEFINED;
+          switch (lexeme.string[0]) {
+          case ':' : // <blotreg init>
+            intBlotregOpPrefix = INIT__INT_BLOTREG_OP_PREFIX;
+          break; case '^' : // <blotreg reset>
+            intBlotregOpPrefix = RESET__INT_BLOTREG_OP_PREFIX;
+          break; case '+' : // <blotreg fetch>
+            intBlotregOpPrefix = FETCH__INT_BLOTREG_OP_PREFIX;
+          break; case '=' : // <blotreg read int>
+            intBlotregOpPrefix = READ__INT_BLOTREG_OP_PREFIX;
+          break; default:
+            m_RAISE(ANOMALY__VALUE__FMT_D,lexeme.string[0])
+          } // switch
+        } // if
       } else { // '?' not found
         // expect: <blotvar> | <blotvar entry> | <blotvar id> | <blotvar strex> | <blotvar name>
+        *a_blotexSequence = nonConstantCasesBlotexSequence ;
         struct BLOTVAR_REFERENCE c_blotvarReference; // UNDEFINED 
         G_STRING_SET_STUFF cvnt_blotvarStuff = (G_STRING_SET_STUFF)UNDEFINED;
         int cvn_entry = UNDEFINED; 
@@ -457,6 +501,7 @@ static int BlotexlibExecutorComputeBlotex(BLOTEXLIB_EXECUTOR_HANDLE handle,
             m_TRACK()
           } // switch
         break; case ANSWER__NO: // Parsed KO
+          m_DIGGY_RETURN(ANSWER__NO)
         break; default:
           m_TRACK()
         } // switch
@@ -610,48 +655,83 @@ static int BlotexlibExecutorExecuteCFunction(void *r_handle, const struct BLOTFU
   m_DIGGY_BOLLARD()
   BLOTEXLIB_EXECUTOR_HANDLE handle = (BLOTEXLIB_EXECUTOR_HANDLE)r_handle;
   m_CHECK_MAGIC_FIELD(BLOTEXLIB_EXECUTOR_HANDLE,handle)
-  int answer = ANSWER__YES; // a priori
   *ac_blotval = TRUE__BLOTVAL0; // a priori
 
   struct STRING_PORTION sequence = ap_blotfunc->call.arguments; 
   switch (ap_blotfunc->entry.localBlotfuncNameEntry) {
   case EVAL__BLOTEXLIB_LOCAL_BLOTFUNC_NAME_ENTRY:
     m_PARSE_PASS_SPACES(sequence,NULL)
-    { struct STRING_PORTION blotvarSequence; // UNDEFINED
-      m_PARSE_TILL_MATCH_C(sequence,":=",NULL, &blotvarSequence)
+    { char b_blotvarReference = b_FALSE0; // a priori
       struct BLOTVAR_REFERENCE c_blotvarReference; // UNDEFINED 
-      if (b_EMPTY_STRING_PORTION(sequence)) { // NO ':=' 
-        sequence = blotvarSequence;
-      } else { // <blotvar> [ '$' ] ':=' <blotex>
-        answer = BlotexlibExecutorRetrieveBlotvar(handle,b_L_VALUE,&blotvarSequence,&c_blotvarReference,
-          nc_abandonmentInfo);
-        m_TRACK_IF(answer < 0)
-        m_PARSE_PASS_SPACES(blotvarSequence,NULL)
-        struct STRING_PORTION lexeme; // UNDEFINED
-        m_PARSE_PASS_SINGLE_CHAR(blotvarSequence,NULL,'$',&lexeme);
-        m_PARSE_OFFSET(sequence,2,NULL)
-      } // if
-      if (answer == ANSWER__YES) {
-        struct BLOTEX_VALUE c_blotexValue; // UNDEFINED
-        answer = BlotexlibExecutorComputeBlotex(handle,&sequence,&c_blotexValue,nc_abandonmentInfo);
-        m_TRACK_IF(answer < 0)
-        G_STRING_SET_STUFF cvnt_blotvarStuff = (G_STRING_SET_STUFF)UNDEFINED;
+      char cb_strex = (char)UNDEFINED; 
+      { struct STRING_PORTION blotvarSequence; // UNDEFINED
+        m_PARSE_TILL_MATCH_C(sequence,":=",NULL, &blotvarSequence)
+        if (b_EMPTY_STRING_PORTION(sequence)) { // NO ':=' 
+          sequence = blotvarSequence;
+        } else { // <blotvar> [ '$' ] ':=' <blotex>
+          b_blotvarReference = b_TRUE;
+          switch (BlotexlibExecutorRetrieveBlotvar(handle,b_L_VALUE,&blotvarSequence,
+            &c_blotvarReference, nc_abandonmentInfo)) {
+          case ANSWER__YES:
+          break; case ANSWER__NO:
+            m_DIGGY_RETURN(ANSWER__NO)
+          break; default:
+            m_TRACK()
+          } // switch
+          m_PARSE_PASS_SPACES(blotvarSequence,NULL)
+          struct STRING_PORTION lexeme; // UNDEFINED
+          m_PARSE_PASS_SINGLE_CHAR(blotvarSequence,NULL,'$',&lexeme);
+          cb_strex = (m_StringPortionLength(&lexeme) == 1); 
+          m_PARSE_OFFSET(sequence,2,NULL)
+          m_PARSE_PASS_SPACES(sequence,NULL)
+        } // if
+      } // blotvarSequence
+
+      struct BLOTEX_VALUE c_blotexValue; // UNDEFINED
+      switch (BlotexlibExecutorComputeBlotex(handle,&sequence,&c_blotexValue,nc_abandonmentInfo)) {
+      case ANSWER__YES:
+      break; case ANSWER__NO:
+        m_DIGGY_RETURN(ANSWER__NO)
+      break; default:
+        m_TRACK()
+      } // switch
+
+      m_PARSE_PASS_SPACES(sequence,NULL)
+      if (!b_EMPTY_STRING_PORTION(sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_INFO)
+
+      if (b_blotvarReference) {
+        G_STRING_SET_STUFF t_blotvarStuff = (G_STRING_SET_STUFF)UNDEFINED;
         switch (BlotexlibExecutorFetchBlotvar(handle, b_L_VALUE,&c_blotvarReference,
-          &cvnt_blotvarStuff,NULL)){
+          &t_blotvarStuff,NULL)) {
         case RESULT__FOUND:
-          cvnt_blotvarStuff[G_PARAM_VALUE_ELEMENT].acolyt.cen_value = c_blotexValue.select.c_blotval;
         break; case RESULT__NOT_FOUND:
+          m_RAISE(ANOMALY__UNEXPECTED_CASE)
         break; default:
           m_TRACK() 
         } // switch
-      } // if 
-    } // blotvarSequence 
+
+        if (cb_strex) {
+          if (! c_blotexValue.b_strex) m_ABANDON(VALUE_ERROR__ABANDONMENT_INFO)
+          m_TRACK_IF(GStringCopy(t_blotvarStuff+G_PARAM_VALUE_ELEMENT,0,&c_blotexValue.select.c_str))
+        } else {
+          if (c_blotexValue.b_strex) m_ABANDON(VALUE_ERROR__ABANDONMENT_INFO)
+          t_blotvarStuff[G_PARAM_VALUE_ELEMENT].acolyt.cen_value = c_blotexValue.select.c_blotval;
+        } // if
+      } // if
+
+      if (c_blotexValue.b_strex) {
+        *ac_blotval = TRUE__BLOTVAL0;
+      } else {
+        *ac_blotval = c_blotexValue.select.c_blotval;
+      } // if
+    } // b_blotvarReference 
+
   break; case OUTPUT_F__BLOTEXLIB_LOCAL_BLOTFUNC_NAME_ENTRY:
   break; default:
     m_RAISE(ANOMALY__VALUE__FMT_D,ap_blotfunc->entry.localBlotfuncNameEntry)
   } // switch
   
-  m_DIGGY_RETURN(answer)
+  m_DIGGY_RETURN(ANSWER__YES)
 } // BlotexlibExecutorExecuteCFunction
 
 

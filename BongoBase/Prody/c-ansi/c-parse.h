@@ -150,7 +150,7 @@
 #define m_PARSE_MATCH(/*struct STRING_PORTION*/m_sequence, \
   /*struct STRING_PORTION*/p_subStringPortion, /*TO_CHAR_FUNCTION*/n_toCharFunction,\
   /*struct STRING_PORTION* */na_lexeme) {\
-  const char *em_scanPtr = m_sequence.string;\
+  const char *em_scanPtr = (m_sequence).string;\
   switch (CompareStringPortions(&m_sequence,&p_subStringPortion,NULL,n_toCharFunction)) {\
   case LESS_THAN__COMPARISON :\
   case GREATER_THAN__COMPARISON :\
