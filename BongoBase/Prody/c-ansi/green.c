@@ -224,15 +224,174 @@ struct INDEX_SEQUENCE {
 //
 #define m_RESET_INDEX_SEQUENCE(m_indexSequence)  (m_indexSequence).n_indexEntry = -1;
 
+// Index entries "block"
+struct INDEX_ENTRIES {
+  int first; // >= 0
+  int last; // >= first
+} ; 
+
+//
+struct INDEX_REQUEST_SEQUENCE {
+  // index entries "blocks" :
+  int indexEntriesNumber5; // between 0 and 5
+  struct INDEX_ENTRIES indexEntries5[5]; 
+  // Fields below are only significant if indexEntriesNumber5 > 0 :
+  int cv_lastIndexEntry; // last index entry for ALL "blocks"  
+  int ci_indexEntryCursor; // "current" index entry; >= -1; when > cv_lastIndexEntry, means "no more" 
+  const struct INDEX_ENTRIES *cv_indexEntriesPtr; // "block" corresponding to "current" index entry 
+} ;
+
+
+// Set up request sequence for the index.
+//
+// Passed:
+// - a_index:
+// - indexSeekFlags: seek flags for sequence request ; TWO cases:
+//   + no flag (ALL_FLAGS_OFF0) "next item" case => fetch next item in sequence (if exists...)
+//   + otherwise, "new sequence" case : selection: 
+//     . INDEX_SEEK_FLAGS__ANY : NOT key-based selection 
+//     . other flags : key-based selection
+// - ccr_keys: search key(s) ; only significant with new sequence's key-based selection 
+// - a_indexRequestSequence-> : current state of sequence
+// - can_entry: item entry to retrieve: only significant whith "next item" case
+//
+// Changed:
+// - a_indexRequestSequence-> : new state of sequence
+// - *can_entry: (only significant whith "next item" case) : 
+//   + -1 special value : not found
+//   + >= 0: corresponding entry
+//
+// Ret:
+// - RETURNED: Ok
+// - -1: anomaly is raised
+static int GreenIndexRequest(struct GREEN_INDEX* a_index,
+  ENTRIES_COMPARE_FUNCTION entriesCompareFunction, void *r_entriesCompareHandle, int indexLabel,
+  unsigned int indexSeekFlags, void *ccr_keys, struct INDEX_REQUEST_SEQUENCE *a_indexRequestSequence,
+  int *an_entry) {
+  m_DIGGY_BOLLARD_S()
+
+  if (indexSeekFlags == ALL_FLAGS_OFF0) { // "next item" case: seek next in existing sequence
+    if (a_indexRequestSequence->indexEntriesNumber5 > 0) {
+      if (++(a_indexRequestSequence->ci_indexEntryCursor) > 
+        a_indexRequestSequence->cv_indexEntriesPtr->last) { // Pass to next block 
+        if (a_indexRequestSequence->cv_indexEntriesPtr < a_indexRequestSequence->indexEntries5 +
+          a_indexRequestSequence->indexEntries5Number - 1) {
+          a_indexRequestSequence->cv_indexEntriesPtr++ ;
+          a_indexRequestSequence->ci_indexEntryCursor =
+            a_indexRequestSequence->cv_indexEntriesPtr->first;
+        } // if
+      } // if
+    } // if
+    if (a_indexRequestSequence->ci_indexEntryCursor <= a_indexRequestSequence->cv_lastIndexEntry)
+      *an_entry = a_index->hsc_array[a_indexRequestSequence->ci_indexEntryCursor];
+    else *an_entry = -1; // No more
+
+  } else { // "new sequence" case
+    a_indexRequestSequence->indexEntriesNumber5 = 0;
+    if (a_index->count > 0) { 
+      int top = UNDEFINED;
+
+      if (b_FLAG_SET_ON(indexSeekFlags,INDEX_SEEK_FLAG__ANY)) { // NOT key-based selection
+        a_indexRequestSequence->indexEntriesNumber5 = 1;
+        a_indexRequestSequence->indexEntries5[0].first = 0;
+        a_indexRequestSequence->cv_lastIndexEntry = a_indexRequestSequence->indexEntries5[0].last
+          = a_index->count-1;
+      } else { // key-based selection
+        a_indexRequestSequence->indexEntriesNumber5 = 0; // Empty selection a priori
+        int n_indexEntry = UNDEFINED;
+        struct INDEX_ENTRIES c_indexEntries; // UNDEFINED
+        int n_firstIndexEntry = -1; // Not found a priori
+        m_TRACK_IF(GreenIndexBSearch(a_index, entriesCompareFunction, r_entriesCompareHandle,
+          indexLabel, -1,ccr_keys, &n_indexEntry,&top,&c_indexEntries) != RETURNED);
+        switch (indexSeekFlags) {
+        case INDEX_SEEK_FLAGS__EQUAL:
+          if (n_indexEntry != -1) {
+            a_indexRequestSequence->indexEntriesNumber5 = 1;
+            a_indexRequestSequence->indexEntries5[0] = c_indexEntries;
+            a_indexRequestSequence->cv_lastIndexEntry =
+              a_indexRequestSequence->indexEntries5[0].last
+          } // if
+        break; case INDEX_SEEK_FLAGS__GREATER_EQUAL:
+          if (n_indexEntry != -1) n_firstIndexEntry = c_indexEntries.first; 
+          else if (top < a_index->count) n_firstIndexEntry = top;
+          if (n_firstIndexEntry != -1) {
+            a_indexRequestSequence->indexEntriesNumber5 = 1;
+            a_indexRequestSequence->indexEntries5[0].first = n_firstIndexEntry;
+            a_indexRequestSequence->cv_lastIndexEntry =
+              a_indexRequestSequence->indexEntries5[0].last = a_index.count-1;
+          } // if
+        break; case INDEX_SEEK_FLAGS__GREATER:
+          if (n_indexEntry != -1 && c_indexEntries.last+1 < a_index->count) n_firstIndexEntry =
+            c_indexEntries.last+1;
+          else if (indexEntry == -1 && top < a_index->count) n_firstIndexEntry = top;
+          if (n_firstIndexEntry != -1) {
+            a_indexRequestSequence->indexEntriesNumber5 = 1;
+            a_indexRequestSequence->indexEntries5[0].first = n_firstIndexEntry;
+            a_indexRequestSequence->cv_lastIndexEntry =
+              a_indexRequestSequence->indexEntries5[0].last = a_index.count-1;
+          } // if
+        break; case INDEX_SEEK_FLAGS__LESS_EQUAL: 
+          if (n_indexEntry == -1 && top > 0) n_indexEntry = top - 1;
+          if (n_indexEntry != -1) {
+            a_indexRequestSequence->indexEntriesNumber5 = 1;
+            a_indexRequestSequence->indexEntries5[0].first = 0;
+            a_indexRequestSequence->cv_lastIndexEntry =
+              a_indexRequestSequence->indexEntries5[0].last = n_indexEntry;
+          } // if
+        break; case INDEX_SEEK_FLAGS__LESS: 
+          if (n_indexEntry != -1) top = c_indexEntries.first-1;
+          if (top > 0) {
+            a_indexRequestSequence->indexEntriesNumber5 = 1;
+            a_indexRequestSequence->indexEntries5[0].first = 0;
+            a_indexRequestSequence->cv_lastIndexEntry =
+              a_indexRequestSequence->indexEntries5[0].last = top;
+          } // if
+        break; case INDEX_SEEK_FLAGS__NOT_EQUAL:
+          if (n_indexEntry != -1) {
+            if (n_indexEntry > 0) {
+              a_indexRequestSequence->indexEntriesNumber5 = 1;
+              a_indexRequestSequence->indexEntries5[0].first = 0;
+              a_indexRequestSequence->cv_lastIndexEntry =
+                a_indexRequestSequence->indexEntries5[0].last = n_indexEntry - 1;
+            } // if
+            if (n_entry + 1 <= a_index->count - 1) {
+              int i = a_indexRequestSequence->indexEntriesNumber5++;
+              a_indexRequestSequence->indexEntries5[i].first = n_entry + 1;
+              a_indexRequestSequence->cv_lastIndexEntry =
+                a_indexRequestSequence->indexEntries5[i].last = a_index->count - 1;
+            } // if
+          } else {
+            a_indexRequestSequence->indexEntriesNumber5 = 1;
+            a_indexRequestSequence->indexEntries5[0].first = 0;
+            a_indexRequestSequence->cv_lastIndexEntry =
+              a_indexRequestSequence->indexEntries5[0].last = a_index->count-1;
+          } // if
+        // TODO: INDEX_SEEK_FLAGS__LIKE case
+        break; default: 
+          m_RAISE(ANOMALY__VALUE__FMT_D,indexSeekFlags)
+        } // switch
+      } // if 
+    } // if
+    if (a_indexRequestSequence->indexEntriesNumber5 > 0) {
+      a_indexRequestSequence->ci_indexEntryCursor = -1; // Prime the pump
+      a_indexRequestSequence->cv_indexEntriesPtr = a_indexRequestSequence->indexEntries5;
+    } // if
+  } // if
+
+  m_DIGGY_RETURN(RETURNED)
+} // GreenIndexRequest
+
+
 // Seek an item via the index, holding a sequence when necessary.
 //
 // Passed:
 // - a_index:
-// - n_indexSeek: seek method
-//   + -1 special value: not specified => fetch next item in sequence (if exists...)
-//   + INDEX_SEEK__ KEY / BOTTOM_UP / BUTTOM_DOWN / TOP_DOWN / TOP_UP / UP / DOWN
-// - ccr_keys: search key(s) ; only significant for
-//   INDEX_SEEK__ KEY / BOTTOM_UP / BUTTOM_DOWN / TOP_DOWN / TOP_UP
+// - indexSeekFlags: seek method
+//   + "no flag" (ALL_FLAGS_OFF0) => fetch next item in sequence (if exists...)
+//   + otherwise, prepare new seek sequence:
+//     . INDEX_SEEK_FLAGS__ANY : NOT key-based seek 
+//     . other flags : key-based seek 
+// - ccr_keys: search key(s) ; only significant with key-based seek 
 // - a_indexSequence-> : current state of sequence
 //
 // Changed:
@@ -246,77 +405,61 @@ struct INDEX_SEQUENCE {
 // - -1: anomaly is raised
 static int GreenIndexSeek(struct GREEN_INDEX* a_index,
   ENTRIES_COMPARE_FUNCTION entriesCompareFunction, void *r_entriesCompareHandle, int indexLabel,
-  int n_indexSeek, void *ccr_keys, struct INDEX_SEQUENCE *a_indexSequence, int *an_entry) {
+  unsigned int indexSeekFlags, void *ccr_keys, struct INDEX_SEQUENCE *a_indexSequence,
+  int *an_entry) {
   m_DIGGY_BOLLARD_S()
 
-  if (n_indexSeek == -1) { // Seek in existing sequence
-    if (a_indexSequence->n_indexEntry != -1 && (a_indexSequence->n_indexEntry >= a_index->count ||
-      a_indexSequence->c_lastIndexEntry >= a_index->count))  a_indexSequence->n_indexEntry = -1;
+  if (indexSeekFlags == ALL_FLAGS_OFF0) { // Seek in existing sequence
     if (a_indexSequence->n_indexEntry != -1) {
-      if (a_indexSequence->n_indexEntry == a_indexSequence->c_lastIndexEntry)  a_indexSequence->
-        n_indexEntry = -1 ;
-      else {
-        if (a_indexSequence->n_indexEntry < a_indexSequence->c_lastIndexEntry) a_indexSequence->
-          n_indexEntry++;
-        else a_indexSequence->n_indexEntry--;
-      } // if
+      m_ASSERT(a_indexSequence->n_indexEntry < a_index->count)
+      m_ASSERT(a_indexSequence->c_lastIndexEntry < a_index->count)
+      if (a_indexSequence->n_indexEntry == a_indexSequence->c_lastIndexEntry) 
+        a_indexSequence->n_indexEntry = -1 ;
+      else n_indexEntry++;
     } // if
 
   } else { // Undertake new seek (sequence)
     a_indexSequence->n_indexEntry = -1;
-    if (a_index->count > 0) { // XXXXXXXXXXXXX TODO VERIFIER 
+    if (a_index->count > 0) { 
       int top = UNDEFINED;
 
-      switch (n_indexSeek) {
-      case INDEX_SEEK__UP:
+      if (b_FLAG_SET_ON(indexSeekFlags,INDEX_SEEK_FLAG__ANY)) {
         a_indexSequence->n_indexEntry = 0;
         a_indexSequence->c_lastIndexEntry = a_index->count-1;
-      break; case INDEX_SEEK__DOWN:
-        a_indexSequence->n_indexEntry = a_index->count-1;
-        a_indexSequence->c_lastIndexEntry = 0;
-      break; case INDEX_SEEK__KEY:
-      case INDEX_SEEK__BOTTOM_UP:
-      case INDEX_SEEK__TOP_DOWN:
-      case INDEX_SEEK__TOP_UP:
-      case INDEX_SEEK__BOTTOM_DOWN:
+      } else {
+        int n_indexEntry = UNDEFINED;
         m_TRACK_IF(GreenIndexBSearch(a_index, entriesCompareFunction, r_entriesCompareHandle,
-          indexLabel, -1,ccr_keys, &a_indexSequence->n_indexEntry,&top) != RETURNED);
-        switch (n_indexSeek) {
-        case INDEX_SEEK__KEY:
-          if (a_indexSequence->n_indexEntry != -1) a_indexSequence->c_lastIndexEntry = 
-            a_indexSequence->n_indexEntry;
-        break; case INDEX_SEEK__BOTTOM_UP:
-        case INDEX_SEEK__BOTTOM_DOWN:
-          if (a_indexSequence->n_indexEntry == -1 && top < a_index->count) a_indexSequence->
-            n_indexEntry = top;
-          if (a_indexSequence->n_indexEntry != -1) {
+          indexLabel, -1,ccr_keys, &n_indexEntry,&top) != RETURNED);
+        switch (indexSeekFlags) {
+        case INDEX_SEEK_FLAGS__EQUAL:
+          if (n_indexEntry != -1) a_indexSequence->c_lastIndexEntry = 
+            a_indexSequence->n_indexEntry = n_indexEntry;
+        break; case INDEX_SEEK_FLAGS__GREATER_EQUAL:
+          if (n_indexEntry == -1 && top < a_index->count)  n_indexEntry = top; 
+          if (n_indexEntry != -1) {
+            a_indexSequence->n_indexEntry = n_indexEntry;
             a_indexSequence->c_lastIndexEntry = a_index->count-1;
-            if (n_indexSeek == INDEX_SEEK__BOTTOM_DOWN) {
-              m_SWAP_INTS(int, a_indexSequence->n_indexEntry, a_indexSequence->c_lastIndexEntry)
-            } // if
           } // if
-        break; default: // INDEX_SEEK__TOP_DOWN / TOP_UP
-          if (a_indexSequence->n_indexEntry == -1 && top > 0) a_indexSequence->n_indexEntry = top
-            - 1;
-          if (a_indexSequence->n_indexEntry != -1) {
-            a_indexSequence->c_lastIndexEntry = 0;
-            if (n_indexSeek == INDEX_SEEK__TOP_UP) {
-              m_SWAP_INTS(int, a_indexSequence->n_indexEntry,a_indexSequence->c_lastIndexEntry)
-            } // if
+        break; case INDEX_SEEK_FLAGS__LESS_EQUAL: 
+          if (n_indexEntry == -1 && top > 0) n_indexEntry = top - 1;
+          if (n_indexEntry != -1) {
+            a_indexSequence->n_indexEntry = 0;
+            a_indexSequence->c_lastIndexEntry = n_indexEntry;
           } // if
+        // TODO: other cases NOT_EQUAL, etc.
+        break; default: 
+          m_RAISE(ANOMALY__VALUE__FMT_D,indexSeekFlags)
         } // switch
-      break; default:
-        m_RAISE(ANOMALY__VALUE__FMT_D,n_indexSeek)
-      } // switch
+      } // if 
     } // if
   } // if
 
   // a_indexSequence->n_indexEntry:
   // -1 : not found
   // >= 0 : entry found in index
-  *an_entry = -1 ;
   if (a_indexSequence->n_indexEntry != -1) *an_entry = a_index->hsc_array[a_indexSequence->
     n_indexEntry];
+  else *an_entry = -1 ;
 
   m_DIGGY_RETURN(RETURNED)
 } // GreenIndexSeek 
@@ -524,11 +667,12 @@ static int GreenIndexesResize (struct GREEN_INDEXES *a_indexes, int newItemsPhys
 //   NULL special address: use internal structure => NOT re-entrant
 //   non NULL: buffer on stack => allows (thread) re-entrancy 
 // - indexLabel: index to use ; if changed, automatically reset sequence
-// - n_indexSeek: seek method
-//   + -1 special value: not specified => fetch next item in sequence (if exists...)
-//   + INDEX_SEEK__ KEY / BOTTOM_UP / BUTTOM_DOWN / TOP_DOWN / TOP_UP / UP / DOWN
-// - ccr_keys: search key(s) ; only significant for
-//   INDEX_SEEK__ KEY / BOTTOM_UP / BUTTOM_DOWN / TOP_DOWN / TOP_UP
+// - indexSeekFlags: seek method flags
+//   + "no flag" (ALL_FLAGS_OFF0) => fetch next item in sequence (if exists...)
+//   + otherwise, prepare new seek sequence:
+//     . INDEX_SEEK_FLAGS__ANY : NOT key-based seek 
+//     . other flags : key-based seek 
+// - ccr_keys: search key(s) ; only significant with key-based seek 
 //
 // Changed:
 // - *an_entry:
@@ -540,7 +684,7 @@ static int GreenIndexesResize (struct GREEN_INDEXES *a_indexes, int newItemsPhys
 // - -1: anomaly is raised
 static int GreenIndexesSeek (struct GREEN_INDEXES* a_indexes,
   INDEX_ITERATOR_AUTOMATIC_BUFFER nf_indexIteratorAutomaticBuffer, int indexLabel,
-  int n_indexSeek, void *ccr_keys, int *an_entry) {
+  unsigned int indexSeekFlags, void *ccr_keys, int *an_entry) {
   m_DIGGY_BOLLARD_S()
   m_ASSERT(indexLabel < a_indexes->indexesNumber) 
   struct GREEN_INDEX *a_index = a_indexes->vnhs_indexes + indexLabel;
@@ -553,7 +697,7 @@ static int GreenIndexesSeek (struct GREEN_INDEXES* a_indexes,
   } // if
 
   m_TRACK_IF(GreenIndexSeek(a_index, a_indexes->entriesCompareFunction,
-    a_indexes->r_entriesCompareHandle, indexLabel, n_indexSeek, ccr_keys,
+    a_indexes->r_entriesCompareHandle, indexLabel, indexSeekFlags, ccr_keys,
     &indexIteratorPtr->indexSequence, an_entry) != RETURNED) 
 
   m_DIGGY_RETURN(RETURNED)
@@ -1050,9 +1194,9 @@ enum {
 //   + >= 0: entry for the <item> in the list (0 == 1st entry) (direct fetch) ; if that position
 //     either exceeds that reflected by formal <item>s count, or designate a gap, then the entry is
 //     NOT fetched
-// - c_fetch4: only significant with "direct fetch" (n_entry >= 0) : 
-//   note1: "smart fetch" is tacitly a "fetch 4 change" 
-//   note2: only "fetch 4 read only" allowed if the collection is frozen 
+// - fetch4:  
+//   + must be == FETCH_4__CHANGE when n_entry < 0 ("smart fetch") 
+//   + must be == FETCH_4__READ if the collection is frozen 
 //
 // Changed:
 // - *acntr_greenItemStuff:
@@ -1063,13 +1207,14 @@ enum {
 // Returned:
 // - >= 0: OK, entry in the collection
 // - -1: unexpected problem ; anomaly is raised
-static int GreenCollectionFetchInternal (GREEN_COLLECTION_HANDLE cp_handle, int n_entry, int c_fetch4,
+static int GreenCollectionFetchInternal (GREEN_COLLECTION_HANDLE cp_handle, int n_entry, int fetch4,
   char **acntr_greenItemStuff) {
   m_DIGGY_BOLLARD_S()
   m_ASSERT(cp_handle->nv_fetched4ChangeEntry < 0)
   // MICROMONITOR: [NADA]
   if (n_entry == -1) { // Smart fetch
     m_ASSERT(!cp_handle->b_frozen) 
+    m_ASSERT(fetch4 == FETCH_4__CHANGE)
     if ((n_entry = n_GAPS_STACK_GET_FIRST(cp_handle->gaps)) < 0) { // No gap
       n_entry = cp_handle->i_itemsCount ;
       // Ensure physical arrays are large enough vis-a-vis fetched entry
@@ -1100,12 +1245,12 @@ static int GreenCollectionFetchInternal (GREEN_COLLECTION_HANDLE cp_handle, int 
       !b_FLAG_SET_ON(cp_handle->hsc_flags[n_entry],DEAD_FLAG)) { // It's NOT a gap
       m_ASSERT(b_ALL_FLAGS_OK(cp_handle->hsc_flags[n_entry],FAMED_ALIVE__FLAGS))
       // MICROMONITOR: |-- FAMED / ALIVE ...
-      if (c_fetch4 != FETCH_4__READ) { 
+      if (fetch4 != FETCH_4__READ) { 
         m_ASSERT(!cp_handle->b_frozen) 
         m_GREEN_INDEXES_REMOVE(cp_handle->indexes,n_entry)
         m_SET_FLAG_ON(cp_handle->hsc_flags[n_entry],ALIEN_FLAG)
         // MICROMONITOR: ... ALIEN / ALIVE ...
-        if (c_fetch4 == FETCH_4__CHANGE) { 
+        if (fetch4 == FETCH_4__CHANGE) { 
           cp_handle->nv_fetched4ChangeEntry = n_entry;
           // MICROMONITOR: ... ALIEN / ALIVE (fetched 4 change) ...
         } else { // FETCH_4__REMOVE
@@ -1218,12 +1363,17 @@ int GreenCollectionAddIndex (GREEN_COLLECTION_HANDLE handle, int keysNumber) {
   m_DIGGY_RETURN(newIndexLabel)
 } // GreenCollectionAddIndex
 
+// Public function; see description in .h
+int GreenCollectionIndexRequest(GREEN_COLLECTION_HANDLE cp_handle,
+  INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaNumber,
+  int indexLabel1, unsigned int indexSeekFlags1, void *cr_keys1, ...){
+  m_DIGGY_BOLLARD()
+  m_DIGGY_RETURN(RETURNED)
+} // GreenCollectionIndexRequest
 
 // Public function; see description in .h
-int GreenCollectionIndexFetch (GREEN_COLLECTION_HANDLE cp_handle,
-  INDEX_ITERATOR_AUTOMATIC_BUFFER nf_indexIteratorAutomaticBuffer,  int indexLabel,
-  int indexFetch,  int c_indexSeek,  char **acvntr_greenItemStuff,  int *nacvn_entry,
-  void *ccr_keys) {
+int GreenCollectionIndexFetch(GREEN_COLLECTION_HANDLE cp_handle, unsigned int indexFetchFlags,
+  char **acvntr_greenItemStuff, int *nacvn_entry) {
   m_DIGGY_BOLLARD()
   // MICROMONITOR: ... ALIEN / ALIVE (fetched 4 change) ...
   //               or [NADA]
@@ -1250,15 +1400,13 @@ int GreenCollectionIndexFetch (GREEN_COLLECTION_HANDLE cp_handle,
     if (n_entry >= 0) n_fetch4 = FETCH_4__REMOVE; 
   break; case INDEX_FETCH__FETCH:
     m_ASSERT(!cp_handle->b_frozen)
-    n_fetch4 = FETCH_4__CHANGE; // Note: fetch 4 change is implicit with "smart fetch" but n_fetch4
-      // var MUST be explicitly set here even if n_entry == -1 because nullability is used in the
-      // flow control below (X)   
+    n_fetch4 = FETCH_4__CHANGE; 
   break; default:
     m_RAISE(ANOMALY__VALUE__FMT_D,indexFetch)
   } // switch
   
   int n_fetchedEntry = -1; // a priori
-  if (n_fetch4 != -1) { // See (X) above
+  if (n_fetch4 != -1) { 
     // MICROMONITOR: [NADA]
     n_fetchedEntry = GreenCollectionFetchInternal(cp_handle,n_entry,n_fetch4,acvntr_greenItemStuff);
     m_TRACK_IF(n_fetchedEntry < 0)

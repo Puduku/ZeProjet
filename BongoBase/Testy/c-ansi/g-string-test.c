@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include "c-ansi/g-string.h"
+#include "c-ansi/g-param.h"
 
 #include "diggy/diggy.h"
 #include "testy/getopts.h"

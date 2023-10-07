@@ -7,7 +7,7 @@
 #include "c-ansi/stderr.h"
 #include "c-ansi/types.h"
 #include "c-ansi/magic.h"
-
+#include "flint/flags.h"
 
 
 ////////////////////////////
@@ -38,10 +38,15 @@
 typedef int (*GREEN_HANDLER__DISENGAGE_FUNCTION) (void *r_handle, char *r_greenItemStuff) ;
 
 #define INDEX_LABEL0 0
+// TODO: ag virer ??? :
 #define INDEX_LABEL1 1
 
 // #REF GREEN_HANDLER__KEYS_COMPARE_FUNCTION <GreenItem> - Custom function definition...
-// Extract A and B key(s) value(s) from green items and compare those two keys values.
+// Compare "A" and "B" keys values.
+// - "A" key(s) are extracted from "A" greem item. 
+// - "B" key(s) :
+//   + are extracted from "B" greem item when such item present
+//   + are used "directly" otherwise 
 //
 // Passed:
 // - cpr_handle: private handle ; protected instance if collection is frozen 
@@ -63,6 +68,26 @@ typedef int (*GREEN_HANDLER__DISENGAGE_FUNCTION) (void *r_handle, char *r_greenI
 typedef int (*GREEN_HANDLER__KEYS_COMPARE_FUNCTION) (void *cpr_handle,  char b_frozen,
   int indexLabel, int keyRank,  char *pr_aGreenItemStuff,  char *npr_bGreenItemStuff,
   void *cpr_bKeys) ;
+
+
+// #REF GREEN_HANDLER__EQUATE_FUNCTION <GreenItem> - Custom function definition...
+// Adequate "A" item with "B" key(s) value. 
+//
+// Passed:
+// - cpr_handle: private handle ; protected instance if collection is frozen 
+// - b_frozen: TRUE if collection is frozen
+// - indexLabel: specific index label (see <GreenItem>AddIndex() function)
+// - keyRank: between 0 (0 == 1ST rank) and <number of index keys> - 1
+// - pr_a<GreenItem>Stuff: <GreenItem> containing the A key(s) 
+// - pr_bKeys: "raw" B key(s)
+//
+// Returned:
+// - >=0: "equation" between :"A" and "B" with that key component... 
+//   + ANSWER__YES : "A" item and "B" key(s) are similar 
+//   + ANSWER__NO : "A" item and "B" key(s) are NOT similar 
+// - -1: unexpected problem; anomaly is raised
+typedef int (*GREEN_HANDLER__EQUATE_FUNCTION) (void *cpr_handle,  char b_frozen,
+  int indexLabel, int keyRank,  char *pr_aGreenItemStuff, void *pr_bKeys) ;
 
  
 // Green collections
@@ -95,6 +120,9 @@ typedef struct GREEN_COLLECTION *GREEN_COLLECTION_HANDLE;
 // - n_greenHandlerKeysCompareFunction:
 //   + NULL special value: indexes not used in the <green collection>
 //   + non NULL pointer: allows to use indexes in the <green collection>
+// - n_greenHandlerEquateFunction:
+//   + NULL special value: "non-indexed" requests not used in the <green collection>
+//   + non NULL pointer: allows to combine "non-indexed" search in requests 
 // - cfr_greenHandlerHandle: not significant if no "hook" function is provided ; handler's
 //   private handle 
 // TODO: ??? sequence fetching limit mechanism (protection against endless loops...)
@@ -108,7 +136,7 @@ typedef struct GREEN_COLLECTION *GREEN_COLLECTION_HANDLE;
 int GreenCollectionCreateInstance(GREEN_COLLECTION_HANDLE *azh_handle,  int expectedItemsNumber,
   int greenItemSize,  GREEN_HANDLER__DISENGAGE_FUNCTION n_greenHandlerDisengageFunction,
   GREEN_HANDLER__KEYS_COMPARE_FUNCTION n_greenHandlerKeysCompareFunction,
-  void *cfr_greenHandlerHandle) ;
+  GREEN_HANDLER__EQUATE_FUNCTION n_greenHandlerEquateFunction, void *cfr_greenHandlerHandle) ;
 
 
 // #REF smart-fetch-notices
@@ -197,8 +225,9 @@ int GreenCollectionGetCount(GREEN_COLLECTION_HANDLE cp_handle, char **navntr_gre
 
 
 // #REF GreenCollectionAddIndex  <green item> 
-// Add an index to the collection. Allows to sort and quickly retrieve <green item>s in the
+// Add a "formal index" to the collection. Allows to sort and quickly retrieve <green item>s in the
 // collection.
+// NB: we also need to add a "formal index" to enable "non-indexed" requests.
 // This function is only callable if the collection does support indexes (See the
 // initialization function of the collection) 
 // Notice: this operation is not possible when:
@@ -216,6 +245,107 @@ int GreenCollectionGetCount(GREEN_COLLECTION_HANDLE cp_handle, char **navntr_gre
 int GreenCollectionAddIndex(GREEN_COLLECTION_HANDLE handle,  int keysNumber) ;
 
 
+// * Truly index-based seek flags:
+// NOT key-based seek flag: mutually exclusive with other truly index-based seek flags: 
+#define INDEX_SEEK_FLAG__ANY     0x01
+// Key-based seek flags: 
+#define INDEX_SEEK_FLAG__EQUAL   0x02
+#define INDEX_SEEK_FLAG__LESS    0x04
+#define INDEX_SEEK_FLAG__GREATER 0x08 
+// * NON-index based seek flag: mutually exclusive with truly index-based seek flags: 
+#define INDEX_SEEK_FLAG__LIKE    0x10 
+
+enum { // #REF enum-INDEX_SEEK
+  // seek in collection regarding index
+  INDEX_SEEK_FLAGS__ANY           = INDEX_SEEK_FLAG__ANY, 
+  INDEX_SEEK_FLAGS__EQUAL         = INDEX_SEEK_FLAG__EQUAL, 
+  INDEX_SEEK_FLAGS__LESS          = INDEX_SEEK_FLAG__LESS, 
+  INDEX_SEEK_FLAGS__LESS_EQUAL    = INDEX_SEEK_FLAG__EQUAL | INDEX_SEEK_FLAG__LESS, 
+  INDEX_SEEK_FLAGS__GREATER       = INDEX_SEEK_FLAG__GREATER, 
+  INDEX_SEEK_FLAGS__GREATER_EQUAL = INDEX_SEEK_FLAG__EQUAL | INDEX_SEEK_FLAG__GREATER, 
+  INDEX_SEEK_FLAGS__NOT_EQUAL     = INDEX_SEEK_FLAG__LESS | INDEX_SEEK_FLAG__GREATER, 
+  INDEX_SEEK_FLAGS__LIKE          = INDEX_SEEK_FLAG__LIKE, 
+} ;
+
+#if 0
+enum { // #REF enum-INDEX_SEEK
+  // seek in collection regarding index
+  INDEX_SEEK__UP, // Seek FIRST (lowest) item of collection in index (and look up)
+  INDEX_SEEK__DOWN, // Seek LAST (highest) item of collection in index (and look down)
+  INDEX_SEEK__KEY, // Seek item matching key
+  INDEX_SEEK__BOTTOM_UP, // Seek FIRST (lowest) among items matching or FOLLOWING key (and look up)
+  INDEX_SEEK__BOTTOM_DOWN, // Seek LAST (highest) among items matching or FOLLOWING key (and look down)
+  INDEX_SEEK__TOP_DOWN, // Seek LAST (highest) among items matching or PRECEDING key (and look down)
+  INDEX_SEEK__TOP_UP, // Seek FIRST (lowest) among items matching or PRECEDING key (and look up)
+} ;
+#endif
+
+// This variable is required by m_INDEX_REQUEST_AUTOMATIC_BUFFER() macro below. 
+extern const int p_indexRequestAutomaticBufferSize;
+
+typedef char *INDEX_REQUEST_AUTOMATIC_BUFFER ;
+
+// This macro is useful when the collection is "frozen" (after a call to GreenCollectionFreeze()).
+// Put (in stack) the needed "index request buffer" set-up by GreenCollectionIndexRequest() and used
+// by GreenCollectionIndexFetch().
+#define m_INDEX_REQUEST_AUTOMATIC_BUFFER(m_indexRequestAutomaticBuffer) \
+char m_indexRequestAutomaticBuffer[p_indexRequestAutomaticBufferSize] ; 
+
+enum {
+  REQUEST_CRITERIA_OP__AND,
+  REQUEST_CRITERIA_OP__OR,
+} ;
+
+// Construct a request for indexed fetch - see GreenCollectionIndexFetch()
+//
+// Passed:
+// - handle:
+// - nf_indexRequestAutomaticBuffer:
+//   This buffer is mandatory when then collection is "frozen" (See GreenCollectionFreeze()) 
+//   NULL special address: use internal structure => NOT safe for concurrency (i.e "thread safe"
+//   and re-entrant)
+//   non NULL: buffer on stack => allows (thread) re-entrancy ; that buffer will be used by 
+//   GreenCollectionIndexFetch() index fetching function... 
+// - int criteriaNumber:
+// - indexLabel1: (1st criterion) >= 0: see GreenCollectionCreateInstance()
+// - indexSeekFlags1: (1st criterion)
+// - cr_keys1:  (1st criterion) search key(s) value(s) of item (regarding index) ;
+//   not significant without actual index seek flag (INDEX_SEEK_FLAGS__ANY)
+// - optional criteria (...) :
+//  + requestCriteraOp2 :
+//  + indexLabel2:
+//  + c_indexSeekFlags2:
+//  + ccr_keys2: 
+//  (etc.)
+// 
+// Changed:
+// - nf_indexRequestAutomaticBuffer : (if used) initialized 
+//
+// Ret:
+//
+// - RETURNED; Ok
+// - -1: unexpected problem ; anomaly is raised
+int GreenCollectionIndexRequest(GREEN_COLLECTION_HANDLE cp_handle,
+  INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaNumber,
+  int indexLabel1, unsigned int indexSeekFlags1, void *cr_keys1, ...);
+
+// Indicates whether key value parameter is significant with index request... 
+//
+// Passed:
+// - indexSeekFlags: SEE enum-INDEX_SEEK
+//
+// Return:
+// - True : search key(s) value(s) is(are) significant with index request 
+// - False : search key(s) value(s) is(are) not significant with index request 
+#define b_SIGNIFICANT_GREEN_COLLECTION_INDEX_KEYS(/*unsigned int*/indexSeekFlags) \
+  (! b_ALL_FLAGS_OK(indexSeekFlags,ALL_FLAGS_OFF0))
+
+//GreenCollectionIndexRequest(blotregHandle,indexRequestAutomaticBuffer, 2,
+//  INDEX_LABEL0, INDEX_SEEK_FLAGS__LIKE, "*bolo*", REQUEST_CRITERIA_OP__OR,
+//  INDEX_LABEL0, INDEX_SEEK_FLAGS__GREATER_EQUAL, "c"); 
+     
+
+#if 0
 enum { // #REF enum-INDEX_FETCH
   INDEX_FETCH__FETCH,      // if not found, do "smart fetch" (*) (**)
   INDEX_FETCH__SEEK_ONLY,  // No item added if doesn't exist (*)
@@ -228,90 +358,49 @@ enum { // #REF enum-INDEX_FETCH
                            // (*) : breaks "read only" sequence if any
                            // (**) : NOT ALLOWED if the collection is "frozen"
 } ;
+#endif
 
-enum { // #REF enum-INDEX_SEEK
-  // seek in collection regarding index
-  INDEX_SEEK__UP, // Seek FIRST (lowest) item of collection in index (and look up)
-  INDEX_SEEK__DOWN, // Seek LAST (highest) item of collection in index (and look down)
-  INDEX_SEEK__KEY, // Seek item matching key
-  INDEX_SEEK__BOTTOM_UP, // Seek FIRST (lowest) among items matching or FOLLOWING key (and look up)
-  INDEX_SEEK__BOTTOM_DOWN, // Seek LAST (highest) among items matching or FOLLOWING key (and look down)
-  INDEX_SEEK__TOP_DOWN, // Seek LAST (highest) among items matching or PRECEDING key (and look down)
-  INDEX_SEEK__TOP_UP, // Seek FIRST (lowest) among items matching or PRECEDING key (and look up)
+enum {
+// TODO: quand pas combined avec __NEXT, va chercher le 1er item, mais le curseur reste
+// "derriegre" ce 1er item... 
+// TODO: Pour gedrer les doublons dans une CHANGE / REMOVE sedquence : technique :
+//  nv_fetched4ChangeEntry => v_fetched4ChangeEntries
+  INDEX_FETCH_FLAG__RESET      = 0x01, 
+  // INDEX_FETCH_FLAG__CHANGE / REMOVE / READ are mutually exclusive: 
+  INDEX_FETCH_FLAG__CHANGE     = 0x02, // must be combined with INDEX_FETCH_FLAG__RESET
+  INDEX_FETCH_FLAG__SMART      = 0x04, // must be combined with INDEX_FETCH_FLAG__CHANGE
+  INDEX_FETCH_FLAG__REMOVE     = 0x08, // must be combined INDEX_FETCH_FLAG__RESET
+  INDEX_FETCH_FLAG__READ       = 0x10, // must be combined INDEX_FETCH_FLAG__RESET
+  INDEX_FETCH_FLAG__DESCENDING = 0x20, // must be combined with INDEX_FETCH_FLAG__RESET
+  INDEX_FETCH_FLAG__NEXT       = 0x40, //  
 } ;
 
-// Example: fetching an item in that collection:
-// +-- FIRST (i.e "lowest") item in collection with index
-// |        +-- LAST (i.e "highest") item in collection with index
-// v        v
-// B; C; E; F
-//
-// => Simple fetch (No sequence); NOT valid for INDEX_FETCH__READ_NEXT
-//      Key         : A  B  C  D  E  F  G
-//      -----------------------------------
-// I S| UP (*)      : B  B  B  B  B  B  B  |F I
-// N E| DOWN (*)    : F  F  F  F  F  F  F  |E T
-// D E| KEY         : -  B  C  -  E  F  -  |T E
-// E K| BOTTOM_UP   : B  B  C  E  E  F  -  |C M
-// X _| BOTTOM_DOWN : F  F  F  F  F  F  -  |H
-// _ _| TOP_DOWN    : -  B  C  C  E  F  F  |E
-//    | TOP_UP      : -  B  B  B  B  B  B  |D
-// Legend: -: not found    (*): search key is not significant
-//
-// => Fetching in "read only" sequence;
-//    INDEX_FETCH__READ_ONLY / READ_NEXT
-//      #call (*)     :#1 #2 #3 #4 #5 #6
-//      --------------------------------
-// I S| UP            : B  C  E  F  -  - |F I
-// N E| DOWN          : F  E  C  B  -  - |E T
-// D E| KEY A         : -  -  -  -  -  - |T E
-// E K| KEY B         : B  -  -  -  -  - |C M
-// X _| KEY C         : C  -  -  -  -  - |H
-// _ _| KEY D         : -  -  -  -  -  - |E
-//    | KEY E         : E  -  -  -  -  - |D
-//   (| KEY F         : F  -  -  -  -  - |
-//   K| KEY G         : -  -  -  -  -  - |
-//   e| BOTTOM_UP A   : B  C  E  F  -  - |
-//   y| BOTTOM_UP B   : B  C  E  F  -  - |
-//   )| BOTTOM_UP C   : C  E  F  -  -  - |
-//    | BOTTOM_UP D   : E  F  -  -  -  - |
-//    | BOTTOM_UP E   : E  F  -  -  -  - |
-//    | BOTTOM_UP F   : F  -  -  -  -  - |
-//    | BOTTOM_UP G   : -  -  -  -  -  - |
-//    | BOTTOM_DOWN A : F  E  C  B  -  - |
-//    | BOTTOM_DOWN B : F  E  C  B  -  - |
-//    | BOTTOM_DOWN C : F  E  C  -  -  - |
-//    | BOTTOM_DOWN D : F  E  -  -  -  - |
-//    | BOTTOM_DOWN E : F  E  -  -  -  - |
-//    | BOTTOM_DOWN F : F  -  -  -  -  - |
-//    | BOTTOM_DOWN G : -  -  -  -  -  - |
-//    | TOP_DOWN A    : -  -  -  -  -  - |
-//    | TOP_DOWN B    : B  -  -  -  -  - |
-//    | TOP_DOWN C    : C  B  -  -  -  - |
-//    | TOP_DOWN D    : C  B  -  -  -  - |
-//    | TOP_DOWN E    : E  C  B  -  -  - |
-//    | TOP_DOWN F    : F  E  C  B  -  - |
-//    | TOP_DOWN G    : F  E  C  B  -  - |
-//    | TOP_UP A      : -  -  -  -  -  - |
-//    | TOP_UP B      : B  -  -  -  -  - |
-//    | TOP_UP C      : B  C  -  -  -  - |
-//    | TOP_UP D      : B  C  -  -  -  - |
-//    | TOP_UP E      : B  C  E  -  -  - |
-//    | TOP_UP F      : B  C  E  F  -  - |
-//    | TOP_UP G      : B  C  E  F  -  - |
-// Legend: -: not found
-//         (*): call #1           => READ_ONLY
-//              calls #2, #3, ... => READ_NEXT
-
-// This variable is required by m_INDEX_ITERATOR_AUTOMATIC_BUFFER() macro below. 
-extern const int p_indexIteratorAutomaticBufferSize;
-
-typedef char *INDEX_ITERATOR_AUTOMATIC_BUFFER ;
-
-// This macro is useful when the collection is "frozen" (after a call to GreenCollectionFreeze()).
-// Put (in stack) the needed "index iterator buffer" needed by GreenCollectionIndexFetch()
-#define m_INDEX_ITERATOR_AUTOMATIC_BUFFER(m_indexIteratorAutomaticBuffer) \
-char m_indexIteratorAutomaticBuffer[p_indexIteratorAutomaticBufferSize] ; 
+enum { // #REF enum-INDEX_FETCH
+  // - "Compatible" modes:
+  INDEX_FETCH_FLAGS__FETCH                  = INDEX_FETCH_FLAG__RESET | INDEX_FETCH_FLAG__CHANGE |
+    INDEX_FETCH_FLAG__SMART | INDEX_FETCH_FLAG__NEXT, // If not found, do "smart fetch" (*) (**)
+  INDEX_FETCH_FLAGS__SEEK_ONLY              = INDEX_FETCH_FLAG__RESET | INDEX_FETCH_FLAG__CHANGE |
+    INDEX_FETCH_FLAG__NEXT, // No item added if doesn't exist (*)
+  INDEX_FETCH_FLAGS__REMOVE                 = INDEX_FETCH_FLAG__RESET | INDEX_FETCH_FLAG__REMOVE |
+    INDEX_FETCH_FLAG__NEXT, // Remove from indexes (if exists) (*) (**)
+  INDEX_FETCH_FLAGS__READ_ONLY              = INDEX_FETCH_FLAG__RESET | INDEX_FETCH_FLAG__READ |
+    INDEX_FETCH_FLAG__NEXT, // No item added if doesn't exist ; this mode actually disables indexes'
+    // synchronization and starts "read only" sequence" 
+  INDEX_FETCH_FLAGS__READ_NEXT              = INDEX_FETCH_FLAG__NEXT, // read next item of sequence
+  // (*) : breaks select sequence if any
+  // (**) : NOT ALLOWED if the collection is "frozen"
+  // - "Extended" modes:
+  INDEX_FETCH_FLAGS__CURRENT                = ALL_FLAGS_OFF0,
+  INDEX_FETCH_FLAGS__SELECT                 = INDEX_FETCH_FLAG__RESET | INDEX_FETCH_FLAG__CHANGE,
+  INDEX_FETCH_FLAGS__SELECT_READ            = INDEX_FETCH_FLAG__RESET | INDEX_FETCH_FLAG__READ,
+  INDEX_FETCH_FLAGS__RESET                  = INDEX_FETCH_FLAG__RESET,
+  INDEX_FETCH_FLAGS__SELECT_DESCENDING      = INDEX_FETCH_FLAG__RESET | INDEX_FETCH_FLAG__CHANGE |
+    INDEX_FETCH_FLAG__DESCENDING,
+  INDEX_FETCH_FLAGS__SELECT_READ_DESCENDING = INDEX_FETCH_FLAG__RESET | INDEX_FETCH_FLAG__READ |
+    INDEX_FETCH_FLAG__DESCENDING,
+  INDEX_FETCH_FLAGS__RESET_DESCENDING       = INDEX_FETCH_FLAG__RESET | INDEX_FETCH_FLAG__DESCENDING,
+  INDEX_FETCH_FLAGS__NEXT                   = INDEX_FETCH_FLAG__NEXT, 
+} ;
 
 
 // #REF GreenCollectionIndexFetch <greenItem> <keys> 
@@ -320,64 +409,39 @@ char m_indexIteratorAutomaticBuffer[p_indexIteratorAutomaticBufferSize] ;
 // Passed:
 // - cp_handle: collection handle - see GreenCollectionCreateInstance() ; "protected instance" if 
 //   the collection is frozen.
-// - nf_indexIteratorAutomaticBuffer:
-//   This buffer is mandatory when then collection is "frozen" (See GreenCollectionFreeze()) 
-//   NULL special address: use internal structure => NOT safe for concurrency (i.e "thread safe"
-//   and re-entrant)
-//   non NULL: buffer on stack => allows (thread) re-entrancy ; SAME buffer must
-//   be presented in index fetching reading sequence (INDEX_FETCH__READ_ONLY / READ_NEXT)
-// - indexLabel: >= 0: see GreenCollectionCreateInstance()
-//   NOTICE: changing index label automatically "resets" "read sequence" (see INDEX_FETCH__READ_NEXT)
-// - indexFetch: #SEE enum-INDEX_FETCH
+// - indexFetchFlags: #SEE enum-INDEX_FETCH
 //   #SEE smart-fetch-notices
-// - c_indexSeek: not significant with INDEX_FETCH__READ_NEXT ; #SEE enum-INDEX_SEEK
 // - nacvn_entry: NULL address if not used
-// - ccr_<keys>: search key(s) value(s) of item (regarding index) ;
-//   not significant with INDEX_FETCH__READ_NEXT ;
-//   not significant with INDEX_SEEK__UP / INDEX_SEEK__DOWN 
 //
 // Changed:
 // - *acvntr_<greenItem>Stuff: (if used) :
 //   + status RESULT__FOUND: (never NULL) corresponding green item "stuff" (=> ready for "update")
 //   + status RESULT__NOT_FOUND: 
-//     . with INDEX_FETCH__FETCH: new item is at your disposal ; note that item MAY BE yet in
+//     . with INDEX_FETCH_FLAGS__FETCH: new item is at your disposal ; note that item MAY BE yet in
 //       "engaged" state when the emplacement corresponded to a gap that has been "recycled"...
-//     . otherwise (INDEX_FETCH__SEEK_ONLY/READ_ONLY/READ_NEXT/REMOVE): set to NULL special value
+//     . otherwise (INDEX_FETCH_FLAGS__SEEK_ONLY / READ_ONLY / READ_NEXT / REMOVE): set to NULL
+//       special value
 //   #SEE fetched-item-notices
 // - *nacvn_entry:
 //   + status RESULT__FOUND: corresponding item entry 
 //   + status RESULT__NOT_FOUND: 
-//     . with INDEX_FETCH__FETCH: entry of new item at your disposal 
-//     . otherwise (INDEX_FETCH__SEEK_ONLY/READ_ONLY/READ_NEXT/REMOVE): set to -1 special value
+//     . with INDEX_FETCH_FLAGS__FETCH: entry of new item at your disposal 
+//     . otherwise (INDEX_FETCH_FLAGS__SEEK_ONLY / READ_ONLY / READ_NEXT / REMOVE): set to -1
+//       special value
 //
 // returned status :
 // - RESULT__FOUND: Found item in index.
 // - RESULT__NOT_FOUND: not found via this index ;
-//   + if you "enforced" fetching (INDEX_FETCH__FETCH) : the fetched item is "new"
-//   + otherwize, NO item has been fetched
+//   + if you "enforced" fetching (INDEX_FETCH_FLAGS__FETCH) : the fetched item is "new"
+//   + otherwise, NO item has been fetched
 // - -1: unexpected problem ; anomaly is raised
 // TODO: FETCH new: mechanism to check that the inserted item matches with the search key 
-int GreenCollectionIndexFetch(GREEN_COLLECTION_HANDLE cp_handle,
-  INDEX_ITERATOR_AUTOMATIC_BUFFER nf_indexIteratorAutomaticBuffer,  int indexLabel,
-  int indexFetch,  int c_indexSeek,  char **acvntr_greenItemStuff,  int *nacvn_entry,
-  void *ccr_keys);
+int GreenCollectionIndexFetch(GREEN_COLLECTION_HANDLE cp_handle, unsigned int indexFetchFlags,
+  char **acvntr_greenItemStuff, int *nacvn_entry);
 // TODO: add *na_remainingCount param (utile pour si on a des doublons)...
 // TODO : prevoir mechanisme optionel qui verifie qu'une fois insere, le NOUVEL item
 //        est bien vu par l'index...
 
-
-// Indicates whether index key parameter is significant with index fetching
-//
-// Passed:
-// - indexFetch: SEE enum-INDEX_FETCH
-// - c_indexSeek: not significant with INDEX_FETCH__READ_NEXT ; SEE enum-INDEX_SEEK
-//
-// Return:
-// - True : search key(s) value(s) is(are) significant with index fetching
-// - False : search key(s) value(s) is(are) not significant with index fetching
-#define b_SIGNIFICANT_GREEN_COLLECTION_INDEX_KEYS(/*int*/indexFetch, /*int*/c_indexSeek) \
-  ((indexFetch) != INDEX_FETCH__READ_NEXT && (c_indexSeek) != INDEX_SEEK__UP && (c_indexSeek) !=\
-  INDEX_SEEK__DOWN)
 
 
 // Refresh the indexes regarding last "fetched" item.
