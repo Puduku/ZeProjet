@@ -222,7 +222,7 @@ int BlotcodeCreateInstance (BLOTCODE_HANDLE *azh_handle) {
   m_ASSERT(GStringsFreeze(handle->h_blotkeywsHandle, NULL) >= BLOTKEYW_IDS_NUMBER)
 
   m_TRACK_IF(GreenCollectionCreateInstance(&(handle->h_blotlibsHandle),  10,
-    sizeof(struct BLOTLIB),  NULL, NULL, (void *)UNDEFINED) != RETURNED)
+    sizeof(struct BLOTLIB),  NULL, NULL,NULL, (void *)UNDEFINED) != RETURNED)
   handle->b_frozen = b_FALSE0;
 
   m_DIGGY_RETURN(RETURNED)
@@ -246,14 +246,14 @@ int BlotcodeCreateInstance (BLOTCODE_HANDLE *azh_handle) {
 static int BlotcodeFindBlotkeyw (BLOTCODE_HANDLE p_handle,
   const struct STRING_PORTION*  ap_litteralKeyw,  int *ac_blotkeywId) {
   m_DIGGY_BOLLARD_S()
-  m_INDEX_ITERATOR_AUTOMATIC_BUFFER(indexIteratorAutomaticBuffer)
+  m_INDEX_REQUEST_AUTOMATIC_BUFFER(indexRequestAutomaticBuffer)
   G_STRING_STUFF t_blotkeywStuff = (G_STRING_STUFF) UNDEFINED;
 
   struct G_KEY gKey;
   m_ASSIGN_G_KEY__STRING_PORTION(gKey, *ap_litteralKeyw); 
 
-  int result = G_STRINGS_INDEX_FETCH(p_handle->h_blotkeywsHandle,  indexIteratorAutomaticBuffer,
-    INDEX_LABEL0,  INDEX_FETCH__READ_ONLY, INDEX_SEEK__KEY,  &t_blotkeywStuff,
+  int result = G_STRINGS_INDEX_FETCH(p_handle->h_blotkeywsHandle,  indexRequestAutomaticBuffer,
+    INDEX_LABEL0,  INDEX_FETCH_FLAGS__READ_ONLY, INDEX_SEEK_FLAGS__EQUAL,  &t_blotkeywStuff,
     &gKey); 
   switch(result) { 
   case RESULT__FOUND:
@@ -306,7 +306,7 @@ int BlotcodeFreeze(BLOTCODE_HANDLE ep_handle) {
 
   m_TRACK_IF(GreenCollectionCreateInstance(&(ep_handle->ch_blotfuncsHandle),
     BATEAU__EXPECTED_ITEMS_NUMBER,  sizeof(struct BLOTFUNC_ENTRY), NULL,
-    BlotfuncsHandlerKeysCompare, &(ep_handle->c_blotfuncsHandler)) != RETURNED)
+    BlotfuncsHandlerKeysCompare, NULL, &(ep_handle->c_blotfuncsHandler)) != RETURNED)
   m_ASSERT(GreenCollectionAddIndex(ep_handle->ch_blotfuncsHandle,1) == INDEX_LABEL0)  
 
   BLOTFUNC_ENTRY_STUFF blotfuncEntryStuff = (BLOTFUNC_ENTRY_STUFF)UNDEFINED;
@@ -376,7 +376,7 @@ static int BlotcodeFindBlotfunc(BLOTCODE_HANDLE p_handle, struct STRING_PORTION 
   m_DIGGY_BOLLARD_S()
   struct BLOTFUNC_KEY_NAME blotfuncKeyName;
   m_ASSERT(p_handle->b_frozen) 
-  m_INDEX_ITERATOR_AUTOMATIC_BUFFER(indexIteratorAutomaticBuffer)
+  m_INDEX_REQUEST_AUTOMATIC_BUFFER(indexRequestAutomaticBuffer)
 
   m_PARSE_PASS_CHARS(referral,b_REGULAR_SCAN,b_PASS_CHARS_TILL,NULL,'.',&(blotfuncKeyName.prefix))
   if (b_EMPTY_STRING_PORTION(referral)) {
@@ -388,9 +388,11 @@ static int BlotcodeFindBlotfunc(BLOTCODE_HANDLE p_handle, struct STRING_PORTION 
   } // if
      
   BLOTFUNC_ENTRY_STUFF blotfuncEntryStuff = (BLOTFUNC_ENTRY_STUFF)UNDEFINED;
+  m_TRACK_IF(GreenCollectionIndexRequest(p_handle->ch_blotfuncsHandle,
+    indexRequestAutomaticBuffer, 1, INDEX_LABEL0, INDEX_SEEK_FLAGS__EQUAL,
+    (void *) &blotfuncKeyName) != RETURNED)
   int result = GreenCollectionIndexFetch(p_handle->ch_blotfuncsHandle,
-    indexIteratorAutomaticBuffer,  INDEX_LABEL0,  INDEX_FETCH__READ_ONLY,INDEX_SEEK__KEY,
-    (char **)&blotfuncEntryStuff,  (int *)NULL,  (void *) &blotfuncKeyName);
+    indexRequestAutomaticBuffer, INDEX_FETCH_FLAGS__READ_ONLY, (char **)&blotfuncEntryStuff, NULL);
   switch(result) {
   case RESULT__FOUND:
     *ac_blotfuncEntry = *blotfuncEntryStuff ;
@@ -559,8 +561,8 @@ int BlotcodeExecutorCreateInstance(BLOTCODE_EXECUTOR_HANDLE *azh_handle,
   } // blotlibStuff
 
   m_TRACK_IF(GreenCollectionCreateInstance(&handle->h_templatePartitionsHandle,
-    BATEAU__EXPECTED_ITEMS_NUMBER,  sizeof(struct TEMPLATE_PARTITION),
-    NULL,  NULL, (void*)UNDEFINED) != RETURNED)
+    BATEAU__EXPECTED_ITEMS_NUMBER,sizeof(struct TEMPLATE_PARTITION), NULL,NULL,NULL,
+    (void*)UNDEFINED) != RETURNED)
 
   m_C_STACK_INIT(handle->h_flowControlStack)
 

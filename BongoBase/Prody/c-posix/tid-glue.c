@@ -88,7 +88,7 @@ int TidGlueCreateInstance(TID_GLUE_HANDLE *azh_handle, int b_portable) {
 
   if (((*azh_handle)->b_portable = b_portable)) {
     m_TRACK_IF(GreenCollectionCreateInstance(&(*azh_handle)->ch_pthreadVsTidCollectionHandle,
-      BATEAU__EXPECTED_ITEMS_NUMBER, sizeof(struct PTHREAD_VS_TID), NULL, TidGlueKeysCompare,
+      BATEAU__EXPECTED_ITEMS_NUMBER,sizeof(struct PTHREAD_VS_TID),NULL,TidGlueKeysCompare,NULL,
       (void *)UNDEFINED) != RETURNED)
     m_ASSERT(GreenCollectionAddIndex((*azh_handle)->ch_pthreadVsTidCollectionHandle,1) == 0)
   } else {
@@ -115,9 +115,10 @@ int TidGlueSelfPthread2Tid (TID_GLUE_HANDLE handle, tid_t *a_tid) {
     PTHREAD_VS_TID_STUFF t_pthreadVsTidStuff = (PTHREAD_VS_TID_STUFF) UNDEFINED;
 
     *a_tid = gettid() ;
-    switch (GreenCollectionIndexFetch(handle->ch_pthreadVsTidCollectionHandle, NULL, 0,
-      INDEX_FETCH__FETCH,INDEX_SEEK__KEY, (char **)&t_pthreadVsTidStuff, NULL,
-      (void *)(GENERIC_INTEGER)*a_tid)) {
+    m_TRACK_IF(GreenCollectionIndexRequest(handle->ch_pthreadVsTidCollectionHandle,NULL,1,
+      INDEX_LABEL0, INDEX_SEEK_FLAGS__EQUAL, (void *)(GENERIC_INTEGER)*a_tid) != RETURNED)
+    switch (GreenCollectionIndexFetch(handle->ch_pthreadVsTidCollectionHandle, NULL,
+      INDEX_FETCH_FLAGS__FETCH, (char **)&t_pthreadVsTidStuff, NULL)) {
     case RESULT__FOUND:
     case RESULT__NOT_FOUND:
       t_pthreadVsTidStuff->pthread = pthread ;
@@ -146,9 +147,10 @@ int TidGlueTid2Pthread (TID_GLUE_HANDLE handle, tid_t tid, pthread_t *ac_pthread
 
   if (handle->b_portable) {
     PTHREAD_VS_TID_STUFF t_pthreadVsTidStuff = (PTHREAD_VS_TID_STUFF) UNDEFINED;
-    result = GreenCollectionIndexFetch(handle->ch_pthreadVsTidCollectionHandle, NULL, 0,
-      INDEX_FETCH__READ_ONLY,INDEX_SEEK__KEY, (char**)&t_pthreadVsTidStuff, NULL,
-      (void *)(GENERIC_INTEGER)tid);
+    m_TRACK_IF(GreenCollectionIndexRequest(handle->ch_pthreadVsTidCollectionHandle,NULL,1,
+      INDEX_LABEL0,INDEX_SEEK_FLAGS__EQUAL, (void *)(GENERIC_INTEGER)tid) != RETURNED)
+    result = GreenCollectionIndexFetch(handle->ch_pthreadVsTidCollectionHandle, NULL,
+      INDEX_FETCH_FLAGS__READ_ONLY,(char**)&t_pthreadVsTidStuff, NULL);
     switch (result) {
     case RESULT__FOUND:
       *ac_pthread = t_pthreadVsTidStuff->pthread;

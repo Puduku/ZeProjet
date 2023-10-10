@@ -87,7 +87,7 @@ typedef struct LINE_DELIMITOR* LINE_DELIMITOR_STUFF;
   /*GREEN_HANDLER__KEYS_COMPARE_FUNCTION*/n_linesComparatorKeysCompareFunction,\
   /*void* */ cfr_linesComparatorHandle) \
   GreenCollectionCreateInstance(azh_handle,  expectedItemsNumber,  sizeof(struct LINE_DELIMITOR),\
-    NULL,  n_linesComparatorKeysCompareFunction, cfr_linesComparatorHandle)
+    NULL,n_linesComparatorKeysCompareFunction,NULL, cfr_linesComparatorHandle)
 
 
 // #SEE GreenCollectionGetCount@c-ansi/green.h <line delimitor>

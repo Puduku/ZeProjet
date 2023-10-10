@@ -328,7 +328,7 @@ int GStringsCreateInstance(G_STRINGS_HANDLE* azh_handle,  int expectedItemsNumbe
   handle->vnhs_indexesProperties = NULL;
 
   m_TRACK_IF(GreenCollectionCreateInstance(&handle->h_greenCollectionHandle,  expectedItemsNumber,
-    sizeof(struct G_STRING),  GStringsDisengage,  GStringsKeysCompare, handle) != RETURNED)
+    sizeof(struct G_STRING),  GStringsDisengage,  GStringsKeysCompare, NULL, handle) != RETURNED)
 
   m_ASSIGN_MAGIC_FIELD(G_STRINGS_HANDLE,handle)
 
@@ -419,13 +419,13 @@ int GStringsAddIndex (G_STRINGS_HANDLE handle,  int keysNumber,
 
 // Public function : see .h
 int GStringsIndexFetch(G_STRINGS_HANDLE cp_handle,
-  INDEX_ITERATOR_AUTOMATIC_BUFFER nf_indexIteratorAutomaticBuffer,  int indexLabel,
-  int indexFetch, int c_indexSeek,  G_STRING_SET_STUFF *acvnt_gStringSetStuff, int *nacvn_entry,
-  const struct G_KEY *ccap_key1, ...) {
+  INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int indexLabel,
+  unsigned int indexFetchFlags, unsigned int c_indexSeekFlags,
+  G_STRING_SET_STUFF *acvnt_gStringSetStuff, int *nacvn_entry, const struct G_KEY *ccap_key1, ...) {
   m_DIGGY_BOLLARD()
   const struct G_KEY* ccsap_keys[cp_handle->gStringSetCardinality] ; 
 
-  if (b_SIGNIFICANT_GREEN_COLLECTION_INDEX_KEYS(indexFetch,c_indexSeek)) {
+  if (b_SIGNIFICANT_GREEN_COLLECTION_INDEX_KEYS(c_indexSeekFlags)) {
     m_ASSERT(cp_handle->indexesNumber > indexLabel)
     struct INDEX_PROPERTIES *a_indexProperties = cp_handle->vnhs_indexesProperties + indexLabel ;
     va_list ap ;
@@ -442,9 +442,10 @@ int GStringsIndexFetch(G_STRINGS_HANDLE cp_handle,
     va_end(ap) ;
   } // if
 
+  m_TRACK_IF(GreenCollectionIndexRequest(cp_handle->h_greenCollectionHandle,
+    nf_indexRequestAutomaticBuffer,  1, indexLabel,  c_indexSeekFlags, ccsap_keys) != RETURNED)
   int result = GreenCollectionIndexFetch(cp_handle->h_greenCollectionHandle,
-    nf_indexIteratorAutomaticBuffer,  indexLabel,  indexFetch,  c_indexSeek,
-    (char **)acvnt_gStringSetStuff, nacvn_entry,  ccsap_keys) ;
+    nf_indexRequestAutomaticBuffer, indexFetchFlags, (char **)acvnt_gStringSetStuff,nacvn_entry);
   m_TRACK_IF(result < 0)
   m_DIGGY_RETURN(result)
 } // GStringsIndexFetch

@@ -415,23 +415,23 @@ struct G_KEY { //
 // #SEE GreenCollectionIndexFetch@c-ansi/green.h  <<gStringSet>> <keys> 
 // Passed keys :
 // - ccap_key1: key 1 search value(s) ; only significant when 
-//   indexFetch != INDEX_FETCH__READ_NEXT and when c_indexSeek == INDEX_SEEK__KEY / BOTTOM / TOP.
+//   indexFetchFlags != INDEX_FETCH__READ_NEXT and when c_indexSeekFlags == INDEX_SEEK__KEY / BOTTOM / TOP.
 //   type of comparison (see enum-G_KEYS_COMPARISON) must correspond to that assigned to index
 //   (see GStringsAddIndex() above) 
 // - ... (variadic parameters) : for "compound" keys: key2, key3, etc.
 int GStringsIndexFetch(G_STRINGS_HANDLE cp_handle,
-  INDEX_ITERATOR_AUTOMATIC_BUFFER nf_indexIteratorAutomaticBuffer,  int indexLabel,
-  int indexFetch, int c_indexSeek,  G_STRING_SET_STUFF *acvnt_gStringSetStuff, int *nacvn_entry,
-  const struct G_KEY *ccap_key1, ...);
+  INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int indexLabel,
+  unsigned int indexFetchFlags, unsigned int c_indexSeekFlags,  G_STRING_SET_STUFF *acvnt_gStringSetStuff,
+  int *nacvn_entry, const struct G_KEY *ccap_key1, ...);
 
 
 // Fetch g-string item based on plain index 
 // #SEE GStringsIndexFetch @ c-ansi/g-string.h <gString>
 #define /*int*/ G_STRINGS_INDEX_FETCH(/*G_STRINGS_HANDLE*/handle,\
-  /*INDEX_ITERATOR_AUTOMATIC_BUFFER*/nf_indexIteratorAutomaticBuffer,\
-  /*int*/indexLabel,  /*int*/indexFetch, /*int*/c_indexSeek,\
+  /*INDEX_REQUEST_AUTOMATIC_BUFFER*/nf_indexRequestAutomaticBuffer,\
+  /*int*/indexLabel,  /*int*/indexFetchFlags, /*int*/c_indexSeekFlags,\
   /*G_STRING_STUFF* */acvnt_gStringStuff,  /*const struct G_KEY* */ccap_key) \
-  GStringsIndexFetch(handle, nf_indexIteratorAutomaticBuffer, indexLabel,indexFetch,c_indexSeek,\
+  GStringsIndexFetch(handle, nf_indexRequestAutomaticBuffer, indexLabel,indexFetchFlags,c_indexSeekFlags,\
   acvnt_gStringStuff,NULL, ccap_key)
 
 

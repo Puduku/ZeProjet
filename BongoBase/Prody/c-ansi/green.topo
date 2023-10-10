@@ -52,7 +52,7 @@
 
 
 
-`
+
 // Example: fetching an item in that collection:
 // +-- FIRST (i.e "lowest") item in collection with index
 // |        +-- LAST (i.e "highest") item in collection with index

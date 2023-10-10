@@ -77,7 +77,7 @@ int AlarmTimetableCreateInstance(ALARM_TIMETABLE_HANDLE *azh_handle) {
   m_ASSIGN_MAGIC_FIELD(ALARM_TIMETABLE_HANDLE,handle)
 
   m_TRACK_IF(GreenCollectionCreateInstance(&handle->h_timelinesHandle, 50, sizeof(struct TIMELINE),
-    (GREEN_HANDLER__DISENGAGE_FUNCTION)NULL, AlarmTimetableKeysCompare, handle) != RETURNED)
+    NULL, AlarmTimetableKeysCompare, NULL, handle) != RETURNED)
 
   m_ASSERT(GreenCollectionAddIndex(handle->h_timelinesHandle,1) == ID_INDEX_LABEL)
   m_ASSERT(GreenCollectionAddIndex(handle->h_timelinesHandle,1) == TIME_INDEX_LABEL)
@@ -95,9 +95,12 @@ int AlarmTimetableProgram (ALARM_TIMETABLE_HANDLE handle, g_ATT_ID_unsigned_int 
   TIMELINE_STUFF tc_timelineStuff = (TIMELINE_STUFF) UNDEFINED;
   int result = UNDEFINED; 
 
-  switch (result = GreenCollectionIndexFetch(handle->h_timelinesHandle, NULL, ID_INDEX_LABEL,
-    b_newAlarm ? INDEX_FETCH__FETCH: INDEX_FETCH__REMOVE, INDEX_SEEK__KEY,
-    (char **)&tc_timelineStuff, NULL, (void *)(GENERIC_INTEGER)attId)) {
+  m_TRACK_IF(GreenCollectionIndexRequest(handle->h_timelinesHandle, NULL, 1, ID_INDEX_LABEL,
+    INDEX_SEEK_FLAGS__EQUAL,(void *)(GENERIC_INTEGER)attId) != RETURNED) 
+
+  switch (result = GreenCollectionIndexFetch(handle->h_timelinesHandle, NULL, 
+    b_newAlarm ? INDEX_FETCH_FLAGS__FETCH: INDEX_FETCH_FLAGS__REMOVE, 
+    (char **)&tc_timelineStuff, NULL)) {
   case RESULT__FOUND:
     if (nac_ancientAttTime != NULL) {
       *nac_ancientAttTime = tc_timelineStuff->attTime;
@@ -123,8 +126,11 @@ int AlarmTimetableGetRefreshTime (ALARM_TIMETABLE_HANDLE handle,
   int result = UNDEFINED;
   TIMELINE_STUFF tc_timelineStuff = (TIMELINE_STUFF) UNDEFINED;
 
-  switch (result = GreenCollectionIndexFetch(handle->h_timelinesHandle, NULL, TIME_INDEX_LABEL,
-    INDEX_FETCH__READ_ONLY, INDEX_SEEK__UP, (char**)&tc_timelineStuff,  NULL, (void *)UNDEFINED)) {
+  m_TRACK_IF(GreenCollectionIndexRequest(handle->h_timelinesHandle, NULL, 1, TIME_INDEX_LABEL,
+    INDEX_SEEK_FLAGS__ANY, (void *)UNDEFINED) != 0) 
+
+  switch (result = GreenCollectionIndexFetch(handle->h_timelinesHandle, NULL, 
+    INDEX_FETCH_FLAGS__READ_ONLY, (char**)&tc_timelineStuff,  NULL)) {
   case RESULT__FOUND:
     *ac_refreshAttTime = tc_timelineStuff->attTime ;
   break; case RESULT__NOT_FOUND:
@@ -147,9 +153,10 @@ int AlarmTimetableRefresh (ALARM_TIMETABLE_HANDLE handle, gen_ATT_TIME_long refr
   unsigned long delay = UNDEFINED;
 
   do {
-    switch (result = GreenCollectionIndexFetch(handle->h_timelinesHandle, NULL, TIME_INDEX_LABEL,
-      INDEX_FETCH__REMOVE, INDEX_SEEK__TOP_UP, (char**)&tc_timelineStuff, NULL,
-      (void*)refreshAttTime)) {
+    m_TRACK_IF(GreenCollectionIndexRequest(handle->h_timelinesHandle, NULL, 1, TIME_INDEX_LABEL,
+      INDEX_SEEK_FLAGS__LESS_EQUAL, (void*)refreshAttTime) != RETURNED)
+    switch (result = GreenCollectionIndexFetch(handle->h_timelinesHandle, NULL, 
+      INDEX_FETCH_FLAGS__REMOVE, (char**)&tc_timelineStuff, NULL)) {
     case RESULT__FOUND:
       m_ASSERT(refreshAttTime >= tc_timelineStuff->attTime)
       delay = (unsigned long) (refreshAttTime - tc_timelineStuff->attTime);

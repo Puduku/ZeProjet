@@ -106,7 +106,7 @@ int BlotexlibExecutorGetBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct G_KEY gKey ;
   m_ASSIGN_G_KEY__STRING_PORTION(gKey,blotregName)
   int result = G_STRINGS_INDEX_FETCH(handle->h_blotregsHandle,NULL,INDEX_LABEL0,
-    INDEX_FETCH__SEEK_ONLY, INDEX_SEEK__KEY,  &ct_namedBlotregStuff, &gKey);
+    INDEX_FETCH_FLAGS__SEEK_ONLY, INDEX_SEEK_FLAGS__EQUAL,  &ct_namedBlotregStuff, &gKey);
   switch (result) {
   case RESULT__FOUND:
     m_ASSERT((*ac_blotregHandle = ct_namedBlotregStuff->acolyt.cnhr_handle) != NULL)
@@ -132,7 +132,7 @@ int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct G_KEY gKey ;
   m_ASSIGN_G_KEY__STRING_PORTION(gKey,blotregName)
   int result = G_STRINGS_INDEX_FETCH(handle->h_blotregsHandle,NULL,INDEX_LABEL0,
-    INDEX_FETCH__FETCH, INDEX_SEEK__KEY,  &t_namedBlotregStuff, &gKey);
+    INDEX_FETCH_FLAGS__FETCH, INDEX_SEEK_FLAGS__EQUAL,  &t_namedBlotregStuff, &gKey);
   switch (result) {
   case RESULT__FOUND:
     m_ASSERT(t_namedBlotregStuff->acolyt.cnhr_handle != NULL)
@@ -305,8 +305,8 @@ static int BlotexlibExecutorFetchBlotvar(BLOTEXLIB_EXECUTOR_HANDLE handle, char 
   m_DIGGY_BOLLARD_S()
 
   int ret =  UNDEFINED;
-  int indexFetch = INDEX_FETCH__SEEK_ONLY; 
-  if (b_lValue) indexFetch = INDEX_FETCH__FETCH; 
+  int indexFetch = INDEX_FETCH_FLAGS__SEEK_ONLY; 
+  if (b_lValue) indexFetch = INDEX_FETCH_FLAGS__FETCH; 
   *acvnt_blotvarStuff = (G_STRING_SET_STUFF)UNDEFINED;
   switch (ap_blotvarReference->blotvarReference) {
   case NAME__BLOTVAR_REFERENCE:
@@ -321,7 +321,7 @@ static int BlotexlibExecutorFetchBlotvar(BLOTEXLIB_EXECUTOR_HANDLE handle, char 
         m_ASSIGN_G_KEY__ACOLYT_VALUE(gKey,ap_blotvarReference->select.c_pseudoId)
       } // if
       switch (ret = GStringsIndexFetch(ap_blotvarReference->blotregHandle,NULL,indexLabel,
-        INDEX_FETCH__FETCH, INDEX_SEEK__KEY, acvnt_blotvarStuff, nacvn_entry,&gKey)) { 
+        INDEX_FETCH_FLAGS__FETCH, INDEX_SEEK_FLAGS__EQUAL, acvnt_blotvarStuff, nacvn_entry,&gKey)) { 
       case RESULT__FOUND:
       break; case RESULT__NOT_FOUND:
         m_RAISE_VERBATIM_IF(b_lValue)
