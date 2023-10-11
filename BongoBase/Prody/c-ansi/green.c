@@ -138,7 +138,8 @@ struct INDEX_ENTRIES {
 //   -1 => "B" is not referenced in index ("Not found")
 // - *a_top: "best" top index entry established so far ; when "Not found", corresponds to the
 //   closest entry in the index that is on top of "B"
-// - *nac_indexEntries: (when used) only significant if found entry in index 
+// - *nac_indexEntries: (when used) only significant if found entry in index; delimit ALL "B"
+//   entries 
 //
 // Ret:
 // - RETURNED
@@ -172,6 +173,26 @@ static int GreenIndexBSearch(struct GREEN_INDEX *a_index,
     if (*an_indexEntry >= 0) break;
   } // while
   *a_top = top;
+  if (*an_indexEntry >= 0 && nac_indexEntries != NULL) {
+    for (i = *an_indexEntry-1 ; i >= 0 ; i--) {
+      m_GREEN_INDEX_COMPARE(a_index, entriesCompareFunction,r_entriesCompareHandle, indexLabel,
+        i,-1,cpr_bKeys, comparison)
+      if (comparison != EQUAL_TO__COMPARISON) {
+        m_ASSERT(comparison == LESS_THAN__COMPARISON) 
+        break; 
+      } // if
+    } // for
+    nac_indexEntries->first = i+1;
+    for (i = *an_indexEntry+1 ; i < a_index->count ; i++) {
+      m_GREEN_INDEX_COMPARE(a_index, entriesCompareFunction,r_entriesCompareHandle, indexLabel,
+        i,-1,cpr_bKeys, comparison)
+      if (comparison != EQUAL_TO__COMPARISON) {
+        m_ASSERT(comparison == GREATER_THAN__COMPARISON) 
+        break; 
+      } // if
+    } // for
+    nac_indexEntries->last = i-1;
+  } //if     
   m_DIGGY_RETURN(RETURNED)
 } // GreenIndexBSearch
 
@@ -298,6 +319,7 @@ static int GreenIndexSeek(struct GREEN_INDEX* a_index,
     if (a_indexSequence->indexEntriesNumber5 > 0) {
       if (++(a_indexSequence->ci_indexEntryCursor) > 
         a_indexSequence->cv_indexEntriesPtr->last) { // Pass to next block 
+        m_ASSERT(a_indexSequence->ci_indexEntryCursor >= 0)
         if (a_indexSequence->cv_indexEntriesPtr < a_indexSequence->indexEntries5 +
           a_indexSequence->indexEntriesNumber5 - 1) {
           a_indexSequence->cv_indexEntriesPtr++ ;

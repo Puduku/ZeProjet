@@ -325,7 +325,7 @@ int GreenCollectionIndexRequest(GREEN_COLLECTION_HANDLE cp_handle,
 // - True : search key(s) value(s) is(are) significant with index request 
 // - False : search key(s) value(s) is(are) not significant with index request 
 #define b_SIGNIFICANT_GREEN_COLLECTION_INDEX_KEYS(/*unsigned int*/indexSeekFlags) \
-  (! b_ALL_FLAGS_OK(indexSeekFlags,ALL_FLAGS_OFF0))
+  (b_FLAG_SET_OFF(indexSeekFlags,INDEX_SEEK_FLAG__ANY))
 
 //GreenCollectionIndexRequest(blotregHandle,indexRequestAutomaticBuffer, 2,
 //  INDEX_LABEL0, INDEX_SEEK_FLAGS__LIKE, "*bolo*", REQUEST_CRITERIA_OP__OR,
