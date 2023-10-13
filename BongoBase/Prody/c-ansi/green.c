@@ -131,7 +131,6 @@ struct INDEX_ENTRIES {
 // - n_bEntry: >= 0 => entry in index for "B"
 // - cpr_bKeys: raw key(s) for "B" when entry for "B" not provided
 // - nac_indexEntries: NULL if not used 
-
 //
 // Modified:
 // - *an_indexEntry: >=0 => found entry in index
@@ -248,16 +247,16 @@ static int GreenIndexBSearch(struct GREEN_INDEX *a_index,
 //
 struct INDEX_SEQUENCE {
   // index entries "blocks" :
-  int indexEntriesNumber5; // between 0 and 5
+  int indexEntriesNumber5; // between 0 and 5 : 0 => 'hard reset' ;  >0 -> active
   struct INDEX_ENTRIES indexEntries5[5]; 
   // Fields below are only significant if indexEntriesNumber5 > 0 :
   int cv_lastIndexEntry; // last index entry for ALL "blocks"  
-  int ci_indexEntryCursor; // "current" index entry; >= -1; when > cv_lastIndexEntry, means "no more" 
+  int ci_indexEntryCursor; // "current" index entry; <0 => 'soft reset' ; [0-cv_lastIndexEntry] => 'in sequence' , >cv_lastIndexEntry => "no more" 
   const struct INDEX_ENTRIES *cv_indexEntriesPtr; // "block" corresponding to "current" index entry 
 } ;
 
 //
-#define m_RESET_INDEX_SEQUENCE(m_indexSequence)  (m_indexSequence).indexEntriesNumber5 = 0;
+#define m_HARD_RESET_INDEX_SEQUENCE(m_indexSequence)  (m_indexSequence).indexEntriesNumber5 = 0;
 
 // Get current entry in index sequence.
 //
@@ -609,13 +608,13 @@ struct INDEX_ITERATOR {
   (m_indexIterator).indexSeekFlags = m_indexSeekFlags;\
   (m_indexIterator).cfr_keys = mcfr_keys;\
   (m_indexIterator).b_descending = mb_descending;\
-  m_RESET_INDEX_SEQUENCE((m_indexIterator).indexSequence)\
+  m_HARD_RESET_INDEX_SEQUENCE((m_indexIterator).indexSequence)\
 }
 
 
-#define m_RESET_INDEX_ITERATOR(/*struct INDEX_ITERATOR*/m_indexIterator, mb_descending) {\
+#define m_HARD_RESET_INDEX_ITERATOR(/*struct INDEX_ITERATOR*/m_indexIterator, mb_descending) {\
   (m_indexIterator).b_descending = mb_descending;\
-  m_RESET_INDEX_SEQUENCE((m_indexIterator).indexSequence)\
+  m_HARD_RESET_INDEX_SEQUENCE((m_indexIterator).indexSequence)\
 }
 
 // Seek an item using the indexes, holding a sequence when necessary.
@@ -625,16 +624,16 @@ struct INDEX_ITERATOR {
 // - a_indexIterator:
 //   + indexSeekFlags: seek flags for sequence request ; TWO cases:
 //     . "next item" case : not significant 
-//     . otherwise, "new sequence" case : selection: 
+//     . otherwise, "soft reset" case : selection: 
 //       - INDEX_SEEK_FLAGS__ANY : NOT key-based selection 
 //       - other flags : key-based selection
 //   + ccr_keys: search key(s) ; only significant with new sequence's key-based selection 
 // - nan_entry: 
-//   + == NULL:  "new sequence" case
+//   + == NULL:  "soft reset" case
 //   + != NULL:  "next item" case
 //
 // Changed:
-// - a_indexIterator->:
+// - a_indexIterator->: either "soft reset" / "in sequence" / "no more" state
 // - *nan_entry: (only significant whith "next item" case) item entry to retrieve : 
 //   + -1 special value : not found
 //   + >= 0: corresponding entry
@@ -942,9 +941,9 @@ struct INDEX_REQUEST {
 #define m_DEFAULT_INDEX_REQUEST(/*struct INDEX_REQUEST*/m_indexRequest) m_INIT_INDEX_REQUEST(\
   m_indexRequest,INDEX_LABEL0,ALL_FLAGS_OFF0, (void*)UNDEFINED, b_DESCENDING, FETCH_4__CHANGE)
 
-#define m_RESET_INDEX_REQUEST(/*struct INDEX_REQUEST*/m_indexRequest, mb_descending,\
+#define m_HARD_RESET_INDEX_REQUEST(/*struct INDEX_REQUEST*/m_indexRequest, mb_descending,\
   /*int*/m_fetch4) {\
-  m_RESET_INDEX_ITERATOR((m_indexRequest).iterator, mb_descending) \
+  m_HARD_RESET_INDEX_ITERATOR((m_indexRequest).iterator, mb_descending) \
   (m_indexRequest).fetch4 = m_fetch4;\
 }
 
@@ -1394,7 +1393,6 @@ int GreenCollectionIndexRequest(GREEN_COLLECTION_HANDLE cp_handle,
   m_TRACK_IF(GreenCollectionRefreshIndexesInternal(cp_handle,b_TRUE) != RETURNED)
   // MICROMONITOR: [NADA]
 
-  // TODO: Remove this call ??
   m_TRACK_IF(GreenIndexesSeek(&cp_handle->indexes, &indexRequestPtr->iterator, NULL) != RETURNED)
 
   m_DIGGY_RETURN(RETURNED)
@@ -1419,7 +1417,7 @@ int GreenCollectionIndexFetch(GREEN_COLLECTION_HANDLE cp_handle,
     if (b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__READ)) fetch4 = FETCH_4__READ;
     else if (b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__REMOVE)) fetch4 = FETCH_4__REMOVE;
      
-    m_RESET_INDEX_REQUEST(*indexRequestPtr,b_FLAG_SET_ON(indexFetchFlags,
+    m_HARD_RESET_INDEX_REQUEST(*indexRequestPtr,b_FLAG_SET_ON(indexFetchFlags,
       INDEX_FETCH_FLAG__DESCENDING),fetch4)
     m_TRACK_IF(GreenIndexesSeek(&cp_handle->indexes,&indexRequestPtr->iterator,NULL) != RETURNED)
   } // if    
