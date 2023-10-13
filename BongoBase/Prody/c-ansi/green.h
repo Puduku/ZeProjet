@@ -289,8 +289,7 @@ enum {
 // - handle:
 // - nf_indexRequestAutomaticBuffer:
 //   This buffer is mandatory when then collection is "frozen" (See GreenCollectionFreeze()) 
-//   NULL special address: use internal structure => NOT safe for concurrency (i.e "thread safe"
-//   and re-entrant)
+//   NULL special address: use internal structure => NOT "thread safe" / "re-entrant"
 //   non NULL: buffer on stack => allows (thread) re-entrancy ; that buffer will be used by 
 //   GreenCollectionIndexFetch() index fetching function... 
 // - int criteriaNumber:
@@ -382,9 +381,8 @@ enum { // #REF enum-INDEX_FETCH
 // - cp_handle: collection handle - see GreenCollectionCreateInstance() ; "protected instance" if 
 //   the collection is frozen.
 // - nf_indexRequestAutomaticBuffer:
-//   This buffer is mandatory when then collection is "frozen" (See GreenCollectionFreeze()) 
-//   NULL special address: use internal structure => NOT safe for concurrency (i.e "thread safe"
-//   and re-entrant)
+//   This buffer is mandatory when the collection is "frozen" (See GreenCollectionFreeze()) 
+//   NULL special address: use internal structure => NOT "thread safe" / "re-entrant"
 //   non NULL: buffer on stack => allows (thread) re-entrancy ; that buffer must correspond to that 
 //   passed to GreenCollectionIndexRequest() function... 
 // - indexFetchFlags: #SEE enum-INDEX_FETCH
@@ -392,15 +390,15 @@ enum { // #REF enum-INDEX_FETCH
 // - nacvn_entry: NULL address if not used
 //
 // Changed:
-// - *acvntr_<greenItem>Stuff: (if used) :
-//   + status RESULT__FOUND: (never NULL) corresponding green item "stuff" (=> ready for "update")
+// - *acvntr_<greenItem>Stuff: 
+//   + status RESULT__FOUND: (never NULL) corresponding green item "stuff"0
 //   + status RESULT__NOT_FOUND: 
 //     . with INDEX_FETCH_FLAGS__FETCH: new item is at your disposal ; note that item MAY BE yet in
 //       "engaged" state when the emplacement corresponded to a gap that has been "recycled"...
 //     . otherwise (INDEX_FETCH_FLAGS__SEEK_ONLY / READ_ONLY / READ_NEXT / REMOVE): set to NULL
 //       special value
 //   #SEE fetched-item-notices
-// - *nacvn_entry:
+// - *nacvn_entry: (if used)
 //   + status RESULT__FOUND: corresponding item entry 
 //   + status RESULT__NOT_FOUND: 
 //     . with INDEX_FETCH_FLAGS__FETCH: entry of new item at your disposal 
