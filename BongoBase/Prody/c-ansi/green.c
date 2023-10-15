@@ -968,8 +968,11 @@ struct GREEN_COLLECTION {
   struct GREEN_INDEXES indexes;
   struct INDEX_REQUEST internalIndexRequest;
   struct GAPS_STACK gaps; // TODO: ajouter h_ prefix vu qu'il faut appeler m_GAPS_STACK_FREE()
-  int nv_fetched4ChangeEntry; // -1 special value: no entry currently "fetched"
-                              // >= 0: entry currently "fetched" (ALIEN / ALIVE state)
+  //int nv_fetched4ChangeEntry; // -1 special value: no entry currently "fetched"
+  //                            // >= 0: entry currently "fetched" (ALIEN / ALIVE state)
+  int fetched4ChangeEntriesNumber;  
+  int fetched4ChangeEntriesPhysicalNumber;  
+  int *h_fetched4ChangeEntries;  
 };
 
 // typedef GREEN_HANDLER__KEYS_COMPARE_FUNCTION
@@ -1039,14 +1042,17 @@ static int GreenCollectionEntriesCompare (void *r_handle, int indexLabel, int ke
 // the collection may take the following "transitory" state:
 // ALIEN / ALIVE (fetched 4 change) : barely fetched item "removed" from indexes ; the emplacement
 // has been "reserved"; fetched item is "waiting" for update...
-// The item state displayed in MICROMONITOR is ormamented with the following decorators:
-// - |-- decorator emphases the effective "starting" of item monitoring
-// - --| decorator emphases the effective "termination" of item monitoring
-// - ... decorator emphases the "continuation" of item monitoring
-// - [NADA] decorator simply stipulates that no item currently requires "monitoring"...
-// - => [NADA] decorator emphases the entrance into a [NADA] phase
 // Example of MICROMONITOR "display":
-// MICROMONITOR: |-- ALIEN / DEAD ...
+// MICROMONITOR: ALIEN / DEAD
+
+// NOTICE: "MINIMONITOR"
+// MINIMONITOR is another imaginary device allowing to follow the lists of ALIEN / ALIVE items 
+// currently "fetched for change". The followings "decorators" are used:  
+// - NADA decorator stipulates that no item is currently "monitored"...
+// - ANY+ decorator stipulates that one or more item(s) is(are) currently "monitored"...
+// - ANY decorator simply makes no presumption about currently "monitored" items...    
+// Example of MINIMONITOR "display":
+// MINIMONITOR: NADA
 
 
 // Public function; see description in .h
@@ -1083,8 +1089,10 @@ int GreenCollectionCreateInstance(GREEN_COLLECTION_HANDLE *azh_handle,  int expe
   m_GAPS_STACK_INIT(handle->gaps,handle->itemsPhysicalNumber)
   m_DEFAULT_INDEX_REQUEST(handle->internalIndexRequest)
 
-  handle->nv_fetched4ChangeEntry = -1 ;
-  // MICROMONITOR: [NADA]
+  //handle->nv_fetched4ChangeEntry = -1 ;
+  handle->fetched4ChangeEntriesPhysicalNumber = expectedItemsNumber;
+  handle->fetched4ChangeEntriesNumber = 0;
+  // MINIMONITOR: NADA
   m_DIGGY_RETURN(RETURNED)
 } // GreenCollectionCreateInstance
 
@@ -1093,26 +1101,22 @@ int GreenCollectionCreateInstance(GREEN_COLLECTION_HANDLE *azh_handle,  int expe
 //
 // Passed:
 // - handle:
-// - increase: >0 (actually  the increment is handle->expectedItemsNumber)
-static int GreenCollectionResize(GREEN_COLLECTION_HANDLE handle, int increase) {
+static int GreenCollectionResize(GREEN_COLLECTION_HANDLE handle) {
   m_DIGGY_BOLLARD_S()
-  m_ASSERT(increase > 0)
   m_ASSERT(!handle->b_frozen)
 
-  increase = ((increase-1)/handle->expectedItemsNumber + 1) * handle->expectedItemsNumber;
-
-  int newItemsPhysicalNumber = handle->itemsPhysicalNumber + increase;
+  int newItemsPhysicalNumber = handle->itemsPhysicalNumber + handle->expectedItemsNumber;
 
   m_REALLOC(handle->h_greenArray, handle->greenItemSize*newItemsPhysicalNumber)
   memset(handle->h_greenArray + handle->greenItemSize * handle->itemsPhysicalNumber, 0,
-    handle->greenItemSize * increase);
+    handle->greenItemSize * handle->expectedItemsNumber);
 
   m_GAPS_STACK_RESIZE(handle->gaps, newItemsPhysicalNumber)
   m_REALLOC_ARRAY(handle->hsc_flags, newItemsPhysicalNumber)
   m_TRACK_IF(GreenIndexesResize(&handle->indexes,newItemsPhysicalNumber) != 0)
 
   handle->itemsPhysicalNumber = newItemsPhysicalNumber;
-  m_DIGGY_RETURN(increase)
+  m_DIGGY_RETURN(handle->expectedItemsNumber)
 } // GreenCollectionResize
 
 
@@ -1129,23 +1133,29 @@ static int GreenCollectionRefreshIndexesInternal(GREEN_COLLECTION_HANDLE handle,
     m_DIGGY_RETURN(RETURNED)
   } // if
 
-  // MICROMONITOR: ... ALIEN / ALIVE (fetched 4 change) ...
-  // or            [NADA]
+  // MINIMONITOR: ANY
 
-  if (handle->nv_fetched4ChangeEntry < 0) {
-    // MICROMONITOR: [NADA]
+  //if (handle->nv_fetched4ChangeEntry < 0) 
+  if (handle->fetched4ChangeEntriesNumber == 0) {
+    // MINIMONITOR: NADA
     m_DIGGY_RETURN(RETURNED)
   } // if
 
   m_ASSERT(!handle->b_frozen)
 
-  // MICROMONITOR: ... ALIEN / ALIVE (fetched 4 change) ...
-  m_ASSERT(b_ALL_FLAGS_OK(handle->hsc_flags[handle->nv_fetched4ChangeEntry],ALIEN_ALIVE__FLAGS))
-m_DIGGY_INFO("handle->nv_fetched4ChangeEntry=%d Before m_GREEN_INDEXES_ADD()...",handle->nv_fetched4ChangeEntry)
-  m_GREEN_INDEXES_ADD(handle->indexes,handle->nv_fetched4ChangeEntry)
-  m_SET_FLAG_OFF(handle->hsc_flags[handle->nv_fetched4ChangeEntry],ALIEN_FLAG)
-  handle->nv_fetched4ChangeEntry = -1;
-  // MICROMONITOR: ... FAMED / ALIVE --| => [NADA]
+  // MINIMONITOR: ANY+
+  int i = 0;
+  int *fetched4ChangeEntryPtr = handle->h_fetched4ChangeEntries; 
+  for (; i < handle->fetched4ChangeEntriesNumber; i++, fetched4ChangeEntryPtr++) { 
+    // MICROMONITOR: ALIEN / ALIVE (fetched 4 change)
+    m_ASSERT(b_ALL_FLAGS_OK(handle->hsc_flags[*fetched4ChangeEntryPtr],ALIEN_ALIVE__FLAGS))
+m_DIGGY_INFO("*fetched4ChangeEntryPtr=%d Before m_GREEN_INDEXES_ADD()...",*fetched4ChangeEntryPtr)
+    m_GREEN_INDEXES_ADD(handle->indexes,*fetched4ChangeEntryPtr)
+    m_SET_FLAG_OFF(handle->hsc_flags[*fetched4ChangeEntryPtr],ALIEN_FLAG)
+    // MICROMONITOR: FAMED / ALIVE
+  } // for
+  handle->fetched4ChangeEntriesNumber = 0; 
+  // MINIMONITOR: NADA
 
   m_DIGGY_RETURN(RETURNED)
 } // GreenCollectionRefreshIndexesInternal
@@ -1163,10 +1173,9 @@ int GreenCollectionPullOut (GREEN_COLLECTION_HANDLE handle, char **at_greenArray
   m_DIGGY_BOLLARD()
   m_ASSERT(GreenIndexesVerifyEnabled(&handle->indexes))
 
-  // MICROMONITOR: ... ALIEN / ALIVE (fetched 4 change) ...
-  //               or [NADA]
+  // MINIMONITOR: ANY
   m_TRACK_IF(GreenCollectionRefreshIndexesInternal(handle,b_TRUE) != RETURNED)
-  // MICROMONITOR: [NADA]
+  // MINIMONITOR: NADA
 
   *at_greenArray  = handle->h_greenArray;
 
@@ -1177,10 +1186,9 @@ int GreenCollectionPullOut (GREEN_COLLECTION_HANDLE handle, char **at_greenArray
 // Public function; see description in .h
 int GreenCollectionFreeze(GREEN_COLLECTION_HANDLE handle,  char **nap_greenArray) {
   m_DIGGY_BOLLARD()
-  // MICROMONITOR: ... ALIEN / ALIVE (fetched 4 change) ...
-  //               or [NADA]
+  // MINIMONITOR: ANY
   m_TRACK_IF(GreenCollectionRefreshIndexesInternal(handle,b_TRUE) != RETURNED)
-  // MICROMONITOR: [NADA]
+  // MINIMONITOR: NADA
 
   handle->b_frozen = b_TRUE;
 
@@ -1191,7 +1199,16 @@ int GreenCollectionFreeze(GREEN_COLLECTION_HANDLE handle,  char **nap_greenArray
   m_DIGGY_RETURN(handle->itemsPhysicalNumber)
 } // GreenCollectionFreeze
 
-
+static inline int m_GreenCollectionAddFetched4ChangeEntry(GREEN_COLLECTION_HANDLE handle,
+  int entry) { 
+  m_ASSERT(!handle->b_frozen)
+  if (handle->fetched4ChangeEntriesNumber == handle->fetched4ChangeEntriesPhysicalNumber) {
+    m_REALLOC(handle->h_fetched4ChangeEntries,handle->fetched4ChangeEntriesPhysicalNumber +=
+      handle->expectedItemsNumber)
+  } // if
+  handle->h_fetched4ChangeEntries[handle->fetched4ChangeEntriesNumber++] = entry;
+  return RETURNED;
+} // m_GreenCollectionAddFetched4ChangeEntry
 
 // Obtain or retrieve emplacement for a green item (in the collection's array).
 //
@@ -1220,8 +1237,8 @@ int GreenCollectionFreeze(GREEN_COLLECTION_HANDLE handle,  char **nap_greenArray
 static int GreenCollectionFetchInternal (GREEN_COLLECTION_HANDLE cp_handle, int n_entry, int fetch4,
   char **acntr_greenItemStuff) {
   m_DIGGY_BOLLARD_S()
-  m_ASSERT(cp_handle->nv_fetched4ChangeEntry < 0)
-  // MICROMONITOR: [NADA]
+  //m_ASSERT(cp_handle->nv_fetched4ChangeEntry < 0)
+  // MINIMONITOR: ANY
   if (n_entry == -1) { // Smart fetch
     m_ASSERT(!cp_handle->b_frozen) 
     m_ASSERT(fetch4 == FETCH_4__CHANGE)
@@ -1230,57 +1247,60 @@ static int GreenCollectionFetchInternal (GREEN_COLLECTION_HANDLE cp_handle, int 
       // Ensure physical arrays are large enough vis-a-vis fetched entry
       if (n_entry >= cp_handle->itemsPhysicalNumber) {
         m_ASSERT(n_entry <= cp_handle->itemsPhysicalNumber)
-        m_TRACK_IF(GreenCollectionResize(cp_handle,1) < 0)
+        m_TRACK_IF(GreenCollectionResize(cp_handle) < 0)
         m_ASSERT(n_entry < cp_handle->itemsPhysicalNumber)
       } // if
       // New item
       m_SET_ALL_FLAGS(cp_handle->hsc_flags[n_entry],ALIEN_ALIVE__FLAGS)
       if (++(cp_handle->i_itemsCount) > cp_handle->v_maxItemsCount) cp_handle->v_maxItemsCount = 
         cp_handle->i_itemsCount;
-      // MICROMONITOR: |-- ALIEN / ALIVE ...
+      // MICROMONITOR: ALIEN / ALIVE 
     } else { // Use existing gap 
       m_ASSERT(n_entry < cp_handle->i_itemsCount)
       m_ASSERT(b_ALL_FLAGS_OK(cp_handle->hsc_flags[n_entry],ALIEN_DEAD__FLAGS))
-      // MICROMONITOR: |-- ALIEN / DEAD ...
+      // MICROMONITOR: ALIEN / DEAD 
       m_GAPS_STACK_POP(cp_handle->gaps,n_entry)
       m_SET_FLAG_OFF(cp_handle->hsc_flags[n_entry],DEAD_FLAG)
-      // MICROMONITOR: ... ALIEN / ALIVE ...
+      // MICROMONITOR: ALIEN / ALIVE 
     } // if
-    cp_handle->nv_fetched4ChangeEntry = n_entry;
-    // MICROMONITOR: ... ALIEN / ALIVE (fetched 4 change) ...
+    //cp_handle->nv_fetched4ChangeEntry = n_entry;
+    m_TRACK_IF(m_GreenCollectionAddFetched4ChangeEntry(cp_handle,n_entry) != RETURNED)
+    // MICROMONITOR: ALIEN / ALIVE (fetched 4 change)
+    // MINIMONITOR: ANY+
     *acntr_greenItemStuff = r_GREEN_COLLECTION_GET_GREEN_ITEM_STUFF(cp_handle,n_entry);
 
   } else { // Direct fetch
     if (n_entry < cp_handle->i_itemsCount &&  // Existing item
       !b_FLAG_SET_ON(cp_handle->hsc_flags[n_entry],DEAD_FLAG)) { // It's NOT a gap
       m_ASSERT(b_ALL_FLAGS_OK(cp_handle->hsc_flags[n_entry],FAMED_ALIVE__FLAGS))
-      // MICROMONITOR: |-- FAMED / ALIVE ...
+      // MICROMONITOR: FAMED / ALIVE 
       if (fetch4 != FETCH_4__READ) { 
         m_ASSERT(!cp_handle->b_frozen) 
         m_GREEN_INDEXES_REMOVE(cp_handle->indexes,n_entry)
         m_SET_FLAG_ON(cp_handle->hsc_flags[n_entry],ALIEN_FLAG)
-        // MICROMONITOR: ... ALIEN / ALIVE ...
+        // MICROMONITOR: ALIEN / ALIVE
         if (fetch4 == FETCH_4__CHANGE) { 
-          cp_handle->nv_fetched4ChangeEntry = n_entry;
-          // MICROMONITOR: ... ALIEN / ALIVE (fetched 4 change) ...
+          //cp_handle->nv_fetched4ChangeEntry = n_entry;
+          m_TRACK_IF(m_GreenCollectionAddFetched4ChangeEntry(cp_handle,n_entry) != RETURNED)
+          // MICROMONITOR: ALIEN / ALIVE (fetched 4 change)
+          // MINIMONITOR: ANY+
         } else { // FETCH_4__REMOVE
-          // MICROMONITOR: ... ALIEN / ALIVE ...
+          // MICROMONITOR: ALIEN / ALIVE
           m_GAPS_STACK_PUSH(cp_handle->gaps, n_entry, cp_handle->itemsPhysicalNumber)
           m_SET_FLAG_ON(cp_handle->hsc_flags[n_entry],DEAD_FLAG)
-          // MICROMONITOR: ... ALIEN / DEAD --| => [NADA]
+          // MICROMONITOR: ALIEN / DEAD
         } // if
       // } else { // FETCH_4__READ 
-      // MICROMONITOR: ... FAMED / ALIVE --| => [NADA] 
+        // MICROMONITOR: FAMED / ALIVE
       } // if
       *acntr_greenItemStuff = r_GREEN_COLLECTION_GET_GREEN_ITEM_STUFF(cp_handle,n_entry);
     } else { // Not fetchable 
       *acntr_greenItemStuff = NULL; 
-      // MICROMONITOR: [NADA]
+      // MINIMONITOR: ANY
     } // if
   } // if
 
-  // MICROMONITOR: ... ALIEN / ALIVE (fetched 4 change) ...
-  //               or [NADA]
+  // MINIMONITOR: ANY
   m_DIGGY_RETURN(n_entry)
 } // GreenCollectionFetchInternal
 
@@ -1288,10 +1308,9 @@ static int GreenCollectionFetchInternal (GREEN_COLLECTION_HANDLE cp_handle, int 
 // Public function; see description in .h
 int GreenCollectionGetCount (GREEN_COLLECTION_HANDLE cp_handle, char **navntr_greenItemStuff ) {
   m_DIGGY_BOLLARD()
-  // MICROMONITOR: ... ALIEN / ALIVE (fetched 4 change) ...
-  //               or [NADA]
+  // MINIMONITOR: ANY 
   m_TRACK_IF(GreenCollectionRefreshIndexesInternal(cp_handle,b_TRUE) != RETURNED)
-  // MICROMONITOR: [NADA]
+  // MINIMONITOR: NADA
 
   if (navntr_greenItemStuff != NULL) {
     if (cp_handle->i_itemsCount > 0) {
@@ -1300,9 +1319,8 @@ int GreenCollectionGetCount (GREEN_COLLECTION_HANDLE cp_handle, char **navntr_gr
         cp_handle->b_frozen? FETCH_4__READ: FETCH_4__CHANGE,  navntr_greenItemStuff); 
       m_TRACK_IF(ret < 0) 
       m_ASSERT(ret == cp_handle->i_itemsCount - 1)
-      m_ASSERT(cp_handle->nv_fetched4ChangeEntry == -1 || cp_handle->nv_fetched4ChangeEntry == ret)
-      // MICROMONITOR: ... ALIEN / ALIVE (fetched 4 change) ...
-      //               or [NADA] (if the collection is "frozen" or item is not fetchable)
+      //m_ASSERT(cp_handle->nv_fetched4ChangeEntry == -1 || cp_handle->nv_fetched4ChangeEntry == ret)
+      // MINIMONITOR: ANY (0 or 1 item) 
     } else *navntr_greenItemStuff = NULL;
   } // if
 
@@ -1318,18 +1336,16 @@ int GreenCollectionGetCount (GREEN_COLLECTION_HANDLE cp_handle, char **navntr_gr
 int GreenCollectionFetch (GREEN_COLLECTION_HANDLE cp_handle, int n_entry,
   char **acntr_greenItemStuff) {
   m_DIGGY_BOLLARD()
-  // MICROMONITOR: ... ALIEN / ALIVE (fetched 4 change) ...
-  //               or [NADA]
+  // MINIMONITOR: ANY
   m_TRACK_IF(GreenCollectionRefreshIndexesInternal(cp_handle,b_TRUE) != RETURNED)
-  // MICROMONITOR: [NADA]
+  // MINIMONITOR: NADA
 
   int entry = GreenCollectionFetchInternal(cp_handle,n_entry,
     cp_handle->b_frozen? FETCH_4__READ: FETCH_4__CHANGE, acntr_greenItemStuff);
   m_TRACK_IF(entry < 0)
-  m_ASSERT(cp_handle->nv_fetched4ChangeEntry == -1 || cp_handle->nv_fetched4ChangeEntry == entry)
+  //m_ASSERT(cp_handle->nv_fetched4ChangeEntry == -1 || cp_handle->nv_fetched4ChangeEntry == entry)
 
-  // MICROMONITOR: ... ALIEN / ALIVE (fetched 4 change) ...
-  //               or [NADA] (if the collection is "frozen" or item is not fetchable)
+  // MINIMONITOR: ANY (0 or 1 item) 
 
   m_DIGGY_RETURN(entry)
 } // GreenCollectionFetch
@@ -1339,15 +1355,15 @@ int GreenCollectionFetch (GREEN_COLLECTION_HANDLE cp_handle, int n_entry,
 int GreenCollectionClear (GREEN_COLLECTION_HANDLE handle) {
   m_DIGGY_BOLLARD()
   m_ASSERT(!handle->b_frozen)
-  // MICROMONITOR: ... ALIEN / ALIVE (fetched 4 change) ...
-  //               or [NADA]
+  // MINIMONITOR: ANY
 
   handle->i_itemsCount = 0 ;
-  handle->nv_fetched4ChangeEntry = -1 ;
+  //handle->nv_fetched4ChangeEntry = -1 ;
+  handle->fetched4ChangeEntriesNumber = 0 ;
   m_GAPS_STACK_CLEAR(handle->gaps)
   m_TRACK_IF(GreenIndexesClear(&handle->indexes) != RETURNED)
 
-  // MICROMONITOR: [NADA]
+  // MINIMONITOR: NADA
   m_DIGGY_RETURN(RETURNED)
 } // GreenCollectionClear
 
@@ -1356,10 +1372,9 @@ int GreenCollectionClear (GREEN_COLLECTION_HANDLE handle) {
 int GreenCollectionAddIndex (GREEN_COLLECTION_HANDLE handle, int keysNumber) {
   m_DIGGY_BOLLARD()
   m_ASSERT(!handle->b_frozen)
-  // MICROMONITOR: ... ALIEN / ALIVE (fetched 4 change) ...
-  //               or [NADA]
+  // MINIMONITOR: ANY
   m_TRACK_IF(GreenCollectionRefreshIndexesInternal(handle,b_TRUE) != RETURNED)
-  // MICROMONITOR: [NADA]
+  // MINIMONITOR: NADA
 
   // TODO: permettre d'ajouter des indexes ag chaud...
   m_ASSERT(handle->i_itemsCount == 0)
@@ -1388,10 +1403,9 @@ int GreenCollectionIndexRequest(GREEN_COLLECTION_HANDLE cp_handle,
   m_INIT_INDEX_REQUEST(*indexRequestPtr,indexLabel1,indexSeekFlags1,cfr_keys1,b_ASCENDING,
     FETCH_4__CHANGE)
 
-  // MICROMONITOR: ... ALIEN / ALIVE (fetched 4 change) ...
-  //               or [NADA]
+  // MINIMONITOR: ANY
   m_TRACK_IF(GreenCollectionRefreshIndexesInternal(cp_handle,b_TRUE) != RETURNED)
-  // MICROMONITOR: [NADA]
+  // MINIMONITOR: NADA
 
   m_TRACK_IF(GreenIndexesSeek(&cp_handle->indexes, &indexRequestPtr->iterator, NULL) != RETURNED)
 
@@ -1404,15 +1418,15 @@ int GreenCollectionIndexFetch(GREEN_COLLECTION_HANDLE cp_handle,
   INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, unsigned int indexFetchFlags,
   char **acvntr_greenItemStuff, int *nacvn_entry) {
   m_DIGGY_BOLLARD()
-  // MICROMONITOR: ... ALIEN / ALIVE (fetched 4 change) ...
-  //               or [NADA]
-  m_TRACK_IF(GreenCollectionRefreshIndexesInternal(cp_handle,b_TRUE) != RETURNED)
-  // MICROMONITOR: [NADA]
+  // MINIMONITOR: ANY
+  //m_TRACK_IF(GreenCollectionRefreshIndexesInternal(cp_handle,b_TRUE) != RETURNED)
 
   struct INDEX_REQUEST *indexRequestPtr = (nf_indexRequestAutomaticBuffer != NULL?
     (struct INDEX_REQUEST *)nf_indexRequestAutomaticBuffer: &(cp_handle->internalIndexRequest));
 
   if (b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__RESET)) {
+    m_TRACK_IF(GreenCollectionRefreshIndexesInternal(cp_handle,b_TRUE) != RETURNED)
+    // MINIMONITOR: NADA
     int fetch4 = FETCH_4__CHANGE; // a priori
     if (b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__READ)) fetch4 = FETCH_4__READ;
     else if (b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__REMOVE)) fetch4 = FETCH_4__REMOVE;
@@ -1439,20 +1453,18 @@ int GreenCollectionIndexFetch(GREEN_COLLECTION_HANDLE cp_handle,
     b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__CHANGE) &&
     b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__SMART))) n_fetch4 = indexRequestPtr->fetch4 ;
 
-  // MICROMONITOR: [NADA]
+  // MINIMONITOR: ANY 
   
   int n_fetchedEntry = -1; // a priori
   if (n_fetch4 != -1) { 
-    // MICROMONITOR: [NADA]
+    // MINIMONITOR: ANY 
     n_fetchedEntry = GreenCollectionFetchInternal(cp_handle,n_entry,n_fetch4,acvntr_greenItemStuff);
     m_TRACK_IF(n_fetchedEntry < 0)
     m_ASSERT(*acvntr_greenItemStuff != NULL)
-    m_ASSERT(n_fetch4 != FETCH_4__CHANGE || cp_handle->nv_fetched4ChangeEntry == n_fetchedEntry)
-    // MICROMONITOR: ... ALIEN / ALIVE (fetched 4 change) ...
-    //               or [NADA] 
+    //m_ASSERT(n_fetch4 != FETCH_4__CHANGE || cp_handle->nv_fetched4ChangeEntry == n_fetchedEntry)
+    // MINIMONITOR: ANY 
   } else *acvntr_greenItemStuff = NULL; 
-  // MICROMONITOR: ... ALIEN / ALIVE (fetched 4 change) ...
-  //               or [NADA]
+  // MINIMONITOR: ANY
 
   if (nacvn_entry != NULL) *nacvn_entry = n_fetchedEntry;
 
@@ -1463,10 +1475,9 @@ int GreenCollectionIndexFetch(GREEN_COLLECTION_HANDLE cp_handle,
 // Public function; see description in .h
 int GreenCollectionVerifyIndexes (GREEN_COLLECTION_HANDLE handle) {
   m_DIGGY_BOLLARD()
-  // MICROMONITOR: ... ALIEN / ALIVE (fetched 4 change) ...
-  //               or [NADA]
+  // MINIMONITOR: ANY
   m_TRACK_IF(GreenCollectionRefreshIndexesInternal(handle,b_TRUE) != RETURNED)
-  // MICROMONITOR: [NADA]
+  // MINIMONITOR: NADA
 
   int completed = COMPLETED__OK; // a priori 
 
