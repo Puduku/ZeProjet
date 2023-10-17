@@ -97,7 +97,7 @@
 //   so-called "object-oriented" programming... Modules remain the "essence" of preliminary
 //   software design (*).
 //   "Classes" may only make sense far later, during the "detailed" design process...
-//   => Practical pattern: one module <mod> exactly corresponds to:
+//   => Practical convention: one module <mod> exactly corresponds to:
 //   - single <mod>.h header file OR
 //   - <mod>.h header and <mod>.c source files (most common case) OR
 //   - single <mod>.c source file if and only if it implements main() function.
