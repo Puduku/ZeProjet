@@ -359,12 +359,13 @@ struct G_KEY { //
 // Assign a g-key for string (lexical) comparison
 //
 // Passed:
-// - m_gKey: 
+// - m_gKeys: 
+// - entry: >= 0 ; (0 for plain index)
 // - up_stringPortion:
-#define m_ASSIGN_G_KEY__STRING_PORTION(/*struct G_KEY*/ m_gKey, \
+#define m_ASSIGN_G_KEY__STRING_PORTION(/*struct G_KEY* */m_gKeys, /*int*/entry,\
   /*const struct STRING_PORTION*/up_stringPortion) {\
-  (m_gKey).gKeysComparison = STRING_PORTION__G_KEYS_COMPARISON;\
-  (m_gKey).bare.cp_stringPortion = up_stringPortion ; \
+  (m_gKeys)[entry].gKeysComparison = STRING_PORTION__G_KEYS_COMPARISON;\
+  (m_gKeys)[entry].bare.cp_stringPortion = up_stringPortion ; \
 } 
 
 // Assign a g-key for 'intrinsic values' comparison
@@ -372,10 +373,10 @@ struct G_KEY { //
 // Passed:
 // - m_gKey: 
 // - u_value:
-#define m_ASSIGN_G_KEY__INTRINSIC_VALUE(/*struct G_KEY*/m_gKey,\
+#define m_ASSIGN_G_KEY__INTRINSIC_VALUE(/*struct G_KEY* */m_gKeys, /*int*/entry,\
   /*GENERIC_INTEGER*/uen_intrinsicValue) {\
-  (m_gKey).gKeysComparison = INTRINSIC_VALUE__G_KEYS_COMPARISON;\
-  (m_gKey).bare.cen_intrinsicValue = uen_intrinsicValue; \
+  (m_gKeys)[entry].gKeysComparison = INTRINSIC_VALUE__G_KEYS_COMPARISON;\
+  (m_gKeys)[entry].bare.cen_intrinsicValue = uen_intrinsicValue; \
 } 
 
 // Assign a g-key for 'token ids' comparison
@@ -383,9 +384,10 @@ struct G_KEY { //
 // Passed:
 // - m_gKey: 
 // - uen_value:
-#define m_ASSIGN_G_KEY__ACOLYT_TOKEN_ID(/*struct G_KEY*/m_gKey, /*int*/u_tokenId) {\
-  (m_gKey).gKeysComparison = ACOLYT_TOKEN_ID__G_KEYS_COMPARISON;\
-  (m_gKey).bare.c_acolytTokenId = u_tokenId; \
+#define m_ASSIGN_G_KEY__ACOLYT_TOKEN_ID(/*struct G_KEY* */m_gKeys, /*int*/entry,\
+  /*int*/u_tokenId) {\
+  (m_gKeys)[entry].gKeysComparison = ACOLYT_TOKEN_ID__G_KEYS_COMPARISON;\
+  (m_gKeys)[entry].bare.c_acolytTokenId = u_tokenId; \
 } 
 
 // Assign a g-key for 'acolyt values' comparison
@@ -393,10 +395,10 @@ struct G_KEY { //
 // Passed:
 // - m_gKey: 
 // - uen_value:
-#define m_ASSIGN_G_KEY__ACOLYT_VALUE(/*struct G_KEY*/m_gKey,\
+#define m_ASSIGN_G_KEY__ACOLYT_VALUE(/*struct G_KEY* */m_gKeys, /*int*/entry,\
   /*GENERIC_INTEGER*/uen_acolytValue) {\
-  (m_gKey).gKeysComparison = ACOLYT_VALUE__G_KEYS_COMPARISON;\
-  (m_gKey).bare.cen_acolytValue = uen_acolytValue; \
+  (m_gKeys)[entry].gKeysComparison = ACOLYT_VALUE__G_KEYS_COMPARISON;\
+  (m_gKeys)[entry].bare.cen_acolytValue = uen_acolytValue; \
 } 
 
 // Assign a g-key for 'acolyt handle' comparison
@@ -404,36 +406,47 @@ struct G_KEY { //
 // Passed:
 // - m_gKey: 
 // - uen_value:
-#define m_ASSIGN_G_KEY__ACOLYT_HANDLE(/*struct G_KEY*/m_gKey,\
+#define m_ASSIGN_G_KEY__ACOLYT_HANDLE(/*struct G_KEY* */m_gKeys, /*int*/entry,\
   /*void* */unr_acolytHandle) {\
-  (m_gKey).gKeysComparison = ACOLYT_HANDLE__G_KEYS_COMPARISON;\
-  (m_gKey).bare.cnr_acolytHandle = unr_acolytHandle; \
+  (m_gKeys)[entry].gKeysComparison = ACOLYT_HANDLE__G_KEYS_COMPARISON;\
+  (m_gKeys)[entry].bare.cnr_acolytHandle = unr_acolytHandle; \
 } 
 
 
-// #REF GStringsIndexFetch <gStringSet>
-// #SEE GreenCollectionIndexFetch@c-ansi/green.h  <<gStringSet>> <keys> 
+// #REF GStringsIndexRequest <gStringSet>
+// #SEE GreenCollectionIndexRequest@c-ansi/green.h  <<gStringSet>> <keys> 
 // Passed keys :
-// - ccap_key1: key 1 search value(s) ; only significant when 
-//   indexFetchFlags != INDEX_FETCH__READ_NEXT and when c_indexSeekFlags == INDEX_SEEK__KEY / BOTTOM / TOP.
+// - cfps_keys1: (1st criterion) search key(s) value(s) of item (regarding index) ;
+//   not significant without actual index seek flag (INDEX_SEEK_FLAGS__ANY)
 //   type of comparison (see enum-G_KEYS_COMPARISON) must correspond to that assigned to index
 //   (see GStringsAddIndex() above) 
-// - ... (variadic parameters) : for "compound" keys: key2, key3, etc.
+// - ... (variadic parameters) : search key(s) value(s) for other criteria...  
+int GStringsIndexRequest(G_STRINGS_HANDLE cp_handle,
+  INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaNumber,
+  int indexLabel1, unsigned int indexSeekFlags1, const struct G_KEY *cfps_keys1, ...);
+
+// #REF GStringsIndexFetch <gStringSet>
+// #SEE GreenCollectionIndexRequest@c-ansi/green.h  <<gStringSet>> 
 int GStringsIndexFetch(G_STRINGS_HANDLE cp_handle,
-  INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int indexLabel,
-  unsigned int indexFetchFlags, unsigned int c_indexSeekFlags,  G_STRING_SET_STUFF *acvnt_gStringSetStuff,
-  int *nacvn_entry, const struct G_KEY *ccap_key1, ...);
+  INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, unsigned int indexFetchFlags,
+  G_STRING_SET_STUFF *acvnt_gStringSetStuff, int *nacvn_entry);
 
-
-// Fetch g-string item based on plain index 
-// #SEE GStringsIndexFetch @ c-ansi/g-string.h <gString>
-#define /*int*/ G_STRINGS_INDEX_FETCH(/*G_STRINGS_HANDLE*/handle,\
-  /*INDEX_REQUEST_AUTOMATIC_BUFFER*/nf_indexRequestAutomaticBuffer,\
-  /*int*/indexLabel,  /*int*/indexFetchFlags, /*int*/c_indexSeekFlags,\
-  /*G_STRING_STUFF* */acvnt_gStringStuff,  /*const struct G_KEY* */ccap_key) \
-  GStringsIndexFetch(handle, nf_indexRequestAutomaticBuffer, indexLabel,indexFetchFlags,c_indexSeekFlags,\
-  acvnt_gStringStuff,NULL, ccap_key)
-
+// Simple fetch, based on plain index 
+// #SEE GStringsIndexRequest <gStringSet>
+// #SEE GStringsIndexFetch <gStringSet>
+static inline int m_GStringsIndexSingleFetch(G_STRINGS_HANDLE cp_handle, 
+  INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, 
+  int indexLabel, unsigned int indexSeekFlags, const struct G_KEY *cfps_keys,
+  unsigned int indexFetchFlags, G_STRING_SET_STUFF *acvnt_gStringSetStuff, int *nacvn_entry) {
+  m_DIGGY_BOLLARD_S() 
+  m_TRACK_IF(GStringsIndexRequest(cp_handle,nf_indexRequestAutomaticBuffer,1,indexLabel,
+    indexSeekFlags, cfps_keys) != RETURNED) 
+  int answer = GStringsIndexFetch(cp_handle,nf_indexRequestAutomaticBuffer,indexFetchFlags,
+    acvnt_gStringSetStuff,nacvn_entry);
+  m_TRACK_IF(answer < 0)
+  m_DIGGY_RETURN(answer)
+} // m_GStringsIndexSingleFetch
+  
 
 // #REF GStringsVerifyIndexes <g-string set>
 // #SEE GreenCollectionVerifyIndexes@c-ansi/green.h  <<g-string set>>

@@ -250,11 +250,11 @@ static int BlotcodeFindBlotkeyw (BLOTCODE_HANDLE p_handle,
   G_STRING_STUFF t_blotkeywStuff = (G_STRING_STUFF) UNDEFINED;
 
   struct G_KEY gKey;
-  m_ASSIGN_G_KEY__STRING_PORTION(gKey, *ap_litteralKeyw); 
+  m_ASSIGN_G_KEY__STRING_PORTION(&gKey,0, *ap_litteralKeyw); 
 
-  int result = G_STRINGS_INDEX_FETCH(p_handle->h_blotkeywsHandle,  indexRequestAutomaticBuffer,
-    INDEX_LABEL0,  INDEX_FETCH_FLAGS__READ_ONLY, INDEX_SEEK_FLAGS__EQUAL,  &t_blotkeywStuff,
-    &gKey); 
+  int result = m_GStringsIndexSingleFetch(p_handle->h_blotkeywsHandle, indexRequestAutomaticBuffer,
+    INDEX_LABEL0,INDEX_SEEK_FLAGS__EQUAL,&gKey,INDEX_FETCH_FLAGS__READ_ONLY,&t_blotkeywStuff,
+    NULL); 
   switch(result) { 
   case RESULT__FOUND:
     *ac_blotkeywId = t_blotkeywStuff->acolyt.cen_value ;

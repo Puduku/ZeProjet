@@ -104,9 +104,9 @@ int BlotexlibExecutorGetBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
 
   G_STRING_STUFF ct_namedBlotregStuff = (G_STRING_STUFF)UNDEFINED; 
   struct G_KEY gKey ;
-  m_ASSIGN_G_KEY__STRING_PORTION(gKey,blotregName)
-  int result = G_STRINGS_INDEX_FETCH(handle->h_blotregsHandle,NULL,INDEX_LABEL0,
-    INDEX_FETCH_FLAGS__SEEK_ONLY, INDEX_SEEK_FLAGS__EQUAL,  &ct_namedBlotregStuff, &gKey);
+  m_ASSIGN_G_KEY__STRING_PORTION(&gKey,0,blotregName)
+  int result = m_GStringsIndexSingleFetch(handle->h_blotregsHandle,NULL,INDEX_LABEL0,
+    INDEX_SEEK_FLAGS__EQUAL,&gKey, INDEX_FETCH_FLAGS__SEEK_ONLY,&ct_namedBlotregStuff, NULL);
   switch (result) {
   case RESULT__FOUND:
     m_ASSERT((*ac_blotregHandle = ct_namedBlotregStuff->acolyt.cnhr_handle) != NULL)
@@ -130,9 +130,9 @@ int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
   int completed = COMPLETED__OK; // a priori
   G_STRING_STUFF t_namedBlotregStuff = (G_STRING_STUFF)UNDEFINED; 
   struct G_KEY gKey ;
-  m_ASSIGN_G_KEY__STRING_PORTION(gKey,blotregName)
-  int result = G_STRINGS_INDEX_FETCH(handle->h_blotregsHandle,NULL,INDEX_LABEL0,
-    INDEX_FETCH_FLAGS__FETCH, INDEX_SEEK_FLAGS__EQUAL,  &t_namedBlotregStuff, &gKey);
+  m_ASSIGN_G_KEY__STRING_PORTION(&gKey,0,blotregName)
+  int result = m_GStringsIndexSingleFetch(handle->h_blotregsHandle,NULL,INDEX_LABEL0,
+    INDEX_SEEK_FLAGS__EQUAL,&gKey, INDEX_FETCH_FLAGS__FETCH,&t_namedBlotregStuff,NULL);
   switch (result) {
   case RESULT__FOUND:
     m_ASSERT(t_namedBlotregStuff->acolyt.cnhr_handle != NULL)
@@ -315,13 +315,13 @@ static int BlotexlibExecutorFetchBlotvar(BLOTEXLIB_EXECUTOR_HANDLE handle, char 
       int indexLabel = UNDEFINED;
       if (ap_blotvarReference->blotvarReference == NAME__BLOTVAR_REFERENCE) {
         indexLabel = NAME__BLOTREG_INDEX_LABEL;
-        m_ASSIGN_G_KEY__STRING_PORTION(gKey,ap_blotvarReference->select.c_name)
+        m_ASSIGN_G_KEY__STRING_PORTION(&gKey,0,ap_blotvarReference->select.c_name)
       } else {
         indexLabel = PSEUDO_ID__BLOTREG_INDEX_LABEL;
-        m_ASSIGN_G_KEY__ACOLYT_VALUE(gKey,ap_blotvarReference->select.c_pseudoId)
+        m_ASSIGN_G_KEY__ACOLYT_VALUE(&gKey,0,ap_blotvarReference->select.c_pseudoId)
       } // if
-      switch (ret = GStringsIndexFetch(ap_blotvarReference->blotregHandle,NULL,indexLabel,
-        INDEX_FETCH_FLAGS__FETCH, INDEX_SEEK_FLAGS__EQUAL, acvnt_blotvarStuff, nacvn_entry,&gKey)) { 
+      switch (ret = m_GStringsIndexSingleFetch(ap_blotvarReference->blotregHandle,NULL,indexLabel,
+        INDEX_SEEK_FLAGS__EQUAL, &gKey, INDEX_FETCH_FLAGS__FETCH, acvnt_blotvarStuff, nacvn_entry)) { 
       case RESULT__FOUND:
       break; case RESULT__NOT_FOUND:
         m_RAISE_VERBATIM_IF(b_lValue)

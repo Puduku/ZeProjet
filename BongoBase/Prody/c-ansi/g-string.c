@@ -418,32 +418,29 @@ int GStringsAddIndex (G_STRINGS_HANDLE handle,  int keysNumber,
 
 
 // Public function : see .h
-int GStringsIndexFetch(G_STRINGS_HANDLE cp_handle,
-  INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int indexLabel,
-  unsigned int indexFetchFlags, unsigned int c_indexSeekFlags,
-  G_STRING_SET_STUFF *acvnt_gStringSetStuff, int *nacvn_entry, const struct G_KEY *ccap_key1, ...) {
+int GStringsIndexRequest(G_STRINGS_HANDLE cp_handle,
+  INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaNumber,
+  int indexLabel1, unsigned int indexSeekFlags1, const struct G_KEY *cfps_keys1, ...) {
   m_DIGGY_BOLLARD()
-  const struct G_KEY* ccsap_keys[cp_handle->gStringSetCardinality] ; 
 
-  if (b_SIGNIFICANT_GREEN_COLLECTION_INDEX_KEYS(c_indexSeekFlags)) {
-    m_ASSERT(cp_handle->indexesNumber > indexLabel)
-    struct INDEX_PROPERTIES *a_indexProperties = cp_handle->vnhs_indexesProperties + indexLabel ;
-    va_list ap ;
-    va_start(ap,ccap_key1) ;
-
-    int i = 0;
-    const struct G_KEY **sap_keyPtr = ccsap_keys;
-    for (; i < a_indexProperties->keysNumber ; i++, sap_keyPtr++) {
-      if (i > 0) {
-        ccap_key1 = va_arg(ap,const struct G_KEY*) ;
-      } // if
-      *sap_keyPtr = ccap_key1;
-    } // for
-    va_end(ap) ;
-  } // if
+  //  va_list ap ;
+  //  va_start(ap,cafp_key1_1) ;
+  //      cap_key1 = va_arg(ap,const struct G_KEY*) ;
+  //  va_end(ap) ;
 
   m_TRACK_IF(GreenCollectionIndexRequest(cp_handle->h_greenCollectionHandle,
-    nf_indexRequestAutomaticBuffer,  1, indexLabel,  c_indexSeekFlags, ccsap_keys) != RETURNED)
+    nf_indexRequestAutomaticBuffer, criteriaNumber, indexLabel1, indexSeekFlags1,
+    (void*)cfps_keys1) != RETURNED)
+  m_DIGGY_RETURN(RETURNED)
+} // GStringsIndexRequest
+
+
+// Public function : see .h
+int GStringsIndexFetch(G_STRINGS_HANDLE cp_handle,
+  INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, unsigned int indexFetchFlags,
+  G_STRING_SET_STUFF *acvnt_gStringSetStuff, int *nacvn_entry) {
+  m_DIGGY_BOLLARD()
+
   int result = GreenCollectionIndexFetch(cp_handle->h_greenCollectionHandle,
     nf_indexRequestAutomaticBuffer, indexFetchFlags, (char **)acvnt_gStringSetStuff,nacvn_entry);
   m_TRACK_IF(result < 0)

@@ -594,7 +594,7 @@ static int GreenIndexesResize (struct GREEN_INDEXES *a_indexes, int newItemsPhys
 struct INDEX_ITERATOR {
   int indexLabel;
   unsigned int indexSeekFlags;
-  void *cfr_keys; // Only significant with Key-based seek flag(s)
+  void *cfpr_keys; // Only significant with Key-based seek flag(s)
   char b_descending; 
   struct INDEX_SEQUENCE indexSequence;
 };
@@ -603,10 +603,10 @@ struct INDEX_ITERATOR {
 #define b_DESCENDING b_TRUE
 
 #define m_INIT_INDEX_ITERATOR(/*struct INDEX_ITERATOR*/m_indexIterator, /*int*/m_indexLabel,\
-  /*unsigned int*/m_indexSeekFlags, /*void* */mcfr_keys, mb_descending) {\
+  /*unsigned int*/m_indexSeekFlags, /*void* */mcfpr_keys, mb_descending) {\
   (m_indexIterator).indexLabel = m_indexLabel;\
   (m_indexIterator).indexSeekFlags = m_indexSeekFlags;\
-  (m_indexIterator).cfr_keys = mcfr_keys;\
+  (m_indexIterator).cfpr_keys = mcfpr_keys;\
   (m_indexIterator).b_descending = mb_descending;\
   m_HARD_RESET_INDEX_SEQUENCE((m_indexIterator).indexSequence)\
 }
@@ -649,7 +649,7 @@ static int GreenIndexesSeek(struct GREEN_INDEXES* a_indexes, struct INDEX_ITERAT
   
   m_TRACK_IF(GreenIndexSeek(a_index, a_indexes->entriesCompareFunction,
     a_indexes->r_entriesCompareHandle, a_indexIterator->indexLabel, a_indexIterator->indexSeekFlags,
-    a_indexIterator->cfr_keys, &a_indexIterator->indexSequence, nan_entry) != RETURNED) 
+    a_indexIterator->cfpr_keys, &a_indexIterator->indexSequence, nan_entry) != RETURNED) 
 
   m_DIGGY_RETURN(RETURNED)
 } // GreenIndexesSeek
@@ -932,8 +932,8 @@ struct INDEX_REQUEST {
 } ;
  
 #define m_INIT_INDEX_REQUEST(/*struct INDEX_REQUEST*/m_indexRequest, /*int*/m_indexLabel,\
-  /*unsigned int*/m_indexSeekFlags, /*void* */mcfr_keys, mb_descending, /*int*/m_fetch4) {\
-  m_INIT_INDEX_ITERATOR((m_indexRequest).iterator, m_indexLabel, m_indexSeekFlags, mcfr_keys,\
+  /*unsigned int*/m_indexSeekFlags, /*void* */mcfpr_keys, mb_descending, /*int*/m_fetch4) {\
+  m_INIT_INDEX_ITERATOR((m_indexRequest).iterator, m_indexLabel, m_indexSeekFlags, mcfpr_keys,\
     mb_descending) \
   (m_indexRequest).fetch4 = m_fetch4;\
 }
@@ -968,8 +968,7 @@ struct GREEN_COLLECTION {
   struct GREEN_INDEXES indexes;
   struct INDEX_REQUEST internalIndexRequest;
   struct GAPS_STACK gaps; // TODO: ajouter h_ prefix vu qu'il faut appeler m_GAPS_STACK_FREE()
-  //int nv_fetched4ChangeEntry; // -1 special value: no entry currently "fetched"
-  //                            // >= 0: entry currently "fetched" (ALIEN / ALIVE state)
+  // "Monitored" entries "fetched for change" (in ALIEN / ALIVE state) : 
   int fetched4ChangeEntriesNumber;  
   int fetched4ChangeEntriesPhysicalNumber;  
   int *h_fetched4ChangeEntries;  
@@ -1089,7 +1088,6 @@ int GreenCollectionCreateInstance(GREEN_COLLECTION_HANDLE *azh_handle,  int expe
   m_GAPS_STACK_INIT(handle->gaps,handle->itemsPhysicalNumber)
   m_DEFAULT_INDEX_REQUEST(handle->internalIndexRequest)
 
-  //handle->nv_fetched4ChangeEntry = -1 ;
   handle->fetched4ChangeEntriesPhysicalNumber = expectedItemsNumber;
   handle->fetched4ChangeEntriesNumber = 0;
   // MINIMONITOR: NADA
@@ -1135,7 +1133,6 @@ static int GreenCollectionRefreshIndexesInternal(GREEN_COLLECTION_HANDLE handle,
 
   // MINIMONITOR: ANY
 
-  //if (handle->nv_fetched4ChangeEntry < 0) 
   if (handle->fetched4ChangeEntriesNumber == 0) {
     // MINIMONITOR: NADA
     m_DIGGY_RETURN(RETURNED)
@@ -1237,7 +1234,6 @@ static inline int m_GreenCollectionAddFetched4ChangeEntry(GREEN_COLLECTION_HANDL
 static int GreenCollectionFetchInternal (GREEN_COLLECTION_HANDLE cp_handle, int n_entry, int fetch4,
   char **acntr_greenItemStuff) {
   m_DIGGY_BOLLARD_S()
-  //m_ASSERT(cp_handle->nv_fetched4ChangeEntry < 0)
   // MINIMONITOR: ANY
   if (n_entry == -1) { // Smart fetch
     m_ASSERT(!cp_handle->b_frozen) 
@@ -1263,7 +1259,6 @@ static int GreenCollectionFetchInternal (GREEN_COLLECTION_HANDLE cp_handle, int 
       m_SET_FLAG_OFF(cp_handle->hsc_flags[n_entry],DEAD_FLAG)
       // MICROMONITOR: ALIEN / ALIVE 
     } // if
-    //cp_handle->nv_fetched4ChangeEntry = n_entry;
     m_TRACK_IF(m_GreenCollectionAddFetched4ChangeEntry(cp_handle,n_entry) != RETURNED)
     // MICROMONITOR: ALIEN / ALIVE (fetched 4 change)
     // MINIMONITOR: ANY+
@@ -1280,7 +1275,6 @@ static int GreenCollectionFetchInternal (GREEN_COLLECTION_HANDLE cp_handle, int 
         m_SET_FLAG_ON(cp_handle->hsc_flags[n_entry],ALIEN_FLAG)
         // MICROMONITOR: ALIEN / ALIVE
         if (fetch4 == FETCH_4__CHANGE) { 
-          //cp_handle->nv_fetched4ChangeEntry = n_entry;
           m_TRACK_IF(m_GreenCollectionAddFetched4ChangeEntry(cp_handle,n_entry) != RETURNED)
           // MICROMONITOR: ALIEN / ALIVE (fetched 4 change)
           // MINIMONITOR: ANY+
@@ -1319,7 +1313,6 @@ int GreenCollectionGetCount (GREEN_COLLECTION_HANDLE cp_handle, char **navntr_gr
         cp_handle->b_frozen? FETCH_4__READ: FETCH_4__CHANGE,  navntr_greenItemStuff); 
       m_TRACK_IF(ret < 0) 
       m_ASSERT(ret == cp_handle->i_itemsCount - 1)
-      //m_ASSERT(cp_handle->nv_fetched4ChangeEntry == -1 || cp_handle->nv_fetched4ChangeEntry == ret)
       // MINIMONITOR: ANY (0 or 1 item) 
     } else *navntr_greenItemStuff = NULL;
   } // if
@@ -1343,10 +1336,8 @@ int GreenCollectionFetch (GREEN_COLLECTION_HANDLE cp_handle, int n_entry,
   int entry = GreenCollectionFetchInternal(cp_handle,n_entry,
     cp_handle->b_frozen? FETCH_4__READ: FETCH_4__CHANGE, acntr_greenItemStuff);
   m_TRACK_IF(entry < 0)
-  //m_ASSERT(cp_handle->nv_fetched4ChangeEntry == -1 || cp_handle->nv_fetched4ChangeEntry == entry)
 
   // MINIMONITOR: ANY (0 or 1 item) 
-
   m_DIGGY_RETURN(entry)
 } // GreenCollectionFetch
 
@@ -1358,7 +1349,6 @@ int GreenCollectionClear (GREEN_COLLECTION_HANDLE handle) {
   // MINIMONITOR: ANY
 
   handle->i_itemsCount = 0 ;
-  //handle->nv_fetched4ChangeEntry = -1 ;
   handle->fetched4ChangeEntriesNumber = 0 ;
   m_GAPS_STACK_CLEAR(handle->gaps)
   m_TRACK_IF(GreenIndexesClear(&handle->indexes) != RETURNED)
@@ -1391,7 +1381,7 @@ int GreenCollectionAddIndex (GREEN_COLLECTION_HANDLE handle, int keysNumber) {
 // Public function; see description in .h
 int GreenCollectionIndexRequest(GREEN_COLLECTION_HANDLE cp_handle,
   INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaNumber,
-  int indexLabel1, unsigned int indexSeekFlags1, void *cfr_keys1, ...) {
+  int indexLabel1, unsigned int indexSeekFlags1, void *cfpr_keys1, ...) {
   m_DIGGY_BOLLARD()
 
   m_ASSERT(indexSeekFlags1 != ALL_FLAGS_OFF0) 
@@ -1400,7 +1390,7 @@ int GreenCollectionIndexRequest(GREEN_COLLECTION_HANDLE cp_handle,
   struct INDEX_REQUEST *indexRequestPtr = (nf_indexRequestAutomaticBuffer != NULL?
     (struct INDEX_REQUEST *)nf_indexRequestAutomaticBuffer: &(cp_handle->internalIndexRequest));
 
-  m_INIT_INDEX_REQUEST(*indexRequestPtr,indexLabel1,indexSeekFlags1,cfr_keys1,b_ASCENDING,
+  m_INIT_INDEX_REQUEST(*indexRequestPtr,indexLabel1,indexSeekFlags1,cfpr_keys1,b_ASCENDING,
     FETCH_4__CHANGE)
 
   // MINIMONITOR: ANY
@@ -1457,14 +1447,10 @@ int GreenCollectionIndexFetch(GREEN_COLLECTION_HANDLE cp_handle,
   
   int n_fetchedEntry = -1; // a priori
   if (n_fetch4 != -1) { 
-    // MINIMONITOR: ANY 
     n_fetchedEntry = GreenCollectionFetchInternal(cp_handle,n_entry,n_fetch4,acvntr_greenItemStuff);
     m_TRACK_IF(n_fetchedEntry < 0)
     m_ASSERT(*acvntr_greenItemStuff != NULL)
-    //m_ASSERT(n_fetch4 != FETCH_4__CHANGE || cp_handle->nv_fetched4ChangeEntry == n_fetchedEntry)
-    // MINIMONITOR: ANY 
   } else *acvntr_greenItemStuff = NULL; 
-  // MINIMONITOR: ANY
 
   if (nacvn_entry != NULL) *nacvn_entry = n_fetchedEntry;
 

@@ -283,6 +283,7 @@ enum {
   REQUEST_CRITERIA_OP__OR,
 } ;
 
+// #REF GreenCollectionIndexRequest <greenItem> <keys> 
 // Construct a request for indexed fetch - see GreenCollectionIndexFetch()
 //
 // Passed:
@@ -295,13 +296,13 @@ enum {
 // - int criteriaNumber:
 // - indexLabel1: (1st criterion) >= 0: see GreenCollectionCreateInstance()
 // - indexSeekFlags1: (1st criterion)
-// - cfr_keys1:  (1st criterion) search key(s) value(s) of item (regarding index) ;
+// - cfpr_keys1:  (1st criterion) search key(s) value(s) of item (regarding index) ;
 //   not significant without actual index seek flag (INDEX_SEEK_FLAGS__ANY)
 // - optional criteria (...) :
 //  + requestCriteraOp2 :
 //  + indexLabel2:
 //  + c_indexSeekFlags2:
-//  + cfr_keys2: 
+//  + cfpr_keys2: 
 //  (etc.)
 // 
 // Changed:
@@ -313,7 +314,7 @@ enum {
 // - -1: unexpected problem ; anomaly is raised
 int GreenCollectionIndexRequest(GREEN_COLLECTION_HANDLE cp_handle,
   INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaNumber,
-  int indexLabel1, unsigned int indexSeekFlags1, void *cfr_keys1, ...);
+  int indexLabel1, unsigned int indexSeekFlags1, void *cfpr_keys1, ...);
 
 // Indicates whether key value parameter is significant with index request... 
 //
@@ -326,9 +327,6 @@ int GreenCollectionIndexRequest(GREEN_COLLECTION_HANDLE cp_handle,
 #define b_SIGNIFICANT_GREEN_COLLECTION_INDEX_KEYS(/*unsigned int*/indexSeekFlags) \
   (b_FLAG_SET_OFF(indexSeekFlags,INDEX_SEEK_FLAG__ANY))
 
-//GreenCollectionIndexRequest(blotregHandle,indexRequestAutomaticBuffer, 2,
-//  INDEX_LABEL0, INDEX_SEEK_FLAGS__LIKE, "*bolo*", REQUEST_CRITERIA_OP__OR,
-//  INDEX_LABEL0, INDEX_SEEK_FLAGS__GREATER_EQUAL, "c"); 
      
 enum {
 // TODO: quand pas combined avec __NEXT, va chercher le 1er item, mais le curseur reste
