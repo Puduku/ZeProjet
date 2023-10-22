@@ -38,8 +38,6 @@
 typedef int (*GREEN_HANDLER__DISENGAGE_FUNCTION) (void *r_handle, char *r_greenItemStuff) ;
 
 #define INDEX_LABEL0 0
-// TODO: ag virer ??? :
-#define INDEX_LABEL1 1
 
 // #REF GREEN_HANDLER__KEYS_COMPARE_FUNCTION <GreenItem> - Custom function definition...
 // Compare "A" and "B" keys values.
@@ -329,10 +327,6 @@ int GreenCollectionIndexRequest(GREEN_COLLECTION_HANDLE cp_handle,
 
      
 enum {
-// TODO: quand pas combined avec __NEXT, va chercher le 1er item, mais le curseur reste
-// "derriegre" ce 1er item... 
-// TODO: Pour gedrer les doublons dans une CHANGE / REMOVE sedquence : technique :
-//  nv_fetched4ChangeEntry => v_fetched4ChangeEntries
   INDEX_FETCH_FLAG__RESET      = 0x01, 
   // INDEX_FETCH_FLAG__CHANGE / REMOVE / READ are mutually exclusive: 
   INDEX_FETCH_FLAG__CHANGE     = 0x02, // must be combined with INDEX_FETCH_FLAG__RESET
@@ -413,7 +407,6 @@ enum { // #REF enum-INDEX_FETCH
 int GreenCollectionIndexFetch(GREEN_COLLECTION_HANDLE cp_handle, 
   INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, unsigned int indexFetchFlags, 
   char **acvntr_greenItemStuff, int *nacvn_entry);
-// TODO: add *na_remainingCount param (utile pour si on a des doublons)...
 // TODO : prevoir mechanisme optionel qui verifie qu'une fois insere, le NOUVEL item
 //        est bien vu par l'index...
 

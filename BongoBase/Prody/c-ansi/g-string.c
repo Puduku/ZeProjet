@@ -169,13 +169,18 @@ int GStringSetDestroyInstance(G_STRING_SET_STUFF xh_notNamedObjectStuff,  int ca
 struct KEY_SETTINGS {
   int gStringSetElement;
   int gKeysComparison;
-// TODO: union
-  // Only significant with STRING_PORTION__G_KEYS_COMPARISON:
-  IS_CHAR_FUNCTION cn_isNeutralCharFunction;
-  TO_CHAR_FUNCTION cn_toCharFunction;
-  // Only significant with INTRINSIC_VALUE__G_KEYS_COMPARISON:
-  STRING_PORTION_INTRINSIC_VALUE_FUNCTION stringPortionIntrinsicValueFunction;
-  void *stringPortionIntrinsicValueFunctionHandle;
+  union {
+    // Only significant with STRING_PORTION__G_KEYS_COMPARISON:
+    struct {
+      IS_CHAR_FUNCTION cn_isNeutralCharFunction;
+      TO_CHAR_FUNCTION cn_toCharFunction;
+    } stringPortionComparison ;
+    // Only significant with INTRINSIC_VALUE__G_KEYS_COMPARISON:
+    struct {
+      STRING_PORTION_INTRINSIC_VALUE_FUNCTION stringPortionIntrinsicValueFunction;
+      void *stringPortionIntrinsicValueFunctionHandle;
+    } intrinsicValueComparison ;
+  } select ; 
 };
 
 
@@ -188,7 +193,8 @@ struct INDEX_PROPERTIES {
 struct G_STRINGS {
   GREEN_COLLECTION_HANDLE h_greenCollectionHandle;
   int gStringSetCardinality;
-  int gStringConveyance;
+  int n_gStringConveyance; 
+  const int *cps_gStringConveyances; // not significant if general conveyance is specified
   NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION c_namedObjectDestroyInstanceFunction;
   int indexesNumber;
   struct INDEX_PROPERTIES *vnhs_indexesProperties;
@@ -202,12 +208,15 @@ static int GStringsDisengage(void *r_handle,  char *r_greenItemStuff) {
   m_CHECK_MAGIC_FIELD(G_STRINGS_HANDLE,handle)
   G_STRING_SET_STUFF gStringSetStuff = (G_STRING_SET_STUFF) r_greenItemStuff;
   
-  if (handle->gStringConveyance == NAMED_OBJECT__G_STRING_CONVEYANCE &&
-    gStringSetStuff->acolyt.cnhr_handle != NULL) {
-    m_ASSERT(handle->gStringSetCardinality == 1)
-    m_TRACK_IF(handle->c_namedObjectDestroyInstanceFunction(gStringSetStuff->acolyt.cnhr_handle) !=
-      RETURNED)
-  } // if
+  int i = 0;
+  for (; i < handle->gStringSetCardinality ; i++) {
+    if ((handle->n_gStringConveyance >= 0? handle->n_gStringConveyance:
+      (handle->cps_gStringConveyances)[i]) == NAMED_OBJECT__G_STRING_CONVEYANCE &&
+      gStringSetStuff->acolyt.cnhr_handle != NULL) {
+      m_TRACK_IF(handle->c_namedObjectDestroyInstanceFunction(gStringSetStuff[i].acolyt.cnhr_handle)
+      != RETURNED)
+    } // if
+  } // for 
   m_TRACK_IF(GStringSetDisengage(gStringSetStuff, handle->gStringSetCardinality) != RETURNED)
 
   return RETURNED;
@@ -271,7 +280,8 @@ static int GStringsKeysCompare(void *cpr_handle,  char b_frozen, int indexLabel,
   { G_STRING_STUFF p_aGStringStuff = (G_STRING_STUFF) pr_aGreenItemStuff +
       ap_keySettings->gStringSetElement;
     m_ASSIGN_BARE_G_KEY__G_STRING(aBareGKey,  ap_keySettings->gKeysComparison, p_aGStringStuff,
-      ap_keySettings->stringPortionIntrinsicValueFunction,ap_keySettings->stringPortionIntrinsicValueFunctionHandle);
+      ap_keySettings->select.intrinsicValueComparison.stringPortionIntrinsicValueFunction,
+      ap_keySettings->select.intrinsicValueComparison.stringPortionIntrinsicValueFunctionHandle);
   } // G_STRING_STUFF
 
   // Bare key 'b':
@@ -280,7 +290,8 @@ static int GStringsKeysCompare(void *cpr_handle,  char b_frozen, int indexLabel,
     G_STRING_STUFF p_bGStringStuff = (G_STRING_STUFF) npr_bGreenItemStuff + 
       ap_keySettings->gStringSetElement;
     m_ASSIGN_BARE_G_KEY__G_STRING(bBareGKey,  ap_keySettings->gKeysComparison, p_bGStringStuff,
-      ap_keySettings->stringPortionIntrinsicValueFunction,ap_keySettings->stringPortionIntrinsicValueFunctionHandle);
+      ap_keySettings->select.intrinsicValueComparison.stringPortionIntrinsicValueFunction,
+      ap_keySettings->select.intrinsicValueComparison.stringPortionIntrinsicValueFunctionHandle);
   } else {
     const struct G_KEY *ap_bGKey = ((const struct G_KEY **)cpr_bKeys)[keyRank];
     m_ASSIGN_BARE_G_KEY__G_KEY(bBareGKey,  ap_keySettings->gKeysComparison,  ap_bGKey)
@@ -291,7 +302,8 @@ static int GStringsKeysCompare(void *cpr_handle,  char b_frozen, int indexLabel,
   switch (ap_keySettings->gKeysComparison) {
   case STRING_PORTION__G_KEYS_COMPARISON:
     comparison = CompareStringPortions(&aBareGKey.cp_stringPortion,  &bBareGKey.cp_stringPortion,
-      ap_keySettings->cn_isNeutralCharFunction,  ap_keySettings->cn_toCharFunction); 
+      ap_keySettings->select.stringPortionComparison.cn_isNeutralCharFunction,
+      ap_keySettings->select.stringPortionComparison.cn_toCharFunction); 
   break; case INTRINSIC_VALUE__G_KEYS_COMPARISON:
     comparison = GET_COMPARISON(aBareGKey.cen_intrinsicValue,bBareGKey.cen_intrinsicValue);
   break; case ACOLYT_TOKEN_ID__G_KEYS_COMPARISON:
@@ -311,17 +323,17 @@ m_DIGGY_VAR_COMPARISON(comparison)
 
 // Public function : see .h
 int GStringsCreateInstance(G_STRINGS_HANDLE* azh_handle,  int expectedItemsNumber,
-  int gStringSetCardinality, int n_gStringConveyance,
+  int gStringSetCardinality, int n_gStringConveyance, const int *cnfps_gStringConveyances,
   NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION c_namedObjectDestroyInstanceFunction) {
   m_DIGGY_BOLLARD()
   m_MALLOC_INSTANCE(*azh_handle)
   G_STRINGS_HANDLE handle = *azh_handle;
 
   handle->gStringSetCardinality = gStringSetCardinality;
-  handle->gStringConveyance = (n_gStringConveyance < 0? TOKEN__G_STRING_CONVEYANCE :
-    n_gStringConveyance); 
-  m_ASSERT(handle->gStringConveyance != NAMED_OBJECT__G_STRING_CONVEYANCE ||
-    handle->gStringSetCardinality == 1)
+  if (n_gStringConveyance == -1 && cnfps_gStringConveyances == NULL) n_gStringConveyance =
+    TOKEN__G_STRING_CONVEYANCE ;
+  handle->n_gStringConveyance = n_gStringConveyance; 
+  handle->cps_gStringConveyances = cnfps_gStringConveyances; 
   handle->c_namedObjectDestroyInstanceFunction = c_namedObjectDestroyInstanceFunction;
  
   handle->indexesNumber = 0;
@@ -390,22 +402,26 @@ int GStringsAddIndex (G_STRINGS_HANDLE handle,  int keysNumber,
     } // if
     m_ASSERT(key1GStringSetElement < handle->gStringSetCardinality)
     s_keysSettings->gStringSetElement = key1GStringSetElement;
+    int gStringConveyance = (handle->n_gStringConveyance >= 0? handle->n_gStringConveyance:
+      handle->cps_gStringConveyances[key1GStringSetElement]);
     switch (s_keysSettings->gKeysComparison = key1GKeysComparison) {
     case STRING_PORTION__G_KEYS_COMPARISON:
     case INTRINSIC_VALUE__G_KEYS_COMPARISON:
     break; case ACOLYT_TOKEN_ID__G_KEYS_COMPARISON:
-      m_ASSERT(handle->gStringConveyance == TOKEN__G_STRING_CONVEYANCE)
+      m_ASSERT(gStringConveyance == TOKEN__G_STRING_CONVEYANCE)
     break; case ACOLYT_VALUE__G_KEYS_COMPARISON:
-      m_ASSERT(handle->gStringConveyance == VALUED_STRING__G_STRING_CONVEYANCE)
+      m_ASSERT(gStringConveyance == VALUED_STRING__G_STRING_CONVEYANCE)
     break; case ACOLYT_HANDLE__G_KEYS_COMPARISON:
-      m_ASSERT(handle->gStringConveyance == NAMED_OBJECT__G_STRING_CONVEYANCE)
+      m_ASSERT(gStringConveyance == NAMED_OBJECT__G_STRING_CONVEYANCE)
     break; default:
       m_RAISE(ANOMALY__VALUE__FMT_D,key1GKeysComparison)
     } // switch
-    s_keysSettings->cn_isNeutralCharFunction = cn_key1IsNeutralCharFunction;
-    s_keysSettings->cn_toCharFunction = cn_key1ToCharFunction;
-    s_keysSettings->stringPortionIntrinsicValueFunction = c_key1StringPortionIntrinsicValueFunction;
-    s_keysSettings->stringPortionIntrinsicValueFunctionHandle = cfr_key1StringPortionIntrinsicValueFunctionHandle;
+    s_keysSettings->select.stringPortionComparison.cn_isNeutralCharFunction = cn_key1IsNeutralCharFunction;
+    s_keysSettings->select.stringPortionComparison.cn_toCharFunction = cn_key1ToCharFunction;
+    s_keysSettings->select.intrinsicValueComparison.stringPortionIntrinsicValueFunction =
+      c_key1StringPortionIntrinsicValueFunction;
+    s_keysSettings->select.intrinsicValueComparison.stringPortionIntrinsicValueFunctionHandle =
+      cfr_key1StringPortionIntrinsicValueFunctionHandle;
    } // for
   va_end(ap) ;
 
@@ -504,10 +520,11 @@ int GStringsClear(G_STRINGS_HANDLE handle, char b_fullClear) {
 } // GStringsClear
 
 // Public function : see .h
-int GStringsGetConveyance(G_STRINGS_HANDLE handle) {
+int GStringsGetConveyance(G_STRINGS_HANDLE handle, int element) {
   m_DIGGY_BOLLARD()
-
-  m_DIGGY_RETURN(handle->gStringConveyance)
+  m_ASSERT(element < handle->gStringSetCardinality)
+  if (handle->n_gStringConveyance >= 0) m_DIGGY_RETURN(handle->n_gStringConveyance)
+  else m_DIGGY_RETURN(handle->cps_gStringConveyances[element])
 } // GStringsGetConveyance 
 
 // Public function : see .h

@@ -967,7 +967,7 @@ struct GREEN_COLLECTION {
   int v_maxItemsCount; // max number of items "logically" referenced
   struct GREEN_INDEXES indexes;
   struct INDEX_REQUEST internalIndexRequest;
-  struct GAPS_STACK gaps; // TODO: ajouter h_ prefix vu qu'il faut appeler m_GAPS_STACK_FREE()
+  struct GAPS_STACK h_gaps; 
   // "Monitored" entries "fetched for change" (in ALIEN / ALIVE state) : 
   int fetched4ChangeEntriesNumber;  
   int fetched4ChangeEntriesPhysicalNumber;  
@@ -1085,7 +1085,7 @@ int GreenCollectionCreateInstance(GREEN_COLLECTION_HANDLE *azh_handle,  int expe
   m_MALLOC_ARRAY(handle->hsc_flags, handle->itemsPhysicalNumber)
   handle->v_maxItemsCount = handle->i_itemsCount = 0 ;
   m_GREEN_INDEXES_INIT(handle->indexes,GreenCollectionEntriesCompare,(void *) handle)
-  m_GAPS_STACK_INIT(handle->gaps,handle->itemsPhysicalNumber)
+  m_GAPS_STACK_INIT(handle->h_gaps,handle->itemsPhysicalNumber)
   m_DEFAULT_INDEX_REQUEST(handle->internalIndexRequest)
 
   handle->fetched4ChangeEntriesPhysicalNumber = expectedItemsNumber;
@@ -1109,7 +1109,7 @@ static int GreenCollectionResize(GREEN_COLLECTION_HANDLE handle) {
   memset(handle->h_greenArray + handle->greenItemSize * handle->itemsPhysicalNumber, 0,
     handle->greenItemSize * handle->expectedItemsNumber);
 
-  m_GAPS_STACK_RESIZE(handle->gaps, newItemsPhysicalNumber)
+  m_GAPS_STACK_RESIZE(handle->h_gaps, newItemsPhysicalNumber)
   m_REALLOC_ARRAY(handle->hsc_flags, newItemsPhysicalNumber)
   m_TRACK_IF(GreenIndexesResize(&handle->indexes,newItemsPhysicalNumber) != 0)
 
@@ -1238,7 +1238,7 @@ static int GreenCollectionFetchInternal (GREEN_COLLECTION_HANDLE cp_handle, int 
   if (n_entry == -1) { // Smart fetch
     m_ASSERT(!cp_handle->b_frozen) 
     m_ASSERT(fetch4 == FETCH_4__CHANGE)
-    if ((n_entry = n_GAPS_STACK_GET_FIRST(cp_handle->gaps)) < 0) { // No gap
+    if ((n_entry = n_GAPS_STACK_GET_FIRST(cp_handle->h_gaps)) < 0) { // No gap
       n_entry = cp_handle->i_itemsCount ;
       // Ensure physical arrays are large enough vis-a-vis fetched entry
       if (n_entry >= cp_handle->itemsPhysicalNumber) {
@@ -1255,7 +1255,7 @@ static int GreenCollectionFetchInternal (GREEN_COLLECTION_HANDLE cp_handle, int 
       m_ASSERT(n_entry < cp_handle->i_itemsCount)
       m_ASSERT(b_ALL_FLAGS_OK(cp_handle->hsc_flags[n_entry],ALIEN_DEAD__FLAGS))
       // MICROMONITOR: ALIEN / DEAD 
-      m_GAPS_STACK_POP(cp_handle->gaps,n_entry)
+      m_GAPS_STACK_POP(cp_handle->h_gaps,n_entry)
       m_SET_FLAG_OFF(cp_handle->hsc_flags[n_entry],DEAD_FLAG)
       // MICROMONITOR: ALIEN / ALIVE 
     } // if
@@ -1280,7 +1280,7 @@ static int GreenCollectionFetchInternal (GREEN_COLLECTION_HANDLE cp_handle, int 
           // MINIMONITOR: ANY+
         } else { // FETCH_4__REMOVE
           // MICROMONITOR: ALIEN / ALIVE
-          m_GAPS_STACK_PUSH(cp_handle->gaps, n_entry, cp_handle->itemsPhysicalNumber)
+          m_GAPS_STACK_PUSH(cp_handle->h_gaps, n_entry, cp_handle->itemsPhysicalNumber)
           m_SET_FLAG_ON(cp_handle->hsc_flags[n_entry],DEAD_FLAG)
           // MICROMONITOR: ALIEN / DEAD
         } // if
@@ -1320,7 +1320,7 @@ int GreenCollectionGetCount (GREEN_COLLECTION_HANDLE cp_handle, char **navntr_gr
   // TODO:
   // if (na_actualItemsCount != NULL) { 
   // TODO: macro m_GAPS_GET_COUNT()
-  // *na_actualItemsCount =  cp_handle->i_itemsCount - cp_handle->gaps.count
+  // *na_actualItemsCount =  cp_handle->i_itemsCount - cp_handle->h_gaps.count
   m_DIGGY_RETURN(cp_handle->i_itemsCount)
 } // GreenCollectionGetCount
 
@@ -1350,7 +1350,7 @@ int GreenCollectionClear (GREEN_COLLECTION_HANDLE handle) {
 
   handle->i_itemsCount = 0 ;
   handle->fetched4ChangeEntriesNumber = 0 ;
-  m_GAPS_STACK_CLEAR(handle->gaps)
+  m_GAPS_STACK_CLEAR(handle->h_gaps)
   m_TRACK_IF(GreenIndexesClear(&handle->indexes) != RETURNED)
 
   // MINIMONITOR: NADA
@@ -1478,7 +1478,7 @@ int GreenCollectionVerifyIndexes (GREEN_COLLECTION_HANDLE handle) {
   } // if 
 #endif
 
-  int gapsCount = GapsStackVerifyCount(&handle->gaps);
+  int gapsCount = GapsStackVerifyCount(&handle->h_gaps);
   m_TRACK_IF(gapsCount < 0)
 
   // 1. Are indexes enabled ? (if not, just verify there's no gap 
@@ -1511,7 +1511,7 @@ m_DIGGY_VAR_D(completed)
     for (; i < handle->i_itemsCount; i++) {
       int expectedHits = 0;
       if (b_FLAG_SET_ON(handle->hsc_flags[i],DEAD_FLAG))  expectedHits = 1; 
-      m_TRACK_IF((completed = GapsStackVerifyEntry(&handle->gaps,i,expectedHits)) < 0)
+      m_TRACK_IF((completed = GapsStackVerifyEntry(&handle->h_gaps,i,expectedHits)) < 0)
       if (completed == COMPLETED__BUT) break;
       expectedHits = 0;
       if (!b_FLAG_SET_ON(handle->hsc_flags[i],ALIEN_FLAG))  expectedHits = 1;
@@ -1548,7 +1548,7 @@ int GreenCollectionDestroyInstance (GREEN_COLLECTION_HANDLE xh_handle) {
 
   m_GREEN_INDEXES_FREE(xh_handle->indexes)
 
-  m_GAPS_STACK_FREE(xh_handle->gaps)
+  m_GAPS_STACK_FREE(xh_handle->h_gaps)
 
   free(xh_handle) ;
 

@@ -18,12 +18,12 @@ struct TOKEN_DEFINITION {
 } ; 
 
 
-// #REF NAMED_OBJECTS_CREATE_INSTANCE <named-object>
+// #REF G_TOKENS_CREATE_INSTANCE <named-object>
 // #SEE G_STRINGS_CREATE_INSTANCE <named-object>
 // Note: TOKEN__G_STRING_CONVEYANCE => token id acolyt 
 #define /*int*/ G_TOKENS_CREATE_INSTANCE(/*G_STRINGS_HANDLE*/ azh_handle,\
   /*int*/ expectedItemsNumber)  GStringsCreateInstance(azh_handle, expectedItemsNumber, 1,\
-  TOKEN__G_STRING_CONVEYANCE, (NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION)UNDEFINED)
+  TOKEN__G_STRING_CONVEYANCE,(const int *)UNDEFINED,(NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION)UNDEFINED)
 
 
 // Manipulate g-string as 'token'
@@ -38,7 +38,8 @@ struct TOKEN_DEFINITION {
 // - -1: unexpected problem; anomaly is raised...
 static inline int m_GStringAsToken(G_STRING_STUFF stuff, int tokenId, 
   G_STRINGS_HANDLE n_gStringsHandle) {
-  m_CHECK_G_STRINGS_COLLECTION_CONVEYANCE(n_gStringsHandle,TOKEN__G_STRING_CONVEYANCE)
+  m_CHECK_G_STRINGS_COLLECTION_CONVEYANCE(n_gStringsHandle,FIRST_ELEMENT0,
+    TOKEN__G_STRING_CONVEYANCE)
   stuff->acolyt.c_tokenId = tokenId;
   return RETURNED;
 } // m_GStringAsToken

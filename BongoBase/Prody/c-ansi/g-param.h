@@ -15,22 +15,34 @@
 // name AND value conveyance : VALUED_STRING__G_STRING_CONVEYANCE
 // TODO: name conveyance TOKEN__G_STRING_CONVEYANCE 
 
+const int ps_gParamGStringConveyances[G_PARAM_CARDINALITY] = { 
+   TOKEN__G_STRING_CONVEYANCE, 
+   VALUED_STRING__G_STRING_CONVEYANCE, 
+} ; 
+
+// #REF G_PARAMS_CREATE_INSTANCE <named-object>
+// #SEE GStringsCreateInstance@c-ansi/g-string.h  <g-string>
+#define /*int*/ G_PARAMS_CREATE_INSTANCE(/*G_STRINGS_HANDLE*/azh_handle,/*int*/expectedItemsNumber)\
+  GStringsCreateInstance(azh_handle, expectedItemsNumber,G_PARAM_CARDINALITY,-1,\
+  ps_gParamGStringConveyances,(NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION)UNDEFINED)
+
 // Manipulate g-string as 'valued string'
 // 
 // Passed
-// - stuff:
+// - stuff: g-string as g-param's value
 // - acolytValue:
-// - n_gStringsHandle:
+// - n_gStringsHandle: not NULL => g-params collection
 // 
 // Ret:
 // - RETURNED: OK
 // - -1: unexpected problem; anomaly is raised...
-static inline int m_GStringAsValuedString(G_STRING_STUFF stuff, GENERIC_INTEGER en_value, 
+static inline int m_GStringAsGParamValue(G_STRING_STUFF stuff, GENERIC_INTEGER en_value, 
   G_STRINGS_HANDLE n_gStringsHandle) {
-  m_CHECK_G_STRINGS_COLLECTION_CONVEYANCE(n_gStringsHandle,VALUED_STRING__G_STRING_CONVEYANCE)
+  m_CHECK_G_STRINGS_COLLECTION_CONVEYANCE(n_gStringsHandle,G_PARAM_VALUE_ELEMENT,
+   VALUED_STRING__G_STRING_CONVEYANCE)
   stuff->acolyt.cen_value = en_value;
   return RETURNED;
-} // m_GStringAsValuedString
+} // m_GStringAsGParamValue
 
 
 #endif // __C_ANSI_G_PARAM_H_INCLUDED

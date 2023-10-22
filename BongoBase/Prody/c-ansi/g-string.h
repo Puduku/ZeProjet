@@ -182,6 +182,7 @@ int GStringConvert(G_STRING_STUFF stuff,  IS_CHAR_FUNCTION n_isNeutralCharFuncti
 // To retrieve a specific g-string element of a set, just apply the "good old" pointer arithmetic. 
 typedef struct G_STRING *G_STRING_SET_STUFF;
 
+#define FIRST_ELEMENT0 0
 
 // #REF GStringSetCreateInstance <g-string set>.
 // Creation and initialization of a single <g-string set>.
@@ -253,8 +254,10 @@ typedef int (*NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION) (void *xhr_handle) ;
 // - expectedItemsNumber:
 //   #SEE GreenCollectionCreateInstance-expectedItemsNumber@c-ansi/green.h <<g-string set>>
 // - gStringSetCardinality: number of elements in a set (>0 ; 0 value is taken for a BUG) #SKIP
-// - n_gStringConveyance: (-1 special value: not used) #see enum-G_STRING_CONVEYANCE 
-//   TODO: conveyance per g-string set ELEMENT..
+// - n_gStringConveyance: (-1 special value: not used) general conveyance
+//   #see enum-G_STRING_CONVEYANCE 
+// - cnfps_gStringConveyances: (not significant if general conveyance is specified; NULL special
+//   value: not used) 
 // - c_namedObjectDestroyInstanceFunction: only significant with NAMED_OBJECT__G_STRING_CONVEYANCE
 // 
 // Modified:
@@ -263,20 +266,20 @@ typedef int (*NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION) (void *xhr_handle) ;
 // Returned:
 // - RETURNED: Ok, <g-string set> collection is instancied
 // - -1: unexpected problem; anomaly is raised 
-int GStringsCreateInstance(G_STRINGS_HANDLE* azh_handle,  int expectedItemsNumber,
-  int gStringSetCardinality, int n_gStringConveyance,
+int GStringsCreateInstance(G_STRINGS_HANDLE* azh_handle, int expectedItemsNumber,
+  int gStringSetCardinality, int n_gStringConveyance, const int *cnfps_gStringConveyances,
   NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION c_namedObjectDestroyInstanceFunction);
 
 // #REF G_STRINGS_CREATE_INSTANCE <g-string>
 // #SEE GStringsCreateInstance <g-string>
 #define /*int*/ G_STRINGS_CREATE_INSTANCE(/*G_STRINGS_HANDLE*/ azh_handle,\
-  /*int*/ expectedItemsNumber)  GStringsCreateInstance(azh_handle, expectedItemsNumber,1, -1,\
+  /*int*/ expectedItemsNumber)  GStringsCreateInstance(azh_handle,expectedItemsNumber,1,-1,NULL,\
   (NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION)UNDEFINED)
 
 
 // #REF GStringsFetch <gStringSet> 
 // #SEE GreenCollectionFetch @ c-ansi/green.h <<gStringSet>>
-int GStringsFetch(G_STRINGS_HANDLE cp_handle,  int n_entry,  G_STRING_SET_STUFF* acnt_gStringSetStuff);
+int GStringsFetch(G_STRINGS_HANDLE cp_handle, int n_entry, G_STRING_SET_STUFF* acnt_gStringSetStuff);
 
 
 // #REF GStringsGetCount <gStringSet> 
@@ -292,10 +295,10 @@ enum { // #REF enum-G_KEYS_COMPARISON
    ACOLYT_HANDLE__G_KEYS_COMPARISON, // mutually exclusive with other ACOLYT_*__G_KEYS_COMPARISON
 } ;
 
-
-//
+// #REF STRING_PORTION_INTRINSIC_VALUE_FUNCTION - "custom" function definition
+// 
 // Passed:
-// - r_handle:
+// - r_handle: private handle TODO : possibly frozen ???
 // - ap_stringPortion: 
 // 
 // Ret:
@@ -507,21 +510,23 @@ int GStringsClear(G_STRINGS_HANDLE handle, char b_fullClear);
 // 
 // Passed:
 // - handle: gtrings collection handle 
+// - element:
 //
 // Ret:
 // >= 0: conveyance 
 // -1: unexpected problem; anomaly is raised
-int GStringsGetConveyance(G_STRINGS_HANDLE handle) ;
+int GStringsGetConveyance(G_STRINGS_HANDLE handle, int element) ;
 
 // Check if g-string's conveyance is "okay" vis-a-vis a collection...
 //
 // Passed:
 // - n_gStringsHandle: (NULL special value: not provided => NO check)  
+// - c_element: (only significant if g-strings collection is provided)
 // - c_expectedGStringConveyance: (only significant if g-strings collection is provided) 
 #define m_CHECK_G_STRINGS_COLLECTION_CONVEYANCE(/*G_STRING_HANDLE*/n_gStringsHandle,\
-  /*int*/c_expectedGStringConveyance) {\
+  /*int*/c_element, /*int*/c_expectedGStringConveyance) {\
   if (n_gStringsHandle != NULL) {\
-    int collectionGStringConveyance = GStringsGetConveyance(n_gStringsHandle) ;\
+    int collectionGStringConveyance = GStringsGetConveyance(n_gStringsHandle,c_element) ;\
     m_TRACK_IF(collectionGStringConveyance < 0) \
     m_ASSERT(collectionGStringConveyance == c_expectedGStringConveyance) \
   } \

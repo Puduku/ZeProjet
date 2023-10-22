@@ -15,7 +15,7 @@
   /*int*/ expectedItemsNumber,\
   /*NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION*/namedObjectDestroyInstanceFunction)\
   GStringsCreateInstance(azh_handle, expectedItemsNumber,1, NAMED_OBJECT__G_STRING_CONVEYANCE,\
-  namedObjectDestroyInstanceFunction)
+  (const int *)UNDEFINED,namedObjectDestroyInstanceFunction)
 
 
 // Manipulate g-string as 'named object'
@@ -30,7 +30,8 @@
 // - -1: unexpected problem; anomaly is raised...
 static inline int m_GStringAsNamedObject(G_STRING_STUFF stuff, void *nhr_handle,
   G_STRINGS_HANDLE n_gStringsHandle) {
-  m_CHECK_G_STRINGS_COLLECTION_CONVEYANCE(n_gStringsHandle,NAMED_OBJECT__G_STRING_CONVEYANCE)
+  m_CHECK_G_STRINGS_COLLECTION_CONVEYANCE(n_gStringsHandle,FIRST_ELEMENT0,
+    NAMED_OBJECT__G_STRING_CONVEYANCE)
   stuff->acolyt.cnhr_handle = nhr_handle;
   return RETURNED;
 } // m_GStringAsNamedObject 
