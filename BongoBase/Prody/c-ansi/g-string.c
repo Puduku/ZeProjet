@@ -178,7 +178,7 @@ struct KEY_SETTINGS {
     // Only significant with INTRINSIC_VALUE__G_KEYS_COMPARISON:
     struct {
       STRING_PORTION_INTRINSIC_VALUE_FUNCTION stringPortionIntrinsicValueFunction;
-      void *stringPortionIntrinsicValueFunctionHandle;
+      void *pr_stringPortionIntrinsicValueFunctionHandle;
     } intrinsicValueComparison ;
   } select ; 
 };
@@ -236,17 +236,19 @@ static int GStringsDisengage(void *r_handle,  char *r_greenItemStuff) {
 // Passed:
 // - m_bareGKey:
 // - m_gKeysComparison:
-// - ap_gKey:
+// - p_gStringStuff:
+// - c_stringPortionIntrinsicValueFunction:
+// - cpr_stringPortionIntrinsicValueFunctionHandle:
 #define m_ASSIGN_BARE_G_KEY__G_STRING(/*union BARE_G_KEY*/m_bareGKey, /*int*/gKeysComparison,\
   /*G_STRING_STUFF*/ p_gStringStuff,\
   /*STRING_PORTION_INTRINSIC_VALUE_FUNCTION*/c_stringPortionIntrinsicValueFunction,\
-  /*void* */c_stringPortionIntrinsicValueFunctionHandle) {\
+  /*void* */cpr_stringPortionIntrinsicValueFunctionHandle) {\
   switch (gKeysComparison) {\
   case STRING_PORTION__G_KEYS_COMPARISON: \
     (m_bareGKey).cp_stringPortion = (p_gStringStuff)->cv_stringPortion;\
   break; case INTRINSIC_VALUE__G_KEYS_COMPARISON:\
     (m_bareGKey).cen_intrinsicValue = (c_stringPortionIntrinsicValueFunction)\
-      (c_stringPortionIntrinsicValueFunctionHandle,&(p_gStringStuff)->cv_stringPortion);\
+      (cpr_stringPortionIntrinsicValueFunctionHandle,&(p_gStringStuff)->cv_stringPortion);\
   break; case ACOLYT_TOKEN_ID__G_KEYS_COMPARISON:\
     (m_bareGKey).c_acolytTokenId = (p_gStringStuff)->acolyt.c_tokenId;\
   break; case ACOLYT_VALUE__G_KEYS_COMPARISON:\
@@ -281,7 +283,7 @@ static int GStringsKeysCompare(void *cpr_handle,  char b_frozen, int indexLabel,
       ap_keySettings->gStringSetElement;
     m_ASSIGN_BARE_G_KEY__G_STRING(aBareGKey,  ap_keySettings->gKeysComparison, p_aGStringStuff,
       ap_keySettings->select.intrinsicValueComparison.stringPortionIntrinsicValueFunction,
-      ap_keySettings->select.intrinsicValueComparison.stringPortionIntrinsicValueFunctionHandle);
+      ap_keySettings->select.intrinsicValueComparison.pr_stringPortionIntrinsicValueFunctionHandle);
   } // G_STRING_STUFF
 
   // Bare key 'b':
@@ -291,7 +293,7 @@ static int GStringsKeysCompare(void *cpr_handle,  char b_frozen, int indexLabel,
       ap_keySettings->gStringSetElement;
     m_ASSIGN_BARE_G_KEY__G_STRING(bBareGKey,  ap_keySettings->gKeysComparison, p_bGStringStuff,
       ap_keySettings->select.intrinsicValueComparison.stringPortionIntrinsicValueFunction,
-      ap_keySettings->select.intrinsicValueComparison.stringPortionIntrinsicValueFunctionHandle);
+      ap_keySettings->select.intrinsicValueComparison.pr_stringPortionIntrinsicValueFunctionHandle);
   } else {
     const struct G_KEY *ap_bGKey = ((const struct G_KEY **)cpr_bKeys)[keyRank];
     m_ASSIGN_BARE_G_KEY__G_KEY(bBareGKey,  ap_keySettings->gKeysComparison,  ap_bGKey)
@@ -375,7 +377,7 @@ int GStringsAddIndex (G_STRINGS_HANDLE handle,  int keysNumber,
   int key1GStringSetElement,  int key1GKeysComparison,
   IS_CHAR_FUNCTION cn_key1IsNeutralCharFunction,  TO_CHAR_FUNCTION cn_key1ToCharFunction,
   STRING_PORTION_INTRINSIC_VALUE_FUNCTION c_key1StringPortionIntrinsicValueFunction,
-  void *cfr_key1StringPortionIntrinsicValueFunctionHandle,  ...) {
+  void *cfpr_key1StringPortionIntrinsicValueFunctionHandle,  ...) {
   m_DIGGY_BOLLARD()
 
   m_REALLOC_ARRAY(handle->vnhs_indexesProperties,++(handle->indexesNumber))
@@ -386,7 +388,7 @@ int GStringsAddIndex (G_STRINGS_HANDLE handle,  int keysNumber,
   m_MALLOC_ARRAY(a_indexProperties->hs_keysSettings,a_indexProperties->keysNumber = keysNumber)
 
   va_list ap ;
-  va_start(ap,cfr_key1StringPortionIntrinsicValueFunctionHandle) ;
+  va_start(ap,cfpr_key1StringPortionIntrinsicValueFunctionHandle) ;
 
   int i = 0;
   struct KEY_SETTINGS *s_keysSettings = a_indexProperties->hs_keysSettings;
@@ -397,7 +399,7 @@ int GStringsAddIndex (G_STRINGS_HANDLE handle,  int keysNumber,
       cn_key1IsNeutralCharFunction = va_arg(ap,IS_CHAR_FUNCTION);
       cn_key1ToCharFunction = va_arg(ap,TO_CHAR_FUNCTION);
       c_key1StringPortionIntrinsicValueFunction = va_arg(ap,STRING_PORTION_INTRINSIC_VALUE_FUNCTION);
-      cfr_key1StringPortionIntrinsicValueFunctionHandle = va_arg(ap,void *);
+      cfpr_key1StringPortionIntrinsicValueFunctionHandle = va_arg(ap,void *);
       
     } // if
     m_ASSERT(key1GStringSetElement < handle->gStringSetCardinality)
@@ -420,8 +422,8 @@ int GStringsAddIndex (G_STRINGS_HANDLE handle,  int keysNumber,
     s_keysSettings->select.stringPortionComparison.cn_toCharFunction = cn_key1ToCharFunction;
     s_keysSettings->select.intrinsicValueComparison.stringPortionIntrinsicValueFunction =
       c_key1StringPortionIntrinsicValueFunction;
-    s_keysSettings->select.intrinsicValueComparison.stringPortionIntrinsicValueFunctionHandle =
-      cfr_key1StringPortionIntrinsicValueFunctionHandle;
+    s_keysSettings->select.intrinsicValueComparison.pr_stringPortionIntrinsicValueFunctionHandle =
+      cfpr_key1StringPortionIntrinsicValueFunctionHandle;
    } // for
   va_end(ap) ;
 

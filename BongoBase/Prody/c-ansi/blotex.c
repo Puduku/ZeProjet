@@ -120,7 +120,7 @@ int BlotexlibExecutorGetBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
 
 
 #define NAME__BLOTREG_INDEX_LABEL      0
-#define PSEUDO_ID__BLOTREG_INDEX_LABEL 1
+#define TOKEN_ID__BLOTREG_INDEX_LABEL 1
 
 // Public function; see .h
 int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
@@ -146,7 +146,7 @@ int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
         (STRING_PORTION_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) == NAME__BLOTREG_INDEX_LABEL)
       m_ASSERT(GStringsAddIndex(h_blotregHandle,1,G_PARAM_NAME_ELEMENT,
         ACOLYT_VALUE__G_KEYS_COMPARISON,(IS_CHAR_FUNCTION)UNDEFINED,(TO_CHAR_FUNCTION)UNDEFINED,
-        (STRING_PORTION_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) == PSEUDO_ID__BLOTREG_INDEX_LABEL)
+        (STRING_PORTION_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) == TOKEN_ID__BLOTREG_INDEX_LABEL)
       t_namedBlotregStuff->acolyt.cnhr_handle = h_blotregHandle;
     } // h_blotregHandle 
   break; default:
@@ -177,7 +177,7 @@ int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
 enum {
   NAME__BLOTVAR_REFERENCE, // '.' <entity name>
   ENTRY__BLOTVAR_REFERENCE, // '[' <intex> ']'
-  PSEUDO_ID__BLOTVAR_REFERENCE, // '{' <intex> '}'
+  TOKEN_ID__BLOTVAR_REFERENCE, // '{' <intex> '}'
 };
 
 struct BLOTVAR_REFERENCE {
@@ -186,7 +186,7 @@ struct BLOTVAR_REFERENCE {
   union {
     struct STRING_PORTION c_name; // Only significant with NAME__BLOTVAR_REFERENCE
     int c_entry; // Only significant with ENTRY__BLOTVAR_REFERENCE
-    gen_BLOTVAL c_pseudoId; // Only significant with PSEUDO_ID__BLOTVAR_REFERENCE
+    int c_tokenId; // Only significant with TOKEN_ID__BLOTVAR_REFERENCE
   } select;
 } ;
 
@@ -281,9 +281,12 @@ static int BlotexlibExecutorRetrieveBlotvar(BLOTEXLIB_EXECUTOR_HANDLE handle, ch
     m_PARSE_PASS_SINGLE_CHAR(*a_blotvarSequence,NULL,']',&lexeme)
     if (b_EMPTY_STRING_PORTION(lexeme)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_INFO)
   break; case '{' : // '{' <intex> '}' 
-    ac_blotvarReference->blotvarReference = PSEUDO_ID__BLOTVAR_REFERENCE;
-    m_PARSE_GENERIC_INTEGER(*a_blotvarSequence,ac_blotvarReference->select.c_pseudoId,&lexeme)
+    ac_blotvarReference->blotvarReference = TOKEN_ID__BLOTVAR_REFERENCE;
+    m_PARSE_GENERIC_INTEGER(*a_blotvarSequence,genericInteger,&lexeme)
     if (b_EMPTY_STRING_PORTION(lexeme)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_INFO)
+    else if (genericInteger > INT_MAX || genericInteger < 0) m_ABANDON(
+      VALUE_ERROR__ABANDONMENT_INFO)
+    else ac_blotvarReference->select.c_tokenId = genericInteger;
     m_PARSE_PASS_SINGLE_CHAR(*a_blotvarSequence,NULL,'}',&lexeme)
     if (b_EMPTY_STRING_PORTION(lexeme)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_INFO)
   break; default:
@@ -309,15 +312,15 @@ static int BlotexlibExecutorFetchBlotvar(BLOTEXLIB_EXECUTOR_HANDLE handle, char 
   *acvnt_blotvarStuff = (G_STRING_SET_STUFF)UNDEFINED;
   switch (ap_blotvarReference->blotvarReference) {
   case NAME__BLOTVAR_REFERENCE:
-  case PSEUDO_ID__BLOTVAR_REFERENCE:
+  case TOKEN_ID__BLOTVAR_REFERENCE:
     { struct G_KEY gKey ;
       int indexLabel = UNDEFINED;
       if (ap_blotvarReference->blotvarReference == NAME__BLOTVAR_REFERENCE) {
         indexLabel = NAME__BLOTREG_INDEX_LABEL;
         m_ASSIGN_G_KEY__STRING_PORTION(&gKey,0,ap_blotvarReference->select.c_name)
       } else {
-        indexLabel = PSEUDO_ID__BLOTREG_INDEX_LABEL;
-        m_ASSIGN_G_KEY__ACOLYT_VALUE(&gKey,0,ap_blotvarReference->select.c_pseudoId)
+        indexLabel = TOKEN_ID__BLOTREG_INDEX_LABEL;
+        m_ASSIGN_G_KEY__ACOLYT_TOKEN_ID(&gKey,0,ap_blotvarReference->select.c_tokenId)
       } // if
       switch (ret = m_GStringsIndexSingleFetch(ap_blotvarReference->blotregHandle,NULL,indexLabel,
         INDEX_SEEK_FLAGS__EQUAL, &gKey, INDEX_FETCH_FLAGS__FETCH, acvnt_blotvarStuff, nacvn_entry)) { 

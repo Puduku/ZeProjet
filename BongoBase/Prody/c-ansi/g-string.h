@@ -298,12 +298,13 @@ enum { // #REF enum-G_KEYS_COMPARISON
 // #REF STRING_PORTION_INTRINSIC_VALUE_FUNCTION - "custom" function definition
 // 
 // Passed:
-// - r_handle: private handle TODO : possibly frozen ???
+// - pr_handle: private handle ; protected against modification (i.e "thread safe")
+// TODO: protection conditionnelle à l'edtat "frozen" ???? 
 // - ap_stringPortion: 
 // 
 // Ret:
 // (Intrinsic) value corresponding to string portion
-typedef GENERIC_INTEGER (*STRING_PORTION_INTRINSIC_VALUE_FUNCTION) (void *r_handle,
+typedef GENERIC_INTEGER (*STRING_PORTION_INTRINSIC_VALUE_FUNCTION) (void *pr_handle,
   const struct STRING_PORTION *ap_stringPortion);
 
 
@@ -324,24 +325,24 @@ typedef GENERIC_INTEGER (*STRING_PORTION_INTRINSIC_VALUE_FUNCTION) (void *r_hand
 //   + NULL: NO conversion applied before comparison 
 //   + non NULL: conversion applied before comparison 
 // - c_key1StringPortionIntrinsicValueFunction: only significant with INTRINSIC_VALUE__G_KEYS_COMPARISON
-// - cfr_key1StringPortionIntrinsicValueFunctionHandle: only significant with
+// - cfpr_key1StringPortionIntrinsicValueFunctionHandle: only significant with
 //   INTRINSIC_VALUE__G_KEYS_COMPARISON
 // - ... : g-string set(s element for second key (etc.) if any ...
 int GStringsAddIndex(G_STRINGS_HANDLE handle,  int keysNumber, int key1GStringSetElement,
   int key1GKeysComparison,  IS_CHAR_FUNCTION cn_key1IsNeutralCharFunction,
   TO_CHAR_FUNCTION cn_key1ToCharFunction,
   STRING_PORTION_INTRINSIC_VALUE_FUNCTION c_key1StringPortionIntrinsicValueFunction,
-  void *cr_stringPortionIntrinsicValueFunctionHandle,  ...);
+  void *cfpr_key1StringPortionIntrinsicValueFunctionHandle,  ...);
 
 // #SEE GStringsAddIndex <g-string> <key>
 // Nb: Plain index => one key
-#define /*int*/ G_STRINGS_ADD_INDEX(/*G_STRINGS_HANDLE*/ handle, /*int*/ keyGKeysComparison,\
-  /*IS_CHAR_FUNCTION*/ cn_keyIsNeutralCharFunction, /*TO_CHAR_FUNCTION*/ cn_keyToCharFunction, \
-  /*STRING_PORTION_INTRINSIC_VALUE_FUNCTION*/ c_keyStringPortionIntrinsicValueFunction,\
-  /*void* */cfr_keyStringPortionIntrinsicValueFunctionHandle, ...) \
+#define /*int*/ G_STRINGS_ADD_INDEX(/*G_STRINGS_HANDLE*/handle, /*int*/keyGKeysComparison,\
+  /*IS_CHAR_FUNCTION*/ cn_keyIsNeutralCharFunction, /*TO_CHAR_FUNCTION*/cn_keyToCharFunction,\
+  /*STRING_PORTION_INTRINSIC_VALUE_FUNCTION*/c_keyStringPortionIntrinsicValueFunction,\
+  /*void* */cfpr_keyStringPortionIntrinsicValueFunctionHandle, ...) \
   GStringsAddIndex(handle,  1,  0,  keyGKeysComparison,\
   cn_keyIsNeutralCharFunction, cn_keyToCharFunction,\
-  c_keyStringPortionIntrinsicValueFunction,cfr_keyStringPortionIntrinsicValueFunctionHandle) 
+  c_keyStringPortionIntrinsicValueFunction,cfpr_keyStringPortionIntrinsicValueFunctionHandle) 
 
 
 // (Internal use)
