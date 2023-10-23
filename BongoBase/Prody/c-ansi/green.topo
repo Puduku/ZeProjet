@@ -49,69 +49,10 @@
 // => FROZEN COLLECTION: we can also "freeze" the collection to prevent further modification. The
 //    benefit of that operation is that the collection can be then safely shared by different
 //    threads (of process)...  
+// => Indexes can be used to retrieve and sort items in the collection.
+//    - We define requests with
+//      + search keys, regarding used index
+//      + bunch of "SEEK flags", e.g INDEX_SEEK_FLAGS__LESS_EQUAL
+//    - Then we fetch item(s) based on the request, using bunch of "FETCH flags", e.g 
+//      INDEX_FETCH_FLAGS__SELECT_DESCENDING
 
-
-
-
-// Example: fetching an item in that collection:
-// +-- FIRST (i.e "lowest") item in collection with index
-// |        +-- LAST (i.e "highest") item in collection with index
-// v        v
-// B; C; E; F
-//
-// => Simple fetch (No sequence); NOT valid for INDEX_FETCH__READ_NEXT
-//      Key         : A  B  C  D  E  F  G
-//      -----------------------------------
-// I S| UP (*)      : B  B  B  B  B  B  B  |F I
-// N E| DOWN (*)    : F  F  F  F  F  F  F  |E T
-// D E| KEY         : -  B  C  -  E  F  -  |T E
-// E K| BOTTOM_UP   : B  B  C  E  E  F  -  |C M
-// X _| BOTTOM_DOWN : F  F  F  F  F  F  -  |H
-// _ _| TOP_DOWN    : -  B  C  C  E  F  F  |E
-//    | TOP_UP      : -  B  B  B  B  B  B  |D
-// Legend: -: not found    (*): search key is not significant
-//
-// => Fetching in "read only" sequence;
-//    INDEX_FETCH__READ_ONLY / READ_NEXT
-//      #call (*)     :#1 #2 #3 #4 #5 #6
-//      --------------------------------
-// I S| UP            : B  C  E  F  -  - |F I
-// N E| DOWN          : F  E  C  B  -  - |E T
-// D E| KEY A         : -  -  -  -  -  - |T E
-// E K| KEY B         : B  -  -  -  -  - |C M
-// X _| KEY C         : C  -  -  -  -  - |H
-// _ _| KEY D         : -  -  -  -  -  - |E
-//    | KEY E         : E  -  -  -  -  - |D
-//   (| KEY F         : F  -  -  -  -  - |
-//   K| KEY G         : -  -  -  -  -  - |
-//   e| BOTTOM_UP A   : B  C  E  F  -  - |
-//   y| BOTTOM_UP B   : B  C  E  F  -  - |
-//   )| BOTTOM_UP C   : C  E  F  -  -  - |
-//    | BOTTOM_UP D   : E  F  -  -  -  - |
-//    | BOTTOM_UP E   : E  F  -  -  -  - |
-//    | BOTTOM_UP F   : F  -  -  -  -  - |
-//    | BOTTOM_UP G   : -  -  -  -  -  - |
-//    | BOTTOM_DOWN A : F  E  C  B  -  - |
-//    | BOTTOM_DOWN B : F  E  C  B  -  - |
-//    | BOTTOM_DOWN C : F  E  C  -  -  - |
-//    | BOTTOM_DOWN D : F  E  -  -  -  - |
-//    | BOTTOM_DOWN E : F  E  -  -  -  - |
-//    | BOTTOM_DOWN F : F  -  -  -  -  - |
-//    | BOTTOM_DOWN G : -  -  -  -  -  - |
-//    | TOP_DOWN A    : -  -  -  -  -  - |
-//    | TOP_DOWN B    : B  -  -  -  -  - |
-//    | TOP_DOWN C    : C  B  -  -  -  - |
-//    | TOP_DOWN D    : C  B  -  -  -  - |
-//    | TOP_DOWN E    : E  C  B  -  -  - |
-//    | TOP_DOWN F    : F  E  C  B  -  - |
-//    | TOP_DOWN G    : F  E  C  B  -  - |
-//    | TOP_UP A      : -  -  -  -  -  - |
-//    | TOP_UP B      : B  -  -  -  -  - |
-//    | TOP_UP C      : B  C  -  -  -  - |
-//    | TOP_UP D      : B  C  -  -  -  - |
-//    | TOP_UP E      : B  C  E  -  -  - |
-//    | TOP_UP F      : B  C  E  F  -  - |
-//    | TOP_UP G      : B  C  E  F  -  - |
-// Legend: -: not found
-//         (*): call #1           => READ_ONLY
-//              calls #2, #3, ... => READ_NEXT
