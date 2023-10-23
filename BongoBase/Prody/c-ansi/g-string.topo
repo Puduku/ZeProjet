@@ -1,5 +1,6 @@
 // c-ansi/g-string.topo, version 1.93 (ANSI)
 // (c) Atos-Euronext Belgium - 2001, 2002, 2003
+// (c) Puduku - 2023
 
 // => g-string: "Green type" (see c-ansi/green.topo)
 // Aim: facilitate handling of plain character strings...
@@ -11,6 +12,11 @@
 // - "g-param" type is a "g-string set" of cardinality 2 
 //   + 1st g-string element represents param's name
 //   + 2nd g-string element represents param's value
+//
+// => g-string's conveyance (acolyt value)
+// acolyt: individual integral auxiliary value of g-strings 
+// g-string's coveyance: nature of its acolyt value: generic integer, generic pointer, etc.
+// g-string conveyance is a specialzation of g-string : g-token, named-object, etc.
 //
 // => "g-string set collections" (variable collections of g-string sets).
 // As of this generic type definition, the following usual types have been identified:
