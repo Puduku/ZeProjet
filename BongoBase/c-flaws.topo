@@ -5,7 +5,7 @@
 // "Top ten (+ two)" C's REAL flaws
 // ================================
 
-// Idea: Ok, we admit it : C is NOT a flaw free programming language...
+// Idea: Ok, we admit the fact : C is NOT a flaw free programming language...
 // However, our belief is that:
 // - Once understood, these defects can be neatly "neutralized". Unfortunetely, do not expect any
 //   "miracle": acceptable software quality is reacheable with C programming, but remains laborious
