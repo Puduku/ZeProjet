@@ -1,5 +1,6 @@
 // programming.topo, version 1.93
 // (c) Atos-Euronext Belgium - 2001, 2002, 2003
+// (c) Puduku - 2023
 //
 // INTRO: question of perspective...
 // Programming perspective (P-level)
@@ -209,3 +210,5 @@
 //   and the encapsulated data (in "object instance") (*)
 //   See also c-ansi/green.topo
 //   (*) : as amendment of "everything is object" holistic vision...
+//
+// TODO: expliquer kekpart le principe du modegle du programme vide...
