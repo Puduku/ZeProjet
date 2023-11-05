@@ -4,11 +4,23 @@
 // Purpose: elementary definitions 
 // =======
 
+// Manage double inclusions : conventions with __FLINT_TYPES_H_INCLUDED__
+// - undefined or 0: not yet included, 1st phase of inclusion triggered - MAY NOT be re-triggered
+// - 1: 1st phase of inclusion completed
+// - 2: 2nd phase of inclusion triggered - MAY NOT be re-triggred 
+// - 3: 2nd phase of inclusion completed
+
+
 #ifndef __FLINT_TYPES_H_INCLUDED__
-#define __FLINT_TYPES_H_INCLUDED__
+#define __FLINT_TYPES_H_INCLUDED__ 0
+#endif
 
-
+#if __FLINT_TYPES_H_INCLUDED__ == 0 || __FLINT_TYPES_H_INCLUDED__ == 2 
+#undef __FLINT_IMAGES_H_INCLUDED__
+#define __FLINT_IMAGES_H_INCLUDED__ __FLINT_TYPES_H_INCLUDED__
 #include "flint/images.h"
+
+#if __FLINT_TYPES_H_INCLUDED__ == 0
 #include "flint/ct-asserts.h"
 #include <stdlib.h>
 
@@ -71,14 +83,37 @@ m_lPtrType mep_lPtr = (m_lPtrType) p_rPtr;
 // 4. Basic enums
 // -------------- 
 
+
+#endif // __FLINT_TYPES_H_INCLUDED__ == 0
+
 // Programs' exit status
-m_DEFINE_TERNARY_ENUM(ExitStatusImage,
-  SUCCESS__EXECUTIVE__EXIT_STATUS, = EXIT_SUCCESS,
-  FAILURE__EXECUTIVE__EXIT_STATUS, = EXIT_FAILURE,
-  NON_EXECUTIVE__EXIT_STATUS, = 100 )
+// TODO: use GENERIC m_DEFINE_TERNARY_ENUM() instead
+m_DEFINE_ENUM_BEGIN(ExitStatusImage)
+  m_ENUM_CASE_VAL(SUCCESS__EXECUTIVE__EXIT_STATUS, EXIT_SUCCESS)
+  m_ENUM_CASE_VAL(FAILURE__EXECUTIVE__EXIT_STATUS, EXIT_FAILURE)
+  m_ENUM_CASE_VAL(NON_EXECUTIVE__EXIT_STATUS, 100)
   // exit status in [0-99] means effective execution ; 0 always means "success"...
   // exit status 100 means exit WITHOUT execution  
   // (bad option(s) arguments(s), simple help request, etc.) 
+m_DEFINE_ENUM_END();
 
-#endif //  __FLINT_TYPES_H_INCLUDED__
+
+// Manage double inclusion: update inclusion state:
+#if __FLINT_TYPES_H_INCLUDED__ == 0
+#undef __FLINT_TYPES_H_INCLUDED__
+#define __FLINT_TYPES_H_INCLUDED__ 1
+#else // __FLINT_TYPES_H_INCLUDED__ == 2
+#undef __FLINT_TYPES_H_INCLUDED__
+#define __FLINT_TYPES_H_INCLUDED__ 3
+#endif
+
+
+// Manage double inclusion: provoke 2nd inclusion:
+#if __FLINT_TYPES_H_INCLUDED__ == 1
+#undef __FLINT_TYPES_H_INCLUDED__
+#define __FLINT_TYPES_H_INCLUDED__ 2
+#include "flint/types.h"
+#endif
+
+#endif // __FLINT_TYPES_H_INCLUDED__ == 0 || __FLINT_TYPES_H_INCLUDED__ == 2
 

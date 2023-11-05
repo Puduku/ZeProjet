@@ -1088,7 +1088,8 @@ int GreenCollectionCreateInstance(GREEN_COLLECTION_HANDLE *azh_handle,  int expe
   m_GAPS_STACK_INIT(handle->h_gaps,handle->itemsPhysicalNumber)
   m_DEFAULT_INDEX_REQUEST(handle->internalIndexRequest)
 
-  handle->fetched4ChangeEntriesPhysicalNumber = expectedItemsNumber;
+  m_MALLOC_ARRAY(handle->h_fetched4ChangeEntries,handle->fetched4ChangeEntriesPhysicalNumber =
+    expectedItemsNumber)
   handle->fetched4ChangeEntriesNumber = 0;
   // MINIMONITOR: NADA
   m_DIGGY_RETURN(RETURNED)
@@ -1198,13 +1199,16 @@ int GreenCollectionFreeze(GREEN_COLLECTION_HANDLE handle,  char **nap_greenArray
 
 static inline int m_GreenCollectionAddFetched4ChangeEntry(GREEN_COLLECTION_HANDLE handle,
   int entry) { 
+  m_DIGGY_BOLLARD_S()
+m_DIGGY_VAR_D(entry)
   m_ASSERT(!handle->b_frozen)
   if (handle->fetched4ChangeEntriesNumber == handle->fetched4ChangeEntriesPhysicalNumber) {
     m_REALLOC(handle->h_fetched4ChangeEntries,handle->fetched4ChangeEntriesPhysicalNumber +=
       handle->expectedItemsNumber)
   } // if
+
   handle->h_fetched4ChangeEntries[handle->fetched4ChangeEntriesNumber++] = entry;
-  return RETURNED;
+  m_DIGGY_RETURN(RETURNED)
 } // m_GreenCollectionAddFetched4ChangeEntry
 
 // Obtain or retrieve emplacement for a green item (in the collection's array).
@@ -1235,6 +1239,7 @@ static int GreenCollectionFetchInternal (GREEN_COLLECTION_HANDLE cp_handle, int 
   char **acntr_greenItemStuff) {
   m_DIGGY_BOLLARD_S()
   // MINIMONITOR: ANY
+m_DIGGY_VAR_D(n_entry) 
   if (n_entry == -1) { // Smart fetch
     m_ASSERT(!cp_handle->b_frozen) 
     m_ASSERT(fetch4 == FETCH_4__CHANGE)
@@ -1259,10 +1264,13 @@ static int GreenCollectionFetchInternal (GREEN_COLLECTION_HANDLE cp_handle, int 
       m_SET_FLAG_OFF(cp_handle->hsc_flags[n_entry],DEAD_FLAG)
       // MICROMONITOR: ALIEN / ALIVE 
     } // if
+
     m_TRACK_IF(m_GreenCollectionAddFetched4ChangeEntry(cp_handle,n_entry) != RETURNED)
+m_DIGGY_VAR_D(n_entry) 
     // MICROMONITOR: ALIEN / ALIVE (fetched 4 change)
     // MINIMONITOR: ANY+
     *acntr_greenItemStuff = r_GREEN_COLLECTION_GET_GREEN_ITEM_STUFF(cp_handle,n_entry);
+m_DIGGY_VAR_P(*acntr_greenItemStuff) 
 
   } else { // Direct fetch
     if (n_entry < cp_handle->i_itemsCount &&  // Existing item
@@ -1549,6 +1557,8 @@ int GreenCollectionDestroyInstance (GREEN_COLLECTION_HANDLE xh_handle) {
   m_GREEN_INDEXES_FREE(xh_handle->indexes)
 
   m_GAPS_STACK_FREE(xh_handle->h_gaps)
+
+  free(xh_handle->h_fetched4ChangeEntries);
 
   free(xh_handle) ;
 

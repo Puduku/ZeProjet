@@ -33,6 +33,7 @@
 
 #define m_DIGGY_VAR_GEN(m_var,m_specifier)
 #define m_DIGGY_VAR_D(m_var)
+#define m_DIGGY_VAR_P(m_var)
 
 #define m_DIGGY_VAR_STRING(m_var)
 

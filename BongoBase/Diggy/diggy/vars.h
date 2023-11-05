@@ -70,6 +70,14 @@
 // - m_var: "int" type var expression to display
 #define m_DIGGY_VAR_D(m_var)  m_DIGGY_VAR_GEN(m_var,d)
 
+// #SEE DIGGY_VAR_XXX_MACRO
+// Simple pointer var display
+// Wraps m_DIGGY_VAR_GEN above
+//
+// Passed
+// - m_var: "int" type var expression to display
+#define m_DIGGY_VAR_P(m_var)  m_DIGGY_VAR_GEN(m_var,p)
+
 
 // 2. Digging in "C-string" vars
 

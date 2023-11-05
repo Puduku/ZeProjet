@@ -1,5 +1,6 @@
 // c-ansi/green.h, version 1.93 (ANSI)
 // (c) Atos-Euronext Belgium - 2001, 2002, 2003
+// (c) Puduku - 2023
 
 #ifndef __C_ANSI_GREEN_H_INCLUDED
 #define __C_ANSI_GREEN_H_INCLUDED
@@ -327,14 +328,15 @@ int GreenCollectionIndexRequest(GREEN_COLLECTION_HANDLE cp_handle,
 
      
 enum {
-  INDEX_FETCH_FLAG__RESET      = 0x01, 
+  INDEX_FETCH_FLAG__NEXT       = 0x01, 
+  INDEX_FETCH_FLAG__RESET      = 0x02, 
   // INDEX_FETCH_FLAG__CHANGE / REMOVE / READ are mutually exclusive: 
-  INDEX_FETCH_FLAG__CHANGE     = 0x02, // must be combined with INDEX_FETCH_FLAG__RESET
-  INDEX_FETCH_FLAG__REMOVE     = 0x08, // must be combined INDEX_FETCH_FLAG__RESET
-  INDEX_FETCH_FLAG__READ       = 0x10, // must be combined INDEX_FETCH_FLAG__RESET
-  INDEX_FETCH_FLAG__DESCENDING = 0x20, // must be combined with INDEX_FETCH_FLAG__RESET
-  INDEX_FETCH_FLAG__NEXT       = 0x40, //  
-  INDEX_FETCH_FLAG__SMART      = 0x04, // must be combined with both INDEX_FETCH_FLAG__NEXT / CHANGE
+  INDEX_FETCH_FLAG__CHANGE     = 0x04, // must be combined with INDEX_FETCH_FLAG__RESET
+  INDEX_FETCH_FLAG__REMOVE     = 0x08, // must be combined with INDEX_FETCH_FLAG__RESET
+  INDEX_FETCH_FLAG__SMART      = 0x10, // must be combined with INDEX_FETCH_FLAG__RESET / NEXT
+                                       // CHANGE
+  INDEX_FETCH_FLAG__READ       = 0x20, // must be combined with INDEX_FETCH_FLAG__RESET
+  INDEX_FETCH_FLAG__DESCENDING = 0x40, // must be combined with INDEX_FETCH_FLAG__RESET
 } ;
 
 enum { // #REF enum-INDEX_FETCH

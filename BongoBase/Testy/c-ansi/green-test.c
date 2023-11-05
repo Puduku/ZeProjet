@@ -38,6 +38,7 @@ static int TestItemHandlerKeysCompare(void *cpr_handle,  char b_frozen,  int ind
 
 
 // Passed:
+// - expectedTestNumber:
 // - handle:
 static int TestFetch(int expectedTestNumber,  GREEN_COLLECTION_HANDLE handle,  int n_entry, 
   int expectedEntry,  int n_expectedId, int c_newId) {
@@ -69,6 +70,7 @@ static int TestFetch(int expectedTestNumber,  GREEN_COLLECTION_HANDLE handle,  i
 
 
 // Passed:
+// - expectedTestNumber:
 // - handle:
 static int TestCount(int expectedTestNumber,  GREEN_COLLECTION_HANDLE handle,  int expectedCount,
   int n_expectedId) {
@@ -93,6 +95,7 @@ static int TestCount(int expectedTestNumber,  GREEN_COLLECTION_HANDLE handle,  i
 
 
 // Passed:
+// - expectedTestNumber:
 // - handle:
 static int TestIndexFetch(int expectedTestNumber,  GREEN_COLLECTION_HANDLE handle,
   unsigned int indexFetchFlags, unsigned int c_indexSeekFlags, int cc_idKey,  int expectedResult,
@@ -117,6 +120,7 @@ static int TestIndexFetch(int expectedTestNumber,  GREEN_COLLECTION_HANDLE handl
   m_ASSERT(result == expectedResult)
   if (n_expectedId >= 0) {
     m_ASSERT(n_entry != -1) 
+m_DIGGY_INFO("n_entry:%d c_expectedEntry:%d",n_entry,c_expectedEntry)
     m_ASSERT(n_entry == c_expectedEntry) 
     m_ASSERT(nt_testItemStuff != NULL) 
     m_ASSERT(nt_testItemStuff->id == n_expectedId) 
@@ -141,10 +145,18 @@ int main (int argc, char **argv) {
   m_DIGGY_INIT_BOLLARD(dgFlags)
   int ret = UNDEFINED;
 
+int exitStatus = NON_EXECUTIVE__EXIT_STATUS;
+m_DIGGY_INFO("exitStatus=%s",ExitStatusImage(exitStatus))
+exitStatus = SUCCESS__EXECUTIVE__EXIT_STATUS;
+m_DIGGY_INFO("exitStatus=%s",ExitStatusImage(exitStatus))
+exitStatus = 69;
+m_DIGGY_INFO("exitStatus=%s",ExitStatusImage(exitStatus))
+return 69;
+
   GREEN_COLLECTION_HANDLE handle = (GREEN_COLLECTION_HANDLE) UNDEFINED;
 
   b_diggyGreenCollectionExam = b_TRUE;   
-  m_TRACK_IF(GreenCollectionCreateInstance(&handle, /*BATEAU__EXPECTED_ITEMS_NUMBER*/2,
+  m_TRACK_IF(GreenCollectionCreateInstance(&handle, BATEAU__EXPECTED_ITEMS_NUMBER/*2*/,
     sizeof(struct TEST_ITEM), NULL,TestItemHandlerKeysCompare,NULL,NULL) != RETURNED)
 
 
