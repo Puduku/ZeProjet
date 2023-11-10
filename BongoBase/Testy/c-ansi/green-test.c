@@ -151,6 +151,12 @@ exitStatus = SUCCESS__EXECUTIVE__EXIT_STATUS;
 m_DIGGY_INFO("exitStatus=%s",ExitStatusImage(exitStatus))
 exitStatus = 69;
 m_DIGGY_INFO("exitStatus=%s",ExitStatusImage(exitStatus))
+exitStatus = INDEX_FETCH_FLAGS__SELECT_DESCENDING;
+m_DIGGY_INFO("exitStatus=%s",m_IndexFetchFlagsImage(exitStatus))
+exitStatus = 0x01;
+m_DIGGY_INFO("exitStatus=%s",m_IndexFetchFlagsImage(exitStatus))
+exitStatus = 0x46;
+m_DIGGY_INFO("exitStatus=%s",m_IndexFetchFlagsImage(exitStatus))
 return 69;
 
   GREEN_COLLECTION_HANDLE handle = (GREEN_COLLECTION_HANDLE) UNDEFINED;
