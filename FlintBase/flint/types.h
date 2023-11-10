@@ -4,19 +4,12 @@
 // Purpose: elementary definitions 
 // =======
 
-// #SEE double-inclusion-4-generic-imaged-enums @ flint/images.h <__FLINT_TYPES_H_INCLUDED__>
-
-
 #ifndef __FLINT_TYPES_H_INCLUDED__
-#define __FLINT_TYPES_H_INCLUDED__ 0
-#endif
+#define __FLINT_TYPES_H_INCLUDED__
 
-#if __FLINT_TYPES_H_INCLUDED__ == 0 || __FLINT_TYPES_H_INCLUDED__ == 2 
-
-#if __FLINT_TYPES_H_INCLUDED__ == 0
 #include "flint/ct-asserts.h"
+#include "flint/images.h"
 #include <stdlib.h>
-
 
 // 1. Basic constants 
 // ------------------
@@ -73,38 +66,16 @@ m_lPtrType mep_lPtr = (m_lPtrType) p_rPtr;
 // TODO: #define EP_PTR__SAFE_CAST(m_epPtrType,  p_ptr)
 
 
-// 4. Basic enums
-// -------------- 
+// 4. Basic program exit statuses
+// ------------------------------ 
 
-
-#endif // __FLINT_TYPES_H_INCLUDED__ == 0
-
-#undef __FLINT_IMAGES_H_INCLUDED__
-#define __FLINT_IMAGES_H_INCLUDED__ __FLINT_TYPES_H_INCLUDED__
-#include "flint/images.h"
-
-// Programs' exit status
-// TODO: use GENERIC m_DEFINE_TERNARY_ENUM() instead
-m_DEFINE_ENUM_CASE_BEGIN(ExitStatusImage)
-  m_ENUM_CASE_VAL(SUCCESS__EXECUTIVE__EXIT_STATUS, EXIT_SUCCESS)
-  m_ENUM_CASE_VAL(FAILURE__EXECUTIVE__EXIT_STATUS, EXIT_FAILURE)
-  m_ENUM_CASE_VAL(NON_EXECUTIVE__EXIT_STATUS, 100)
+m_DEFINE_TERNARY_ENUM(ExitStatusImage,
+  SUCCESS__EXECUTIVE__EXIT_STATUS, = EXIT_SUCCESS,
+  FAILURE__EXECUTIVE__EXIT_STATUS, = EXIT_FAILURE,
+  NON_EXECUTIVE__EXIT_STATUS, = 100)
   // exit status in [0-99] means effective execution ; 0 always means "success"...
   // exit status 100 means exit WITHOUT execution  
   // (bad option(s) arguments(s), simple help request, etc.) 
-m_DEFINE_ENUM_CASE_END();
 
-
-// Manage double inclusion: update inclusion state:
-#if __FLINT_TYPES_H_INCLUDED__ == 0
-#undef __FLINT_TYPES_H_INCLUDED__
-// Manage double inclusion: provoke 2nd inclusion:
-#define __FLINT_TYPES_H_INCLUDED__ 2
-#include "flint/types.h"
-#else 
-#undef __FLINT_TYPES_H_INCLUDED__
-#define __FLINT_TYPES_H_INCLUDED__ 3
-#endif
-
-#endif // __FLINT_TYPES_H_INCLUDED__ == 0 || __FLINT_TYPES_H_INCLUDED__ == 2
+#endif // __FLINT_TYPES_H_INCLUDED__
 

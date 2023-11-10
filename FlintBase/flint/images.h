@@ -186,7 +186,7 @@ m_ENUM_IMAGE_FUNCTION__BUTT()
 #define m_ENUM_CASE_VAL(m_case, m_val) m_case = (m_val),
 
 // To finish "imaged" enum declaration 
-#define m_DEFINE_ENUM_CASE_END() }
+#define m_DEFINE_ENUM_CASE_END() } ;
 
 
 // To start "imaged" alias enum declaration 
@@ -209,7 +209,7 @@ m_ENUM_IMAGE_FUNCTION__BUTT()
 #define m_ENUM_ALIAS_VAL(m_alias, m_val) m_alias = (m_val),
 
 // To finish "imaged" enum declaration 
-#define m_DEFINE_ENUM_ALIAS_END() }
+#define m_DEFINE_ENUM_ALIAS_END() } ;
 
 
 #undef __FLINT_IMAGES_H_INCLUDED__
