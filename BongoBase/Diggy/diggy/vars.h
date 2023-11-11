@@ -117,7 +117,8 @@ void DiggyPrintDataImage(const char *p_data, int length);
   m_DIGGY_VAR(m_var, DiggyPrintDataImage(m_var,length);)
 
 
-// 4. Digging in "value" (aka. "enum") variables
+// 4. Digging in "value" (e.g "enum") variables
+
 
 // #SEE DIGGY_PRINT_IMAGE_FUNCTION
 //
@@ -137,6 +138,5 @@ void DiggyPrintValueImage(int value, const char *p_image);
   const char *emp_image = m_valueImageInlineFunction(m_var);\
   m_DIGGY_VAR(m_var, DiggyPrintValueImage(m_var,emp_image);) \
 }
-
 
 #endif // __DIGGY_VARS_H_INCLUDED

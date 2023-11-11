@@ -64,5 +64,5 @@ void DiggyPrintStringImage(const char *np_string) {
 // #SEE DIGGY_PRINT_IMAGE_FUNCTION @ diggy/vars.h
 void DiggyPrintValueImage(int value, const char *p_image) {
   fputs(p_image,stdout);
-  printf(" (%d)",value) ;
+  printf(" (%d - 0x%x)",value,value) ;
 } // DiggyPrintValueImage

@@ -1,4 +1,4 @@
-// testy/c-ansi/diggy-vars.h, version 1.93 (ANSI)
+// testy/c-ansi-diggy-vars.h, version 1.93 (ANSI)
 // (c) Atos-Euronext Belgium - 2001, 2002, 2003
 
 #ifndef __TESTY_C_ANSI_DIGGY_VARS_H_INCLUDED
@@ -10,12 +10,14 @@
 
 #include "c-ansi/types.h"
 #include "c-ansi/c-string.h"
+#include "c-ansi/green.h"
 #include "c-ansi/blotcode.h"
 
 
 // "c-ansi/types.h" :
 
 // #SEE DIGGY_VAR_XXX_MACRO@diggy/vars.h
+
 // "answer" (enum) var display
 //
 // Passed
@@ -24,7 +26,6 @@
   m_DIGGY_VAR_VALUE(m_var,AnswerImage)
 
 
-// #SEE DIGGY_VAR_XXX_MACRO@diggy/vars.h
 // "comparison" (enum) var display
 //
 // Passed
@@ -35,7 +36,6 @@
 
 // "c-ansi/c-string.h" :
 
-// #SEE DIGGY_VAR_XXX_MACRO@diggy/vars.h
 // "String portion" var display
 //
 // Passed
@@ -45,9 +45,25 @@
   printf("[" FMT_STRING_PORTION "]", m_STRING_PORTION_2_FMT_ARGS(m_var));)
 
 
+// "c-ansi/green.h" :
+
+// "index seek flags" (enum) var display
+//
+// Passed
+// - m_var: common var expression to display
+#define m_DIGGY_VAR_INDEX_SEEK_FLAGS(m_var) \
+  m_DIGGY_VAR_VALUE(m_var,m_IndexSeekFlagsImage)
+
+// "index fetch flags" (enum) var display
+//
+// Passed
+// - m_var: common var expression to display
+#define m_DIGGY_VAR_INDEX_FETCH_FLAGS(m_var) \
+  m_DIGGY_VAR_VALUE(m_var,m_IndexFetchFlagsImage)
+
+
 // "c-ansi/blotcode.h" :
 
-// #SEE DIGGY_VAR_XXX_MACRO @ diggy/vars.h
 // "blotinst" struct var display
 //
 // Passed

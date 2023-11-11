@@ -6,6 +6,7 @@
 #include "diggy/diggy.h"
 #include "testy/getopts.h"
 #include "diggy/vars.h"
+#include "testy/c-ansi-diggy-vars.h"
 
 
 struct TEST_ITEM {
@@ -97,6 +98,8 @@ static int TestCount(int expectedTestNumber,  GREEN_COLLECTION_HANDLE handle,  i
 // Passed:
 // - expectedTestNumber:
 // - handle:
+// - indexFetchFlags:
+// - c_indexSeekFlags: only significant if INDEX_FETCH_FLAG__RESET is ON 
 static int TestIndexFetch(int expectedTestNumber,  GREEN_COLLECTION_HANDLE handle,
   unsigned int indexFetchFlags, unsigned int c_indexSeekFlags, int cc_idKey,  int expectedResult,
   int n_expectedId, int c_expectedEntry, int cc_newId) {
@@ -111,7 +114,9 @@ static int TestIndexFetch(int expectedTestNumber,  GREEN_COLLECTION_HANDLE handl
 
   TEST_ITEM_STUFF nt_testItemStuff = (TEST_ITEM_STUFF)UNDEFINED;
   int n_entry = UNDEFINED;
+m_DIGGY_VAR_INDEX_FETCH_FLAGS(indexFetchFlags)
   if (b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__RESET)) {
+m_DIGGY_VAR_INDEX_SEEK_FLAGS(c_indexSeekFlags)
     m_TRACK_IF(GreenCollectionIndexRequest(handle, (INDEX_REQUEST_AUTOMATIC_BUFFER)NULL, 1,
       INDEX_LABEL0, c_indexSeekFlags, (void *)(GENERIC_INTEGER)cc_idKey) != RETURNED)
   } // if
@@ -144,20 +149,6 @@ int main (int argc, char **argv) {
   unsigned int dgFlags = ParseTestyCommandArguments(argc,argv,ALL_FLAGS_OFF0) ;
   m_DIGGY_INIT_BOLLARD(dgFlags)
   int ret = UNDEFINED;
-
-int exitStatus = NON_EXECUTIVE__EXIT_STATUS;
-m_DIGGY_INFO("exitStatus=%s",ExitStatusImage(exitStatus))
-exitStatus = SUCCESS__EXECUTIVE__EXIT_STATUS;
-m_DIGGY_INFO("exitStatus=%s",ExitStatusImage(exitStatus))
-exitStatus = 69;
-m_DIGGY_INFO("exitStatus=%s",ExitStatusImage(exitStatus))
-exitStatus = INDEX_FETCH_FLAGS__SELECT_DESCENDING;
-m_DIGGY_INFO("exitStatus=%s",m_IndexFetchFlagsImage(exitStatus))
-exitStatus = 0x01;
-m_DIGGY_INFO("exitStatus=%s",m_IndexFetchFlagsImage(exitStatus))
-exitStatus = 0x46;
-m_DIGGY_INFO("exitStatus=%s",m_IndexFetchFlagsImage(exitStatus))
-return 69;
 
   GREEN_COLLECTION_HANDLE handle = (GREEN_COLLECTION_HANDLE) UNDEFINED;
 
