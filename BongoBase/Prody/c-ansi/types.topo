@@ -14,7 +14,7 @@
 //
 // 2. booleans
 // --
-// See watermarks.topo
+// See c-watermarks.topo
 //
 // 
 // 3. "procedures" - return "status" 
