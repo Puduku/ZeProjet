@@ -85,7 +85,7 @@
 // The problem becomes glaring as soon as one uses "packed" structures to represent any kind of
 // "normalized" data formats used for data exchange (protocol message format, etc.) because we
 // absolutely need to use those non-standard directives to represent these standardized data. In
-// other words, we are in the situation of a snake biting its own tail.
+// other words, we fall in the situation of a snake biting its own tail.
 
 // Number 7: 'typedef' is a very "poor" type definition... 
 // 'typedef' is rather a simple type aliasing than a type definition. The mechanism is not
