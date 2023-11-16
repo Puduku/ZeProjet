@@ -7,10 +7,10 @@
 // >Versus<
 // C-Language perspective (L-level)
  
-// 'P'rogramming perspective is a tiny but necessary "abstraction" built above the 'L'anguage
+// 'P'rogramming perspective is a tiny but necessary "abstraction" built just above the 'L'anguage
 // ("grass roots") perspective.
-// Our idea is to NOT "reason" directly with C language features, but above "ad hoc" programming
-// abstractions...
+// Our idea is to NOT "reason" directly with C language features, but with more "ad hoc" 
+// programming abstractions...
 
 // This 'P' layer follows very classical "procedural programming" orientation (*) on which we
 // elaborate (programming) patterns...
