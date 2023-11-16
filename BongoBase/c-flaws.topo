@@ -8,7 +8,7 @@
 // Idea: Ok, we admit the fact : C is NOT a flaw free programming language...
 // However, our belief is that:
 // - Once understood, these defects can be neatly "neutralized". Unfortunetely, do not expect any
-//   "miracle": acceptable software quality is reacheable with C programming, but remains laborious
+//   "miracle": acceptable software quality is attainable with C programming, but remains laborious
 //   to achieve; as soon as we release our efforts and are not careful enough - or too
 //   overconfident, C-code "quality" degenerates very quickly... 
 // - Finding a more adequate language, up to par, and getting rid of C for good would certainly be a
