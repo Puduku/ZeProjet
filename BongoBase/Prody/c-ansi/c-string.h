@@ -12,6 +12,7 @@
 #include "c-ansi/types.h"
 #include "c-ansi/alloc.h"
 
+// SEE ALSO c-flaws.topo, Number -1 
 // The very first aim of the module is to propose to stick once and for all to that CONVENTION.
 // By #including that "module", you tacitly admit the following CONVENTION:
 // #REF Buffer-size-NEVER-zero
