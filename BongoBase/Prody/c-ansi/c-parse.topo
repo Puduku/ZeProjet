@@ -1,7 +1,6 @@
 c-ansi/c-parse.topo
 (c) Puduku - 2023
 
-Goal: Handling general parsing without excessive headaches...
-Principle: no more a priori distinction between syntactic and lexical analyses.
-Parsing step
-Parsing : hierarchical and sequential organisation of pure parsing steps
+Goal: Handle ordinary parsings without excessive headaches...
+Idea: give up distinction made a priori between syntactic and lexical analyses.
+Principle: Parsing = hierarchical and sequential assemblage of elementary parsing steps
