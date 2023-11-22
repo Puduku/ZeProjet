@@ -346,11 +346,11 @@ int GreenCollectionIndexRequest(GREEN_COLLECTION_HANDLE cp_handle,
 enum {
   INDEX_FETCH_FLAG__NEXT       = 0x01, 
   INDEX_FETCH_FLAG__RESET      = 0x02, 
-  // INDEX_FETCH_FLAG__CHANGE / REMOVE / READ are mutually exclusive: 
+  // INDEX_FETCH_FLAG [__CHANGE, __REMOVE and __READ] are mutually exclusive: 
   INDEX_FETCH_FLAG__CHANGE     = 0x04, // must be combined with INDEX_FETCH_FLAG__RESET
   INDEX_FETCH_FLAG__REMOVE     = 0x08, // must be combined with INDEX_FETCH_FLAG__RESET
-  INDEX_FETCH_FLAG__SMART      = 0x10, // must be combined with INDEX_FETCH_FLAG__RESET / NEXT
-                                       // CHANGE
+  INDEX_FETCH_FLAG__SMART      = 0x10, // must be combined with INDEX_FETCH_FLAG [__RESET,
+    // __NEXT and __CHANGE]
   INDEX_FETCH_FLAG__READ       = 0x20, // must be combined with INDEX_FETCH_FLAG__RESET
   INDEX_FETCH_FLAG__DESCENDING = 0x40, // must be combined with INDEX_FETCH_FLAG__RESET
 } ;
