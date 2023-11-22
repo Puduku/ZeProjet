@@ -41,6 +41,10 @@ static int TestItemHandlerKeysCompare(void *cpr_handle,  char b_frozen,  int ind
 // Passed:
 // - expectedTestNumber:
 // - handle:
+// - n_entry: 
+// - expectedEntry: 
+// - n_expectedId: -1 special value => no fetched item check 
+// - c_newId: not significant if no fetched item check 
 static int TestFetch(int expectedTestNumber,  GREEN_COLLECTION_HANDLE handle,  int n_entry, 
   int expectedEntry,  int n_expectedId, int c_newId) {
   m_DIGGY_BOLLARD()
@@ -100,16 +104,24 @@ static int TestCount(int expectedTestNumber,  GREEN_COLLECTION_HANDLE handle,  i
 // - handle:
 // - indexFetchFlags:
 // - c_indexSeekFlags: only significant if INDEX_FETCH_FLAG__RESET is ON 
+// - cc_idKey: only significant if INDEX_FETCH_FLAG__RESET is ON AND INDEX_SEEK_FLAG__ANY is OFF
+// - expectedResult:
+// - n_expectedId: -1 special value => no fetched item check 
+// - c_expectedEntry: only significant if fetched item check  
+// - cn_newId: not significant if no fetched item check ; -1 special value => NO update 
 static int TestIndexFetch(int expectedTestNumber,  GREEN_COLLECTION_HANDLE handle,
   unsigned int indexFetchFlags, unsigned int c_indexSeekFlags, int cc_idKey,  int expectedResult,
-  int n_expectedId, int c_expectedEntry, int cc_newId) {
+  int n_expectedId, int c_expectedEntry, int cn_newId) {
   m_DIGGY_BOLLARD()
+
   m_ASSERT(expectedTestNumber == ++testNumber)
   m_DIGGY_VAR_D(testNumber)
 
+  static char b_readOnly = b_TRUE;
+
   if (n_expectedId == -1) {
     m_ASSERT(indexFetchFlags != INDEX_FETCH_FLAGS__FETCH) 
-    m_ASSERT(expectedResult != RESULT__FOUND) 
+    m_ASSERT(expectedResult == RESULT__NOT_FOUND) 
   } // if
 
   TEST_ITEM_STUFF nt_testItemStuff = (TEST_ITEM_STUFF)UNDEFINED;
@@ -117,6 +129,8 @@ static int TestIndexFetch(int expectedTestNumber,  GREEN_COLLECTION_HANDLE handl
 m_DIGGY_VAR_INDEX_FETCH_FLAGS(indexFetchFlags)
   if (b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__RESET)) {
 m_DIGGY_VAR_INDEX_SEEK_FLAGS(c_indexSeekFlags)
+    b_readOnly = b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__READ); 
+m_DIGGY_VAR_D(cc_idKey)
     m_TRACK_IF(GreenCollectionIndexRequest(handle, (INDEX_REQUEST_AUTOMATIC_BUFFER)NULL, 1,
       INDEX_LABEL0, c_indexSeekFlags, (void *)(GENERIC_INTEGER)cc_idKey) != RETURNED)
   } // if
@@ -129,8 +143,9 @@ m_DIGGY_INFO("n_entry:%d c_expectedEntry:%d",n_entry,c_expectedEntry)
     m_ASSERT(n_entry == c_expectedEntry) 
     m_ASSERT(nt_testItemStuff != NULL) 
     m_ASSERT(nt_testItemStuff->id == n_expectedId) 
-    if (indexFetchFlags != INDEX_FETCH_FLAGS__READ_ONLY && indexFetchFlags != INDEX_FETCH_FLAGS__READ_NEXT) { 
-      nt_testItemStuff->id = cc_newId ; 
+    if (cn_newId >= 0) { 
+      m_ASSERT(!b_readOnly)
+      nt_testItemStuff->id = cn_newId ; 
     } // if
   } else {
     m_ASSERT(nt_testItemStuff == NULL) 
@@ -195,62 +210,62 @@ int main (int argc, char **argv) {
   m_TRACK_IF(TestCount(21,handle, 6,3068) < 0)
 
   m_TRACK_IF(TestIndexFetch(22,handle, INDEX_FETCH_FLAGS__READ_ONLY,INDEX_SEEK_FLAGS__ANY,UNDEFINED,
-    RESULT__FOUND, 1966, 4, UNDEFINED) < 0)
+    RESULT__FOUND, 1966, 4, -1) < 0)
   m_TRACK_IF(TestIndexFetch(23,handle, INDEX_FETCH_FLAGS__READ_NEXT,UNDEFINED,UNDEFINED,
-    RESULT__FOUND, 1967, 2, UNDEFINED) < 0)
+    RESULT__FOUND, 1967, 2, -1) < 0)
   m_TRACK_IF(TestIndexFetch(24,handle, INDEX_FETCH_FLAGS__READ_NEXT,UNDEFINED,UNDEFINED,
-    RESULT__FOUND, 1969, 0, UNDEFINED) < 0)
+    RESULT__FOUND, 1969, 0, -1) < 0)
   m_TRACK_IF(TestIndexFetch(25,handle, INDEX_FETCH_FLAGS__READ_NEXT,UNDEFINED,UNDEFINED,
-    RESULT__FOUND, 1970, 3, UNDEFINED) < 0)
+    RESULT__FOUND, 1970, 3, -1) < 0)
   m_TRACK_IF(TestIndexFetch(26,handle, INDEX_FETCH_FLAGS__READ_NEXT,UNDEFINED,UNDEFINED,
-    RESULT__FOUND, 2068, 1, UNDEFINED) < 0)
+    RESULT__FOUND, 2068, 1, -1) < 0)
   m_TRACK_IF(TestIndexFetch(27,handle, INDEX_FETCH_FLAGS__READ_NEXT,UNDEFINED,UNDEFINED,
-    RESULT__FOUND, 3068, 5, UNDEFINED) < 0)
+    RESULT__FOUND, 3068, 5, -1) < 0)
   m_TRACK_IF(TestIndexFetch(28,handle, INDEX_FETCH_FLAGS__READ_NEXT,UNDEFINED,UNDEFINED,
     RESULT__NOT_FOUND, -1, UNDEFINED, UNDEFINED) < 0)
 
   m_TRACK_IF(TestIndexFetch(29,handle, INDEX_FETCH_FLAGS__READ_ONLY|INDEX_FETCH_FLAG__DESCENDING,
-    INDEX_SEEK_FLAGS__ANY,UNDEFINED, RESULT__FOUND, 3068, 5, UNDEFINED) < 0)
+    INDEX_SEEK_FLAGS__ANY,UNDEFINED, RESULT__FOUND, 3068, 5, -1) < 0)
   m_TRACK_IF(TestIndexFetch(30,handle, INDEX_FETCH_FLAGS__READ_NEXT,UNDEFINED,UNDEFINED,
-    RESULT__FOUND, 2068, 1, UNDEFINED) < 0)
+    RESULT__FOUND, 2068, 1, -1) < 0)
   m_TRACK_IF(TestIndexFetch(31,handle, INDEX_FETCH_FLAGS__READ_NEXT,UNDEFINED,UNDEFINED,
-    RESULT__FOUND, 1970, 3, UNDEFINED) < 0)
+    RESULT__FOUND, 1970, 3, -1) < 0)
   m_TRACK_IF(TestIndexFetch(32,handle, INDEX_FETCH_FLAGS__READ_NEXT,UNDEFINED,UNDEFINED,
-    RESULT__FOUND, 1969, 0, UNDEFINED) < 0)
+    RESULT__FOUND, 1969, 0, -1) < 0)
   m_TRACK_IF(TestIndexFetch(33,handle, INDEX_FETCH_FLAGS__READ_NEXT,UNDEFINED,UNDEFINED,
-    RESULT__FOUND, 1967, 2, UNDEFINED) < 0)
+    RESULT__FOUND, 1967, 2, -1) < 0)
   m_TRACK_IF(TestIndexFetch(34,handle, INDEX_FETCH_FLAGS__READ_NEXT,UNDEFINED,UNDEFINED,
-    RESULT__FOUND, 1966, 4, UNDEFINED) < 0)
+    RESULT__FOUND, 1966, 4, -1) < 0)
   m_TRACK_IF(TestIndexFetch(35,handle, INDEX_FETCH_FLAGS__READ_NEXT,UNDEFINED,UNDEFINED,
     RESULT__NOT_FOUND, -1, UNDEFINED, UNDEFINED) < 0)
 
   m_TRACK_IF(TestIndexFetch(36,handle, INDEX_FETCH_FLAGS__READ_ONLY,
-    INDEX_SEEK_FLAGS__GREATER_EQUAL,1971, RESULT__FOUND, 2068, 1, UNDEFINED) < 0)
+    INDEX_SEEK_FLAGS__GREATER_EQUAL,1971, RESULT__FOUND, 2068, 1, -1) < 0)
   m_TRACK_IF(TestIndexFetch(37,handle, INDEX_FETCH_FLAGS__READ_NEXT,UNDEFINED,UNDEFINED,
-    RESULT__FOUND, 3068, 5, UNDEFINED) < 0)
+    RESULT__FOUND, 3068, 5, -1) < 0)
   m_TRACK_IF(TestIndexFetch(38,handle, INDEX_FETCH_FLAGS__READ_NEXT,UNDEFINED,UNDEFINED,
     RESULT__NOT_FOUND, -1, UNDEFINED, UNDEFINED) < 0)
 
   m_TRACK_IF(TestIndexFetch(39,handle, INDEX_FETCH_FLAGS__READ_ONLY|INDEX_FETCH_FLAG__DESCENDING,
-    INDEX_SEEK_FLAGS__GREATER_EQUAL,1971, RESULT__FOUND, 3068, 5, UNDEFINED) < 0)
+    INDEX_SEEK_FLAGS__GREATER_EQUAL,1971, RESULT__FOUND, 3068, 5, -1) < 0)
   m_TRACK_IF(TestIndexFetch(40,handle, INDEX_FETCH_FLAGS__READ_NEXT,UNDEFINED,UNDEFINED,
-    RESULT__FOUND, 2068, 1, UNDEFINED) < 0)
+    RESULT__FOUND, 2068, 1, -1) < 0)
   m_TRACK_IF(TestIndexFetch(41,handle, INDEX_FETCH_FLAGS__READ_NEXT,UNDEFINED,UNDEFINED,
     RESULT__NOT_FOUND, -1, UNDEFINED, UNDEFINED) < 0)
 
   m_TRACK_IF(TestIndexFetch(42,handle, INDEX_FETCH_FLAGS__READ_ONLY|INDEX_FETCH_FLAG__DESCENDING,
-    INDEX_SEEK_FLAGS__LESS_EQUAL,1969, RESULT__FOUND, 1969, 0, UNDEFINED) < 0)
+    INDEX_SEEK_FLAGS__LESS_EQUAL,1969, RESULT__FOUND, 1969, 0, -1) < 0)
   m_TRACK_IF(TestIndexFetch(43,handle, INDEX_FETCH_FLAGS__READ_NEXT,UNDEFINED,UNDEFINED,
-    RESULT__FOUND, 1967, 2, UNDEFINED) < 0)
+    RESULT__FOUND, 1967, 2, -1) < 0)
   m_TRACK_IF(TestIndexFetch(44,handle, INDEX_FETCH_FLAGS__READ_NEXT,UNDEFINED,UNDEFINED,
-    RESULT__FOUND, 1966, 4, UNDEFINED) < 0)
+    RESULT__FOUND, 1966, 4, -1) < 0)
   m_TRACK_IF(TestIndexFetch(45,handle, INDEX_FETCH_FLAGS__READ_NEXT,UNDEFINED,UNDEFINED,
     RESULT__NOT_FOUND, -1, UNDEFINED, UNDEFINED) < 0)
 
   m_TRACK_IF(TestIndexFetch(46,handle, INDEX_FETCH_FLAGS__READ_ONLY,INDEX_SEEK_FLAGS__LESS_EQUAL,
-    1968, RESULT__FOUND, 1966, 4, UNDEFINED) < 0)
+    1968, RESULT__FOUND, 1966, 4, -1) < 0)
   m_TRACK_IF(TestIndexFetch(47,handle, INDEX_FETCH_FLAGS__READ_NEXT,UNDEFINED,UNDEFINED,
-    RESULT__FOUND, 1967, 2, UNDEFINED) < 0)
+    RESULT__FOUND, 1967, 2, -1) < 0)
   m_TRACK_IF(TestIndexFetch(48,handle, INDEX_FETCH_FLAGS__READ_NEXT,UNDEFINED,UNDEFINED,
     RESULT__NOT_FOUND, -1, UNDEFINED, UNDEFINED) < 0)
 
@@ -270,28 +285,28 @@ int main (int argc, char **argv) {
   m_TRACK_IF(TestFetch(55, handle,-1,5,3068,1971) < 0)
 
   m_TRACK_IF(TestIndexFetch(56,handle, INDEX_FETCH_FLAGS__READ_ONLY,
-    INDEX_SEEK_FLAGS__GREATER_EQUAL,1968, RESULT__FOUND, 1968, 1, UNDEFINED) < 0)
+    INDEX_SEEK_FLAGS__GREATER_EQUAL,1968, RESULT__FOUND, 1968, 1, -1) < 0)
   m_TRACK_IF(TestIndexFetch(57,handle, INDEX_FETCH_FLAGS__READ_NEXT,UNDEFINED,UNDEFINED,
-    RESULT__FOUND, 1969, 0, UNDEFINED) < 0)
+    RESULT__FOUND, 1969, 0, -1) < 0)
   m_TRACK_IF(TestIndexFetch(58,handle, INDEX_FETCH_FLAGS__READ_NEXT,UNDEFINED,UNDEFINED,
-    RESULT__FOUND, 1969, 2, UNDEFINED) < 0)
+    RESULT__FOUND, 1969, 2, -1) < 0)
   m_TRACK_IF(TestIndexFetch(59,handle, INDEX_FETCH_FLAGS__READ_NEXT,UNDEFINED,UNDEFINED,
-    RESULT__FOUND, 1970, 3, UNDEFINED) < 0)
+    RESULT__FOUND, 1970, 3, -1) < 0)
   m_TRACK_IF(TestIndexFetch(60,handle, INDEX_FETCH_FLAGS__READ_NEXT,UNDEFINED,UNDEFINED,
-    RESULT__FOUND, 1971, 5, UNDEFINED) < 0)
+    RESULT__FOUND, 1971, 5, -1) < 0)
   m_TRACK_IF(TestIndexFetch(61,handle, INDEX_FETCH_FLAGS__READ_NEXT,UNDEFINED,UNDEFINED,
     RESULT__NOT_FOUND, -1, UNDEFINED, UNDEFINED) < 0)
 
   m_TRACK_IF(TestIndexFetch(62,handle, INDEX_FETCH_FLAGS__READ_ONLY|INDEX_FETCH_FLAG__DESCENDING,
-    INDEX_SEEK_FLAGS__LESS_EQUAL, 1970, RESULT__FOUND, 1970, 3, UNDEFINED) < 0)
+    INDEX_SEEK_FLAGS__LESS_EQUAL, 1970, RESULT__FOUND, 1970, 3, -1) < 0)
   m_TRACK_IF(TestIndexFetch(63,handle, INDEX_FETCH_FLAGS__READ_NEXT,UNDEFINED,UNDEFINED,
-    RESULT__FOUND, 1969, 2, UNDEFINED) < 0)
+    RESULT__FOUND, 1969, 2, -1) < 0)
   m_TRACK_IF(TestIndexFetch(64,handle, INDEX_FETCH_FLAGS__READ_NEXT,UNDEFINED,UNDEFINED,
-    RESULT__FOUND, 1969, 0, UNDEFINED) < 0)
+    RESULT__FOUND, 1969, 0, -1) < 0)
   m_TRACK_IF(TestIndexFetch(65,handle, INDEX_FETCH_FLAGS__READ_NEXT,UNDEFINED,UNDEFINED,
-    RESULT__FOUND, 1968, 1, UNDEFINED) < 0)
+    RESULT__FOUND, 1968, 1, -1) < 0)
   m_TRACK_IF(TestIndexFetch(66,handle, INDEX_FETCH_FLAGS__READ_NEXT,UNDEFINED,UNDEFINED,
-    RESULT__FOUND, 1966, 4, UNDEFINED) < 0)
+    RESULT__FOUND, 1966, 4, -1) < 0)
   m_TRACK_IF(TestIndexFetch(67,handle, INDEX_FETCH_FLAGS__READ_NEXT,UNDEFINED,UNDEFINED,
     RESULT__NOT_FOUND, -1, UNDEFINED, UNDEFINED) < 0)
 
