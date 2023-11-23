@@ -3,7 +3,7 @@ c-ansi/c-parse.topo
 
 Goal: Handle ordinary parsings without excessive headaches...
 Idea: give up distinction made a priori between syntactic and lexical analyses.
-Principle: Parsing = hierarchical and sequential assemblage of elementary parsing steps
+Principle: Parsing = hierarchical and sequential assemblage of very elementary parsing steps
 
 Parsing step is an elementary operation which extracts "head" lexeme of a sequence (of characters) 
 PARSE(S,L) : 
@@ -14,9 +14,10 @@ PARSE(S,L) :
   + out: lexeme extracted at the begin of the sequence
 
 Notes:
- - Parsing step is, by essence, always a successful operation
- - Limit cases during which sequence and/or lexeme stay unchanged or get emptied are "remarkable" cases - not "error" cases
- - From these special cases, we may however decrete some global parsing failure ('syntax error' and so on.) 
+ - The parsing step is, in essence, always a successful operation.
+ - Borderline cases (such as empty lexeme with unchanged sequence; empty sequence with lexeme corresponding
+   to the initial sequence) do not constitute, in themselves, cases of parsing "error".
+ - Borderline cases, like ordinary cases, are possibly interpreted as errors: "syntax", "value" or other...
 
 Sequence of Parsing step: the sequence used in (and changed by) the 1st step is used in the 2nd step
  PARSE(S,L) ; PARSE(S,L)
