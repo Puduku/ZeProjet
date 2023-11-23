@@ -4,3 +4,21 @@ c-ansi/c-parse.topo
 Goal: Handle ordinary parsings without excessive headaches...
 Idea: give up distinction made a priori between syntactic and lexical analyses.
 Principle: Parsing = hierarchical and sequential assemblage of elementary parsing steps
+
+Parsing step is an elementary operation which extracts "head" lexeme of a sequence (of characters) 
+PARSE(S,L) : 
+ - S:sequence:
+   + In: initial sequence
+   + Out: remaining sequence after lexeme extraction
+- L:lexeme:
+  + out: lexeme extracted at the begin of the sequence
+
+Notes:
+ - Parsing step is always a successful operation
+ - Corner cases in which operation unchanged or emptied lexeme and/or sequence are just remarkable cases - and not "error" cases
+
+Sequence of Parsing step: the sequence used in (and changed by) the 1st step is used in the 2nd step
+ PARSE(S,L) ; PARSE(S,L)
+
+Hierarchy of parsing step: the lexeme extracted in the 1st step is the sequence in the 2nd step
+PARSE(S,LS); PARSE(LS,LL);
