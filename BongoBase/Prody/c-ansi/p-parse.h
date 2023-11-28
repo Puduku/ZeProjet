@@ -1,10 +1,10 @@
-// c-ansi/c-parse.h, version 1.93 (ANSI)
+// c-ansi/p-parse.h, version 1.93 (ANSI)
 // (c) Puduku - 2023
 
 #ifndef __C_ANSI_C_PARSE_H_INCLUDED
 #define __C_ANSI_C_PARSE_H_INCLUDED
 
-#include "c-ansi/c-string.h"
+#include "c-ansi/p-string.h"
 
 
 // Parse a string portion sequence according to scan pointer corresponding to the delimitation of
