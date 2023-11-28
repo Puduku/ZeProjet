@@ -1,9 +1,9 @@
-// c-ansi/c-string.h, version 1.93 (ANSI)
+// c-ansi/p-string.h, version 1.93 (ANSI)
 // (c) Atos-Euronext Belgium - 2001, 2002, 2003
 // (c) Puduku - 2023
 
-#ifndef __C_ANSI_C_STRING_H_INCLUDED
-#define __C_ANSI_C_STRING_H_INCLUDED
+#ifndef __C_ANSI_P_STRING_H_INCLUDED
+#define __C_ANSI_P_STRING_H_INCLUDED
 
 #include <string.h>
 #include <ctype.h>
@@ -486,4 +486,4 @@ int ReadGenericIntegerStringPortion(struct STRING_PORTION stringPortion,  GENERI
   int *nac_parsedLength);
 
 
-#endif // __C_ANSI_C_STRING_H_INCLUDED
+#endif // __C_ANSI_P_STRING_H_INCLUDED
