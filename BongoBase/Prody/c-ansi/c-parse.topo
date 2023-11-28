@@ -1,33 +1,32 @@
-c-ansi/c-parse.topo
-(c) Puduku - 2023
+// c-ansi/c-parse.topo
+// (c) Puduku - 2023
 
-Goal: Handle ordinary parsings without excessive headaches...
-Idea: give up distinction made a priori between syntactic and lexical analyses.
-Principle: Parsing = hierarchical and sequential assemblage of very elementary parsing steps
+// Goal: Handle ordinary parsings without excessive headaches...
+// Idea: give up distinction made a priori between syntactic and lexical analyses.
+// Principle: Parsing = mixed hierarchical and sequential assembly of elementary parsing steps...
 
-A parsing step is an elementary operation which extracts "head" lexeme of a sequence (of characters) 
-PARSE(S,L) : 
- - S:sequence:
-   + Passed: initial sequence
-   + Updated: remaining sequence after lexeme extraction
-- L:lexeme:
-  + Updated: lexeme extracted at the begin of the sequence
+// A parsing step is thus an elementary operation which extracts "head" lexeme from a sequence (of characters)
+// <PARSE-STEP>(S,L) : 
+// - S:sequence:
+//   + Passed: initial sequence
+//   + Updated: remaining sequence after lexeme extraction
+// - L:lexeme:
+//   + Updated: lexeme extracted at the begin of the sequence
 
-Notes:
- - The parsing step is, in essence, always a successful operation.
- - Borderline cases (such as empty lexeme with unchanged sequence; emptied sequence with lexeme corresponding
-   to the initial sequence) do not constitute, in themselves, cases of parsing "error".
- - Borderline cases, like ordinary cases, are possibly interpreted as errors: "syntax", "value" or other...
+// Notes:
+// - The parsing step is, in essence, always a "successful" operation.
+// - There is no reason a priori to consider "borderline" cases (such as empty lexeme with unchanged
+//   sequence; empty sequence with lexeme corresponding to the initial sequence) as "parsing errors".
 
-In a purely sequential assemblage of parsing steps, the sequence of characters passed in (and updated by) the 1st
-step is passed in the 2nd step.
-PARSE(S,L); PARSE(S,L);
+// Two "ways" to assemble parsing steps:
+// - In a purely sequential assemblage, the sequence of characters passed in (and updated by) the 1st step is
+//   passed in the 2nd step.
+//   <PARSE-STEP-A>(S,L); <PARSE-STEP-B>(S,L);
+// - In a hierarchical assemblage, the lexeme extracted in the 1st step becomes the initial sequence in the 2nd
+//   step.
+//   <PARSE-STEP-A>(S,LS); <PARSE-STEP-B>(LS,LL);
 
-In a hierarchical assemblage, the lexeme extracted in the 1st step becomes the initial sequence in the 2nd step.
-PARSE(S,LS); PARSE(LS,LL);
+// Typical parsing "operations" are made in two steps in sequence. For instance, to "read" a token:
+// - In 1st step, we "locate" the (begin of) token 
+// - In 2nd step, we pass (aka "read") the token,
 
-Typical parsing steps
-- seaching a (specific) token
-- passing offset (e.g token)
-- skipping blanks
-- passing a token
