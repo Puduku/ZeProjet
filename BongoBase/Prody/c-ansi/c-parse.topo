@@ -15,18 +15,18 @@
 
 // Notes:
 // - The parsing step is, in essence, always a "successful" operation.
-// - There is no reason a priori to consider "borderline" cases (such as empty lexeme with unchanged
-//   sequence; empty sequence with lexeme corresponding to the initial sequence) as "parsing errors".
+// - Hence, there is no reason a priori to consider "limit" cases (such as empty lexeme with unchanged
+//   sequence; empty sequence with lexeme corresponding to the initial sequence) as intrinsic "parsing errors".
 
-// Two "ways" to assemble parsing steps:
+// The two "ways" to assemble parsing steps are:
 // - In a purely sequential assemblage, the sequence of characters passed in (and updated by) the 1st step is
-//   passed in the 2nd step.
+//   passed in the 2nd step :
 //   <PARSE-STEP-A>(S,L); <PARSE-STEP-B>(S,L);
 // - In a hierarchical assemblage, the lexeme extracted in the 1st step becomes the initial sequence in the 2nd
-//   step.
+//   step :
 //   <PARSE-STEP-A>(S,LS); <PARSE-STEP-B>(LS,LL);
 
-// Typical parsing "operations" are made in two steps in sequence. For instance, to "read" a token:
+// Typical parsing "operations" are made of two elementary steps in a sequence. For instance, to "read" a token:
 // - In 1st step, we "locate" the (begin of) token 
-// - In 2nd step, we pass (aka "read") the token,
+// - In 2nd step, we pass (aka "read") the token...
 
