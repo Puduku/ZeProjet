@@ -1,4 +1,4 @@
-// c-ansi/c-string.c, version 1.93 (ANSI)
+// c-ansi/p-string.c, version 1.93 (ANSI)
 // (c) Atos-Euronext Belgium - 2001, 2002, 2003
 
 #include <stdio.h>
@@ -9,7 +9,7 @@
 #include <stdarg.h>
 
 #include "c-ansi/alloc.h"
-#include "c-ansi/c-string.h"
+#include "c-ansi/p-string.h"
 #include "c-ansi/diggy.h"
 #include "c-ansi/testy-diggy.h"
 
