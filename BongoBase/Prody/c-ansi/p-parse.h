@@ -1,8 +1,8 @@
 // c-ansi/p-parse.h, version 1.93 (ANSI)
 // (c) Puduku - 2023
 
-#ifndef __C_ANSI_C_PARSE_H_INCLUDED
-#define __C_ANSI_C_PARSE_H_INCLUDED
+#ifndef __C_ANSI_P_PARSE_H_INCLUDED
+#define __C_ANSI_P_PARSE_H_INCLUDED
 
 #include "c-ansi/p-string.h"
 
@@ -214,4 +214,4 @@
   m_PARSE_SEQUENCE(m_sequence,em_scanPtr, na_lexeme)\
 }
 
-#endif // __C_ANSI_C_PARSE_H_INCLUDED
+#endif // __C_ANSI_P_PARSE_H_INCLUDED
