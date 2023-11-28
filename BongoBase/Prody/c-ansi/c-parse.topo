@@ -3,7 +3,7 @@
 
 // Goal: Handle ordinary parsings without excessive headaches...
 // Idea: give up distinction made a priori between syntactic and lexical analyses.
-// Principle: Parsing = mixed hierarchical and sequential assembly of elementary parsing steps...
+// Principle: some parsing = mixed hierarchical and sequential assembly of elementary parsing steps...
 
 // A parsing step is thus an elementary operation which extracts "head" lexeme from a sequence (of characters)
 // <PARSE-STEP>(S,L) : 
@@ -29,4 +29,3 @@
 // Typical parsing "operations" are made of two elementary steps in a sequence. For instance, to "read" a token:
 // - In 1st step, we "locate" the (begin of) token 
 // - In 2nd step, we pass (aka "read") the token...
-
