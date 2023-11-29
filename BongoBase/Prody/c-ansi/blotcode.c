@@ -13,8 +13,8 @@
 #include "c-ansi/stderr.h"
 #include "c-ansi/c-stack.h"
 #include "c-ansi/blotcode.h"
-#include "c-ansi/c-string.h"
-#include "c-ansi/c-parse.h"
+#include "c-ansi/p-string.h"
+#include "c-ansi/p-parse.h"
 #include "c-ansi/g-string.h"
 #include "c-ansi/g-token.h"
 

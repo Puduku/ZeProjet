@@ -10,7 +10,7 @@
 
 #include "c-ansi/stderr.h"
 #include "c-ansi/types.h"
-#include "c-ansi/c-string.h"
+#include "c-ansi/p-string.h"
 #include "c-ansi/g-string.h"
 
 

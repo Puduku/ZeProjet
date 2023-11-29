@@ -6,7 +6,7 @@
 #define __C_POSIX_FETEPE_H_INCLUDED
 
 #include "c-ansi/types.h"
-#include "c-ansi/c-string.h"
+#include "c-ansi/p-string.h"
 #include "c-ansi/g-string.h"
 #include "c-posix/rw.h"
 #include "c-posix/sucker.h"

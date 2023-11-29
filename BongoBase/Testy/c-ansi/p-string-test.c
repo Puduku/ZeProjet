@@ -1,4 +1,4 @@
-#include "c-ansi/c-string.h"
+#include "c-ansi/p-string.h"
 #include "c-ansi/alloc.h"
 #include "diggy/diggy.h"
 #include "diggy/vars.h"

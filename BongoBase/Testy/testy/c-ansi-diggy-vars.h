@@ -9,7 +9,7 @@
 #include "diggy/vars-fields.h"
 
 #include "c-ansi/types.h"
-#include "c-ansi/c-string.h"
+#include "c-ansi/p-string.h"
 #include "c-ansi/green.h"
 #include "c-ansi/blotcode.h"
 
@@ -34,7 +34,7 @@
   m_DIGGY_VAR_VALUE(m_var,ComparisonImage)
 
 
-// "c-ansi/c-string.h" :
+// "c-ansi/p-string.h" :
 
 // "String portion" var display
 //

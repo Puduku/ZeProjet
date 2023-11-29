@@ -8,7 +8,7 @@
 #include "c-posix/sucker.h"
 
 #include "c-ansi/alloc.h"
-#include "c-ansi/c-string.h"
+#include "c-ansi/p-string.h"
 
 #include "diggy/diggy.h"
 #include "testy/getopts.h"

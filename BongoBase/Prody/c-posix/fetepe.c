@@ -13,7 +13,7 @@
 #include <ctype.h>
 
 #include "c-ansi/g-string.h"
-#include "c-ansi/c-string.h"
+#include "c-ansi/p-string.h"
 #include "c-ansi/eol.h"
 #include "c-ansi/alloc.h"
 
