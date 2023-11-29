@@ -293,10 +293,32 @@ typedef char *INDEX_REQUEST_AUTOMATIC_BUFFER ;
 #define m_INDEX_REQUEST_AUTOMATIC_BUFFER(m_indexRequestAutomaticBuffer) \
 char m_indexRequestAutomaticBuffer[p_indexRequestAutomaticBufferSize] ; 
 
-enum {
-  REQUEST_CRITERIA_OP__AND,
-  REQUEST_CRITERIA_OP__OR,
-} ;
+#define CRITERIA_OP_FLAG__AND    0x01
+#define CRITERIA_OP_FLAG__OR     0x02
+#define CRITERIA_OP_FLAG__OPEN   0x10 // Open bracket
+#define CRITERIA_OP_FLAG__CLOSE  0x20 // Close bracket
+
+#endif // __C_ANSI_GREEN_H_INCLUDED__ == 0
+
+#undef __FLINT_IMAGES_H_INCLUDED__
+#define __FLINT_IMAGES_H_INCLUDED__ __C_ANSI_GREEN_H_INCLUDED__
+#include "flint/images.h"
+
+// #REF enum-CRITERIA_OP
+m_DEFINE_ENUM_ALIAS_BEGIN(m_CriteriaOpFlagsImage)
+  // Index request operators (flags) 
+  m_ENUM_ALIAS_VAL(CRITERIA_OP_FLAGS__AND       ,CRITERIA_OP_FLAG__AND) 
+  m_ENUM_ALIAS_VAL(CRITERIA_OP_FLAGS__OR        ,CRITERIA_OP_FLAG__OR) 
+  m_ENUM_ALIAS_VAL(CRITERIA_OP_FLAGS__OPEN_AND  ,CRITERIA_OP_FLAG__OPEN | CRITERIA_OP_FLAG__AND) 
+  m_ENUM_ALIAS_VAL(CRITERIA_OP_FLAGS__OPEN_OR   ,CRITERIA_OP_FLAG__OPEN | CRITERIA_OP_FLAG__OR) 
+  m_ENUM_ALIAS_VAL(CRITERIA_OP_FLAGS__AND_CLOSE ,CRITERIA_OP_FLAG__AND  | CRITERIA_OP_FLAG__CLOSE) 
+  m_ENUM_ALIAS_VAL(CRITERIA_OP_FLAGS__OR_CLOSE  ,CRITERIA_OP_FLAG__OR   | CRITERIA_OP_FLAG__CLOSE) 
+  m_ENUM_ALIAS_VAL(CRITERIA_OP_FLAGS__CLOSE     ,CRITERIA_OP_FLAG__CLOSE) 
+m_DEFINE_ENUM_ALIAS_END()
+
+#if __C_ANSI_GREEN_H_INCLUDED__ == 0
+
+// name > 'a' open_and sex = 'F' or_close age > 20 
 
 // #REF GreenCollectionIndexRequest <greenItem> <keys> 
 // Construct a request for indexed fetch - see GreenCollectionIndexFetch()
@@ -314,7 +336,7 @@ enum {
 // - cfpr_keys1:  (1st criterion) search key(s) value(s) of item (regarding index) ;
 //   not significant without actual index seek flag (INDEX_SEEK_FLAGS__ANY)
 // - optional criteria (...) :
-//  + requestCriteraOp2 :
+//  + criteraOpFlags2 :
 //  + indexLabel2:
 //  + c_indexSeekFlags2:
 //  + cfpr_keys2: 
