@@ -216,7 +216,7 @@
 // representation is indeed, by far, the most effective one can imagine...
 // ...Unfortunately, there is a huge DOWNSIDE: this representation simply does NOT allow you to
 // handle ORDINARY PORTIONS of such strings... Now, - what bad luck! -, in "higher level"
-// applications, MOST strings processings precisely manipulate strings PORTIONS.
+// ordinary applications, MOST strings processings precisely manipulate strings PORTIONS.
 
 
 // Moralited:
