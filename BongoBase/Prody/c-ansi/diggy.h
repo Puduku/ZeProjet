@@ -29,10 +29,10 @@
 // When -DDIGGY compilation directive is absent:
 
 // m_DIGGY_BOLLARD() macro is just a place holder
-#define m_DIGGY_BOLLARD()
+#define m_DIGGY_BOLLARD() ;
 
 // m_DIGGY_BOLLARD_S() macro is just a place holder
-#define m_DIGGY_BOLLARD_S()
+#define m_DIGGY_BOLLARD_S() ;
 
 
 // m_DIGGY_RETURN() macro just returns value

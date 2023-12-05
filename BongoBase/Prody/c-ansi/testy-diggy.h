@@ -29,33 +29,33 @@
 
 // m_DIGGY_VAR_<XXX>() placeholders for "diggy/vars.h"
 
-#define m_DIGGY_VAR(m_var, m_printImageAction)
+#define m_DIGGY_VAR(m_var, m_printImageAction) ;
 
-#define m_DIGGY_VAR_GEN(m_var,m_specifier)
+#define m_DIGGY_VAR_GEN(m_var,m_specifier) ;
 
-#define m_DIGGY_VAR_D(m_var)
+#define m_DIGGY_VAR_D(m_var) ;
 
-#define m_DIGGY_VAR_P(m_var)
+#define m_DIGGY_VAR_P(m_var) ;
 
-#define m_DIGGY_VAR_STRING(m_var)
+#define m_DIGGY_VAR_STRING(m_var) ;
 
-#define m_DIGGY_VAR_DATA(m_var,length)
+#define m_DIGGY_VAR_DATA(m_var,length) ;
 
-#define m_DIGGY_VAR_VALUE(m_var, m_valueImageInlineFunction)
+#define m_DIGGY_VAR_VALUE(m_var, m_valueImageInlineFunction) ;
 
 // m_DIGGY_VAR_<XXX>() placeholders for "testy/c-ansi-diggy-vars.h" 
 
-#define m_DIGGY_VAR_ANSWER(m_var)
+#define m_DIGGY_VAR_ANSWER(m_var) ;
 
-#define m_DIGGY_VAR_COMPARISON(m_var)
+#define m_DIGGY_VAR_COMPARISON(m_var) ;
 
-#define m_DIGGY_VAR_STRING_PORTION(m_var)
+#define m_DIGGY_VAR_STRING_PORTION(m_var) ;
 
-#define m_DIGGY_VAR_INDEX_SEEK_FLAGS(m_var)
+#define m_DIGGY_VAR_INDEX_SEEK_FLAGS(m_var) ;
 
-#define m_DIGGY_VAR_INDEX_FETCH_FLAGS(m_var)
+#define m_DIGGY_VAR_INDEX_FETCH_FLAGS(m_var) ;
 
-#define m_DIGGY_VAR_BLOTINST(m_var)
+#define m_DIGGY_VAR_BLOTINST(m_var) ;
 
 #endif
 

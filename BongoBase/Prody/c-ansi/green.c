@@ -692,6 +692,30 @@ struct INDEX_ITERATOR {
 // Ret:
 // - RETURNED: Ok
 // - -1: anomaly is raised
+
+// Returned:
+// - >=0: "equation" between :"A" and "B" with that key component... 
+//   + ANSWER__YES : "A" item and "B" key(s) are similar 
+//   + ANSWER__NO : "A" item and "B" key(s) are NOT similar 
+// - -1: unexpected problem; anomaly is raised
+int EntryEquateKeys(int indexLabel, int aEntry, unsigned int indexSeekFlags, void *cpr_bKeys) {
+  int answer = ANSWER__NO; // a priori 
+      switch (indexSeekFlags) {
+      case INDEX_SEEK_FLAGS__ANY: 
+      break; case INDEX_SEEK_FLAGS__EQUAL:
+        
+      break; case INDEX_SEEK_FLAGS__LESS:
+      break; case INDEX_SEEK_FLAGS__LESS_EQUAL:
+      break; case INDEX_SEEK_FLAGS__GREATER: 
+      break; case INDEX_SEEK_FLAGS__GREATER_EQUAL:
+      break; case INDEX_SEEK_FLAGS__NOT_EQUAL:
+      break; case INDEX_SEEK_FLAGS__LIKE:
+      break; default: 
+        m_RAISE(ANOMALY__VALUE__FMT_D,indexSeekFlags)
+      } // switch
+  return answer; 
+} // EntryEquateKeys
+
 static int GreenIndexesSeek(struct GREEN_INDEXES* a_indexes, struct INDEX_ITERATOR *a_indexIterator,
   int *nan_entry) {
   m_DIGGY_BOLLARD_S()
@@ -699,13 +723,25 @@ static int GreenIndexesSeek(struct GREEN_INDEXES* a_indexes, struct INDEX_ITERAT
   struct GREEN_INDEX *a_index = a_indexes->vnhs_indexes +
     a_indexIterator->selections[0].indexLabel;
   
-  m_ASSERT(a_indexIterator->selectionsNumber5 == 1)
-  m_TRACK_IF(GreenIndexSeek(a_index, a_indexes->entriesCompareFunction,
-    a_indexes->r_entriesCompareHandle, a_indexIterator->selections[0].indexLabel,
-    a_indexIterator->b_descending, a_indexIterator->selections[0].indexSeekFlags,
-    a_indexIterator->selections[0].cfpr_keys, &a_indexIterator->indexSequence,
-    nan_entry) != RETURNED) 
-    if (nan_entry != NULL) m_DIGGY_VAR_D(*nan_entry)
+  do {
+    m_TRACK_IF(GreenIndexSeek(a_index, a_indexes->entriesCompareFunction,
+      a_indexes->r_entriesCompareHandle, a_indexIterator->selections[0].indexLabel,
+      a_indexIterator->b_descending, a_indexIterator->selections[0].indexSeekFlags,
+      a_indexIterator->selections[0].cfpr_keys, &a_indexIterator->indexSequence,
+      nan_entry) != RETURNED) 
+    if (nan_entry != NULL && *nan_entry >= 0) {
+      int i = 1;
+      for (; i < a_indexIterator->selectionsNumber5; i++) {
+        int answer = EntryEquateKeys(a_indexIterator->selections[i].indexLabel,*nan_entry,
+          a_indexIterator->selections[i].indexSeekFlags,
+          a_indexIterator->selections[i].cfpr_keys);
+        if (answer == ANSWER__NO) break; 
+        else if (answer != ANSWER__YES) m_TRACK()
+      } // for
+      if (i < a_indexIterator->selectionsNumber5) continue; // Entry does not match extra criteria
+    } // if
+  } while (b_FALSE0) ;
+if (nan_entry != NULL) m_DIGGY_VAR_D(*nan_entry)
   m_DIGGY_RETURN(RETURNED)
 } // GreenIndexesSeek
 
