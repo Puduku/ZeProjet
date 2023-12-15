@@ -58,12 +58,12 @@ struct GREEN_INDEX {
   (az_index)->count = 0;\
 }
 
-// Index's virtual function to compare to items of the index.
+// Index's virtual function to compare two items.
 //
 // Passed:
 // - r_handle:
 // - indexLabel:
-// - int keyRank: indicate the key commponent to use for comparison
+// - keyRank: indicate the key commponent to use for comparison
 // - aEntry: entry for "A"
 // - n_bEntry: >= 0 => entry for "B"
 // - cpr_bKeys: raw key(s) for "B" when entry for "B" not provided
@@ -77,12 +77,28 @@ struct GREEN_INDEX {
 typedef int (*ENTRIES_COMPARE_FUNCTION) (void *r_handle, int indexLabel, int keyRank,
   int aEntry, int n_bEntry, void *cpr_bKeys) ;
 
+// Index's virtual function to adequate an item with a key.
+//
+// Passed:
+// - r_handle:
+// - indexLabel:
+// - keyRank: indicate the key commponent to use for comparison
+// - aEntry: entry for "A"
+// - pr_bKeys: raw key(s) for "B" 
+//
+// Ret: adequation between "A" (entry) and "B" (key) ?
+// - ANSWER__YES: 
+// - ANSWER__NO: 
+// - -1: unexpected problem; anomaly is raised
+typedef int (*ENTRIES_EQUATE_FUNCTION) (void *r_handle, int indexLabel, int keyRank,
+  int aEntry, void *pr_bKeys) ;
+
 // Compare two items of the index
 //
 // Passed:
 // - a_index:
 // - entriesCompareFunction:
-// - r_entriesCompareHandle:
+// - r_entriesFunctionsHandle:
 // - aIndexEntry: entry in index for "A"
 // - n_bEntry: >= 0 => entry in index for "B"
 // - cpr_bKeys: raw key(s) for "B" when entry for "B" not provided
@@ -93,18 +109,66 @@ typedef int (*ENTRIES_COMPARE_FUNCTION) (void *r_handle, int indexLabel, int key
 //   + EQUAL_TO__COMPARISON : "A" and "B" are "identical"
 //   + GREATER_THAN__COMPARISON : "A" 'greater than' "B" 
 #define m_GREEN_INDEX_COMPARE(/*struct GREEN_INDEX* */a_index,\
-  /*ENTRIES_COMPARE_FUNCTION*/entriesCompareFunction,\
-  /*void* */r_entriesCompareHandle,  /*int*/indexLabel,  /*int*/aIndexEntry,  /*int*/n_bEntry,\
-  /*void* */cpr_bKeys,  /*int*/m_comparison) {\
+  /*ENTRIES_COMPARE_FUNCTION*/entriesCompareFunction, /*void* */r_entriesFunctionsHandle,\
+  /*int*/indexLabel, /*int*/aIndexEntry, /*int*/n_bEntry, /*void* */cpr_bKeys,\
+  /*int*/m_comparison) {\
   int em_aEntry = a_index->hsc_array[aIndexEntry];\
   int em_j = 0;\
   for ( ; em_j < (a_index)->keysNumber ; em_j++) {\
-    m_TRACK_IF((m_comparison = entriesCompareFunction(r_entriesCompareHandle, indexLabel,\
+    m_TRACK_IF((m_comparison = entriesCompareFunction(r_entriesFunctionsHandle, indexLabel,\
       em_j, em_aEntry, n_bEntry,cpr_bKeys)) < 0)\
     if (m_comparison != EQUAL_TO__COMPARISON) break ;\
   }\
   if (m_comparison == EQUAL_TO__COMPARISON && n_bEntry != -1)  m_comparison = \
     DIFFERENCE_2_COMPARISON(em_aEntry - n_bEntry) ;\
+}
+
+// Equate entry with key(s) using comparison function.
+//
+// Passed:
+// - a_index:
+// - entriesCompareFunction:
+// - r_entriesFunctionsHandle:
+// - aEntry: entry for "A"
+// - pr_bKeys: raw key(s) for "B" 
+//
+// Changed:
+// - *m_comparison: "A - B" comparison between entry "A" and passed key "B"
+//   + LESS_THAN__COMPARISON : "A" 'less than' "B" 
+//   + EQUAL_TO__COMPARISON : "A" and "B" are "identical"
+//   + GREATER_THAN__COMPARISON : "A" 'greater than' "B" 
+#define m_GREEN_INDEX_ENTRY_COMPARE(/*struct GREEN_INDEX* */a_index,\
+  /*ENTRIES_COMPARE_FUNCTION*/entriesCompareFunction, /*void* */r_entriesFunctionsHandle,\
+  /*int*/indexLabel, /*int*/aEntry, /*void* */pr_bKeys, /*int*/m_comparison) {\
+  int em_j = 0;\
+  for ( ; em_j < (a_index)->keysNumber ; em_j++) {\
+    m_TRACK_IF((m_comparison = entriesCompareFunction(r_entriesFunctionsHandle, indexLabel,\
+      em_j, aEntry, -1,pr_bKeys)) < 0)\
+    if (m_comparison != EQUAL_TO__COMPARISON) break ;\
+  }\
+}
+
+// Equate entry with key(s) using actual adequation function.
+//
+// Passed:
+// - a_index:
+// - entriesEquateFunction:
+// - r_entriesFunctionsHandle:
+// - aEntry: entry for "A"
+// - pr_bKeys: raw key(s) for "B" 
+//
+// Changed:
+// - *m_answer: adequation between "A" (entry) and "B" (key) (True or False)
+#define m_GREEN_INDEX_REAL_EQUATE(/*struct GREEN_INDEX* */a_index,\
+  /*ENTRIES_EQUATE_FUNCTION*/entriesEquateFunction, /*void* */r_entriesFunctionsHandle,\
+  /*int*/indexLabel, /*int*/aEntry, /*void* */pr_bKeys, /*int*/m_answer) {\
+  int em_j = 0;\
+  m_answer = UNDEFINED;\
+  for ( ; em_j < (a_index)->keysNumber ; em_j++) {\
+    m_TRACK_IF((m_answer = entriesEquateFunction(r_entriesFunctionsHandle, indexLabel,\
+      em_j, aEntry, pr_bKeys)) < 0)\
+    if (m_answer != ANSWER__YES) break ;\
+  }\
 }
 
 
@@ -126,7 +190,7 @@ struct INDEX_ENTRIES {
 // Passed:
 // - a_index: index to use
 // - entriesCompareFunction: index's (custom) comparison function
-// - r_entriesCompareHandle: (custom) comparison function's private stuff
+// - r_entriesFunctionsHandle: (custom) comparison function's private stuff
 // - indexLabel:
 // - n_bEntry: >= 0 => entry in index for "B"
 // - cpr_bKeys: raw key(s) for "B" when entry for "B" not provided
@@ -144,7 +208,7 @@ struct INDEX_ENTRIES {
 // - RETURNED
 // - -1: anomaly is raised
 static int GreenIndexBSearch(struct GREEN_INDEX *a_index,
-  ENTRIES_COMPARE_FUNCTION entriesCompareFunction, void *r_entriesCompareHandle, int indexLabel,
+  ENTRIES_COMPARE_FUNCTION entriesCompareFunction, void *r_entriesFunctionsHandle, int indexLabel,
   int n_bEntry, void *cpr_bKeys, int *an_indexEntry, int *a_top,
   struct INDEX_ENTRIES *nac_indexEntries) {
   m_DIGGY_BOLLARD_S()
@@ -158,7 +222,7 @@ static int GreenIndexBSearch(struct GREEN_INDEX *a_index,
   while (top - bottom > 1) {
     i =  (top + bottom) >> 1 ;
 
-    m_GREEN_INDEX_COMPARE(a_index, entriesCompareFunction,r_entriesCompareHandle, indexLabel,
+    m_GREEN_INDEX_COMPARE(a_index, entriesCompareFunction,r_entriesFunctionsHandle, indexLabel,
       i,n_bEntry,cpr_bKeys, comparison)
     switch (comparison) {
     case GREATER_THAN__COMPARISON:
@@ -175,7 +239,7 @@ static int GreenIndexBSearch(struct GREEN_INDEX *a_index,
   *a_top = top;
   if (*an_indexEntry >= 0 && nac_indexEntries != NULL) {
     for (i = *an_indexEntry-1 ; i >= 0 ; i--) {
-      m_GREEN_INDEX_COMPARE(a_index, entriesCompareFunction,r_entriesCompareHandle, indexLabel,
+      m_GREEN_INDEX_COMPARE(a_index, entriesCompareFunction,r_entriesFunctionsHandle, indexLabel,
         i,-1,cpr_bKeys, comparison)
       if (comparison != EQUAL_TO__COMPARISON) {
         m_ASSERT(comparison == LESS_THAN__COMPARISON) 
@@ -184,7 +248,7 @@ static int GreenIndexBSearch(struct GREEN_INDEX *a_index,
     } // for
     nac_indexEntries->first = i+1;
     for (i = *an_indexEntry+1 ; i < a_index->count ; i++) {
-      m_GREEN_INDEX_COMPARE(a_index, entriesCompareFunction,r_entriesCompareHandle, indexLabel,
+      m_GREEN_INDEX_COMPARE(a_index, entriesCompareFunction,r_entriesFunctionsHandle, indexLabel,
         i,-1,cpr_bKeys, comparison)
       if (comparison != EQUAL_TO__COMPARISON) {
         m_ASSERT(comparison == GREATER_THAN__COMPARISON) 
@@ -294,7 +358,7 @@ static inline int m_GreenIndexCurrent(struct GREEN_INDEX* a_index,
 // Passed:
 // - a_index:
 // - entriesCompareFunction:
-// - r_entriesCompareHandle:
+// - r_entriesFunctionsHandle:
 // - indexLabel:
 // - b_descending: False:Ascending ; True:DEscending 
 // - c_indexSeekFlags: seek flags for sequence request ; only significant with "new sequence" case;
@@ -316,7 +380,7 @@ static inline int m_GreenIndexCurrent(struct GREEN_INDEX* a_index,
 // - RETURNED: Ok
 // - -1: anomaly is raised
 static int GreenIndexSeek(struct GREEN_INDEX* a_index,
-  ENTRIES_COMPARE_FUNCTION entriesCompareFunction, void *r_entriesCompareHandle, int indexLabel,
+  ENTRIES_COMPARE_FUNCTION entriesCompareFunction, void *r_entriesFunctionsHandle, int indexLabel,
   char b_descending, unsigned int c_indexSeekFlags, void *ccr_keys,
   struct INDEX_SEQUENCE *a_indexSequence, int *nan_entry) {
   m_DIGGY_BOLLARD_S()
@@ -384,7 +448,7 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(c_indexSeekFlags)
         int top = UNDEFINED;
         int n_indexEntry = UNDEFINED;
         struct INDEX_ENTRIES c_indexEntries; // UNDEFINED
-        m_TRACK_IF(GreenIndexBSearch(a_index, entriesCompareFunction, r_entriesCompareHandle,
+        m_TRACK_IF(GreenIndexBSearch(a_index, entriesCompareFunction, r_entriesFunctionsHandle,
           indexLabel, -1,ccr_keys, &n_indexEntry,&top,&c_indexEntries) != RETURNED);
         switch (c_indexSeekFlags) {
         case INDEX_SEEK_FLAGS__EQUAL:
@@ -455,7 +519,7 @@ m_DIGGY_VAR_D(a_indexSequence->indexEntriesNumber5)
 // Passed:
 // -a_index:
 // -entriesCompareFunction:
-// -r_entriesCompareHandle:
+// -r_entriesFunctionsHandle:
 // -indexLabel:
 //
 // Ret:
@@ -463,7 +527,7 @@ m_DIGGY_VAR_D(a_indexSequence->indexEntriesNumber5)
 // - COMPLETED__BUT: index is corrupted
 // - -1: anomaly is raised
 static int GreenIndexVerify(struct GREEN_INDEX *a_index,
-  ENTRIES_COMPARE_FUNCTION entriesCompareFunction, void *r_entriesCompareHandle, int indexLabel) {
+  ENTRIES_COMPARE_FUNCTION entriesCompareFunction, void *r_entriesFunctionsHandle, int indexLabel) {
   m_DIGGY_BOLLARD_S()
   int comparison = UNDEFINED;
 
@@ -479,7 +543,7 @@ static int GreenIndexVerify(struct GREEN_INDEX *a_index,
 
   int j = 1;
   for (; j < a_index->count; j++) {
-    m_GREEN_INDEX_COMPARE(a_index, entriesCompareFunction,r_entriesCompareHandle, indexLabel,j,
+    m_GREEN_INDEX_COMPARE(a_index, entriesCompareFunction,r_entriesFunctionsHandle, indexLabel,j,
       a_index->hsc_array[j-1],(void *)(GENERIC_INTEGER) UNDEFINED, comparison)
     if (comparison != GREATER_THAN__COMPARISON) {
       m_ASSERT(comparison != EQUAL_TO__COMPARISON)
@@ -526,7 +590,8 @@ static int GreenIndexVerifyEntry(struct GREEN_INDEX *a_index, int entry, int exp
 
 struct GREEN_INDEXES {
   ENTRIES_COMPARE_FUNCTION entriesCompareFunction;
-  void *r_entriesCompareHandle;
+  ENTRIES_EQUATE_FUNCTION entriesEquateFunction;
+  void *r_entriesFunctionsHandle;
   int indexesNumber ; // when ENABLED ; >= 0
   struct GREEN_INDEX *vnhs_indexes ; // NULL when indexesNumber == 0
 };
@@ -534,13 +599,15 @@ struct GREEN_INDEXES {
 
 // Passed:
 // - mz_indexes:
-// - entriesCompareFunctionParam:
-// - r_entriesCompareHandleParam:
+// - m_entriesCompareFunction:
+// - mr_entriesFunctionsHandle:
 #define m_GREEN_INDEXES_INIT(/*struct GREEN_INDEXES*/mz_indexes,\
-  /*ENTRIES_COMPARE_FUNCTION*/entriesCompareFunctionParam,\
-  /*void */r_entriesCompareHandleParam) {\
-  (mz_indexes).entriesCompareFunction = entriesCompareFunctionParam;\
-  (mz_indexes).r_entriesCompareHandle = r_entriesCompareHandleParam;\
+  /*ENTRIES_COMPARE_FUNCTION*/m_entriesCompareFunction,\
+  /*ENTRIES_EQUATE_FUNCTION*/m_entriesEquateFunction,\
+  /*void */mr_entriesFunctionsHandle) {\
+  (mz_indexes).entriesCompareFunction = m_entriesCompareFunction;\
+  (mz_indexes).entriesEquateFunction = m_entriesEquateFunction;\
+  (mz_indexes).r_entriesFunctionsHandle = mr_entriesFunctionsHandle;\
   (mz_indexes).indexesNumber = 0;\
   (mz_indexes).vnhs_indexes = NULL;\
 }
@@ -604,7 +671,7 @@ static int GreenIndexesResize (struct GREEN_INDEXES *a_indexes, int newItemsPhys
   struct GREEN_INDEX *s_index = (m_indexes).vnhs_indexes;\
   for ( ; em_i < (m_indexes).indexesNumber ; em_i ++, s_index++) {\
     m_TRACK_IF(GreenIndexBSearch(s_index, (m_indexes).entriesCompareFunction,\
-     (m_indexes).r_entriesCompareHandle,em_i,entry,(void *)UNDEFINED,&emn_indexEntry,&top,NULL) !=\
+     (m_indexes).r_entriesFunctionsHandle,em_i,entry,(void *)UNDEFINED,&emn_indexEntry,&top,NULL) !=\
      RETURNED)\
     if (emn_indexEntry >= 0) {\
       m_GREEN_INDEX_REMOVE(s_index,emn_indexEntry)\
@@ -624,7 +691,7 @@ static int GreenIndexesResize (struct GREEN_INDEXES *a_indexes, int newItemsPhys
   struct GREEN_INDEX *s_index = (m_indexes).vnhs_indexes;\
   for ( ; em_i < (m_indexes).indexesNumber ; em_i ++, s_index++) {\
     m_TRACK_IF(GreenIndexBSearch(s_index,\
-      (m_indexes).entriesCompareFunction,(m_indexes).r_entriesCompareHandle, em_i, entry,\
+      (m_indexes).entriesCompareFunction,(m_indexes).r_entriesFunctionsHandle, em_i, entry,\
       (void*)UNDEFINED, &emn_indexEntry, &top, NULL) != RETURNED)\
     if (emn_indexEntry == -1) {\
       m_GREEN_INDEX_ADD(s_index,top,entry)\
@@ -693,29 +760,71 @@ struct INDEX_ITERATOR {
 // - RETURNED: Ok
 // - -1: anomaly is raised
 
+// Passed:
+// - indexLabel
+// - aEntry:
+// - indexSeekFlags:
+// - pr_bKeys:
+//
 // Returned:
 // - >=0: "equation" between :"A" and "B" with that key component... 
 //   + ANSWER__YES : "A" item and "B" key(s) are similar 
 //   + ANSWER__NO : "A" item and "B" key(s) are NOT similar 
 // - -1: unexpected problem; anomaly is raised
-int EntryEquateKeys(int indexLabel, int aEntry, unsigned int indexSeekFlags, void *cpr_bKeys) {
-  int answer = ANSWER__NO; // a priori 
-      switch (indexSeekFlags) {
-      case INDEX_SEEK_FLAGS__ANY: 
-      break; case INDEX_SEEK_FLAGS__EQUAL:
-        
-      break; case INDEX_SEEK_FLAGS__LESS:
-      break; case INDEX_SEEK_FLAGS__LESS_EQUAL:
-      break; case INDEX_SEEK_FLAGS__GREATER: 
-      break; case INDEX_SEEK_FLAGS__GREATER_EQUAL:
-      break; case INDEX_SEEK_FLAGS__NOT_EQUAL:
-      break; case INDEX_SEEK_FLAGS__LIKE:
-      break; default: 
-        m_RAISE(ANOMALY__VALUE__FMT_D,indexSeekFlags)
-      } // switch
-  return answer; 
-} // EntryEquateKeys
+static int GreenIndexesEntryEquateKeys(struct GREEN_INDEXES* a_indexes, int indexLabel, int aEntry,
+  unsigned int indexSeekFlags, void *pr_bKeys) {
+  if (indexSeekFlags == INDEX_SEEK_FLAGS__ANY) return ANSWER__YES;
 
+  int answer = ANSWER__NO; // a priori
+  if (indexSeekFlags != INDEX_SEEK_FLAGS__LIKE) {
+    int comparison = UNDEFINED;
+    m_GREEN_INDEX_ENTRY_COMPARE(a_indexes->vnhs_indexes+indexLabel,
+      a_indexes->entriesCompareFunction,a_indexes->r_entriesFunctionsHandle, indexLabel, aEntry,
+      pr_bKeys,comparison)
+    switch (indexSeekFlags) {
+    case INDEX_SEEK_FLAGS__EQUAL:
+      if (comparison == EQUAL_TO__COMPARISON) answer = ANSWER__YES;
+    break; case INDEX_SEEK_FLAGS__LESS:
+      if (comparison == LESS_THAN__COMPARISON) answer = ANSWER__YES;
+    break; case INDEX_SEEK_FLAGS__LESS_EQUAL:
+      if (comparison == LESS_THAN__COMPARISON || comparison == EQUAL_TO__COMPARISON) answer =
+        ANSWER__YES;
+    break; case INDEX_SEEK_FLAGS__GREATER: 
+      if (comparison == GREATER_THAN__COMPARISON) answer = ANSWER__YES;
+    break; case INDEX_SEEK_FLAGS__GREATER_EQUAL:
+      if (comparison == GREATER_THAN__COMPARISON || comparison == EQUAL_TO__COMPARISON) answer =
+        ANSWER__YES;
+    break; case INDEX_SEEK_FLAGS__NOT_EQUAL:
+      if (comparison != EQUAL_TO__COMPARISON) answer = ANSWER__YES;
+    break; default: 
+      m_RAISE(ANOMALY__VALUE__FMT_D,indexSeekFlags)
+    } // switch
+  } else { // INDEX_SEEK_FLAGS__LIKE
+    m_GREEN_INDEX_REAL_EQUATE(a_indexes->vnhs_indexes+indexLabel,
+      a_indexes->entriesEquateFunction,a_indexes->r_entriesFunctionsHandle, indexLabel, aEntry,
+      pr_bKeys, answer)
+  } // if 
+  return answer; 
+} // GreenIndexesEntryEquateKeys
+
+// Update index iterator sequence.
+//
+// Passed:
+// - a_indexes: 
+// - a_indexIterator-> : current index iterator
+// - nan_entry: 
+//   + == NULL: "new sequence" (aka "soft reset") case
+//   + != NULL: "next item" case
+//
+// Changed:
+// - a_indexIterator-> : new state of index iterator 
+// - *nan_entry: (only significant whith "next item" case) item entry to retrieve : 
+//   + -1 special value : not found, that is "disabled" or "no more"
+//   + >= 0: corresponding entry
+//
+// Ret:
+// - RETURNED: Ok
+// - -1: anomaly is raised
 static int GreenIndexesSeek(struct GREEN_INDEXES* a_indexes, struct INDEX_ITERATOR *a_indexIterator,
   int *nan_entry) {
   m_DIGGY_BOLLARD_S()
@@ -725,17 +834,18 @@ static int GreenIndexesSeek(struct GREEN_INDEXES* a_indexes, struct INDEX_ITERAT
   
   do {
     m_TRACK_IF(GreenIndexSeek(a_index, a_indexes->entriesCompareFunction,
-      a_indexes->r_entriesCompareHandle, a_indexIterator->selections[0].indexLabel,
+      a_indexes->r_entriesFunctionsHandle, a_indexIterator->selections[0].indexLabel,
       a_indexIterator->b_descending, a_indexIterator->selections[0].indexSeekFlags,
       a_indexIterator->selections[0].cfpr_keys, &a_indexIterator->indexSequence,
       nan_entry) != RETURNED) 
     if (nan_entry != NULL && *nan_entry >= 0) {
       int i = 1;
       for (; i < a_indexIterator->selectionsNumber5; i++) {
-        int answer = EntryEquateKeys(a_indexIterator->selections[i].indexLabel,*nan_entry,
+        int answer = GreenIndexesEntryEquateKeys(a_indexes,
+          a_indexIterator->selections[i].indexLabel,*nan_entry,
           a_indexIterator->selections[i].indexSeekFlags,
           a_indexIterator->selections[i].cfpr_keys);
-        if (answer == ANSWER__NO) break; 
+        if (answer == ANSWER__NO) break; // Entry does not match that extra criterium 
         else if (answer != ANSWER__YES) m_TRACK()
       } // for
       if (i < a_indexIterator->selectionsNumber5) continue; // Entry does not match extra criteria
@@ -796,7 +906,7 @@ static int GreenIndexesVerify (struct GREEN_INDEXES *a_indexes) {
 
   for ( ; i < a_indexes->indexesNumber ; i++, s_index++) {
     switch (GreenIndexVerify(s_index, a_indexes->entriesCompareFunction,
-      a_indexes->r_entriesCompareHandle, i)) {
+      a_indexes->r_entriesFunctionsHandle, i)) {
     case COMPLETED__OK:
     break; case COMPLETED__BUT:
       completed = COMPLETED__BUT;
@@ -1090,7 +1200,7 @@ static int  NotEnabledEquate(void *cpr_handle,  char b_frozen,
   /*int*/entry)  r_GET_GREEN_ITEM_STUFF((handle)->h_greenArray, (entry), (handle)->greenItemSize)
 
 
- // ENTRIES_COMPARE_FUNCTION
+// ENTRIES_COMPARE_FUNCTION
 static int GreenCollectionEntriesCompare (void *r_handle, int indexLabel, int keyRank, int aEntry,
   int n_bEntry, void *cpr_bKeys) {
   m_DIGGY_BOLLARD_S()
@@ -1106,6 +1216,21 @@ static int GreenCollectionEntriesCompare (void *r_handle, int indexLabel, int ke
 
   m_DIGGY_RETURN(comparison)
 } // GreenCollectionEntriesCompare
+
+// ENTRIES_EQUATE_FUNCTION
+static int GreenCollectionEntriesEquate (void *r_handle, int indexLabel, int keyRank, int aEntry,
+  void *pr_bKeys) {
+  m_DIGGY_BOLLARD_S()
+  GREEN_COLLECTION_HANDLE handle = (GREEN_COLLECTION_HANDLE) r_handle;
+
+  char *r_aGreenItemStuff = r_GREEN_COLLECTION_GET_GREEN_ITEM_STUFF(handle,aEntry);
+
+  int answer = handle->greenHandlerEquateFunction(handle->cr_greenHandlerHandle,
+    handle->b_frozen, indexLabel,keyRank, r_aGreenItemStuff, pr_bKeys);
+  m_TRACK_IF(answer < 0)
+
+  m_DIGGY_RETURN(answer)
+} // GreenCollectionEntriesEquate
 
 
 // Formal "status flagS"...
@@ -1178,7 +1303,8 @@ int GreenCollectionCreateInstance(GREEN_COLLECTION_HANDLE *azh_handle,  int expe
   m_CALLOC(handle->h_greenArray,handle->itemsPhysicalNumber,handle->greenItemSize)
   m_MALLOC_ARRAY(handle->hsc_flags, handle->itemsPhysicalNumber)
   handle->v_maxItemsCount = handle->i_itemsCount = 0 ;
-  m_GREEN_INDEXES_INIT(handle->indexes,GreenCollectionEntriesCompare,(void *) handle)
+  m_GREEN_INDEXES_INIT(handle->indexes,GreenCollectionEntriesCompare,GreenCollectionEntriesEquate,
+    (void *) handle)
   m_GAPS_STACK_INIT(handle->h_gaps,handle->itemsPhysicalNumber)
   m_INIT_INDEX_REQUEST(handle->internalIndexRequest,INDEX_LABEL0,ALL_FLAGS_OFF0,(void*)UNDEFINED)
 
