@@ -47,7 +47,7 @@ typedef int (*GREEN_HANDLER__DISENGAGE_FUNCTION) (void *r_handle, char *r_greenI
 
 #define INDEX_LABEL0 0
 
-// #REF GREEN_HANDLER__KEYS_COMPARE_FUNCTION <GreenItem> - Custom function definition...
+// #REF GREEN_HANDLER__COMPARE_FUNCTION <GreenItem> - Custom function definition...
 // Compare "A" and "B" keys values.
 // - "A" key(s) are extracted from "A" greem item. 
 // - "B" key(s) :
@@ -71,7 +71,7 @@ typedef int (*GREEN_HANDLER__DISENGAGE_FUNCTION) (void *r_handle, char *r_greenI
 //   + EQUAL_TO__COMPARISON : "A" and "B" are "identical"
 //   + GREATER_THAN__COMPARISON : "A" 'greater than' "B" 
 // - -1: unexpected problem; anomaly is raised
-typedef int (*GREEN_HANDLER__KEYS_COMPARE_FUNCTION) (void *cpr_handle,  char b_frozen,
+typedef int (*GREEN_HANDLER__COMPARE_FUNCTION) (void *cpr_handle,  char b_frozen,
   int indexLabel, int keyRank,  char *pr_aGreenItemStuff,  char *npr_bGreenItemStuff,
   void *cpr_bKeys) ;
 
@@ -123,7 +123,7 @@ typedef struct GREEN_COLLECTION *GREEN_COLLECTION_HANDLE;
 //   + NULL special value: no need to disengage <green item>s (=> "ULTRA-green" type)
 //   + non NULL pointer: ad hoc function to release resources (called for each <green item>) before
 //     destroying <green collection>)
-// - n_greenHandlerKeysCompareFunction:
+// - n_greenHandlerCompareFunction:
 //   + NULL special value: indexes not used in the <green collection>
 //   + non NULL pointer: allows to use indexes in the <green collection>
 // - n_greenHandlerEquateFunction:
@@ -141,7 +141,7 @@ typedef struct GREEN_COLLECTION *GREEN_COLLECTION_HANDLE;
 // - -1: unexpected problem ; anomaly is raised
 int GreenCollectionCreateInstance(GREEN_COLLECTION_HANDLE *azh_handle,  int expectedItemsNumber,
   int greenItemSize,  GREEN_HANDLER__DISENGAGE_FUNCTION n_greenHandlerDisengageFunction,
-  GREEN_HANDLER__KEYS_COMPARE_FUNCTION n_greenHandlerKeysCompareFunction,
+  GREEN_HANDLER__COMPARE_FUNCTION n_greenHandlerCompareFunction,
   GREEN_HANDLER__EQUATE_FUNCTION n_greenHandlerEquateFunction, void *cfr_greenHandlerHandle) ;
 
 
