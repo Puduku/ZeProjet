@@ -110,14 +110,14 @@ struct INDEX_ENTRIES {
 // - a_index: index to use
 // - n_bEntry: >= 0 => entry in index for "B"
 // - cpr_bKeys: raw key(s) for "B" when entry for "B" not provided
-// - nac_indexEntries: NULL if not used 
+// - cac_indexEntries: only significant if entry in index is specified for "B". 
 //
 // Modified:
 // - *an_indexEntry: >=0 => found entry in index
 //   -1 => "B" is not referenced in index ("Not found")
 // - *a_top: "best" top index entry established so far ; when "Not found", corresponds to the
 //   closest entry in the index that is on top of "B"
-// - *nac_indexEntries: (when used) only significant if found entry in index; delimit ALL "B"
+// - *cac_indexEntries: (when used) only significant if found entry in index; delimit ALL "B"
 //   entries 
 //
 // Ret:
@@ -125,7 +125,7 @@ struct INDEX_ENTRIES {
 // - -1: anomaly is raised
 static int GreenIndexBSearch(struct GREEN_INDEX *a_index,
   int n_bEntry, void *cpr_bKeys, int *an_indexEntry, int *a_top,
-  struct INDEX_ENTRIES *nac_indexEntries) {
+  struct INDEX_ENTRIES *cac_indexEntries) {
   m_DIGGY_BOLLARD_S()
   int comparison = UNDEFINED;
   int i = UNDEFINED;
@@ -146,12 +146,12 @@ static int GreenIndexBSearch(struct GREEN_INDEX *a_index,
     break; case EQUAL_TO__COMPARISON:
       *an_indexEntry = i ;
     break; default:
-      m_RAISE(ANOMALY__VALUE__FMT_D,comparison)
+      m_RAISE(ANOMALY__VALUE__D,comparison)
     } // switch
     if (*an_indexEntry >= 0) break;
   } // while
   *a_top = top;
-  if (*an_indexEntry >= 0 && nac_indexEntries != NULL) {
+  if (*an_indexEntry >= 0 && n_bEntry < 0) {
     for (i = *an_indexEntry-1 ; i >= 0 ; i--) {
       m_GREEN_INDEX_COMPARE(a_index, i,-1,cpr_bKeys, comparison)
       if (comparison != EQUAL_TO__COMPARISON) {
@@ -159,7 +159,7 @@ static int GreenIndexBSearch(struct GREEN_INDEX *a_index,
         break; 
       } // if
     } // for
-    nac_indexEntries->first = i+1;
+    cac_indexEntries->first = i+1;
     for (i = *an_indexEntry+1 ; i < a_index->count ; i++) {
       m_GREEN_INDEX_COMPARE(a_index, i,-1,cpr_bKeys, comparison)
       if (comparison != EQUAL_TO__COMPARISON) {
@@ -167,7 +167,7 @@ static int GreenIndexBSearch(struct GREEN_INDEX *a_index,
         break; 
       } // if
     } // for
-    nac_indexEntries->last = i-1;
+    cac_indexEntries->last = i-1;
   } //if     
   m_DIGGY_RETURN(RETURNED)
 } // GreenIndexBSearch
@@ -224,9 +224,9 @@ static int GreenIndexBSearch(struct GREEN_INDEX *a_index,
 //
 struct INDEX_SEQUENCE {
   // index entries "blocks":
-  int indexEntriesNumber5; // between 0 and 5 : 0 => 'disabled' ; >0 -> 'enabled' 
-  struct INDEX_ENTRIES indexEntries5[5]; 
-  // Fields below are only significant if 'enabled' (indexEntriesNumber5 > 0) :
+  int indexEntriesNumber2; // between 0 and 2 : 0 => 'disabled' ; >0 -> 'enabled' 
+  struct INDEX_ENTRIES indexEntries2[2]; 
+  // Fields below are only significant if 'enabled' (indexEntriesNumber2 > 0) :
   int cv_firstIndexEntry; // first index entry for ALL "blocks"  
   int cv_lastIndexEntry; // last index entry for ALL "blocks"  
   int ci_indexEntryCursor; // "current" index entry: < cv_firstIndexEntry => Ascending:"soft reset",
@@ -236,7 +236,7 @@ struct INDEX_SEQUENCE {
 } ;
 
 // Disable index sequence (disambiguation purpose...)
-#define m_DISABLE_INDEX_SEQUENCE(m_indexSequence)  (m_indexSequence).indexEntriesNumber5 = 0;
+#define m_DISABLE_INDEX_SEQUENCE(m_indexSequence)  (m_indexSequence).indexEntriesNumber2 = 0;
 
 // Get current entry in index sequence.
 //
@@ -255,8 +255,8 @@ struct INDEX_SEQUENCE {
 static inline int m_GreenIndexCurrent(struct GREEN_INDEX* a_index,
   struct INDEX_SEQUENCE *a_indexSequence, int *an_entry) {
 
-  if (a_indexSequence->indexEntriesNumber5 > 0 && a_indexSequence->ci_indexEntryCursor >= 
-    a_indexSequence->indexEntries5[0].first && a_indexSequence->ci_indexEntryCursor <=
+  if (a_indexSequence->indexEntriesNumber2 > 0 && a_indexSequence->ci_indexEntryCursor >= 
+    a_indexSequence->indexEntries2[0].first && a_indexSequence->ci_indexEntryCursor <=
     a_indexSequence->cv_lastIndexEntry)
     *an_entry = a_index->hsc_array[a_indexSequence->ci_indexEntryCursor];
   else *an_entry = -1; // No current item 
@@ -294,42 +294,42 @@ static int GreenIndexSeek(struct GREEN_INDEX* a_index, char b_descending,
   m_DIGGY_BOLLARD_S()
 
   if (nan_entry != NULL) { // "next item" case: seek next in existing sequence
-m_DIGGY_VAR_D(a_indexSequence->indexEntriesNumber5)
-m_DIGGY_VAR_D(a_indexSequence->indexEntries5[0].first)
-m_DIGGY_VAR_D(a_indexSequence->indexEntries5[0].last)
+m_DIGGY_VAR_D(a_indexSequence->indexEntriesNumber2)
+m_DIGGY_VAR_D(a_indexSequence->indexEntries2[0].first)
+m_DIGGY_VAR_D(a_indexSequence->indexEntries2[0].last)
     *nan_entry = -1; // "disabled" / "No more" a priori
-    if (a_indexSequence->indexEntriesNumber5 > 0) { // "enabled"
+    if (a_indexSequence->indexEntriesNumber2 > 0) { // "enabled"
       if (b_descending) {
-        if (a_indexSequence->ci_indexEntryCursor >= a_indexSequence->indexEntries5[0].first) { 
+        if (a_indexSequence->ci_indexEntryCursor >= a_indexSequence->indexEntries2[0].first) { 
           // NOT YET "no more"...
           if (a_indexSequence->ci_indexEntryCursor > a_indexSequence->cv_lastIndexEntry) {
             // "soft reset"
             a_indexSequence->ci_indexEntryCursor = (a_indexSequence->cv_indexEntriesPtr =
-              a_indexSequence->indexEntries5 + a_indexSequence->indexEntriesNumber5 - 1)->last;
+              a_indexSequence->indexEntries2 + a_indexSequence->indexEntriesNumber2 - 1)->last;
 m_DIGGY_VAR_D(a_indexSequence->ci_indexEntryCursor)
           } else if (--(a_indexSequence->ci_indexEntryCursor) <
             a_indexSequence->cv_indexEntriesPtr->first && a_indexSequence->cv_indexEntriesPtr >
-            a_indexSequence->indexEntries5) {
+            a_indexSequence->indexEntries2) {
             // Pass to next block:
             a_indexSequence->ci_indexEntryCursor = (--(a_indexSequence->cv_indexEntriesPtr))->last;
 m_DIGGY_VAR_D(a_indexSequence->ci_indexEntryCursor)
           } // if
 m_DIGGY_VAR_D(a_indexSequence->ci_indexEntryCursor)
-          if (a_indexSequence->ci_indexEntryCursor >= a_indexSequence->indexEntries5[0].first) 
+          if (a_indexSequence->ci_indexEntryCursor >= a_indexSequence->indexEntries2[0].first) 
             // STILL NOT YET "no more"
             *nan_entry = a_index->hsc_array[a_indexSequence->ci_indexEntryCursor];
         } // if
       } else { // Ascending...
         if (a_indexSequence->ci_indexEntryCursor <= a_indexSequence->cv_lastIndexEntry) { 
           // NOT YET "no more"...
-          if (a_indexSequence->ci_indexEntryCursor < a_indexSequence->indexEntries5[0].first) {
+          if (a_indexSequence->ci_indexEntryCursor < a_indexSequence->indexEntries2[0].first) {
             // "soft reset"
             a_indexSequence->ci_indexEntryCursor = (a_indexSequence->cv_indexEntriesPtr =
-              a_indexSequence->indexEntries5)->first;
+              a_indexSequence->indexEntries2)->first;
 m_DIGGY_VAR_D(a_indexSequence->ci_indexEntryCursor)
           } else if (++(a_indexSequence->ci_indexEntryCursor) >
             a_indexSequence->cv_indexEntriesPtr->last && a_indexSequence->cv_indexEntriesPtr <
-            a_indexSequence->indexEntries5 + a_indexSequence->indexEntriesNumber5 - 1) {
+            a_indexSequence->indexEntries2 + a_indexSequence->indexEntriesNumber2 - 1) {
             // Pass to next block:
             a_indexSequence->ci_indexEntryCursor = (++(a_indexSequence->cv_indexEntriesPtr))->first;
 m_DIGGY_VAR_D(a_indexSequence->ci_indexEntryCursor)
@@ -344,7 +344,7 @@ m_DIGGY_VAR_D(a_indexSequence->ci_indexEntryCursor)
 m_DIGGY_VAR_D(*nan_entry)
 
   } else { // "new sequence" case
-    a_indexSequence->indexEntriesNumber5 = 0; // Empty ("disabled") selection a priori
+    a_indexSequence->indexEntriesNumber2 = 0; // Empty ("disabled") selection a priori
     if (a_index->count > 0) { 
 m_DIGGY_VAR_INDEX_SEEK_FLAGS(c_indexSeekFlags)
 
@@ -384,7 +384,7 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(c_indexSeekFlags)
             if (c_indexEntries.last+1 < a_index->count) n_firstIndexEntry = c_indexEntries.last+1;
           } else n_firstIndexEntry = 0; 
         break; default: // INDEX_SEEK_FLAGS__LIKE case 
-          m_RAISE(ANOMALY__VALUE__FMT_D,c_indexSeekFlags)
+          m_RAISE(ANOMALY__VALUE__D,c_indexSeekFlags)
         } // switch
       } // if 
 
@@ -392,31 +392,31 @@ m_DIGGY_VAR_D(n_firstIndexEntry)
 m_DIGGY_VAR_D(n_lastIndexEntry)
 
       if (n_firstIndexEntry >= 0 && n_lastIndexEntry >= 0 && n_firstIndexEntry > n_lastIndexEntry) {
-        a_indexSequence->indexEntriesNumber5 = 2; 
-        a_indexSequence->indexEntries5[0].first = 0;
-        a_indexSequence->indexEntries5[0].last = n_lastIndexEntry;
-        a_indexSequence->indexEntries5[1].first = n_firstIndexEntry;
-        a_indexSequence->cv_lastIndexEntry = a_indexSequence->indexEntries5[1].last =
+        a_indexSequence->indexEntriesNumber2 = 2; 
+        a_indexSequence->indexEntries2[0].first = 0;
+        a_indexSequence->indexEntries2[0].last = n_lastIndexEntry;
+        a_indexSequence->indexEntries2[1].first = n_firstIndexEntry;
+        a_indexSequence->cv_lastIndexEntry = a_indexSequence->indexEntries2[1].last =
           a_index->count-1;
-m_DIGGY_VAR_D(a_indexSequence->indexEntries5[0].first)
-m_DIGGY_VAR_D(a_indexSequence->indexEntries5[0].last)
-m_DIGGY_VAR_D(a_indexSequence->indexEntries5[1].first)
-m_DIGGY_VAR_D(a_indexSequence->indexEntries5[1].last)
+m_DIGGY_VAR_D(a_indexSequence->indexEntries2[0].first)
+m_DIGGY_VAR_D(a_indexSequence->indexEntries2[0].last)
+m_DIGGY_VAR_D(a_indexSequence->indexEntries2[1].first)
+m_DIGGY_VAR_D(a_indexSequence->indexEntries2[1].last)
       } else if (n_firstIndexEntry >= 0 || n_lastIndexEntry >= 0) {
-        a_indexSequence->indexEntriesNumber5 = 1; 
+        a_indexSequence->indexEntriesNumber2 = 1; 
         if (n_firstIndexEntry < 0) n_firstIndexEntry = 0;
         if (n_lastIndexEntry < 0) n_lastIndexEntry = a_index->count-1;
-        a_indexSequence->indexEntries5[0].first = n_firstIndexEntry;
+        a_indexSequence->indexEntries2[0].first = n_firstIndexEntry;
         a_indexSequence->cv_lastIndexEntry =
-          a_indexSequence->indexEntries5[0].last = n_lastIndexEntry;
-m_DIGGY_VAR_D(a_indexSequence->indexEntries5[0].first)
-m_DIGGY_VAR_D(a_indexSequence->indexEntries5[0].last)
+          a_indexSequence->indexEntries2[0].last = n_lastIndexEntry;
+m_DIGGY_VAR_D(a_indexSequence->indexEntries2[0].first)
+m_DIGGY_VAR_D(a_indexSequence->indexEntries2[0].last)
       } // if
-m_DIGGY_VAR_D(a_indexSequence->indexEntriesNumber5)
+m_DIGGY_VAR_D(a_indexSequence->indexEntriesNumber2)
       // Prime the pump: ("soft reset")
       a_indexSequence->ci_indexEntryCursor = (b_descending? a_indexSequence->cv_lastIndexEntry
-        + 1: a_indexSequence->indexEntries5[0].first - 1);
-      a_indexSequence->cv_indexEntriesPtr = a_indexSequence->indexEntries5;
+        + 1: a_indexSequence->indexEntries2[0].first - 1);
+      a_indexSequence->cv_indexEntriesPtr = a_indexSequence->indexEntries2;
     } // if
   } // if
 
@@ -637,8 +637,8 @@ static int GreenIndexesResize (struct GREEN_INDEXES *a_indexes, int newItemsPhys
   int em_i = 0;\
   struct GREEN_INDEX *s_index = (m_indexes).vnhs_indexes;\
   for ( ; em_i < (m_indexes).indexesNumber ; em_i ++, s_index++) {\
-    m_TRACK_IF(GreenIndexBSearch(s_index, entry,(void *)UNDEFINED,&emn_indexEntry,&em_top,NULL)\
-      != RETURNED)\
+    m_TRACK_IF(GreenIndexBSearch(s_index, entry,(void *)UNDEFINED,&emn_indexEntry,&em_top,\
+      (struct INDEX_ENTRIES*)UNDEFINED) != RETURNED)\
     if (emn_indexEntry >= 0) {\
       m_GREEN_INDEX_REMOVE(s_index,emn_indexEntry)\
     }\
@@ -657,7 +657,7 @@ static int GreenIndexesResize (struct GREEN_INDEXES *a_indexes, int newItemsPhys
   struct GREEN_INDEX *s_index = (m_indexes).vnhs_indexes;\
   for ( ; em_i < (m_indexes).indexesNumber ; em_i ++, s_index++) {\
     m_TRACK_IF(GreenIndexBSearch(s_index, entry, (void*)UNDEFINED, &emn_indexEntry, &top,\
-      NULL) != RETURNED)\
+      (struct INDEX_ENTRIES*)UNDEFINED) != RETURNED)\
     if (emn_indexEntry == -1) {\
       m_GREEN_INDEX_ADD(s_index,top,entry)\
     }\
@@ -760,7 +760,7 @@ static int GreenIndexesSeekEntryEquate(struct GREEN_INDEXES* a_indexes, int inde
     break; case INDEX_SEEK_FLAGS__NOT_EQUAL:
       if (comparison != EQUAL_TO__COMPARISON) answer = ANSWER__YES;
     break; default: 
-      m_RAISE(ANOMALY__VALUE__FMT_D,indexSeekFlags)
+      m_RAISE(ANOMALY__VALUE__D,indexSeekFlags)
     } // switch
   } else { // INDEX_SEEK_FLAGS__LIKE
     m_TRACK_IF((answer = GreenIndexesEntryEquate(a_indexes,indexLabel, aEntry, pr_bKeys)) < 0)

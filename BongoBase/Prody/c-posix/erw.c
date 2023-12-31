@@ -350,7 +350,7 @@ static int WrhPrepareWrite (WRH_HANDLE handle, const char **ap_writeBuffer, int 
 // - -1: unexpected problem
 static int WrhCheckWrite (WRH_HANDLE handle, int writtenLength) {
   m_DIGGY_BOLLARD_S()
-  m_RAISE_IF(writtenLength <= 0,ANOMALY__VALUE__FMT_D,writtenLength)
+  m_RAISE_IF(writtenLength <= 0,ANOMALY__VALUE__D,writtenLength)
   handle->messagePartWrittenLength += writtenLength;
   int i = handle->writtenMessagePartsCount ;
   if (handle->messagePartWrittenLength == handle->s_messagePartsLength[i]) {
@@ -553,7 +553,7 @@ int ErwRead (ERW_HANDLE handle, const struct WAITING_PLAN *nap_waitingPlan,
     case RW_STATUS__CONNECTION_LOST:
       m_TRACK_IF(RdhFlush(handle->nh_rdhHandle,na_messageBuffer,a_messageLength) != RETURNED)
     break; default:
-      m_RAISE(ANOMALY__VALUE__FMT_D,n_rwStatus)
+      m_RAISE(ANOMALY__VALUE__D,n_rwStatus)
     } // switch 
   } // while 
 

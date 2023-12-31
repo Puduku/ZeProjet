@@ -19,8 +19,8 @@ extern char b_diggyGreenCollectionExam;
 
 static int testNumber = 0;
 
-// #SEE GREEN_ITEM_HANDLER__KEYS_COMPARE_FUNCTION @ c-ansi/green.h
-static int TestItemHandlerKeysCompare(void *cpr_handle,  char b_frozen,  int indexLabel,
+// #SEE GREEN_HANDLER__COMPARE_FUNCTION @ c-ansi/green.h
+static int TestItemHandlerCompare(void *cpr_handle,  char b_frozen,  int indexLabel,
   int keyRank, char *pr_aGreenItemStuff,  char *npr_bGreenItemStuff, void *cpr_bKeys) {
   m_DIGGY_BOLLARD()
   m_ASSERT(keyRank == 0)
@@ -35,7 +35,7 @@ static int TestItemHandlerKeysCompare(void *cpr_handle,  char b_frozen,  int ind
   int comparison = GET_COMPARISON(aId,bId); 
 
   m_DIGGY_RETURN(comparison)
-} // TestItemHandlerKeysCompare
+} // TestItemHandlerCompare
 
 
 // Passed:
@@ -169,7 +169,7 @@ int main (int argc, char **argv) {
 
   b_diggyGreenCollectionExam = b_TRUE;   
   m_TRACK_IF(GreenCollectionCreateInstance(&handle, BATEAU__EXPECTED_ITEMS_NUMBER/*2*/,
-    sizeof(struct TEST_ITEM), NULL,TestItemHandlerKeysCompare,NULL,NULL) != RETURNED)
+    sizeof(struct TEST_ITEM), NULL,TestItemHandlerCompare,NULL,NULL) != RETURNED)
 
 
   m_TRACK_IF((ret = GreenCollectionAddIndex(handle,1)) < 0) 

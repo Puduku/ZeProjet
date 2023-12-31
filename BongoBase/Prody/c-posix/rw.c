@@ -163,7 +163,7 @@ int ProtectedWrite2 (BROKEN_PIPE_FIX_HANDLE brokenPipeFixHandle, int descriptor,
       } // switch
 
     } else if (ret == 0) {
-      m_RAISE(ANOMALY__VALUE__FMT_D,ret)
+      m_RAISE(ANOMALY__VALUE__D,ret)
     } else { // Some piece of data has been written 
       n_rwStatus = RW_STATUS__OK ; 
       *ac_writtenLength = ret ;

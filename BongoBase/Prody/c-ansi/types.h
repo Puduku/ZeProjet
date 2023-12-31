@@ -114,7 +114,7 @@ break; case EQUAL_TO__COMPARISON:\
 break; case GREATER_THAN__COMPARISON:\
   m_difference = 1;\
 break; default:\
-  m_RAISE(ANOMALY__VALUE__FMT_D,comparison)\
+  m_RAISE(ANOMALY__VALUE__D,comparison)\
 } 
 
 

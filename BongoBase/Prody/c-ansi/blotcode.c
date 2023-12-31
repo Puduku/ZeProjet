@@ -142,8 +142,8 @@ struct BLOTFUNC_KEY_NAME {
   m_ASSIGN_C_STRING_PORTION(m_blotfuncKeyName.name, m_name) \
 } 
 
-// GREEN_HANDLER__KEYS_COMPARE_FUNCTION
-static int BlotfuncsHandlerKeysCompare (void *cpr_handle,  char b_frozen, int indexLabel,  int keyRank,
+// GREEN_HANDLER__COMPARE_FUNCTION
+static int BlotfuncsHandlerCompare (void *cpr_handle,  char b_frozen, int indexLabel,  int keyRank,
   char *pr_aGreenItemStuff,  char *npr_bGreenItemStuff, void *cpr_bKeys) {
   m_DIGGY_BOLLARD_S()
   struct BLOTFUNCS_HANDLER *p_handle = (struct BLOTFUNCS_HANDLER *)cpr_handle; // protected
@@ -177,7 +177,7 @@ static int BlotfuncsHandlerKeysCompare (void *cpr_handle,  char b_frozen, int in
   } //if
   
   m_DIGGY_RETURN(comparison)
-} // BlotfuncsHandlerKeysCompare
+} // BlotfuncsHandlerCompare
 
 
 // BLOTCODE (blot code)
@@ -292,7 +292,7 @@ int BlotcodeFreeze(BLOTCODE_HANDLE ep_handle) {
 
   m_TRACK_IF(GreenCollectionCreateInstance(&(ep_handle->ch_blotfuncsHandle),
     BATEAU__EXPECTED_ITEMS_NUMBER,  sizeof(struct BLOTFUNC_ENTRY), NULL,
-    BlotfuncsHandlerKeysCompare, NULL, &(ep_handle->c_blotfuncsHandler)) != RETURNED)
+    BlotfuncsHandlerCompare, NULL, &(ep_handle->c_blotfuncsHandler)) != RETURNED)
   m_ASSERT(GreenCollectionAddIndex(ep_handle->ch_blotfuncsHandle,1) == INDEX_LABEL0)  
 
   BLOTFUNC_ENTRY_STUFF blotfuncEntryStuff = (BLOTFUNC_ENTRY_STUFF)UNDEFINED;
@@ -622,8 +622,8 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
   }\
 }
 
-#define DELIMITOR__FMT_S "**%s** delimitor"
-#define DELIMITOR__FMT_C "**%c** delimitor"
+#define DELIMITOR__S "**%s** delimitor"
+#define DELIMITOR__C "**%c** delimitor"
 
   TEMPLATE_PARTITION_STUFF ti_templatePartitionStuff = (TEMPLATE_PARTITION_STUFF) UNDEFINED;
   int v_templatePartitionEntry = UNDEFINED; 
@@ -649,7 +649,7 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
 
     m_PARSE_TILL_MATCH_C(fp_template,">>",NULL, &blotinstSequence)
     if (b_EMPTY_STRING_PORTION(fp_template)) { // ending ">>" not located 
-      m_REPORT_ERROR(NULL,"Missing " DELIMITOR__FMT_S, ">>")
+      m_REPORT_ERROR(NULL,"Missing " DELIMITOR__S, ">>")
     } // if
     m_PARSE_OFFSET(fp_template,2, NULL)
 
@@ -670,18 +670,18 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
     m_PARSE_PASS_SPACES(blotinstSequence, NULL)
     m_PARSE_PASS_CHARS(blotinstSequence,b_REGULAR_SCAN, b_PASS_CHARS_TILL,NULL,'(', &dummy)
     if (!b_EMPTY_STRING_PORTION(dummy)) {
-      m_REPORT_ERROR(&dummy,"Unexpected content before " DELIMITOR__FMT_C,'(')
+      m_REPORT_ERROR(&dummy,"Unexpected content before " DELIMITOR__C,'(')
     } // if
     if ((b_arguments = !b_EMPTY_STRING_PORTION(blotinstSequence))) {
       m_PARSE_OFFSET(blotinstSequence,1, NULL)
       m_PARSE_PASS_CHARS(blotinstSequence,b_REVERTED_SCAN, b_PASS_CHARS_TILL,NULL,')', &c_arguments)
       if (b_EMPTY_STRING_PORTION(blotinstSequence)) {
-        m_REPORT_ERROR(&c_arguments,"Missing " DELIMITOR__FMT_C, ')')
+        m_REPORT_ERROR(&c_arguments,"Missing " DELIMITOR__C, ')')
       } // if
       m_PARSE_OFFSET(blotinstSequence,1, NULL)
       m_PARSE_PASS_SPACES(blotinstSequence, NULL)
       if (!b_EMPTY_STRING_PORTION(blotinstSequence)) {
-        m_REPORT_ERROR(&blotinstSequence,"Trailing content after " DELIMITOR__FMT_C, ')')
+        m_REPORT_ERROR(&blotinstSequence,"Trailing content after " DELIMITOR__C, ')')
       } // if
     } // if
     // basicToken1: initialized (should not be empty) 
@@ -781,7 +781,7 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
     case END_SWITCH__BLOTKEYW_ID:
     case DEFAULT_CASE__BLOTKEYW_ID:
     break; default:
-      m_RAISE(ANOMALY__VALUE__FMT_D,vc_blotinstPtr->blotkeywId)
+      m_RAISE(ANOMALY__VALUE__D,vc_blotinstPtr->blotkeywId)
     } // switch
 
     switch (vc_blotinstPtr->blotkeywId) {
@@ -831,7 +831,7 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
                 "(prior control statement is neither a switch, a case nor a default case)")
             } // if 
           break; default:
-            m_RAISE(ANOMALY__VALUE__FMT_D,vc_blotinstPtr->blotkeywId)
+            m_RAISE(ANOMALY__VALUE__D,vc_blotinstPtr->blotkeywId)
           } // switch
         } // if 
            
@@ -847,7 +847,7 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
         } // switch
       } // if 
     break; default:
-      m_RAISE(ANOMALY__VALUE__FMT_D,vc_blotinstPtr->blotkeywId)
+      m_RAISE(ANOMALY__VALUE__D,vc_blotinstPtr->blotkeywId)
     } // switch
   } // while
 
@@ -856,8 +856,8 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
     m_REPORT_ERROR(NULL, "Trailing %d loop or switch control statement(s)", trailingBlotkeywsNumber)
   } // if
 
-#undef DELIMITOR__FMT_STRING_PORTION
-#undef DELIMITOR__FMT_C 
+#undef DELIMITOR__S
+#undef DELIMITOR__C 
 #undef m_REPORT_ERROR
   m_DIGGY_RETURN(answer)
 } // BlotcodeExecutorParseTemplate 
@@ -1030,7 +1030,7 @@ int BlotcodeExecutorConstructPage (BLOTCODE_EXECUTOR_HANDLE handle,
       } // Bloc 
 
     break; default: 
-      m_RAISE(ANOMALY__VALUE__FMT_D, blotinstPtr->blotkeywId)
+      m_RAISE(ANOMALY__VALUE__D, blotinstPtr->blotkeywId)
     } // switch 
   } // for 
   if (n_blotcodeConstructionStatus == -1) {

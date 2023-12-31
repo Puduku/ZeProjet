@@ -33,8 +33,8 @@ struct TID_GLUE {
 } ;
 
 
-// #see GREEN_ITEM_HANDLER__KEYS_COMPARE_FUNCTION @ c-ansi/green.h
-static int TidGlueKeysCompare (void *cpr_handle, char b_frozen, int indexLabel, int keyRank,
+// #see GREEN_HANDLER__COMPARE_FUNCTION @ c-ansi/green.h
+static int TidGlueCompare (void *cpr_handle, char b_frozen, int indexLabel, int keyRank,
   char *pr_aGreenItemStuff, char *npr_bGreenItemStuff, void *cpr_bKeys) {
   m_ASSERT(keyRank == 0)
 
@@ -45,7 +45,7 @@ static int TidGlueKeysCompare (void *cpr_handle, char b_frozen, int indexLabel, 
   } // if
 
   return GET_COMPARISON(aKeyTid,bKeyTid);
-} // TidGlueKeysCompare
+} // TidGlueCompare
 
 
 #if PLATFORM_ASSUMPTION == GEEK_RULED__PLATFORM_ASSUMPTION
@@ -88,7 +88,7 @@ int TidGlueCreateInstance(TID_GLUE_HANDLE *azh_handle, int b_portable) {
 
   if (((*azh_handle)->b_portable = b_portable)) {
     m_TRACK_IF(GreenCollectionCreateInstance(&(*azh_handle)->ch_pthreadVsTidCollectionHandle,
-      BATEAU__EXPECTED_ITEMS_NUMBER,sizeof(struct PTHREAD_VS_TID),NULL,TidGlueKeysCompare,NULL,
+      BATEAU__EXPECTED_ITEMS_NUMBER,sizeof(struct PTHREAD_VS_TID),NULL,TidGlueCompare,NULL,
       (void *)UNDEFINED) != RETURNED)
     m_ASSERT(GreenCollectionAddIndex((*azh_handle)->ch_pthreadVsTidCollectionHandle,1) == 0)
   } else {

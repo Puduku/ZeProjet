@@ -75,7 +75,7 @@ int ProtectedGethostbynameR (const char *p_host,
       // Let's go for new try:
       m_REALLOC(h_buf,bufSize)
     break; default:
-      m_RAISE(ANOMALY__VALUE__FMT_D,ret)
+      m_RAISE(ANOMALY__VALUE__D,ret)
     } // switch
   } // while
 

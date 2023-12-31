@@ -256,13 +256,13 @@ static int GStringsDisengage(void *r_handle,  char *r_greenItemStuff) {
   break; case ACOLYT_HANDLE__G_KEYS_COMPARISON:\
     (m_bareGKey).cnr_acolytHandle = (p_gStringStuff)->acolyt.cnhr_handle;\
   break; default:\
-    m_RAISE(ANOMALY__VALUE__FMT_D,gKeysComparison)\
+    m_RAISE(ANOMALY__VALUE__D,gKeysComparison)\
   }\
 }
 
 
-// #SEE GREEN_ITEM_HANDLER__KEYS_COMPARE_FUNCTION @ c-ansi/green.h
-static int GStringsKeysCompare(void *cpr_handle,  char b_frozen, int indexLabel,  int keyRank,
+// #SEE GREEN_ITEM_HANDLER__COMPARE_FUNCTION @ c-ansi/green.h
+static int GStringsCompare(void *cpr_handle,  char b_frozen, int indexLabel,  int keyRank,
   char *pr_aGreenItemStuff,  char *npr_bGreenItemStuff,  void *cpr_bKeys) {
   m_DIGGY_BOLLARD()
   G_STRINGS_HANDLE p_handle = (G_STRINGS_HANDLE) cpr_handle;
@@ -315,12 +315,12 @@ static int GStringsKeysCompare(void *cpr_handle,  char b_frozen, int indexLabel,
   break; case ACOLYT_HANDLE__G_KEYS_COMPARISON:
     comparison = GET_COMPARISON(aBareGKey.cnr_acolytHandle,bBareGKey.cnr_acolytHandle);
   break; default:
-    m_RAISE(ANOMALY__VALUE__FMT_D,ap_keySettings->gKeysComparison)
+    m_RAISE(ANOMALY__VALUE__D,ap_keySettings->gKeysComparison)
   } // switch
   
 m_DIGGY_VAR_COMPARISON(comparison)
   m_DIGGY_RETURN(comparison)
-} // GStringsKeysCompare
+} // GStringsCompare
 
 
 // Public function : see .h
@@ -342,7 +342,7 @@ int GStringsCreateInstance(G_STRINGS_HANDLE* azh_handle,  int expectedItemsNumbe
   handle->vnhs_indexesProperties = NULL;
 
   m_TRACK_IF(GreenCollectionCreateInstance(&handle->h_greenCollectionHandle,  expectedItemsNumber,
-    sizeof(struct G_STRING),  GStringsDisengage,  GStringsKeysCompare, NULL, handle) != RETURNED)
+    sizeof(struct G_STRING),  GStringsDisengage,  GStringsCompare, NULL, handle) != RETURNED)
 
   m_ASSIGN_MAGIC_FIELD(G_STRINGS_HANDLE,handle)
 
@@ -416,7 +416,7 @@ int GStringsAddIndex (G_STRINGS_HANDLE handle,  int keysNumber,
     break; case ACOLYT_HANDLE__G_KEYS_COMPARISON:
       m_ASSERT(gStringConveyance == NAMED_OBJECT__G_STRING_CONVEYANCE)
     break; default:
-      m_RAISE(ANOMALY__VALUE__FMT_D,key1GKeysComparison)
+      m_RAISE(ANOMALY__VALUE__D,key1GKeysComparison)
     } // switch
     s_keysSettings->select.stringPortionComparison.cn_isNeutralCharFunction = cn_key1IsNeutralCharFunction;
     s_keysSettings->select.stringPortionComparison.cn_toCharFunction = cn_key1ToCharFunction;

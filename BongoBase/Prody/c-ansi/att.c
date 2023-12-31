@@ -31,8 +31,8 @@ struct ALARM_TIMETABLE {
 #define TIME_INDEX_LABEL 1
 
 
-// #see GREEN_ITEM_HANDLER__KEYS_COMPARE_FUNCTION @ c-ansi/green.h
-static int AlarmTimetableKeysCompare (void *nr_privateHandle, char b_frozen, int indexLabel,
+// #see GREEN_HANDLER__COMPARE_FUNCTION @ c-ansi/green.h
+static int AlarmTimetableCompare (void *nr_privateHandle, char b_frozen, int indexLabel,
   int keyRank, char *pr_aGreenItemStuff, char *npr_bGreenItemStuff, void *cpr_bKeys) {
   m_DIGGY_BOLLARD_S()
 m_DIGGY_INFO("indexLabel=%d",indexLabel)
@@ -60,11 +60,11 @@ m_DIGGY_INFO("indexLabel=%d",indexLabel)
       comparison = GET_COMPARISON(p_aTimelineStuff->attTime,bAttTime);
     } // bAttTime
   break; default:
-    m_RAISE(ANOMALY__VALUE__FMT_D,indexLabel)
+    m_RAISE(ANOMALY__VALUE__D,indexLabel)
   } // switch
 
   m_DIGGY_RETURN(comparison)
-} // AlarmTimetableKeysCompare
+} // AlarmTimetableCompare
 
 
 // Public function; see description in .h
@@ -77,7 +77,7 @@ int AlarmTimetableCreateInstance(ALARM_TIMETABLE_HANDLE *azh_handle) {
   m_ASSIGN_MAGIC_FIELD(ALARM_TIMETABLE_HANDLE,handle)
 
   m_TRACK_IF(GreenCollectionCreateInstance(&handle->h_timelinesHandle, 50, sizeof(struct TIMELINE),
-    NULL, AlarmTimetableKeysCompare, NULL, handle) != RETURNED)
+    NULL, AlarmTimetableCompare, NULL, handle) != RETURNED)
 
   m_ASSERT(GreenCollectionAddIndex(handle->h_timelinesHandle,1) == ID_INDEX_LABEL)
   m_ASSERT(GreenCollectionAddIndex(handle->h_timelinesHandle,1) == TIME_INDEX_LABEL)

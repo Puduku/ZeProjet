@@ -284,7 +284,7 @@ static int RingAlarm (void *pr_handle, unsigned int attId, unsigned long delay) 
   break; case ESRCH: // No such thread
     p_handle->private.phantomPthreadsCount++ ;
   break; default:
-    m_RAISE(ANOMALY__VALUE__FMT_D,ret)
+    m_RAISE(ANOMALY__VALUE__D,ret)
   } // switch
 
   m_DIGGY_RETURN(RETURNED)
@@ -335,7 +335,7 @@ static int TheCustodianMain (ALARM_SYSTEM_HANDLE handle) {
     { // zzz...
       int ret = pthread_cond_timedwait(&handle->h_cond,&handle->hj_mutex,
                                        &timeSpecification) ;
-      m_RAISE_IF(ret != 0 && ret != ETIMEDOUT, ANOMALY__VALUE__FMT_D,ret)
+      m_RAISE_IF(ret != 0 && ret != ETIMEDOUT, ANOMALY__VALUE__D,ret)
     } // zzz...
   } // while 
 
@@ -429,7 +429,7 @@ int PthreadAlarmSystemDestroyInstance (ALARM_SYSTEM_HANDLE xhj_handle) {
 
     m_PTHREAD_CALL(pthread_cancel(xhj_handle->private.custodianPthreads[i]))
     m_PTHREAD_CALL(pthread_join(xhj_handle->private.custodianPthreads[i],&r_status))
-    m_RAISE_IF(r_status != PTHREAD_CANCELED, ANOMALY__VALUE__FMT_P,r_status)
+    m_RAISE_IF(r_status != PTHREAD_CANCELED, ANOMALY__VALUE__P,r_status)
   } // for
 
   // 2. Liquidate stuff

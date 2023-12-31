@@ -30,11 +30,11 @@
 // String format arg(s), if present, simply correspond to FTP command arg(s)
 //
 // USER => %s : user name
-#define USER__FTP_COMMAND__FMT_S	"USER %s"
+#define USER__FTP_COMMAND__S	"USER %s"
 // PASS => %s : password
-#define PASS__FTP_COMMAND__FMT_S	"PASS %s"
+#define PASS__FTP_COMMAND__S	"PASS %s"
 // TYPE => %c : 'I' or 'A'
-#define TYPE__FTP_COMMAND__FMT_C	"TYPE %c"
+#define TYPE__FTP_COMMAND__C	"TYPE %c"
 // NOOP => no arg
 #define NOOP__FTP_COMMAND__FMT  	"NOOP"
 // PWD => no arg
@@ -42,39 +42,39 @@
 // SYST => no arg
 #define SYST__FTP_COMMAND__FMT  	"SYST"
 // CWD => %s : dir name
-#define  CWD__FTP_COMMAND__FMT_S	"CWD %s"
+#define  CWD__FTP_COMMAND__S	"CWD %s"
 // RNFR => %s : old name
-#define RNFR__FTP_COMMAND__FMT_S	"RNFR %s"
+#define RNFR__FTP_COMMAND__S	"RNFR %s"
 // RNTO => %s : new name
-#define RNTO__FTP_COMMAND__FMT_S	"RNTO %s"
+#define RNTO__FTP_COMMAND__S	"RNTO %s"
 // DELE => file name
-#define DELE__FTP_COMMAND__FMT_S	"DELE %s"
+#define DELE__FTP_COMMAND__S	"DELE %s"
 // PASV => no arg
 #define PASV__FTP_COMMAND__FMT  	"PASV"
 // PORT => %u %u %u %u : IP address  ;  %u %u : TCP port
-#define PORT__FTP_COMMAND__FMT_6U	"PORT %u,%u,%u,%u,%u,%u"
+#define PORT__FTP_COMMAND__6U	"PORT %u,%u,%u,%u,%u,%u"
 // QUIT => no arg
 #define QUIT__FTP_COMMAND__FMT   	"QUIT"
 // STOR => %s : file name
-#define STOR__FTP_COMMAND__FMT_S	"STOR %s"
+#define STOR__FTP_COMMAND__S	"STOR %s"
 // RETR => %s : file name
-#define RETR__FTP_COMMAND__FMT_S	"RETR %s"
+#define RETR__FTP_COMMAND__S	"RETR %s"
 
 // Generic format strings to generate FTP commands with "dynamic" number of arguments...
 //
 // When you want to generate a command without argument
 // %s : FTP command name
-#define  SIMPLE_FTP_COMMAND__FMT_S  	"%s"
+#define  SIMPLE_FTP_COMMAND__S  	"%s"
 // When you want to generate a command with one argument (passed as string)
 // %s : FTP command name
 // %s : FTP command argument (passed as string)
-#define ONE_ARG_FTP_COMMAND__FMT_S_S	"%s %s"
+#define ONE_ARG_FTP_COMMAND__S_S	"%s %s"
 // FTP commands strings usable with Generic format strings above
 #define NLST__FTP_COMMAND	"NLST"
 #define LIST__FTP_COMMAND	"LIST"
 
 // Specific ftp response status format 
-#define ENTERING_PASSIVE_MODE_STATUS__FMT_6U  "227 Entering Passive Mode (%u,%u,%u,%u,%u,%u)"
+#define ENTERING_PASSIVE_MODE_STATUS__6U  "227 Entering Passive Mode (%u,%u,%u,%u,%u,%u)"
 
 
 
@@ -276,7 +276,7 @@ static int GetFlopOrigin (int suckerStatus, int sButtIs) {
     break; case S_BUTT_IS__REMOTE:
       flopOrigin = FLOP_ORIGIN__REMOTE;
     break; default:
-      m_RAISE(ANOMALY__VALUE__FMT_D,sButtIs)
+      m_RAISE(ANOMALY__VALUE__D,sButtIs)
     } // switch
   break; case SUCKER_STATUS__D_FLOP:
     switch (sButtIs) {
@@ -286,10 +286,10 @@ static int GetFlopOrigin (int suckerStatus, int sButtIs) {
     break; case S_BUTT_IS__REMOTE:
       flopOrigin = FLOP_ORIGIN__LOCAL;
     break; default:
-      m_RAISE(ANOMALY__VALUE__FMT_D,sButtIs)
+      m_RAISE(ANOMALY__VALUE__D,sButtIs)
     } // switch
   break; default:
-    m_RAISE(ANOMALY__VALUE__FMT_D,suckerStatus)
+    m_RAISE(ANOMALY__VALUE__D,suckerStatus)
   } // switch
 
   m_DIGGY_RETURN(flopOrigin)
@@ -358,7 +358,7 @@ const char *FetepeGetClue (FETEPE_HANDLE handle) {
         } // if
       } // if 
     break; default:
-      m_RAISE_V(NULL,ANOMALY__VALUE__FMT_D,handle->data.outline.sucker.suckerStatus)
+      m_RAISE_V(NULL,ANOMALY__VALUE__D,handle->data.outline.sucker.suckerStatus)
     } // switch
 
     if (!b_clearClue) {
@@ -611,11 +611,11 @@ int FetepeConnect (FETEPE_HANDLE handle, const char *p_hostIpAddress, const char
   } // if
   
   if (fetepeStatus == FETEPE_STATUS__OK) {
-    m_TRACK_IF(FetepeWriteCommand(handle,&fetepeStatus,USER__FTP_COMMAND__FMT_S,p_user) != RETURNED)
+    m_TRACK_IF(FetepeWriteCommand(handle,&fetepeStatus,USER__FTP_COMMAND__S,p_user) != RETURNED)
     m_TRACK_IF(FetepeReadCommandStatus(handle,&fetepeStatus,-1) != RETURNED)
     if (fetepeStatus == FETEPE_STATUS__OK &&
         handle->command.outline.ftpCommandStatus == ASK_FOR_PASSWORD__FTP_COMMAND_STATUS) {
-       m_TRACK_IF(FetepeWriteCommand(handle,&fetepeStatus,PASS__FTP_COMMAND__FMT_S,
+       m_TRACK_IF(FetepeWriteCommand(handle,&fetepeStatus,PASS__FTP_COMMAND__S,
          np_password != NULL? np_password: p_user) != RETURNED)
        m_TRACK_IF(FetepeReadCommandStatus(handle,&fetepeStatus,-1) != RETURNED)
     } // if
@@ -641,7 +641,7 @@ static int FetepeSetType (FETEPE_HANDLE handle, char letter) {
 
   m_RESET_OUTLINE(handle)
 
-  m_TRACK_IF(FetepeWriteCommand(handle,&fetepeStatus,TYPE__FTP_COMMAND__FMT_C,letter) != RETURNED)
+  m_TRACK_IF(FetepeWriteCommand(handle,&fetepeStatus,TYPE__FTP_COMMAND__C,letter) != RETURNED)
   m_TRACK_IF(FetepeReadCommandStatus(handle,&fetepeStatus, COMMAND_EXECUTED__FTP_COMMAND_STATUS) != RETURNED)
 
   m_DIGGY_RETURN(fetepeStatus)
@@ -717,7 +717,7 @@ int FetepeCd (FETEPE_HANDLE handle, const char *directoryName) {
   int fetepeStatus = FETEPE_STATUS__OK ;
   m_RESET_OUTLINE(handle)
 
-  m_TRACK_IF(FetepeWriteCommand(handle,&fetepeStatus,CWD__FTP_COMMAND__FMT_S,directoryName) != RETURNED)
+  m_TRACK_IF(FetepeWriteCommand(handle,&fetepeStatus,CWD__FTP_COMMAND__S,directoryName) != RETURNED)
   m_TRACK_IF(FetepeReadCommandStatus(handle,&fetepeStatus, FILE_SERVICE_OK__FTP_COMMAND_STATUS) != RETURNED)
   
   m_DIGGY_RETURN(fetepeStatus)
@@ -730,12 +730,12 @@ int FetepeRename (FETEPE_HANDLE handle, const char *oldName, const char *newName
   int fetepeStatus = FETEPE_STATUS__OK ;
   m_RESET_OUTLINE(handle)
 
-  m_TRACK_IF(FetepeWriteCommand(handle,&fetepeStatus,RNFR__FTP_COMMAND__FMT_S,oldName) != RETURNED)
+  m_TRACK_IF(FetepeWriteCommand(handle,&fetepeStatus,RNFR__FTP_COMMAND__S,oldName) != RETURNED)
   m_TRACK_IF(FetepeReadCommandStatus(handle,&fetepeStatus,
     FILE_SERVICE_WAITING_FOR_COMPLEMENTARY_INFORMATION__FTP_COMMAND_STATUS) != RETURNED)
 
   if (fetepeStatus == FETEPE_STATUS__OK) {
-    m_TRACK_IF(FetepeWriteCommand(handle,&fetepeStatus,RNTO__FTP_COMMAND__FMT_S,newName) != RETURNED)
+    m_TRACK_IF(FetepeWriteCommand(handle,&fetepeStatus,RNTO__FTP_COMMAND__S,newName) != RETURNED)
     m_TRACK_IF(FetepeReadCommandStatus(handle,&fetepeStatus, FILE_SERVICE_OK__FTP_COMMAND_STATUS) != RETURNED)
   } // if
 
@@ -749,7 +749,7 @@ int FetepeDelete (FETEPE_HANDLE handle, const char *name) {
   int fetepeStatus = FETEPE_STATUS__OK ;
   m_RESET_OUTLINE(handle)
 
-  m_TRACK_IF(FetepeWriteCommand(handle,&fetepeStatus,DELE__FTP_COMMAND__FMT_S,name) != RETURNED)
+  m_TRACK_IF(FetepeWriteCommand(handle,&fetepeStatus,DELE__FTP_COMMAND__S,name) != RETURNED)
   m_TRACK_IF(FetepeReadCommandStatus(handle,&fetepeStatus, FILE_SERVICE_OK__FTP_COMMAND_STATUS) != RETURNED)
   
   m_DIGGY_RETURN(fetepeStatus)
@@ -806,7 +806,7 @@ static int FetepeOpenDataStream (FETEPE_HANDLE handle, int *a_fetepeStatus,
       m_TRACK_IF(commandStatusLinesCount < 0)
       m_ASSERT(lastLineDelimitorStuff != NULL)
       ret = SScanfStringPortion(lastLineDelimitorStuff->practicalLine, 
-        ENTERING_PASSIVE_MODE_STATUS__FMT_6U, &h1,&h2,&h3,&h4, &p1,&p2); 
+        ENTERING_PASSIVE_MODE_STATUS__6U, &h1,&h2,&h3,&h4, &p1,&p2); 
       m_TRACK_IF(ret < 0)
       m_ASSERT(ret == 6)
       switch (CreateAndConnect(&(handle->data.nh_streamDescriptor), RWN_INET_ADDR(h1,h2,h3,h4),
@@ -850,7 +850,7 @@ static int FetepeOpenDataStream (FETEPE_HANDLE handle, int *a_fetepeStatus,
 #define U_ARG_BYTE_OF_INET(m_inet, i) \
 (unsigned int ) RWN_BYTE_OF_INET(m_inet,i)
 
-      m_TRACK_IF(FetepeWriteCommand(handle,a_fetepeStatus,PORT__FTP_COMMAND__FMT_6U,
+      m_TRACK_IF(FetepeWriteCommand(handle,a_fetepeStatus,PORT__FTP_COMMAND__6U,
         U_ARG_BYTE_OF_INET(handle->command.socket.c_inetAddr,0),
         U_ARG_BYTE_OF_INET(handle->command.socket.c_inetAddr,1),
         U_ARG_BYTE_OF_INET(handle->command.socket.c_inetAddr,2),
@@ -937,7 +937,7 @@ int FetepePut3Open (FETEPE_HANDLE handle, const char *p_remoteFileName,
   int fetepeStatus = FETEPE_STATUS__OK;
   m_RESET_OUTLINE(handle)
 
-  m_TRACK_IF(FetepeOpenDataStream(handle,&fetepeStatus, STOR__FTP_COMMAND__FMT_S,p_remoteFileName)
+  m_TRACK_IF(FetepeOpenDataStream(handle,&fetepeStatus, STOR__FTP_COMMAND__S,p_remoteFileName)
      == -1)
 
   if (handle->data.nh_streamDescriptor != -1) {
@@ -970,7 +970,7 @@ int FetepePut2 (FETEPE_HANDLE handle, //const struct SUCKER_BUTT *ap_localButt,
   int fetepeStatus = FETEPE_STATUS__OK;
   m_RESET_OUTLINE(handle)
 
-  m_TRACK_IF(FetepeOpenDataStream(handle,&fetepeStatus, STOR__FTP_COMMAND__FMT_S,p_remoteFileName)
+  m_TRACK_IF(FetepeOpenDataStream(handle,&fetepeStatus, STOR__FTP_COMMAND__S,p_remoteFileName)
     == -1)
 
   if (handle->data.nh_streamDescriptor != -1) {
@@ -1081,10 +1081,10 @@ static int FetepeNListDir (FETEPE_HANDLE handle, const char *p_cmd, const char *
   m_RESET_OUTLINE(handle)
 
   if (n_filter != NULL) {
-    m_TRACK_IF(FetepeOpenDataStream(handle,&fetepeStatus, ONE_ARG_FTP_COMMAND__FMT_S_S,p_cmd,
+    m_TRACK_IF(FetepeOpenDataStream(handle,&fetepeStatus, ONE_ARG_FTP_COMMAND__S_S,p_cmd,
       n_filter) != RETURNED)
   } else {
-    m_TRACK_IF(FetepeOpenDataStream(handle,&fetepeStatus, SIMPLE_FTP_COMMAND__FMT_S,p_cmd) !=
+    m_TRACK_IF(FetepeOpenDataStream(handle,&fetepeStatus, SIMPLE_FTP_COMMAND__S,p_cmd) !=
       RETURNED)
   } // if
 
@@ -1170,7 +1170,7 @@ int FetepeGet2 (FETEPE_HANDLE handle, const char *p_remoteFileName, //const stru
   int fetepeStatus = FETEPE_STATUS__OK; 
   m_RESET_OUTLINE(handle)
 
-  m_TRACK_IF(FetepeOpenDataStream(handle,&fetepeStatus, RETR__FTP_COMMAND__FMT_S,p_remoteFileName)
+  m_TRACK_IF(FetepeOpenDataStream(handle,&fetepeStatus, RETR__FTP_COMMAND__S,p_remoteFileName)
     != RETURNED)
  
   if (handle->data.nh_streamDescriptor != -1) {

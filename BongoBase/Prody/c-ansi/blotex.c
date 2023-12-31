@@ -290,7 +290,7 @@ static int BlotexlibExecutorRetrieveBlotvar(BLOTEXLIB_EXECUTOR_HANDLE handle, ch
     m_PARSE_PASS_SINGLE_CHAR(*a_blotvarSequence,NULL,'}',&lexeme)
     if (b_EMPTY_STRING_PORTION(lexeme)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_INFO)
   break; default:
-    m_RAISE(ANOMALY__VALUE__FMT_D,lexeme.string[0])
+    m_RAISE(ANOMALY__VALUE__D,lexeme.string[0])
   } // switch
 
   m_DIGGY_RETURN(ANSWER__YES) ;
@@ -338,7 +338,7 @@ static int BlotexlibExecutorFetchBlotvar(BLOTEXLIB_EXECUTOR_HANDLE handle, char 
     m_ASSERT(ret == ap_blotvarReference->select.c_entry)
     ret = (acvnt_blotvarStuff == NULL? RESULT__NOT_FOUND: RESULT__NOT_FOUND);
   break; default:
-    m_RAISE(ANOMALY__VALUE__FMT_D,ap_blotvarReference->blotvarReference)  
+    m_RAISE(ANOMALY__VALUE__D,ap_blotvarReference->blotvarReference)  
   } // switch
 
   m_DIGGY_RETURN(ret)
@@ -430,7 +430,7 @@ static int BlotexlibExecutorComputeBlotex(BLOTEXLIB_EXECUTOR_HANDLE handle,
     break; case '+' : n_int1Op = PLUS__INT_1OP;
     break; case '-' : n_int1Op = MINUS__INT_1OP;
     break; default:
-      m_RAISE(ANOMALY__VALUE__FMT_D,lexeme.string[0])
+      m_RAISE(ANOMALY__VALUE__D,lexeme.string[0])
     } // switch
     m_PARSE_PASS_SPACES(*a_blotexSequence,NULL)
   } // if
@@ -481,7 +481,7 @@ static int BlotexlibExecutorComputeBlotex(BLOTEXLIB_EXECUTOR_HANDLE handle,
           break; case '=' : // <blotreg read int>
             intBlotregOpPrefix = READ__INT_BLOTREG_OP_PREFIX;
           break; default:
-            m_RAISE(ANOMALY__VALUE__FMT_D,lexeme.string[0])
+            m_RAISE(ANOMALY__VALUE__D,lexeme.string[0])
           } // switch
         } // if
       } else { // '?' not found
@@ -522,7 +522,7 @@ static int BlotexlibExecutorComputeBlotex(BLOTEXLIB_EXECUTOR_HANDLE handle,
               m_ASSERT(cvn_entry >= 0)
               atomBlotexValue.select.c_blotval = cvn_entry;
             break; default:
-              m_RAISE(ANOMALY__VALUE__FMT_D,lexeme.string[0])
+              m_RAISE(ANOMALY__VALUE__D,lexeme.string[0])
             } // switch
           } else { // <blotvar id>
             atomBlotexValue.select.c_blotval =
@@ -604,7 +604,7 @@ static int BlotexlibExecutorComputeBlotex(BLOTEXLIB_EXECUTOR_HANDLE handle,
           m_TRACK()
         } // switch  
       break; default:
-        m_RAISE(ANOMALY__VALUE__FMT_D,lexeme.string[0])
+        m_RAISE(ANOMALY__VALUE__D,lexeme.string[0])
       } // switch
       
       switch (BlotexlibExecutorComputeBlotex(handle,a_blotexSequence,ac_blotexValue,
@@ -629,7 +629,7 @@ static int BlotexlibExecutorComputeBlotex(BLOTEXLIB_EXECUTOR_HANDLE handle,
           ac_blotexValue->select.c_blotval = atomBlotexValue.select.c_blotval || 
             ac_blotexValue->select.c_blotval;
         break; default:
-          m_RAISE(ANOMALY__VALUE__FMT_D,int2Op) 
+          m_RAISE(ANOMALY__VALUE__D,int2Op) 
         } // switch
       break; case ANSWER__NO:
         m_DIGGY_RETURN(ANSWER__NO)
@@ -730,7 +730,7 @@ static int BlotexlibExecutorExecuteCFunction(void *r_handle, const struct BLOTFU
 
   break; case OUTPUT_F__BLOTEXLIB_LOCAL_BLOTFUNC_NAME_ENTRY:
   break; default:
-    m_RAISE(ANOMALY__VALUE__FMT_D,ap_blotfunc->entry.localBlotfuncNameEntry)
+    m_RAISE(ANOMALY__VALUE__D,ap_blotfunc->entry.localBlotfuncNameEntry)
   } // switch
   
   m_DIGGY_RETURN(ANSWER__YES)

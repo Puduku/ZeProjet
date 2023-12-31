@@ -85,8 +85,8 @@
 
 // If your anomaly detection is based on some simple value check, these formats are at your
 // disposal...
-#define ANOMALY__VALUE__FMT_D		"=%d"
-#define ANOMALY__VALUE__FMT_P		"=%p"
+#define ANOMALY__VALUE__D		"=%d"
+#define ANOMALY__VALUE__P		"=%p"
 
 #define ANOMALY__SHOULD_NOT_BE_HERE "Should not be here..."
 #define ANOMALY__NOT_AVAILABLE "Not available"
