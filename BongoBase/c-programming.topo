@@ -200,15 +200,21 @@
 //       is that formally, we do have encapsulation - the responsibilities of CO and SO are clearly
 //       separated in the code...
 //
-// - Data value type vs. data content type TODO : reddiger blabla... le but ici est de compendre que 
-//   les data types qui nous intedressent (requestes SQL ou autre...) sont avant tout des types de
-//   VALEUR de donnedes - et que un certain type de valeur peut estre matedrialised par une multitude
-//   de types de contenus diffedrents...
-//
 // - Green items and collections:
 //   The green item is an intermediate concept of compound data between the bare struct-based data
 //   and the encapsulated data (in "object instance") (*)
 //   See also c-ansi/green.topo
 //   (*) : as amendment of "everything is object" holistic vision...
 //
-// TODO: expliquer kekpart les principe du modegle du programme vide et du cas hollistique (comme parsing : pas de cas positif / nedgatif)...
+// - Data value type vs. data content type (TODO: reddiger baratin)... le but ici est de compendre que 
+//   les data types qui nous intedressent (requestes SQL ou autre...) sont avant tout des types de
+//   VALEUR de donnedes - et que un certain type de valeur peut estre matedrialised par une multitude
+//   de types de contenus diffedrents...
+//
+// - Empty program model: (TODO: reddiger baratin) principe du modegle du programme vide 
+// 
+// - Monist representations. (TODO: write the spiel properly) Falsely dualistic representations are a source
+//   of confusion and unnecessary complexity. In particular, it can be totally counterproductive to associate
+//   “binary” statuses (OK / KO, etc.) with general procedures.
+//   A striking example is "parsing" for which we tend to oppose "success" to "error" - syntax or otherwise.
+//   We simply associate a "unary" (and non-binary) status with such "monoistic" procedures.
