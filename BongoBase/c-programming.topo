@@ -211,9 +211,13 @@
 //   VALEUR de donnedes - et que un certain type de valeur peut estre matedrialised par une multitude
 //   de types de contenus diffedrents...
 //
-// - Empty program model: (TODO: reddiger baratin) principe du modegle du programme vide 
+// - Empty program model: A simple "trick" to keep in mind to refrain from writing too much "crap"...
+//   The pure and perfect program exists. It is still unique but universal. This is of course the
+//   "empty" program - without a single line of code. Obviously its practical usefulness is very
+//   limited... To give it a use, we common programmers know no other way than to pollute this perfect
+//   program with our rotten lines of code...
 // 
-// - Monist representations. (TODO: write the spiel properly) Falsely dualistic representations are a source
+// - Monistic approcah. (TODO: write the spiel properly) Falsely dualistic representations are a source
 //   of confusion and unnecessary complexity. In particular, it can be totally counterproductive to associate
 //   “binary” statuses (OK / KO, etc.) with general procedures.
 //   A striking example is "parsing" for which we tend to oppose "success" to "error" - syntax or otherwise.
