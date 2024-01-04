@@ -90,7 +90,7 @@
 //     let us NOT having to deal with such philosophical (and somewhat vain) questions...
 
 
-// Programming patterns:
+// Programming patterns and convetions:
 // - "Modular design" : THE (inalienable) principle...
 //   Modules (as designation of "code containers" that are source files) remain the FUNDAMENTAL
 //   conceptual "units" of software development. That "modular design", although "ancestral", is
