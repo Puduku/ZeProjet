@@ -8,13 +8,9 @@
 //   these "motivations" in mind, one should have a better understanding of the design of
 //   the C code in the project...
 // - provide CONTEXTUAL information to sources (C code) files. 
-// The advantage of the maneuver is to lighten the ".h" header files of all the contextual
-// ruminations and thus offer a clear separation between the CONTEXTUAL and TECHNICAL information.
-// Hence, all comments present in ".h" are focused on technical usage of the module (classical
-// description of public functions parameters, etc.)
-// As part of source files "bundle", ".topo" files are to be referenced (with #include directive) by
-// the other source files - in particular, by the affiliated ".h" header file.
-// => though ".topo" files should never contain source code, such files must be "parsable" by the C
+// As part of source files "bundle", relevant ".topo" files are to be referenced (with #include
+// directive) by "genuine" header (and sometimes source) files.
+// => Though ".topo" files should never contain source code, such files must be "parsable" by the C
 //    compiler/macro-processor ; hence all text must be wrapped in "C comments"...
 //
 // SUMMARY: Given module called BROL, you want...
