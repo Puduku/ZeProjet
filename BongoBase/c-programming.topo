@@ -210,7 +210,19 @@
 //   les data types qui nous intedressent (requestes SQL ou autre...) sont avant tout des types de
 //   VALEUR de donnedes - et que un certain type de valeur peut estre matedrialised par une multitude
 //   de types de contenus diffedrents...
-//
+//   Un type de donnée n'a pas de signification utile. Il faut distinguer dans une donnée
+//   - le composition (ou constitution) physique de la donnée (dans la mémoire)   
+//   - la valeur logique que cette donnée représente 
+//   Les types sont des abstractions permettant d'associer des entités entre elles.
+//   Lorsque, dans les cas simples, l'on peut confondre la composition physique avec la valeur logique des données,
+//   définir des types de données a un sens.
+//   Toutefois, dans le cas "général" (par exemple, lorsque l'on travaille sur des bases de données), il n'est plus
+//   possible de confondre les deux aspects (physique et logique) des données. De de fait, la notion même de "type de donnée"
+//   devient totalement vide de sens. En revanche, en faisant bien la distinction, pour une donnée, entre sa composition physique 
+//   et sa valeur logique, il demeure parfaitement sensé de s'intéresser aux types de sa composition physique d'une part et de sa
+//   valeur logique d'autre part. 
+//   
+
 // - Empty program model: A simple "trick" to keep in mind to refrain from writing too much "crap"...
 //   The pure and perfect program exists. It is still unique but universal. This is of course the
 //   "empty" program - without a single line of code. Obviously its practical usefulness is very
