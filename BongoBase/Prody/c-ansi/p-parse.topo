@@ -15,8 +15,8 @@
 
 // Notes:
 // - The parsing step is, in essence, always a "successful" operation.
-// - Hence, there is no reason a priori to consider "limit" cases (such as empty lexeme with unchanged
-//   sequence; empty sequence with lexeme corresponding to the initial sequence) as intrinsic "parsing errors".
+// - Hence, there is no intrinsic reason to consider "limit" cases (such as empty lexeme with unchanged
+//   sequence and emptied sequence with lexeme corresponding to the initial sequence) as "parsing errors".
 
 // The two "ways" to assemble parsing steps are:
 // - In a purely sequential assemblage, the sequence of characters passed in (and updated by) the 1st step is
