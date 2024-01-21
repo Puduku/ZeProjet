@@ -1,0 +1,148 @@
+// c-monism.topo
+// (c) Puduku - 2024
+
+// Monism is C programs...
+
+// First, a few simple (and arbitrary) definitions...
+// Dualism: reduction of a reality to two aspects (or principles)
+// Falsity: any 'false' proposition
+// Holism: any doctrine of the Greater Whole
+// Monism: reduction of a reality to a single aspect (or principle)
+// Ternary: which can take on three possible values (or states)
+// Unary: which can have only one value (or one state)
+// Excluded middle: principle of "either one or the other".
+// Verity: 1. which can take either the value "true" or "false" (at least, in the logic of the
+//            excluded middle)
+//         2. any "true" proposition
+// Truth: Verity (sorry, this subtlety of the English language completely escapes me)
+
+// PREAMBLE: the truth values "true"/"false" are generally perceived as the fundamental duality of
+// logic, from which all the other forms of duality conceived by our consciousness follow, such as
+// "positive"/"negative", "exists"/"does not exist", "yes"/"no", "good"/"bad", "beautiful"/"ugly",
+// "day"/"night", "won"/"lost", "on"/"off", ... not forgetting the digital avatar, the 0/1 bit...
+// The list of dualities is, of course, endless.
+// However, we can see that all these dualities are equivalent from a logical point of view.
+// For example, the duality "day"/"night" can be replaced by "[it's day is] true" / "[it's day is]
+// false".
+// The key is to consider the wording that best 'speaks' to our conscience...
+// However, for our principle of equivalence to really work, we still need to determine the rule
+// that uniquely associates each value between two given dualities.
+// So, for example, when comparing the two dualities "yes"/"no" and "day"/"night", why associate
+// "yes" with "day" (and "no" with "night")? and not the opposite ("yes" with "night"...)?
+// The answer is: in order to establish a rule of univocal association, it is sufficient that the
+// association between any duality with the "fundamental" duality be univocal. So here's the point:
+// the associations between dualities with the "true"/"false" duality seem, all in all, abitrary.
+// For instance, the association of 'good' with "true' is not necessarily intuitive.
+// On the other hand, any association of duality with the 'positive'/'negative' duality seems more
+// natural: thus, "day", "good", "yes", "true", "won", etc. are spontaneously confused with
+// "positive".
+// Let's make no bones about it: this 'obviousness' is merely a manifestation (or, more accurately,
+// a bias) of our Manichean brains...
+// Conclusion: to illustrate our logical demonstrations, it is sometimes better to set aside the
+// "true"/"false" duality in favour of the (subjective) "positive"/"negative" vision...
+// Are all dualities interchangeable? Answer by example...
+// A little comparison between the dualities "yes/no" and "won/lost"...
+// Why do guys so often harass girls?
+// The guy makes a "proposal" to the girl. The girl blows him off. Guy insists.
+// The girl refuses again. But the guy doesn't give up. On the contrary, the angrier the girl gets,
+// the more he he comes back for more...
+// What's remarkable about this banal story is the perfect symmetry:
+// - the girl really doesn't understand why this guy insists (and doesn't end up leaving her alone)
+// - the guy really doesn't understand why the girl gets upset (and doesn't end up accepting his
+// advances).
+// By simply telling yourself that:
+// - the girl is using "yes / no" as a duality of truth.
+// - the guy uses "won/lost" as a duality of truth.
+// We can then better understand the origin of the blockage...
+// (END OF PREAMBLE)
+
+
+// Our aforementioned 'Western' civilisations appreciate 'Eastern' philosophies and their strange
+// holistic thinking, but not without a degree of circumspection.
+// For example, the dogma of the duality of verity (everything is either 'true' or 'false') is so
+// deeply rooted in our our 'rational' minds, that the idea that verity might not be dual seems to
+// us particularly preposterous.
+// Admittedly, we must consider, albeit reluctantly, the idea that the principle of the "excluded
+// middle" may, at times, temporarily bracketed or suspended. This is the case when we ignore a
+// truth we mention an 'unknown' state or declare a piece of information 'not applicable' - the
+// famous "N/A" in the boxes on forms.
+// Even so, this mention of 'unknown' is seen as a mere artifice, behind which lies the fundamental
+// truth ('true' or 'false') that escapes us because, precisely, we don't know it.
+// Thus, if we consider the proposition "Nicolas Sarkozy was sodomised by his German shepherd."
+// (*), like any other proposition, it is either "true" or "false", according to the principle of
+// the "excluded middle".
+// However, 99.99% of us will simply say: "we don't know (and we don't care)".
+// We are therefore attributing neither a "true" nor a "false" value to our proposition; we would
+// therefore not be respecting the principle of the of the excluded middle... In fact, if we
+// analyse our thinking more deeply, on this "we don't know", things look rather like this...
+// "We don't know", because materially, we can't know (if the event happened, we weren't there to
+// hold the candle). Even if we pulled out all the stops (hiring detectives to find out where the
+// person in question lives, bribing the servants, etc.), our chances of finding out would remain
+// infinitesimal.
+// And even if we were to obtain the 'proof' we're looking for (a video, for example), would we
+// know for sure that it would be the truth (lookalike actor, editing, etc.) ?
+// As for establishing the falsity of the proposition, that would appear to be even more arduous...
+// And yet, however inaccessible the "truth" or "falsity" of the proposition may seem to us, we
+// never question its "existence" : we remain convinced that in the "absolute", the proposition is
+// indeed either "true" or "false".
+// In other words, we don't know how to get rid of this 'evidence': absolute Verity is dual.
+
+// The questioning of dualism (as in Eastern thought), therefore, when it is not considered as
+// madness or an insult to "(good) rational Cartesian sense", arouses, at best, vague curiosity,
+// amusement or commiseration towards beliefs that are quite primitive, naive and exotic.
+// In computing (i.e. in our BINARY DIGIT universe), our attachment to dualism is obviously
+// reinforced.
+// It should be noted, however, that ternary logic has, with varying degrees of success, madei
+// notable inroads into the world of the BIT.
+// For example, in the Wikipedia article on the SQL language:
+//   The NULL keyword was introduced into SQL to express missing information in the relational
+//   model. The introduction of NULL, along with TRUE and FALSE, is the foundation of ternary logic.
+//   NULL has no value in SQL (and is not a member of any data type), it is a reserved keyword,i
+//   indicating that information is missing. As a result, a comparison with NULL, even with NULL
+//   itself, can be neither TRUE nor FALSE; it is necessarily unknown and has no Boolean value. Ini
+//   fact, NULL cannot be considered equal to NULL, since the two pieces of missing information,i
+//   which these two distinct NULLs represent, may turn out to be different. NULL is generally
+//   referred to as a "marker".
+// Note: Fifty years on, the question of the RELEVANCE of this ternary logic in SQL is still being
+// debated.
+// Unary verities in computing...
+// The main incarnation of monism in classic structured programming is undoubtedly the 'pure'
+// procedure, which executes without any 'return status'. This idea of absence of return status
+// makes programmers that we are uncomfortable.
+// No doubt we are too oriented or biased by our belief in absolute and dual truth. In any case, we
+// cannot help attributing to any procedural execution a status of return corresponding to its dual
+// truth. Either:
+// - the positive case (true): the procedure was successful ("OK" case)
+// - the negative case (false): the procedure was not successful ("error" case)
+// The problem is that, when it is 'forced' (and therefore not judicious), this dual truth is
+// source of much confusion and major setbacks.
+// The most serious - and most common! - of confusion is to use the negative case of error as a
+// catch-all for all sorts of problems. Thus, all abnormal situations, i.e. unexpected situations,
+// are problems with the DESIGN of the procedure, which are not linked to the EXECUTION of that
+// same procedure.
+// Now, just as the positive case "OK" refers to an EXECUTION status, the same can only be said fori
+// the negative case "error".
+// In more "computer" language, we associate ORTHOGONAL values with a type (or data).
+// Thus, the assimilation of anomalies with "error cases" leads to this aberrant distinction between:
+// - positive "OK" => the procedure was executed correctly
+// - negative "error" => the procedure was designed incorrectly
+// A slightly more subtle case of confusion relates more specifically to parsing procedures. Ai
+// parsing procedure, taken as a whole, actually has a dual verity value (**): the parsing went well
+// vs. the parsing could not be completed (like a "syntax error occurred" (***)). In on the other
+// hand, there is no intrinsic reason to consider elementary parsing actions (such as "passing a
+// token"), of which the global parsing procedure is composed, as binary. Any elementary parsing
+// action is, fundamentally, a "pure" procedure: unary and always positive...
+
+// (*) Dedsoled pour cet exemple un peu cru, mais c'est vraiment l'exemple, bien susr juste
+// grottesque et sans fondement, que j'avais imagined pour forger mes redflexions ag l'edpoque.
+// Evidemment, on pourra m'objecter, qu'au moins j'aurais pu actualiser mon exemple - en remplaccant
+// Sarko par Macron -, mais il n'y a rien ag faire, je trouve l'exemple plus parlant avec Sarko...
+// (**) although the monistic principle is often the rule. For example, web browsers always manage
+// to parse HTML pages, even when they contain errors.
+// (***) note the somewhat abstruse and 'bombastic' wording, typical of assertions that don't
+// actually mean anything...
+
+
+
+
+

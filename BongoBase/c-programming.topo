@@ -90,7 +90,7 @@
 //     let us NOT having to deal with such philosophical (and somewhat vain) questions...
 
 
-// Programming patterns and convetions:
+// Programming patterns and conventions:
 // - "Modular design" : THE (inalienable) principle...
 //   Modules (as designation of "code containers" that are source files) remain the FUNDAMENTAL
 //   conceptual "units" of software development. That "modular design", although "ancestral", is
@@ -232,8 +232,4 @@
 //   limited... To give it a use, we common programmers know no other way than to spoil this perfect
 //   program with our rotten lines of code...
 // 
-// - Monistic approcah. (TODO: write the spiel properly) Falsely dualistic representations are a source
-//   of confusion and unnecessary complexity. In particular, it can be totally counterproductive to associate
-//   “binary” statuses (OK / KO, etc.) with general procedures.
-//   A striking example is "parsing" for which we tend to oppose "success" to "error" - syntax or otherwise.
-//   We simply associate a "unary" (and non-binary) status with such "monoistic" procedures.
+// - Monism and holism in C-programs: see c-monism.topo 
