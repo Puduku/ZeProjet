@@ -92,7 +92,7 @@
 // amusement or commiseration towards beliefs that are quite primitive, naive and exotic.
 // In computing (i.e. in our BINARY DIGIT universe), our attachment to dualism is obviously
 // reinforced.
-// It should be noted, however, that ternary logic has, with varying degrees of success, madei
+// It should be noted, however, that ternary logic has, with varying degrees of success, made
 // notable inroads into the world of the BIT.
 // For example, in the Wikipedia article on the SQL language:
 //   The NULL keyword was introduced into SQL to express missing information in the relational
@@ -120,13 +120,13 @@
 // catch-all for all sorts of problems. Thus, all abnormal situations, i.e. unexpected situations,
 // are problems with the DESIGN of the procedure, which are not linked to the EXECUTION of that
 // same procedure.
-// Now, just as the positive case "OK" refers to an EXECUTION status, the same can only be said fori
+// Now, just as the positive case "OK" refers to an EXECUTION status, the same can only be said for
 // the negative case "error".
 // In more "computer" language, we associate ORTHOGONAL values with a type (or data).
 // Thus, the assimilation of anomalies with "error cases" leads to this aberrant distinction between:
-// - positive "OK" => the procedure was executed correctly
-// - negative "error" => the procedure was designed incorrectly
-// A slightly more subtle case of confusion relates more specifically to parsing procedures. Ai
+// - positive "OK" => the procedure has EXECUTED correctly
+// - negative "error" => the procedure is DESIGNED incorrectly
+// A slightly more subtle case of confusion relates more specifically to parsing procedures. A
 // parsing procedure, taken as a whole, actually has a dual verity value (**): the parsing went well
 // vs. the parsing could not be completed (like a "syntax error occurred" (***)). In on the other
 // hand, there is no intrinsic reason to consider elementary parsing actions (such as "passing a
@@ -134,10 +134,10 @@
 // action is, fundamentally, a "pure" procedure: unary and always positive...
 
 // (*) Dedsoled pour cet exemple un peu cru, mais c'est vraiment l'exemple, bien susr juste
-// grottesque et sans fondement, que j'avais imagined pour forger mes redflexions ag l'edpoque.
+// grotesque et "sans fondement", que j'avais imagined pour forger mes redflexions ag l'edpoque.
 // Evidemment, on pourra m'objecter, qu'au moins j'aurais pu actualiser mon exemple - en remplaccant
 // Sarko par Macron -, mais il n'y a rien ag faire, je trouve l'exemple plus parlant avec Sarko...
-// (**) although the monistic principle is often the rule. For example, web browsers always manage
+// (**) although the monistic principle is often the rule. Such as, web browsers always manage
 // to parse HTML pages, even when they contain errors.
 // (***) note the somewhat abstruse and 'bombastic' wording, typical of assertions that don't
 // actually mean anything...
