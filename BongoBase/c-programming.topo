@@ -209,8 +209,8 @@
 // - Data logical value type vs. data physical content type
 //   Idea: The very simple concept of "data type" is not always a "useful" concept...
 //   A distinction must be made between
-//   + the physical composition (or constitution) of the data (its "materialization" in memory)
-//   + the logical value that this data represents (in the program)
+//   + the physical composition (or constitution) of the data (its "materialization" in memory) on one hand,
+//   + the logical value that this data represents (in the program), on the other hand
 //   In computing, we usually define 'types', which are abstractions that allow all sorts of entities
 //   to be associated with each other.
 //   When, in simple cases, we can confuse the physical composition with the logical value of the
