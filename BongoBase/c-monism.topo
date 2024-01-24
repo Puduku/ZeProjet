@@ -124,8 +124,8 @@
 // the negative case "error".
 // In more "computer" language, we associate ORTHOGONAL values with a type (or data).
 // Thus, the assimilation of anomalies with "error cases" leads to this aberrant distinction between:
-// - positive "OK" => the procedure has EXECUTED correctly
-// - negative "error" => the procedure is DESIGNED incorrectly
+// - positive "OK" case => the procedure has EXECUTED correctly
+// - negative "error" case => the procedure is DESIGNED incorrectly
 // A slightly more subtle case of confusion relates more specifically to parsing procedures. A
 // parsing procedure, taken as a whole, actually has a dual verity value (**): the parsing went well
 // vs. the parsing could not be completed (like a "syntax error occurred" (***)). In on the other
