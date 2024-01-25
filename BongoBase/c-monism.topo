@@ -133,7 +133,7 @@
 // token"), of which the global parsing procedure is composed, as binary. Any elementary parsing
 // action is, fundamentally, a "pure" procedure: unary and always positive...
 
-// (*) Dedsoled pour cet exemple un peu cru, mais c'est vraiment l'exemple, bien susr juste
+// (*) Dedsoled pour cette image un peu crue, mais c'est vraiment l'exemple, bien susr juste
 // grotesque et "sans fondement", que j'avais imagined pour forger mes redflexions ag l'edpoque.
 // Evidemment, on pourra m'objecter, qu'au moins j'aurais pu actualiser mon exemple - en remplaccant
 // Sarko par Macron -, mais il n'y a rien ag faire, je trouve l'exemple plus parlant avec Sarko...
