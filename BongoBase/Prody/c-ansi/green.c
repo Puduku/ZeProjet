@@ -4,6 +4,7 @@
 #include "c-ansi/green.h"
 #include "c-ansi/stderr.h"
 #include "c-ansi/alloc.h"
+#include "c-ansi/c-stack.h"
 #include "flint/flags.h"
 
 #include <string.h>
@@ -92,7 +93,7 @@ struct GREEN_INDEX {
   /*void* */cpr_bKeys, /*int*/m_comparison) {\
   int em_aEntry = a_index->hsc_array[aIndexEntry];\
     m_TRACK_IF((m_comparison = (a_index)->entryCompareFunction((a_index)->r_entryFunctionsHandle,\
-      (a_index)->indexLabel, /*em_j,*/ em_aEntry, n_bEntry,cpr_bKeys)) < 0)\
+      (a_index)->indexLabel, em_aEntry, n_bEntry,cpr_bKeys)) < 0)\
   if (m_comparison == EQUAL_TO__COMPARISON && n_bEntry != -1)  m_comparison = \
     DIFFERENCE_2_COMPARISON(em_aEntry - n_bEntry) ;\
 }
@@ -669,6 +670,7 @@ struct SELECTION {
   int indexLabel;
   unsigned int indexSeekFlags;
   void *cfpr_keys; // Only significant with Key-based seek flag(s)
+  unsigned int criteriaOpFlags;
 } ;
   
 
@@ -682,25 +684,44 @@ struct INDEX_ITERATOR {
 #define b_ASCENDING b_FALSE0
 #define b_DESCENDING b_TRUE
 
+// Passed:
+// - m_indexIterator:
+// - m_indexLabel1:
+// - m_indexSeekFlags1:
+// - mcfpr_keys1:
+// - m_criteriaOpFlags1:
 #define m_INIT_INDEX_ITERATOR(/*struct INDEX_ITERATOR*/m_indexIterator, /*int*/m_indexLabel1,\
-  /*unsigned int*/m_indexSeekFlags1, /*void* */mcfpr_keys1) {\
+  /*unsigned int*/m_indexSeekFlags1, /*void* */mcfpr_keys1, /*unsigned int*/m_criteriaOpFlags1) {\
   (m_indexIterator).selectionsNumber5 = 1;\
   (m_indexIterator).selections[0].indexLabel = m_indexLabel1;\
   (m_indexIterator).selections[0].indexSeekFlags = m_indexSeekFlags1;\
   (m_indexIterator).selections[0].cfpr_keys = mcfpr_keys1;\
+  (m_indexIterator).selections[0].criteriaOpFlags = m_criteriaOpFlags1;\
   (m_indexIterator).b_descending = b_ASCENDING;\
   m_DISABLE_INDEX_SEQUENCE((m_indexIterator).indexSequence)\
 }
 
-#define m_INIT_INDEX_ITERATOR__ARGS(/*struct INDEX_ITERATOR*/m_indexIterator, /*int*/m_indexLabel,\
-  /*unsigned int*/m_indexSeekFlags, /*void* */mcfpr_keys) {\
+// Passed:
+// - m_indexIterator:
+// - m_indexLabel:
+// - m_indexSeekFlags:
+// - mcfpr_keys:
+// - m_criteriaOpFlags:
+#define m_INIT_INDEX_ITERATOR__EXTRAS(/*struct INDEX_ITERATOR*/m_indexIterator,\
+  /*int*/m_indexLabel, /*unsigned int*/m_indexSeekFlags, /*void* */mcfpr_keys,\
+  /*unsigned int*/m_criteriaOpFlags) {\
+  m_ASSERT((m_indexIterator).selectionsNumber5 < 5)\
   int em_i = (m_indexIterator).selectionsNumber5;\
   (m_indexIterator).selections[em_i].indexLabel = m_indexLabel;\
   (m_indexIterator).selections[em_i].indexSeekFlags = m_indexSeekFlags;\
   (m_indexIterator).selections[em_i].cfpr_keys = mcfpr_keys;\
+  (m_indexIterator).selections[em_i].criteriaOpFlags = m_criteriaOpFlags;\
   (m_indexIterator).selectionsNumber5 ++;\
 }
 
+// Passed:
+// - m_indexIterator:
+// - mb_descending:
 #define m_HARD_RESET_INDEX_ITERATOR(/*struct INDEX_ITERATOR*/m_indexIterator, mb_descending) {\
   (m_indexIterator).b_descending = mb_descending;\
   m_DISABLE_INDEX_SEQUENCE((m_indexIterator).indexSequence)\
@@ -793,23 +814,45 @@ static int GreenIndexesSeek(struct GREEN_INDEXES* a_indexes, struct INDEX_ITERAT
   struct GREEN_INDEX *a_index = a_indexes->vnhs_indexes +
     a_indexIterator->selections[0].indexLabel;
   
+  struct C_STACK matchesStack;
+  m_C_STACK_INIT(matchesStack) 
   do {
     m_TRACK_IF(GreenIndexSeek(a_index, a_indexIterator->b_descending,
       a_indexIterator->selections[0].indexSeekFlags, a_indexIterator->selections[0].cfpr_keys,
       &a_indexIterator->indexSequence, nan_entry) != RETURNED) 
     if (nan_entry != NULL && *nan_entry >= 0) {
+      unsigned int criteriaOpFlags = a_indexIterator->selections[0].criteriaOpFlags;
       int i = 1;
       for (; i < a_indexIterator->selectionsNumber5; i++) {
+        if (criteriaOpFlags != a_indexIterator->selections[i].criteriaOpFlags) {
+          criteriaOpFlags = a_indexIterator->selections[i].criteriaOpFlags;
+        } // if
         int answer = GreenIndexesSeekEntryEquate(a_indexes,
           a_indexIterator->selections[i].indexLabel,*nan_entry,
           a_indexIterator->selections[i].indexSeekFlags,
           a_indexIterator->selections[i].cfpr_keys);
-        if (answer == ANSWER__NO) break; // Entry does not match that extra criterium 
-        else if (answer != ANSWER__YES) m_TRACK()
+        if (answer == ANSWER__NO) { // Entry does not match that extra criterium 
+          if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__AND))
+            // AND op => entry rejected because of that criterium 
+            break; // STOP evaluating extra criteria 
+        } else if (answer == ANSWER__YES) { // Entry matches that extra criterium  
+          if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__OR)) {
+            i = a_indexIterator->selectionsNumber5;
+            // OR op => entry not rejected by extra criteria 
+            break; // STOP evaluating extra criteria 
+          } // if
+        } else m_TRACK()
+        if (b_FLAG_SET_ON(a_indexIterator->selections[i].criteriaOpFlags,
+          CRITERIA_OP_FLAG__CLOSE1)) {
+          m_C_STACK_POP(matchesStack,criteriaOpFlags)
+        } // if
       } // for
-      if (i < a_indexIterator->selectionsNumber5) continue; // Entry does not match extra criteria
-    } // if
-  } while (b_FALSE0) ;
+      // i < a_indexIterator->selectionsNumber5 => 1st extra criterium causing entry rejection
+      if (i >= a_indexIterator->selectionsNumber5) break; // Entry not rejected by extra criteria
+    } else break; // No more entry => finished 
+  } while (b_TRUE) ;
+  m_C_STACK_FREE(matchesStack)
+
 if (nan_entry != NULL) m_DIGGY_VAR_D(*nan_entry)
   m_DIGGY_RETURN(RETURNED)
 } // GreenIndexesSeek
@@ -831,7 +874,6 @@ if (nan_entry != NULL) m_DIGGY_VAR_D(*nan_entry)
 static int GreenIndexesCurrent(struct GREEN_INDEXES* a_indexes,
   struct INDEX_ITERATOR *a_indexIterator, int *an_entry) {
   m_DIGGY_BOLLARD_S()
-  m_ASSERT(a_indexIterator->selectionsNumber5 == 1)
   m_ASSERT(a_indexIterator->selections[0].indexLabel < a_indexes->indexesNumber) 
   struct GREEN_INDEX *a_index = a_indexes->vnhs_indexes + a_indexIterator->selections[0].indexLabel;
   
@@ -1091,16 +1133,29 @@ struct INDEX_REQUEST {
   int fetch4; 
 } ;
  
+// Passed:
+// - m_indexRequest:
+// - m_indexLabel1:
+// - m_indexSeekFlags1:
+// - mcfpr_keys1:
+// - m_criteriaOpFlags1:
 #define m_INIT_INDEX_REQUEST(/*struct INDEX_REQUEST*/m_indexRequest, /*int*/m_indexLabel1,\
-  /*unsigned int*/m_indexSeekFlags1, /*void* */mcfpr_keys1) {\
-  m_INIT_INDEX_ITERATOR((m_indexRequest).iterator, m_indexLabel1, m_indexSeekFlags1, mcfpr_keys1) \
+  /*unsigned int*/m_indexSeekFlags1, /*void* */mcfpr_keys1, /*unsigned int*/m_criteriaOpFlags1) {\
+  m_INIT_INDEX_ITERATOR((m_indexRequest).iterator, m_indexLabel1, m_indexSeekFlags1, mcfpr_keys1,\
+    m_criteriaOpFlags1) \
   (m_indexRequest).fetch4 = FETCH_4__CHANGE;\
 }
 
-#define m_INIT_INDEX_REQUEST__ARGS(/*struct INDEX_REQUEST*/m_indexRequest, /*int*/m_indexLabel,\
-  /*unsigned int*/m_indexSeekFlags, /*void* */mcfpr_keys) {\
-  m_INIT_INDEX_ITERATOR__ARGS((m_indexRequest).iterator, m_indexLabel, m_indexSeekFlags,\
-    mcfpr_keys) \
+// Passed:
+// - m_indexRequest:
+// - m_indexLabel:
+// - m_indexSeekFlags:
+// - mcfpr_keys:
+// - m_criteriaOpFlags
+#define m_INIT_INDEX_REQUEST__EXTRAS(/*struct INDEX_REQUEST*/m_indexRequest, /*int*/m_indexLabel,\
+  /*unsigned int*/m_indexSeekFlags, /*void* */mcfpr_keys, /*unsigned int*/m_criteriaOpFlags) {\
+  m_INIT_INDEX_ITERATOR__EXTRAS((m_indexRequest).iterator, m_indexLabel, m_indexSeekFlags,\
+    mcfpr_keys, m_criteriaOpFlags) \
 }
 
 #define m_HARD_RESET_INDEX_REQUEST(/*struct INDEX_REQUEST*/m_indexRequest, mb_descending,\
@@ -1264,7 +1319,8 @@ int GreenCollectionCreateInstance(GREEN_COLLECTION_HANDLE *azh_handle,  int expe
   m_GREEN_INDEXES_INIT(handle->indexes,GreenCollectionEntryRawCompare,
     GreenCollectionEntryRawEquate, (void *) handle)
   m_GAPS_STACK_INIT(handle->h_gaps,handle->itemsPhysicalNumber)
-  m_INIT_INDEX_REQUEST(handle->internalIndexRequest,INDEX_LABEL0,ALL_FLAGS_OFF0,(void*)UNDEFINED)
+  m_INIT_INDEX_REQUEST(handle->internalIndexRequest,INDEX_LABEL0,ALL_FLAGS_OFF0,(void*)UNDEFINED,
+    ALL_FLAGS_OFF0)
 
   m_MALLOC_ARRAY(handle->h_fetched4ChangeEntries,handle->fetched4ChangeEntriesPhysicalNumber =
     expectedItemsNumber)
@@ -1576,21 +1632,28 @@ int GreenCollectionIndexRequest(GREEN_COLLECTION_HANDLE cp_handle,
   struct INDEX_REQUEST *indexRequestPtr = (nf_indexRequestAutomaticBuffer != NULL?
     (struct INDEX_REQUEST *)nf_indexRequestAutomaticBuffer: &(cp_handle->internalIndexRequest));
 
-  m_INIT_INDEX_REQUEST(*indexRequestPtr,indexLabel1,indexSeekFlags1,cfpr_keys1)
-
   { va_list arguments;
+    unsigned int criteriaOpFlags = ALL_FLAGS_OFF0;
+
     va_start(arguments,cfpr_keys1);
 
+    if (criteriaNumber > 1) {
+      criteriaOpFlags = va_arg(arguments,unsigned int);
+      m_ASSERT(criteriaOpFlags == CRITERIA_OP_FLAGS__AND || criteriaOpFlags ==
+        CRITERIA_OP_FLAGS__AND_OPEN)
+    } // if
+    m_INIT_INDEX_REQUEST(*indexRequestPtr,indexLabel1,indexSeekFlags1,cfpr_keys1,criteriaOpFlags)
+
     int i = 1;
-    unsigned int criteraOpFlags = UNDEFINED;
     for (; i < criteriaNumber;  i++) {
-      criteraOpFlags = va_arg(arguments,unsigned int);
       indexLabel1 = va_arg(arguments,int);
       indexSeekFlags1 = va_arg(arguments,unsigned int);
       cfpr_keys1 = va_arg(arguments,void *);
+      criteriaOpFlags = va_arg(arguments,unsigned int);
 
-      m_ASSERT(criteraOpFlags == CRITERIA_OP_FLAGS__AND)
-      m_INIT_INDEX_REQUEST__ARGS(*indexRequestPtr,indexLabel1,indexSeekFlags1,cfpr_keys1)
+      m_ASSERT(criteriaOpFlags == CRITERIA_OP_FLAGS__AND)
+      m_INIT_INDEX_REQUEST__EXTRAS(*indexRequestPtr,indexLabel1,indexSeekFlags1,cfpr_keys1,
+        criteriaOpFlags)
     } // for 
 
     va_end(arguments);

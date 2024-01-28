@@ -293,10 +293,14 @@ typedef char *INDEX_REQUEST_AUTOMATIC_BUFFER ;
 #define m_INDEX_REQUEST_AUTOMATIC_BUFFER(m_indexRequestAutomaticBuffer) \
 char m_indexRequestAutomaticBuffer[p_indexRequestAutomaticBufferSize] ; 
 
-#define CRITERIA_OP_FLAG__AND    0x01
-#define CRITERIA_OP_FLAG__OR     0x02
-#define CRITERIA_OP_FLAG__OPEN   0x10 // Open bracket
-#define CRITERIA_OP_FLAG__CLOSE  0x20 // Close bracket
+#define CRITERIA_OP_FLAG__CLOSE1      0x001 // Close one bracket before op.
+#define CRITERIA_OP_FLAG__CLOSE2      0x002 // Close two brackets before op.
+#define CRITERIA_OP_FLAG__CLOSE3      0x004 // Close three brackets before op.
+#define CRITERIA_OP_FLAG__AND         0x010 // And op.
+#define CRITERIA_OP_FLAG__OR          0x020 // Or op.
+#define CRITERIA_OP_FLAG__OPEN1       0x100 // Open one bracket after op. 
+#define CRITERIA_OP_FLAG__OPEN2       0x200 // Open two brackets after op. 
+#define CRITERIA_OP_FLAG__OPEN3       0x400 // Open three brackets after op. 
 
 #endif // __C_ANSI_GREEN_H_INCLUDED__ == 0
 
@@ -307,13 +311,20 @@ char m_indexRequestAutomaticBuffer[p_indexRequestAutomaticBufferSize] ;
 // #REF enum-CRITERIA_OP
 m_DEFINE_ENUM_ALIAS_BEGIN(m_CriteriaOpFlagsImage)
   // Index request operators (flags) 
-  m_ENUM_ALIAS_VAL(CRITERIA_OP_FLAGS__AND       ,CRITERIA_OP_FLAG__AND) 
-  m_ENUM_ALIAS_VAL(CRITERIA_OP_FLAGS__OR        ,CRITERIA_OP_FLAG__OR) 
-  m_ENUM_ALIAS_VAL(CRITERIA_OP_FLAGS__OPEN_AND  ,CRITERIA_OP_FLAG__OPEN | CRITERIA_OP_FLAG__AND) 
-  m_ENUM_ALIAS_VAL(CRITERIA_OP_FLAGS__OPEN_OR   ,CRITERIA_OP_FLAG__OPEN | CRITERIA_OP_FLAG__OR) 
-  m_ENUM_ALIAS_VAL(CRITERIA_OP_FLAGS__AND_CLOSE ,CRITERIA_OP_FLAG__AND  | CRITERIA_OP_FLAG__CLOSE) 
-  m_ENUM_ALIAS_VAL(CRITERIA_OP_FLAGS__OR_CLOSE  ,CRITERIA_OP_FLAG__OR   | CRITERIA_OP_FLAG__CLOSE) 
-  m_ENUM_ALIAS_VAL(CRITERIA_OP_FLAGS__CLOSE     ,CRITERIA_OP_FLAG__CLOSE) 
+  m_ENUM_ALIAS_VAL(CRITERIA_OP_FLAGS__AND, CRITERIA_OP_FLAG__AND)
+  m_ENUM_ALIAS_VAL(CRITERIA_OP_FLAGS__OR, CRITERIA_OP_FLAG__OR)
+  m_ENUM_ALIAS_VAL(CRITERIA_OP_FLAGS__AND_OPEN,
+    CRITERIA_OP_FLAG__AND | CRITERIA_OP_FLAG__OPEN1) 
+  m_ENUM_ALIAS_VAL(CRITERIA_OP_FLAGS__OR_OPEN,
+    CRITERIA_OP_FLAG__OR | CRITERIA_OP_FLAG__OPEN1)
+  m_ENUM_ALIAS_VAL(CRITERIA_OP_FLAGS__CLOSE_AND,
+    CRITERIA_OP_FLAG__CLOSE1 | CRITERIA_OP_FLAG__AND) 
+  m_ENUM_ALIAS_VAL(CRITERIA_OP_FLAGS__CLOSE_OR,
+    CRITERIA_OP_FLAG__CLOSE1 | CRITERIA_OP_FLAG__OR) 
+  m_ENUM_ALIAS_VAL(CRITERIA_OP_FLAGS__CLOSE_AND_OPEN,
+    CRITERIA_OP_FLAG__CLOSE1 | CRITERIA_OP_FLAG__AND | CRITERIA_OP_FLAG__OPEN1) 
+  m_ENUM_ALIAS_VAL(CRITERIA_OP_FLAGS__CLOSE_OR_OPEN,
+    CRITERIA_OP_FLAG__CLOSE1 | CRITERIA_OP_FLAG__OR | CRITERIA_OP_FLAG__OPEN1) 
 m_DEFINE_ENUM_ALIAS_END()
 
 #if __C_ANSI_GREEN_H_INCLUDED__ == 0
@@ -335,11 +346,13 @@ m_DEFINE_ENUM_ALIAS_END()
 // - indexSeekFlags1: (1st criterion)
 // - cfpr_keys1:  (1st criterion) search key(s) value(s) of item (regarding index) ;
 //   not significant without actual index seek flag (INDEX_SEEK_FLAGS__ANY)
-// - optional criteria (...) :
-//  + criteraOpFlags2 :
+// - optional criteria (...) : when criteriaNumber > 1
+//  + criteriaOpFlags1 : only CRITERIA_OP_FLAGS__AND / CRITERIA_OP_FLAGS__AND_OPEN combinations are
+//    allowed
 //  + indexLabel2:
 //  + c_indexSeekFlags2:
 //  + cfpr_keys2: 
+//  + criteriaOpFlags2 :
 //  (etc.)
 // 
 // Changed:
