@@ -49,12 +49,12 @@ int SuckerCreateInstance(SUCKER_HANDLE *azh_handle, int suckingLimit);
 //
 // Changed:
 // - *ac_chunk: sucked stuff: not significant in case of "flop"
-//   + empty portion (length == 0): end of input ; no more stuff can be sucked
-//   + non empty portion (length > 0): sucked stuff 
+//   + empty portion (length == 0): end of input ; no more chunk can be sucked
+//   + non empty portion (length > 0): sucked chunk
 // - *nar_flopCause: (if asked) <generic status> ; cause of "flop"
 //
 // Ret: sucked OK ? 
-// - ANSWER__YES: OK - "empty" data chunk indicates "end of input" 
+// - ANSWER__YES: OK - "empty" (data) chunk indicates "end of input" 
 // - ANSWER__NO: "flop" during sucking 
 // - -1 : unexpected problem; anomaly is raised
 typedef int (*BUTT_ADEPT_SUCK_FUNCTION) (void *r_handle, char b_kickButt,
@@ -62,7 +62,7 @@ typedef int (*BUTT_ADEPT_SUCK_FUNCTION) (void *r_handle, char b_kickButt,
 
 
 // #REF BUTT_ADEPT_FILL_FUNCTION <generic status>
-// Fill butt with some content...
+// Fill butt with some chunk (content)...
 //
 // Passed:
 // - r_handle: (private) handle
@@ -107,8 +107,8 @@ int SuckerPlugSDButts(SUCKER_HANDLE handle,
 // - *nar_flopCause: (if used) default value
 //
 // Changed:
-// - *ac_chunk: sucked stuff: not significant in case of "flop"
-//   + empty portion (length == 0): end of input ; no more stuff can be sucked
+// - *ac_chunk: sucked chunk: not significant in case of "flop"
+//   + empty portion (length == 0): end of input ; no more chunk can be sucked
 //   + non empty portion (length > 0): sucked stuff
 // - *nar_flopCause: (if asked) <generic status> ; cause of "flop"
 //
@@ -158,7 +158,7 @@ enum { // #REF enum-SUCKER_STATUS
 // - *nar_flopCause: (if used) default value
 //
 // Modified:
-// - *na_suckedOutLength: (if asked) amount of stuff sucked (in bytes)
+// - *na_suckedOutLength: (if asked) amount of chunks sucked (in bytes)
 // - *nar_flopCause: <generic status> ; cause of "flop"
 //
 // Return:
