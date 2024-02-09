@@ -172,8 +172,8 @@
 // the "initialization", we "just have" to cast the field with SUPPOSED equivalent "constless" data
 // type... (*) 
 // But, that's the point : casting operations are by essence dangerous dispositions (remember,
-// 'cast' operator DISABLES any data type consistency CONTROLS made by the compiler, and by the
-// way transform simple compilation problems into application crashes that must, of course, be
+// casting (pseudo-)operations DISABLES any data type consistency CONTROLS made by the compiler, and
+// by the way transform simple compilation problems into application crashes that must, of course, be
 // avoided).  
 // So, 'const' does provides effective protection against invalid data changes, which are specific
 // forms of data corruption, but the price to pay for this protection is a real risk of causing
