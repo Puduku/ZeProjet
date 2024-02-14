@@ -97,7 +97,7 @@
 // abstractions) ...
 
 // Number 6: "Pointer, what pointer ?..." The numerous ambivalences of the pointer concept.
-// "Pointers" are hiding everywhere in C ; however, WHAT is EXACTLY a pointer in C ? Actually, a
+// "Pointers" are showing everywhere in C ; however, WHAT is EXACTLY a pointer in C ? Actually, a
 // lot of different answers are possible... 'Pointer' is a "phantom" concept in C. 
 // Examples of pitfalls caused by that ambivalence:
 // Ex1: pf() vs. *pf() 
