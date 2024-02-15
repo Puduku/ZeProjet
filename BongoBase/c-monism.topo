@@ -114,9 +114,9 @@
 // truth. Either:
 // - the positive case (true): the procedure was successful ("OK" case)
 // - the negative case (false): the procedure was not successful ("error" case)
-// The problem is that, when it is 'forced' (and therefore not judicious), this dual truth is
+// The problem is that, when it is 'forced' (and therefore not judicious), this dual vision is
 // source of much confusion and major setbacks.
-// The most serious - and most common! - of confusion is to use the negative case of error as a
+// The most serious - and most common! - of confusion is to use the negative error case as a
 // catch-all for all sorts of problems. Thus, all abnormal situations, i.e. unexpected situations,
 // are problems with the DESIGN of the procedure, which are not linked to the EXECUTION of that
 // same procedure.
