@@ -143,7 +143,7 @@
 //     concept - i.e association principle of code and data (so-called "methods" and "attributes")
 //     can be easily implemented in C by means of "instances" and "handles".
 //     . An "instance" is simply an allocation in memory (generally heap) of some data structure.
-//       An "instance" is defined in the private part of modules.   
+//       "Instance" are defined in the private part of modules.   
 //     . A "handle" is nothing but a pointer variable pointing to the "instance". A "handle" is the
 //       only public definition related to data instance. 
 //       The fundamental, and natural, property of "handles" is that multiple "handles" can be
