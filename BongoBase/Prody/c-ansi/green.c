@@ -789,6 +789,24 @@ static int GreenIndexesSeekEntryEquate(struct GREEN_INDEXES* a_indexes, int inde
   return answer; 
 } // GreenIndexesSeekEntryEquate
 
+// Passed:
+// - criteriaOpFlags
+static inline int m_OpenBracketsNumber(unsigned int criteriaOpFlags) {
+  if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__OPEN3)) return 3;
+  else if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__OPEN2)) return 2;
+  else if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__OPEN1)) return 1;
+  return 0;
+} // m_OpenBracketsNumber 
+
+// Passed:
+// - criteriaOpFlags
+static inline int m_CloseBracketsNumber(unsigned int criteriaOpFlags) {
+  if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE3)) return 3;
+  else if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE2)) return 2;
+  else if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE1)) return 1;
+  return 0;
+} // m_CloseBracketsNumber 
+
 // Update index iterator sequence.
 //
 // Passed:
@@ -814,44 +832,99 @@ static int GreenIndexesSeek(struct GREEN_INDEXES* a_indexes, struct INDEX_ITERAT
   struct GREEN_INDEX *a_index = a_indexes->vnhs_indexes +
     a_indexIterator->selections[0].indexLabel;
   
-  struct C_STACK matchesStack;
-  m_C_STACK_INIT(matchesStack) 
+  // ASSERT: selections[].criteriaOpFlags are NORMALIZED
+
+#define CRITERIA_STACK_SIZE 10
+
+  unsigned int criteriaOpFlags[CRITERIA_STACK_SIZE] ;
+  char statuses[CRITERIA_STACK_SIZE]; // 'U': Unkown 'C': Canceled 'O': Ok 'K': KO
+  
+// Passed:
+// m_i: criteria entry position 
+#define m_HANDLE_OPEN_BRACKETS(/*int*/m_i) {\
+  int em_n = m_OpenBracketsNumber(a_indexIterator->selections[m_i].criteriaOpFlags);\
+  int em_j = 0; for (; em_j < em_n; em_j++) {\
+    m_ASSERT(++i_stackEntry < CRITERIA_STACK_SIZE);\
+    v_criteriaOpFlagsPtr++; \
+    v_statusPtr++; \
+    if (statuses[i_stackEntry-1] == 'U') *v_statusPtr = 'U' ;\
+    else *v_statusPtr = 'C' ;\
+    *v_criteriaOpFlagsPtr = ALL_FLAGS_OFF0;\
+  }\
+}
+
+// Passed:
+// m_i: criteria entry position 
+#define m_HANDLE_EQUATION_AND_CLOSE_BRACKETS(/*int*/m_i) \
+  int em_closeBracketsNumber = m_CloseBracketsNumber(\
+    a_indexIterator->selections[m_i].criteriaOpFlags);\
+  if (*v_criteriaOpFlagsPtr == ALL_FLAGS_OFF0 && em_closeBracketsNumber == 0) \
+    *v_criteriaOpFlagsPtr = a_indexIterator->selections[m_i].criteriaOpFlags;\
+  if (*v_statusPtr == 'U') {\
+    int answer = GreenIndexesSeekEntryEquate(a_indexes,\
+      a_indexIterator->selections[m_i].indexLabel,*nan_entry,\
+      a_indexIterator->selections[m_i].indexSeekFlags,\
+      a_indexIterator->selections[m_i].cfpr_keys);\
+    switch (answer) {\
+    break; case ANSWER__YES:\
+      if (b_FLAG_SET_OFF(*v_criteriaOpFlagsPtr,CRITERIA_OP_FLAG__AND) || em_closeBracketsNumber > 0)\
+        *v_statusPtr = 'O';\
+    case ANSWER__NO: \
+      if (b_FLAG_SET_OFF(*v_criteriaOpFlagsPtr,CRITERIA_OP_FLAG__OR) || em_closeBracketsNumber > 0)\
+        *v_statusPtr = 'K'; \
+    break; default:\
+      m_TRACK()\
+    }\
+  }\
+  int em_j = 0; for (; em_j < em_closeBracketsNumber; em_j++) {\
+    i_stackEntry--;\
+    v_criteriaOpFlagsPtr--; \
+    v_statusPtr--; \
+    if (em_j == em_closeBracketsNumber-1 && *v_criteriaOpFlagsPtr == ALL_FLAGS_OFF0) \
+      *v_criteriaOpFlagsPtr = a_indexIterator->selections[m_i].criteriaOpFlags;\
+    if (*v_statusPtr == 'U') {\
+      if (b_FLAG_SET_OFF(*v_criteriaOpFlagsPtr,CRITERIA_OP_FLAG__OR)) {\
+        *v_statusPtr = 'O';\
+      } else { \
+        *v_statusPtr = 'K';\
+      } \
+    } \
+    if (i_stackEntry > 0 && statuses[i_stackEntry+1] != 'C') {\
+      m_ASSERT(*v_statusPtr == 'U')\
+      if (statuses[i_stackEntry+1] == 'O' && b_FLAG_SET_OFF(*v_criteriaOpFlagsPtr,CRITERIA_OP_FLAG__AND))\
+        *v_statusPtr = 'O' ; \
+      else if (*v_statusPtr == 'K' && b_FLAG_SET_OFF(*v_criteriaOpFlagsPtr,\
+        CRITERIA_OP_FLAG__OR)) *v_statusPtr = 'K'; \
+    } \
+  } \
+  if (*v_criteriaOpFlagsPtr == ALL_FLAGS_OFF0) *v_criteriaOpFlagsPtr =\
+   a_indexIterator->selections[m_i].criteriaOpFlags;\
+
+
   do {
     m_TRACK_IF(GreenIndexSeek(a_index, a_indexIterator->b_descending,
       a_indexIterator->selections[0].indexSeekFlags, a_indexIterator->selections[0].cfpr_keys,
       &a_indexIterator->indexSequence, nan_entry) != RETURNED) 
     if (nan_entry != NULL && *nan_entry >= 0) {
-      unsigned int criteriaOpFlags = a_indexIterator->selections[0].criteriaOpFlags;
-      int i = 1;
-      for (; i < a_indexIterator->selectionsNumber5; i++) {
-        if (criteriaOpFlags != a_indexIterator->selections[i].criteriaOpFlags) {
-          criteriaOpFlags = a_indexIterator->selections[i].criteriaOpFlags;
+      int i_stackEntry = 0; 
+      unsigned int *v_criteriaOpFlagsPtr = criteriaOpFlags;
+      char *v_statusPtr = statuses;
+      statuses[0] = 'U' ; // Unknown
+      m_ASSERT(b_FLAG_SET_OFF(criteriaOpFlags[0] = a_indexIterator->selections[0].criteriaOpFlags,
+        CRITERIA_OP_FLAGS__OR))
+      int i = 0; for (; i < a_indexIterator->selectionsNumber5; i++) {
+        if (i == 0) {
+          if (a_indexIterator->selectionsNumber5 == 1) statuses[0] = 'O' ; // Ok 
+        } else { 
+          m_HANDLE_EQUATION_AND_CLOSE_BRACKETS(i)
         } // if
-        int answer = GreenIndexesSeekEntryEquate(a_indexes,
-          a_indexIterator->selections[i].indexLabel,*nan_entry,
-          a_indexIterator->selections[i].indexSeekFlags,
-          a_indexIterator->selections[i].cfpr_keys);
-        if (answer == ANSWER__NO) { // Entry does not match that extra criterium 
-          if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__AND))
-            // AND op => entry rejected because of that criterium 
-            break; // STOP evaluating extra criteria 
-        } else if (answer == ANSWER__YES) { // Entry matches that extra criterium  
-          if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__OR)) {
-            i = a_indexIterator->selectionsNumber5;
-            // OR op => entry not rejected by extra criteria 
-            break; // STOP evaluating extra criteria 
-          } // if
-        } else m_TRACK()
-        if (b_FLAG_SET_ON(a_indexIterator->selections[i].criteriaOpFlags,
-          CRITERIA_OP_FLAG__CLOSE1)) {
-          m_C_STACK_POP(matchesStack,criteriaOpFlags)
-        } // if
+        m_HANDLE_OPEN_BRACKETS(i)
       } // for
-      // i < a_indexIterator->selectionsNumber5 => 1st extra criterium causing entry rejection
-      if (i >= a_indexIterator->selectionsNumber5) break; // Entry not rejected by extra criteria
+      m_ASSERT(i_stackEntry == 0)
+      m_ASSERT(statuses[0] == 'O' || statuses[0] == 'K')
+      if (statuses[0] == 'O') break; // Entry not rejected by extra criteria 
     } else break; // No more entry => finished 
   } while (b_TRUE) ;
-  m_C_STACK_FREE(matchesStack)
 
 if (nan_entry != NULL) m_DIGGY_VAR_D(*nan_entry)
   m_DIGGY_RETURN(RETURNED)
@@ -1639,8 +1712,6 @@ int GreenCollectionIndexRequest(GREEN_COLLECTION_HANDLE cp_handle,
 
     if (criteriaNumber > 1) {
       criteriaOpFlags = va_arg(arguments,unsigned int);
-      m_ASSERT(criteriaOpFlags == CRITERIA_OP_FLAGS__AND || criteriaOpFlags ==
-        CRITERIA_OP_FLAGS__AND_OPEN)
     } // if
     m_INIT_INDEX_REQUEST(*indexRequestPtr,indexLabel1,indexSeekFlags1,cfpr_keys1,criteriaOpFlags)
 
@@ -1651,7 +1722,6 @@ int GreenCollectionIndexRequest(GREEN_COLLECTION_HANDLE cp_handle,
       cfpr_keys1 = va_arg(arguments,void *);
       criteriaOpFlags = va_arg(arguments,unsigned int);
 
-      m_ASSERT(criteriaOpFlags == CRITERIA_OP_FLAGS__AND)
       m_INIT_INDEX_REQUEST__EXTRAS(*indexRequestPtr,indexLabel1,indexSeekFlags1,cfpr_keys1,
         criteriaOpFlags)
     } // for 
