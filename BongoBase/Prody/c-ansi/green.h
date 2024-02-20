@@ -329,6 +329,24 @@ m_DEFINE_ENUM_ALIAS_END()
 
 #if __C_ANSI_GREEN_H_INCLUDED__ == 0
 
+// Passed:
+// - criteriaOpFlags
+static inline int m_OpenBracketsNumber(unsigned int criteriaOpFlags) {
+  if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__OPEN3)) return 3;
+  else if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__OPEN2)) return 2;
+  else if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__OPEN1)) return 1;
+  return 0;
+} // m_OpenBracketsNumber 
+
+// Passed:
+// - criteriaOpFlags
+static inline int m_CloseBracketsNumber(unsigned int criteriaOpFlags) {
+  if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE3)) return 3;
+  else if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE2)) return 2;
+  else if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE1)) return 1;
+  return 0;
+} // m_CloseBracketsNumber 
+
 // name > 'a' open_and sex = 'F' or_close age > 20 
 
 // #REF GreenCollectionIndexRequest <greenItem> <keys> 
