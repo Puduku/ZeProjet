@@ -192,7 +192,7 @@
 // fair control on the nature of the integer data (size and  signedness). However, inopportune
 // typedefs (which "opacify" without reason - just for the pleasure - the data types) complicate
 // the situation...
-// (*) This serious problem persists in C++. C++ does provide a mechanism that mimics ADA's
+// (*) This serious problem persists in C++. C++ does well provide a mechanism that mimics ADA's
 // exceptions, but that mechanism is actually useless regarding numbers' OVERFLOWS. The problem is
 // that, though the 'overflow_error' is well defined with the C++ standard, we still have to raise it
 // "manually" in the code if we want to handle it as exception.  It's like you have a shiny car in
