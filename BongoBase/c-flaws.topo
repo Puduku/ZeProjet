@@ -196,7 +196,8 @@
 // exceptions, but that mechanism is actually useless regarding numbers' OVERFLOWS. The problem is
 // that, though the 'overflow_error' is well defined with the C++ standard, we still have to raise it
 // "manually" in the code if we want to handle it as exception.  It's like you have a shiny car in
-// your hands, but there's no engine under the hood - you have to pedal to move forward...
+// your hands, with a lot of sophisticated controls on the dashboard, but there's no engine under the
+// hood - you have to pedal (and to simulate the engine noise with your mouth) to move forward...
 
 // Number 1: Unreadable C interface headers - mess with portability flags. 
 // This is not an originel flaw of the language. But now, after more than forty years of (often
