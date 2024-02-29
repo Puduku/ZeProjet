@@ -128,7 +128,7 @@
 // - for the "slave", smooth termination: hanging up in turn (step 3) 
 // - for the "slave", rough termination: hanging up the first (step 1)
 // 
-// So far, we have totally neglected the following "unhappy ends" :
+// So far, we totally neglected the following "unhappy ends" :
 // - UE1: in write operation, the underlying file system is physically full, or a quota prevents
 //   from writing more data on the file, hence the write is not possible because there is "not
 //   enough room"...
