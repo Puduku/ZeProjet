@@ -3,7 +3,7 @@ GENESEE - (teeny tiny) bits of tips : files and directories naming conventions
 ==============================================================================
 (c) 2023 - Puduku
 
-Notice: the following principles have been conceived for "UNIXes" family files systems. In
+Notice: the following principles were conceived for "UNIXes" family files systems. In
 particular, the principles are not applicable to "MS-DOS/Windozes" family files systems ;
 (*) notes remind these incompatibilities... 
 
