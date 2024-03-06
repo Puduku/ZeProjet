@@ -347,10 +347,15 @@ static inline int m_CloseBracketsNumber(unsigned int criteriaOpFlags) {
   return 0;
 } // m_CloseBracketsNumber 
 
-// name > 'a' open_and sex = 'F' or_close age > 20 
+// Ex.
+// x AND (( y OR u OR z) AND ( w OR t))  <== request
+// ^--0---^ ^1-^ ^2-^ ^--3---^ ^4-^ ^5^  <== criteria      
 
 // #REF GreenCollectionIndexRequest <greenItem> <keys> 
 // Construct a request for indexed fetch - see GreenCollectionIndexFetch()
+// Note1: AND op. has precedence on OR op.
+// Note2: inconsistencies in the request expression (missing closing brackets, etc.) are 
+// - normally - rectified properly.
 //
 // Passed:
 // - handle:
@@ -365,8 +370,7 @@ static inline int m_CloseBracketsNumber(unsigned int criteriaOpFlags) {
 // - cfpr_keys1:  (1st criterion) search key(s) value(s) of item (regarding index) ;
 //   not significant without actual index seek flag (INDEX_SEEK_FLAGS__ANY)
 // - optional criteria (...) : when criteriaNumber > 1
-//  + criteriaOpFlags1 : only CRITERIA_OP_FLAGS__AND / CRITERIA_OP_FLAGS__AND_OPEN combinations are
-//    allowed
+//  + criteriaOpFlags1 : CRITERIA_OP_FLAG__OR and CRITERIA_OP_FLAG__CLOSE* are not allowed
 //  + indexLabel2:
 //  + c_indexSeekFlags2:
 //  + cfpr_keys2: 
@@ -376,9 +380,9 @@ static inline int m_CloseBracketsNumber(unsigned int criteriaOpFlags) {
 // Changed:
 // - nf_indexRequestAutomaticBuffer : (if used) initialized 
 //
-// Ret:
-//
-// - RETURNED: Ok
+// Ret: 
+// - COMPLETED__OK: Ok
+// - COMPLETED__BUT: request rectified (missing closing brackets, etc.)
 // - -1: unexpected problem ; anomaly is raised
 int GreenCollectionIndexRequest(GREEN_COLLECTION_HANDLE cp_handle,
   INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaNumber,

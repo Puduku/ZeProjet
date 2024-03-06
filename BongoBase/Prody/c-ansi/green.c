@@ -438,16 +438,14 @@ static int GreenIndexVerify(struct GREEN_INDEX *a_index) {
 
 #ifdef DIGGY
   if (b_diggyGreenCollectionExam) {
-    int i = 0 ;
     m_DIGGY_INFO("Exam: a_index->count=%d (indexLabel=%d)",a_index->count,a_index->indexLabel)
-    for (; i < a_index->count; i++) {
+    int i = 0 ; for (; i < a_index->count; i++) {
       m_DIGGY_INFO("  a_index->hsc_array[%d]=%d",i,a_index->hsc_array[i])
     } // for
   } // if 
 #endif
 
-  int j = 1;
-  for (; j < a_index->count; j++) {
+  int j = 1; for (; j < a_index->count; j++) {
     m_GREEN_INDEX_COMPARE(a_index, j, a_index->hsc_array[j-1],
       (void *)(GENERIC_INTEGER) UNDEFINED, comparison)
     if (comparison != GREATER_THAN__COMPARISON) {
@@ -479,9 +477,8 @@ static int GreenIndexVerifyEntry(struct GREEN_INDEX *a_index, int entry, int exp
   int completed = COMPLETED__OK;
   
   int hits = 0;
-  int i = 0;
   int *s_indexArrayPtr = a_index->hsc_array;
-  for (; i < a_index->count ; i++, s_indexArrayPtr++) {
+  int i = 0; for (; i < a_index->count ; i++, s_indexArrayPtr++) {
     if (*s_indexArrayPtr == entry) hits++ ;
   } // for
 
@@ -789,54 +786,53 @@ static int GreenIndexesSeekEntryEquate(struct GREEN_INDEXES* a_indexes, int inde
   return answer; 
 } // GreenIndexesSeekEntryEquate
 
-  // ASSERT: selections[].criteriaOpFlags are NORMALIZED
-
 #define CRITERIA_STACK_SIZE 10
 
-// statuses : 'U': Unkown 'C': Canceled 'O': Ok 'K': KO
+// Possible statuses : 'U': Unkown 'C': Canceled 'O': Ok 'K': KO
 #define m_CRITERIA_HANDLER_CREATE() \
   unsigned int knownCriteriaOpFlags[CRITERIA_STACK_SIZE] ;\
   char statuses[CRITERIA_STACK_SIZE]; 
   
-
+// Re-init criteria handler.
+// 1st criterium op. flags are rectified if needed:
+// - AND op. is set
+// - OR op. is removed
+//
 // Passed:
-// a_indexIterator:
+// - a_indexIterator:
 #define m_CRITERIA_HANDLER_RESET(/*struct INDEX_ITERATOR* */a_indexIterator) \
   int i_stackEntry = 0;\
   unsigned int *v_knownCriteriaOpFlagsPtr = knownCriteriaOpFlags;\
   char *v_statusPtr = statuses;\
   statuses[0] = 'U' ; \
-  m_ASSERT(b_FLAG_SET_OFF(knownCriteriaOpFlags[0] = a_indexIterator->selections[0].criteriaOpFlags,\
-    CRITERIA_OP_FLAGS__OR))
+  knownCriteriaOpFlags[0] = a_indexIterator->selections[0].criteriaOpFlags;\
+  m_SET_FLAG_ON(knownCriteriaOpFlags[0], CRITERIA_OP_FLAG__AND)\
+  m_SET_FLAG_OFF(knownCriteriaOpFlags[0], CRITERIA_OP_FLAG__OR)\
 
+// Handle equation and then closing brackets for current criterium
+// criterium op. flags are rectified if needed:
+// - closing bracket added to ensure AND op. precedence (over OR op.)
+// - missing closing brackets (at the end of the expression) are added 
+// - superfluous closing brackets are ignored
+//
 // Passed:
-// a_indexIterator:
-// m_i: criteria entry position 
-#define m_CRITERIA_HANDLER_OPEN_BRACKETS(/*struct INDEX_ITERATOR* */a_indexIterator, /*int*/m_i) {\
-  int em_n = m_OpenBracketsNumber(a_indexIterator->selections[m_i].criteriaOpFlags);\
-  int em_j = 0; for (; em_j < em_n; em_j++) {\
-    m_ASSERT(++i_stackEntry < CRITERIA_STACK_SIZE);\
-    v_knownCriteriaOpFlagsPtr++; \
-    v_statusPtr++; \
-    if (statuses[i_stackEntry-1] == 'U') *v_statusPtr = 'U' ;\
-    else *v_statusPtr = 'C' ;\
-    *v_knownCriteriaOpFlagsPtr = ALL_FLAGS_OFF0;\
-  }\
-}
-
-// Passed:
-// a_indexes:
-// a_indexIterator:
-// m_i: criteria entry position 
+// - a_indexes: indexes global handler
+// - a_indexIterator: contains selections criteria
+// - m_i: criterium entry 
 #define m_CRITERIA_HANDLER_EQUATION_AND_CLOSE_BRACKETS(/*struct GREEN_INDEXES* */a_indexes,\
   /*struct INDEX_ITERATOR* */a_indexIterator, /*int*/m_i) \
 if (m_i == 0) {\
   if (a_indexIterator->selectionsNumber5 == 1) statuses[0] = 'O' ; \
 } else { \
-  int em_closeBracketsNumber = m_CloseBracketsNumber(\
-    a_indexIterator->selections[m_i].criteriaOpFlags);\
-  if (*v_knownCriteriaOpFlagsPtr == ALL_FLAGS_OFF0 && em_closeBracketsNumber == 0) \
-    *v_knownCriteriaOpFlagsPtr = a_indexIterator->selections[m_i].criteriaOpFlags;\
+  int em_cn = ((m_i)+1 == a_indexIterator->selectionsNumber5)? i_stackEntry: \
+    m_CloseBracketsNumber(a_indexIterator->selections[m_i].criteriaOpFlags);\
+  if (em_cn == 0) {\
+    if (*v_knownCriteriaOpFlagsPtr == ALL_FLAGS_OFF0) *v_knownCriteriaOpFlagsPtr = \
+      a_indexIterator->selections[m_i].criteriaOpFlags;\
+    if ((m_i)+1 < a_indexIterator->selectionsNumber5 && b_FLAG_SET_ON(\
+      *v_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__OR) && b_FLAG_SET_ON(\
+      a_indexIterator->selections[m_i+1].criteriaOpFlags, CRITERIA_OP_FLAG__AND)) em_cn++;\
+  } else if (em_cn > i_stackEntry) em_cn = i_stackEntry; \
   if (*v_statusPtr == 'U') {\
     int answer = GreenIndexesSeekEntryEquate(a_indexes,\
       a_indexIterator->selections[m_i].indexLabel,*nan_entry,\
@@ -844,20 +840,20 @@ if (m_i == 0) {\
       a_indexIterator->selections[m_i].cfpr_keys);\
     switch (answer) {\
     break; case ANSWER__YES:\
-      if (b_FLAG_SET_OFF(*v_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__AND) || em_closeBracketsNumber > 0)\
-        *v_statusPtr = 'O';\
+      if (b_FLAG_SET_OFF(*v_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__AND) || \
+        em_cn > 0 || (m_i)+1 == a_indexIterator->selectionsNumber5) *v_statusPtr = 'O';\
     case ANSWER__NO: \
-      if (b_FLAG_SET_OFF(*v_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__OR) || em_closeBracketsNumber > 0)\
-        *v_statusPtr = 'K'; \
+      if (b_FLAG_SET_OFF(*v_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__OR) || \
+        em_cn > 0 || (m_i)+1 == a_indexIterator->selectionsNumber5) *v_statusPtr = 'K'; \
     break; default:\
       m_TRACK()\
     }\
   }\
-  int em_j = 0; for (; em_j < em_closeBracketsNumber; em_j++) {\
-    i_stackEntry--;\
+  int em_j = 0; for (; em_j < em_cn; em_j++) {\
+    m_ASSERT(--i_stackEntry >= 0)\
     v_knownCriteriaOpFlagsPtr--; \
     v_statusPtr--; \
-    if (em_j == em_closeBracketsNumber-1 && *v_knownCriteriaOpFlagsPtr == ALL_FLAGS_OFF0) \
+    if (em_j == em_cn-1 && *v_knownCriteriaOpFlagsPtr == ALL_FLAGS_OFF0) \
       *v_knownCriteriaOpFlagsPtr = a_indexIterator->selections[m_i].criteriaOpFlags;\
     if (*v_statusPtr == 'U') {\
       if (b_FLAG_SET_OFF(*v_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__OR)) {\
@@ -868,8 +864,8 @@ if (m_i == 0) {\
     } \
     if (i_stackEntry > 0 && statuses[i_stackEntry+1] != 'C') {\
       m_ASSERT(*v_statusPtr == 'U')\
-      if (statuses[i_stackEntry+1] == 'O' && b_FLAG_SET_OFF(*v_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__AND))\
-        *v_statusPtr = 'O' ; \
+      if (statuses[i_stackEntry+1] == 'O' && b_FLAG_SET_OFF(*v_knownCriteriaOpFlagsPtr,\
+        CRITERIA_OP_FLAG__AND)) *v_statusPtr = 'O' ; \
       else if (*v_statusPtr == 'K' && b_FLAG_SET_OFF(*v_knownCriteriaOpFlagsPtr,\
         CRITERIA_OP_FLAG__OR)) *v_statusPtr = 'K'; \
     } \
@@ -878,11 +874,35 @@ if (m_i == 0) {\
     a_indexIterator->selections[m_i].criteriaOpFlags;\
 } 
 
-// Break loop if entry not rejected by extra criteria 
+// Handle open brackets for current criterium
+// Note: in this implementation, opening brackets are indeed handled AFTER handling of closing
+// brackets...
+// criterium op. flags are rectified if needed:
+// - open bracket added to ensure AND op. precedence (over OR op.)
+//
+// Passed:
+// - a_indexIterator: contains selections criteria
+// - m_i: criterium entry 
+#define m_CRITERIA_HANDLER_OPEN_BRACKETS(/*struct INDEX_ITERATOR* */a_indexIterator, /*int*/m_i) {\
+  int em_on = m_OpenBracketsNumber(a_indexIterator->selections[m_i].criteriaOpFlags);\
+  if (em_on == 0 && (m_i)+1 < a_indexIterator->selectionsNumber5 && b_FLAG_SET_ON(\
+    *v_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__AND) && b_FLAG_SET_ON(\
+    a_indexIterator->selections[m_i+1].criteriaOpFlags, CRITERIA_OP_FLAG__OR)) em_on++;\
+  int em_j = 0; for (; em_j < em_on; em_j++) {\
+    m_ASSERT(++i_stackEntry < CRITERIA_STACK_SIZE);\
+    v_knownCriteriaOpFlagsPtr++; \
+    v_statusPtr++; \
+    if (statuses[i_stackEntry-1] == 'U') *v_statusPtr = 'U' ;\
+    else *v_statusPtr = 'C' ;\
+    *v_knownCriteriaOpFlagsPtr = ALL_FLAGS_OFF0;\
+  }\
+}
+
+// Break "criteria handling" loop if entry not rejected by extra criteria 
 #define m_CRITERIA_HANDLER_CHECK_STATUS() \
   m_ASSERT(i_stackEntry == 0) \
-  m_ASSERT(statuses[0] == 'O' || statuses[0] == 'K') \
-  if (statuses[0] == 'O') break;
+  m_ASSERT(*v_statusPtr == 'O' || *v_statusPtr == 'K') \
+  if (*v_statusPtr == 'O') break;
 
 // Update index iterator sequence.
 //
@@ -1149,9 +1169,8 @@ static int GapsStackVerifyEntry (struct GAPS_STACK *a_gaps, int entry, int expec
   int completed = COMPLETED__OK;
   
   int hits = 0;
-  int i = 0;
   int *s_stackPtr = a_gaps->hsc_stack;
-  for (; i < a_gaps->count ; i++, s_stackPtr++) {
+  int i = 0; for (; i < a_gaps->count ; i++, s_stackPtr++) {
     if (*s_stackPtr == entry) hits++ ;
   } // for
 
@@ -1169,9 +1188,8 @@ static int GapsStackVerifyCount (struct GAPS_STACK *a_gaps) {
 
 #ifdef DIGGY
   if (b_diggyGreenCollectionExam) {
-    int i = 0 ;
     m_DIGGY_INFO("Exam: a_gaps->count=%d",a_gaps->count)
-    for (; i < a_gaps->count; i++) {
+    int i = 0; for (; i < a_gaps->count; i++) {
       m_DIGGY_INFO("  a_gaps->hsc_stack[%d]=%d",i,a_gaps->hsc_stack[i])
     } // for
   } // if 
@@ -1447,9 +1465,8 @@ static int GreenCollectionRefreshIndexesInternal(GREEN_COLLECTION_HANDLE handle,
   m_ASSERT(!handle->b_frozen)
 
   // MINIMONITOR: ANY+
-  int i = 0;
   int *fetched4ChangeEntryPtr = handle->h_fetched4ChangeEntries; 
-  for (; i < handle->fetched4ChangeEntriesNumber; i++, fetched4ChangeEntryPtr++) { 
+  int i = 0; for (; i < handle->fetched4ChangeEntriesNumber; i++, fetched4ChangeEntryPtr++) {
     // MICROMONITOR: ALIEN / ALIVE (fetched 4 change)
     m_ASSERT(b_ALL_FLAGS_OK(handle->hsc_flags[*fetched4ChangeEntryPtr],ALIEN_ALIVE__FLAGS))
 m_DIGGY_INFO("*fetched4ChangeEntryPtr=%d Before m_GREEN_INDEXES_ADD()...",*fetched4ChangeEntryPtr)
@@ -1713,8 +1730,7 @@ int GreenCollectionIndexRequest(GREEN_COLLECTION_HANDLE cp_handle,
     } // if
     m_INIT_INDEX_REQUEST(*indexRequestPtr,indexLabel1,indexSeekFlags1,cfpr_keys1,criteriaOpFlags)
 
-    int i = 1;
-    for (; i < criteriaNumber;  i++) {
+    int i = 1; for (; i < criteriaNumber;  i++) {
       indexLabel1 = va_arg(arguments,int);
       indexSeekFlags1 = va_arg(arguments,unsigned int);
       cfpr_keys1 = va_arg(arguments,void *);
@@ -1806,8 +1822,7 @@ int GreenCollectionVerifyIndexes (GREEN_COLLECTION_HANDLE handle) {
   if (b_diggyGreenCollectionExam) {
     m_DIGGY_INFO("Exam: handle->(h_greenArray=%p itemsPhysicalNumber=%d i_itemsCount=%d)",
       handle->h_greenArray,handle->itemsPhysicalNumber,handle->i_itemsCount)
-    int i = 0 ;
-    for (; i < handle->i_itemsCount; i++) {
+    int i = 0 ; for (; i < handle->i_itemsCount; i++) {
       m_DIGGY_INFO("  handle->hsc_flags[%d]=%02x",i,handle->hsc_flags[i])
     } // for
   } // if 
@@ -1842,8 +1857,7 @@ m_DIGGY_VAR_D(completed)
   // 3. Verify  presence/absence of entries in indexes and gaps stack
   if (completed == COMPLETED__OK) {
 m_DIGGY_VAR_D(completed)
-    int i = 0;
-    for (; i < handle->i_itemsCount; i++) {
+    int i = 0; for (; i < handle->i_itemsCount; i++) {
       int expectedHits = 0;
       if (b_FLAG_SET_ON(handle->hsc_flags[i],DEAD_FLAG))  expectedHits = 1; 
       m_TRACK_IF((completed = GapsStackVerifyEntry(&handle->h_gaps,i,expectedHits)) < 0)
@@ -1873,8 +1887,7 @@ int GreenCollectionDestroyInstance (GREEN_COLLECTION_HANDLE xh_handle) {
 
   if (xh_handle->n_greenHandlerDisengageFunction != NULL) {
     char *r_greenItemStuff = xh_handle->h_greenArray;
-    int i = 0;
-    for (; i < xh_handle->v_maxItemsCount ; i++, r_greenItemStuff += xh_handle->greenItemSize) {
+    int i = 0; for (; i < xh_handle->v_maxItemsCount ; i++, r_greenItemStuff += xh_handle->greenItemSize) {
       m_TRACK_IF(xh_handle->n_greenHandlerDisengageFunction(xh_handle->cr_greenHandlerHandle,
         r_greenItemStuff) != RETURNED)
     } // for
