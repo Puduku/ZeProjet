@@ -194,7 +194,7 @@ enum {
 // Usage of "mandatory" lock allows to protect files against indelicate process, but, since the
 // nature of the lock is out of strict POSIX definition, we have no grasp on it...
 // NOTE: it seems you can equally use that mechanism to lock "named pipes" (though we've not found
-// platform that warrants that to work...) ... However, from functional perpective, we don't see
+// platform that warrants that to work...) ... However, from functional perspective, we don't see
 // the point to lock a segment in a fifo...
 //  
 // Passed:
