@@ -520,15 +520,16 @@ struct GREEN_INDEXES {
 // ENTRY_COMPARE_FUNCTION
 static int GreenIndexesEntryCompare (void *r_handle, int indexLabel, int aEntry,
   int n_bEntry, void *cpr_bKeys) {
+  m_DIGGY_BOLLARD_S()
   struct GREEN_INDEXES *a_indexes = (struct GREEN_INDEXES *)r_handle;  
-  int j = 0;
   int comparison = UNDEFINED;
-  for ( ; j < a_indexes->vnhs_keysNumbers[indexLabel] ; j++) {
+  m_ASSERT(indexLabel < a_indexes->indexesNumber) 
+  int j = 0; for ( ; j < a_indexes->vnhs_keysNumbers[indexLabel] ; j++) {
     m_TRACK_IF((comparison = a_indexes->entryRawCompareFunction(
       a_indexes->r_entryRawFunctionsHandle, indexLabel, j, aEntry, n_bEntry,cpr_bKeys)) < 0)
     if (comparison != EQUAL_TO__COMPARISON) break ;
   } // for
-  return comparison;
+  m_DIGGY_RETURN(comparison)
 } // GreenIndexesEntryCompare
 
 // Adequate an item with a key.
@@ -546,8 +547,8 @@ static int GreenIndexesEntryCompare (void *r_handle, int indexLabel, int aEntry,
 static int GreenIndexesEntryEquate(struct GREEN_INDEXES *a_indexes, int indexLabel, int aEntry,
   void *pr_bKeys) {
   int answer = UNDEFINED;
-  int j = 0;
-  for ( ; j < a_indexes->vnhs_keysNumbers[indexLabel] ; j++) {
+  m_ASSERT(indexLabel < a_indexes->indexesNumber) 
+  int j = 0; for ( ; j < a_indexes->vnhs_keysNumbers[indexLabel] ; j++) {
     m_TRACK_IF((answer = a_indexes->entryRawEquateFunction(a_indexes->r_entryRawFunctionsHandle,
       indexLabel, j, aEntry, pr_bKeys)) < 0)
     if (answer != ANSWER__YES) break ;
@@ -724,30 +725,14 @@ struct INDEX_ITERATOR {
   m_DISABLE_INDEX_SEQUENCE((m_indexIterator).indexSequence)\
 }
 
-// Seek an item using the indexes, using sequence when necessary.
+// Perform "equation" of entry with a key. 
 //
 // Passed:
 // - a_indexes:
-// - a_indexIterator:
-// - nan_entry: 
-//   + == NULL:  "soft reset" case
-//   + != NULL:  "next item" case
-//
-// Changed:
-// - a_indexIterator->: either "soft reset" / "in sequence" / "no more" state
-// - *nan_entry: (only significant whith "next item" case) item entry to retrieve : 
-//   + -1 special value : not found
-//   + >= 0: corresponding entry
-//
-// Ret:
-// - RETURNED: Ok
-// - -1: anomaly is raised
-
-// Passed:
-// - indexLabel
-// - aEntry:
-// - indexSeekFlags:
-// - pr_bKeys:
+// - indexLabel: 
+// - aEntry: "A" entry 
+// - indexSeekFlags: 
+// - pr_bKeys: "B" keys(s) 
 //
 // Returned:
 // - >=0: "equation" between :"A" and "B" with that key component... 
@@ -756,6 +741,7 @@ struct INDEX_ITERATOR {
 // - -1: unexpected problem; anomaly is raised
 static int GreenIndexesSeekEntryEquate(struct GREEN_INDEXES* a_indexes, int indexLabel, int aEntry,
   unsigned int indexSeekFlags, void *pr_bKeys) {
+  m_DIGGY_BOLLARD_S()
   if (indexSeekFlags == INDEX_SEEK_FLAGS__ANY) return ANSWER__YES;
 
   int answer = ANSWER__NO; // a priori
@@ -783,7 +769,7 @@ static int GreenIndexesSeekEntryEquate(struct GREEN_INDEXES* a_indexes, int inde
   } else { // INDEX_SEEK_FLAGS__LIKE
     m_TRACK_IF((answer = GreenIndexesEntryEquate(a_indexes,indexLabel, aEntry, pr_bKeys)) < 0)
   } // if 
-  return answer; 
+  m_DIGGY_RETURN(answer)
 } // GreenIndexesSeekEntryEquate
 
 #define CRITERIA_STACK_SIZE 10
@@ -839,10 +825,10 @@ if (m_i == 0) {\
       a_indexIterator->selections[m_i].indexSeekFlags,\
       a_indexIterator->selections[m_i].cfpr_keys);\
     switch (answer) {\
-    break; case ANSWER__YES:\
+    case ANSWER__YES:\
       if (b_FLAG_SET_OFF(*v_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__AND) || \
         em_cn > 0 || (m_i)+1 == a_indexIterator->selectionsNumber5) *v_statusPtr = 'O';\
-    case ANSWER__NO: \
+    break; case ANSWER__NO: \
       if (b_FLAG_SET_OFF(*v_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__OR) || \
         em_cn > 0 || (m_i)+1 == a_indexIterator->selectionsNumber5) *v_statusPtr = 'K'; \
     break; default:\
