@@ -393,6 +393,7 @@ int GStringsAddIndex (G_STRINGS_HANDLE handle,  int keysNumber,
   int i = 0;
   struct KEY_SETTINGS *s_keysSettings = a_indexProperties->hs_keysSettings;
   for ( ; i < keysNumber ; i++, s_keysSettings++) {
+m_DIGGY_INFO("i=%d, keysNumber=%d",i,keysNumber)
     if (i > 0) { 
       key1GStringSetElement = va_arg(ap,int);
       key1GKeysComparison = va_arg(ap,int);
@@ -408,7 +409,14 @@ int GStringsAddIndex (G_STRINGS_HANDLE handle,  int keysNumber,
       handle->cps_gStringConveyances[key1GStringSetElement]);
     switch (s_keysSettings->gKeysComparison = key1GKeysComparison) {
     case STRING_PORTION__G_KEYS_COMPARISON:
-    case INTRINSIC_VALUE__G_KEYS_COMPARISON:
+      s_keysSettings->select.stringPortionComparison.cn_isNeutralCharFunction =
+        cn_key1IsNeutralCharFunction;
+      s_keysSettings->select.stringPortionComparison.cn_toCharFunction = cn_key1ToCharFunction;
+    break; case INTRINSIC_VALUE__G_KEYS_COMPARISON:
+      s_keysSettings->select.intrinsicValueComparison.stringPortionIntrinsicValueFunction =
+        c_key1StringPortionIntrinsicValueFunction;
+      s_keysSettings->select.intrinsicValueComparison.pr_stringPortionIntrinsicValueFunctionHandle =
+        cfpr_key1StringPortionIntrinsicValueFunctionHandle;
     break; case ACOLYT_TOKEN_ID__G_KEYS_COMPARISON:
       m_ASSERT(gStringConveyance == TOKEN__G_STRING_CONVEYANCE)
     break; case ACOLYT_VALUE__G_KEYS_COMPARISON:
@@ -418,13 +426,7 @@ int GStringsAddIndex (G_STRINGS_HANDLE handle,  int keysNumber,
     break; default:
       m_RAISE(ANOMALY__VALUE__D,key1GKeysComparison)
     } // switch
-    s_keysSettings->select.stringPortionComparison.cn_isNeutralCharFunction = cn_key1IsNeutralCharFunction;
-    s_keysSettings->select.stringPortionComparison.cn_toCharFunction = cn_key1ToCharFunction;
-    s_keysSettings->select.intrinsicValueComparison.stringPortionIntrinsicValueFunction =
-      c_key1StringPortionIntrinsicValueFunction;
-    s_keysSettings->select.intrinsicValueComparison.pr_stringPortionIntrinsicValueFunctionHandle =
-      cfpr_key1StringPortionIntrinsicValueFunctionHandle;
-   } // for
+  } // for
   va_end(ap) ;
 
   int indexLabel =

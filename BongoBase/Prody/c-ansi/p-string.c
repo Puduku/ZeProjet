@@ -66,7 +66,6 @@ int CompareStringPortions(const struct STRING_PORTION *ap_stringPortion1,
   } else {
     const char *ptr1 = ap_stringPortion1->string - 1;
     const char *ptr2 = ap_stringPortion2->string - 1;
-
     if (n_isNeutralCharFunction == NULL) {
       // Invariant: portions [ap_stringPortion1->string:ptr1[ and 
         // [ap_stringPortion2->string:ptr2[ are identical
@@ -132,9 +131,6 @@ int ParanoidCompareStringPortions(const struct STRING_PORTION *ap_stringPortion1
   const struct STRING_PORTION *ap_stringPortion2,
   IS_CHAR_FUNCTION n_isNeutralCharFunction,  TO_CHAR_FUNCTION n_toCharFunction) { 
   m_DIGGY_BOLLARD()
-//m_DIGGY_INFO("*ap_stringPortion1=[" FMT_STRING_PORTION "] ",m_STRING_PORTION_2_FMT_ARGS(*ap_stringPortion1))
-//m_DIGGY_INFO("*ap_stringPortion2=[" FMT_STRING_PORTION "] ",m_STRING_PORTION_2_FMT_ARGS(*ap_stringPortion2))
-//m_DIGGY_INFO("n_isNeutralCharFunction=%p n_toCharFunction=%p ", n_isNeutralCharFunction,n_toCharFunction)
   int comparison1 = CompareStringPortions(ap_stringPortion1, ap_stringPortion2,
     n_isNeutralCharFunction,  n_toCharFunction);
   m_TRACK_IF(comparison1 < 0) ; 

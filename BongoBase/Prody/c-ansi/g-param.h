@@ -13,7 +13,6 @@
 #define G_PARAM_CARDINALITY 2
 
 // name AND value conveyance : VALUED_STRING__G_STRING_CONVEYANCE
-// TODO: name conveyance TOKEN__G_STRING_CONVEYANCE 
 
 const int ps_gParamGStringConveyances[G_PARAM_CARDINALITY] = { 
    TOKEN__G_STRING_CONVEYANCE, 
