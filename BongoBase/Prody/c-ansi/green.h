@@ -388,6 +388,13 @@ int GreenCollectionIndexRequest(GREEN_COLLECTION_HANDLE cp_handle,
   INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaNumber,
   int indexLabel1, unsigned int indexSeekFlags1, void *cfpr_keys1, ...);
 
+// #SEE GreenCollectionIndexRequest <greenItem> <keys>
+int GreenCollectionIndexRequestV(GREEN_COLLECTION_HANDLE cp_handle,
+  INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaNumber,
+  int indexLabel1, unsigned int indexSeekFlags1, void *cfpr_keys1, va_list extraCriteria);
+
+
+
 // Indicates whether key value parameter is significant with index request... 
 //
 // Passed:

@@ -1695,9 +1695,9 @@ int GreenCollectionAddIndex (GREEN_COLLECTION_HANDLE handle, int keysNumber) {
 } // GreenCollectionAddIndex
 
 // Public function; see description in .h
-int GreenCollectionIndexRequest(GREEN_COLLECTION_HANDLE cp_handle,
+int GreenCollectionIndexRequestV(GREEN_COLLECTION_HANDLE cp_handle,
   INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaNumber,
-  int indexLabel1, unsigned int indexSeekFlags1, void *cfpr_keys1, ...) {
+  int indexLabel1, unsigned int indexSeekFlags1, void *cfpr_keys1, va_list extraCriteria) {
   m_DIGGY_BOLLARD()
 
   m_ASSERT(indexSeekFlags1 != ALL_FLAGS_OFF0) 
@@ -1706,34 +1706,46 @@ int GreenCollectionIndexRequest(GREEN_COLLECTION_HANDLE cp_handle,
   struct INDEX_REQUEST *indexRequestPtr = (nf_indexRequestAutomaticBuffer != NULL?
     (struct INDEX_REQUEST *)nf_indexRequestAutomaticBuffer: &(cp_handle->internalIndexRequest));
 
-  { va_list arguments;
-    unsigned int criteriaOpFlags = ALL_FLAGS_OFF0;
+  unsigned int criteriaOpFlags = ALL_FLAGS_OFF0;
 
-    va_start(arguments,cfpr_keys1);
+  if (criteriaNumber > 1) {
+    criteriaOpFlags = va_arg(extraCriteria,unsigned int);
+  } // if
+  m_INIT_INDEX_REQUEST(*indexRequestPtr,indexLabel1,indexSeekFlags1,cfpr_keys1,criteriaOpFlags)
 
-    if (criteriaNumber > 1) {
-      criteriaOpFlags = va_arg(arguments,unsigned int);
-    } // if
-    m_INIT_INDEX_REQUEST(*indexRequestPtr,indexLabel1,indexSeekFlags1,cfpr_keys1,criteriaOpFlags)
+  int i = 1; for (; i < criteriaNumber;  i++) {
+    indexLabel1 = va_arg(extraCriteria,int);
+    indexSeekFlags1 = va_arg(extraCriteria,unsigned int);
+    cfpr_keys1 = va_arg(extraCriteria,void *);
+    criteriaOpFlags = va_arg(extraCriteria,unsigned int);
 
-    int i = 1; for (; i < criteriaNumber;  i++) {
-      indexLabel1 = va_arg(arguments,int);
-      indexSeekFlags1 = va_arg(arguments,unsigned int);
-      cfpr_keys1 = va_arg(arguments,void *);
-      criteriaOpFlags = va_arg(arguments,unsigned int);
-
-      m_INIT_INDEX_REQUEST__EXTRAS(*indexRequestPtr,indexLabel1,indexSeekFlags1,cfpr_keys1,
-        criteriaOpFlags)
-    } // for 
-
-    va_end(arguments);
-  } // arguments
+    m_INIT_INDEX_REQUEST__EXTRAS(*indexRequestPtr,indexLabel1,indexSeekFlags1,cfpr_keys1,
+      criteriaOpFlags)
+  } // for 
 
   // MINIMONITOR: ANY
   m_TRACK_IF(GreenCollectionRefreshIndexesInternal(cp_handle,b_TRUE) != RETURNED)
   // MINIMONITOR: NADA
 
   m_TRACK_IF(GreenIndexesSeek(&cp_handle->indexes, &indexRequestPtr->iterator, NULL) != RETURNED)
+
+  m_DIGGY_RETURN(RETURNED)
+} // GreenCollectionIndexRequestV
+
+
+// Public function; see description in .h
+int GreenCollectionIndexRequest(GREEN_COLLECTION_HANDLE cp_handle,
+  INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaNumber,
+  int indexLabel1, unsigned int indexSeekFlags1, void *cfpr_keys1, ...) {
+  m_DIGGY_BOLLARD()
+
+  va_list extraCriteria;
+  va_start(extraCriteria,cfpr_keys1);
+
+  m_TRACK_IF(GreenCollectionIndexRequestV(cp_handle,nf_indexRequestAutomaticBuffer,
+    criteriaNumber,indexLabel1,indexSeekFlags1,cfpr_keys1,extraCriteria) != RETURNED) 
+
+  va_end(extraCriteria);
 
   m_DIGGY_RETURN(RETURNED)
 } // GreenCollectionIndexRequest

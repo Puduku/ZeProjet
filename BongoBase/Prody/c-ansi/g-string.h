@@ -335,6 +335,7 @@ int GStringsAddIndex(G_STRINGS_HANDLE handle,  int keysNumber, int key1GStringSe
   void *cfpr_key1StringPortionIntrinsicValueFunctionHandle,  ...);
 
 // #SEE GStringsAddIndex <g-string> <key>
+// Add an index for single (aka cardinality 1) g-strings collection
 // Nb: Plain index => one key
 #define /*int*/ G_STRINGS_ADD_INDEX(/*G_STRINGS_HANDLE*/handle, /*int*/keyGKeysComparison,\
   /*IS_CHAR_FUNCTION*/ cn_keyIsNeutralCharFunction, /*TO_CHAR_FUNCTION*/cn_keyToCharFunction,\
@@ -435,7 +436,7 @@ int GStringsIndexFetch(G_STRINGS_HANDLE cp_handle,
   INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, unsigned int indexFetchFlags,
   G_STRING_SET_STUFF *acvnt_gStringSetStuff, int *nacvn_entry);
 
-// Simple fetch, based on plain index 
+// Simple fetch (one single criterium)
 // #SEE GStringsIndexRequest <gStringSet>
 // #SEE GStringsIndexFetch <gStringSet>
 static inline int m_GStringsIndexSingleFetch(G_STRINGS_HANDLE cp_handle, 

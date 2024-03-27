@@ -268,7 +268,7 @@ static int GStringsCompare(void *cpr_handle,  char b_frozen, int indexLabel,  in
   G_STRINGS_HANDLE p_handle = (G_STRINGS_HANDLE) cpr_handle;
   m_CHECK_MAGIC_FIELD(G_STRINGS_HANDLE,p_handle)
   m_ASSERT(indexLabel < p_handle->indexesNumber)
-
+m_DIGGY_INFO("indexLabel=%d keyRank=%d",indexLabel,keyRank)
   // Key settings:
   struct KEY_SETTINGS *ap_keySettings = (struct KEY_SETTINGS *)UNDEFINED;
   { struct INDEX_PROPERTIES *ap_indexProperties = p_handle->vnhs_indexesProperties + indexLabel;
@@ -295,12 +295,13 @@ static int GStringsCompare(void *cpr_handle,  char b_frozen, int indexLabel,  in
       ap_keySettings->select.intrinsicValueComparison.stringPortionIntrinsicValueFunction,
       ap_keySettings->select.intrinsicValueComparison.pr_stringPortionIntrinsicValueFunctionHandle);
   } else {
-    const struct G_KEY *ap_bGKey = ((const struct G_KEY **)cpr_bKeys)[keyRank];
+    const struct G_KEY *ap_bGKey = ((const struct G_KEY *)cpr_bKeys) + keyRank;
     m_ASSIGN_BARE_G_KEY__G_KEY(bBareGKey,  ap_keySettings->gKeysComparison,  ap_bGKey)
   } // if
   
   // Compare bare keys:
   int comparison = UNDEFINED;
+m_DIGGY_INFO("ap_keySettings->gKeysComparison=%d",ap_keySettings->gKeysComparison)
   switch (ap_keySettings->gKeysComparison) {
   case STRING_PORTION__G_KEYS_COMPARISON:
     comparison = CompareStringPortions(&aBareGKey.cp_stringPortion,  &bBareGKey.cp_stringPortion,
@@ -448,9 +449,14 @@ int GStringsIndexRequest(G_STRINGS_HANDLE cp_handle,
   //      cap_key1 = va_arg(ap,const struct G_KEY*) ;
   //  va_end(ap) ;
 
-  m_TRACK_IF(GreenCollectionIndexRequest(cp_handle->h_greenCollectionHandle,
-    nf_indexRequestAutomaticBuffer, criteriaNumber, indexLabel1, indexSeekFlags1,
-    (void*)cfps_keys1) != RETURNED)
+  { va_list arguments;
+    va_start(arguments,cfps_keys1);
+//m_ASSERT(criteriaNumber == 1) // TODO: other criteria
+    m_TRACK_IF(GreenCollectionIndexRequestV(cp_handle->h_greenCollectionHandle,
+      nf_indexRequestAutomaticBuffer, criteriaNumber, indexLabel1, indexSeekFlags1,
+      (void*)cfps_keys1, arguments) != RETURNED)
+    va_end(arguments) ;
+  } // arguments
   m_DIGGY_RETURN(RETURNED)
 } // GStringsIndexRequest
 
