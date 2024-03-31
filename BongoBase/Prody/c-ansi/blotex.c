@@ -47,6 +47,7 @@ int BlotexlibExecutorFactoryDestroyInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE xh
 struct BLOTEXLIB_EXECUTOR {
   m_DECLARE_MAGIC_FIELD(BLOTEXLIB_EXECUTOR_HANDLE)
   G_STRINGS_HANDLE h_blotregsHandle ; 
+  G_STRINGS_HANDLE h_blottabsHandle ; 
   G_STRING_STUFF h_working1GStringStuff ;
   G_STRING_STUFF h_working2GStringStuff ;
   G_STRING_STUFF availableGStringStuff ;
@@ -62,6 +63,16 @@ static int BlotregDestroyInstance(void *xhr_handle) {
   m_DIGGY_RETURN(RETURNED) 
 } // BlotregDestroyInstance 
 
+// NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION
+static int BlottabDestroyInstance(void *xhr_handle) {
+  m_DIGGY_BOLLARD_S()
+  G_STRINGS_HANDLE xh_handle = (G_STRINGS_HANDLE) xhr_handle;
+
+  m_TRACK_IF(GStringsDestroyInstance(xh_handle) < 0)  
+
+  m_DIGGY_RETURN(RETURNED) 
+} // BlottabDestroyInstance 
+
 // #SEE BLOTLIB_EXECUTOR_FACTORY__CREATE_PRODUCT_INSTANCE_FUNCTION <blotex>
 static int BlotexlibExecutorFactoryCreateProductInstance(void *pr_handle,
   void **azhr_blotlibExecutorHandle) {
@@ -74,11 +85,16 @@ static int BlotexlibExecutorFactoryCreateProductInstance(void *pr_handle,
     *(BLOTEXLIB_EXECUTOR_HANDLE*)azhr_blotlibExecutorHandle)
 
   BLOTEXLIB_EXECUTOR_HANDLE productHandle = *azhr_blotlibExecutorHandle;
+
   m_TRACK_IF(NAMED_OBJECTS_CREATE_INSTANCE(&(productHandle->h_blotregsHandle), 10,
     BlotregDestroyInstance) != RETURNED)
+  m_ASSERT(G_STRINGS_ADD_PLAIN_LEXICAL_INDEX(productHandle->h_blotregsHandle, NULL,NULL) !=
+    INDEX_LABEL0)
 
-  m_ASSERT(G_STRINGS_ADD_INDEX(productHandle->h_blotregsHandle, STRING_PORTION__G_KEYS_COMPARISON,
-    NULL,NULL,(STRING_PORTION_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) != INDEX_LABEL0)
+  m_TRACK_IF(NAMED_OBJECTS_CREATE_INSTANCE(&(productHandle->h_blottabsHandle), 10,
+    BlottabDestroyInstance) != RETURNED)
+  m_ASSERT(G_STRINGS_ADD_PLAIN_LEXICAL_INDEX(productHandle->h_blottabsHandle, NULL,NULL) !=
+    INDEX_LABEL0)
 
   m_TRACK_IF(G_STRING_CREATE_INSTANCE(&productHandle->h_working1GStringStuff) != RETURNED)
   m_TRACK_IF(G_STRING_CREATE_INSTANCE(&productHandle->h_working2GStringStuff) != RETURNED)
@@ -96,6 +112,7 @@ int BlotexlibExecutorCheckHandle(void *r_handle) {
   m_DIGGY_RETURN(RETURNED)
 } // BlotexlibExecutorCheckHandle
 
+// Blotregs: 
 
 // Public function; see .h
 int BlotexlibExecutorGetBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
@@ -117,7 +134,6 @@ int BlotexlibExecutorGetBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
 
   m_DIGGY_RETURN(result)
 } // BlotexlibExecutorGetBlotreg
-
 
 #define NAME__BLOTREG_INDEX_LABEL      0
 #define TOKEN_ID__BLOTREG_INDEX_LABEL 1
@@ -143,10 +159,12 @@ int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
         RETURNED) 
       m_ASSERT(GStringsAddIndex(h_blotregHandle,1,G_PARAM_NAME_ELEMENT,
         STRING_PORTION__G_KEYS_COMPARISON,NULL,NULL,
-        (STRING_PORTION_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) == NAME__BLOTREG_INDEX_LABEL)
+        (STRING_PORTION_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) ==
+        NAME__BLOTREG_INDEX_LABEL)
       m_ASSERT(GStringsAddIndex(h_blotregHandle,1,G_PARAM_NAME_ELEMENT,
         ACOLYT_VALUE__G_KEYS_COMPARISON,(IS_CHAR_FUNCTION)UNDEFINED,(TO_CHAR_FUNCTION)UNDEFINED,
-        (STRING_PORTION_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) == TOKEN_ID__BLOTREG_INDEX_LABEL)
+        (STRING_PORTION_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) ==
+        TOKEN_ID__BLOTREG_INDEX_LABEL)
       t_namedBlotregStuff->acolyt.cnhr_handle = h_blotregHandle;
     } // h_blotregHandle 
   break; default:
@@ -156,6 +174,58 @@ int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
 
   m_DIGGY_RETURN(completed)
 } // BlotexlibExecutorCreateBlotreg
+
+// Blottabs: 
+
+// Public function; see .h
+int BlotexlibExecutorGetBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle,
+  struct STRING_PORTION blottabName, G_STRINGS_HANDLE *ac_blottabHandle) {
+  m_DIGGY_BOLLARD()
+
+  G_STRING_STUFF ct_namedBlottabStuff = (G_STRING_STUFF)UNDEFINED; 
+  struct G_KEY gKey ;
+  m_ASSIGN_G_KEY__STRING_PORTION(&gKey,0,blottabName)
+  int result = m_GStringsIndexSingleFetch(handle->h_blottabsHandle,NULL,INDEX_LABEL0,
+    INDEX_SEEK_FLAGS__EQUAL,&gKey, INDEX_FETCH_FLAGS__SEEK_ONLY,&ct_namedBlottabStuff, NULL);
+  switch (result) {
+  case RESULT__FOUND:
+    m_ASSERT((*ac_blottabHandle = ct_namedBlottabStuff->acolyt.cnhr_handle) != NULL)
+  break; case RESULT__NOT_FOUND:
+  break; default:
+    m_TRACK()
+  } // switch
+
+  m_DIGGY_RETURN(result)
+} // BlotexlibExecutorGetBlottab
+
+// Public function; see .h
+int BlotexlibExecutorCreateBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle,
+  struct STRING_PORTION blottabName, G_STRINGS_HANDLE *na_blottabHandle) {
+  m_DIGGY_BOLLARD()
+
+  int completed = COMPLETED__OK; // a priori
+  G_STRING_STUFF t_namedBlottabStuff = (G_STRING_STUFF)UNDEFINED; 
+  struct G_KEY gKey ;
+  m_ASSIGN_G_KEY__STRING_PORTION(&gKey,0,blottabName)
+  int result = m_GStringsIndexSingleFetch(handle->h_blottabsHandle,NULL,INDEX_LABEL0,
+    INDEX_SEEK_FLAGS__EQUAL,&gKey, INDEX_FETCH_FLAGS__FETCH,&t_namedBlottabStuff,NULL);
+  switch (result) {
+  case RESULT__FOUND:
+    m_ASSERT(t_namedBlottabStuff->acolyt.cnhr_handle != NULL)
+    completed = COMPLETED__BUT;
+  break; case RESULT__NOT_FOUND:
+    { G_STRINGS_HANDLE h_blottabHandle = (G_STRINGS_HANDLE)UNDEFINED ;
+      m_TRACK_IF(G_PARAMS_CREATE_INSTANCE(&h_blottabHandle,BATEAU__EXPECTED_ITEMS_NUMBER) !=
+        RETURNED) 
+      t_namedBlottabStuff->acolyt.cnhr_handle = h_blottabHandle;
+    } // h_blottabHandle 
+  break; default:
+    m_TRACK()
+  } // switch
+  if (na_blottabHandle != NULL) *na_blottabHandle = t_namedBlottabStuff->acolyt.cnhr_handle;
+
+  m_DIGGY_RETURN(completed)
+} // BlotexlibExecutorCreateBlottab
 
 
 #define SYNTAX_ERROR__ABANDONMENT_INFO "Syntax error"

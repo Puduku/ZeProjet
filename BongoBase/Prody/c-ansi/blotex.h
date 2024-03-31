@@ -107,6 +107,7 @@ int BlotexlibExecutorGetBlotreg (BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct STRING_PORTION blotregName, G_STRINGS_HANDLE *ac_blotregHandle) ;
 
 // Create blot register.
+// Note: blot registers are based g-params (specialised g-string set collections) 
 // 
 // Passed:
 // - handle:
@@ -121,6 +122,41 @@ int BlotexlibExecutorGetBlotreg (BLOTEXLIB_EXECUTOR_HANDLE handle,
 // - COMPLETED__BUT: the register already exists 
 // - -1: unexpected problem; anomaly is raised
 int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
+  struct STRING_PORTION blotregName, G_STRINGS_HANDLE *na_blotregHandle);
+
+// Retrieve some blot table.
+// 
+// Passed:
+// - handle:
+// - blotregName: blot table's name 
+//
+// Changed:
+// - *ac_blotregHandle: (only significant when retrieved : RESULT__FOUND) 
+//   blot table's handle
+//
+// Ret:
+// - RESULT__FOUND: OK
+// - RESULT__NOT_FOUND: 
+// - -1: unexpected problem; anomaly is raised
+int BlotexlibExecutorGetBlottab (BLOTEXLIB_EXECUTOR_HANDLE handle,
+  struct STRING_PORTION blotregName, G_STRINGS_HANDLE *ac_blotregHandle) ;
+
+// Create blot table.
+// Note: blot tables are based on g-string set collections. 
+// 
+// Passed:
+// - handle:
+// - blotregName: blot table's name 
+// - na_blotregHandle: NULL special pointer: not used
+//
+// Changed:
+// - *na_blotregHandle: (if used) blot table 's handle
+//
+// Ret:
+// - COMPLETED__OK: OK
+// - COMPLETED__BUT: the table already exists 
+// - -1: unexpected problem; anomaly is raised
+int BlotexlibExecutorCreateBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct STRING_PORTION blotregName, G_STRINGS_HANDLE *na_blotregHandle);
 
 

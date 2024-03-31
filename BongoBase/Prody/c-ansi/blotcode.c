@@ -200,9 +200,7 @@ int BlotcodeCreateInstance (BLOTCODE_HANDLE *azh_handle) {
   BLOTCODE_HANDLE handle = *azh_handle;
 
   m_TRACK_IF(G_TOKENS_CREATE_INSTANCE(&handle->h_blotkeywsHandle, BLOTKEYW_IDS_NUMBER) != RETURNED)
-  m_ASSERT(G_STRINGS_ADD_INDEX(handle->h_blotkeywsHandle, STRING_PORTION__G_KEYS_COMPARISON, NULL,
-    NULL, (STRING_PORTION_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED)
-    == INDEX_LABEL0)
+  m_ASSERT(G_STRINGS_ADD_PLAIN_LEXICAL_INDEX(handle->h_blotkeywsHandle, NULL, NULL) == INDEX_LABEL0)
   m_G_TOKENS_IMPORT(handle->h_blotkeywsHandle, p_blotkeywsTokenDefinitions,
     BLOTKEYW_IDS_NUMBER)
   m_ASSERT(GStringsFreeze(handle->h_blotkeywsHandle, NULL) >= BLOTKEYW_IDS_NUMBER)

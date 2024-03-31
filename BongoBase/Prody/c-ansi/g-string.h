@@ -335,15 +335,12 @@ int GStringsAddIndex(G_STRINGS_HANDLE handle,  int keysNumber, int key1GStringSe
   void *cfpr_key1StringPortionIntrinsicValueFunctionHandle,  ...);
 
 // #SEE GStringsAddIndex <g-string> <key>
-// Add an index for single (aka cardinality 1) g-strings collection
-// Nb: Plain index => one key
-#define /*int*/ G_STRINGS_ADD_INDEX(/*G_STRINGS_HANDLE*/handle, /*int*/keyGKeysComparison,\
-  /*IS_CHAR_FUNCTION*/ cn_keyIsNeutralCharFunction, /*TO_CHAR_FUNCTION*/cn_keyToCharFunction,\
-  /*STRING_PORTION_INTRINSIC_VALUE_FUNCTION*/c_keyStringPortionIntrinsicValueFunction,\
-  /*void* */cfpr_keyStringPortionIntrinsicValueFunctionHandle, ...) \
-  GStringsAddIndex(handle,  1,  0,  keyGKeysComparison,\
-  cn_keyIsNeutralCharFunction, cn_keyToCharFunction,\
-  c_keyStringPortionIntrinsicValueFunction,cfpr_keyStringPortionIntrinsicValueFunctionHandle) 
+// Add an index for single (aka cardinality 1) g-strings collection for LEXICAL comparison
+// Nb: Plain index => one single key
+#define /*int*/ G_STRINGS_ADD_PLAIN_LEXICAL_INDEX(/*G_STRINGS_HANDLE*/handle,\
+  /*IS_CHAR_FUNCTION*/ n_keyIsNeutralCharFunction, /*TO_CHAR_FUNCTION*/n_keyToCharFunction) \
+  GStringsAddIndex(handle, 1, 0, STRING_PORTION__G_KEYS_COMPARISON, n_keyIsNeutralCharFunction,\
+  n_keyToCharFunction, (STRING_PORTION_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) 
 
 
 // (Internal use)
@@ -373,44 +370,48 @@ struct G_KEY { //
   (m_gKeys)[entry].bare.cp_stringPortion = up_stringPortion ; \
 } 
 
-// Assign a g-key for 'intrinsic values' comparison
+// Assign a g-key for 'intrinsic (generic) values' comparison
 //
 // Passed:
-// - m_gKey: 
-// - u_value:
+// - m_gKeys: 
+// - entry: >= 0 ; (0 for plain index)
+// - uen_intrinsicValue:
 #define m_ASSIGN_G_KEY__INTRINSIC_VALUE(/*struct G_KEY* */m_gKeys, /*int*/entry,\
   /*GENERIC_INTEGER*/uen_intrinsicValue) {\
   (m_gKeys)[entry].gKeysComparison = INTRINSIC_VALUE__G_KEYS_COMPARISON;\
   (m_gKeys)[entry].bare.cen_intrinsicValue = uen_intrinsicValue; \
 } 
 
-// Assign a g-key for 'token ids' comparison
+// Assign a g-key for 'acolyt token ids' comparison
 //
 // Passed:
-// - m_gKey: 
-// - uen_value:
+// - m_gKeys: 
+// - entry: >= 0 ; (0 for plain index)
+// - u_tokenId:
 #define m_ASSIGN_G_KEY__ACOLYT_TOKEN_ID(/*struct G_KEY* */m_gKeys, /*int*/entry,\
   /*int*/u_tokenId) {\
   (m_gKeys)[entry].gKeysComparison = ACOLYT_TOKEN_ID__G_KEYS_COMPARISON;\
   (m_gKeys)[entry].bare.c_acolytTokenId = u_tokenId; \
 } 
 
-// Assign a g-key for 'acolyt values' comparison
+// Assign a g-key for 'acolyt (generic) values' comparison
 //
 // Passed:
-// - m_gKey: 
-// - uen_value:
+// - m_gKeys:
+// - entry: >= 0 ; (0 for plain index)
+// - uen_acolytValue:
 #define m_ASSIGN_G_KEY__ACOLYT_VALUE(/*struct G_KEY* */m_gKeys, /*int*/entry,\
   /*GENERIC_INTEGER*/uen_acolytValue) {\
   (m_gKeys)[entry].gKeysComparison = ACOLYT_VALUE__G_KEYS_COMPARISON;\
   (m_gKeys)[entry].bare.cen_acolytValue = uen_acolytValue; \
 } 
 
-// Assign a g-key for 'acolyt handle' comparison
+// Assign a g-key for 'acolyt handles' comparison
 //
 // Passed:
-// - m_gKey: 
-// - uen_value:
+// - m_gKeys:
+// - entry: >= 0 ; (0 for plain index)
+// - unr_acolytHandle:
 #define m_ASSIGN_G_KEY__ACOLYT_HANDLE(/*struct G_KEY* */m_gKeys, /*int*/entry,\
   /*void* */unr_acolytHandle) {\
   (m_gKeys)[entry].gKeysComparison = ACOLYT_HANDLE__G_KEYS_COMPARISON;\
