@@ -16,12 +16,9 @@
 
 static int testNumber = 0;
 
-#define DUMMY_BLOTLIB_EXECUTOR_FACTORY_HANDLE (void *)0xCACABEBE
-#define DUMMY_BLOTLIB_EXECUTOR_HANDLE (void *)0xFADABEDE
+#define DUMMY_BLOTLIB1_EXECUTOR_FACTORY_HANDLE (void *)0xCACABEBE
 
 const char* s_localBlotfuncsName1[] = { "func1" , "InitUnDeuxTrois" , "UnDeuxTrois" , "func4" } ;
-
-#define DUMMY_BLOTLIB1_EXECUTOR_FACTORY_HANDLE DUMMY_BLOTLIB_EXECUTOR_FACTORY_HANDLE
 
 struct BLOTLIB1_EXECUTOR {
   gen_BLOTVAL nbIters ;
@@ -38,7 +35,6 @@ static int Blotlib1ExecutorFactoryCreateProductInstance(void *r_handle,
   m_MALLOC_INSTANCE(h_blotlib1ExecutorHandle);
   h_blotlib1ExecutorHandle->nbIters = 3;
   *azhr_blotlibExecutorHandle = h_blotlib1ExecutorHandle;
-  //*azhr_blotlibExecutorHandle = DUMMY_BLOTLIB_EXECUTOR_HANDLE;
   m_DIGGY_RETURN(RETURNED)
 } // Blotlib1ExecutorFactoryCreateProductInstance
 
@@ -48,7 +44,7 @@ static int Blotlib1ExecutorExecuteC(void *r_handle, const struct BLOTFUNC *ap_bl
   BLOTLIB1_EXECUTOR_HANDLE handle = (BLOTLIB1_EXECUTOR_HANDLE)r_handle;
   
   m_DIGGY_BOLLARD()
-  //m_ASSERT(r_handle == DUMMY_BLOTLIB_EXECUTOR_HANDLE)
+
   if (ap_blotfunc->entry.localBlotfuncNameEntry == 1) { // InitUnDeuxTrois function 
     int answer = ReadGenericIntegerStringPortion(ap_blotfunc->call.arguments, &handle->nbIters,  (int*)NULL);
     m_TRACK_IF(answer < 0)
@@ -68,55 +64,11 @@ static int Blotlib1ExecutorExecuteC(void *r_handle, const struct BLOTFUNC *ap_bl
 static int Blotlib1ExecutorDestroyInstance(void *xhr_handle) {
   m_DIGGY_BOLLARD()
   free(xhr_handle);
-  //m_ASSERT(xhr_handle == DUMMY_BLOTLIB_EXECUTOR_HANDLE)
   m_DIGGY_RETURN(RETURNED)
 } // Blotlib1ExecutorDestroyInstance 
 
 
 const char* s_localBlotfuncsName2[] = { "Nom" , "Verbe" , "Nombre", "Adverbe" } ;
-
-#define DUMMY_BLOTLIB2_EXECUTOR_FACTORY_HANDLE (DUMMY_BLOTLIB_EXECUTOR_FACTORY_HANDLE + 1)
-#define DUMMY_BLOTLIB2_EXECUTOR_HANDLE  (DUMMY_BLOTLIB_EXECUTOR_HANDLE + 1) 
-
-// BLOTLIB_EXECUTOR_FACTORY__CREATE_PRODUCT_INSTANCE_FUNCTION
-static int Blotlib2ExecutorFactoryCreateProductInstance(void *r_handle,
-  void **azhr_blotlibExecutorHandle) {
-  m_DIGGY_BOLLARD()
-  m_ASSERT(r_handle == DUMMY_BLOTLIB2_EXECUTOR_FACTORY_HANDLE)
-
-  *azhr_blotlibExecutorHandle = DUMMY_BLOTLIB2_EXECUTOR_HANDLE;
-  m_DIGGY_RETURN(RETURNED)
-} // Blotlib2ExecutorFactoryCreateProductInstance
-
-// BLOTLIB_EXECUTOR__EXECUTE_C_FUNCTION
-static int Blotlib2ExecutorExecuteC(void *r_handle, const struct BLOTFUNC *ap_blotfunc,
-  G_STRING_STUFF c_surrogate, gen_BLOTVAL *ac_blotval, G_STRING_STUFF nc_abandonmentInfo) { 
-  m_DIGGY_BOLLARD()
-  m_ASSERT(r_handle == DUMMY_BLOTLIB2_EXECUTOR_HANDLE)
-  *ac_blotval = 0;
-  int answer = ANSWER__YES; // a priori
-  switch (ap_blotfunc->entry.localBlotfuncNameEntry) {
-  case 1:  // Verbe
-    { int comparison = m_CompareWithCString(&ap_blotfunc->call.arguments, "savoir, 1ps");
-      m_ASSERT(comparison == EQUAL_TO__COMPARISON)
-    } // comparison 
-    m_ASSERT(m_GStringCCopy(c_surrogate,0,"sait") >= 0)
-  break; case 2: // Nombre
-    answer = ReadGenericIntegerStringPortion(ap_blotfunc->call.arguments, ac_blotval,(int*)NULL);
-    m_TRACK_IF(answer < 0)
-//m_DIGGY_VAR_D(*ac_blotval)
-  break; default: ;
-  } // switch
-  m_DIGGY_RETURN(answer)
-} // Blotlib2ExecutorExecuteC 
-
-// BLOTLIB_EXECUTOR__DESTROY_INSTANCE_FUNCTION
-static int Blotlib2ExecutorDestroyInstance (void *xhr_handle) {
-  m_DIGGY_BOLLARD()
-  m_ASSERT(xhr_handle == DUMMY_BLOTLIB2_EXECUTOR_HANDLE)
-  m_DIGGY_RETURN(RETURNED)
-} // Blotlib2ExecutorDestroyInstance 
-
 
 // Returned:
 // - RETURNED: OK
@@ -153,10 +105,6 @@ m_DIGGY_VAR_STRING(ccp_expectedOutput)
 
 #define DUMMY_TEMPLATE "La Nature est un temple oug de vivants piliers"
 #define DUMMY_OUTPUT DUMMY_TEMPLATE
-#define DUMMY_TEMPLATE2 "Elle croit, elle ##<< lib2.Verbe(savoir, 1ps) >> cette vierge infedconde"
-#define DUMMY_OUTPUT2 "Elle croit, elle sait cette vierge infedconde"
-
-#define DUMMY_TEMPLATE3 "Et pourtant ##<< lib2.Adjectif(nedcessaire, ms) >> ag la Marche du Monde"
 
 #define DUMMY_TEMPLATE4 "Que la ##<< loop 1 >>Beauted##<<endLoop>> du corps est un sublime don"
 #define DUMMY_OUTPUT4 "Que la Beauted du corps est un sublime don"
@@ -170,24 +118,6 @@ m_DIGGY_VAR_STRING(ccp_expectedOutput)
   "Beauted"\
 "##<<endLoop>> du corps est un sublime don"
 #define DUMMY_OUTPUT6 "Que la BeautedBeautedBeauted du corps est un sublime don"
-
-#define DUMMY_TEMPLATE7 "Qui de toute ##<< switch lib2.Nombre(69) >>##<<case 68>>connerie##<<case 69>>infasmie##<<defaultCase>>prout##<<endSwitch>> arrache le pardon"
-#define DUMMY_OUTPUT7 "Qui de toute infasmie arrache le pardon"
-
-#define DUMMY_TEMPLATE8 "Elle ##<<switch lib2.Nombre(3)>>##<<case 4>>Dedconne##<<case 3>>##<<loop 4>>ignore##<<endLoop>>##<<endSwitch>> l'Enfer comme le Purgatoire."
-#define DUMMY_OUTPUT8 "Elle ignoreignoreignoreignore l'Enfer comme le Purgatoire."
-
-#define DUMMY_TEMPLATE9 "Elle " \
-"##<<switch lib2.Nombre(3)>>" \
-"##<<case 4>>Dedconne" \
-"##<<case 3>>" \
-  "##<< lib1.InitUnDeuxTrois(5) >>"\
-  "##<<loop lib1.UnDeuxTrois()>>" \
-    "ignore" \
-  "##<<endLoop>>" \
-"##<<endSwitch>>" \
-" l'Enfer comme le Purgatoire."
-#define DUMMY_OUTPUT9 "Elle ignoreignoreignoreignoreignore l'Enfer comme le Purgatoire."
 
 
 #define DUMMY_TEMPLATE10 "Et quand l'" \
@@ -209,16 +139,22 @@ int main (int argc, char** argv) {
   BLOTCODE_HANDLE h_blotcodeHandle = (BLOTCODE_HANDLE)UNDEFINED;
   m_TRACK_IF(BlotcodeCreateInstance(&h_blotcodeHandle) != RETURNED)
   
+  BLOTEXLIB_EXECUTOR_FACTORY_HANDLE h_blotexlibExecutorFactoryHandle =
+    (BLOTEXLIB_EXECUTOR_FACTORY_HANDLE)UNDEFINED;
+  m_TRACK_IF(BlotexlibExecutorFactoryCreateInstance(&h_blotexlibExecutorFactoryHandle) != RETURNED)
+
   int blotlibLabel = UNDEFINED; 
   blotlibLabel = BlotcodeLinkBlotlib(h_blotcodeHandle,  "lib1", 4, s_localBlotfuncsName1,
     Blotlib1ExecutorFactoryCreateProductInstance,  DUMMY_BLOTLIB1_EXECUTOR_FACTORY_HANDLE,
     Blotlib1ExecutorExecuteC,  Blotlib1ExecutorDestroyInstance);
   m_ASSERT(blotlibLabel == BLOTLIB_ENTRY0)
 
-  blotlibLabel = BlotcodeLinkBlotlib(h_blotcodeHandle,  "lib2",  4, s_localBlotfuncsName2,
-    Blotlib2ExecutorFactoryCreateProductInstance,  DUMMY_BLOTLIB2_EXECUTOR_FACTORY_HANDLE,
-    Blotlib2ExecutorExecuteC,  Blotlib2ExecutorDestroyInstance);
-  m_ASSERT(blotlibLabel == BLOTLIB_ENTRY0 + 1)
+#define BLOTEXLIB_PREFIX "be"
+
+  int blotexlibLabel = BlotcodeLinkBlotexlib(h_blotcodeHandle, BLOTEXLIB_PREFIX,
+    h_blotexlibExecutorFactoryHandle) ;
+  m_ASSERT(blotexlibLabel == BLOTLIB_ENTRY0 + 1)
+
 
   m_TRACK_IF(BlotcodeFreeze(h_blotcodeHandle) != RETURNED)
 
@@ -233,6 +169,11 @@ int main (int argc, char** argv) {
   BLOTCODE_EXECUTOR_HANDLE h_blotcodeExecutorHandle = (BLOTCODE_EXECUTOR_HANDLE)UNDEFINED;
   m_TRACK_IF(BlotcodeExecutorCreateInstance(&h_blotcodeExecutorHandle,  h_blotcodeHandle) !=
     RETURNED)
+
+  BLOTEXLIB_EXECUTOR_HANDLE blotexlibExecutorHandle = (BLOTEXLIB_EXECUTOR_HANDLE)UNDEFINED;
+  m_ASSERT(BlotcodeExecutorGetBlotexlibExecutorHandle(h_blotcodeExecutorHandle,blotexlibLabel,
+    &blotexlibExecutorHandle) == RETURNED)
+
 
   G_STRING_STUFF h_outputGStringStuff = (G_STRING_STUFF)UNDEFINED;
   m_TRACK_IF(G_STRING_CREATE_INSTANCE(&h_outputGStringStuff) != RETURNED)
@@ -249,38 +190,18 @@ int main (int argc, char** argv) {
     DUMMY_OUTPUT) != RETURNED) 
 
   m_TRACK_IF(BlotcodeExecutorTest(2,h_blotcodeExecutorHandle, h_outputSuckerHandle,
-    h_outputGStringStuff, DUMMY_TEMPLATE2, ANSWER__YES,  BLOTCODE_CONSTRUCTION_STATUS__OK,
-    DUMMY_OUTPUT2) != RETURNED) 
-
-  m_TRACK_IF(BlotcodeExecutorTest(3,h_blotcodeExecutorHandle, h_outputSuckerHandle,
-    h_outputGStringStuff, DUMMY_TEMPLATE3, ANSWER__NO,  UNDEFINED,  (const char *)UNDEFINED) !=
-    RETURNED) 
-
-  m_TRACK_IF(BlotcodeExecutorTest(4,h_blotcodeExecutorHandle, h_outputSuckerHandle,
     h_outputGStringStuff, DUMMY_TEMPLATE4, ANSWER__YES,  BLOTCODE_CONSTRUCTION_STATUS__OK,
     DUMMY_OUTPUT4) != RETURNED)
 
-  m_TRACK_IF(BlotcodeExecutorTest(5,h_blotcodeExecutorHandle, h_outputSuckerHandle,
+  m_TRACK_IF(BlotcodeExecutorTest(3,h_blotcodeExecutorHandle, h_outputSuckerHandle,
     h_outputGStringStuff, DUMMY_TEMPLATE5, ANSWER__YES,  BLOTCODE_CONSTRUCTION_STATUS__OK,
     DUMMY_OUTPUT5) != RETURNED) 
 
-  m_TRACK_IF(BlotcodeExecutorTest(6,h_blotcodeExecutorHandle, h_outputSuckerHandle,
+  m_TRACK_IF(BlotcodeExecutorTest(4,h_blotcodeExecutorHandle, h_outputSuckerHandle,
     h_outputGStringStuff, DUMMY_TEMPLATE6, ANSWER__YES,  BLOTCODE_CONSTRUCTION_STATUS__OK,
     DUMMY_OUTPUT6) != RETURNED) 
 
-  m_TRACK_IF(BlotcodeExecutorTest(7,h_blotcodeExecutorHandle, h_outputSuckerHandle,
-    h_outputGStringStuff, DUMMY_TEMPLATE7, ANSWER__YES,  BLOTCODE_CONSTRUCTION_STATUS__OK,
-    DUMMY_OUTPUT7) != RETURNED) 
-
-  m_TRACK_IF(BlotcodeExecutorTest(8,h_blotcodeExecutorHandle, h_outputSuckerHandle,
-    h_outputGStringStuff, DUMMY_TEMPLATE8, ANSWER__YES,  BLOTCODE_CONSTRUCTION_STATUS__OK,
-    DUMMY_OUTPUT8) != RETURNED) 
-
-  m_TRACK_IF(BlotcodeExecutorTest(9,h_blotcodeExecutorHandle, h_outputSuckerHandle,
-    h_outputGStringStuff, DUMMY_TEMPLATE9, ANSWER__YES,  BLOTCODE_CONSTRUCTION_STATUS__OK,
-    DUMMY_OUTPUT9) != RETURNED) 
-
-  m_TRACK_IF(BlotcodeExecutorTest(10,h_blotcodeExecutorHandle, h_outputSuckerHandle,
+  m_TRACK_IF(BlotcodeExecutorTest(5,h_blotcodeExecutorHandle, h_outputSuckerHandle,
     h_outputGStringStuff, DUMMY_TEMPLATE10, ANSWER__YES,  BLOTCODE_CONSTRUCTION_STATUS__OK,
     DUMMY_OUTPUT10) != RETURNED) 
 
@@ -290,6 +211,8 @@ int main (int argc, char** argv) {
   m_TRACK_IF(BlotcodeExecutorDestroyInstance(h_blotcodeExecutorHandle) != RETURNED)
   m_TRACK_IF(SuckerDestroyInstance(h_outputSuckerHandle) != RETURNED)
   m_TRACK_IF(BrokenPipeFixDestroyInstance(brokenPipeFixHandle) != RETURNED)
+
+  m_TRACK_IF(BlotexlibExecutorFactoryDestroyInstance(h_blotexlibExecutorFactoryHandle) != RETURNED)
 
   m_TRACK_IF(BlotcodeDestroyInstance(h_blotcodeHandle) != RETURNED)
 

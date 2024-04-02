@@ -49,9 +49,9 @@ int BlotexlibExecutorFactoryDestroyInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE xh
 // TODO: indiquer que cette medthode n'est pas "native" de blotcode ???
 // 
 // Passed:
-// - ep_handle:
+// - ep_handle: blotcode instance handle created by BlotcodeCreateInstance()
 // - nfp_blotlibPrefix:
-// - fp_blotexlibExecutorFactoryHandle:
+// - fp_blotexlibExecutorFactoryHandle: see BlotexlibExecutorFactoryCreateInstance()
 //
 // Returned: 
 // - >= 0: entry (label) of library (BLOTLIB_ENTRY0 for 1st blotlib, etc.)
@@ -68,26 +68,34 @@ int BlotcodeLinkBlotexlib(BLOTCODE_HANDLE ep_handle, const char* nfp_blotlibPref
 // Interface with other blotlibs
 // =============================
 
-// Allow exchange of variable values between blotex lib and other blot libraries. 
+// Allow access to blotex variables... 
 
-// Check handle retrieved by BlotcodeExecutorGetBlotlibExecutorHandle() function.
+struct BLOTEXLIB_EXECUTOR; // Private structure 
+typedef struct BLOTEXLIB_EXECUTOR *BLOTEXLIB_EXECUTOR_HANDLE; // Public handle
+
+// This function, which wraps BlotcodeExecutorGetBlotlibExecutorHandle(), retrieves the executor
+// handle of =>blotex<= library.
+// This function is useful to access to all blotex variables... 
+// TODO: indiquer que cette medthode n'est pas "native" de blotcode executor ???
 //
 // Passed:
-// r_handle: see BlotcodeExecutorGetBlotlibExecutorHandle()
+// - handle: see BlotcodeExecutorCreateInstance() 
+// - blotexLibEntry: entry (label) of blotex library (see BlotcodeLinkBlotexlib() above) 
 //
-// Returned :
-// - RETURNED: OK
-// - -1: unexpected problem 
-int BlotexlibExecutorCheckHandle(void *r_handle) ;
-
+// Modified:
+// - *a_blotexlibExecutorHandle: blotex executor library handle 
+//
+// Returned: 
+// - RETURNED: Ok
+// - -1: unexpected problem ; anomaly is raised
+int BlotcodeExecutorGetBlotexlibExecutorHandle(BLOTCODE_EXECUTOR_HANDLE handle, int blotexlibEntry,
+  BLOTEXLIB_EXECUTOR_HANDLE *a_blotexlibExecutorHandle) ;
+												  
 
 #define GLOBAL_BLOTREG_NAME GOOD_OLD_EMPTY_C_STRING
 
 #define BLOTVAR_NAME_ELEMENT G_PARAM_NAME_ELEMENT
 #define BLOTVAR_VALUE_ELEMENT G_PARAM_VALUE_ELEMENT 
-
-struct BLOTEXLIB_EXECUTOR; // Private structure 
-typedef struct BLOTEXLIB_EXECUTOR *BLOTEXLIB_EXECUTOR_HANDLE; // Public handle
 
 // Retrieve some blot register.
 // 

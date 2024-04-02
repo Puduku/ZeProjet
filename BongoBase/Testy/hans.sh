@@ -106,6 +106,9 @@ CommandCompileTests () {
         dobjs=("${dobjs[@]}" c-ansi-green-diggy.o c-ansi-g-string-diggy.o)
         echo "BIDON"
       fi
+      if [ "$_te" = "c-ansi-blotex-test" ] ;then
+        dobjs=("${dobjs[@]}" c-ansi-green-diggy.o c-ansi-g-string-diggy.o)
+      fi
       #eval LD_OBJS=($(Adolf "$_to") $(Adolf_P "$diggyGardenLocation/" "${dobjs[@]}")) 
       eval LD_OBJS=($(Adolf "$_to") $(Adolf "${dobjs[@]}")) 
       CommandLd "$_te"

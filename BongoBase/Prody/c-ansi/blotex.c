@@ -88,12 +88,12 @@ static int BlotexlibExecutorFactoryCreateProductInstance(void *pr_handle,
 
   m_TRACK_IF(NAMED_OBJECTS_CREATE_INSTANCE(&(productHandle->h_blotregsHandle), 10,
     BlotregDestroyInstance) != RETURNED)
-  m_ASSERT(G_STRINGS_ADD_PLAIN_LEXICAL_INDEX(productHandle->h_blotregsHandle, NULL,NULL) !=
+  m_ASSERT(G_STRINGS_ADD_PLAIN_LEXICAL_INDEX(productHandle->h_blotregsHandle, NULL,NULL) ==
     INDEX_LABEL0)
 
   m_TRACK_IF(NAMED_OBJECTS_CREATE_INSTANCE(&(productHandle->h_blottabsHandle), 10,
     BlottabDestroyInstance) != RETURNED)
-  m_ASSERT(G_STRINGS_ADD_PLAIN_LEXICAL_INDEX(productHandle->h_blottabsHandle, NULL,NULL) !=
+  m_ASSERT(G_STRINGS_ADD_PLAIN_LEXICAL_INDEX(productHandle->h_blottabsHandle, NULL,NULL) ==
     INDEX_LABEL0)
 
   m_TRACK_IF(G_STRING_CREATE_INSTANCE(&productHandle->h_working1GStringStuff) != RETURNED)
@@ -105,12 +105,25 @@ static int BlotexlibExecutorFactoryCreateProductInstance(void *pr_handle,
   
 
 // Public function; see .h
-int BlotexlibExecutorCheckHandle(void *r_handle) {
+int BlotcodeExecutorGetBlotexlibExecutorHandle(BLOTCODE_EXECUTOR_HANDLE handle, int blotexlibEntry,
+  BLOTEXLIB_EXECUTOR_HANDLE *a_blotexlibExecutorHandle) {
   m_DIGGY_BOLLARD()
-  BLOTEXLIB_EXECUTOR_HANDLE handle = (BLOTEXLIB_EXECUTOR_HANDLE)r_handle;
-  m_CHECK_MAGIC_FIELD(BLOTEXLIB_EXECUTOR_HANDLE,handle)
+  void *r_blotexlibExecutorHandle = (void *)UNDEFINED;
+  int result = BlotcodeExecutorGetBlotlibExecutorHandle(handle,blotexlibEntry,
+    &r_blotexlibExecutorHandle);
+  switch (result) {
+  case RESULT__FOUND:
+    *a_blotexlibExecutorHandle =
+      (BLOTEXLIB_EXECUTOR_HANDLE)r_blotexlibExecutorHandle;
+    m_CHECK_MAGIC_FIELD(BLOTEXLIB_EXECUTOR_HANDLE,*a_blotexlibExecutorHandle)
+  break; case RESULT__NOT_FOUND:
+    m_RAISE(ANOMALY__VALUE__D,result)
+  break; default:
+    m_TRACK()
+  } // switch 
+
   m_DIGGY_RETURN(RETURNED)
-} // BlotexlibExecutorCheckHandle
+} // BlotcodeExecutorGetBlotexlibExecutorHandle
 
 // Blotregs: 
 

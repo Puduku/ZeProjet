@@ -456,7 +456,7 @@ int GStringsIndexRequest(G_STRINGS_HANDLE cp_handle,
       nf_indexRequestAutomaticBuffer, criteriaNumber, indexLabel1, indexSeekFlags1,
       (void*)cfps_keys1, arguments) != RETURNED)
     va_end(arguments) ;
-  } // arguments
+  } // arguments
   m_DIGGY_RETURN(RETURNED)
 } // GStringsIndexRequest
 
