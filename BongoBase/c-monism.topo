@@ -105,7 +105,7 @@
 //   which these two distinct NULLs represent, may turn out to be different. NULL is generally
 //   referred to as a "marker".
 // Note: Fifty years on, the question of the RELEVANCE of this ternary logic in SQL is still being
-// debated.
+// debated (in a nutshell: the DBAs love it and the programmers hate it.)
 // Unary verities in computing...
 // The main incarnation of monism in classic structured programming is undoubtedly the 'pure'
 // procedure, which executes without any 'return status'. This idea of absence of return status
