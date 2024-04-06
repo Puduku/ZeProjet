@@ -457,21 +457,6 @@ static int IsNameOrEntryBlotvarTerminalSymbol(int c) {
 } // IsNameOrEntryBlotvarTerminalSymbol 
 
 // IS_CHAR_FUNCTION:
-static int IsInt2OpChar(int c) {
-  return (c == '+' || c == '-' || c == '*' || c == '/' || c == '&' || c == '!');
-} // IsInt2OpChar
-
-// Terminal symbols (of <int 2op> terminal symbol)
-enum {
-  ADD__INT_2OP,
-  SUBTRACT__INT_2OP,
-  MULTIPLY__INT_2OP,
-  DIVIDE__INT_2OP,
-  AND__INT_2OP,
-  OR__INT_2OP,
-} ;
-
-// IS_CHAR_FUNCTION:
 static int IsIntBlotregOpPrefix(int c) {
   return (c == ':' || c == '^' || c == '+' ||  c == '=');
 } // IsIntBlotregOpPrefix
@@ -633,6 +618,21 @@ m_DIGGY_VAR_STRING_PORTION(lexeme)
 
   m_DIGGY_RETURN(ANSWER__YES)
 } // m_BlotexlibExecutorComputeBlotexAtom
+
+// IS_CHAR_FUNCTION:
+static int IsInt2OpChar(int c) {
+  return (c == '+' || c == '-' || c == '*' || c == '/' || c == '&' || c == '!');
+} // IsInt2OpChar
+
+// Terminal symbols (of <int 2op> terminal symbol)
+enum {
+  ADD__INT_2OP,
+  SUBTRACT__INT_2OP,
+  MULTIPLY__INT_2OP,
+  DIVIDE__INT_2OP,
+  AND__INT_2OP,
+  OR__INT_2OP,
+} ;
 
 // Parse <intex> | <strex> 
 //
