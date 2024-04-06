@@ -72,7 +72,7 @@
 #define m_PARSE_PASS_CHARS(/*struct STRING_PORTION*/m_sequence, \
   b_regularScan, b_passCharsTill, /*IS_CHAR_FUNCTION*/n_isCharFunction, /*char*/c_char,\
   /*struct STRING_PORTION* */na_lexeme) {\
-  const char *em_scanPtr = ScanStringPortion(&m_sequence,b_regularScan,b_passCharsTill,\
+  const char *em_scanPtr = ScanStringPortion(&(m_sequence),b_regularScan,b_passCharsTill,\
     n_isCharFunction,c_char);\
   m_PARSE_SEQUENCE(m_sequence,em_scanPtr, na_lexeme)\
 }

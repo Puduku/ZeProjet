@@ -106,11 +106,11 @@ m_DIGGY_VAR_STRING(ccp_expectedOutput)
 #define DUMMY_TEMPLATE "La Nature est un temple oug de vivants piliers"
 #define DUMMY_OUTPUT DUMMY_TEMPLATE
 
-#define DUMMY_TEMPLATE4 "Que la ##<< loop 1 >>Beauted##<<endLoop>> du corps est un sublime don"
+#define DUMMY_TEMPLATE4 "Que la ##<< be.Eval(0) >>Beauted du corps est un sublime don"
 #define DUMMY_OUTPUT4 "Que la Beauted du corps est un sublime don"
 
-#define DUMMY_TEMPLATE5 "Que la ##<< loop 2 >>Beauted##<<endLoop>> du corps est un sublime don"
-#define DUMMY_OUTPUT5 "Que la BeautedBeauted du corps est un sublime don"
+#define DUMMY_TEMPLATE5 "Que la ##<< loop be.Eval(69) >>Beauted##<<endLoop>> du corps est un sublime don"
+#define DUMMY_OUTPUT5 "Que la  du corps est un sublime don"
 
 #define DUMMY_TEMPLATE6 "Que la "\
 "##<< lib1.InitUnDeuxTrois(3) >>"\

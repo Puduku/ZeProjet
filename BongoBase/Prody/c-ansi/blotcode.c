@@ -924,12 +924,14 @@ int BlotcodeExecutorConstructPage (BLOTCODE_EXECUTOR_HANDLE handle,
         handle->hshr_blotlibExecutorHandles[blotlibEntry],  a_blotfunc,
         handle->h_blotfuncSurrogate,  &blotinstPtr->c_blotval, nc_abandonmentInfo)) {
       case ANSWER__YES: // Blot function completed
+m_DIGGY_VAR_LD(blotinstPtr->c_blotval)
         if (handle->h_blotfuncSurrogate->c_copiedLength > 0) {
           m_TRACK_IF(SuckerFillDButt(outputSuckerHandle, 
             m_GStringGetLogicalStringPortion(handle->h_blotfuncSurrogate),  NULL) != 0)
         } // if
       break; case ANSWER__NO: // Abandon dynamic construction
         blotinstPtr->b_blotval = b_FALSE0;
+m_DIGGY_INFO("ANSWER__NO => BLOTCODE_CONSTRUCTION_STATUS__ABANDONNED")
         n_blotcodeConstructionStatus = BLOTCODE_CONSTRUCTION_STATUS__ABANDONNED;
         continue;
       break; default: 

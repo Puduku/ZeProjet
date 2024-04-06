@@ -24,13 +24,13 @@
 // <blotex> ::= <intex> | <strex> 
 //
 // Blot expressions are made of "atoms" :
-// <intex> ::= <int atom> ( <int 2op> <intex> )*  
-// <strex> ::= <str atom> ( <str 2op> <strex> )*  
+// <intex> ::= <intex atom> ( <int 2op> <intex> )*  
+// <strex> ::= <strex atom> ( <str 2op> <strex> )*  
 //
 // The atoms are made of constants, variables and "register operations".
-// <int atom> ::= [ <int 1op> ] ( <int constant> | <blotvar> | <blotvar entry> | <blotvar id> |
+// <intex atom> ::= [ <int 1op> ] ( <int constant> | <blotvar> | <blotvar entry> | <blotvar id> |
 //   <int blotreg op> ) 
-// <str atom> ::= <str constant> | <blotvar strex> | <blotvar name> | <str blotreg read op> 
+// <strex atom> ::= <str constant> | <blotvar strex> | <blotvar name> | <str blotreg read op> 
 //
 // Constant expressions
 // <int constant> ::= <decimal int constant> | <hexadecimal int constant> 

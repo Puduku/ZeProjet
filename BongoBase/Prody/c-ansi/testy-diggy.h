@@ -35,6 +35,10 @@
 
 #define m_DIGGY_VAR_D(m_var) ;
 
+#define m_DIGGY_VAR_LD(m_var) ;
+
+#define m_DIGGY_VAR_U(m_var) ;
+
 #define m_DIGGY_VAR_P(m_var) ;
 
 #define m_DIGGY_VAR_STRING(m_var) ;

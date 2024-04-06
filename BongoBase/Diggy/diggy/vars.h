@@ -71,6 +71,22 @@
 #define m_DIGGY_VAR_D(m_var)  m_DIGGY_VAR_GEN(m_var,d)
 
 // #SEE DIGGY_VAR_XXX_MACRO
+// Simple long integer var display
+// Wraps m_DIGGY_VAR_GEN above
+//
+// Passed
+// - m_var: "long int" type var expression to display
+#define m_DIGGY_VAR_LD(m_var)  m_DIGGY_VAR_GEN(m_var,ld)
+
+// #SEE DIGGY_VAR_XXX_MACRO
+// Simple unsigned integer var display
+// Wraps m_DIGGY_VAR_GEN above
+//
+// Passed
+// - m_var: "unsigned int" type var expression to display
+#define m_DIGGY_VAR_U(m_var)  m_DIGGY_VAR_GEN(m_var,u)
+
+// #SEE DIGGY_VAR_XXX_MACRO
 // Simple pointer var display
 // Wraps m_DIGGY_VAR_GEN above
 //
