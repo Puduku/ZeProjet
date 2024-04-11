@@ -216,9 +216,8 @@
 // with my videopac toy "computer" from the year 1978), "low level" drivers, etc. - this
 // representation is indeed, by far, the most effective one can imagine...
 // ...Unfortunately, there is a huge DOWNSIDE: this representation simply does NOT allow you to
-// handle ORDINARY PORTIONS of such strings... Now, - what bad luck! -, in "higher level"
-// ordinary applications, MOST strings processings (notably the "parsings") precisely manipulate
-// strings PORTIONS.
+// handle ORDINARY PORTIONS of such strings... Now, - what bad luck! -, in ordinary applications,
+// MOST of strings processings (notably the "parsings") precisely manipulate strings PORTIONS.
 
 
 // Moralited:
