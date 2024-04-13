@@ -477,7 +477,7 @@ m_DEFINE_ENUM_ALIAS_END()
 //   + status RESULT__FOUND: (never NULL) corresponding green item "stuff"0
 //   + status RESULT__NOT_FOUND: 
 //     . with INDEX_FETCH_FLAGS__FETCH: new item is at your disposal ; note that item MAY BE yet in
-//       "engaged" state when the emplacement corresponded to a gap that has been "recycled"...
+//       "engaged" state when the emplacement corresponds to a gap that was "recycled"...
 //     . otherwise (INDEX_FETCH_FLAGS__SEEK_ONLY / READ_ONLY / READ_NEXT / REMOVE): set to NULL
 //       special value
 //   #SEE fetched-item-notices
