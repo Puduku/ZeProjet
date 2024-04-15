@@ -595,7 +595,7 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
 // (Do nothing if some error is ALREADY reported...)
 //
 // Passed:
-// nap_lexeme:
+// lexeme:
 // p_format:
 // ...: 
 //
@@ -603,7 +603,7 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
 // - answer 
 // - nac_parsingErrorLocalization
 // - blotinstSequence 
-#define m_REPORT_ERROR(/*const struct STRING_PORTION* */nap_lexeme,\
+#define m_REPORT_ERROR(/*const struct STRING_PORTION */lexeme,\
   /*const char* */p_format, ...) {\
   if (answer == ANSWER__YES) { \
     answer = ANSWER__NO ;\
@@ -611,11 +611,9 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
       *nac_parsingErrorLocalization = blotinstSequence;\
     }\
     if (nc_parsingErrorInfo != NULL) {\
-      GStringPrintf(nc_parsingErrorInfo,0,p_format, ##__VA_ARGS__);\
-      if ((nap_lexeme) != NULL) {\
-        GStringPrintf(nc_parsingErrorInfo,1,"[" FMT_STRING_PORTION "]", m_STRING_PORTION_2_FMT_ARGS(\
-          *((const struct STRING_PORTION*)nap_lexeme)));\
-      }\
+      m_TRACK_IF(GStringPrintf(nc_parsingErrorInfo,0,p_format, ##__VA_ARGS__) < 0)\
+      m_TRACK_IF(GStringPrintf(nc_parsingErrorInfo,-1," [" FMT_STRING_PORTION "]",\
+        m_STRING_PORTION_2_FMT_ARGS(lexeme)) < 0)\
     }\
   }\
 }
@@ -628,6 +626,7 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
   struct BLOTINST *vc_blotinstPtr = (struct BLOTINST *) UNDEFINED;
   struct STRING_PORTION decor; // UNDEFINED 
   struct STRING_PORTION dummy; // UNDEFINED 
+  m_ASSIGN_STRING_PORTION(dummy,"N/A",-1)
 
   while (answer == ANSWER__YES && !b_EMPTY_STRING_PORTION(fp_template)) {
 
@@ -647,7 +646,7 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
 
     m_PARSE_TILL_MATCH_C(fp_template,">>",NULL, &blotinstSequence)
     if (b_EMPTY_STRING_PORTION(fp_template)) { // ending ">>" not located 
-      m_REPORT_ERROR(NULL,"Missing " DELIMITOR__S, ">>")
+      m_REPORT_ERROR(dummy,"Missing " DELIMITOR__S, ">>")
     } // if
     m_PARSE_OFFSET(fp_template,2, NULL)
 
@@ -668,18 +667,18 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
     m_PARSE_PASS_SPACES(blotinstSequence, NULL)
     m_PARSE_PASS_CHARS(blotinstSequence,b_REGULAR_SCAN, b_PASS_CHARS_TILL,NULL,'(', &dummy)
     if (!b_EMPTY_STRING_PORTION(dummy)) {
-      m_REPORT_ERROR(&dummy,"Unexpected content before " DELIMITOR__C,'(')
+      m_REPORT_ERROR(dummy,"Unexpected content before " DELIMITOR__C,'(')
     } // if
     if ((b_arguments = !b_EMPTY_STRING_PORTION(blotinstSequence))) {
       m_PARSE_OFFSET(blotinstSequence,1, NULL)
       m_PARSE_PASS_CHARS(blotinstSequence,b_REVERTED_SCAN, b_PASS_CHARS_TILL,NULL,')', &c_arguments)
       if (b_EMPTY_STRING_PORTION(blotinstSequence)) {
-        m_REPORT_ERROR(&c_arguments,"Missing " DELIMITOR__C, ')')
+        m_REPORT_ERROR(c_arguments,"Missing " DELIMITOR__C, ')')
       } // if
       m_PARSE_OFFSET(blotinstSequence,1, NULL)
       m_PARSE_PASS_SPACES(blotinstSequence, NULL)
       if (!b_EMPTY_STRING_PORTION(blotinstSequence)) {
-        m_REPORT_ERROR(&blotinstSequence,"Trailing content after " DELIMITOR__C, ')')
+        m_REPORT_ERROR(blotinstSequence,"Trailing content after " DELIMITOR__C, ')')
       } // if
     } // if
     // basicToken1: initialized (should not be empty) 
@@ -729,7 +728,7 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
         vc_blotinstPtr->b_blotfunc = b_TRUE;
         m_ASSIGN_BLOTFUNC_CALL(vc_blotinstPtr->c_blotfunc.call, referral, c_arguments) 
       break; case RESULT__NOT_FOUND:
-        m_REPORT_ERROR(&referral, "Unknown blotfunc")
+        m_REPORT_ERROR(referral, "Unknown blotfunc")
       break; default:
         m_TRACK()
       } // switch
@@ -742,11 +741,11 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
       case ANSWER__YES: 
         vc_blotinstPtr->b_blotval = b_TRUE;
         if (parsedLength < m_StringPortionLength(&litteralBlotval)) {
-          m_REPORT_ERROR(&litteralBlotval, "Trailing chars in blotval")
+          m_REPORT_ERROR(litteralBlotval, "Trailing chars in blotval")
         } // if
       break; case ANSWER__NO: 
         vc_blotinstPtr->b_blotval = b_FALSE0;
-        m_REPORT_ERROR(&litteralBlotval, "Invalid blotval")
+        m_REPORT_ERROR(litteralBlotval, "Invalid blotval")
       break; default:
         m_TRACK()
       } // switch
@@ -757,7 +756,7 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
         &vc_blotinstPtr->blotkeywId)) {
       case RESULT__FOUND: 
       break; case RESULT__NOT_FOUND: 
-        m_REPORT_ERROR(&litteralKeyw, "Unknown blotkeyw")
+        m_REPORT_ERROR(litteralKeyw, "Unknown blotkeyw")
       break; default:
         m_TRACK()
       } // switch
@@ -772,7 +771,7 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
     case SWITCH__BLOTKEYW_ID:
     case CASE__BLOTKEYW_ID:
       if ((!vc_blotinstPtr->b_blotfunc) && (!vc_blotinstPtr->b_blotval)) {
-        m_REPORT_ERROR(&litteralKeyw, "Control statement without value")
+        m_REPORT_ERROR(litteralKeyw, "Control statement without value")
       } // if
     break ; case NONE__BLOTKEYW_ID:
     case END_LOOP__BLOTKEYW_ID:
@@ -793,7 +792,7 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
     case END_LOOP__BLOTKEYW_ID:
     case END_SWITCH__BLOTKEYW_ID:
       if (C_STACK_GET_COUNT(handle->h_flowControlStack) == 0) {
-        m_REPORT_ERROR(&litteralKeyw,"Orphan control statement (NO prior control statement)")
+        m_REPORT_ERROR(litteralKeyw,"Orphan control statement (NO prior control statement)")
 
       } else { 
         struct BLOTINST *t_priorBlotinstPtr = (struct BLOTINST *)UNDEFINED; 
@@ -809,7 +808,7 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
 
         if (vc_blotinstPtr->blotkeywId == END_LOOP__BLOTKEYW_ID) {
           if (t_priorBlotinstPtr->blotkeywId != LOOP__BLOTKEYW_ID) { 
-            m_REPORT_ERROR(&litteralKeyw,
+            m_REPORT_ERROR(litteralKeyw,
               "Orphan control statement (prior control statement is not a loop)")
           } // if 
         } else {
@@ -817,7 +816,7 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
           case CASE__BLOTKEYW_ID:                  
           case DEFAULT_CASE__BLOTKEYW_ID:                  
             if (t_priorBlotinstPtr->blotkeywId == DEFAULT_CASE__BLOTKEYW_ID) {
-              m_REPORT_ERROR(&litteralKeyw,
+              m_REPORT_ERROR(litteralKeyw,
                 "Orphan control statement (prior control statement is a default case)")
             } // if 
           case END_SWITCH__BLOTKEYW_ID:
@@ -825,7 +824,7 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
                 t_priorBlotinstPtr->blotkeywId != CASE__BLOTKEYW_ID &&
                 t_priorBlotinstPtr->blotkeywId != 
                 DEFAULT_CASE__BLOTKEYW_ID) { 
-              m_REPORT_ERROR(&litteralKeyw,"Orphan control statement "
+              m_REPORT_ERROR(litteralKeyw,"Orphan control statement "
                 "(prior control statement is neither a switch, a case nor a default case)")
             } // if 
           break; default:
@@ -851,7 +850,7 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
 
   int trailingBlotkeywsNumber = C_STACK_GET_COUNT(handle->h_flowControlStack);
   if (trailingBlotkeywsNumber > 0) {
-    m_REPORT_ERROR(NULL, "Trailing %d loop or switch control statement(s)", trailingBlotkeywsNumber)
+    m_REPORT_ERROR(dummy, "Trailing %d loop or switch control statement(s)", trailingBlotkeywsNumber)
   } // if
 
 #undef DELIMITOR__S

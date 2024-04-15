@@ -21,9 +21,9 @@
 // Manipulate g-string as 'named object'
 // 
 // Passed
-// - stuff:
+// - stuff: stuff of (supposed 'named object') g-string
 // - nhr_handle: object's (head) handle
-// - n_gStringsHandle:
+// - n_gStringsHandle: (when non NULL) "reference" named objects collection
 // 
 // Ret:
 // - RETURNED: OK

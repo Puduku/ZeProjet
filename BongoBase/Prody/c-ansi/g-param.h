@@ -25,12 +25,12 @@ const int ps_gParamGStringConveyances[G_PARAM_CARDINALITY] = {
   GStringsCreateInstance(azh_handle, expectedItemsNumber,G_PARAM_CARDINALITY,-1,\
   ps_gParamGStringConveyances,(NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION)UNDEFINED)
 
-// Manipulate g-string as 'valued string'
+// Manipulate g-string as 'g-param's value'
 // 
 // Passed
 // - stuff: g-string as g-param's value
-// - acolytValue:
-// - n_gStringsHandle: not NULL => g-params collection
+// - en_value: integer value to assign
+// - n_gStringsHandle: (when non NULL) "reference" g-params collection
 // 
 // Ret:
 // - RETURNED: OK
@@ -40,6 +40,25 @@ static inline int m_GStringAsGParamValue(G_STRING_STUFF stuff, GENERIC_INTEGER e
   m_CHECK_G_STRINGS_COLLECTION_CONVEYANCE(n_gStringsHandle,G_PARAM_VALUE_ELEMENT,
    VALUED_STRING__G_STRING_CONVEYANCE)
   stuff->acolyt.cen_value = en_value;
+  return RETURNED;
+} // m_GStringAsGParamValue
+
+
+// Manipulate g-string as 'g-param's name'
+// 
+// Passed
+// - stuff: g-string as g-param's name 
+// - tokenId: id to assign
+// - n_gStringsHandle: (when non NULL) "reference" g-params collection
+// 
+// Ret:
+// - RETURNED: OK
+// - -1: unexpected problem; anomaly is raised...
+static inline int m_GStringAsGParamName(G_STRING_STUFF stuff, int tokenId, 
+  G_STRINGS_HANDLE n_gStringsHandle) {
+  m_CHECK_G_STRINGS_COLLECTION_CONVEYANCE(n_gStringsHandle,G_PARAM_NAME_ELEMENT,
+   TOKEN__G_STRING_CONVEYANCE)
+  stuff->acolyt.c_tokenId = tokenId;
   return RETURNED;
 } // m_GStringAsGParamValue
 

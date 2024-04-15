@@ -29,9 +29,9 @@ struct TOKEN_DEFINITION {
 // Manipulate g-string as 'token'
 // 
 // Passed
-// - stuff:
-// - tokenId:
-// - n_gStringsHandle:
+// - stuff: stuff of (supposed 'token') g-string
+// - tokenId: token id to assign
+// - n_gStringsHandle: (when non NULL) "reference" tokens collection
 // 
 // Ret:
 // - RETURNED: OK
