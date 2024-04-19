@@ -44,9 +44,9 @@
 // - !=0 : represents "false" boolean value
 //
 // Entities
-// - blotreg
-// - blotvar
-// - blot table
+// - blotreg (blot register)
+// - blotvar (blot variable)
+// - blottab (blot table)
 // are identified by their name (may be empty).
 //
 // <entity name> ::= ( <letter> | <digit> | '_' )*

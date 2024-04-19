@@ -248,6 +248,9 @@ int BlotexlibExecutorCreateBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle,
 #define UNKNOWN_BLOTVAR__ABANDONMENT_INFO "Unknown blotvar"
 #define UNKNOWN_BLOTREG__ABANDONMENT_INFO "Unknown blotreg"
 
+// Passed:
+// - initialSequence: sequence "just before" abandonment...
+// - p_sequenceType:  
 #define m_PREPARE_ABANDON(/*struct STRING_PORTION*/initialSequence,\
   /*const char* */p_sequenceType) \
   const struct STRING_PORTION em_initialSequence = (initialSequence);\
@@ -509,6 +512,88 @@ enum {
   READ__INT_BLOTREG_OP_PREFIX,
 } ;
 
+// Parse blotvar reference as value of blotex atom
+// expect: <blotvar> | <blotvar entry> | <blotvar id> | <blotvar strex> | <blotvar name>
+//
+// Passed:
+// - handle:
+// - *a_sequence: before parsing
+//
+// Changed:
+// - *a_sequence: after parsing 
+// - ac_atomBlotexValue: only significant if "computed successfully" ; value corresponding to 
+//   blotvar reference  
+// - nc_abandonmentInfo: only significant if "computing abandoned"
+//
+// Ret: Computed successfully ? 
+// - ANSWER__YES: Ok,
+// - ANSWER__NO: 'syntax' 'not found' error; abandon processing 
+// - -1: unexpected problem
+static inline int m_BlotexlibExecutorComputeBlotexAtomBlotvar(BLOTEXLIB_EXECUTOR_HANDLE handle,
+  struct STRING_PORTION *a_sequence, struct BLOTEX_VALUE *ac_atomBlotexValue,
+  G_STRING_STUFF nc_abandonmentInfo) {
+  m_DIGGY_BOLLARD()
+
+  struct BLOTVAR_REFERENCE c_blotvarReference; // UNDEFINED 
+  G_STRING_SET_STUFF cvnt_blotvarStuff = (G_STRING_SET_STUFF)UNDEFINED;
+  int cvn_entry = UNDEFINED; 
+  struct STRING_PORTION lexeme; // UNDEFINED
+  m_PREPARE_ABANDON(*a_sequence, "(blotvar reference)") 
+
+  // Parse <blotvar>:
+  switch (BlotexlibExecutorRetrieveBlotvar(handle, b_R_VALUE, a_sequence,
+    &c_blotvarReference, nc_abandonmentInfo)) {
+  case ANSWER__YES: // Parsed successfully    
+    switch (BlotexlibExecutorFetchBlotvar(handle, b_R_VALUE,&c_blotvarReference,
+      &cvnt_blotvarStuff,&cvn_entry)){
+    case RESULT__FOUND:
+    break; case RESULT__NOT_FOUND:
+m_DIGGY_VAR_D(cvn_entry)
+      m_ASSERT(cvn_entry == -1)
+      m_ABANDON(UNKNOWN_BLOTVAR__ABANDONMENT_INFO) 
+    break; default:
+      m_TRACK()
+    } // switch
+  break; case ANSWER__NO: // Parsed KO
+    m_DIGGY_RETURN(ANSWER__NO)
+  break; default:
+    m_TRACK()
+  } // switch
+  m_PARSE_PASS_SPACES(*a_sequence,NULL)
+  m_PARSE_PASS_SINGLE_CHAR(*a_sequence,NULL,'!',&lexeme)
+  if (!b_EMPTY_STRING_PORTION(lexeme)) { // <blotvar id> | <blotvar entry> | <blotvar name>
+    m_PARSE_PASS_SINGLE_CHAR(*a_sequence,IsNameOrEntryBlotvarTerminalSymbol,(char)UNDEFINED,
+      &lexeme)
+    if (!b_EMPTY_STRING_PORTION(lexeme)) {
+      switch (lexeme.string[0]) {
+      case '$': // <blotvar name>
+        ac_atomBlotexValue->b_strex = b_TRUE;
+        ac_atomBlotexValue->select.c_str =
+          cvnt_blotvarStuff[G_PARAM_NAME_ELEMENT].cv_stringPortion; 
+      break; case '#': // <blotvar entry>
+        m_ASSERT(cvn_entry >= 0)
+        ac_atomBlotexValue->select.c_blotval = cvn_entry;
+      break; default:
+        m_RAISE(ANOMALY__VALUE__D,lexeme.string[0])
+      } // switch
+    } else { // <blotvar id>
+      ac_atomBlotexValue->select.c_blotval =
+        cvnt_blotvarStuff[G_PARAM_NAME_ELEMENT].acolyt.cen_value;
+    } // if
+  } else { // <blotvar strex> | <blotvar> 
+    m_PARSE_PASS_SINGLE_CHAR(*a_sequence,NULL,'$',&lexeme)
+    if (b_EMPTY_STRING_PORTION(lexeme)) { // <blotvar> (integer value)
+      ac_atomBlotexValue->select.c_blotval =
+        cvnt_blotvarStuff[G_PARAM_VALUE_ELEMENT].acolyt.cen_value;
+    } else { // <blotvar strex>
+      ac_atomBlotexValue->select.c_str =
+        cvnt_blotvarStuff[G_PARAM_VALUE_ELEMENT].cv_stringPortion; 
+    } // if
+  } // if
+
+  return ANSWER__YES;
+} // m_BlotexlibExecutorComputeBlotexAtomBlotvar
+
 // Parse <intex atom> | <strex atom>  
 //
 // Passed:
@@ -536,7 +621,7 @@ static inline int m_BlotexlibExecutorComputeBlotexAtom(BLOTEXLIB_EXECUTOR_HANDLE
   int n_int1Op = -1; // No <int 1op> a priori
   m_PARSE_PASS_SPACES(*a_sequence,NULL)
   if (b_EMPTY_STRING_PORTION(*a_sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_INFO) 
-  m_PARSE_PASS_SINGLE_CHAR(*a_sequence,IsInt1Op,UNDEFINED,&lexeme)
+  m_PARSE_PASS_SINGLE_CHAR(*a_sequence,IsInt1Op,(char)UNDEFINED,&lexeme)
   if (!b_EMPTY_STRING_PORTION(lexeme)) { // <int 1op>
     switch (lexeme.string[0]) {
     case '!' : n_int1Op = NOT__INT_1OP;
@@ -584,7 +669,7 @@ m_DIGGY_VAR_STRING_PORTION(lexeme)
         if ((ac_atomBlotexValue->b_strex = !b_EMPTY_STRING_PORTION(lexeme))) { // <str blotreg read op> 
         } else { // <int blotreg op>
           m_PARSE_PASS_SPACES(*a_sequence,NULL) // Try <int blotreg op details> ...
-          m_PARSE_PASS_SINGLE_CHAR(*a_sequence,IsIntBlotregOpPrefix,UNDEFINED,&lexeme)
+          m_PARSE_PASS_SINGLE_CHAR(*a_sequence,IsIntBlotregOpPrefix,(char)UNDEFINED,&lexeme)
           if (b_EMPTY_STRING_PORTION(lexeme)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_INFO)
           int intBlotregOpPrefix = UNDEFINED;
           switch (lexeme.string[0]) {
@@ -601,61 +686,16 @@ m_DIGGY_VAR_STRING_PORTION(lexeme)
           } // switch
         } // if
       } else { // '?' not found
-        // expect: <blotvar> | <blotvar entry> | <blotvar id> | <blotvar strex> | <blotvar name>
         *a_sequence = nonConstantCasesBlotexSequence ;
-        struct BLOTVAR_REFERENCE c_blotvarReference; // UNDEFINED 
-        G_STRING_SET_STUFF cvnt_blotvarStuff = (G_STRING_SET_STUFF)UNDEFINED;
-        int cvn_entry = UNDEFINED; 
-        // Parse <blotvar>:
-        switch (BlotexlibExecutorRetrieveBlotvar(handle, b_R_VALUE, a_sequence,
-          &c_blotvarReference, nc_abandonmentInfo)) {
-        case ANSWER__YES: // Parsed successfully    
-          switch (BlotexlibExecutorFetchBlotvar(handle, b_R_VALUE,&c_blotvarReference,
-            &cvnt_blotvarStuff,&cvn_entry)){
-          case RESULT__FOUND:
-          break; case RESULT__NOT_FOUND:
-m_DIGGY_VAR_D(cvn_entry)
-            m_ASSERT(cvn_entry == -1)
-            m_ABANDON(UNKNOWN_BLOTVAR__ABANDONMENT_INFO) 
-          break; default:
-            m_TRACK()
-          } // switch
-        break; case ANSWER__NO: // Parsed KO
+        // expect: <blotvar> | <blotvar entry> | <blotvar id> | <blotvar strex> | <blotvar name>
+        switch (m_BlotexlibExecutorComputeBlotexAtomBlotvar(handle,a_sequence,ac_atomBlotexValue,
+          nc_abandonmentInfo)) {
+        case ANSWER__YES:
+        break; case ANSWER__NO:
           m_DIGGY_RETURN(ANSWER__NO)
-        break; default:
+        break; default: 
           m_TRACK()
         } // switch
-        m_PARSE_PASS_SPACES(*a_sequence,NULL)
-        m_PARSE_PASS_SINGLE_CHAR(*a_sequence,NULL,'!',&lexeme)
-        if (!b_EMPTY_STRING_PORTION(lexeme)) { // <blotvar id> | <blotvar entry> | <blotvar name>
-          m_PARSE_PASS_SINGLE_CHAR(*a_sequence,IsNameOrEntryBlotvarTerminalSymbol,UNDEFINED,
-            &lexeme)
-          if (!b_EMPTY_STRING_PORTION(lexeme)) {
-            switch (lexeme.string[0]) {
-            case '$': // <blotvar name>
-              ac_atomBlotexValue->b_strex = b_TRUE;
-              ac_atomBlotexValue->select.c_str =
-                cvnt_blotvarStuff[G_PARAM_NAME_ELEMENT].cv_stringPortion; 
-            break; case '#': // <blotvar entry>
-              m_ASSERT(cvn_entry >= 0)
-              ac_atomBlotexValue->select.c_blotval = cvn_entry;
-            break; default:
-              m_RAISE(ANOMALY__VALUE__D,lexeme.string[0])
-            } // switch
-          } else { // <blotvar id>
-            ac_atomBlotexValue->select.c_blotval =
-              cvnt_blotvarStuff[G_PARAM_NAME_ELEMENT].acolyt.cen_value;
-          } // if
-        } else { // <blotvar strex> | <blotvar> 
-          m_PARSE_PASS_SINGLE_CHAR(*a_sequence,NULL,'$',&lexeme)
-          if (b_EMPTY_STRING_PORTION(lexeme)) { // <blotvar> (integer value)
-            ac_atomBlotexValue->select.c_blotval =
-              cvnt_blotvarStuff[G_PARAM_VALUE_ELEMENT].acolyt.cen_value;
-          } else { // <blotvar strex>
-            ac_atomBlotexValue->select.c_str =
-              cvnt_blotvarStuff[G_PARAM_VALUE_ELEMENT].cv_stringPortion; 
-          } // if
-        } // if
       } // if
     } // if 
   } // if 
