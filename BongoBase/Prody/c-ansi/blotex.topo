@@ -103,7 +103,7 @@
 // Operators 
 // operators allows to combine expressions together 
 // <int 1op> ::= '!' | '+' | '-' 
-// <int 2op> ::= '+' | '-' | '*' | '/' | '&&' | '!!'
+// <int 2op> ::= '+' | '-' | '*' | '/' | '&&' | '!!' | '>' | '<' | '>=' | '<=' | '==' | '!=' 
 // Logical operators ('!', '&&' and '!!') combine integer expressions together, "seen" as booleans.
 // <str 2op> ::= '+' 
 // ('+' operator applied on strings is a concatenation)

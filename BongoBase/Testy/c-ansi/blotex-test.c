@@ -119,13 +119,14 @@ m_DIGGY_VAR_STRING(ccp_expectedOutput)
 #define DUMMY_TEMPLATE3 "Que la ##<< loop be.Eval(69) >>Beauted##<<endLoop>> du corps est un sublime don"
 #define DUMMY_OUTPUT3 "Que la  du corps est un sublime don"
 
-#define DUMMY_TEMPLATE4 "##<< be.Eval(.toto := 69)>>Que la ##<<loop be.Eval(.toto)>>Beauted##<<endLoop>> du corps est un sublime don"
+#define DUMMY_TEMPLATE4 "##<< be.Eval(.toto := 69)>>Que la "\
+"##<<loop be.Eval(.toto)>>"\
+"Beauted##<<endLoop>> du corps est un sublime don"
 #define DUMMY_OUTPUT4 "Que la  du corps est un sublime don"
 
-#define DUMMY_TEMPLATE5 "Que la "\
-"##<< lib1.InitUnDeuxTrois(3) >>"\
-"##<< loop lib1.UnDeuxTrois() >>"\
-  "Beauted"\
+#define DUMMY_TEMPLATE5 "Que la ##<< be.Eval(.toto := 3)>>"\
+"##<< loop be.Eval(.toto > 0) >>"\
+"Beauted##<< be.Eval(.toto := .toto - 1)>>"\
 "##<<endLoop>> du corps est un sublime don"
 #define DUMMY_OUTPUT5 "Que la BeautedBeautedBeauted du corps est un sublime don"
 

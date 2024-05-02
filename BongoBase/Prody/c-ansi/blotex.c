@@ -405,7 +405,7 @@ m_DIGGY_VAR_STRING_PORTION(*a_blotvarSequence)
 // Passed:
 // - handle:
 // - b_lValue: TRUE => create blot if does not exist
-// - ap_blotvarReference:
+// - ap_blotvarReference: 
 // - acvnt_blotvarStuff:
 // - nacvn_entry
 // 
@@ -705,18 +705,186 @@ m_DIGGY_VAR_STRING_PORTION(lexeme)
 
 // IS_CHAR_FUNCTION:
 static int IsInt2OpChar(int c) {
-  return (c == '+' || c == '-' || c == '*' || c == '/' || c == '&' || c == '!');
+  return (c == '+' || c == '-' || c == '*' || c == '/' || c == '&' || c == '!' || c == '>' || c ==
+    '<');
 } // IsInt2OpChar
 
 // Terminal symbols (of <int 2op> terminal symbol)
 enum {
-  ADD__INT_2OP,
-  SUBTRACT__INT_2OP,
-  MULTIPLY__INT_2OP,
-  DIVIDE__INT_2OP,
-  AND__INT_2OP,
-  OR__INT_2OP,
+            ADD__INT_2OP,
+       SUBTRACT__INT_2OP,
+       MULTIPLY__INT_2OP,
+         DIVIDE__INT_2OP,
+            AND__INT_2OP,
+             OR__INT_2OP,
+          EQUAL__INT_2OP,
+           LESS__INT_2OP,
+     LESS_EQUAL__INT_2OP,
+        GREATER__INT_2OP,
+  GREATER_EQUAL__INT_2OP,
+      NOT_EQUAL__INT_2OP,
 } ;
+
+// Parse <int 2op> if present
+//
+// Passed:
+// - handle:
+// - *a_sequence: before parsing
+//
+// Changed:
+// - *a_sequence: after parsing 
+// - *an_int2Op:
+//   + -1: special value: <int 2op> NOT present
+//   + >=0 : corresponding int 2op 
+static inline int m_BlotexlibExecutorParseInt2Op(BLOTEXLIB_EXECUTOR_HANDLE handle,
+  struct STRING_PORTION *a_sequence, int *an_int2Op) {
+  m_DIGGY_BOLLARD()
+  struct STRING_PORTION lexeme; // UNDEFINED
+
+  *an_int2Op = -1;
+  m_PARSE_PASS_CHARS(*a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_WHILE,IsInt2OpChar,UNDEFINED,
+    &lexeme) 
+m_DIGGY_VAR_STRING_PORTION(lexeme)
+    if (!b_EMPTY_STRING_PORTION(lexeme)) { 
+      switch (lexeme.string[0]) {
+      case '+': 
+        if (m_StringPortionLength(&lexeme) == 1) *an_int2Op = ADD__INT_2OP;
+      break; case '-':
+        if (m_StringPortionLength(&lexeme) == 1) *an_int2Op = SUBTRACT__INT_2OP;
+      break; case '*':
+        if (m_StringPortionLength(&lexeme) == 1) *an_int2Op = MULTIPLY__INT_2OP;
+      break; case '/':
+        if (m_StringPortionLength(&lexeme) == 1) *an_int2Op = DIVIDE__INT_2OP;
+      break; case '&':
+        switch (m_StringPortionLength(&lexeme)) {
+        case 2: 
+          switch (lexeme.string[1]) {
+          case '&': *an_int2Op = AND__INT_2OP;
+          break; 
+          } // switch  
+        break; 
+        } // switch  
+      break; case '!':
+        switch (m_StringPortionLength(&lexeme)) {
+        case 2: 
+          switch (lexeme.string[1]) {
+          case '!': *an_int2Op = OR__INT_2OP;
+          break; case '=': *an_int2Op = NOT_EQUAL__INT_2OP;
+          break; 
+          } // switch  
+        break; 
+        } // switch  
+      break; case '>':
+        switch (m_StringPortionLength(&lexeme)) {
+        case 1: *an_int2Op = GREATER__INT_2OP; 
+        break; case 2: 
+          if (lexeme.string[1] == '=') *an_int2Op = GREATER_EQUAL__INT_2OP;
+        break; 
+        } // switch  
+      break; case '<':
+        switch (m_StringPortionLength(&lexeme)) {
+        case 1: *an_int2Op = LESS__INT_2OP; 
+        break; case 2: 
+          if (lexeme.string[1] == '=') *an_int2Op = LESS_EQUAL__INT_2OP;
+        break; 
+        } // switch  
+      break; case '=':
+        if (m_StringPortionLength(&lexeme) == 1) *an_int2Op = EQUAL__INT_2OP;
+      break; 
+        m_RAISE(ANOMALY__VALUE__D,lexeme.string[0])
+      } // switch
+    } // if  
+m_DIGGY_VAR_D(*an_int2Op)
+  
+  m_DIGGY_RETURN(RETURNED)
+} // m_BlotexlibExecutorParseInt2Op
+
+static int BlotexlibExecutorComputeBlotex(BLOTEXLIB_EXECUTOR_HANDLE handle,
+  struct STRING_PORTION *a_sequence, struct BLOTEX_VALUE *ac_blotexValue,
+  G_STRING_STUFF nc_abandonmentInfo) ;
+
+// Compute full intex ; that is
+// Parse next <intex> and if existing compute it with intex atom
+// Otherwise, full intex simply corresponds to intex atom
+//
+// Passed:
+// - handle:
+// - *a_sequence: before parsing
+// - atomBlotexValue: intex atom
+//
+// Changed:
+// - *a_sequence: after parsing 
+// - ac_blotexValue: only significant if "computed successfully" 
+// - nc_abandonmentInfo: only significant if "processing abandoned"
+//
+// Ret: Computed successfully ? 
+// - ANSWER__YES: Ok,
+// - ANSWER__NO: 'value' error (next <blotex> NOT intex) ; abandon processing 
+// - -1: unexpected problem
+static inline int m_BlotexlibExecutorComputeIntex(BLOTEXLIB_EXECUTOR_HANDLE handle,
+  struct STRING_PORTION *a_sequence, struct BLOTEX_VALUE atomBlotexValue,
+  struct BLOTEX_VALUE *ac_blotexValue, G_STRING_STUFF nc_abandonmentInfo) {
+  m_DIGGY_BOLLARD_S()
+m_DIGGY_VAR_STRING_PORTION(*a_sequence)
+  m_PREPARE_ABANDON(*a_sequence, "<intex>") 
+    int n_int2Op = -1;
+    m_TRACK_IF(m_BlotexlibExecutorParseInt2Op(handle,a_sequence,&n_int2Op) != RETURNED)
+m_DIGGY_VAR_D(n_int2Op)
+    
+  if (n_int2Op == -1) *ac_blotexValue = atomBlotexValue;
+  else {
+    switch (BlotexlibExecutorComputeBlotex(handle,a_sequence,ac_blotexValue,
+      nc_abandonmentInfo)){
+    case ANSWER__YES:
+m_DIGGY_VAR_D(ac_blotexValue->b_strex)
+      if (ac_blotexValue->b_strex) m_ABANDON(VALUE_ERROR__ABANDONMENT_INFO)
+      switch (n_int2Op) {
+      case ADD__INT_2OP:
+        ac_blotexValue->select.c_blotval += atomBlotexValue.select.c_blotval;
+      break; case SUBTRACT__INT_2OP:
+        ac_blotexValue->select.c_blotval = atomBlotexValue.select.c_blotval -
+          ac_blotexValue->select.c_blotval;
+      break; case MULTIPLY__INT_2OP:
+        ac_blotexValue->select.c_blotval *= atomBlotexValue.select.c_blotval;
+      break; case DIVIDE__INT_2OP:
+        ac_blotexValue->select.c_blotval = atomBlotexValue.select.c_blotval /
+          ac_blotexValue->select.c_blotval;
+      break; case AND__INT_2OP:
+        ac_blotexValue->select.c_blotval = atomBlotexValue.select.c_blotval && 
+          ac_blotexValue->select.c_blotval;
+      break; case OR__INT_2OP:
+        ac_blotexValue->select.c_blotval = atomBlotexValue.select.c_blotval || 
+          ac_blotexValue->select.c_blotval;
+      break; case EQUAL__INT_2OP:
+        ac_blotexValue->select.c_blotval = (atomBlotexValue.select.c_blotval ==
+          ac_blotexValue->select.c_blotval? TRUE__BLOTVAL0: FALSE__BLOTVAL);
+      break; case LESS__INT_2OP:
+        ac_blotexValue->select.c_blotval = (atomBlotexValue.select.c_blotval <
+          ac_blotexValue->select.c_blotval? TRUE__BLOTVAL0: FALSE__BLOTVAL);
+      break; case LESS_EQUAL__INT_2OP:
+        ac_blotexValue->select.c_blotval = (atomBlotexValue.select.c_blotval <=
+          ac_blotexValue->select.c_blotval? TRUE__BLOTVAL0: FALSE__BLOTVAL);
+      break; case GREATER__INT_2OP:
+        ac_blotexValue->select.c_blotval = (atomBlotexValue.select.c_blotval >
+          ac_blotexValue->select.c_blotval? TRUE__BLOTVAL0: FALSE__BLOTVAL);
+      break; case GREATER_EQUAL__INT_2OP:
+        ac_blotexValue->select.c_blotval = (atomBlotexValue.select.c_blotval >=
+          ac_blotexValue->select.c_blotval? TRUE__BLOTVAL0: FALSE__BLOTVAL);
+      break; case NOT_EQUAL__INT_2OP:
+        ac_blotexValue->select.c_blotval = (atomBlotexValue.select.c_blotval !=
+          ac_blotexValue->select.c_blotval? TRUE__BLOTVAL0: FALSE__BLOTVAL);
+      break; default:
+        m_RAISE(ANOMALY__VALUE__D,n_int2Op) 
+      } // switch
+    break; case ANSWER__NO:
+      m_DIGGY_RETURN(ANSWER__NO)
+    break; default:
+      m_TRACK()
+    } // switch
+  } // if 
+
+  m_DIGGY_RETURN(ANSWER__YES)
+} // m_BlotexlibExecutorComputeIntex 
 
 // Parse <intex> | <strex> 
 //
@@ -754,7 +922,7 @@ m_DIGGY_VAR_STRING_PORTION(*a_sequence)
   m_PREPARE_ABANDON(*a_sequence, "<blotex>") 
 
   m_PARSE_PASS_SPACES(*a_sequence,NULL)
-  if (atomBlotexValue.b_strex) { // strex 
+  if (atomBlotexValue.b_strex) { // strex
     m_PARSE_PASS_SINGLE_CHAR(*a_sequence,NULL,'+',&lexeme) // Try <str 2op> ...
     if (b_EMPTY_STRING_PORTION(lexeme)) *ac_blotexValue = atomBlotexValue;
     else { 
@@ -776,78 +944,14 @@ m_DIGGY_VAR_STRING_PORTION(*a_sequence)
     } // if 
 
   } else { // intex
-    m_PARSE_PASS_CHARS(*a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_WHILE,IsInt2OpChar,UNDEFINED,
-      &lexeme) // Try <int 2op> ...
-    if (b_EMPTY_STRING_PORTION(lexeme)) *ac_blotexValue = atomBlotexValue;
-    else { 
-      int int2Op = UNDEFINED;
-      switch (lexeme.string[0]) {
-      case '+': 
-        if (m_StringPortionLength(&lexeme) != 1) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_INFO)
-        int2Op = ADD__INT_2OP;
-      break; case '-':
-        if (m_StringPortionLength(&lexeme) != 1) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_INFO)
-        int2Op = SUBTRACT__INT_2OP;
-      break; case '*':
-        if (m_StringPortionLength(&lexeme) != 1) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_INFO)
-        int2Op = MULTIPLY__INT_2OP;
-      break; case '/':
-        if (m_StringPortionLength(&lexeme) != 1) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_INFO)
-        int2Op = DIVIDE__INT_2OP;
-      break; case '&':
-        switch (m_CompareWithCString(&lexeme,"&&")) {
-        case LESS_THAN__COMPARISON : 
-        case GREATER_THAN__COMPARISON:
-          m_ABANDON(SYNTAX_ERROR__ABANDONMENT_INFO)
-        break; case EQUAL_TO__COMPARISON : 
-          int2Op = AND__INT_2OP;
-        break; default:
-          m_TRACK()
-        } // switch  
-      break; case '!':
-        switch (m_CompareWithCString(&lexeme,"!!")) {
-        case LESS_THAN__COMPARISON : 
-        case GREATER_THAN__COMPARISON:
-          m_ABANDON(SYNTAX_ERROR__ABANDONMENT_INFO)
-        break; case EQUAL_TO__COMPARISON : 
-          int2Op = OR__INT_2OP;
-        break; default:
-          m_TRACK()
-        } // switch  
-      break; default:
-        m_RAISE(ANOMALY__VALUE__D,lexeme.string[0])
-      } // switch
-      
-      switch (BlotexlibExecutorComputeBlotex(handle,a_sequence,ac_blotexValue,
-        nc_abandonmentInfo)){
-      case ANSWER__YES:
-        if (!ac_blotexValue->b_strex) m_ABANDON(VALUE_ERROR__ABANDONMENT_INFO)
-        switch (int2Op) {
-        case ADD__INT_2OP:
-          ac_blotexValue->select.c_blotval += atomBlotexValue.select.c_blotval;
-        break; case  SUBTRACT__INT_2OP:
-          ac_blotexValue->select.c_blotval = atomBlotexValue.select.c_blotval -
-            ac_blotexValue->select.c_blotval;
-        break; case  MULTIPLY__INT_2OP:
-          ac_blotexValue->select.c_blotval *= atomBlotexValue.select.c_blotval;
-        break; case  DIVIDE__INT_2OP:
-          ac_blotexValue->select.c_blotval = atomBlotexValue.select.c_blotval /
-            ac_blotexValue->select.c_blotval;
-        break; case AND__INT_2OP:
-          ac_blotexValue->select.c_blotval = atomBlotexValue.select.c_blotval && 
-            ac_blotexValue->select.c_blotval;
-        break; case OR__INT_2OP:
-          ac_blotexValue->select.c_blotval = atomBlotexValue.select.c_blotval || 
-            ac_blotexValue->select.c_blotval;
-        break; default:
-          m_RAISE(ANOMALY__VALUE__D,int2Op) 
-        } // switch
-      break; case ANSWER__NO:
-        m_DIGGY_RETURN(ANSWER__NO)
-      break; default:
-        m_TRACK()
-      } // switch
-    } // if 
+    switch (m_BlotexlibExecutorComputeIntex(handle,a_sequence,atomBlotexValue,ac_blotexValue,
+      nc_abandonmentInfo)) {
+    case ANSWER__YES:
+    break; case ANSWER__NO:
+      m_DIGGY_RETURN(ANSWER__NO)
+    break; default:
+      m_TRACK()
+    } // switch
   } // if 
 
 m_DIGGY_VAR_D(ac_blotexValue->b_strex)
@@ -877,10 +981,11 @@ m_DIGGY_VAR_STRING_PORTION(ap_blotfunc->call.arguments)
   struct STRING_PORTION sequence = ap_blotfunc->call.arguments; 
   switch (ap_blotfunc->entry.localBlotfuncNameEntry) {
   case EVAL__BLOTEXLIB_LOCAL_BLOTFUNC_NAME_ENTRY:
-    m_PARSE_PASS_SPACES(sequence,NULL)
     { char b_blotvarReference = b_FALSE0; // a priori
       struct BLOTVAR_REFERENCE c_blotvarReference; // UNDEFINED 
       char cb_strex = (char)UNDEFINED; 
+      m_PREPARE_ABANDON(sequence, "Eval") 
+      m_PARSE_PASS_SPACES(sequence,NULL)
       { struct STRING_PORTION blotvarSequence; // UNDEFINED
         m_PARSE_TILL_MATCH_C(sequence,":=",NULL, &blotvarSequence)
         if (b_EMPTY_STRING_PORTION(sequence)) { // NO ':=' 
@@ -914,7 +1019,6 @@ m_DIGGY_INFO("answer is NO!!!!!")
         m_TRACK()
       } // switch
 
-      m_PREPARE_ABANDON(sequence, "Exec blotex") 
       m_PARSE_PASS_SPACES(sequence,NULL)
       if (!b_EMPTY_STRING_PORTION(sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_INFO)
 
