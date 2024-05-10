@@ -234,7 +234,6 @@ const char *ScanStringPortionTillMatch(const struct STRING_PORTION *ap_stringPor
         m_ASSIGN_LOCAL_STRING_PORTION(ptrStringPortion,  ptr,subLength)
         int comparison = CompareStringPortions(&ptrStringPortion,  ap_subStringPortion,  NULL,
           n_toCharFunction); 
-        m_TRACK_IF(comparison < 0)
         if (comparison == EQUAL_TO__COMPARISON) break ;
       }  // if
     } // while 

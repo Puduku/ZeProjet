@@ -8,6 +8,7 @@
 #include "c-ansi/stderr.topo"
 /////////////////////////////
 #include "c-ansi/stderr-kitchen.h"
+#include <stdlib.h>
 
 // TODO: protect against crash
 
@@ -55,16 +56,19 @@
 
 // "Last resort" actions...
 
-// Raise anomaly and undertake some "fatal action" allowing to interrupt execution WITHOUT
+// May be redefined as needed...
+#define m_FATAL_ACTION() exit(-1);
+
+// Raise anomaly and undertake "fatal action" allowing to interrupt execution WITHOUT
 // returning from the function call...
-// Designed for NON "status-returning" functions (i.e "technical routines" and "pure" functions).
+// Use this macro only in case anomaly tracking is not possible (i.e "technical routines" and
+// "pure" functions).
 //
 // Passed:
-// - m_fatalAction: e.g. exit(-1);
 // - p_anomaly: #SEE p_anomaly@c-ansi/stderr-kitchen.h
-#define m_RAISE_AND(m_fatalAction, /*const char* */ p_anomaly, ...) {\
+#define m_RAISE_FATAL(/*const char* */ p_anomaly, ...) {\
   STDERR_RAISE(p_anomaly, ##__VA_ARGS__);\
-  m_fatalAction \
+  m_FATAL_ACTION() \
 }
 
 

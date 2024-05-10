@@ -130,17 +130,9 @@ m_DIGGY_VAR_STRING(ccp_expectedOutput)
 "##<<endLoop>> du corps est un sublime don"
 #define DUMMY_OUTPUT5 "Que la BeautedBeautedBeauted du corps est un sublime don"
 
-
-#define DUMMY_TEMPLATE6 "Et quand l'" \
-"##<<loop 3>>" \
-  "heure " \
-  "##<<loop 2>>" \
-    "viendra " \
-  "##<<endLoop>>" \
-"##<<endLoop>>" \
-"d'entrer dans la Nuit Noire,"
-// "Et quand l'##<<loop 3>>heure ##<<loop 2>>viendra ##<<endLoop>>##<<endLoop>>d'entrer dans la Nuit Noire,"
-#define DUMMY_OUTPUT6 "Et quand l'heure viendra viendra heure viendra viendra heure viendra viendra d'entrer dans la Nuit Noire,"
+#define DUMMY_TEMPLATE6 "##<<be.Eval(.julie$ := \"Beauted\")>>Que la "\
+"##<< be.OutputF(%s, .julie$) >> du corps est un sublime don"
+#define DUMMY_OUTPUT6 "Que la Beauted du corps est un sublime don"
 
 
 int main (int argc, char** argv) {

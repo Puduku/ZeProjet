@@ -173,7 +173,6 @@ static inline int m_StringPortionLength(const struct STRING_PORTION *ap_stringPo
 // Returned: 
 // - COMPLETED__OK:
 // - COMPLETED__BUT: rectified
-// - -1: unexpected problem; anomaly is raised
 int VerifyCStringPortion(struct STRING_PORTION *a_stringPortion);
 
 
@@ -273,7 +272,6 @@ typedef int (*TO_CHAR_FUNCTION) (int c) ;
 //   + LESS_THAN__COMPARISON : string 1 'less than' string 2
 //   + EQUAL_TO__COMPARISON : strings are "identical"
 //   + GREATER_THAN__COMPARISON : string 1 'greater than' string 2
-// - -1: unexpected problem; anomaly is raised
 int CompareStringPortions(const struct STRING_PORTION *ap_stringPortion1, 
   const struct STRING_PORTION *ap_stringPortion2,  IS_CHAR_FUNCTION n_isNeutralCharFunction,
   TO_CHAR_FUNCTION n_toCharFunction) ; 
@@ -284,9 +282,30 @@ static inline int m_CompareWithCString(const struct STRING_PORTION *ap_stringPor
   return CompareStringPortions(ap_stringPortion1, &stringPortion2,  NULL, NULL) ;
 } 
 
+// m_CompareWithCString() wrapper ; indicates whether string portion matches with a c-string...
+// 
+// Ret: boolean value (TRUE when strings matches)
+static inline int mb_EqualToCString(const struct STRING_PORTION *ap_stringPortion1,
+  const char *ap_cString2) {
+  int comparison = m_CompareWithCString(ap_stringPortion1,ap_cString2);
+  switch (comparison) {
+  case LESS_THAN__COMPARISON:
+  case GREATER_THAN__COMPARISON:
+  case EQUAL_TO__COMPARISON:
+  break; default: 
+    m_RAISE_FATAL(ANOMALY__VALUE__D,comparison) 
+  } // switch
+  return comparison == EQUAL_TO__COMPARISON; 
+}  
+
+
 // Paranoid wrapper of CompareStringPortions() (testing/critical embedded purpose)
 // Ensure that the optmized forms of the fonction (i.e called without filter) behave identically
 // to general one... 
+// 
+// Ret:
+// - >0 : LESS_THAN__COMPARISON / EQUAL_TO__COMPARISON / GREATER_THAN__COMPARISON 
+// - -1: unexpected problem, anomaly is raised
 int ParanoidCompareStringPortions(const struct STRING_PORTION *ap_stringPortion1,
   const struct STRING_PORTION *ap_stringPortion2,
   IS_CHAR_FUNCTION n_isNeutralCharFunction,  TO_CHAR_FUNCTION n_toCharFunction) ; 
@@ -317,9 +336,8 @@ int ParanoidCompareStringPortions(const struct STRING_PORTION *ap_stringPortion1
 // - c_char: only significant if n_isCharFunction == NULL ; specific char to seek 
 //
 // Returned:
-// - != NULL: scanning position ; use b_SCAN_STRING_PORTION_LOCATED() below to check whether char
-//   is actually located. 
-// - NULL: unexpected problem; anomaly is raised
+// (!= NULL) scanning position ; use b_SCAN_STRING_PORTION_LOCATED() below to check whether char
+// is actually located. 
 const char *ScanStringPortion(const struct STRING_PORTION *ap_stringPortion,
   char b_regularScan, char b_passCharsTill, IS_CHAR_FUNCTION n_isCharFunction, int c_char);
 
@@ -338,9 +356,8 @@ const char *ScanStringPortion(const struct STRING_PORTION *ap_stringPortion,
 //     comparison is NOT possible
 //
 // Returned:
-// - != NULL: scanning position; use b_SCAN_STRING_PORTION_LOCATED() below to check whether
-//   sub-string is actually located. 
-// - NULL: unexpected problem; anomaly is raised
+// (!= NULL) scanning position; use b_SCAN_STRING_PORTION_LOCATED() below to check whether
+// sub-string is actually located. 
 const char *ScanStringPortionTillMatch(const struct STRING_PORTION *ap_stringPortion,
   const struct STRING_PORTION *ap_subStringPortion,  TO_CHAR_FUNCTION n_toCharFunction);
 
@@ -348,6 +365,10 @@ const char *ScanStringPortionTillMatch(const struct STRING_PORTION *ap_stringPor
 // Paranoid wrapper of ScanStringPortionTillMatch() (testing/critical embedded purpose)
 // Ensure that the optmized forms of the fonction (i.e called without filter) behave identically
 // to general one... 
+// 
+// Ret:
+// - != NULL: scanning position... 
+// - NULL: unexpected problem, anomaly is raised
 const char *ParanoidScanStringPortionTillMatch(const struct STRING_PORTION *ap_stringPortion, 
   const struct STRING_PORTION *ap_subStringPortion,  TO_CHAR_FUNCTION n_toCharFunction) ;
 
