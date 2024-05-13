@@ -53,7 +53,7 @@
 
 #define m_DIGGY_VAR_COMPARISON(m_var) ;
 
-#define m_DIGGY_VAR_STRING_PORTION(m_var) ;
+#define m_DIGGY_VAR_P_STRING(m_var) ;
 
 #define m_DIGGY_VAR_INDEX_SEEK_FLAGS(m_var) ;
 

@@ -158,7 +158,7 @@ static int CheckReadFtpCommandStatus (void * r_virtualHandle, const char *p_read
   int answer = ANSWER__NO; // a priori 
 
   m_ASSERT(readLength > 0)
-  m_ASSIGN_LOCAL_STRING_PORTION(readPortion,p_readBuffer,readLength)
+  m_ASSIGN_LOCAL_P_STRING(readPortion,p_readBuffer,readLength)
   int count = ParseAsciiLines(readPortion,0,ac_messageLength,linesPartitionHandle);
   m_TRACK_IF(count < 0)
 
@@ -167,7 +167,7 @@ static int CheckReadFtpCommandStatus (void * r_virtualHandle, const char *p_read
 
   if (n_lastLineDelimitorStuff != NULL) {
     int practicalLength = UNDEFINED;
-    practicalLength = m_StringPortionLength(&n_lastLineDelimitorStuff->practicalLine);
+    practicalLength = m_PStringLength(&n_lastLineDelimitorStuff->practicalLine);
     if (practicalLength >= 4 && isdigit(n_lastLineDelimitorStuff->practicalLine.string[0]) && 
       isdigit(n_lastLineDelimitorStuff->practicalLine.string[1]) && 
       isdigit(n_lastLineDelimitorStuff->practicalLine.string[2]) &&
@@ -457,7 +457,7 @@ static int FetepeReadCommandStatus (FETEPE_HANDLE handle, int *a_fetepeStatus,
         handle->command.status.h_linesPartitionHandle, &t_lineDelimitorStuff); 
       m_TRACK_IF(commandStatusLinesCount < 0)\
       m_ASSERT(t_lineDelimitorStuff != NULL)
-      switch (SScanfStringPortion(t_lineDelimitorStuff->practicalLine,"%3d",
+      switch (SScanfPString(t_lineDelimitorStuff->practicalLine,"%3d",
         &handle->command.outline.ftpCommandStatus))  {
       case 1:
       break; case 0:
@@ -805,7 +805,7 @@ static int FetepeOpenDataStream (FETEPE_HANDLE handle, int *a_fetepeStatus,
         handle->command.status.h_linesPartitionHandle, &lastLineDelimitorStuff);
       m_TRACK_IF(commandStatusLinesCount < 0)
       m_ASSERT(lastLineDelimitorStuff != NULL)
-      ret = SScanfStringPortion(lastLineDelimitorStuff->practicalLine, 
+      ret = SScanfPString(lastLineDelimitorStuff->practicalLine, 
         ENTERING_PASSIVE_MODE_STATUS__6U, &h1,&h2,&h3,&h4, &p1,&p2); 
       m_TRACK_IF(ret < 0)
       m_ASSERT(ret == 6)
@@ -1107,7 +1107,7 @@ static int FetepeNListDir (FETEPE_HANDLE handle, const char *p_cmd, const char *
     } // switch
 
     m_TRACK_IF(GreenCollectionClear(handle->data.h_lsLines) != RETURNED)
-    m_TRACK_IF(ParseAsciiLines(m_GStringGetLogicalStringPortion(handle->data.h_lsOutput), -1,NULL,
+    m_TRACK_IF(ParseAsciiLines(m_GStringGetLogicalPString(handle->data.h_lsOutput), -1,NULL,
       handle->data.h_lsLines) < 0)
     int count = LINES_PARTITION_GET_COUNT(handle->data.h_lsLines,NULL);
     m_TRACK_IF(count < 0)

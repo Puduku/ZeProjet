@@ -27,7 +27,7 @@ struct G_STRING { // #REF struct-G_STRING
   // ALWAYS >= strlen(nhi_string) ;
   // WHEN == strlen(nhi_string), this "empiric" check asserts the string contains NO '\0' char
   // (excepted the ending '\0').
-  struct STRING_PORTION cv_stringPortion; // g-string's "logical" string portion 
+  struct P_STRING cv_pString; // g-string's "logical" string portion 
     // -when g-string is "copied" (nhi_string != NULL) : corresponds to g-string "physical" value
     // -when g-string is not "copied" (nhi_string == NULL) : pure "logical" string portion 
   union { // according to g-string's conveyance:
@@ -43,9 +43,9 @@ typedef struct G_STRING *G_STRING_STUFF;
 
 
 // Get g-string's "logical" string. 
-static inline struct STRING_PORTION m_GStringGetLogicalStringPortion(G_STRING_STUFF stuff) {
-  return stuff->cv_stringPortion; 
-} // m_GStringGetLogicalStringPortion 
+static inline struct P_STRING m_GStringGetLogicalPString(G_STRING_STUFF stuff) {
+  return stuff->cv_pString; 
+} // m_GStringGetLogicalPString 
 
 // #REF GStringCopy
 // Copy (or concatenate...) a string portion into a "g-string".
@@ -61,7 +61,7 @@ static inline struct STRING_PORTION m_GStringGetLogicalStringPortion(G_STRING_ST
 //   + -1 special value (*) : "end of string"; set to current copied length => i.e concatenation
 //   + >= 0: "offset copy" ; 0 corresponds to "ordinary" copy ;
 //     REM: if offset > current copied length, the offset is rectified (concatenation)
-// - ap_stringPortion: 
+// - ap_pString: 
 //   (*) empty string for neutral operation
 //
 // Modified:
@@ -70,14 +70,14 @@ static inline struct STRING_PORTION m_GStringGetLogicalStringPortion(G_STRING_ST
 // Returned:
 // - >= 0: OK, copied (copied length of dest string)
 // - -1: unexpected problem
-int GStringCopy(G_STRING_STUFF stuff, int n_offset, const struct STRING_PORTION *ap_stringPortion);
+int GStringCopy(G_STRING_STUFF stuff, int n_offset, const struct P_STRING *ap_pString);
 
 // Copy (or concatenate...) a '\0'-terminated C string g into a "g-string"
 // See GStringCopy() above
 static inline int m_GStringCCopy(G_STRING_STUFF stuff, int n_offset, const char* p_cString) {
   m_DIGGY_BOLLARD()
-  m_ASSIGN_LOCAL_C_STRING_PORTION(stringPortion, p_cString)
-  m_DIGGY_RETURN(GStringCopy(stuff, n_offset, &stringPortion))
+  m_ASSIGN_LOCAL_C_P_STRING(pString, p_cString)
+  m_DIGGY_RETURN(GStringCopy(stuff, n_offset, &pString))
 } // m_GStringCCopy
 
 // Copy (or concatenate...) a g-string into a "g-string"
@@ -85,8 +85,8 @@ static inline int m_GStringCCopy(G_STRING_STUFF stuff, int n_offset, const char*
 // See GStringCopy() above
 static inline int m_GStringGCopy(G_STRING_STUFF stuff, int n_offset, G_STRING_STUFF p_gStringStuff) {
   m_DIGGY_BOLLARD()
-  struct STRING_PORTION stringPortion =  m_GStringGetLogicalStringPortion(p_gStringStuff);
-  m_DIGGY_RETURN(GStringCopy(stuff,n_offset,&stringPortion))
+  struct P_STRING pString =  m_GStringGetLogicalPString(p_gStringStuff);
+  m_DIGGY_RETURN(GStringCopy(stuff,n_offset,&pString))
 } // m_GStringGCopy
 
 
@@ -97,7 +97,7 @@ static inline int m_GStringGCopy(G_STRING_STUFF stuff, int n_offset, G_STRING_ST
 // 
 // Passed:
 // - stuff:
-// - afp_stringPortion:
+// - afp_pString:
 // 
 // Changed:
 // - stuff: remains pure "logical" if possible
@@ -107,14 +107,14 @@ static inline int m_GStringGCopy(G_STRING_STUFF stuff, int n_offset, G_STRING_ST
 // - COMPLETED__BUT: imported, but "physical" copy was needed ; if it's not normal, don't
 //   hesitate to raise ANOMALY__NON_PURE_LOGICAL_G_STRING ...
 // - -1: unexpected problem
-int GStringImport(G_STRING_STUFF stuff, const struct STRING_PORTION *afp_stringPortion);
+int GStringImport(G_STRING_STUFF stuff, const struct P_STRING *afp_pString);
 
 // Import a '\0'-terminated C string g into a "g-string" token
 // See GStringImport() above
 static inline int m_GStringCImport(G_STRING_STUFF stuff, const char* fp_cString) {
   m_DIGGY_BOLLARD()
-  m_ASSIGN_LOCAL_C_STRING_PORTION(stringPortion, fp_cString)
-  m_DIGGY_RETURN(GStringImport(stuff, &stringPortion))
+  m_ASSIGN_LOCAL_C_P_STRING(pString, fp_cString)
+  m_DIGGY_RETURN(GStringImport(stuff, &pString))
 } // m_GStringCImport
 
 // See GStringImport() / m_GStringCImport() above...
@@ -288,24 +288,24 @@ int GStringsGetCount (G_STRINGS_HANDLE cp_handle,  G_STRING_SET_STUFF *navnt_gSt
 
 
 enum { // #REF enum-G_KEYS_COMPARISON 
-  STRING_PORTION__G_KEYS_COMPARISON, //
+  P_STRING__G_KEYS_COMPARISON, //
  INTRINSIC_VALUE__G_KEYS_COMPARISON, //
  ACOLYT_TOKEN_ID__G_KEYS_COMPARISON, // mutually exclusive with other ACOLYT_*__G_KEYS_COMPARISON 
     ACOLYT_VALUE__G_KEYS_COMPARISON, // mutually exclusive with other ACOLYT_*__G_KEYS_COMPARISON
    ACOLYT_HANDLE__G_KEYS_COMPARISON, // mutually exclusive with other ACOLYT_*__G_KEYS_COMPARISON
 } ;
 
-// #REF STRING_PORTION_INTRINSIC_VALUE_FUNCTION - "custom" function definition
+// #REF P_STRING_INTRINSIC_VALUE_FUNCTION - "custom" function definition
 // 
 // Passed:
 // - pr_handle: private handle ; protected against modification (i.e "thread safe")
 // TODO: protection conditionnelle à l'edtat "frozen" ???? 
-// - ap_stringPortion: 
+// - ap_pString: 
 // 
 // Ret:
 // (Intrinsic) value corresponding to string portion
-typedef GENERIC_INTEGER (*STRING_PORTION_INTRINSIC_VALUE_FUNCTION) (void *pr_handle,
-  const struct STRING_PORTION *ap_stringPortion);
+typedef GENERIC_INTEGER (*P_STRING_INTRINSIC_VALUE_FUNCTION) (void *pr_handle,
+  const struct P_STRING *ap_pString);
 
 
 // #REF GStringsAddIndex <g-string set> <key1>
@@ -318,34 +318,34 @@ typedef GENERIC_INTEGER (*STRING_PORTION_INTRINSIC_VALUE_FUNCTION) (void *pr_han
 //   ACOLYT_TOKEN_ID__G_KEYS_COMPARISON : only possible with TOKEN__G_STRING_CONVEYANCE
 //   ACOLYT_VALUE__G_KEYS_COMPARISON : only possible with VALUED_STRING__G_STRING_CONVEYANCE
 //   ACOLYT_HANDLE__G_KEYS_COMPARISON : only possible with NAMED_OBJECT__G_STRING_CONVEYANCE
-// - cn_key1IsNeutralCharFunction: only significant with STRING_PORTION__G_KEYS_COMPARISON 
+// - cn_key1IsNeutralCharFunction: only significant with P_STRING__G_KEYS_COMPARISON 
 //   + NULL: DO NOT eliminate neutral chars before comparison 
 //   + non NULL: eliminate neutral chars before comparison 
-// - cn_key1ToCharFunction: only significant with STRING_PORTION__G_KEYS_COMPARISON 
+// - cn_key1ToCharFunction: only significant with P_STRING__G_KEYS_COMPARISON 
 //   + NULL: NO conversion applied before comparison 
 //   + non NULL: conversion applied before comparison 
-// - c_key1StringPortionIntrinsicValueFunction: only significant with INTRINSIC_VALUE__G_KEYS_COMPARISON
-// - cfpr_key1StringPortionIntrinsicValueFunctionHandle: only significant with
+// - c_key1PStringIntrinsicValueFunction: only significant with INTRINSIC_VALUE__G_KEYS_COMPARISON
+// - cfpr_key1PStringIntrinsicValueFunctionHandle: only significant with
 //   INTRINSIC_VALUE__G_KEYS_COMPARISON
 // - ... : g-string set(s element for second key (etc.) if any ...
 int GStringsAddIndex(G_STRINGS_HANDLE handle,  int keysNumber, int key1GStringSetElement,
   int key1GKeysComparison,  IS_CHAR_FUNCTION cn_key1IsNeutralCharFunction,
   TO_CHAR_FUNCTION cn_key1ToCharFunction,
-  STRING_PORTION_INTRINSIC_VALUE_FUNCTION c_key1StringPortionIntrinsicValueFunction,
-  void *cfpr_key1StringPortionIntrinsicValueFunctionHandle,  ...);
+  P_STRING_INTRINSIC_VALUE_FUNCTION c_key1PStringIntrinsicValueFunction,
+  void *cfpr_key1PStringIntrinsicValueFunctionHandle,  ...);
 
 // #SEE GStringsAddIndex <g-string> <key>
 // Add an index for single (aka cardinality 1) g-strings collection for LEXICAL comparison
 // Nb: Plain index => one single key
 #define /*int*/ G_STRINGS_ADD_PLAIN_LEXICAL_INDEX(/*G_STRINGS_HANDLE*/handle,\
   /*IS_CHAR_FUNCTION*/ n_keyIsNeutralCharFunction, /*TO_CHAR_FUNCTION*/n_keyToCharFunction) \
-  GStringsAddIndex(handle, 1, 0, STRING_PORTION__G_KEYS_COMPARISON, n_keyIsNeutralCharFunction,\
-  n_keyToCharFunction, (STRING_PORTION_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) 
+  GStringsAddIndex(handle, 1, 0, P_STRING__G_KEYS_COMPARISON, n_keyIsNeutralCharFunction,\
+  n_keyToCharFunction, (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) 
 
 
 // (Internal use)
 union BARE_G_KEY {
-  struct STRING_PORTION cp_stringPortion; // with STRING_PORTION__G_KEYS_COMPARISON
+  struct P_STRING cp_pString; // with P_STRING__G_KEYS_COMPARISON
   GENERIC_INTEGER cen_intrinsicValue; // with INTRINSIC_VALUE___G_KEYS_COMPARISON
   int c_acolytTokenId; // with ACOLYT_TOKEN_ID__G_KEYS_COMPARISON
   GENERIC_INTEGER cen_acolytValue; // with ACOLYT_VALUE__G_KEYS_COMPARISON 
@@ -363,11 +363,11 @@ struct G_KEY { //
 // Passed:
 // - m_gKeys: 
 // - entry: >= 0 ; (0 for plain index)
-// - up_stringPortion:
-#define m_ASSIGN_G_KEY__STRING_PORTION(/*struct G_KEY* */m_gKeys, /*int*/entry,\
-  /*const struct STRING_PORTION*/up_stringPortion) {\
-  (m_gKeys)[entry].gKeysComparison = STRING_PORTION__G_KEYS_COMPARISON;\
-  (m_gKeys)[entry].bare.cp_stringPortion = up_stringPortion ; \
+// - up_pString:
+#define m_ASSIGN_G_KEY__P_STRING(/*struct G_KEY* */m_gKeys, /*int*/entry,\
+  /*const struct P_STRING*/up_pString) {\
+  (m_gKeys)[entry].gKeysComparison = P_STRING__G_KEYS_COMPARISON;\
+  (m_gKeys)[entry].bare.cp_pString = up_pString ; \
 } 
 
 // Assign a g-key for 'intrinsic (generic) values' comparison

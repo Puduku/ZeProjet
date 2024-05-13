@@ -89,7 +89,7 @@ typedef struct BLOTLIB *BLOTLIB_STUFF;
 
 // 
 #define m_ASSIGN_BLOTFUNC_CALL(/*struct BLOTFUNC_CALL*/m_blotfuncCallStruct,\
-  /*struct STRING_PORTION*/ m_referral, /*struct STRING_PORTION*/ m_arguments) {\
+  /*struct P_STRING*/ m_referral, /*struct P_STRING*/ m_arguments) {\
   (m_blotfuncCallStruct).referral =  m_referral;\
   (m_blotfuncCallStruct).arguments = m_arguments;\
 }
@@ -127,19 +127,19 @@ struct BLOTFUNCS_HANDLER {
 
 // Pure key
 struct BLOTFUNC_KEY_NAME {
-  struct STRING_PORTION prefix ;
-  struct STRING_PORTION name ;
+  struct P_STRING prefix ;
+  struct P_STRING name ;
 } ;
 
 //
 #define m_ASSIGN_BLOTFUNC_KEY_NAME(/*struct BLOTFUNC_KEY_NAME*/m_blotfuncKeyName,\
   /*char* */n_prefix, /*char* */m_name) {\
   if (n_prefix != NULL) {\
-    m_ASSIGN_C_STRING_PORTION(m_blotfuncKeyName.prefix, n_prefix)\
+    m_ASSIGN_C_P_STRING(m_blotfuncKeyName.prefix, n_prefix)\
   } else {\
-    m_ASSIGN_EMPTY_STRING_PORTION(m_blotfuncKeyName.prefix) \
+    m_ASSIGN_EMPTY_P_STRING(m_blotfuncKeyName.prefix) \
   }\
-  m_ASSIGN_C_STRING_PORTION(m_blotfuncKeyName.name, m_name) \
+  m_ASSIGN_C_P_STRING(m_blotfuncKeyName.name, m_name) \
 } 
 
 // GREEN_HANDLER__COMPARE_FUNCTION
@@ -169,10 +169,10 @@ static int BlotfuncsHandlerCompare (void *cpr_handle,  char b_frozen, int indexL
       blotlibStuff->cp_localBlotfuncNames[p_blotfuncEntryStuff->localBlotfuncNameEntry])
   } else bBlotfuncKeyName = *((struct BLOTFUNC_KEY_NAME*)cpr_bKeys); 
 
-  int comparison = CompareStringPortions(&(aBlotfuncKeyName.prefix),
+  int comparison = ComparePStrings(&(aBlotfuncKeyName.prefix),
     &(bBlotfuncKeyName.prefix),  (IS_CHAR_FUNCTION)NULL,  (TO_CHAR_FUNCTION)NULL);
   if (comparison == EQUAL_TO__COMPARISON) {
-    comparison = CompareStringPortions(&(aBlotfuncKeyName.name),
+    comparison = ComparePStrings(&(aBlotfuncKeyName.name),
       &(bBlotfuncKeyName.name), (IS_CHAR_FUNCTION)NULL,  (TO_CHAR_FUNCTION)NULL);
   } //if
   
@@ -228,13 +228,13 @@ int BlotcodeCreateInstance (BLOTCODE_HANDLE *azh_handle) {
 // - RESULT__NOT_FOUND:
 // - -1: unexpected problem ; anomaly is raised
 static int BlotcodeFindBlotkeyw (BLOTCODE_HANDLE p_handle,
-  const struct STRING_PORTION*  ap_litteralKeyw,  int *ac_blotkeywId) {
+  const struct P_STRING*  ap_litteralKeyw,  int *ac_blotkeywId) {
   m_DIGGY_BOLLARD_S()
   m_INDEX_REQUEST_AUTOMATIC_BUFFER(indexRequestAutomaticBuffer)
   G_STRING_STUFF t_blotkeywStuff = (G_STRING_STUFF) UNDEFINED;
 
   struct G_KEY gKey;
-  m_ASSIGN_G_KEY__STRING_PORTION(&gKey,0, *ap_litteralKeyw); 
+  m_ASSIGN_G_KEY__P_STRING(&gKey,0, *ap_litteralKeyw); 
 
   int result = m_GStringsIndexSingleFetch(p_handle->h_blotkeywsHandle, indexRequestAutomaticBuffer,
     INDEX_LABEL0,INDEX_SEEK_FLAGS__EQUAL,&gKey,INDEX_FETCH_FLAGS__READ_ONLY,&t_blotkeywStuff,
@@ -267,7 +267,6 @@ int BlotcodeLinkBlotlib (BLOTCODE_HANDLE ep_handle,  const char* nfp_blotlibPref
   BLOTLIB_STUFF blotlibStuff = (BLOTLIB_STUFF)UNDEFINED;
   blotlibEntry = GreenCollectionFetch(ep_handle->h_blotlibsHandle, -1,  (char **) &blotlibStuff);
   m_TRACK_IF(blotlibEntry < 0)
-
   m_ASSIGN_BLOTLIB(*blotlibStuff,  nfp_blotlibPrefix,  localBlotfuncNamesNumber,
     cfp_localBlotfuncNames,  blotlibExecutorFactoryCreateProductInstanceFunction,
     fpr_blotlibExecutorFactoryHandle,  blotlibExecutorExecuteCFunction,
@@ -338,10 +337,6 @@ int BlotcodeFreeze(BLOTCODE_HANDLE ep_handle) {
   (m_blotlibsCount) = (p_handle)->c_blotfuncsHandler.blotlibsCount;\
 } 
 
-//  m_DIGGY_VAR_GEN((m_stringPortion).string,s)
-//  m_DIGGY_VAR_D(m_StringPortionLength(&(m_stringPortion))) 
-
-
 // Only callable if the blotcode instance is frozen.
 //
 // Passed:
@@ -355,21 +350,23 @@ int BlotcodeFreeze(BLOTCODE_HANDLE ep_handle) {
 // - RESULT__FOUND:
 // - RESULT__NOT_FOUND: 
 // - -1: unexpected problem; anomaly is raised
-static int BlotcodeFindBlotfunc(BLOTCODE_HANDLE p_handle, struct STRING_PORTION referral,
+static int BlotcodeFindBlotfunc(BLOTCODE_HANDLE p_handle, struct P_STRING referral,
   struct BLOTFUNC_ENTRY *ac_blotfuncEntry) {
   m_DIGGY_BOLLARD_S()
   struct BLOTFUNC_KEY_NAME blotfuncKeyName;
   m_ASSERT(p_handle->b_frozen) 
   m_INDEX_REQUEST_AUTOMATIC_BUFFER(indexRequestAutomaticBuffer)
-
+m_DIGGY_VAR_P_STRING(referral)
   m_PARSE_PASS_CHARS(referral,b_REGULAR_SCAN,b_PASS_CHARS_TILL,NULL,'.',&(blotfuncKeyName.prefix))
-  if (b_EMPTY_STRING_PORTION(referral)) {
+  if (b_EMPTY_P_STRING(referral)) {
     blotfuncKeyName.name = blotfuncKeyName.prefix; 
-    m_ASSIGN_EMPTY_STRING_PORTION(blotfuncKeyName.prefix)
+    m_ASSIGN_EMPTY_P_STRING(blotfuncKeyName.prefix)
   } else {
     m_PARSE_OFFSET(referral,1,NULL)
     blotfuncKeyName.name = referral;
   } // if
+m_DIGGY_VAR_P_STRING(blotfuncKeyName.prefix)
+m_DIGGY_VAR_P_STRING(blotfuncKeyName.name)
      
   BLOTFUNC_ENTRY_STUFF blotfuncEntryStuff = (BLOTFUNC_ENTRY_STUFF)UNDEFINED;
   m_TRACK_IF(GreenCollectionIndexRequest(p_handle->ch_blotfuncsHandle,
@@ -477,7 +474,7 @@ struct BLOTINST {
 struct TEMPLATE_PARTITION {
   char b_blotinst ;
   union {
-    struct STRING_PORTION c_decor; 
+    struct P_STRING c_decor; 
     struct BLOTINST c_blotinst; 
   } select;
 } ;
@@ -487,7 +484,7 @@ typedef struct TEMPLATE_PARTITION *TEMPLATE_PARTITION_STUFF ;
 // 
 #define m_ASSIGN_DECOR_TEMPLATE_PARTITION(\
   /*struct TEMPLATE_PARTITION*/ m_templatePartitionStruct,\
-  /*const struct STRING_PORTION*/ p_decor) {\
+  /*const struct P_STRING*/ p_decor) {\
   (m_templatePartitionStruct).b_blotinst = b_FALSE0;\
   (m_templatePartitionStruct).select.c_decor = p_decor;\
 } 
@@ -579,7 +576,7 @@ static int IsBasicTokenChar(int c) {
 // Public function: see .h
 // TODO: split in static local functions (see _k indicator)
 int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
-  struct STRING_PORTION fp_template, struct STRING_PORTION *nac_parsingErrorLocalization,
+  struct P_STRING fp_template, struct P_STRING *nac_parsingErrorLocalization,
   G_STRING_STUFF nc_parsingErrorInfo) {
   m_DIGGY_BOLLARD()
   int answer = ANSWER__YES; // a priori
@@ -588,8 +585,8 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
 
   m_C_STACK_CLEAR(handle->h_flowControlStack)
 
-  struct STRING_PORTION blotinstSequence; 
-  m_ASSIGN_EMPTY_STRING_PORTION(blotinstSequence)
+  struct P_STRING blotinstSequence; 
+  m_ASSIGN_EMPTY_P_STRING(blotinstSequence)
 
 // Report error in some Blot instruction
 // (Do nothing if some error is ALREADY reported...)
@@ -603,7 +600,7 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
 // - answer 
 // - nac_parsingErrorLocalization
 // - blotinstSequence 
-#define m_REPORT_ERROR(/*const struct STRING_PORTION */lexeme,\
+#define m_REPORT_ERROR(/*const struct P_STRING */lexeme,\
   /*const char* */p_format, ...) {\
   if (answer == ANSWER__YES) { \
     answer = ANSWER__NO ;\
@@ -612,8 +609,8 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
     }\
     if (nc_parsingErrorInfo != NULL) {\
       m_TRACK_IF(GStringPrintf(nc_parsingErrorInfo,0,p_format, ##__VA_ARGS__) < 0)\
-      m_TRACK_IF(GStringPrintf(nc_parsingErrorInfo,-1," [" FMT_STRING_PORTION "]",\
-        m_STRING_PORTION_2_FMT_ARGS(lexeme)) < 0)\
+      m_TRACK_IF(GStringPrintf(nc_parsingErrorInfo,-1," [" FMT_P_STRING "]",\
+        m_P_STRING_2_FMT_ARGS(lexeme)) < 0)\
     }\
   }\
 }
@@ -624,28 +621,28 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
   TEMPLATE_PARTITION_STUFF ti_templatePartitionStuff = (TEMPLATE_PARTITION_STUFF) UNDEFINED;
   int v_templatePartitionEntry = UNDEFINED; 
   struct BLOTINST *vc_blotinstPtr = (struct BLOTINST *) UNDEFINED;
-  struct STRING_PORTION decor; // UNDEFINED 
-  struct STRING_PORTION dummy; // UNDEFINED 
-  m_ASSIGN_STRING_PORTION(dummy,"N/A",-1)
+  struct P_STRING decor; // UNDEFINED 
+  struct P_STRING dummy; // UNDEFINED 
+  m_ASSIGN_P_STRING(dummy,"N/A",-1)
 
-  while (answer == ANSWER__YES && !b_EMPTY_STRING_PORTION(fp_template)) {
+  while (answer == ANSWER__YES && !b_EMPTY_P_STRING(fp_template)) {
 
     // Stage 1: Locate new blotinst "sequence" 
 
     m_PARSE_TILL_MATCH_C(fp_template,"##<<",NULL, &decor)
-    if (!b_EMPTY_STRING_PORTION(decor)) {
+    if (!b_EMPTY_P_STRING(decor)) {
       v_templatePartitionEntry = GreenCollectionFetch(handle->h_templatePartitionsHandle, -1,
         (char**)&ti_templatePartitionStuff);
       m_TRACK_IF(v_templatePartitionEntry < 0)
       m_ASSIGN_DECOR_TEMPLATE_PARTITION(*ti_templatePartitionStuff, decor)
     } // if
-    if (b_EMPTY_STRING_PORTION(fp_template)) { // "##<<' NOT located 
+    if (b_EMPTY_P_STRING(fp_template)) { // "##<<' NOT located 
       continue;
     } // if
     m_PARSE_OFFSET(fp_template,4, NULL)
 
     m_PARSE_TILL_MATCH_C(fp_template,">>",NULL, &blotinstSequence)
-    if (b_EMPTY_STRING_PORTION(fp_template)) { // ending ">>" not located 
+    if (b_EMPTY_P_STRING(fp_template)) { // ending ">>" not located 
       m_REPORT_ERROR(dummy,"Missing " DELIMITOR__S, ">>")
     } // if
     m_PARSE_OFFSET(fp_template,2, NULL)
@@ -655,7 +652,7 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
     // Stage 2: Getting raw "tokens" within blotinst "sequence" 
     // Parsing <basic token 1> [ <basic token 2> ] [ '(' <arguments> ')' ]
     char b_arguments = b_FALSE0; // No arguments lexeme a priori
-    struct STRING_PORTION basicToken1, basicToken2, c_arguments ;
+    struct P_STRING basicToken1, basicToken2, c_arguments ;
     m_PARSE_PASS_SPACES(blotinstSequence, NULL)
     m_PARSE_PASS_CHARS(blotinstSequence,b_REGULAR_SCAN, b_PASS_CHARS_WHILE,IsBasicTokenChar,
       UNDEFINED, &basicToken1)
@@ -666,18 +663,18 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
 
     m_PARSE_PASS_SPACES(blotinstSequence, NULL)
     m_PARSE_PASS_CHARS(blotinstSequence,b_REGULAR_SCAN, b_PASS_CHARS_TILL,NULL,'(', &dummy)
-    if (!b_EMPTY_STRING_PORTION(dummy)) {
+    if (!b_EMPTY_P_STRING(dummy)) {
       m_REPORT_ERROR(dummy,"Unexpected content before " DELIMITOR__C,'(')
     } // if
-    if ((b_arguments = !b_EMPTY_STRING_PORTION(blotinstSequence))) {
+    if ((b_arguments = !b_EMPTY_P_STRING(blotinstSequence))) {
       m_PARSE_OFFSET(blotinstSequence,1, NULL)
       m_PARSE_PASS_CHARS(blotinstSequence,b_REVERTED_SCAN, b_PASS_CHARS_TILL,NULL,')', &c_arguments)
-      if (b_EMPTY_STRING_PORTION(blotinstSequence)) {
+      if (b_EMPTY_P_STRING(blotinstSequence)) {
         m_REPORT_ERROR(c_arguments,"Missing " DELIMITOR__C, ')')
       } // if
       m_PARSE_OFFSET(blotinstSequence,1, NULL)
       m_PARSE_PASS_SPACES(blotinstSequence, NULL)
-      if (!b_EMPTY_STRING_PORTION(blotinstSequence)) {
+      if (!b_EMPTY_P_STRING(blotinstSequence)) {
         m_REPORT_ERROR(blotinstSequence,"Trailing content after " DELIMITOR__C, ')')
       } // if
     } // if
@@ -687,13 +684,13 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
     // c_arguments: (when located) may be empty  
 
     // Stage 3: Finding actual "tokens" within blotinst "sequence" 
-    struct STRING_PORTION litteralKeyw, referral, litteralBlotval; 
-    m_ASSIGN_EMPTY_STRING_PORTION(litteralKeyw)
-    m_ASSIGN_EMPTY_STRING_PORTION(referral)
-    m_ASSIGN_EMPTY_STRING_PORTION(litteralBlotval)
+    struct P_STRING litteralKeyw, referral, litteralBlotval; 
+    m_ASSIGN_EMPTY_P_STRING(litteralKeyw)
+    m_ASSIGN_EMPTY_P_STRING(referral)
+    m_ASSIGN_EMPTY_P_STRING(litteralBlotval)
 
     if (b_arguments) { // Found '(' <arguments> ')' 
-      if (!b_EMPTY_STRING_PORTION(basicToken2)) { // two tokens 
+      if (!b_EMPTY_P_STRING(basicToken2)) { // two tokens 
         // <keyw> <blotfunct referral> '(' arguments ')' : 
         litteralKeyw = basicToken1;
         referral = basicToken2;
@@ -704,7 +701,7 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
     } else {
       // <keyw> [ <blotval> ] :
       litteralKeyw = basicToken1;
-      if (!b_EMPTY_STRING_PORTION(basicToken2)) {
+      if (!b_EMPTY_P_STRING(basicToken2)) {
         // <keyw> <blotval> :
         litteralBlotval = basicToken2;
       } // if
@@ -734,13 +731,13 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
       } // switch
     } // if
 
-    if (!b_EMPTY_STRING_PORTION(litteralBlotval)) {
+    if (!b_EMPTY_P_STRING(litteralBlotval)) {
       int parsedLength = UNDEFINED;
-      switch (ReadGenericIntegerStringPortion(litteralBlotval,  &vc_blotinstPtr->c_blotval,
+      switch (ReadGenericIntegerPString(litteralBlotval,  &vc_blotinstPtr->c_blotval,
         &parsedLength)) {
       case ANSWER__YES: 
         vc_blotinstPtr->b_blotval = b_TRUE;
-        if (parsedLength < m_StringPortionLength(&litteralBlotval)) {
+        if (parsedLength < m_PStringLength(&litteralBlotval)) {
           m_REPORT_ERROR(litteralBlotval, "Trailing chars in blotval")
         } // if
       break; case ANSWER__NO: 
@@ -751,7 +748,7 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
       } // switch
     } // if 
 
-    if (!b_EMPTY_STRING_PORTION(litteralKeyw)) { 
+    if (!b_EMPTY_P_STRING(litteralKeyw)) { 
       switch (BlotcodeFindBlotkeyw(handle->frozenBlotcodeHandle, &litteralKeyw,
         &vc_blotinstPtr->blotkeywId)) {
       case RESULT__FOUND: 
@@ -926,11 +923,10 @@ int BlotcodeExecutorConstructPage (BLOTCODE_EXECUTOR_HANDLE handle,
 m_DIGGY_VAR_LD(blotinstPtr->c_blotval)
         if (handle->h_blotfuncSurrogate->c_copiedLength > 0) {
           m_TRACK_IF(SuckerFillDButt(outputSuckerHandle, 
-            m_GStringGetLogicalStringPortion(handle->h_blotfuncSurrogate),  NULL) != 0)
+            m_GStringGetLogicalPString(handle->h_blotfuncSurrogate),  NULL) != 0)
         } // if
       break; case ANSWER__NO: // Abandon dynamic construction
         blotinstPtr->b_blotval = b_FALSE0;
-m_DIGGY_INFO("ANSWER__NO => BLOTCODE_CONSTRUCTION_STATUS__ABANDONNED")
         n_blotcodeConstructionStatus = BLOTCODE_CONSTRUCTION_STATUS__ABANDONNED;
         continue;
       break; default: 

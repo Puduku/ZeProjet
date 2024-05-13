@@ -156,7 +156,7 @@
 //   Eval (^recettes2?=name := "craboutchas") => new record name 
 //
 //
-// OutputF (<format> <blotex> ) 
+// OutputF (<format> ',' <blotex> ) 
 // -------
 //
 // Replace blot with content, following format

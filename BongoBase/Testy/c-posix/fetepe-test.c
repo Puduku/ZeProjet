@@ -14,7 +14,7 @@
 #include <stdio.h>
 
 // FETEPE_LOG_COMMAND_STATUS_FUNCTION
-static int FetepeTestLogCommandStatus ( void *r_handle, struct STRING_PORTION commandStatusLine,
+static int FetepeTestLogCommandStatus ( void *r_handle, struct P_STRING commandStatusLine,
   char b_lastLine) {
   m_DIGGY_BOLLARD()
   m_DIGGY_VAR_GEN(commandStatusLine.string, .10s)

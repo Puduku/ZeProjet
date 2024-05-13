@@ -56,8 +56,8 @@ typedef int (*BLOTLIB_EXECUTOR_FACTORY__CREATE_PRODUCT_INSTANCE_FUNCTION)(void *
 
 
 struct BLOTFUNC_CALL {
-  struct STRING_PORTION referral;
-  struct STRING_PORTION arguments; // arguments list passed to the blot function
+  struct P_STRING referral;
+  struct P_STRING arguments; // arguments list passed to the blot function
   // (in the template), excluding initial '(' and  final ')')
 } ;
 
@@ -245,7 +245,7 @@ int BlotcodeExecutorGetBlotlibExecutorHandle(BLOTCODE_EXECUTOR_HANDLE handle, in
 // - ANSWER__NO: Blot parsing error:
 // - -1: unexpected problem ; anomaly is raised
 int BlotcodeExecutorParseTemplate(BLOTCODE_EXECUTOR_HANDLE handle,
-  struct STRING_PORTION fp_template, struct STRING_PORTION *nac_parsingErrorLocalization,
+  struct P_STRING fp_template, struct P_STRING *nac_parsingErrorLocalization,
   G_STRING_STUFF nc_parsingErrorInfo) ;
 
 

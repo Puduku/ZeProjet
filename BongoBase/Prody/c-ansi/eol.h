@@ -54,7 +54,7 @@ int RemoveAsciiEol (char *line) ;
 
 // GREEN ITEM:
 struct LINE_DELIMITOR {
-  struct STRING_PORTION practicalLine; 
+  struct P_STRING practicalLine; 
   int eolLength ;
 } ;
 typedef struct LINE_DELIMITOR* LINE_DELIMITOR_STUFF;
@@ -69,7 +69,7 @@ typedef struct LINE_DELIMITOR* LINE_DELIMITOR_STUFF;
 // - m_physicalLength:
 #define m_GET_LINE_DELIMITOR_PHYSICAL_LENGTH(/*struct LINE_DELIMITOR*/m_lineDelimitor,\
   /*int*/m_physicalLength) {\
-  m_physicalLength = m_StringPortionLength(&(m_lineDelimitor).practicalLine);\
+  m_physicalLength = m_PStringLength(&(m_lineDelimitor).practicalLine);\
   (m_physicalLength) += (m_lineDelimitor).eolLength;\
 }
 
@@ -129,7 +129,7 @@ typedef struct LINE_DELIMITOR* LINE_DELIMITOR_STUFF;
 // Ret:
 // - >= 0: number of NEW lines parsed in that pass
 // - -1 : unexpected problem ; anomaly is raised
-int ParseAsciiLines(struct STRING_PORTION input, int n_trueLinesParsingLimit,
+int ParseAsciiLines(struct P_STRING input, int n_trueLinesParsingLimit,
   int *nav_parsedLength,  GREEN_COLLECTION_HANDLE linesPartitionHandle) ;
 
 

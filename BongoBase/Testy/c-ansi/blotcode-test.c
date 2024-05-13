@@ -50,7 +50,7 @@ static int Blotlib1ExecutorExecuteC(void *r_handle, const struct BLOTFUNC *ap_bl
   m_DIGGY_BOLLARD()
   //m_ASSERT(r_handle == DUMMY_BLOTLIB_EXECUTOR_HANDLE)
   if (ap_blotfunc->entry.localBlotfuncNameEntry == 1) { // InitUnDeuxTrois function 
-    int answer = ReadGenericIntegerStringPortion(ap_blotfunc->call.arguments, &handle->nbIters,  (int*)NULL);
+    int answer = ReadGenericIntegerPString(ap_blotfunc->call.arguments, &handle->nbIters,  (int*)NULL);
     m_TRACK_IF(answer < 0)
 //m_DIGGY_VAR_D(handle->nbIters)
     if (answer == ANSWER__NO) m_DIGGY_RETURN(ANSWER__NO)
@@ -102,7 +102,7 @@ static int Blotlib2ExecutorExecuteC(void *r_handle, const struct BLOTFUNC *ap_bl
     } // comparison 
     m_ASSERT(m_GStringCCopy(c_surrogate,0,"sait") >= 0)
   break; case 2: // Nombre
-    answer = ReadGenericIntegerStringPortion(ap_blotfunc->call.arguments, ac_blotval,(int*)NULL);
+    answer = ReadGenericIntegerPString(ap_blotfunc->call.arguments, ac_blotval,(int*)NULL);
     m_TRACK_IF(answer < 0)
 //m_DIGGY_VAR_D(*ac_blotval)
   break; default: ;
@@ -125,7 +125,7 @@ static int BlotcodeExecutorTest (int expectedTestNumber, BLOTCODE_EXECUTOR_HANDL
   SUCKER_HANDLE outputSuckerHandle, G_STRING_STUFF outputGStringStuff,  const char *p_template,
   int expectedAnswer, int c_expectedBlotcodeConstructionStatus,  const char *ccp_expectedOutput) {
   m_DIGGY_BOLLARD()
-  m_ASSIGN_LOCAL_C_STRING_PORTION(localTemplate,p_template)
+  m_ASSIGN_LOCAL_C_P_STRING(localTemplate,p_template)
   m_ASSERT(expectedTestNumber == ++testNumber)
   m_DIGGY_VAR_D(testNumber)
 

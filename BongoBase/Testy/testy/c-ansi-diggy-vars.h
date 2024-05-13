@@ -40,9 +40,9 @@
 //
 // Passed
 // - m_var: common var expression to display
-#define m_DIGGY_VAR_STRING_PORTION(m_var) \
+#define m_DIGGY_VAR_P_STRING(m_var) \
   m_DIGGY_VAR(m_var,\
-  printf("[" FMT_STRING_PORTION "]", m_STRING_PORTION_2_FMT_ARGS(m_var));)
+  printf("[" FMT_P_STRING "]", m_P_STRING_2_FMT_ARGS(m_var));)
 
 
 // "c-ansi/green.h" :

@@ -51,7 +51,7 @@ int FileButtAdeptCreateInstance(FILE_BUTT_ADEPT_HANDLE *azh_handle,
 
 // BUTT_ADEPT_SUCK_FUNCTION
 // Public function: see .h
-int FileButtAdeptSuck(void *r_handle,  char b_kickButt, struct STRING_PORTION *ac_chunk,
+int FileButtAdeptSuck(void *r_handle,  char b_kickButt, struct P_STRING *ac_chunk,
   int *nar_flopCause) {
   m_DIGGY_BOLLARD()
   FILE_BUTT_ADEPT_HANDLE handle = (FILE_BUTT_ADEPT_HANDLE)r_handle;
@@ -68,7 +68,7 @@ int FileButtAdeptSuck(void *r_handle,  char b_kickButt, struct STRING_PORTION *a
 
   int ret = fread(handle->ch_readBuffer,handle->n_readBufferSize,1,handle->nh_file);
   m_ASSERT(ret >= 0)
-  m_ASSIGN_STRING_PORTION(*ac_chunk,handle->ch_readBuffer,ret) 
+  m_ASSIGN_P_STRING(*ac_chunk,handle->ch_readBuffer,ret) 
 
   m_DIGGY_RETURN(ANSWER__YES)
 } // FileButtAdeptSuck
@@ -76,7 +76,7 @@ int FileButtAdeptSuck(void *r_handle,  char b_kickButt, struct STRING_PORTION *a
 
 // BUTT_ADEPT_FILL_FUNCTION
 // Public function: see .h
-int FileButtAdeptFill(void *r_handle,  struct STRING_PORTION chunk, int *nar_flopCause) {
+int FileButtAdeptFill(void *r_handle,  struct P_STRING chunk, int *nar_flopCause) {
   m_DIGGY_BOLLARD()
   FILE_BUTT_ADEPT_HANDLE handle = (FILE_BUTT_ADEPT_HANDLE)r_handle;
   m_CHECK_MAGIC_FIELD(FILE_BUTT_ADEPT_HANDLE,handle)
@@ -88,10 +88,10 @@ int FileButtAdeptFill(void *r_handle,  struct STRING_PORTION chunk, int *nar_flo
     m_DIGGY_RETURN(ANSWER__NO)
   } // if
 
-  int ret = fwrite(chunk.string,m_StringPortionLength(&chunk),1,handle->nh_file);
+  int ret = fwrite(chunk.string,m_PStringLength(&chunk),1,handle->nh_file);
   m_ASSERT(ret >= 0)
   // TODO: gedrer edcritures partielles...
-  m_ASSERT(ret == m_StringPortionLength(&chunk)) 
+  m_ASSERT(ret == m_PStringLength(&chunk)) 
 
   m_DIGGY_RETURN(ANSWER__YES)
 } // FileButtAdeptFill  
@@ -131,16 +131,16 @@ int GStringButtAdeptCreateInstance(G_STRING_BUTT_ADEPT_HANDLE *azh_handle,
 
 // BUTT_ADEPT_SUCKER_FUNCTION
 // Public function: see .h
-int GStringButtAdeptSuck(void *r_handle,  char b_kickButt, struct STRING_PORTION *ac_chunk,
+int GStringButtAdeptSuck(void *r_handle,  char b_kickButt, struct P_STRING *ac_chunk,
   int *nar_flopCause) {
   m_DIGGY_BOLLARD()
   G_STRING_BUTT_ADEPT_HANDLE handle = (G_STRING_BUTT_ADEPT_HANDLE)r_handle;
   m_CHECK_MAGIC_FIELD(G_STRING_BUTT_ADEPT_HANDLE,handle)
 
   if (b_kickButt) {
-    *ac_chunk = handle->gStringStuff->cv_stringPortion;
+    *ac_chunk = handle->gStringStuff->cv_pString;
   } else {
-    m_ASSIGN_EMPTY_STRING_PORTION(*ac_chunk)
+    m_ASSIGN_EMPTY_P_STRING(*ac_chunk)
   } // if
 
   m_DIGGY_RETURN(ANSWER__YES)
@@ -148,7 +148,7 @@ int GStringButtAdeptSuck(void *r_handle,  char b_kickButt, struct STRING_PORTION
 
 // BUTT_ADEPT_FILLER_FUNCTION
 // Public function: see .h
-int GStringButtAdeptFill(void *r_handle, struct STRING_PORTION chunk, int *nar_flopCause){
+int GStringButtAdeptFill(void *r_handle, struct P_STRING chunk, int *nar_flopCause){
   m_DIGGY_BOLLARD()
   G_STRING_BUTT_ADEPT_HANDLE handle = (G_STRING_BUTT_ADEPT_HANDLE)r_handle;
   m_CHECK_MAGIC_FIELD(G_STRING_BUTT_ADEPT_HANDLE,handle)
@@ -181,13 +181,13 @@ struct SUCKER {
 
 
 // BUTT_ADEPT_SUCK_FUNCTION
-static int DummyButtAdeptSuck(void *r_handle,  char b_kickButt, struct STRING_PORTION *ac_chunk,
+static int DummyButtAdeptSuck(void *r_handle,  char b_kickButt, struct P_STRING *ac_chunk,
   int *nar_flopCause) {
   m_RAISE(ANOMALY__SHOULD_NOT_BE_HERE)
 } // DummyButtAdeptSuck
 
 // BUTT_ADEPT_FILL_FUNCTION
-int DummyButtAdeptFill(void *r_handle, struct STRING_PORTION chunk, int *nar_flopCause) {
+int DummyButtAdeptFill(void *r_handle, struct P_STRING chunk, int *nar_flopCause) {
   m_RAISE(ANOMALY__SHOULD_NOT_BE_HERE)
 } // DummyButtAdeptFill
 
@@ -226,7 +226,7 @@ int SuckerPlugSDButts(SUCKER_HANDLE handle,
 
 
 // Public function ; see .h
-int SuckerSuckSButt(SUCKER_HANDLE handle, char b_kickButt, struct STRING_PORTION *ac_chunk,
+int SuckerSuckSButt(SUCKER_HANDLE handle, char b_kickButt, struct P_STRING *ac_chunk,
   int *nar_flopCause) {
   m_DIGGY_BOLLARD()
   int answer = handle->sButtAdeptSuckFunction(handle->r_sButtAdeptSuckHandle,b_kickButt,
@@ -236,7 +236,7 @@ int SuckerSuckSButt(SUCKER_HANDLE handle, char b_kickButt, struct STRING_PORTION
 } // SuckerSuckSButt
 
 
-int SuckerFillDButt(SUCKER_HANDLE handle, struct STRING_PORTION chunk, int *nar_flopCause) {
+int SuckerFillDButt(SUCKER_HANDLE handle, struct P_STRING chunk, int *nar_flopCause) {
   m_DIGGY_BOLLARD()
   int answer = handle->dButtAdeptFillFunction(handle->r_dButtAdeptFillHandle,
     chunk, nar_flopCause);
@@ -251,15 +251,15 @@ int SuckerSuckOut (SUCKER_HANDLE handle, int *na_suckedOutLength, int *nar_flopC
   int n_suckerStatus = -1 ; // unknown status
   int suckedOutLength = 0;
 
-  struct STRING_PORTION c_chunk; // Not significant in case of flop... 
+  struct P_STRING c_chunk; // Not significant in case of flop... 
   while (n_suckerStatus == -1) {
     int suckedLength = 0;
 
     switch (handle->sButtAdeptSuckFunction(handle->r_sButtAdeptSuckHandle, suckedOutLength==0,
        &c_chunk, nar_flopCause)) {
     case ANSWER__YES:
-      suckedLength = m_StringPortionLength(&c_chunk);
-      if (b_EMPTY_STRING_PORTION(c_chunk)) {
+      suckedLength = m_PStringLength(&c_chunk);
+      if (b_EMPTY_P_STRING(c_chunk)) {
         n_suckerStatus = SUCKER_STATUS__OK;
       } else if (handle->suckingLimit > 0 && suckedOutLength + suckedLength > handle->suckingLimit) {
         n_suckerStatus = SUCKER_STATUS__LIMIT_BREACHED;

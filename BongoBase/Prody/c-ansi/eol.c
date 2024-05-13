@@ -31,7 +31,7 @@ int RemoveAsciiEol (char *line) {
 
 
 // Public function : see description in .h
-int ParseAsciiLines (struct STRING_PORTION input, int n_trueLinesParsingLimit,
+int ParseAsciiLines (struct P_STRING input, int n_trueLinesParsingLimit,
   int *nav_parsedLength,  GREEN_COLLECTION_HANDLE linesPartitionHandle) {
   m_DIGGY_BOLLARD()
   const char *ptr =input.string;

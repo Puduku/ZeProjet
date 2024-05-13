@@ -58,7 +58,7 @@ int SuckerCreateInstance(SUCKER_HANDLE *azh_handle, int suckingLimit);
 // - ANSWER__NO: "flop" during sucking 
 // - -1 : unexpected problem; anomaly is raised
 typedef int (*BUTT_ADEPT_SUCK_FUNCTION) (void *r_handle, char b_kickButt,
-  struct STRING_PORTION *ac_chunk, int *nar_flopCause);
+  struct P_STRING *ac_chunk, int *nar_flopCause);
 
 
 // #REF BUTT_ADEPT_FILL_FUNCTION <generic status>
@@ -77,7 +77,7 @@ typedef int (*BUTT_ADEPT_SUCK_FUNCTION) (void *r_handle, char b_kickButt,
 // - ANSWER__YES: chunk successully introduced in butt 
 // - ANSWER__NO: "flop" occured during introduction...
 // - -1 : unexpected problem; anomaly is raised
-typedef int (*BUTT_ADEPT_FILL_FUNCTION) (void *r_handle, struct STRING_PORTION chunk,
+typedef int (*BUTT_ADEPT_FILL_FUNCTION) (void *r_handle, struct P_STRING chunk,
    int *nar_flopCause);
 
 
@@ -116,7 +116,7 @@ int SuckerPlugSDButts(SUCKER_HANDLE handle,
 // - ANSWER__YES: OK - "empty" data chunk indicates "end of input" 
 // - ANSWER__NO: "flop" during sucking 
 // - -1 : unexpected problem; anomaly is raised
-int SuckerSuckSButt(SUCKER_HANDLE handle, char b_kickButt, struct STRING_PORTION *ac_chunk,
+int SuckerSuckSButt(SUCKER_HANDLE handle, char b_kickButt, struct P_STRING *ac_chunk,
   int *nar_flopCause);
 
 
@@ -136,7 +136,7 @@ int SuckerSuckSButt(SUCKER_HANDLE handle, char b_kickButt, struct STRING_PORTION
 // - ANSWER__YES: chunk successully introduced in butt 
 // - ANSWER__NO: "flop" occured during introduction...
 // - -1 : unexpected problem; anomaly is raised
-int SuckerFillDButt(SUCKER_HANDLE handle, struct STRING_PORTION chunk, int *nar_flopCause);
+int SuckerFillDButt(SUCKER_HANDLE handle, struct P_STRING chunk, int *nar_flopCause);
 
 
 enum { // #REF enum-SUCKER_STATUS
@@ -228,12 +228,12 @@ int GStringButtAdeptCreateInstance(G_STRING_BUTT_ADEPT_HANDLE *azh_handle,
 
 // BUTT_ADEPT_SUCKER_FUNCTION
 // #SEE BUTT_ADEPT_SUCK_FUNCTION <g-string>
-int GStringButtAdeptSuck(void *r_handle,  char b_kickButt, struct STRING_PORTION *ac_chunk,
+int GStringButtAdeptSuck(void *r_handle,  char b_kickButt, struct P_STRING *ac_chunk,
   int *na_flopCause) ;
 
 // BUTT_ADEPT_FILLER_FUNCTION
 // #SEE BUTT_ADEPT_FILL_FUNCTION <g-string>
-int GStringButtAdeptFill(void *r_handle, struct STRING_PORTION chunk, int *na_flopCause);
+int GStringButtAdeptFill(void *r_handle, struct P_STRING chunk, int *na_flopCause);
 
 
 // Destroy g-string butt adept instance.
@@ -285,12 +285,12 @@ enum { // #REF FILE_FLOP_CAUSE-enum
 
 // #see BUTT_ADEPT_SUCK_FUNCTION
 // #see FILE_FLOP_CAUSE-enum 
-int FileButtAdeptSuck(void *r_handle,  char b_kickButt, struct STRING_PORTION *ac_chunk,
+int FileButtAdeptSuck(void *r_handle,  char b_kickButt, struct P_STRING *ac_chunk,
   int *na_flopCause) ;
 
 // #see BUTT_ADEPT_FILL_FUNCTION
 // #see FILE_FLOP_CAUSE-enum 
-int FileButtAdeptFill(void *r_handle, struct STRING_PORTION chunk, int *na_flopCause);
+int FileButtAdeptFill(void *r_handle, struct P_STRING chunk, int *na_flopCause);
 
 
 // Destroy "file" butt adept instance.

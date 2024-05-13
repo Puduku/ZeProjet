@@ -67,7 +67,7 @@ int StreamButtAdeptKick(STREAM_BUTT_ADEPT_HANDLE handle, int f_openDescriptor) {
 
 // BUTT_ADEPT_SUCKER_FUNCTION
 // Public function: see .h
-int StreamButtAdeptSuck(void *r_handle,  char b_kickButt, struct STRING_PORTION *ac_chunk,
+int StreamButtAdeptSuck(void *r_handle,  char b_kickButt, struct P_STRING *ac_chunk,
   int *nar_flopCause) {
   m_DIGGY_BOLLARD()
   STREAM_BUTT_ADEPT_HANDLE handle = (STREAM_BUTT_ADEPT_HANDLE)r_handle;
@@ -81,7 +81,7 @@ int StreamButtAdeptSuck(void *r_handle,  char b_kickButt, struct STRING_PORTION 
   switch (ErwRead(handle->h_erwHandle,NULL,&readChunk,&readChunkLength)) {
     case RW_STATUS__OK :
     break; case RW_STATUS__TERMINATING :
-      m_ASSIGN_STRING_PORTION(*ac_chunk,readChunk,readChunkLength)
+      m_ASSIGN_P_STRING(*ac_chunk,readChunk,readChunkLength)
     break; case RW_STATUS__TRY_AGAIN :
       m_ASSERT(readChunkLength == 0)
       answer = ANSWER__NO; // flop
@@ -100,13 +100,13 @@ int StreamButtAdeptSuck(void *r_handle,  char b_kickButt, struct STRING_PORTION 
 
 // BUTT_ADEPT_FILLER_FUNCTION
 // Public function: see .h
-int StreamButtAdeptFill(void *r_handle, struct STRING_PORTION chunk, int *nar_flopCause) { 
+int StreamButtAdeptFill(void *r_handle, struct P_STRING chunk, int *nar_flopCause) { 
   m_DIGGY_BOLLARD()
   STREAM_BUTT_ADEPT_HANDLE handle = (STREAM_BUTT_ADEPT_HANDLE)r_handle;
   m_CHECK_MAGIC_FIELD(STREAM_BUTT_ADEPT_HANDLE,handle)
 
   int answer = ANSWER__YES; // A priori
-  switch (ErwWrite2(handle->h_erwHandle,NULL, m_STRING_PORTION_2_BUFFER_LENGTH(chunk), NULL)) {
+  switch (ErwWrite2(handle->h_erwHandle,NULL, m_P_STRING_2_BUFFER_LENGTH(chunk), NULL)) {
   case RW_STATUS__OK :
   break; case RW_STATUS__TERMINATING :
     answer = ANSWER__NO; // flop

@@ -26,7 +26,7 @@
 
 
 // String portion ("compound" data struct) : 
-struct STRING_PORTION { // #REF struct-STRING_PORTION
+struct P_STRING { // #REF struct-P_STRING
   const char *string; // "util" (raw) char array (start pointer)
   const char *stop; // explicit stop pointer delimitor - normally cannot point before string start
     // pointer ; otherwise, such (so-called "crazy") string portions are hold as EMPTY strings... 
@@ -40,7 +40,7 @@ struct STRING_PORTION { // #REF struct-STRING_PORTION
 // Of course, when the string portion is '\0'-terminated (C-string), we can "safely" depoint stop 
 // position (which must correspond to good old '\0' char...)  
 
-// #REF TRIVIAL_EMPTY_STRING_PORTION
+// #REF TRIVIAL_EMPTY_P_STRING
 // Remark: string == stop == NULL (called "trivial" empty string) is thus a VALID representation of
 // empty string portions...
 
@@ -52,77 +52,77 @@ struct STRING_PORTION { // #REF struct-STRING_PORTION
 // Assign a string portion.
 // 
 // Passed:
-// - m_stringPortion
+// - m_pString
 // - p_string:
 // - un_length: (once evaluated parameter)
 //   + >= 0: raw string length (may include '\0' chars)
 //   + -1 special value: '\0'-terminated C string
 // 
 // Assigned:
-// - m_stringPortion: 
-#define m_ASSIGN_STRING_PORTION(/*struct STRING_PORTION*/m_stringPortion,\
+// - m_pString: 
+#define m_ASSIGN_P_STRING(/*struct P_STRING*/m_pString,\
   /*const char* */p_string, /*int*/un_length) {\
   int em_length = (un_length);\
   if (em_length < 0) em_length = strlen(p_string);\
-  (m_stringPortion).stop = ((m_stringPortion).string = (p_string)) + (em_length);\
+  (m_pString).stop = ((m_pString).string = (p_string)) + (em_length);\
 }
 
 // Assign a local string portion.
 // 
 // Passed:
-// - m_stringPortion: local var to create
-// (other params : see m_ASSIGN_STRING_PORTION() above) 
+// - m_pString: local var to create
+// (other params : see m_ASSIGN_P_STRING() above) 
 //
 // Created (local var):
-// - m_stringPortion: 
-#define m_ASSIGN_LOCAL_STRING_PORTION(/*struct STRING_PORTION*/m_localStringPortion,\
+// - m_pString: 
+#define m_ASSIGN_LOCAL_P_STRING(/*struct P_STRING*/m_localPString,\
   /*const char* */p_string, /*int*/un_length) \
-  struct STRING_PORTION m_localStringPortion;\
-  m_ASSIGN_STRING_PORTION(m_localStringPortion, p_string, un_length)
+  struct P_STRING m_localPString;\
+  m_ASSIGN_P_STRING(m_localPString, p_string, un_length)
 
 // Assign "empty string" to "string portion" 
 // TODO: use "trivial" empty string instead 
 // 
 // Passed:
-// - m_stringPortion: 
+// - m_pString: 
 //
 // Assigned:
-// - m_stringPortion: 
-#define m_ASSIGN_EMPTY_STRING_PORTION(/*struct STRING_PORTION*/m_stringPortion) \
-  m_ASSIGN_STRING_PORTION(m_stringPortion, GOOD_OLD_EMPTY_C_STRING,\
+// - m_pString: 
+#define m_ASSIGN_EMPTY_P_STRING(/*struct P_STRING*/m_pString) \
+  m_ASSIGN_P_STRING(m_pString, GOOD_OLD_EMPTY_C_STRING,\
     EMPTY_STRING_LENGTH0)
 
 // Assign "empty string" to LOCAL "string portion" 
-// See m_ASSIGN_EMPTY_STRING_PORTION() above.
-#define m_ASSIGN_LOCAL_EMPTY_STRING_PORTION(/*struct STRING_PORTION*/m_localStringPortion) \
-  struct STRING_PORTION m_localStringPortion;\
-  m_ASSIGN_EMPTY_STRING_PORTION(m_localStringPortion)
+// See m_ASSIGN_EMPTY_P_STRING() above.
+#define m_ASSIGN_LOCAL_EMPTY_P_STRING(/*struct P_STRING*/m_localPString) \
+  struct P_STRING m_localPString;\
+  m_ASSIGN_EMPTY_P_STRING(m_localPString)
 
 // Assign simple "C-string" to "string portion" 
 // 
 // Passed:
-// - m_stringPortion: 
+// - m_pString: 
 // - p_cString: c string (buffer start address)
 //
 // Assigned:
-// - m_stringPortion:
-#define m_ASSIGN_C_STRING_PORTION(/*struct STRING_PORTION*/m_stringPortion,\
+// - m_pString:
+#define m_ASSIGN_C_P_STRING(/*struct P_STRING*/m_pString,\
   /*const char* */p_cString) {\
-  m_ASSIGN_STRING_PORTION(m_stringPortion,p_cString, -1)\
+  m_ASSIGN_P_STRING(m_pString,p_cString, -1)\
 }
 
 // Assign simple "C-string" to local "string portion" 
 // 
 // Passed:
-// - m_stringPortion: local var to create
-// (other params : see m_ASSIGN_STRING_PORTION() above) 
+// - m_pString: local var to create
+// (other params : see m_ASSIGN_P_STRING() above) 
 //
 // Assigned (local var):
-// - m_stringPortion:
-#define m_ASSIGN_LOCAL_C_STRING_PORTION(/*struct STRING_PORTION*/m_localStringPortion,\
+// - m_pString:
+#define m_ASSIGN_LOCAL_C_P_STRING(/*struct P_STRING*/m_localPString,\
   /*const char* */p_cString) \
-  struct STRING_PORTION m_localStringPortion;\
-  m_ASSIGN_C_STRING_PORTION(m_localStringPortion,  p_cString)
+  struct P_STRING m_localPString;\
+  m_ASSIGN_C_P_STRING(m_localPString,  p_cString)
 
 
 // String portions properties
@@ -132,61 +132,61 @@ struct STRING_PORTION { // #REF struct-STRING_PORTION
 // Note: pathetic case in which stop ptr preceeds start ptr is considered as empty string...
 //
 // Passed:
-// - ap_stringPortion: 
+// - ap_pString: 
 // 
 // Ret: string portion length (ALWAYS >= 0)
-static inline int m_StringPortionLength(const struct STRING_PORTION *ap_stringPortion) { 
-  int length = ap_stringPortion->stop - ap_stringPortion->string;
+static inline int m_PStringLength(const struct P_STRING *ap_pString) { 
+  int length = ap_pString->stop - ap_pString->string;
   if (length < 0) length = 0;
   return length;
-} // m_StringPortionLength
+} // m_PStringLength
 
 // Is a string portion empty ?
 //
 // Passed:
-// - p_stringPortion: 
+// - p_pString: 
 // 
 // Ret:
-// - TRUE: the stringPortion is empty (length == 0)
-// - FALSE: the stringPortion is not empty (length > 0)
-#define b_EMPTY_STRING_PORTION(/*const struct STRING_PORTION*/p_stringPortion) \
-  (m_StringPortionLength(&(p_stringPortion)) == 0)
+// - TRUE: the pString is empty (length == 0)
+// - FALSE: the pString is not empty (length > 0)
+#define b_EMPTY_P_STRING(/*const struct P_STRING*/p_pString) \
+  (m_PStringLength(&(p_pString)) == 0)
 
 
 // Provide buffer / length function parameters corresponding to string portion.
 // 
 // Passed:
-// - p_stringPortion: string portion 
-#define m_STRING_PORTION_2_BUFFER_LENGTH(/*const struct STRING_PORTION*/p_stringPortion) \
- (p_stringPortion).string , m_StringPortionLength(&(p_stringPortion))
+// - p_pString: string portion 
+#define m_P_STRING_2_BUFFER_LENGTH(/*const struct P_STRING*/p_pString) \
+ (p_pString).string , m_PStringLength(&(p_pString))
 
 
 // Verify if string portion corresponds well to C-string (i.e exempted of '\0' chars)
 //
 // Passed:
-// - a_stringPortion : address of string portion data struct 
+// - a_pString : address of string portion data struct 
 // 
 // Changed: 
-// - a_stringPortion : rectified with COMPLETED__BUT status... 
-// - <a_stringPortion>->stop : delimit actual string length 
+// - a_pString : rectified with COMPLETED__BUT status... 
+// - <a_pString>->stop : delimit actual string length 
 //
 // Returned: 
 // - COMPLETED__OK:
 // - COMPLETED__BUT: rectified
-int VerifyCStringPortion(struct STRING_PORTION *a_stringPortion);
+int VerifyCPString(struct P_STRING *a_pString);
 
 
 // Using string portions with printf() family of functions...
  
 // format directive for string portions:
-#define FMT_STRING_PORTION "%.*s" 
+#define FMT_P_STRING "%.*s" 
 
 // String portions wrapper usable with format directive above.
 //
 // Passed:
-// - p_stringPortion: string portion passed in printf() subsequent argument(s) 
-#define m_STRING_PORTION_2_FMT_ARGS(/*const struct STRING_PORTION*/p_stringPortion) \
- m_StringPortionLength(&(p_stringPortion)) , (p_stringPortion).string
+// - p_pString: string portion passed in printf() subsequent argument(s) 
+#define m_P_STRING_2_FMT_ARGS(/*const struct P_STRING*/p_pString) \
+ m_PStringLength(&(p_pString)) , (p_pString).string
 
 
 // Copy string portions 
@@ -195,35 +195,35 @@ int VerifyCStringPortion(struct STRING_PORTION *a_stringPortion);
 // Establish the optimal size for destination string buffer in string copy operation. 
 // 
 // Passed:
-// - srcStringPortionLength : 'string' source string length 
+// - srcPStringLength : 'string' source string length 
 // 
 // Ret: optimal buffer size (> 0)
-#define /*int*/OPTIMAL_BUFFER_SIZE_4_STRING_PORTION_COPY(/*int*/srcStringPortionLength) \
-  ((srcStringPortionLength) + 1) 
+#define /*int*/OPTIMAL_BUFFER_SIZE_4_P_STRING_COPY(/*int*/srcPStringLength) \
+  ((srcPStringLength) + 1) 
 
 
 // Same purpose as standard "strcpy" function, except that this function takes care never to
 // overflow the target string.
 // ATTENTION: source and destination MAY NOT overlap
-// TODO: MoveStringPortion()
+// TODO: MovePString()
 //
 // Passed:
 // - dstRawString : target string (buffer address)
 // - dstBufferSize : target string's buffer size; > 0 (CANNOT be == 0) ; see 
-//   OPTIMAL_BUFFER_SIZE_4_STRING_PORTION_COPY() macro above.
-// - ap_srcStringPortion : source string portion 
+//   OPTIMAL_BUFFER_SIZE_4_P_STRING_COPY() macro above.
+// - ap_srcPString : source string portion 
 //
 // Modified:
 // - dstString : copy of 'source string' (limited to dst buffer size); ==> ALWAYS '\0' terminated.
-// - *na_dstStringPortion : (if explicit target used) target string portion 
+// - *na_dstPString : (if explicit target used) target string portion 
 //
 // Returned:
 // - >= 0 and < dstBufferSize: copied length (not taking into account the extra '\0'
 //   ending char) (the copy is COMPLETE if and only 'destination' buffer is big enough) 
 // - -1: unexpected problem; anomaly is raised
 // TODO: supprimer ap_ ???
-int CopyStringPortion(char *dstRawString, int dstBufferSize, 
-  const struct STRING_PORTION *ap_srcStringPortion);
+int CopyPString(char *dstRawString, int dstBufferSize, 
+  const struct P_STRING *ap_srcPString);
 
 
 // Compare string portions
@@ -250,14 +250,14 @@ typedef int (*IS_CHAR_FUNCTION) (int c) ;
 typedef int (*TO_CHAR_FUNCTION) (int c) ;
 
 
-// #REF CompareStringPortions
+// #REF ComparePStrings
 // Lexical comparison of raw strings:
 // - "binary" comparison when possible (i.e memcmp()-based => more efficient) 
 // - otherwize, "char to char" comparison of raw strings.
 //
 // Passed:
-// - ap_stringPortion1 : 1st string to compare #SEE struct-STRING_PORTION
-// - ap_stringPortion2 : 2nd string to compare #SEE struct-STRING_PORTION
+// - ap_pString1 : 1st string to compare #SEE struct-P_STRING
+// - ap_pString2 : 2nd string to compare #SEE struct-P_STRING
 // - n_isNeutralCharFunction: handling of "neutral" chars (white spaces, etc.) 
 //   + NULL: NO char elimination applied before comparison 
 //   + != NULL: elimination of each "neutral" char of both strings before comparison ; "binary"
@@ -272,22 +272,22 @@ typedef int (*TO_CHAR_FUNCTION) (int c) ;
 //   + LESS_THAN__COMPARISON : string 1 'less than' string 2
 //   + EQUAL_TO__COMPARISON : strings are "identical"
 //   + GREATER_THAN__COMPARISON : string 1 'greater than' string 2
-int CompareStringPortions(const struct STRING_PORTION *ap_stringPortion1, 
-  const struct STRING_PORTION *ap_stringPortion2,  IS_CHAR_FUNCTION n_isNeutralCharFunction,
+int ComparePStrings(const struct P_STRING *ap_pString1, 
+  const struct P_STRING *ap_pString2,  IS_CHAR_FUNCTION n_isNeutralCharFunction,
   TO_CHAR_FUNCTION n_toCharFunction) ; 
 
-// CompareStringPortions() wrapper ; compare a string portion with a c-string...
-static inline int m_CompareWithCString(const struct STRING_PORTION *ap_stringPortion1, const char *ap_cString2) {
-  m_ASSIGN_LOCAL_C_STRING_PORTION(stringPortion2,ap_cString2)
-  return CompareStringPortions(ap_stringPortion1, &stringPortion2,  NULL, NULL) ;
+// ComparePStrings() wrapper ; compare a string portion with a c-string...
+static inline int m_CompareWithCString(const struct P_STRING *ap_pString1, const char *ap_cString2) {
+  m_ASSIGN_LOCAL_C_P_STRING(pString2,ap_cString2)
+  return ComparePStrings(ap_pString1, &pString2,  NULL, NULL) ;
 } 
 
 // m_CompareWithCString() wrapper ; indicates whether string portion matches with a c-string...
 // 
 // Ret: boolean value (TRUE when strings matches)
-static inline int mb_EqualToCString(const struct STRING_PORTION *ap_stringPortion1,
+static inline int mb_EqualToCString(const struct P_STRING *ap_pString1,
   const char *ap_cString2) {
-  int comparison = m_CompareWithCString(ap_stringPortion1,ap_cString2);
+  int comparison = m_CompareWithCString(ap_pString1,ap_cString2);
   switch (comparison) {
   case LESS_THAN__COMPARISON:
   case GREATER_THAN__COMPARISON:
@@ -299,15 +299,15 @@ static inline int mb_EqualToCString(const struct STRING_PORTION *ap_stringPortio
 }  
 
 
-// Paranoid wrapper of CompareStringPortions() (testing/critical embedded purpose)
+// Paranoid wrapper of ComparePStrings() (testing/critical embedded purpose)
 // Ensure that the optmized forms of the fonction (i.e called without filter) behave identically
 // to general one... 
 // 
 // Ret:
 // - >0 : LESS_THAN__COMPARISON / EQUAL_TO__COMPARISON / GREATER_THAN__COMPARISON 
 // - -1: unexpected problem, anomaly is raised
-int ParanoidCompareStringPortions(const struct STRING_PORTION *ap_stringPortion1,
-  const struct STRING_PORTION *ap_stringPortion2,
+int ParanoidComparePStrings(const struct P_STRING *ap_pString1,
+  const struct P_STRING *ap_pString2,
   IS_CHAR_FUNCTION n_isNeutralCharFunction,  TO_CHAR_FUNCTION n_toCharFunction) ; 
 
 
@@ -322,10 +322,10 @@ int ParanoidCompareStringPortions(const struct STRING_PORTION *ap_stringPortion1
 
 // Simple string (char to char) "scanning" function 
 // Locate first char having / NOT having a property
-// NOTE: not be confused with SScanfStringPortion() declared below... 
+// NOTE: not be confused with SScanfPString() declared below... 
 //
 // Passed:
-// - ap_stringPortion : string portion to scan. 
+// - ap_pString : string portion to scan. 
 // - b_regularScan 
 //   + b_REGULAR_SCAN (TRUE) :
 //   + b_REVERTED_SCAN (FALSE) :
@@ -336,9 +336,9 @@ int ParanoidCompareStringPortions(const struct STRING_PORTION *ap_stringPortion1
 // - c_char: only significant if n_isCharFunction == NULL ; specific char to seek 
 //
 // Returned:
-// (!= NULL) scanning position ; use b_SCAN_STRING_PORTION_LOCATED() below to check whether char
+// (!= NULL) scanning position ; use b_SCAN_P_STRING_LOCATED() below to check whether char
 // is actually located. 
-const char *ScanStringPortion(const struct STRING_PORTION *ap_stringPortion,
+const char *ScanPString(const struct P_STRING *ap_pString,
   char b_regularScan, char b_passCharsTill, IS_CHAR_FUNCTION n_isCharFunction, int c_char);
 
 
@@ -348,43 +348,43 @@ const char *ScanStringPortion(const struct STRING_PORTION *ap_stringPortion,
 // - "char to char" comparison otherwise.
 //
 // Passed:
-// - ap_stringPortion: string to scan #SEE struct-STRING_PORTION
-// - ap_subStringPortion: sub string to locate
+// - ap_pString: string to scan #SEE struct-P_STRING
+// - ap_subPString: sub string to locate
 // - n_toCharFunction: 
 //   + NULL: not provided; no conversion before  comparison 
 //   + != NULL: conversion applied on (each char of) both strings before comparison ; "binary"
 //     comparison is NOT possible
 //
 // Returned:
-// (!= NULL) scanning position; use b_SCAN_STRING_PORTION_LOCATED() below to check whether
+// (!= NULL) scanning position; use b_SCAN_P_STRING_LOCATED() below to check whether
 // sub-string is actually located. 
-const char *ScanStringPortionTillMatch(const struct STRING_PORTION *ap_stringPortion,
-  const struct STRING_PORTION *ap_subStringPortion,  TO_CHAR_FUNCTION n_toCharFunction);
+const char *ScanPStringTillMatch(const struct P_STRING *ap_pString,
+  const struct P_STRING *ap_subPString,  TO_CHAR_FUNCTION n_toCharFunction);
 
 
-// Paranoid wrapper of ScanStringPortionTillMatch() (testing/critical embedded purpose)
+// Paranoid wrapper of ScanPStringTillMatch() (testing/critical embedded purpose)
 // Ensure that the optmized forms of the fonction (i.e called without filter) behave identically
 // to general one... 
 // 
 // Ret:
 // - != NULL: scanning position... 
 // - NULL: unexpected problem, anomaly is raised
-const char *ParanoidScanStringPortionTillMatch(const struct STRING_PORTION *ap_stringPortion, 
-  const struct STRING_PORTION *ap_subStringPortion,  TO_CHAR_FUNCTION n_toCharFunction) ;
+const char *ParanoidScanPStringTillMatch(const struct P_STRING *ap_pString, 
+  const struct P_STRING *ap_subPString,  TO_CHAR_FUNCTION n_toCharFunction) ;
 
 
-// Boolean interpretation (located or not) of scan pointer returned by ScanStringPortion*()
+// Boolean interpretation (located or not) of scan pointer returned by ScanPString*()
 // functions.
 //
 // Passed:
-// - p_stringPortion: as passed to (and updated by) ScanStringPortion*()
-// - scanPtr : offset returned by ScanStringPortion*()
+// - p_pString: as passed to (and updated by) ScanPString*()
+// - scanPtr : offset returned by ScanPString*()
 //
 // Ret:
 // - TRUE: located at position indicated by scan pointer 
 // - FALSE: not located, 
-#define b_SCAN_STRING_PORTION_LOCATED(/*const struct STRING_PORTION*/p_stringPortion,\
-  /*const char* */u_scanPtr)  ( (u_scanPtr) < (p_stringPortion).stop ) 
+#define b_SCAN_P_STRING_LOCATED(/*const struct P_STRING*/p_pString,\
+  /*const char* */u_scanPtr)  ( (u_scanPtr) < (p_pString).stop ) 
 
 
 // Converting string portions
@@ -397,7 +397,7 @@ const char *ParanoidScanStringPortionTillMatch(const struct STRING_PORTION *ap_s
 // Possibly, "neutral" chars (white space, etc.) can be eliminated...
 //
 // Passed:
-// - aep_stringPortion: string to convert #SEE struct-STRING_PORTION
+// - aep_pString: string to convert #SEE struct-P_STRING
 // - b_cTerminated: 
 //   + b_C_TERMINATED : explictely '\0'-terminated
 //   + b_NOT_C_TERMINATED : pure string portion (not '\0'-terminated)
@@ -407,20 +407,20 @@ const char *ParanoidScanStringPortionTillMatch(const struct STRING_PORTION *ap_s
 // - toCharFunction: 
 //
 // Modified:
-// - aep_stringPortion: converted string portion ; 
+// - aep_pString: converted string portion ; 
 //   string length may have been reduced after elimination of neutral chars.  
 //   '\0' ending char is added if the string is explicitly NULL-terminated.
 //
 // Returned:
 // - >=0: string length after conversion 
 // - -1: unexpected problem; anomaly is raised
-int ConvertStringPortion(struct STRING_PORTION *aep_stringPortion, char b_cTerminated,
+int ConvertPString(struct P_STRING *aep_pString, char b_cTerminated,
   IS_CHAR_FUNCTION n_isNeutralCharFunction,  TO_CHAR_FUNCTION toCharFunction) ;
 
-// Paranoid wrapper of ConvertStringPortion() (testing/critical embedded stuff purpose)
+// Paranoid wrapper of ConvertPString() (testing/critical embedded stuff purpose)
 // Ensure that the optmized forms of the fonction (i.e called without filter) behave identically
 // to general one... 
-int ParanoidConvertStringPortion(struct STRING_PORTION *aep_stringPortion, char b_cTerminated,
+int ParanoidConvertPString(struct P_STRING *aep_pString, char b_cTerminated,
   IS_CHAR_FUNCTION n_isNeutralCharFunction,  TO_CHAR_FUNCTION toCharFunction) ;
 
 
@@ -433,47 +433,47 @@ int ParanoidConvertStringPortion(struct STRING_PORTION *aep_stringPortion, char 
 // Replace temporarilly string portion with an equivalent '\0'-terminated C string.
 // 
 // Passed:
-// - m_stringPortion : #SEE struct-STRING_PORTION
+// - m_pString : #SEE struct-P_STRING
 //   must be a single variable name.
 //
 // Changed:
-// - m_stringPortion: "hijacked" ; 
+// - m_pString: "hijacked" ; 
 //   + string: points to adequate buffer (ALWAYS '\0'-terminated) :
 //     . points to auto (stack) required buffer size <= LOCAL_STRING_AUTO_BUFFER_SIZE 
 //     . otherwise, points to buffer created in heap
 //   + stop: updated accordingly if necessary 
-#define m_HIJACK_STRING_PORTION(/*struct STRING_PORTION*/m_stringPortion) \
-  char emc_localString_ ## m_stringPortion [LOCAL_STRING_AUTO_BUFFER_SIZE] ;\
-  char *emnh_heapString_ ## m_stringPortion = NULL;\
-  int em_requiredBufferSize = OPTIMAL_BUFFER_SIZE_4_STRING_PORTION_COPY(m_StringPortionLength(\
-    &(m_stringPortion))); \
+#define m_HIJACK_P_STRING(/*struct P_STRING*/m_pString) \
+  char emc_localString_ ## m_pString [LOCAL_STRING_AUTO_BUFFER_SIZE] ;\
+  char *emnh_heapString_ ## m_pString = NULL;\
+  int em_requiredBufferSize = OPTIMAL_BUFFER_SIZE_4_P_STRING_COPY(m_PStringLength(\
+    &(m_pString))); \
   char* emep_string = (char*)UNDEFINED; \
   if (em_requiredBufferSize > LOCAL_STRING_AUTO_BUFFER_SIZE) {\
-    m_MALLOC(emep_string = emnh_heapString_ ## m_stringPortion,  em_requiredBufferSize)\
-  } else emep_string = emc_localString_ ## m_stringPortion;\
-  m_ASSERT(CopyStringPortion(emep_string, em_requiredBufferSize,  &m_stringPortion) == \
+    m_MALLOC(emep_string = emnh_heapString_ ## m_pString,  em_requiredBufferSize)\
+  } else emep_string = emc_localString_ ## m_pString;\
+  m_ASSERT(CopyPString(emep_string, em_requiredBufferSize,  &m_pString) == \
     em_requiredBufferSize-1)\
-  m_ASSIGN_STRING_PORTION(m_stringPortion,emep_string,em_requiredBufferSize-1)\
+  m_ASSIGN_P_STRING(m_pString,emep_string,em_requiredBufferSize-1)\
 
 // 
 // Passed:
-// - mx_stringPortion : string portion used m_HIJACK_STRING_PORTION()  
+// - mx_pString : string portion used m_HIJACK_P_STRING()  
 //   must be a single variable name.
 // 
 // Changed:
-// - mx_stringPortion : this string portion is no more usable 
+// - mx_pString : this string portion is no more usable 
 // 
-#define m_RELEASE_HIJACKED_STRING_PORTION(mx_stringPortion) \
-if (emnh_heapString_ ## mx_stringPortion != NULL) free(emnh_heapString_ ## mx_stringPortion);
+#define m_RELEASE_HIJACKED_P_STRING(mx_pString) \
+if (emnh_heapString_ ## mx_pString != NULL) free(emnh_heapString_ ## mx_pString);
 
 
 // Wraps sscanf() 
-// NOTE: not be confused with ScanStringPortion() declared above... 
+// NOTE: not be confused with ScanPString() declared above... 
 // 
 // Ret:
 // - 0 : number of param actualy read
 // - -1: unexpected problem ; anomaly is raised
-int SScanfStringPortion(struct STRING_PORTION stringPortion, const char *p_format, ...) ;
+int SScanfPString(struct P_STRING pString, const char *p_format, ...) ;
 
 
 // Recognize long signed integral numbers expressed according to C conventions (like 0x prefix for
@@ -501,9 +501,9 @@ int ReadGenericIntegerCString(const char *p_cString,  GENERIC_INTEGER *ac_value,
 // Allows parsing any kind of string portion (in lieu of '\0'-terminated C-string)...
 //
 // Passed:
-// stringPortion : 
+// pString : 
 // (Other params : see ReadGenericIntegerCString() above)   
-int ReadGenericIntegerStringPortion(struct STRING_PORTION stringPortion,  GENERIC_INTEGER *ac_value,
+int ReadGenericIntegerPString(struct P_STRING pString,  GENERIC_INTEGER *ac_value,
   int *nac_parsedLength);
 
 

@@ -53,7 +53,7 @@ typedef struct FETEPE *FETEPE_HANDLE ;
 // - RETURNED: OK
 // - -1: unexpected problem ; anomaly is raised
 typedef int (*FETEPE_LOG_COMMAND_STATUS_FUNCTION) (void *r_handle,
-  struct STRING_PORTION commandStatusLine, char b_lastLine) ;
+  struct P_STRING commandStatusLine, char b_lastLine) ;
 
 
 // "FETEPE's FTP operations" : possible statuses...

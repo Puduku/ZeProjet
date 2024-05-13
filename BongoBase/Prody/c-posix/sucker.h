@@ -77,13 +77,13 @@ enum { // #REF STREAM_FLOP_CAUSE-enum
 
 // #SEE BUTT_ADEPT_SUCK_FUNCTION@c-ansi/sucker.h <stream>
 // #SEE STREAM_FLOP_CAUSE-enum
-int StreamButtAdeptSuck(void *r_handle,  char b_kickButt, struct STRING_PORTION *ac_chunk,
+int StreamButtAdeptSuck(void *r_handle,  char b_kickButt, struct P_STRING *ac_chunk,
    int *nar_flopCause) ;
 
 
 // #SEE BUTT_ADEPT_FILL_FUNCTION@c-ansi/sucker.h <stream>
 // #SEE STREAM_FLOP_CAUSE-enum
-int StreamButtAdeptFill(void *r_handle, struct STRING_PORTION chunk, int *nar_flopCause);
+int StreamButtAdeptFill(void *r_handle, struct P_STRING chunk, int *nar_flopCause);
 
 
 // Destroy stream butt adept...
