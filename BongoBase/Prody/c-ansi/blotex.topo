@@ -53,38 +53,34 @@
 // A Blot variable (blotvar) stores a blotex value.
 // A register (blotreg) is a collection of blovars
 // (the register with empty name is called the global register)
-// <blotvar> ::= <entity name> ( '.' <entity name>  | '[' <intex> ']' | '{' <intex> '}' ) 
+// <blotvar> ::= <entity name> ( '.' <entity name>  | '[' <intex> ']' ) 
 // Blotvar examples: 
 // .toto => "toto" blotvar of global register
 // recettes.bolo => "bolo" blotvar of "recettes" register
 // recettes[0] => 1st blotvar stored in "recettes" register 
 // [1] => 2nd blotvar stored in global register 
-// recettes[.toto] => "recettes" register's blotvar indexed by "toto" global blotvar  
-// recettes{69} => blotvar with id. 69 in "recettes" register 
-// {69} => global blotvar with id. 69
-// {-69} => global blotvar with id. -69
+// recettes[.toto] => "recettes" register's blotvar indexed by "toto" global blotvar   
 //
-// Blotvar implicit integer value
+// Blotvar implicit and explicit integer value
 // A blotvar value is implicitly an integer value
+// However, reference to integer value of a blotvar may be explicit
+// <blotvar intex> ::= <blotvar> '#'
 // Examples:
-// .toto => "toto" global blotvar integer value 
+// .toto => "toto" global blotvar's integer value 
+// .toto# => ALSO "toto" global blotvar's integer value
 //
 // Blotvar string value 
 // <blotvar strex> ::= <blotvar> '$' 
 // Examples:
 // .toto$ => "toto" global blotvar string value 
-// recettes{69}$ => string value of blotvar with id. 69 in "recettes" register 
 // recettes[.toto]$ => string value of "recettes" register's blotvar indexed by "toto" global blotvar
 //
-// Blotvar name, id. and entry
+// Blotvar name and entry
 // <blotvar name> ::= <blotvar> '!$'
 // <blotvar entry> ::= <blotvar> '!#'
-// <blotvar id> ::= <blotvar> '!'
 // Examples
-// toto!$ => "toto" global blotvar's name, that is "toto"
-// recettes[0]!$ => name of 1st blotvar stored in "recettes" register 
-// {69}!$ => name of global blotvar with id. 69  
-// .toto! => id of "toto" global blotvar
+// .toto!$ => "toto" global blotvar's name, that is "toto"
+// recettes[0]!$ => name of 1st blotvar stored in "recettes" register   
 // recettes.bolo!# => index (entry) of "bolo" blotvar in "recettes" register
 // .toto!# => index (entry) of "toto" global blotvar 
 //
@@ -148,7 +144,8 @@
 // Surrogate: None 
 //
 // Examples:
-//   Eval (recettes?: !$ === "*bolo*" and ! >= 69 :?) => new register selection 
+//   Eval (recettes?: !$ === "*bolo*" and # >= 69 :?) => new register selection 
+//   Eval (recettes?: !$ === "*bolo*" or $ === "*bolo*" :?) => new register selection (2nd exemple)
 //   Eval (recettes?^) => single reset, ascending 
 //   Eval (recettes?+) => fetch next one
 //   Eval (var := recettes?=) => read current int value 
