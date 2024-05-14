@@ -148,18 +148,19 @@
 // Surrogate: None 
 //
 // Examples:
-//   Eval (recettes?: == "*bolo*" || >= "c*" :?) => new register selection 
+//   Eval (recettes?: !$ === "*bolo*" and ! >= 69 :?) => new register selection 
 //   Eval (recettes?^) => single reset, ascending 
 //   Eval (recettes?+) => fetch next one
 //   Eval (var := recettes?=) => read current int value 
 //   Eval (var$ := recettes?=$) => read current str value 
-//   Eval (^recettes2?: name == "*bolo*" || >= "c*" or price < 10 :?) => new table selection 
-//   Eval (recettes?^) => single reset, ascending 
+//   Eval (^recettes2?[ name price ]? => Create "recettes2" table with two fielss "name" and "price" 
+//   Eval (^recettes2?: name$ == "*bolo*" or price < 10 :?) => new table selection 
+//   Eval (^recettes?^) => single reset, ascending 
 //   Eval (^recettes2?+) => fetch next one 
-//   Eval (var$ := ^recettes?=name) => read current name 
+//   Eval (var$ := ^recettes?=name$) => read current name 
 //   Eval (^recettes2?=price := 15) => update current price 
 //   Eval (^recettes2?@) => insert new table record  
-//   Eval (^recettes2?=name := "craboutchas") => new record name 
+//   Eval (^recettes2?=name$ := "craboutchas") => new set name 
 //
 //
 // OutputF (<format> ',' <blotex> ) 
