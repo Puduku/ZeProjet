@@ -20,7 +20,7 @@
 //
 // There two types of blot expressions: 
 // - "string" blotex => "strex" type
-// - "blotval" blotex: signed integer (aka C's "int" type) => "intex" type
+// - "blotval" blotex: signed integer => "intex" type
 // <blotex> ::= <intex> | <strex> 
 //
 // Blot expressions are made of "atoms" :
@@ -33,12 +33,10 @@
 // <strex atom> ::= <str constant> | <blotvar strex> | <blotvar name> | <str blotreg read op> 
 //
 // Constant expressions
-// <int constant> ::= <decimal int constant> | <hexadecimal int constant> 
-// <decimal int constant> ::= [ '-' ] ( <decimal digit> )+
-// <hexadecimal int constant> ::= ( '0x' | '0X' ) ( <hexadecimal digit> )+
+// <int constant> : any integer constants of C language... 
 // <str constant> ::= '"' ( <single char> )* '"'
 // String example: "Julie" 
-// Integer example: 69 
+// Integer examples: 69 , 0xCACABEBE
 // Reminder: blotval's convention : 
 // - 0 : represents "true" boolean value
 // - !=0 : represents "false" boolean value
@@ -108,6 +106,14 @@
 // <str 2op> ::= '+' 
 // ('+' operator applied on strings is a concatenation)
 // 
+// Tables
+// A blot set (blotset) is a fixed set of blotex values. Each element of the set is identified by its name; 
+// A blot table (blottab) is a collection of blotrows 
+// (the table with empty name is called the global table)
+// <blottab> ::= '^' <entity name> '?'
+// Blottab examples: 
+// ^recettes2? => "recettes2" blot table
+// ^? => global bot table
 //
 // II. "blotex" library's functions (those to be placed in blot code)
 // --------------------------------
