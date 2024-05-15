@@ -96,6 +96,15 @@
 // <blotreg fetch> ::= '+'
 // <blotreg read int> ::= '='
 //
+// Blot requests are made of "atoms" : 
+// <blot request> ::= <request atom> ( <request 2op> <blot request> )*
+// <request atom> ::= <int request atom> | <str request atom>
+// <int request atom> ::= ( '#' | '!#' ) <request comp op> <intex> 
+// <request comp op> ::= '>' | '<' | '>=' | '<=' | '==' | '!='
+// <str request atom> ::= ( '$' | '!$' ) <str request comp op> <strex> 
+// <str request comp op> ::=  <request comp op>  | '===' 
+// <logical 2op> ::= 'and' | 'or' 
+//
 // Examples
 // recettes?: !$ === "*bolo*" and # >= 69 :?       => new register selection 
 // recettes?: !$ === "*bolo*" or $ === "*bolo*" :? => new register selection (2nd exemple)
@@ -105,12 +114,12 @@
 // recettes?=$                                     => read current str value 
 //
 // Expressions operators 
-// operators allows to combine expressions together 
+// operators allows to combine expression atoms together 
 // <int 1op> ::= '!' | '+' | '-' 
-// <int 2op> ::= '+' | '-' | '*' | '/' | '&&' | '!!' | '>' | '<' | '>=' | '<=' | '==' | '!=' 
-// Logical operators ('!', '&&' and '!!') combine integer expressions together, "seen" as booleans.
-// <str 2op> ::= '+' 
-// ('+' operator applied on strings is a concatenation)
+// <int 2op> ::= '+' | '-' | '*' | '/' | '&&' | '||' | '>' | '<' | '>=' | '<=' | '==' | '!='
+// Logical operators ('!', '&&' and '||') combine integer expressions together, "seen" as booleans.
+// <str 2op> ::= '+' | '>' | '<' | '>=' | '<=' | '==' | '!=' | '===' 
+// '+' operator applied on strings is a concatenation
 // 
 // Blot tables
 // A blot set (blotset) is a fixed set of blotex values. Each element of the set is identified by its name; 
