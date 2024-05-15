@@ -55,34 +55,34 @@
 // (the register with empty name is called the global register)
 // <blotvar> ::= <entity name> ( '.' <entity name>  | '[' <intex> ']' ) 
 // Blotvar examples: 
-// .toto => "toto" blotvar of global register
-// recettes.bolo => "bolo" blotvar of "recettes" register
-// recettes[0] => 1st blotvar stored in "recettes" register 
+// .toto => toto blotvar of global register
+// recettes.bolo => bolo blotvar of recettes register
+// recettes[0] => 1st blotvar stored in recettes register 
 // [1] => 2nd blotvar stored in global register 
-// recettes[.toto] => "recettes" register's blotvar indexed by "toto" global blotvar   
+// recettes[.toto] => recettes register's blotvar indexed by toto global blotvar   
 //
 // Blotvar implicit and explicit integer value
 // A blotvar value is implicitly an integer value
 // However, reference to integer value of a blotvar may be explicit
 // <blotvar intex> ::= <blotvar> '#'
 // Examples:
-// .toto => "toto" global blotvar's integer value 
-// .toto# => ALSO "toto" global blotvar's integer value
+// .toto => toto global blotvar's integer value 
+// .toto# => ALSO toto global blotvar's integer value
 //
 // Blotvar string value 
 // <blotvar strex> ::= <blotvar> '$' 
 // Examples:
-// .toto$ => "toto" global blotvar string value 
-// recettes[.toto]$ => string value of "recettes" register's blotvar indexed by "toto" global blotvar
+// .toto$ => toto global blotvar string value 
+// recettes[.toto]$ => string value of recettes register's blotvar indexed by toto global blotvar
 //
 // Blotvar name and entry
 // <blotvar name> ::= <blotvar> '!$'
 // <blotvar entry> ::= <blotvar> '!#'
 // Examples
-// .toto!$ => "toto" global blotvar's name, that is "toto"
-// recettes[0]!$ => name of 1st blotvar stored in "recettes" register   
-// recettes.bolo!# => index (entry) of "bolo" blotvar in "recettes" register
-// .toto!# => index (entry) of "toto" global blotvar 
+// .toto!$ => toto global blotvar's name, that is "toto"
+// recettes[0]!$ => name of 1st blotvar stored in recettes register   
+// recettes.bolo!# => index (entry) of bolo blotvar in recettes register
+// .toto!# => index (entry) of toto global blotvar 
 //
 // Register operations 
 // <int blotreg op> ::= <entity name> '?' <int blotreg op details>  
@@ -108,7 +108,7 @@
 // (the table with empty name is called the global table)
 // <blottab> ::= '^' <entity name> '?'
 // Blottab examples: 
-// ^recettes2? => "recettes2" blot table
+// ^recettes2? => recettes2 blot table
 // ^? => global bot table
 //
 // II. "blotex" library's functions (those to be placed in blot code)
@@ -150,7 +150,7 @@
 //   Eval (recettes?+) => fetch next one
 //   Eval (var := recettes?=) => read current int value 
 //   Eval (var$ := recettes?=$) => read current str value 
-//   Eval (^recettes2?[ name price ]? => Create "recettes2" table with two fielss "name" and "price" 
+//   Eval (^recettes2?[ name price ]? => Create recettes2 table with two fields name and price 
 //   Eval (^recettes2?: name$ == "*bolo*" or price < 10 :?) => new table selection 
 //   Eval (^recettes?^) => single reset, ascending 
 //   Eval (^recettes2?+) => fetch next one 
