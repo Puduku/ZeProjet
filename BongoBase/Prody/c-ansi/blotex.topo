@@ -50,9 +50,11 @@
 // <entity name> ::= ( <letter> | <digit> | '_' )*
 //
 // Variables and registers
-// A Blot variable (blotvar) stores a blotex value.
-// A register (blotreg) is a collection of blovars
-// (the register with empty name is called the global register)
+// A blot variable (blotvar) stores a blotex value.
+// A blot register (blotreg) is a collection of blovars
+// (the register with empty entity name is called the global register)
+//
+// Formally a blotvar is referenced as following (in which the 1st entity name identifies the register) :
 // <blotvar> ::= <entity name> ( '.' <entity name>  | '[' <intex> ']' ) 
 // Blotvar examples: 
 // .toto => toto blotvar of global register
@@ -94,7 +96,15 @@
 // <blotreg fetch> ::= '+'
 // <blotreg read int> ::= '='
 //
-// Operators 
+// Examples
+// recettes?: !$ === "*bolo*" and # >= 69 :?       => new register selection 
+// recettes?: !$ === "*bolo*" or $ === "*bolo*" :? => new register selection (2nd exemple)
+// recettes?^                                      => single reset, ascending 
+// recettes?+                                      => fetch next one
+// recettes?=                                      => read current int value 
+// recettes?=$                                     => read current str value 
+//
+// Expressions operators 
 // operators allows to combine expressions together 
 // <int 1op> ::= '!' | '+' | '-' 
 // <int 2op> ::= '+' | '-' | '*' | '/' | '&&' | '!!' | '>' | '<' | '>=' | '<=' | '==' | '!=' 
@@ -102,14 +112,24 @@
 // <str 2op> ::= '+' 
 // ('+' operator applied on strings is a concatenation)
 // 
-// Tables
+// Blot tables
 // A blot set (blotset) is a fixed set of blotex values. Each element of the set is identified by its name; 
 // A blot table (blottab) is a collection of blotrows 
 // (the table with empty name is called the global table)
 // <blottab> ::= '^' <entity name> '?'
+//
 // Blottab examples: 
 // ^recettes2? => recettes2 blot table
-// ^? => global bot table
+// ^? => global blot table
+// ^recettes2?[ name price ]?                      => Create recettes2 table with two fields name and price 
+// ^recettes2?: name$ == "*bolo*" or price < 10 :? => new table selection 
+// ^recettes?^                                     => single reset, ascending 
+// ^recettes2?+                                    => fetch next one 
+// var$ := ^recettes?=name$                        => read current name 
+// ^recettes2?=price := 15                         => update current price 
+// ^recettes2?@                                    => insert new table record  
+// ^recettes2?=name$ := "craboutchas"              => new set name 
+//
 //
 // II. "blotex" library's functions (those to be placed in blot code)
 // --------------------------------
