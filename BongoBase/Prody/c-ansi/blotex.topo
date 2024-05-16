@@ -88,10 +88,10 @@
 //
 // Register operations 
 // <int blotreg op> ::= <entity name> '?' <int blotreg op details>  
-// <int blotreg op details> ::= <blotreg init> | <blotreg reset> | <blotreg fetch> |
+// <int blotreg op details> ::= <blotreg request> | <blotreg reset> | <blotreg fetch> |
 //   <blotreg read int> 
 // <str blotreg read op> ::= <entity name> '?=$'  
-// <blotreg init> ::= ':' <blot request> ':?'
+// <blotreg request> ::= ':' <blot request> ':?'
 // <blotreg reset> ::= '^'
 // <blotreg fetch> ::= '+'
 // <blotreg read int> ::= '='
@@ -119,10 +119,11 @@
 // (the table with empty entity name is called the global table)
 // 
 // <int blottab op> ::= '^' <entity name> '?' <int blottab op details>  
-// <int blottab op details> ::= <blottab init> | <blottab reset> | <blottab fetch> |
+// <int blottab op details> ::= <blottab create> | <blottab request> | <blottab reset> | <blottab fetch> |
 //   <blottab read int> 
-// <str blottab read op> ::= '^' <entity name> '?=$'  
-// <blottab init> ::= ':' <blot request> ':?'
+// <str blottab read op> ::= '^' <entity name> '?=$'
+// <blotttab create> ::= '[' ( <entity name> )+ ']?' 
+// <blottab request> ::= ':' <blot request> ':?'
 // <blottab reset> ::= '^'
 // <blottab fetch> ::= '+'
 // <blottab read int> ::= '='
