@@ -112,24 +112,22 @@
 // recettes?+                                      => fetch next one
 // recettes?=                                      => read current int value 
 // recettes?=$                                     => read current str value 
-//
-// Expressions operators 
-// operators allows to combine expression atoms together 
-// <int 1op> ::= '!' | '+' | '-' 
-// <int 2op> ::= '+' | '-' | '*' | '/' | '&&' | '||' | '>' | '<' | '>=' | '<=' | '==' | '!='
-// Logical operators ('!', '&&' and '||') combine integer expressions together, "seen" as booleans.
-// <str 2op> ::= '+' | '>' | '<' | '>=' | '<=' | '==' | '!=' | '===' 
-// '+' operator applied on strings is a concatenation
 // 
-// Blot tables
+// Blot tables and blot table operations
 // A blot set (blotset) is a fixed set of blotex values. Each element of the set is identified by its name; 
-// A blot table (blottab) is a collection of blotrows 
-// (the table with empty name is called the global table)
-// <blottab> ::= '^' <entity name> '?'
+// A blot table (blottab) is a collection of blotsets 
+// (the table with empty entity name is called the global table)
+// 
+// <int blottab op> ::= '^' <entity name> '?' <int blottab op details>  
+// <int blottab op details> ::= <blottab init> | <blottab reset> | <blottab fetch> |
+//   <blottab read int> 
+// <str blottab read op> ::= '^' <entity name> '?=$'  
+// <blottab init> ::= ':' <blot request> ':?'
+// <blottab reset> ::= '^'
+// <blottab fetch> ::= '+'
+// <blottab read int> ::= '='
 //
-// Blottab examples: 
-// ^recettes2? => recettes2 blot table
-// ^? => global blot table
+// Blottab operations examples: 
 // ^recettes2?[ name price ]?                      => Create recettes2 table with two fields name and price 
 // ^recettes2?: name$ == "*bolo*" or price < 10 :? => new table selection 
 // ^recettes?^                                     => single reset, ascending 
@@ -138,6 +136,14 @@
 // ^recettes2?=price := 15                         => update current price 
 // ^recettes2?@                                    => insert new table record  
 // ^recettes2?=name$ := "craboutchas"              => new set name 
+//
+// Expressions operators 
+// operators allows to combine expression atoms together 
+// <int 1op> ::= '!' | '+' | '-' 
+// <int 2op> ::= '+' | '-' | '*' | '/' | '&&' | '||' | '>' | '<' | '>=' | '<=' | '==' | '!='
+// Logical operators ('!', '&&' and '||') combine integer expressions together, "seen" as booleans.
+// <str 2op> ::= '+' | '>' | '<' | '>=' | '<=' | '==' | '!=' | '===' 
+// '+' operator applied on strings is a concatenation
 //
 //
 // II. "blotex" library's functions (those to be placed in blot code)
