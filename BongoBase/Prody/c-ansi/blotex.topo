@@ -45,6 +45,7 @@
 // - blotreg (blot register)
 // - blotvar (blot variable)
 // - blottab (blot table)
+// - blotset element 
 // are identified by their name (may be empty).
 //
 // <entity name> ::= ( <letter> | <digit> | '_' )*
