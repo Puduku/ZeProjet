@@ -88,22 +88,23 @@
 //
 // Register operations 
 // <int blotreg op> ::= <entity name> '?' <int blotreg op details>  
-// <int blotreg op details> ::= <blotreg request> | <blotreg reset> | <blotreg fetch> |
+// <int blotreg op details> ::= <blotreg select> | <blotreg reset> | <blotreg fetch> |
 //   <blotreg read int> 
 // <str blotreg read op> ::= <entity name> '?=$'  
-// <blotreg request> ::= ':' <blot request> ':?'
+// <blotreg select> ::= ':' <blotreg request> ':?'
 // <blotreg reset> ::= '^'
 // <blotreg fetch> ::= '+'
 // <blotreg read int> ::= '='
 //
-// Blot requests are made of "atoms" : 
-// <blot request> ::= <request atom> ( <request 2op> <blot request> )*
-// <request atom> ::= <int request atom> | <str request atom>
-// <int request atom> ::= ( '#' | '!#' ) <request comp op> <intex> 
-// <request comp op> ::= '>' | '<' | '>=' | '<=' | '==' | '!='
-// <str request atom> ::= ( '$' | '!$' ) <str request comp op> <strex> 
+// Blotreg requests are made of "atoms" : 
+// <blotreg request> ::= <blotreg request atom> ( <logical 2op> <blotreg request> )*
+// <blotreg request atom> ::= <int blotreg request atom> | <str blotreg request atom>
+// <int blotreg request atom> ::= ( '#' | '!#' ) <request comp op> <intex> 
+// <str blotreg request atom> ::= ( '$' | '!$' ) <str request comp op> <strex> 
+//
 // <str request comp op> ::=  <request comp op>  | '===' 
-// <logical 2op> ::= 'and' | 'or' 
+// <request comp op> ::= '>' | '<' | '>=' | '<=' | '==' | '!='
+// <logical 2op> ::= 'and' | 'or'
 //
 // Examples
 // recettes?: !$ === "*bolo*" and # >= 69 :?       => new register selection 
@@ -119,14 +120,20 @@
 // (the table with empty entity name is called the global table)
 // 
 // <int blottab op> ::= '^' <entity name> '?' <int blottab op details>  
-// <int blottab op details> ::= <blottab create> | <blottab request> | <blottab reset> | <blottab fetch> |
+// <int blottab op details> ::= <blottab create> | <blottab select> | <blottab reset> | <blottab fetch> |
 //   <blottab read int> 
 // <str blottab read op> ::= '^' <entity name> '?=$'
 // <blotttab create> ::= '[' ( <entity name> )+ ']?' 
-// <blottab request> ::= ':' <blot request> ':?'
+// <blottab select> ::= ':' <blottab request> ':?'
 // <blottab reset> ::= '^'
 // <blottab fetch> ::= '+'
 // <blottab read int> ::= '='
+//
+// Blottab requests are made of "atoms" : 
+// <blottab request> ::= <blottab request atom> ( <logical 2op> <blottab request> )*
+// <blottab request atom> ::= <int blottab request atom> | <str blottab request atom>
+// <int blottab request atom> ::= <int blottab request element> <request comp op> <intex> 
+// <str blottab request atom> ::= <str blottab request element> <str request comp op> <strex> 
 //
 // Blottab operations examples: 
 // ^recettes2?[ name price ]?                      => Create recettes2 table with two fields name and price 
