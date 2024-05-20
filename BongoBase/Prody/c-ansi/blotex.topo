@@ -17,6 +17,7 @@
 //
 // I. Blot expressions (blotex) 
 // ----------------------------
+// TODO: clarifier quand les espaces sont authorised
 //
 // There two types of blot expressions: 
 // - "string" blotex => "strex" type
@@ -27,10 +28,18 @@
 // <intex> ::= <intex atom> ( <int 2op> <intex> )*  
 // <strex> ::= <strex atom> ( <str 2op> <strex> )*  
 //
+// Expressions operators allows to combine expression atoms together 
+// <int 1op> ::= '!' | '+' | '-' 
+// <int 2op> ::= '+' | '-' | '*' | '/' | '&&' | '||' | '>' | '<' | '>=' | '<=' | '==' | '!='
+// Logical operators ('!', '&&' and '||') combine integer expressions together, "seen" as booleans.
+//
+// <str 2op> ::= '+' | '>' | '<' | '>=' | '<=' | '==' | '!=' | '===' 
+// '+' operator applied on strings is a concatenation
+//
 // The atoms are made of constants, variables and "register operations".
-// <intex atom> ::= [ <int 1op> ] ( <int constant> | <blotvar> | <blotvar entry> | <blotvar id> |
-//   <int blotreg op> ) 
-// <strex atom> ::= <str constant> | <blotvar strex> | <blotvar name> | <str blotreg read op> 
+// <intex atom> ::= [ <int 1op> ] ( <int constant> | <blotvar as int> | <blotvar entry> | <blotvar id> |
+//   <blotreg int> | <blottab int> ) 
+// <strex atom> ::= <str constant> | <blotvar as str> | <blotvar name> | <blotreg str> | <blottab str> 
 //
 // Constant expressions
 // <int constant> : any integer constants of C language... 
@@ -41,11 +50,11 @@
 // - 0 : represents "true" boolean value
 // - !=0 : represents "false" boolean value
 //
-// Entities
+// Entities. The different entities:
 // - blotreg (blot register)
 // - blotvar (blot variable)
 // - blottab (blot table)
-// - blotset element 
+// - blottab element
 // are identified by their name (may be empty).
 //
 // <entity name> ::= ( <letter> | <digit> | '_' )*
@@ -67,15 +76,15 @@
 // Blotvar implicit and explicit integer value
 // A blotvar value is implicitly an integer value
 // However, reference to integer value of a blotvar may be explicit
-// <blotvar intex> ::= <blotvar> '#'
+// <blotvar as int> ::= <blotvar> [ '#' ]
 // Examples:
 // .toto => toto global blotvar's integer value 
 // .toto# => ALSO toto global blotvar's integer value
 //
 // Blotvar string value 
-// <blotvar strex> ::= <blotvar> '$' 
+// <blotvar as str> ::= <blotvar> '$' 
 // Examples:
-// .toto$ => toto global blotvar string value 
+// .toto$           => toto global blotvar string value 
 // recettes[.toto]$ => string value of recettes register's blotvar indexed by toto global blotvar
 //
 // Blotvar name and entry
@@ -88,14 +97,18 @@
 // .toto!# => index (entry) of toto global blotvar 
 //
 // Register operations 
-// <int blotreg op> ::= <entity name> '?' <int blotreg op details>  
-// <int blotreg op details> ::= <blotreg select> | <blotreg reset> | <blotreg fetch> |
-//   <blotreg read int> 
-// <str blotreg read op> ::= <entity name> '?=$'  
-// <blotreg select> ::= ':' <blotreg request> ':?'
-// <blotreg reset> ::= '^'
-// <blotreg fetch> ::= '+'
-// <blotreg read int> ::= '='
+// <blotreg int> ::= <entity name> '?' <blotreg ops int>  
+// <blotreg ops int> ::= [ <blotreg op select> ] [ <blotreg op reset> ] [ <blotreg op fetch> ]
+//   [ <blotreg op read int> ] 
+// <blotreg op select> ::= ':' <blotreg request> ':?'
+// <blotreg op reset> ::= '^'
+// <blotreg op fetch> ::= '+'
+// <blotreg op read int> ::= '=' [ ( '#' | '!#' ) ]
+//
+// <blotreg str> ::= <entity name> '?' <blotreg ops str>  
+// <blotreg ops str> ::= [ <blotreg op select> ] [ <blotreg op reset> ] [ <blotreg op fetch> ]
+//   <blotreg op read str>
+// <blotreg op read str> ::= '=' ( '$' | '!$' )  
 //
 // Blotreg requests are made of "atoms" : 
 // <blotreg request> ::= <blotreg request atom> ( <logical 2op> <blotreg request> )*
@@ -103,9 +116,9 @@
 // <int blotreg request atom> ::= ( '#' | '!#' ) <request comp op> <intex> 
 // <str blotreg request atom> ::= ( '$' | '!$' ) <str request comp op> <strex> 
 //
-// <str request comp op> ::=  <request comp op>  | '===' 
 // <request comp op> ::= '>' | '<' | '>=' | '<=' | '==' | '!='
 // <logical 2op> ::= 'and' | 'or'
+// <str request comp op> ::=  <request comp op>  | '===' 
 //
 // Examples
 // recettes?: !$ === "*bolo*" and # >= 69 :?       => new register selection 
@@ -114,52 +127,55 @@
 // recettes?+                                      => fetch next one
 // recettes?=                                      => read current int value 
 // recettes?=$                                     => read current str value 
+// recettes?: !$ === "*bolo*" :?+=$                => read str value of 1st "bolo" recette  
 // 
 // Blot tables and blot table operations
-// A blot set (blotset) is a fixed set of blotex values. Each element of the set is identified by its name; 
+//
+// A blot set (blotset) is a fixed set of blot values. Each element of the set is identified by
+// its name. 
 // A blot table (blottab) is a collection of blotsets 
 // (the table with empty entity name is called the global table)
-// 
-// <int blottab op> ::= '^' <entity name> '?' <int blottab op details>  
-// <int blottab op details> ::= <blottab create> | <blottab select> | <blottab reset> | <blottab fetch> |
-//   <blottab read int> 
-// <str blottab read op> ::= '^' <entity name> '?=$'
-// <blotttab create> ::= '[' ( <entity name> )+ ']?' 
-// <blottab select> ::= ':' <blottab request> ':?'
-// <blottab reset> ::= '^'
-// <blottab fetch> ::= '+'
-// <blottab read int> ::= '='
 //
-// Blottab requests are made of "atoms" : 
+// <blottab int> ::= '^' <entity name> '?' <blottab ops int>  
+// <blottab ops int> ::= <blottab op create> | ( [ <blottab op select> ] [ <blottab op reset> ]
+//   [ <blottab op insert> ] [ <blottab op fetch> ] [ <blottab op read int> ] ) 
+// <blottab op create> ::=  '[' ( <entity name> )+ ']?' 
+// <blottab op select> ::= ':' <blottab request> ':?'
+// <blottab op reset> ::= '^'
+// <blottab op fetch> ::= '+'
+// <blottab op insert> ::= '@'
+// <blottab op read int> ::= '=' <int blottab element>
+//
+// <int blottab element> ::= <entity name> [ '#' ] 
+// <str blottab element> ::= <entity name> '$'
+//
+// <blottab str> ::= '^' <entity name> '?' <blottab ops str>  
+// <blottab ops str> ::= [ <blottab op select> ] [ <blottab op reset> ] [ <blottab op fetch> ]
+//   [ <blottab op insert> ] <blottab op read str>
+// <blottab op read str> ::= '=' <str blottab element> 
+//
+// Like blotreg requests, blottab requests are made of "atoms" : 
 // <blottab request> ::= <blottab request atom> ( <logical 2op> <blottab request> )*
 // <blottab request atom> ::= <int blottab request atom> | <str blottab request atom>
-// <int blottab request atom> ::= <int blottab request element> <request comp op> <intex> 
-// <str blottab request atom> ::= <str blottab request element> <str request comp op> <strex> 
+// <int blottab request atom> ::= <int blottab element> <request comp op> <intex> 
+// <str blottab request atom> ::= <str blottab element> <str request comp op> <strex> 
 //
 // Blottab operations examples: 
-// ^recettes2?[ name price ]?                      => Create recettes2 table with two fields name and price 
-// ^recettes2?: name$ == "*bolo*" or price < 10 :? => new table selection 
-// ^recettes?^                                     => single reset, ascending 
-// ^recettes2?+                                    => fetch next one 
-// var$ := ^recettes?=name$                        => read current name 
-// ^recettes2?=price := 15                         => update current price 
-// ^recettes2?@                                    => insert new table record  
-// ^recettes2?=name$ := "craboutchas"              => new set name 
-//
-// Expressions operators 
-// operators allows to combine expression atoms together 
-// <int 1op> ::= '!' | '+' | '-' 
-// <int 2op> ::= '+' | '-' | '*' | '/' | '&&' | '||' | '>' | '<' | '>=' | '<=' | '==' | '!='
-// Logical operators ('!', '&&' and '||') combine integer expressions together, "seen" as booleans.
-// <str 2op> ::= '+' | '>' | '<' | '>=' | '<=' | '==' | '!=' | '===' 
-// '+' operator applied on strings is a concatenation
+// ^recettes2?[ name price ]?                       => Create table with two elements
+// ^recettes2?: name$ === "*bolo*" or price < 10 :? => new table selection 
+// ^recettes?^                                      => single reset, ascending 
+// ^recettes2?+                                     => fetch next one 
+// .var$ := ^recettes?=name$                        => read current name 
+// ^recettes2?=price := 15                          => update current price 
+// ^recettes2?@                                     => insert new table record  
+// ^recettes2?=name$ := "craboutchas"               => new set name 
 //
 //
 // II. "blotex" library's functions (those to be placed in blot code)
 // --------------------------------
 //
-// Eval ([ <blotvar> := ] <intex>)
-// Eval ([ <blotvar strex> := ] <strex>)
+// Eval ([ <blotvar as int> := ] <intex>)
+// Eval ([ <blotvar as str> := ] <strex>)
 // ---- 
 //
 // Evaluate the blotex and eventually assign the result into a blotvar.
