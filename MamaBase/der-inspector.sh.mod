@@ -7,9 +7,9 @@
 # <<GARDEN>>/der-inspector.sh
 . mama.esh
 
-#########################################################################
-plot="Valorize <<GARDEN>> header files' documentation (pick all COde COmments' NUTS...) 
-#########################################################################
+#########################################
+plot="<<CODE/API DOCUMENTATION SHAPING>>"
+#########################################
 
 . der-inspector.esh
 
