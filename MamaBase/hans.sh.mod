@@ -1,18 +1,23 @@
-#### BEGIN OF REMOVABLE CARTRIDGE
-####  hans.sh scripts MODEL ; tags to adapt are: 
-####  <<GARDEN>>                        : garden's name
-####  <<COMPILATION PLAN DESCRIPTION>>  : plot's (compilation) short description (one single line)
-####  <<CODE 4 CREEK FUNCTIONS>>        : bash code for definition of all creek functions
-####  <<CREEK FUNCTIONS LIST>>          : list of all creek functions
-####  <<CODE 4 PLAN EXECUTION>>         : bash code for executing the plot 
-####  <<SPECIFIC EXECUTABLES TO CLEAN>> : list of specific executables to clean...
-#### END OF REMOVABLE CARTRIDGE
+#### BEGIN OF REMOVABLE HEADER
+#### Instructions:
+#### cp hans.sh.mod <garden>/hans.sh
+#### Edit <garden>/hans.sh :
+#### - Adapt the following tags:
+####    <<GARDEN>>                        : garden's name
+####    <<COMPILING>>                     : script purpose (one single line)
+####    <<CREEK FUNCTIONS CODE>>          : bash code for definition of all creek functions
+####    <<CREEK FUNCTIONS LIST>>          : list of all creek functions
+####    <<MAIN CODE>>                     : script main code 
+####    <<SPECIFIC EXECUTABLES TO CLEAN>> : list of specific executables to clean...
+#### - Remove that header
+#### chmod u+x <garden>/hans.sh
+#### END OF REMOVABLE HEADER
 #!/bin/bash
 # <<GARDEN>>/hans.sh
 . mama.esh
 
 #######################################
-plot="<<COMPILATION PLAN DESCRIPTION>>"
+plot="<<COMPILING>>"
 #######################################
 cleaning=s
 
@@ -21,13 +26,13 @@ cleaning=s
 
 #### Creek functions: 
 
-<<CODE 4 CREEK FUNCTIONS>>
+<<CREEK FUNCTIONS CODE>>
 
 CreekFunctions <<CREEK FUNCTIONS LIST>> 
 
 #### Execute plot... 
 CommandClean  <<SPECIFIC EXECUTABLES TO CLEAN>>
 
-<<CODE 4 PLAN EXECUTION>>
+<<MAIN CODE>>
 
 Success
