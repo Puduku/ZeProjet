@@ -1,15 +1,20 @@
-#### BEGIN OF REMOVABLE CARTRIDGE
-####  fritz.sh scripts MODEL ; tags to adapt are: 
+#### BEGIN OF REMOVABLE HEADER
+#### Instructions:
+#### cp fritz.sh.mod <garden>/fritz.sh
+#### Edit <garden>/fritz.sh :
+#### - Adapt the following tags:
 ####  <<GARDEN>>                 : garden's name
-####  <<TESTS PLAN DESCRIPTION>> : (tests execution) plot's short description (one single line)
-####  <<CODE 4 PLAN EXECUTION>>  : bash code for executing the plot
-#### END OF REMOVABLE CARTRIDGE
+####  <<TESTS>> : (tests execution) script purpose description (one single line)
+####  <<CODE 4 TESTS EXECUTION>>  : bash code for executing the tests
+#### - Remove that header
+#### chmod u+x <garden>/der-inspector.sh
+#### END OF REMOVABLE HEADER
 #!/bin/bash
 # <<GARDEN>>/fritz.sh
 . mama.esh
 
 #################################
-plot="<<TESTS PLAN DESCRIPTION>>"
+plot="<<TESTS>>"
 #################################
 
 specificUsage='[ <special options to <<GARDEN>> executables> ]'
@@ -34,6 +39,6 @@ SpecificInstructionsOutline () {
 
 CommandPrepareSandbox
 
-<<CODE 4 PLAN EXECUTION>>
+<<CODE 4 TESTS EXECUTION>>
 
 Success
