@@ -2,9 +2,9 @@
 # Prody/der-inspector.sh
 . mama.esh
 
-##############################################################################################
-plot="Collect all the coconuts in Prody's garden (i.e. highlight doc in Prody's header files)"
-##############################################################################################
+########################################
+plot="Highlight Prody API documentation"
+########################################
 
 . der-inspector.esh
 
