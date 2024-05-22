@@ -1,5 +1,5 @@
 #### BEGIN OF REMOVABLE HEADER
-#### Intructions:
+#### Instructions:
 #### cp der-inspector.sh.mod <garden>/der-inspector.sh
 #### Edit <garden>/der-inspector.sh :
 #### - Adapt the following tags:
