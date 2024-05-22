@@ -80,11 +80,11 @@ If you need to compile some code of the garden, you can create "hans.sh" exclusi
 $ cp "$MAMA/hans.sh.mod" hans.sh
 If you need to run tests in the garden, you can create "fritz.sh" exclusive script from model :
 $ cp "$MAMA/fritz.sh.mod" fritz.sh
-If you need to maintain code's documentation comments (with coco tool), you can create
-"der-inspector.sh" exclusive script from model:
+If you want to maintain code's documentation comments (so-called "coconuts"), you can create
+"der-inspector.sh" exclusive script from model (based on "coco" tool) :
 $ cp "$MAMA/der-inspector.sh.mod" der-inspector.sh
 Then edit and adapt your exclusive script(s). The following command shows the environment (bash
-functions and variables) usable by exclusive scripts:  
+functions and variables) usable by these exclusive scripts:  
 $ mama.sh -i
 Finally, don't forget to set 'execution permission' of script file, like:
 $ chmod u+x hans.sh
