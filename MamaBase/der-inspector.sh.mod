@@ -1,8 +1,14 @@
-#### BEGIN OF REMOVABLE CARTRIDGE
-####  der-inspector.sh MODEL ; tags to adapt are:
-####  <<GARDEN>> : garden's name
-####  <<ROOT DIRS LIST>> : dir names list - eg : toto "tara tata"
-#### END OF REMOVABLE CARTRIDGE
+#### BEGIN OF REMOVABLE HEADER
+#### Intructions:
+#### cp der-inspector.sh.mod <garden>/der-inspector.sh
+#### Edit <garden>/der-inspector.sh :
+#### - Adapt the following tags:
+####    <<GARDEN>> : garden's name
+####    <<CODE/API DOCUMENTATION SHAPING>> : script purpose description 
+####    <<ROOT DIRS LIST>> : dir. names list - eg : toto "tara tata"
+#### - Remove that header
+#### chmod u+x <garden>/der-inspector.sh
+#### END OF REMOVABLE HEADER
 #!/bin/bash
 # <<GARDEN>>/der-inspector.sh
 . mama.esh
