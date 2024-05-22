@@ -4,10 +4,10 @@
 #### Edit <garden>/fritz.sh :
 #### - Adapt the following tags:
 ####  <<GARDEN>>                 : garden's name
-####  <<TESTS>> : (tests execution) script purpose description (one single line)
-####  <<CODE 4 TESTS EXECUTION>>  : bash code for executing the tests
+####  <<TESTS>>                  : script purpose (one single line)
+####  <<CODE 4 TESTS EXECUTION>> : bash code for executing the tests
 #### - Remove that header
-#### chmod u+x <garden>/der-inspector.sh
+#### chmod u+x <garden>/fritz.sh
 #### END OF REMOVABLE HEADER
 #!/bin/bash
 # <<GARDEN>>/fritz.sh
