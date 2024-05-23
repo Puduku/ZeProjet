@@ -17,14 +17,13 @@
 // Truth: Verity (sorry, this subtlety of the English language completely escapes me)
 
 // PREAMBLE: the truth values "true"/"false" are generally perceived as the fundamental duality of
-// logic, from which all the other forms of duality conceived by our consciousness follow, such as
+// logic, from which all the other forms of duality conceived by our consciousness derive, such as
 // "positive"/"negative", "exists"/"does not exist", "yes"/"no", "good"/"bad", "beautiful"/"ugly",
 // "day"/"night", "win"/"lose", "on"/"off", "white/"black",... not forgetting the digital avatar, 
 // the 0/1 bit... The list of rational dualities is, of course, endless.
-// However, we can see that all these dualities are equivalent from a logical point of view.
-// For example, the duality "day"/"night" can be replaced by "[it's day is] true" / "[it's day is]
-// false".
-// The key is to consider the wording that best 'speaks' to our conscience...
+// All these dualities are equivalent from a logical point of view (e.g., the duality "day"/"night"
+// can be simply restated with "[it's day is] true" / "[it's day is] false").
+// It seems that it's simply a question of using the best wording, depending on the context...
 // However, for our principle of equivalence to really work, we still need to determine the rule
 // that uniquely associates each single verity value between two given dualities.
 // So, for example, when comparing the two dualities "yes"/"no" and "day"/"night", why associate
