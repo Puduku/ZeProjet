@@ -16,27 +16,28 @@
 //         2. any "true" proposition
 // Truth: Verity (sorry, this subtlety of the English language completely escapes me)
 
-// PREAMBLE: the truth values "true"/"false" are generally perceived as the fundamental duality of
-// logic, from which all the other forms of duality conceived by our consciousness derive, such as
-// "positive"/"negative", "exists"/"does not exist", "yes"/"no", "good"/"bad", "beautiful"/"ugly",
-// "day"/"night", "win"/"lose", "on"/"off", "white/"black",... not forgetting the digital avatar, 
-// the 0/1 bit... The list of rational dualities is, of course, endless.
-// All these dualities are equivalent from a logical point of view (e.g., the duality "day"/"night"
-// can be simply restated with "[it's day is] true" / "[it's day is] false").
-// It seems that it's simply a question of using the best wording, depending on the context...
-// However, for our principle of equivalence to really work, we still need to determine the rule
-// that uniquely associates each single verity value between two given dualities.
-// So, for example, when comparing the two dualities "yes"/"no" and "day"/"night", why associate
-// "yes" with "day" (and "no" with "night")? and not the opposite ("yes" with "night"...)?
-// The answer is: in order to establish a rule of univocal association, it is sufficient that the
+// PREAMBLE: the truth values 'true'/'false' are generally perceived as the fundamental duality of
+// logic, from which all the other forms of duality conceived by our consciousness - such as
+// 'positive'/'negative', 'exists'/'does not exist', 'yes'/'no', 'good'/'bad', 'beautiful'/'ugly',
+// 'day'/'nigh'", 'win'/'lose', 'on'/'off', 'white'/'black',... not forgetting the digital avatar, 
+// the 0/1 bit - derive. All these dualities are equivalent from a logical perspective (e.g., the
+// duality 'day'/'nigh'" can be simply restated with "[it's day is] true" / "[it's day is] false").
+// It seems that the different 'dualities', which are "logically equivalent", are simple question of
+// wording,
+// However, for our principle of equivalence to be really applicable, we still need to determine a
+// rule that uniquely associates each single verity value between two given dualities.
+// So, for example, when comparing the two dualities 'yes'/'no' and 'day'/'night', why associate
+// 'yes' with 'day' (and 'no' with 'night')? and not the opposite ('yes' with 'night'...)?
+// The answer is: in order to establish such rule of univocal association, it is sufficient that the
 // association between any duality with a "fundamental" duality be univocal. So here's the point:
-// the associations between dualities with the "true"/"false" duality seem, all in all, abitrary.
-// For instance, the association of 'good' with "true' is not necessarily intuitive.
+// the associations between dualities with the 'true'/'false' duality are, all in all, abitrary.
+// For instance, the association of 'good' with 'true' is not necessarily intuitive.
 // On the other hand, any association of duality with the 'positive'/'negative' duality seems more
-// natural: thus, "day", "good", "yes", "true", "win", etc. are spontaneously confused with
-// "positive".
+// natural: thus, 'day', 'good', 'yes', 'true', 'win', etc. are spontaneously associated with
+// 'positive'.
 // Let's make no bones about it: this 'obviousness' is merely a manifestation (or, more accurately,
-// a bias) of our Manichean brains...
+// a bias) of our Manichean brains : our mental seperation between the two logical verity values lean
+// on a MORAL partition between the the 'Good' and the 'Evil'.
 // Conclusion: to illustrate our logical demonstrations, it is sometimes better to set aside the
 // "true"/"false" duality in favour of the (subjective) "positive"/"negative" vision...
 // Are all dualities so easily interchangeable? Answer by counterexample...
