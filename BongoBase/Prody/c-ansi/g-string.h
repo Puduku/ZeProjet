@@ -431,6 +431,17 @@ int GStringsIndexRequest(G_STRINGS_HANDLE cp_handle,
   INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaNumber,
   int indexLabel1, unsigned int indexSeekFlags1, const struct G_KEY *cfps_keys1, ...);
 
+// #SEE m_ASSIGN_G_REQUEST_CRITERIUM @ c-ansi/green.h <G_KEYS>
+#defile m_ASSIGN_G_REQUEST_CRITERIUM__G_KEYS(/*struct G_INDEX_CRITERIUM*/m_criterium, /*int*/m_indexLabel, \
+  /*unsigned int*/m_indexSeekFlags, /*const struct G_KEY* */cfps_keys, /*unsigned int*/m_criteriaOpFlags) \
+  m_ASSIGN_G_REQUEST_CRITERIUM(indexLabel,indexSeekFlags,struct G_KEY,cfpr_keys,criteriaOpFlags)
+
+// #SEE GStringsIndexRequest <gStringSet>
+int GStringsIndexRequestR(G_STRINGS_HANDLE cp_handle,
+  INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaNumber,
+  const struct G_REQUEST_CRITERIUM *sp_criteria) ;
+
+
 // #REF GStringsIndexFetch <gStringSet>
 // #SEE GreenCollectionIndexRequest@c-ansi/green.h  <<gStringSet>> 
 int GStringsIndexFetch(G_STRINGS_HANDLE cp_handle,
