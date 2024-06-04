@@ -388,10 +388,39 @@ int GreenCollectionIndexRequest(GREEN_COLLECTION_HANDLE cp_handle,
   INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaNumber,
   int indexLabel1, unsigned int indexSeekFlags1, void *cfpr_keys1, ...);
 
+
 // #SEE GreenCollectionIndexRequest <greenItem> <keys>
 int GreenCollectionIndexRequestV(GREEN_COLLECTION_HANDLE cp_handle,
   INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaNumber,
   int indexLabel1, unsigned int indexSeekFlags1, void *cfpr_keys1, va_list extraCriteria);
+
+
+struct G_REQUEST_CRITERIUM {
+ int indexLabel;  
+ unsigned int indexSeekFlags;
+ void *cfpr_keys;
+ unsigned int criteriaOpFlags;
+}
+
+// #REF  m_ASSIGN_G_REQUEST_CRITERIUM <keys>
+// Paased:
+// - m_criterium:
+// - m_indexLabel:
+// - m_keyType: 
+// - mcfpr_keys: 
+// - m_criteriaOpFlags:
+#defile m_ASSIGN_G_REQUEST_CRITERIUM(/*struct G_INDEX_CRITERIUM*/m_criterium, /*int*/m_indexLabel, \
+  /*unsigned int*/m_indexSeekFlags, m_keyType, mcfpr_keys, /*unsigned int*/m_criteriaOpFlags) {\
+  (m_criterium).indexLabel = (m_indexLabel);\
+  (m_criterium).indexSeekFlags = (m_indexSeekFlags);\
+  (const m_keyType *)(m_criterium).cfpr_keys = (m_cfpr_keys);\
+  (m_criterium).criteriaOpFlags = (m_criteriaOpFlags);\
+}
+
+//  #SEE GreenCollectionIndexRequest <greenItem> <keys>
+int GreenCollectionIndexRequestR(GREEN_COLLECTION_HANDLE cp_handle,
+  INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaNumber,
+  const struct G_REQUEST_CRITERIUM *sp_criteria) ;
 
 
 
