@@ -123,7 +123,7 @@
 // 2nd pitfall: Given function declaration f(char p[256]); , what is the value of sizeof(p) in f ?
 // Some compilers give the size of a pointer (ah?) instead of 256...  (P)
 // Worse, among compilers giving the size of a pointer with the declaration f(char t[256]); ,
-// some nevertheless give the size 256 with the declaration typedef char t256[256]; f(t256p); (P)
+// some of them give the size 256 with the declaration typedef char t256[256]; f(t256p); (P)
 // This is of course in relation with flaw Number 7 : "typedef" thus looks like a very simple
 // aliasing mechanism... with a few (non-portable) subtleties, just there to confuse the "average"
 // programmer... 
