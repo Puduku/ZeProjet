@@ -403,18 +403,22 @@ struct G_REQUEST_CRITERIUM {
 } ;
 
 // #REF  m_ASSIGN_G_REQUEST_CRITERIUM <keys>
-// Paased:
-// - m_criterium:
-// - m_indexLabel:
+// Passed:
+// - u_indexLabel:
+// - u_indexSeekFlags:
 // - m_keyType: 
-// - mcfpr_keys: 
-// - m_criteriaOpFlags:
-#defile m_ASSIGN_G_REQUEST_CRITERIUM(/*struct G_INDEX_CRITERIUM*/m_criterium, /*int*/m_indexLabel, \
-  /*unsigned int*/m_indexSeekFlags, m_keyType, mcfpr_keys, /*unsigned int*/m_criteriaOpFlags) {\
-  (m_criterium).indexLabel = (m_indexLabel);\
-  (m_criterium).indexSeekFlags = (m_indexSeekFlags);\
-  (const m_keyType *)(m_criterium).cfpr_keys = (m_cfpr_keys);\
-  (m_criterium).criteriaOpFlags = (m_criteriaOpFlags);\
+// - ucfpr_keys: 
+// - u_criteriaOpFlags:
+//
+// Changed:
+// - mu_criterium
+#defile m_ASSIGN_G_REQUEST_CRITERIUM(/*struct G_INDEX_CRITERIUM*/mu_criterium, /*int*/u_indexLabel, \
+  /*unsigned int*/u_indexSeekFlags, m_keyType, ucfpr_keys, /*unsigned int*/u_criteriaOpFlags) {\
+  struct G_REQUEST_CRITERIUM em_criterium = (mu_criterium);\
+  em_criterium.indexLabel = (u_indexLabel);\
+  em_criterium.indexSeekFlags = (u_indexSeekFlags);\
+  (const m_keyType *)em_criterium.cfpr_keys = (u_cfpr_keys);\
+  em_criterium.criteriaOpFlags = (u_criteriaOpFlags);\
 }
 
 //  #SEE GreenCollectionIndexRequest <greenItem> <keys>
