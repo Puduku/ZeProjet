@@ -400,7 +400,7 @@ struct G_REQUEST_CRITERIUM {
  unsigned int indexSeekFlags;
  void *cfpr_keys;
  unsigned int criteriaOpFlags;
-}
+} ;
 
 // #REF  m_ASSIGN_G_REQUEST_CRITERIUM <keys>
 // Paased:
