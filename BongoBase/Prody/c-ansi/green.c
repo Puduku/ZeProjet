@@ -1694,6 +1694,7 @@ int GreenCollectionAddIndex (GREEN_COLLECTION_HANDLE handle, int keysNumber) {
   m_DIGGY_RETURN(newIndexLabel)
 } // GreenCollectionAddIndex
 
+  
 // Public function; see description in .h
 int GreenCollectionIndexRequestR(GREEN_COLLECTION_HANDLE cp_handle,
   INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaNumber,
@@ -1706,21 +1707,11 @@ int GreenCollectionIndexRequestR(GREEN_COLLECTION_HANDLE cp_handle,
   struct INDEX_REQUEST *indexRequestPtr = (nf_indexRequestAutomaticBuffer != NULL?
     (struct INDEX_REQUEST *)nf_indexRequestAutomaticBuffer: &(cp_handle->internalIndexRequest));
 
-  //unsigned int criteriaOpFlags = ALL_FLAGS_OFF0;
-
-  //if (criteriaNumber > 1) {
-  //  criteriaOpFlags = va_arg(extraCriteria,unsigned int);
-  //} // if
   if (criteriaNumber == 1) sp_criteria->criteriaOpFlags = ALL_FLAGS_OFF0;
   m_INIT_INDEX_REQUEST(*indexRequestPtr,sp_criteria->indexLabel,sp_criteria->indexSeekFlags,sp_criteria->cfpr_keys1,sp_criteria->criteriaOpFlags)
 
   int i = 1; for (; i < criteriaNumber;  i++) {
     sp_criteria++; 
-    //indexLabel1 = va_arg(extraCriteria,int);
-    //indexSeekFlags1 = va_arg(extraCriteria,unsigned int);
-    //cfpr_keys1 = va_arg(extraCriteria,void *);
-    //criteriaOpFlags = va_arg(extraCriteria,unsigned int);
-
     m_INIT_INDEX_REQUEST__EXTRAS(*indexRequestPtr,sp_criteria->indexLabel,sp_criteria->indexSeekFlags,sp_criteria->cfpr_keys,
       sp_criteria->criteriaOpFlags)
   } // for 
@@ -1733,52 +1724,28 @@ int GreenCollectionIndexRequestR(GREEN_COLLECTION_HANDLE cp_handle,
   m_DIGGY_RETURN(RETURNED)
 } // GreenCollectionIndexRequestR
 
-
 // Public function; see description in .h
 int GreenCollectionIndexRequestV(GREEN_COLLECTION_HANDLE cp_handle,
   INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaNumber,
   int indexLabel1, unsigned int indexSeekFlags1, void *cfpr_keys1, va_list extraCriteria) {
   m_DIGGY_BOLLARD()
 
-  //m_ASSERT(indexSeekFlags1 != ALL_FLAGS_OFF0) 
-  //m_ASSERT(nf_indexRequestAutomaticBuffer != NULL || !cp_handle->b_frozen) 
   m_ASSERT(criteriaNumber > 0)
   struct G_REQUEST_CRITERIUM s_criteria[criteriaNumber] ;
   struct G_REQUEST_CRITERIUM *criteriumPtr = s_criteria;
 
-  //struct INDEX_REQUEST *indexRequestPtr = (nf_indexRequestAutomaticBuffer != NULL?
-  //  (struct INDEX_REQUEST *)nf_indexRequestAutomaticBuffer: &(cp_handle->internalIndexRequest));
-
   unsigned int criteriaOpFlags = ALL_FLAGS_OFF0;
-  if (criteriaNumber > 1) {
-    criteriaOpFlags = va_arg(extraCriteria,unsigned int);
-  } // if
-  m_ASSIGN_G_REQUEST_CRITERIUM(*criteriumPtr,indexLabel1,indexSeekFlags1,cfpr_keys1,criteriaOpFlags)
-  //m_INIT_INDEX_REQUEST(*indexRequestPtr,indexLabel1,indexSeekFlags1,cfpr_keys1,criteriaOpFlags)
+  if (criteriaNumber > 1) criteriaOpFlags = va_arg(extraCriteria,unsigned int);
+  m_ASSIGN_G_REQUEST_CRITERIUM(*criteriumPtr,indexLabel1,indexSeekFlags1,void,cfpr_keys1,criteriaOpFlags)
 
-  int i = 1; for (; i < criteriaNumber;  i++) {
-    indexLabel1 = va_arg(extraCriteria,int);
-    indexSeekFlags1 = va_arg(extraCriteria,unsigned int);
-    cfpr_keys1 = va_arg(extraCriteria,void *);
-    criteriaOpFlags = va_arg(extraCriteria,unsigned int);
-    criteriumPtr++;
-    m_ASSIGN_G_REQUEST_CRITERIUM(*criteriumPtr,indexLabel1,indexSeekFlags1,cfpr_keys1,criteriaOpFlags)
-    //m_INIT_INDEX_REQUEST__EXTRAS(*indexRequestPtr,indexLabel1,indexSeekFlags1,cfpr_keys1,
-    //  criteriaOpFlags)
-  } // for 
+  int i = 1; for (; i < criteriaNumber;  i++) m_ASSIGN_G_REQUEST_CRITERIUM(*(++criteriumPtr),va_arg(extraCriteria,int),
+    va_arg(extraCriteria,unsigned int),void,va_arg(extraCriteria,void *),va_arg(extraCriteria,unsigned int))
 
-  //// MINIMONITOR: ANY
-  //m_TRACK_IF(GreenCollectionRefreshIndexesInternal(cp_handle,b_TRUE) != RETURNED)
-  //// MINIMONITOR: NADA
-  //
-  //m_TRACK_IF(GreenIndexesSeek(&cp_handle->indexes, &indexRequestPtr->iterator, NULL) != RETURNED)
-
- m_TRACK_IF(GreenCollectionIndexRequestR(cp_handle,nf_indexRequestAutomaticBuffer,
+  m_TRACK_IF(GreenCollectionIndexRequestR(cp_handle,nf_indexRequestAutomaticBuffer,
     criteriaNumber,s_criteria) != RETURNED) 
   
   m_DIGGY_RETURN(RETURNED)
 } // GreenCollectionIndexRequestV
-
 
 // Public function; see description in .h
 int GreenCollectionIndexRequest(GREEN_COLLECTION_HANDLE cp_handle,
