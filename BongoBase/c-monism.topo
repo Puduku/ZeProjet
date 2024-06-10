@@ -57,7 +57,7 @@
 // We have a much better insight into the origin of the misunderstanding...
 // (END OF PREAMBLE)
 //
-// About "non-dual" verities
+// About "non-dual" verities.
 // Is there the "absolute" dual Verity behind non-dual verities ?
 // Our aforementioned 'Western' civilisations appreciate 'Eastern' philosophies and their strange
 // holistic thinking, but not without a degree of circumspection.
@@ -89,12 +89,14 @@
 // proposition is indeed either "true" or "false". In other words, we are not capable of 
 // constructing our thoughts out of this 'evidence':  absolute Verity exists, is dual and "not
 // oriented"...
-
+//
+// Non-dual verities in computing.
 // The questioning of dualism (as in Eastern thought), therefore, when it is not considered as
 // madness or an insult to "(good) rational Cartesian sense", arouses, at best, vague curiosity,
 // amusement or commiseration towards beliefs that are quite primitive, naive and exotic.
-// In computing (i.e. in our BINARY DIGIT universe), our attachment to dualism is obviously
-// reinforced.
+// In computing (i.e. in our BINARY DIGIT universe), our attachment to dualism of verity is
+// obviously reinforced.
+// * Incessant debates around ternary logic:
 // It should be noted, however, that ternary logic has, with varying degrees of success, made
 // notable inroads into the world of the BIT.
 // For example, in the Wikipedia article on the SQL language:
@@ -108,10 +110,11 @@
 //   referred to as a "marker".
 // Note: Fifty years on, the question of the RELEVANCE of this ternary logic in SQL is still being
 // debated (in a nutshell: the DBAs love it and the programmers hate it.)
-// Unary verities in computing...
+// * Unary logic: a (particularly) arduous acceptation...
 // The main incarnation of monism in classic structured programming is undoubtedly the 'pure'
 // procedure, which executes without any 'return status'. This idea of absence of return status
 // makes programmers that we are uncomfortable.
+// *  Binary logic puts up resistance...
 // No doubt we are too oriented or biased by our belief in absolute and dual truth. In any case, we
 // cannot help attributing to any procedural execution a status of return corresponding to its dual
 // truth. Either:
