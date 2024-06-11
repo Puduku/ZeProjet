@@ -36,10 +36,10 @@
 // 'positive'.
 // Let's face it: this 'obviousness' is merely a manifestation (or, more accurately, a bias) of our
 // Manichean brains : our mental seperation between two logical verity values rather lean on a MORAL
-// partition between the the 'Good' and the 'Evil'.
+// partition between the 'Good' and the 'Evil'.
 // In short, our different values of verity are merely interchangeable. However, there is no "neutral"
 // 'true' or 'false' Verity. To the contrary, our "fundamental" values of truth are invariably oriented
-// according to a partition between 'Good' and 'Evil'.
+// according to a partition between the 'Good' and the 'Evil'.
 //
 // Are all dual verities so easily interchangeable? Answer by counterexample...
 // Let's try a comparison between 'yes'/'no' and 'win'/'lose' dualities...
@@ -63,19 +63,19 @@
 // For example, the dogma of the duality of verity (everything is either 'true' or 'false') is so
 // deeply rooted in our our 'rational' minds, that the idea that verity might not be dual seems to
 // us particularly preposterous.
-// Admittedly, we must consider, albeit reluctantly, the idea that the principle of the "excluded
-// middle" may, at times, temporarily bracketed or suspended. This is the case when we ignore a
-// truth we mention an 'unknown' state or declare a piece of information 'not applicable' - the
-// famous "N/A" in the boxes on forms.
+// Yet, we must consider, albeit reluctantly, the idea that the principle of the "excluded middle"
+// may, at times, temporarily bracketed or suspended. This is the case when we ignore a truth we
+// mention an 'unknown' state or declare a piece of information 'not applicable' - the famous 
+// "N/A" in the boxes on forms.
 // Even so, this mention of 'unknown' is seen as a mere artifice, behind which lies the fundamental
 // truth ('true' or 'false') that escapes us because, precisely, we don't know it.
-// Thus, if we consider the proposition "Nicolas Sarkozy was sodomised by his German shepherd."
-// (*), like any other proposition, it is either "true" or "false", according to the principle of
-// the "excluded middle".
-// However, what naturally comes to mind is to simply reply "we don't know (and we don't care)".
-// We are not keen to attribute a "true" or "false" value to our proposition; we would therefore
-// not be complying with the "excluded middle" principle... In fact, If we analyse our assessment
-// of the proposal more closely, things look rather like this.
+// Thus, if we consider the proposition "Nicolas Sarkozy was sodomised by his German shepherd." (*),
+// like any other proposition, it is either "true" or "false", according to the principle of the
+// "excluded middle".
+// However, what naturally comes to mind is simply to object "we don't know (and we don't care)".
+// We are not keen to attribute a "true" or "false" value to the proposition; therefore, we do
+// not comply with the "excluded middle" principle... In fact, If we analyse our assessment of the
+// the proposal more closely, things look rather like this.
 // "We don't know", because materially, we can't know (if the event happened, we weren't there to
 // hold the candle). Even if we pulled out all the stops (hiring detectives to find out where the
 // person in question lives, bribing the servants, etc.), our chances of finding out would remain
@@ -86,19 +86,19 @@
 // And yet, however inaccessible and pointless the "truth" or "falsity" of the proposition may seem
 // to us, we never question its "existence" : we remain convinced that in the "absolute", the
 // proposition is indeed either "true" or "false". In other words, we are not capable of 
-// constructing our thoughts out of this (actually totally arbitrary) "evidence" : absolute Verity
+// constructing our thoughts out of the (actually totally arbitrary) "evidence" : absolute Verity
 // exists, is dual and not linked to moral values.
 
 // (*) Dedsoled pour cette image un peu crue, mais c'est vraiment l'exemple, bien susr juste
 // grotesque et "sans fondement", que j'avais imagined pour forger mes redflexions ag l'edpoque.
 // Evidemment, on pourra m'objecter, qu'au moins j'aurais pu actualiser mon exemple - en remplaccant
-// Sarko par Macron -, mais "je ne sais pas pourquoi", je trouve l'exemple plus parlant avec Sarko...
+// au moins Sarko par Macron -, mais c'est juste je trouve l'exemple plus parlant avec Sarko...
 
 // II.2 Verities in computing.
 // The questioning of dualism (as in Eastern thought), therefore, when it is not considered as
 // madness or an insult to "(good) rational Cartesian sense", arouses, at best, vague curiosity,
 // amusement or commiseration towards beliefs that are quite primitive, naive and exotic.
-// In computing (i.e. in our BINARY DIGIT universe), our attachment to dualism of verity is
+// In computing (i.e. in our universe of BINARY DIGITS), our attachment to dualism of verity is
 // obviously reinforced.
 // II.2.a. Incessant debates around ternary logic:
 // It should be noted, however, that ternary logic has, with varying degrees of success, made
@@ -116,12 +116,16 @@
 // debated (in a nutshell: the DBAs love it and the programmers hate it.)
 // II.2.b. Unary logic: a (particularly) arduous acceptation...
 // The main incarnation of monism in classic structured programming is undoubtedly the "pure"
-// procedure, which executes without any "return status". This idea of absence of return status
+// procedure, which executes without any "return status". The idea of absence of return status
 // makes programmers that we are uncomfortable.
+// For instance, we have great difficulty conceiving parsing (which is a fundamental activity in
+// computing) with a monist vision. That is, we tend to consider the "syntax error" as intrinsic to
+// any - even elementary - parsing tasks. This vision, which forbids us from conceiving fundamental
+// parsing processing as pure procedures, also hampers the design of easily reusable code...
 // II.2.c. Ubiquitous binary verities
-// No doubt we are too oriented or biased by our belief in absolute and dual truth. In any case, we
+// No doubt we are too oriented or biased by our belief in absolute and dual truth. Anyway, we
 // cannot help attributing to any procedural execution a status of return corresponding to its dual
-// truth. This "de facto" scheme is applied:
+// truth. The "de facto" scheme is applied:
 // - the positive case (true): the procedure was successful ("OK" case)
 // - the negative case (false): the procedure was not successful ("error" case)
 // The problem is that universal, but oversimplified, vision is source of much confusion and major
@@ -132,15 +136,4 @@
 // misuse of the application).
 // In any way, anomalies of execution are ORTHOGONAL to applicative errors and CANNOT be gathered 
 // together within negative case of procedure execution.
-// A slightly more subtle case of confusion relates more specifically to parsing procedures. A
-// parsing procedure, taken as a whole, actually has a dual verity value (**): the parsing went well
-// vs. the parsing could not be completed (like a "syntax error occurred" (***)). In on the other
-// hand, there is no intrinsic reason to consider elementary parsing actions (such as "passing a
-// token"), of which the global parsing procedure is composed, as binary. Any elementary parsing
-// action is, fundamentally, a "pure" procedure: unary and always positive...
-
-// (**) although the monistic principle is often the rule. Such as, web browsers always manage
-// to parse HTML pages, even when they contain errors.
-// (***) note the somewhat abstruse and 'bombastic' wording, typical of assertions that don't
-// actually mean anything...
 
