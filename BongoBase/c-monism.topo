@@ -41,7 +41,7 @@
 // 'true' or 'false' Verity. To the contrary, our "fundamental" values of truth are invariably oriented
 // according to a partition between the 'Good' and the 'Evil'.
 // 
-// Are all dual verities so easily interchangeable? Answer by counterexample...
+// Are all dual verities so easily interchangeable? Answer with counterexample...
 // Let's try a comparison between 'yes'/'no' and 'win'/'lose' dualities...
 // Why do guys so often harass girls?
 // The guy makes some "advance" to the girl. The girl blows him off. Guy insists.
@@ -120,9 +120,10 @@
 // procedure, which executes without any "return status". The idea of absence of return status
 // makes programmers that we are uncomfortable.
 // For instance, we have great difficulty conceiving parsing (which is a fundamental activity in
-// computing) with a monist vision. That is, we tend to consider the "syntax error" as intrinsic to
-// any - even elementary - parsing tasks. This vision, which forbids us from conceiving fundamental
-// parsing processing as pure procedures, also hampers the design of easily reusable code...
+// computing) with a monist vision. That is, we tend to consider the "syntax error" case as 
+// intrinsic into any - even elementary - parsing tasks. This vision, which forbids us from
+// conceiving fundamental parsing processing as pure procedures, also hampers the design of easily
+// reusable code...
 // III.3. Ubiquitous binary verities
 // No doubt we are too oriented or biased by our belief in absolute and dual truth. Anyway, we
 // cannot help attributing to any procedural execution a status of return corresponding to its dual
