@@ -18,11 +18,11 @@
 
 // I. Dual verities
 // The verity values 'true'/'false' are generally perceived as the fundamental duality of
-// logic, from which the other dualities conceived by our consciousness - such as 'positive'/'negative',
+// logic, from which the other dualities conceived by our mind - such as 'positive'/'negative',
 // 'yes'/'no', 'good'/'bad', 'all'/'nothing', 'on'/'off', ... not forgetting the digital avatar, the 0/1
-// bit - seem to derive. Even practical dualities such as 'day'/'night', 'win'/'lose', 'white'/'black' or
-// 'beautiful'/'ugly' can be trivially reduced to a 'true'/'false' opposition (e.g., the duality 
-// 'day'/'night' can be simply restated with "[it's day is] true" / "[it's day is] false").   
+// bit - seem to derive. Even more practical dualities such as 'day'/'night', 'win'/'lose', 
+// 'white'/'black' or 'beautiful'/'ugly' can be trivially reduced to a 'true'/'false' opposition (e.g.,
+// the duality 'day'/'night' can be simply restated with "[it's day is] true" / "[it's day is] false").
 // However, for the principle of equivalence to be really applicable, we still need to determine a
 // rule that uniquely associates each single verity value between two given dualities.
 // So, for example, when comparing the two dualities 'yes'/'no' and 'day'/'night', why associate
