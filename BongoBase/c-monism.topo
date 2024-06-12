@@ -99,7 +99,7 @@
 // The questioning of dualism (as in Eastern thought), therefore, when it is not considered as
 // madness or an insult to "(good) rational Cartesian sense", arouses, at best, vague curiosity,
 // amusement or commiseration towards beliefs that are quite primitive, naive and exotic.
-// In computing (i.e. in our universe of BINARY DIGITS), our attachment to dualism of verity is
+// In computing (i.e. in our universe of BINARY DIGITS), our attachment to dual verity is
 // obviously reinforced.
 // III.1. Incessant debates around ternary logic:
 // It should be noted, however, that ternary logic has, with varying degrees of success, made
@@ -120,8 +120,8 @@
 // procedure, which executes without any "return status". The idea of absence of return status
 // makes programmers that we are uncomfortable.
 // For instance, we have great difficulty conceiving parsing (which is a fundamental activity in
-// computing) with a monist vision. That is, we tend to consider the "syntax error" case as 
-// intrinsic into any - even elementary - parsing tasks. This vision, which forbids us from
+// computing) with a monist vision. That is, we tend to consider the "syntax error" negative case
+// as intrinsic to any - even elementary - parsing tasks. This vision, which forbids us from
 // conceiving fundamental parsing processing as pure procedures, also hampers the design of easily
 // reusable code...
 // III.3. Ubiquitous binary verities
