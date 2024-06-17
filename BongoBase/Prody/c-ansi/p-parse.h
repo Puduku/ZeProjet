@@ -151,7 +151,7 @@
   /*struct P_STRING*/p_subPString, /*TO_CHAR_FUNCTION*/n_toCharFunction,\
   /*struct P_STRING* */na_lexeme) {\
   const char *em_scanPtr = (m_sequence).string;\
-  switch (ComparePStrings(&m_sequence,&p_subPString,NULL,n_toCharFunction)) {\
+  switch (ComparePStrings(&(m_sequence),&p_subPString,NULL,n_toCharFunction)) {\
   case LESS_THAN__COMPARISON :\
   case GREATER_THAN__COMPARISON :\
   break; case EQUAL_TO__COMPARISON :\

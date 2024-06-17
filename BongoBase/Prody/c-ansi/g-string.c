@@ -437,6 +437,18 @@ m_DIGGY_INFO("i=%d, keysNumber=%d",i,keysNumber)
   m_DIGGY_RETURN(indexLabel)
 } // GStringsAddIndex
 
+// Public function : see .h
+int GStringsIndexRequestR(G_STRINGS_HANDLE cp_handle,
+  INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaNumber,
+  const struct G_REQUEST_CRITERIUM *sp_criteria) {
+  m_DIGGY_BOLLARD()
+
+  m_TRACK_IF(GreenCollectionIndexRequestR(cp_handle->h_greenCollectionHandle,
+    nf_indexRequestAutomaticBuffer,criteriaNumber, sp_criteria) != RETURNED)
+
+  m_DIGGY_RETURN(RETURNED)
+} // GStringsIndexRequestR
+
 
 // Public function : see .h
 int GStringsIndexRequest(G_STRINGS_HANDLE cp_handle,

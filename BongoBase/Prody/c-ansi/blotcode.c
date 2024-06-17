@@ -234,7 +234,7 @@ static int BlotcodeFindBlotkeyw (BLOTCODE_HANDLE p_handle,
   G_STRING_STUFF t_blotkeywStuff = (G_STRING_STUFF) UNDEFINED;
 
   struct G_KEY gKey;
-  m_ASSIGN_G_KEY__P_STRING(&gKey,0, *ap_litteralKeyw); 
+  m_ASSIGN_G_KEY__P_STRING(gKey, *ap_litteralKeyw); 
 
   int result = m_GStringsIndexSingleFetch(p_handle->h_blotkeywsHandle, indexRequestAutomaticBuffer,
     INDEX_LABEL0,INDEX_SEEK_FLAGS__EQUAL,&gKey,INDEX_FETCH_FLAGS__READ_ONLY,&t_blotkeywStuff,

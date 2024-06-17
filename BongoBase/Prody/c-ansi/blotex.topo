@@ -17,7 +17,9 @@
 //
 // I. Blot expressions (blotex) 
 // ----------------------------
-// TODO: clarifier quand les espaces sont authorised
+// Legend:
+// - <entity name>   => "soft" lexeme ; leading white spaces REMOVED 
+// - <<single char>> => "hard" lexeme ; leading white spaces NOT REMOVED
 //
 // There two types of blot expressions: 
 // - "string" blotex => "strex" type
@@ -37,13 +39,13 @@
 // '+' operator applied on strings is a concatenation
 //
 // The atoms are made of constants, variables and "register operations".
-// <intex atom> ::= [ <int 1op> ] ( <int constant> | <blotvar as int> | <blotvar entry> | <blotvar id> |
-//   <blotreg int> | <blottab int> ) 
+// <intex atom> ::= [ <int 1op> ] ( <int constant> | <blotvar as int> | <blotvar entry> |
+//   <blotvar id> | <blotreg int> | <blottab int> ) 
 // <strex atom> ::= <str constant> | <blotvar as str> | <blotvar name> | <blotreg str> | <blottab str> 
 //
 // Constant expressions
 // <int constant> : any integer constants of C language... 
-// <str constant> ::= '"' ( <single char> )* '"'
+// <str constant> ::= '"' ( <<single char>> )* '"'
 // String example: "Julie" 
 // Integer examples: 69 , 0xCACABEBE
 // Reminder: blotval's convention : 
@@ -57,7 +59,7 @@
 // - blottab element
 // are identified by their name (may be empty).
 //
-// <entity name> ::= ( <letter> | <digit> | '_' )*
+// <entity name> ::= ( <<letter>> | <<digit>> | '_' )*
 //
 // Variables and registers
 // A blot variable (blotvar) stores a blotex value.
@@ -98,20 +100,20 @@
 //
 // Register operations 
 // <blotreg int> ::= <entity name> '?' <blotreg ops int>  
-// <blotreg ops int> ::= [ <blotreg op select> ] [ <blotreg op reset> ] [ <blotreg op fetch> ]
-//   [ <blotreg op read int> ] 
-// <blotreg op select> ::= ':' <blotreg request> ':?'
+// <blotreg ops int> ::= [ <blotreg op select> ] [ [ <blotreg op reset> ] [ <blotreg op next> ]
+//   <blotreg op read int> ] 
+// <blotreg op select> ::= ':' <blotreg request>
 // <blotreg op reset> ::= '^'
-// <blotreg op fetch> ::= '+'
+// <blotreg op next> ::= '+'
 // <blotreg op read int> ::= '=' [ ( '#' | '!#' ) ]
 //
 // <blotreg str> ::= <entity name> '?' <blotreg ops str>  
-// <blotreg ops str> ::= [ <blotreg op select> ] [ <blotreg op reset> ] [ <blotreg op fetch> ]
+// <blotreg ops str> ::= [ <blotreg op select> ] [ <blotreg op reset> ] [ <blotreg op next> ]
 //   <blotreg op read str>
 // <blotreg op read str> ::= '=' ( '$' | '!$' )  
 //
 // Blotreg requests are made of "atoms" : 
-// <blotreg request> ::= <blotreg request atom> ( <logical 2op> <blotreg request> )*
+// <blotreg request> ::= <blotreg request atom> ( <logical 2op> <blotreg request> )* ':?'
 // <blotreg request atom> ::= <int blotreg request atom> | <str blotreg request atom>
 // <int blotreg request atom> ::= ( '#' | '!#' ) <request comp op> <intex> 
 // <str blotreg request atom> ::= ( '$' | '!$' ) <str request comp op> <strex> 
@@ -138,11 +140,11 @@
 //
 // <blottab int> ::= '^' <entity name> '?' <blottab ops int>  
 // <blottab ops int> ::= <blottab op create> | ( [ <blottab op select> ] [ <blottab op reset> ]
-//   [ <blottab op insert> ] [ <blottab op fetch> ] [ <blottab op read int> ] ) 
+//   [ <blottab op insert> ] [ <blottab op next> ] [ <blottab op read int> ] ) 
 // <blottab op create> ::=  '[' ( <entity name> )+ ']?' 
 // <blottab op select> ::= ':' <blottab request> ':?'
 // <blottab op reset> ::= '^'
-// <blottab op fetch> ::= '+'
+// <blottab op next> ::= '+'
 // <blottab op insert> ::= '@'
 // <blottab op read int> ::= '=' <int blottab element>
 //
@@ -150,7 +152,7 @@
 // <str blottab element> ::= <entity name> '$'
 //
 // <blottab str> ::= '^' <entity name> '?' <blottab ops str>  
-// <blottab ops str> ::= [ <blottab op select> ] [ <blottab op reset> ] [ <blottab op fetch> ]
+// <blottab ops str> ::= [ <blottab op select> ] [ <blottab op reset> ] [ <blottab op next> ]
 //   [ <blottab op insert> ] <blottab op read str>
 // <blottab op read str> ::= '=' <str blottab element> 
 //

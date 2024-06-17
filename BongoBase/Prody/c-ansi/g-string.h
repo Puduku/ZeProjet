@@ -288,7 +288,7 @@ int GStringsGetCount (G_STRINGS_HANDLE cp_handle,  G_STRING_SET_STUFF *navnt_gSt
 
 
 enum { // #REF enum-G_KEYS_COMPARISON 
-  P_STRING__G_KEYS_COMPARISON, //
+        P_STRING__G_KEYS_COMPARISON, //
  INTRINSIC_VALUE__G_KEYS_COMPARISON, //
  ACOLYT_TOKEN_ID__G_KEYS_COMPARISON, // mutually exclusive with other ACOLYT_*__G_KEYS_COMPARISON 
     ACOLYT_VALUE__G_KEYS_COMPARISON, // mutually exclusive with other ACOLYT_*__G_KEYS_COMPARISON
@@ -361,61 +361,53 @@ struct G_KEY { //
 // Assign a g-key for string (lexical) comparison
 //
 // Passed:
-// - m_gKeys: 
-// - entry: >= 0 ; (0 for plain index)
+// - m_gKey: 
 // - up_pString:
-#define m_ASSIGN_G_KEY__P_STRING(/*struct G_KEY* */m_gKeys, /*int*/entry,\
-  /*const struct P_STRING*/up_pString) {\
-  (m_gKeys)[entry].gKeysComparison = P_STRING__G_KEYS_COMPARISON;\
-  (m_gKeys)[entry].bare.cp_pString = up_pString ; \
+#define m_ASSIGN_G_KEY__P_STRING(/*struct G_KEY */m_gKey, /*const struct P_STRING*/up_pString) {\
+  (m_gKey).gKeysComparison = P_STRING__G_KEYS_COMPARISON;\
+  (m_gKey).bare.cp_pString = up_pString ; \
 } 
 
 // Assign a g-key for 'intrinsic (generic) values' comparison
 //
 // Passed:
 // - m_gKeys: 
-// - entry: >= 0 ; (0 for plain index)
 // - uen_intrinsicValue:
-#define m_ASSIGN_G_KEY__INTRINSIC_VALUE(/*struct G_KEY* */m_gKeys, /*int*/entry,\
+#define m_ASSIGN_G_KEY__INTRINSIC_VALUE(/*struct G_KEY */m_gKey,\
   /*GENERIC_INTEGER*/uen_intrinsicValue) {\
-  (m_gKeys)[entry].gKeysComparison = INTRINSIC_VALUE__G_KEYS_COMPARISON;\
-  (m_gKeys)[entry].bare.cen_intrinsicValue = uen_intrinsicValue; \
+  (m_gKey).gKeysComparison = INTRINSIC_VALUE__G_KEYS_COMPARISON;\
+  (m_gKey).bare.cen_intrinsicValue = uen_intrinsicValue; \
 } 
 
 // Assign a g-key for 'acolyt token ids' comparison
 //
 // Passed:
 // - m_gKeys: 
-// - entry: >= 0 ; (0 for plain index)
 // - u_tokenId:
-#define m_ASSIGN_G_KEY__ACOLYT_TOKEN_ID(/*struct G_KEY* */m_gKeys, /*int*/entry,\
+#define m_ASSIGN_G_KEY__ACOLYT_TOKEN_ID(/*struct G_KEY */m_gKey,\
   /*int*/u_tokenId) {\
-  (m_gKeys)[entry].gKeysComparison = ACOLYT_TOKEN_ID__G_KEYS_COMPARISON;\
-  (m_gKeys)[entry].bare.c_acolytTokenId = u_tokenId; \
+  (m_gKey).gKeysComparison = ACOLYT_TOKEN_ID__G_KEYS_COMPARISON;\
+  (m_gKey).bare.c_acolytTokenId = u_tokenId; \
 } 
 
 // Assign a g-key for 'acolyt (generic) values' comparison
 //
 // Passed:
 // - m_gKeys:
-// - entry: >= 0 ; (0 for plain index)
 // - uen_acolytValue:
-#define m_ASSIGN_G_KEY__ACOLYT_VALUE(/*struct G_KEY* */m_gKeys, /*int*/entry,\
-  /*GENERIC_INTEGER*/uen_acolytValue) {\
-  (m_gKeys)[entry].gKeysComparison = ACOLYT_VALUE__G_KEYS_COMPARISON;\
-  (m_gKeys)[entry].bare.cen_acolytValue = uen_acolytValue; \
+#define m_ASSIGN_G_KEY__ACOLYT_VALUE(/*struct G_KEY */m_gKey, /*GENERIC_INTEGER*/uen_acolytValue) {\
+  (m_gKey).gKeysComparison = ACOLYT_VALUE__G_KEYS_COMPARISON;\
+  (m_gKey).bare.cen_acolytValue = uen_acolytValue; \
 } 
 
 // Assign a g-key for 'acolyt handles' comparison
 //
 // Passed:
 // - m_gKeys:
-// - entry: >= 0 ; (0 for plain index)
 // - unr_acolytHandle:
-#define m_ASSIGN_G_KEY__ACOLYT_HANDLE(/*struct G_KEY* */m_gKeys, /*int*/entry,\
-  /*void* */unr_acolytHandle) {\
-  (m_gKeys)[entry].gKeysComparison = ACOLYT_HANDLE__G_KEYS_COMPARISON;\
-  (m_gKeys)[entry].bare.cnr_acolytHandle = unr_acolytHandle; \
+#define m_ASSIGN_G_KEY__ACOLYT_HANDLE(/*struct G_KEY */m_gKey, /*void* */unr_acolytHandle) {\
+  (m_gKey).gKeysComparison = ACOLYT_HANDLE__G_KEYS_COMPARISON;\
+  (m_gKey).bare.cnr_acolytHandle = unr_acolytHandle; \
 } 
 
 
@@ -432,9 +424,10 @@ int GStringsIndexRequest(G_STRINGS_HANDLE cp_handle,
   int indexLabel1, unsigned int indexSeekFlags1, const struct G_KEY *cfps_keys1, ...);
 
 // #SEE m_ASSIGN_G_REQUEST_CRITERIUM @ c-ansi/green.h <G_KEYS>
-#defile m_ASSIGN_G_REQUEST_CRITERIUM__G_KEYS(/*struct G_INDEX_CRITERIUM*/m_criterium, /*int*/m_indexLabel, \
-  /*unsigned int*/m_indexSeekFlags, /*const struct G_KEY* */cfps_keys, /*unsigned int*/m_criteriaOpFlags) \
-  m_ASSIGN_G_REQUEST_CRITERIUM(indexLabel,indexSeekFlags,struct G_KEY,cfpr_keys,criteriaOpFlags)
+#define m_ASSIGN_G_REQUEST_CRITERIUM__G_KEYS(/*struct G_INDEX_CRITERIUM*/mu_criterium,\
+  /*int*/u_indexLabel, /*unsigned int*/u_indexSeekFlags, /*const struct G_KEY* */ucfps_keys,\
+  /*unsigned int*/u_criteriaOpFlags)  m_ASSIGN_G_REQUEST_CRITERIUM(mu_criterium,u_indexLabel,\
+  u_indexSeekFlags,struct G_KEY,ucfps_keys, u_criteriaOpFlags)
 
 // #SEE GStringsIndexRequest <gStringSet>
 int GStringsIndexRequestR(G_STRINGS_HANDLE cp_handle,

@@ -663,14 +663,6 @@ static int GreenIndexesResize (struct GREEN_INDEXES *a_indexes, int newItemsPhys
   }\
 }
 
-// May or may be NOT index-based selection:
-struct G_REQUEST_CRITERIUM {
-  int indexLabel;
-  unsigned int indexSeekFlags;
-  void *cfpr_keys; // Only significant with Key-based seek flag(s)
-  unsigned int criteriaOpFlags;
-} ;
-  
 
 struct INDEX_ITERATOR {
   int criteriaNumber5 ;
@@ -1371,7 +1363,7 @@ int GreenCollectionCreateInstance(GREEN_COLLECTION_HANDLE *azh_handle,  int expe
     GreenCollectionEntryRawEquate, (void *) handle)
   m_GAPS_STACK_INIT(handle->h_gaps,handle->itemsPhysicalNumber)
   struct G_REQUEST_CRITERIUM defaultCriterium ;
-  m_ASSIGN_G_REQUEST_CRITERIUM(defaultCriterium,INDEX_LABEL0,ALL_FLAGS_OFF0,(void*)UNDEFINED,
+  m_ASSIGN_G_REQUEST_CRITERIUM(defaultCriterium,INDEX_LABEL0,ALL_FLAGS_OFF0,void,(void*)UNDEFINED,
     ALL_FLAGS_OFF0)
   m_INIT_INDEX_REQUEST(handle->internalIndexRequest,defaultCriterium)
 
@@ -1685,7 +1677,7 @@ int GreenCollectionIndexRequestR(GREEN_COLLECTION_HANDLE cp_handle,
   struct INDEX_REQUEST *indexRequestPtr = (nf_indexRequestAutomaticBuffer != NULL?
     (struct INDEX_REQUEST *)nf_indexRequestAutomaticBuffer: &(cp_handle->internalIndexRequest));
 
-  if (criteriaNumber == 1) sp_criteria->criteriaOpFlags = ALL_FLAGS_OFF0;
+  //if (criteriaNumber == 1) sp_criteria->criteriaOpFlags = ALL_FLAGS_OFF0;
   m_INIT_INDEX_REQUEST(*indexRequestPtr,*sp_criteria)
 
   int i = 1; for (; i < criteriaNumber;  i++) {
@@ -1715,8 +1707,9 @@ int GreenCollectionIndexRequestV(GREEN_COLLECTION_HANDLE cp_handle,
   if (criteriaNumber > 1) criteriaOpFlags = va_arg(extraCriteria,unsigned int);
   m_ASSIGN_G_REQUEST_CRITERIUM(*criteriumPtr,indexLabel1,indexSeekFlags1,void,cfpr_keys1,criteriaOpFlags)
 
-  int i = 1; for (; i < criteriaNumber;  i++) m_ASSIGN_G_REQUEST_CRITERIUM(*(++criteriumPtr),va_arg(extraCriteria,int),
-    va_arg(extraCriteria,unsigned int),void,va_arg(extraCriteria,void *),va_arg(extraCriteria,unsigned int))
+  int i = 1; for (; i < criteriaNumber;  i++) m_ASSIGN_G_REQUEST_CRITERIUM(*(++criteriumPtr),
+    va_arg(extraCriteria,int), va_arg(extraCriteria,unsigned int),void,va_arg(extraCriteria,void *),
+    va_arg(extraCriteria,unsigned int))
 
   m_TRACK_IF(GreenCollectionIndexRequestR(cp_handle,nf_indexRequestAutomaticBuffer,
     criteriaNumber,s_criteria) != RETURNED) 

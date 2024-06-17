@@ -395,11 +395,12 @@ int GreenCollectionIndexRequestV(GREEN_COLLECTION_HANDLE cp_handle,
   int indexLabel1, unsigned int indexSeekFlags1, void *cfpr_keys1, va_list extraCriteria);
 
 
+// May or may be NOT index-based selection:
 struct G_REQUEST_CRITERIUM {
- int indexLabel;  
- unsigned int indexSeekFlags;
- void *cfpr_keys;
- unsigned int criteriaOpFlags;
+  int indexLabel;
+  unsigned int indexSeekFlags;
+  void *cfpr_keys; // Only significant with Key-based seek flag(s)
+  unsigned int criteriaOpFlags;
 } ;
 
 // #REF  m_ASSIGN_G_REQUEST_CRITERIUM <keys>
@@ -412,13 +413,13 @@ struct G_REQUEST_CRITERIUM {
 //
 // Changed:
 // - mu_criterium
-#defile m_ASSIGN_G_REQUEST_CRITERIUM(/*struct G_INDEX_CRITERIUM*/mu_criterium, /*int*/u_indexLabel, \
+#define m_ASSIGN_G_REQUEST_CRITERIUM(/*struct G_INDEX_CRITERIUM*/mu_criterium, /*int*/u_indexLabel,\
   /*unsigned int*/u_indexSeekFlags, m_keyType, ucfpr_keys, /*unsigned int*/u_criteriaOpFlags) {\
-  struct G_REQUEST_CRITERIUM em_criterium = (mu_criterium);\
-  em_criterium.indexLabel = (u_indexLabel);\
-  em_criterium.indexSeekFlags = (u_indexSeekFlags);\
-  (const m_keyType *)em_criterium.cfpr_keys = (u_cfpr_keys);\
-  em_criterium.criteriaOpFlags = (u_criteriaOpFlags);\
+  struct G_REQUEST_CRITERIUM *em_criteriumPtr = &(mu_criterium);\
+  (em_criteriumPtr)->indexLabel = (u_indexLabel);\
+  (em_criteriumPtr)->indexSeekFlags = (u_indexSeekFlags);\
+  (em_criteriumPtr)->cfpr_keys = (void *)(const m_keyType *)(ucfpr_keys);\
+  (em_criteriumPtr)->criteriaOpFlags = (u_criteriaOpFlags);\
 }
 
 //  #SEE GreenCollectionIndexRequest <greenItem> <keys>
