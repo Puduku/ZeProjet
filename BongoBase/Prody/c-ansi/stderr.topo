@@ -8,7 +8,7 @@
 // - UNEXPECTED (by the program) implies NEITHER manageable NOR recoverable (by the same program)
 //   (=>TINA!!!<=)
 //   => the ONLY allowed action of a program regarding an anomaly is to RAISE (and TRACK) that
-//      anomaly. Then, the program must promptly ABORT its execution...
+//      anomaly. Then, the program must promptly ABORT the execution...
 // - TECHNICALLY, raising an anomaly exactly consists in reporting a problem in stderr. From external
 //   perspective, a process that starts feeding its stderr must be understood as an univocal 
 //   announcement of abortion of that process - applications should NOT be allowed polluting the
