@@ -224,7 +224,7 @@
 //   logical value is of the same type (e.g. a "date") regardless of their physical composition types, which
 //   may be totally different (e.g. "ASCII" and "BINARY").
 //   (*) It is therefore very regrettable that in most database operating languages (SQL in particular),
-//   the profoundly 'dual' (logical / physical) nature of all data has been overlooked to such an extent! 
+//   the 'dual' nature (logical and physical) of all data is overlooked to such an extent! 
 //
 // - Empty program model: A simple "trick" to keep in mind to refrain from writing too much "crap"...
 //   The pure and perfect program exists. It is still unique but universal. This is of course the
