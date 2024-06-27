@@ -23,23 +23,23 @@
 // bit - seem to derive. Even more practical dualities such as 'day'/'night', 'win'/'lose', 
 // 'white'/'black' or 'beautiful'/'ugly' can be trivially reduced to a 'true'/'false' opposition (e.g.,
 // the duality 'day'/'night' can be simply restated with "[it's day is] true" / "[it's day is] false").
-// However, for the principle of equivalence to be really applicable, we still need to determine a
-// rule that uniquely associates each single verity value between two given dualities.
+// Our logical dualities will be genuinely equivalent once we have determined a rule that uniquely
+// associates each single verity value between two given dualities.
 // So, for example, when comparing the two dualities 'yes'/'no' and 'day'/'night', why associate
 // 'yes' with 'day' (and 'no' with 'night')? and not the opposite ('yes' with 'night'...)?
 // The answer is: in order to establish such rule of univocal association, it is sufficient that the
 // association between any duality with a "fundamental" duality be univocal. So here's the point:
 // the associations between dualities with the 'true'/'false' duality are, all in all, abitrary.
-// For instance, the association of 'beautiful' with 'true' is not self-evident.
-// On the other hand, any association of duality with the 'positive'/'negative' (or 'good'/'bad') duality
-// seems more natural: thus, 'day', 'good', 'yes', 'true', 'win', etc. are spontaneously associated with
-// 'positive'.
-// Let's face it: this 'obviousness' is merely a manifestation (or, more accurately, a bias) of our
-// Manichean brains : our mental seperation between two logical verity values rather lean on a MORAL
-// partition between the 'Good' and the 'Evil'.
+// For instance, the association of 'beautiful' with 'true' is arbitrary.
+// On the other hand, any association of logical duality with the 'positive'/'negative' (or 'good'/'bad')
+// pair of values is self-evident. So, 'day', 'yes', 'true', 'win', etc. are spontaneously
+/  associated with 'positive' (or 'good') value - whereas 'night', 'no', 'false', 'lose' counterparts 
+// are assimilated to 'negative' (or 'bad') value.
+// Let's simply assume this typical bias of our Manichaean brains : our mental ability to seperations
+// leans on moral hierarchy of values. 
 // In short, our different values of verity are merely interchangeable. However, there is no "neutral"
-// 'true' or 'false' Verity. To the contrary, our "fundamental" values of truth are invariably oriented
-// according to a partition between the 'Good' and the 'Evil'.
+// 'true' or 'false' absolute Verity. To the contrary, our "fundamental" values of truth are oriented
+// according to a MORAL partition between the 'Good' and the 'Evil'.
 // 
 // Are dual verities easily interchangeable? Answer with counterexample...
 // Let's try a comparison between 'yes'/'no' and 'win'/'lose' dualities...
