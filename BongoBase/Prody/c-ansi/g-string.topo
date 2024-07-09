@@ -3,7 +3,7 @@
 // (c) Puduku - 2023
 
 // => g-string: "Green type" (see c-ansi/green.topo)
-// Aim: facilitate handling of plain character strings...
+// Aim: facilitate handling of (recyclable) character strings...
 // 
 // => g-string set: contiguous array of "g-string" elements ;
 //    The number of elements of a g-string set is called "cardinality"
