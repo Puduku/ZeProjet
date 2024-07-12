@@ -25,7 +25,7 @@
 
 
 #ifdef DIGGY
-char b_diggyGreenCollectionExam = b_FALSE0;
+char b_diggyGreenCollectionExam = b_TRUE;
 #endif
 
 /////////// 1. GREEN INDEX ("proto" object......) ////////////////////
@@ -961,6 +961,7 @@ static int GreenIndexesVerify (struct GREEN_INDEXES *a_indexes) {
   struct GREEN_INDEX *s_index = a_indexes->vnhs_indexes ;
 
   for ( ; i < a_indexes->indexesNumber ; i++, s_index++) {
+m_DIGGY_VAR_D(i)
     switch (GreenIndexVerify(s_index)) {
     case COMPLETED__OK:
     break; case COMPLETED__BUT:
@@ -1447,7 +1448,7 @@ int GreenCollectionRefreshIndexes (GREEN_COLLECTION_HANDLE handle) {
 // Public function; see description in .h
 int GreenCollectionPullOut (GREEN_COLLECTION_HANDLE handle, char **at_greenArray) {
   m_DIGGY_BOLLARD()
-  m_ASSERT(GreenIndexesVerifyEnabled(&handle->indexes))
+  m_ASSERT(GreenIndexesVerifyEnabled(&handle->indexes) == ANSWER__NO)
 
   // MINIMONITOR: ANY
   m_TRACK_IF(GreenCollectionRefreshIndexesInternal(handle,b_TRUE) != RETURNED)

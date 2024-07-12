@@ -134,6 +134,14 @@ m_DIGGY_VAR_STRING(ccp_expectedOutput)
 "##<< be.OutputF(%s, .julie$) >> du corps est un sublime don"
 #define DUMMY_OUTPUT6 "Que la Beauted du corps est un sublime don"
 
+#define DUMMY_TEMPLATE7 "##<<be.Eval(.julie$ := \"Beauté\")>>##<< be.OutputF(%s, .julie!$) >> "\
+"est une ##<< be.OutputF(%s, .julie$) >>."
+#define DUMMY_OUTPUT7 "julie est une Beauté."
+
+#define DUMMY_TEMPLATE8 "##<<be.Eval(.rulie$ := \"Beauted\")>>Que la "\
+"##<<be.OutputF(%s, ?: !$ == \"rulie\" :?+=$)>> du corps est un sublime don"
+#define DUMMY_OUTPUT8 "Que la Beauted du corps est un sublime don"
+
 
 int main (int argc, char** argv) {
   unsigned int dgFlags = ParseTestyCommandArguments(argc,argv,ALL_FLAGS_OFF0) ;
@@ -211,6 +219,14 @@ int main (int argc, char** argv) {
   m_TRACK_IF(BlotcodeExecutorTest(6,h_blotcodeExecutorHandle, h_outputSuckerHandle,
     h_outputGStringStuff, DUMMY_TEMPLATE6, ANSWER__YES,  BLOTCODE_CONSTRUCTION_STATUS__OK,
     DUMMY_OUTPUT6) != RETURNED) 
+
+  m_TRACK_IF(BlotcodeExecutorTest(7,h_blotcodeExecutorHandle, h_outputSuckerHandle,
+    h_outputGStringStuff, DUMMY_TEMPLATE7, ANSWER__YES,  BLOTCODE_CONSTRUCTION_STATUS__OK,
+    DUMMY_OUTPUT7) != RETURNED) 
+
+  m_TRACK_IF(BlotcodeExecutorTest(8,h_blotcodeExecutorHandle, h_outputSuckerHandle,
+    h_outputGStringStuff, DUMMY_TEMPLATE8, ANSWER__YES,  BLOTCODE_CONSTRUCTION_STATUS__OK,
+    DUMMY_OUTPUT8) != RETURNED) 
 
   m_TRACK_IF(G_STRING_DESTROY_INSTANCE(h_outputGStringStuff) != RETURNED)
 

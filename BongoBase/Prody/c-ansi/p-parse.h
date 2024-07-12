@@ -136,26 +136,27 @@
   m_PARSE_TILL_MATCH(m_sequence,em_localSubPString,n_toCharFunction,na_lexeme) \
 }   
 
-// Parse a string portion sequence: match sub string.
+// Parse a string portion sequence: match token 
 //
 // Passed:
 // - m_sequence: as passed 
-// - a_subPString:
+// - p_token:
 // - n_toCharFunction:
 // - na_lexeme: NULL if not used
 //
 // Changed:
 // - m_sequence: parsed lexeme removed in the sequence 
 // - *na_lexeme: (if used) parsed lexeme (aka token) 
-#define m_PARSE_MATCH(/*struct P_STRING*/m_sequence, \
-  /*struct P_STRING*/p_subPString, /*TO_CHAR_FUNCTION*/n_toCharFunction,\
-  /*struct P_STRING* */na_lexeme) {\
+#define m_PARSE_MATCH(/*struct P_STRING*/m_sequence, /*const struct P_STRING*/p_token,\
+  /*TO_CHAR_FUNCTION*/n_toCharFunction, /*struct P_STRING* */na_lexeme) {\
   const char *em_scanPtr = (m_sequence).string;\
-  switch (ComparePStrings(&(m_sequence),&p_subPString,NULL,n_toCharFunction)) {\
+  int em_length = m_PStringLength(&(p_token));\
+  struct P_STRING em_subSequence = m_SubPString(m_sequence,0,em_length);\
+  switch (ComparePStrings(&(em_subSequence),&p_token,NULL,n_toCharFunction)) {\
   case LESS_THAN__COMPARISON :\
   case GREATER_THAN__COMPARISON :\
   break; case EQUAL_TO__COMPARISON :\
-    em_scanPtr += m_PStringLength(&(p_subPString));\
+    em_scanPtr += em_length;\
   break; default:\
     m_TRACK()\
   } \
@@ -164,10 +165,10 @@
 
 // Wrap m_PARSE_MATCH above
 #define m_PARSE_MATCH_C(/*struct P_STRING*/m_sequence, \
-  /*const char* */p_subCString, /*TO_CHAR_FUNCTION*/n_toCharFunction,\
+  /*const char* */p_token, /*TO_CHAR_FUNCTION*/n_toCharFunction,\
   /*struct P_STRING* */na_lexeme) {\
-  m_ASSIGN_LOCAL_C_P_STRING(em_localSubPString,p_subCString) \
-  m_PARSE_MATCH(m_sequence,em_localSubPString,n_toCharFunction,na_lexeme) \
+  m_ASSIGN_LOCAL_C_P_STRING(em_localToken,p_token) \
+  m_PARSE_MATCH(m_sequence,em_localToken,n_toCharFunction,na_lexeme) \
 }   
 
 // Parse a string portion sequence according to offset (as if was "scanned" position) 

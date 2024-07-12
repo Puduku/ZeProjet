@@ -343,7 +343,7 @@ int GStringsCreateInstance(G_STRINGS_HANDLE* azh_handle,  int expectedItemsNumbe
   handle->vnhs_indexesProperties = NULL;
 
   m_TRACK_IF(GreenCollectionCreateInstance(&handle->h_greenCollectionHandle,  expectedItemsNumber,
-    sizeof(struct G_STRING),  GStringsDisengage,  GStringsCompare, NULL, handle) != RETURNED)
+    sizeof(struct G_STRING) * gStringSetCardinality,  GStringsDisengage,  GStringsCompare, NULL, handle) != RETURNED)
 
   m_ASSIGN_MAGIC_FIELD(G_STRINGS_HANDLE,handle)
 

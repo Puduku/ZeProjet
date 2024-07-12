@@ -51,6 +51,8 @@ int ComparePStrings(const struct P_STRING *ap_pString1,
   const struct P_STRING *ap_pString2,
   IS_CHAR_FUNCTION n_isNeutralCharFunction,  TO_CHAR_FUNCTION n_toCharFunction) { 
   m_DIGGY_BOLLARD()
+m_DIGGY_VAR_P_STRING(*ap_pString1)
+m_DIGGY_VAR_P_STRING(*ap_pString2)
   int difference = 0; // No difference a priori...
 
   int length1 = m_PStringLength(ap_pString1);

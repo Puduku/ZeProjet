@@ -465,13 +465,6 @@ int GStringsVerifyIndexes(G_STRINGS_HANDLE handle);
 
 typedef struct G_STRING *G_STRINGS_ARRAY;
 
-// Passed:
-// - gStringsArray:
-// - cardinality:
-// - element
-#define GET_G_STRING_STUFF(/*G_STRINGS_ARRAY*/gStringsArray,/*int*/cardinality,/*int*/element) \
-  ((gStringsArray) + ((cardinality)*(element)))
-
 
 // #REF GStringsPullOut
 // #SEE GreenCollectionPullOut @ c-ansi/green.h

@@ -132,6 +132,7 @@ struct P_STRING { // #REF struct-P_STRING
 // Note: pathetic case in which stop ptr preceeds start ptr is considered as empty string...
 //
 // Passed:
+// TODO: why pass pointer ???
 // - ap_pString: 
 // 
 // Ret: string portion length (ALWAYS >= 0)
@@ -151,6 +152,26 @@ static inline int m_PStringLength(const struct P_STRING *ap_pString) {
 // - FALSE: the pString is not empty (length > 0)
 #define b_EMPTY_P_STRING(/*const struct P_STRING*/p_pString) \
   (m_PStringLength(&(p_pString)) == 0)
+
+
+// Extract sub string portion
+//
+// Passed:
+// - pString: 
+// - offset: >= 0 ; rectified if exceeds end of portion 
+// - n_length: sub string length:
+//  + -1 special value: end of string
+//  + >=0: actual length (retified if exceeds end of portion) 
+// 
+// Ret: sub string portion 
+static inline struct P_STRING m_SubPString(struct P_STRING pString,int offset,int n_length) {
+  pString.string += offset;
+  if (pString.string > pString.stop) pString.string = pString.stop; 
+  if (n_length > 0 && n_length < (pString.stop - pString.string)) pString.stop = pString.string +
+    n_length;
+
+  return pString;
+} // m_SubPString
 
 
 // Provide buffer / length function parameters corresponding to string portion.
