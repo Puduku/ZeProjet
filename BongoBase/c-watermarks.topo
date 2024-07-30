@@ -83,12 +83,14 @@
 //   complexity") of the calling function...
 // m_ 1. (original meaning) : "pure macro" indicator. Indicates that the macro is a "pure" macro of
 //   the pre-processor.
-//   A pure macro can exploit without restriction all the (portable) features of the C
-//   pre-processor. Yet, pure macros, by nature, "break" the syntax of the C language...
-//   Absence of that indicator means that the macro is a "soft" (or "functional") macro,
-//   A "soft" macro is either a simple constant value or is a construction totally homogeneous to
-//   (and thus replaceable by) a function (*). Hence, a "soft" macro CANNOT break the syntax of C
-//   language. 
+//   A pure macro leverages all the portable features of the C preprocessor. However, pure macros,
+//   by their very nature, “break” the syntax of the C language. Typically, pure macros mangle the 
+//   ';' instruction terminators.
+//   The absence of this indicator means that the macro is a “soft” (or “functional”) macro.
+//   A “soft” macro is either a simple constant value, or a construction totally homogeneous to
+//   (and therefore replaceable by) a function (*). Consequently, an unexpanded "soft" macro must
+//   conform to the general syntax of C. In particular, a “soft” macro must not mangle the ';'
+//   instruction terminators.
 //   (*) excepted side effects due to parameters expansion ; see u_ indicator
 //   2. (extended meaning) : inline function (simple discriminant with "regular" functions...)   
 // n_ / c_ indicators
