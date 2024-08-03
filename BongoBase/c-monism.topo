@@ -17,29 +17,30 @@
 // Truth: Verity (sorry, this subtlety of the English language completely escapes me)
 
 // I. Dual verities
-// The verity values 'true'/'false' are generally perceived as the fundamental duality of
-// logic, from which the other dualities conceived by our mind - such as 'positive'/'negative',
-// 'yes'/'no', 'good'/'bad', 'all'/'nothing', 'on'/'off', ... not forgetting the digital avatar, the 0/1
-// bit - seem to derive. Even more practical dualities such as 'day'/'night', 'win'/'lose', 'rich'/'poor',
-// 'white'/'black' or 'beautiful'/'ugly' can be trivially reduced to a 'true'/'false' opposition (e.g.,
-// the duality 'day'/'night' can be simply restated with "[it's day is] true" / "[it's day is] false").
-// Yet, those logical dualities will be genuinely equivalent once we have determined a rule that uniquely
-// associates each single verity value between two given dualities.
+// The verity values 'true'/'false' are generally perceived as the fundamental duality of logic,
+// from which the other dualities conceived by our mind - such as 'positive'/'negative', 'yes'/'no',
+// 'good'/'bad', 'all'/'nothing', 'on'/'off', ... not forgetting the digital 0/1 bit avatar - seem
+/  to derive. Even more practical dualities such as 'day'/'night', 'win'/'lose', 'rich'/'poor',
+// 'white'/'black' or 'beautiful'/'ugly' can be trivially reduced to a 'true'/'false' opposition (
+// e.g., the duality 'day'/'night' can be simply restated with "[it's day is] true" / "[it's day
+// is] false").
+// Yet, those logical dualities will be genuinely equivalent once we have determined a rule that
+// uniquely associates each single verity value between two given dualities.
 // So, for example, when comparing the two dualities 'yes'/'no' and 'day'/'night', why assimilate
 // 'yes' with 'day' (and 'no' with 'night')? and not the opposite ('yes' with 'night'...)?
 // The answer is: in order to establish such rule of univocal association, it is sufficient that the
 // association between any duality with a "fundamental" duality be univocal. So here's the point:
 // the associations between dualities with the 'true'/'false' duality are, all in all, arbitrary.
 // For instance, the association of 'beautiful' with 'true' is arbitrary.
-// On the other hand, any association of logical duality with the 'positive'/'negative' (or 'good'/'bad')
-// pair of values is self-evident. So, 'day', 'yes', 'true', 'win', etc. are spontaneously
-/  associated with 'positive' (or 'good') value - whereas 'night', 'no', 'false', 'lose' counterparts 
-// are assimilated to 'negative' (or 'bad') value.
-// Let's simply admit this bias typical of our Manichean brains: our mental capacity to operate binary
-// separations is deeply found on our so-called AFFECT, which can only measure moral values. 
-// In short, our different values of verity are merely interchangeable. However, there is no "neutral"
-// 'true' or 'false' verity value. To the contrary, our "fundamental" values of truth are oriented
-// according to a MORAL partition between the 'Good' and the 'Evil'.
+// On the other hand, any association of logical duality with the 'positive'/'negative' (or 'good'/
+// 'bad') pair of values is self-evident. So, 'day', 'yes', 'true', 'win', etc. are spontaneously
+/  associated with 'positive' (or 'good') value - whereas 'night', 'no', 'false', 'lose'
+// counterparts are assimilated to 'negative' (or 'bad') value.
+// Let's simply admit this bias typical of our Manichean brains: our mental capacity to operate
+// binary separations is deeply found on our so-called AFFECT, which can only measure moral values.
+// In short, our different values of verity are merely interchangeable. However, there is no
+// "neutral" 'true' or 'false' verity value. To the contrary, our "fundamental" values of truth are
+// oriented according to a MORAL partition between the 'Good' and the 'Evil'.
 // 
 // Are dual verities practically interchangeable ? Answer with counterexample...
 // Let's try a comparison between 'yes'/'no' and 'win'/'lose' dualities...
@@ -67,14 +68,15 @@
 // may, at times, be questioned. This is the case each time we ignore a truth, we mention some
 // 'unknown' state or declare the information 'not applicable' - the famous "N/A" in the boxes on
 // forms.
-// Even so, such 'unknown' characterization is seen as a mere artifice, behind which lies the fundamental
-// truth ('true' or 'false') that simply escapes us because, precisely, we don't know it.
-// Thus, the proposition "Nicolas Sarkozy was sodomised by his German shepherd." (*), like any other
-// proposition, is either 'true' or 'false', according to the principle of the "excluded middle".
+// Even so, such 'unknown' characterization is seen as a mere artifice, behind which lies the
+// fundamental truth ('true' or 'false') that simply escapes us because, precisely, we don't know
+// it. Thus, the proposition "Nicolas Sarkozy was sodomised by his German shepherd." (*), like any
+// other proposition, is either 'true' or 'false', according to the principle of the "excluded
+// middle".
 // However, we are not keen to attribute a 'true' or 'false' value to such proposition. Instead, we
 // will declare that "we don't know" - and even that we don't care! Such "technical" response
-// obviously do not comply with the "excluded middle" principle...  Will this mean that we actually give
-// up our dual vision of the Truth?
+// obviously do not comply with the "excluded middle" principle...
+// Will this mean that we actually give up our dual vision of the Truth?
 // "We don't know", because materially, we can't know (if the event happened, we weren't there to
 // hold the candle). Even if we pulled out all the stops (hiring detectives to find out where the
 // person in question lives, bribing the servants, etc.), our chances of finding out the truth would
@@ -84,9 +86,9 @@
 // As for establishing the falsity of the proposition, that would appear to be even more arduous...
 // And yet, however inaccessible and pointless the "truth" or "falsity" of the proposition appear
 // to us, we never question its "existence" : we remain convinced that in the "absolute", the
-// proposition must be either "true" or "false". In other words, we are not capable of 
-// constructing our thoughts out of this (actually totally arbitrary) "evidence" : absolute Verity
-// still exists, is dual and not linked to moral values.
+// proposition must be either "true" or "false". In other words, we are not capable of constructing
+// our thoughts out of this (actually totally arbitrary) "evidence" : absolute Verity still exists,
+// is dual and not linked to moral values.
 
 // (*) Dedsoled pour cette image un peu crue, mais c'est vraiment l'exemple, bien susr juste
 // grotesque et "sans fondement", que j'avais imagined ag l'edpoque, tant pour forger mes 
@@ -116,13 +118,13 @@
 // debated (in a nutshell: the DBAs love it and the programmers hate it.)
 // III.2. Unary logic: a (particularly) arduous acceptation...
 // The main incarnation of monism in classic structured programming is undoubtedly the "pure"
-// procedure, which executes without any "return status". The idea of absence of return status
-// makes programmers that we are uncomfortable.
+// procedure, which executes without any "return status". The idea of absence of return status makes
+// programmers that we are uncomfortable.
 // For instance, we have great difficulty conceiving parsing (which is a fundamental activity in
-// computing) with a monist vision. That is, we tend to consider the "syntax error" negative case
-// as intrinsic to any - even elementary - parsing tasks. This vision, which forbids us from
-// conceiving fundamental parsing processing as pure procedures, also hampers the design of easily
-// reusable code...
+// computing) with a monist vision. That is, we tend to consider the "syntax error" negative case as
+// intrinsic to any - even elementary - parsing tasks. This vision, which forbids us from conceiving
+// fundamental parsing processing as pure procedures, also hampers the design of easily reusable
+// code...
 // III.3. Ubiquitous binary verities
 // No doubt we are too oriented or biased by our belief in absolute and dual truth. Anyway, we
 // cannot help attributing to any procedural execution a status of return corresponding to its dual
@@ -133,8 +135,8 @@
 // setbacks.
 // The most serious - and most common! - of confusion is to use the negative error case as a
 // catch-all for all sorts of problems. That is, we blithely mix anomalies of execution (which are
-// linked to the conception of the program) with applicative errors (which are caused by some
-// misuse of the application).
+// linked to the conception of the program) with applicative errors (which are caused by some misuse
+// of the application).
 // In any way, anomalies of execution are ORTHOGONAL to applicative errors and CANNOT be gathered 
 // together within negative case of procedures' execution.
 
