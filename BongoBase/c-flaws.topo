@@ -5,12 +5,12 @@
 // "Top ten (+ two)" C's REAL flaws
 // ================================
 
-// Idea: Ok, we admit the fact : C is NOT a flaw free programming language...
+// Idea: Ok, we admit the fact : C is far to be a flaw free programming language...
 // However, our belief is that:
-// - Once understood, these defects can be neatly "neutralized". Unfortunetely, do not expect any
-//   "miracle": acceptable software quality is attainable with C programming, but remains laborious
-//   to achieve; as soon as we release our efforts and are not careful enough - or too
-//   overconfident, C-code "quality" degenerates very quickly... 
+// - Once understood, these defects can be neatly "neutralized". Yet, do not expect any "miracle":
+//   acceptable software quality is attainable with C programming, but remains laborious to achieve;
+//   as soon as we release our efforts and are not careful enough - or too overconfident, C-code
+//   "quality" degenerates very quickly... 
 // - Finding a more adequate language, up to par, and getting rid of C for good would certainly be a
 //   great progress in the software industry... if and only if we first carefully identify what is
 //   actual C's responsibility in the "SHIT" of C programs - and DON'T UNDERESTIMATE our own role
@@ -189,15 +189,16 @@
 // overflows !... (*)
 // Initially, that limitation was consistent with the language's philosophy: it's up to the
 // programmer to anticipate. Such approach remains reasonable and applicable while programmers keep
-// fair control on the nature of the integer data (size and  signedness). However, inopportune
-// typedefs (which "opacify" without reason - just for the pleasure - the data types) complicate
-// the situation...
+// control on the nature of integer data (size and  signedness). However, inopportune typedefs
+// (which "opacify" without reason - just for the pleasure - the data types) complicate the
+// situation...
 // (*) This serious problem persists in C++. C++ does well provide a mechanism that mimics ADA's
 // exceptions, but that mechanism is actually useless regarding numbers' OVERFLOWS. The problem is
-// that, though the 'overflow_error' is well defined with the C++ standard, we still have to raise it
+// that, though an 'overflow_error' is well defined with the C++ standard, we still have to raise it
 // "manually" in the code if we want to handle it as exception.  It's like you have a shiny car in
-// your hands, with a lot of sophisticated controls on the dashboard, but there's no engine under the
-// hood - you have to pedal (and to simulate the engine noise with your mouth) to move forward...
+// your hands, with a lot of sophisticated controls on the dashboard, but there's no engine under
+// the hood - you have to pedal (and to simulate the engine noise with your mouth) to move
+// forward...
 
 // Number 1: Unreadable C interface headers - mess with portability flags. 
 // This is not an originel flaw of the language. But now, after more than forty years of (often
@@ -216,13 +217,14 @@
 // with my videopac toy "computer" from the year 1978), "low level" drivers, etc. - this
 // representation is indeed, by far, the most effective one can imagine...
 // ...Unfortunately, there is a huge DOWNSIDE: this representation simply does NOT allow you to
-// handle ORDINARY PORTIONS of such strings... Now, - what bad luck! -, in ordinary applications,
-// MOST of strings processings (notably the "parsings") precisely manipulate strings PORTIONS.
+// handle ORDINARY PORTIONS of such strings... Now, - what bad luck! -, in common applications, MOST
+// of strings processings (notably the "parsings") precisely manipulate strings PORTIONS.
 
 
 // Moralited:
 // C, qualified (ag l'edpoque du moins) de langage "edvolued", est en redalited passablement
-// rustique. Nous sommes toujours surpris par ses notations edtranges et sa syntaxe archaitque..
+// rustique. Les puristes que nous sommes demeurons toujours surpris par ces notations edtranges et
+// cette syntaxe archaitque..
 // En dedpit de ses imperfections origineles et d'une edvolution parfois cahotique - voire
 // contre-productive, C reste, dans l'ensemble, raisonnablement cohedrent et conserve son
 // "statut" de meilleur intermeddiaire de programmation edxistant entre l'humain (qui "lit" le
