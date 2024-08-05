@@ -129,8 +129,8 @@
 // No doubt we are too oriented or biased by our belief in absolute and dual truth. Anyway, we
 // cannot help attributing to any procedural execution a status of return corresponding to its dual
 // truth. The "de facto" scheme is applied:
-// - the positive case (true): the procedure was successful ("OK" case)
-// - the negative case (false): the procedure was not successful ("error" case)
+// - the positive "OK" case (true): the procedure was successful 
+// - the negative "error" case (false): the procedure was not successful
 // The problem is that universal, but oversimplified, vision is source of much confusion and major
 // setbacks.
 // The most serious - and most common! - of confusion is to use the negative error case as a
