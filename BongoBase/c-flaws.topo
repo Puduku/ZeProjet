@@ -19,8 +19,8 @@
 //   + Simply switching to a "brand new" language will NEVER improve the situation.
 //   + We must deeply QUESTION our own programming as well as the language itself.
 //   Only then can we hope for real PROGRESS - and avoid the eternal FIASCOS of the C++ genre...
-// In short, if we sincerely want to move forward, whether we are "conservative" (by persisting in
-// programming in C) or "innovative" (by "finally" getting rid of C), we must first point out the
+// In short, if we sincerely want to move forward, whether we are "conservative" (by persisting on
+// programming in C) or "innovative" (by getting rid of C for good), we must first point out the
 // real flaws of C. ..
 
 // Note: Portability issues are marked with (P)
