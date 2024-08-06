@@ -287,10 +287,10 @@
 // exchange feed under control of (higher) session/application protocols (FTP, HTTP, MMTP
 // etc.).
 // One of the purposes of session/application protocols is, by a way or by another, to determine the rank of
-// each peer rank at any moment and to allow peers to swap their ranks during session.
+// each peer at any moment and to allow peers to swap their ranks during session.
 // 
 // Depending on the session protocol, the ranks swapping rules would be either:
-// - implicit: for example, the session protocol says that peers swap their rank after each message
+// - implicit: for example, the session protocol stipulates that peers swap their rank after each message
 //   exchange
 // - explicit: peers swap their rank upon specific request (defined in the session protocol)
 // 
@@ -314,7 +314,7 @@
 // (asymmetric) scheme is clearly no more applicable.
 // Thus, we can introduce a new rank (we call "equal" rank) to be shared by the two peers in
 // replacement of the "master" / "slave" repartition.
-// With the "equal" rank, both peers are allowed to perform read() and write() action at the same
+// With the "equal" rank, both peers are allowed to perform read() and write() actions at the same
 // time, yet no peer is normally allowed to initiate termination. 
 // In brief: 
 // - either one peer is "master" and the other peer is "slave"
