@@ -44,9 +44,7 @@ struct BLOTEXLIB_EXECUTOR {
   m_DECLARE_MAGIC_FIELD(BLOTEXLIB_EXECUTOR_HANDLE)
   G_STRINGS_HANDLE h_blotregsHandle ; 
   G_STRINGS_HANDLE h_blottabsHandle ; 
-  G_STRING_STUFF h_working1GStringStuff ;
-  G_STRING_STUFF h_working2GStringStuff ;
-  G_STRING_STUFF availableGStringStuff ;
+  G_STRINGS_HANDLE h_workingGStringsHandle ;
 } ;  
 
 // NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION
@@ -92,9 +90,7 @@ static int BlotexlibExecutorFactoryCreateProductInstance(void *pr_handle,
   m_ASSERT(G_STRINGS_ADD_PLAIN_LEXICAL_INDEX(productHandle->h_blottabsHandle, NULL,NULL) ==
     INDEX_LABEL0)
 
-  m_TRACK_IF(G_STRING_CREATE_INSTANCE(&productHandle->h_working1GStringStuff) != RETURNED)
-  m_TRACK_IF(G_STRING_CREATE_INSTANCE(&productHandle->h_working2GStringStuff) != RETURNED)
-  productHandle->availableGStringStuff = productHandle->h_working1GStringStuff;
+  m_TRACK_IF(G_STRINGS_CREATE_INSTANCE(&productHandle->h_workingGStringsHandle,5) != RETURNED) 
 
   m_DIGGY_RETURN(RETURNED)
 } // BlotexlibExecutorFactoryCreateProductInstance
@@ -150,7 +146,7 @@ int i=0; for (; i < count ; i++){
  m_DIGGY_VAR_D(na_gStrings[(i*2)+G_PARAM_VALUE_ELEMENT].acolyt.c_tokenId)
  m_DIGGY_VAR_P(&(na_gStrings[(i*2)+G_PARAM_NAME_ELEMENT].cv_pString))
  m_DIGGY_VAR_P(&(na_gStrings[(i*2)+G_PARAM_VALUE_ELEMENT].cv_pString))
-} // while 
+}
 m_DIGGY_VAR_P_STRING(blotregName)
 switch(GStringsVerifyIndexes(*ac_blotregHandle)) {
 case COMPLETED__OK:
@@ -618,7 +614,7 @@ m_DIGGY_VAR_D(cvn_entry)
     } // if
   } // if
 
-  return ANSWER__YES;
+  m_DIGGY_RETURN(ANSWER__YES)
 } // m_BlotexlibExecutorComputeBlotexAtomBlotvar
 
 
@@ -1229,7 +1225,7 @@ m_DIGGY_VAR_D(ac_blotexValue->b_strex)
   m_DIGGY_RETURN(ANSWER__YES)
 } // m_BlotexlibExecutorComputeIntex 
 
-// Parse <intex> | <strex> 
+// Parse <blotex> 
 //
 // Passed:
 // - handle:
@@ -1273,12 +1269,11 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
         nc_abandonmentInfo)) {
       case ANSWER__YES:
         if (!ac_blotexValue->b_strex) m_ABANDON(EXPECT_STREX__ABANDONMENT_CAUSE)
-        m_TRACK_IF(GStringCopy(handle->availableGStringStuff,0, &atomBlotexValue.select.c_str) < 0)
-        m_TRACK_IF(GStringCopy(handle->availableGStringStuff,-1, &ac_blotexValue->select.c_str) < 0)
-        ac_blotexValue->select.c_str = handle->availableGStringStuff->cv_pString;
-        handle->availableGStringStuff = (handle->availableGStringStuff ==
-          handle->h_working1GStringStuff? handle->h_working2GStringStuff:
-          handle->h_working1GStringStuff);
+        G_STRING_STUFF t_workingGStringStuff = (G_STRING_STUFF)UNDEFINED;
+        m_TRACK_IF(GStringsFetch(handle->h_workingGStringsHandle,-1, &t_workingGStringStuff) < 0)
+        m_TRACK_IF(GStringCopy(t_workingGStringStuff,0, &atomBlotexValue.select.c_str) < 0)
+        m_TRACK_IF(GStringCopy(t_workingGStringStuff,-1, &ac_blotexValue->select.c_str) < 0)
+        ac_blotexValue->select.c_str = t_workingGStringStuff->cv_pString;
       break; case ANSWER__NO:
         m_DIGGY_RETURN(ANSWER__NO)
       break; default:
@@ -1392,9 +1387,11 @@ static inline int m_BlotexlibExecutorExecuteCFunctionEval(BLOTEXLIB_EXECUTOR_HAN
   struct P_STRING arguments, G_STRING_STUFF c_surrogate, gen_BLOTVAL *ac_blotval,
   G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
+  m_TRACK_IF(GStringsClear(handle->h_workingGStringsHandle,b_LIGHT_CLEAR) < 0)
   char b_blotvarReference = b_FALSE0; // a priori
   struct BLOTVAR_REFERENCE c_blotvarReference; // UNDEFINED 
   char cb_strex = (char)UNDEFINED; 
+
   m_PREPARE_ABANDON(&arguments, "Eval") 
   m_PARSE_PASS_SPACES(arguments,NULL)
   { struct P_STRING blotvarSequence; // UNDEFINED
@@ -1495,6 +1492,7 @@ static inline int m_BlotexlibExecutorExecuteCFunctionOutputF(BLOTEXLIB_EXECUTOR_
   struct P_STRING arguments, G_STRING_STUFF c_surrogate, gen_BLOTVAL *ac_blotval,
   G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
+  m_TRACK_IF(GStringsClear(handle->h_workingGStringsHandle,b_LIGHT_CLEAR) < 0)
   int n_format = -1;
   switch(m_BlotexlibExecutorParseFormat(handle,&arguments,&n_format,nc_abandonmentInfo)) {
   case ANSWER__YES:
@@ -1603,8 +1601,7 @@ static int BlotexlibExecutorDestroyInstance (void *xhr_handle) {
 
   m_TRACK_IF(GStringsDestroyInstance(xh_handle->h_blotregsHandle) != RETURNED)
 
-  m_TRACK_IF(G_STRING_DESTROY_INSTANCE(xh_handle->h_working1GStringStuff) != RETURNED)
-  m_TRACK_IF(G_STRING_DESTROY_INSTANCE(xh_handle->h_working2GStringStuff) != RETURNED)
+  m_TRACK_IF(GStringsDestroyInstance(xh_handle->h_workingGStringsHandle) != RETURNED)
 
   free(xh_handle);
   m_DIGGY_RETURN(RETURNED)
