@@ -27,8 +27,8 @@
 // <blotex> ::= <intex> | <strex> 
 //
 // Blot expressions are made of "atoms" :
-// <intex> ::= <intex atom> ( <int 2op> <intex> )*  
-// <strex> ::= <strex atom> ( <str 2op> <strex> )*  
+// <intex> ::= <intex atom> ( <int 2op> <intex atom> )*  
+// <strex> ::= <strex atom> ( <str 2op> <strex atom> )*  
 //
 // Expressions operators allows to combine expression atoms together 
 // <int 1op> ::= '!' | '+' | '-' 

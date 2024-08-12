@@ -1143,13 +1143,13 @@ m_DIGGY_VAR_D(*an_int2Op)
 } // m_BlotexlibExecutorParseInt2Op
 
 // Compute full intex ; that is
-// Parse next <intex> and if existing compute it with intex atom
-// Otherwise, full intex simply corresponds to intex atom
+// Parse end of <intex> after 1st <intex atom> and if existing compute it.
+// Otherwise, full intex simply corresponds to intex atom.
 //
 // Passed:
 // - handle:
 // - *a_sequence: before parsing
-// - atomBlotexValue: intex atom
+// - atomBlotexValue: 1st intex atom
 //
 // Changed:
 // - *a_sequence: after parsing 
@@ -1160,58 +1160,57 @@ m_DIGGY_VAR_D(*an_int2Op)
 // - ANSWER__YES: Ok,
 // - ANSWER__NO: 'value' error (next <blotex> NOT intex) ; abandon processing 
 // - -1: unexpected problem
-static inline int m_BlotexlibExecutorComputeIntex(BLOTEXLIB_EXECUTOR_HANDLE handle,
+static inline int m_BlotexlibExecutorComputeFullIntex(BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct P_STRING *a_sequence, struct BLOTEX_VALUE atomBlotexValue,
   struct BLOTEX_VALUE *ac_blotexValue, G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD_S()
 m_DIGGY_VAR_P_STRING(*a_sequence)
   m_PREPARE_ABANDON(a_sequence, "<intex>") 
-    int n_int2Op = -1;
+  int n_int2Op = -1;
+  *ac_blotexValue = atomBlotexValue;
+  while (b_TRUE) {
     m_TRACK_IF(m_BlotexlibExecutorParseInt2Op(handle,a_sequence,&n_int2Op) != RETURNED)
 m_DIGGY_VAR_D(n_int2Op)
-    
-  if (n_int2Op == -1) *ac_blotexValue = atomBlotexValue;
-  else {
-    switch (BlotexlibExecutorComputeBlotex(handle,a_sequence,ac_blotexValue,
-      nc_abandonmentInfo)){
+    if (n_int2Op == -1) break;
+    switch (m_BlotexlibExecutorComputeBlotexAtom(handle,a_sequence,&atomBlotexValue,
+      nc_abandonmentInfo)) {
     case ANSWER__YES:
-m_DIGGY_VAR_D(ac_blotexValue->b_strex)
-      if (ac_blotexValue->b_strex) m_ABANDON(EXPECT_INTEX__ABANDONMENT_CAUSE)
+m_DIGGY_VAR_D(atomBlotexValue.b_strex)
+      if (atomBlotexValue.b_strex) m_ABANDON(EXPECT_INTEX__ABANDONMENT_CAUSE)
       switch (n_int2Op) {
       case ADD__INT_2OP:
         ac_blotexValue->select.c_blotval += atomBlotexValue.select.c_blotval;
       break; case SUBTRACT__INT_2OP:
-        ac_blotexValue->select.c_blotval = atomBlotexValue.select.c_blotval -
-          ac_blotexValue->select.c_blotval;
+        ac_blotexValue->select.c_blotval -= atomBlotexValue.select.c_blotval;
       break; case MULTIPLY__INT_2OP:
         ac_blotexValue->select.c_blotval *= atomBlotexValue.select.c_blotval;
       break; case DIVIDE__INT_2OP:
-        ac_blotexValue->select.c_blotval = atomBlotexValue.select.c_blotval /
-          ac_blotexValue->select.c_blotval;
+        ac_blotexValue->select.c_blotval = ac_blotexValue->select.c_blotval /
+          atomBlotexValue.select.c_blotval;
       break; case AND__INT_2OP:
-        ac_blotexValue->select.c_blotval = atomBlotexValue.select.c_blotval && 
-          ac_blotexValue->select.c_blotval;
+        ac_blotexValue->select.c_blotval = ac_blotexValue->select.c_blotval && 
+          atomBlotexValue.select.c_blotval;
       break; case OR__INT_2OP:
-        ac_blotexValue->select.c_blotval = atomBlotexValue.select.c_blotval || 
-          ac_blotexValue->select.c_blotval;
+        ac_blotexValue->select.c_blotval = ac_blotexValue->select.c_blotval || 
+          atomBlotexValue.select.c_blotval;
       break; case EQUAL__INT_2OP:
-        ac_blotexValue->select.c_blotval = (atomBlotexValue.select.c_blotval ==
-          ac_blotexValue->select.c_blotval? TRUE__BLOTVAL0: FALSE__BLOTVAL);
+        ac_blotexValue->select.c_blotval = (ac_blotexValue->select.c_blotval ==
+          atomBlotexValue.select.c_blotval? TRUE__BLOTVAL0: FALSE__BLOTVAL);
       break; case LESS__INT_2OP:
-        ac_blotexValue->select.c_blotval = (atomBlotexValue.select.c_blotval <
-          ac_blotexValue->select.c_blotval? TRUE__BLOTVAL0: FALSE__BLOTVAL);
+        ac_blotexValue->select.c_blotval = (ac_blotexValue->select.c_blotval <
+          atomBlotexValue.select.c_blotval? TRUE__BLOTVAL0: FALSE__BLOTVAL);
       break; case LESS_EQUAL__INT_2OP:
-        ac_blotexValue->select.c_blotval = (atomBlotexValue.select.c_blotval <=
-          ac_blotexValue->select.c_blotval? TRUE__BLOTVAL0: FALSE__BLOTVAL);
+        ac_blotexValue->select.c_blotval = (ac_blotexValue->select.c_blotval <=
+          atomBlotexValue.select.c_blotval? TRUE__BLOTVAL0: FALSE__BLOTVAL);
       break; case GREATER__INT_2OP:
-        ac_blotexValue->select.c_blotval = (atomBlotexValue.select.c_blotval >
-          ac_blotexValue->select.c_blotval? TRUE__BLOTVAL0: FALSE__BLOTVAL);
+        ac_blotexValue->select.c_blotval = (ac_blotexValue->select.c_blotval >
+          atomBlotexValue.select.c_blotval? TRUE__BLOTVAL0: FALSE__BLOTVAL);
       break; case GREATER_EQUAL__INT_2OP:
-        ac_blotexValue->select.c_blotval = (atomBlotexValue.select.c_blotval >=
-          ac_blotexValue->select.c_blotval? TRUE__BLOTVAL0: FALSE__BLOTVAL);
+        ac_blotexValue->select.c_blotval = (ac_blotexValue->select.c_blotval >=
+          atomBlotexValue.select.c_blotval? TRUE__BLOTVAL0: FALSE__BLOTVAL);
       break; case NOT_EQUAL__INT_2OP:
-        ac_blotexValue->select.c_blotval = (atomBlotexValue.select.c_blotval !=
-          ac_blotexValue->select.c_blotval? TRUE__BLOTVAL0: FALSE__BLOTVAL);
+        ac_blotexValue->select.c_blotval = (ac_blotexValue->select.c_blotval !=
+          atomBlotexValue.select.c_blotval? TRUE__BLOTVAL0: FALSE__BLOTVAL);
       break; default:
         m_RAISE(ANOMALY__VALUE__D,n_int2Op) 
       } // switch
@@ -1220,10 +1219,10 @@ m_DIGGY_VAR_D(ac_blotexValue->b_strex)
     break; default:
       m_TRACK()
     } // switch
-  } // if 
+  } // while 
 
   m_DIGGY_RETURN(ANSWER__YES)
-} // m_BlotexlibExecutorComputeIntex 
+} // m_BlotexlibExecutorComputeFullIntex 
 
 // Parse <blotex> 
 //
@@ -1261,7 +1260,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
   m_PREPARE_ABANDON(a_sequence, "<blotex>") 
 
   m_PARSE_PASS_SPACES(*a_sequence,NULL)
-  if (atomBlotexValue.b_strex) { // strex
+  if (atomBlotexValue.b_strex) { // <strex>
     m_PARSE_PASS_SINGLE_CHAR(*a_sequence,NULL,'+',&lexeme) // Try <str 2op> ...
     if (b_EMPTY_P_STRING(lexeme)) *ac_blotexValue = atomBlotexValue;
     else { 
@@ -1281,8 +1280,8 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
       } // switch
     } // if 
 
-  } else { // intex
-    switch (m_BlotexlibExecutorComputeIntex(handle,a_sequence,atomBlotexValue,ac_blotexValue,
+  } else { // <intex>
+    switch (m_BlotexlibExecutorComputeFullIntex(handle,a_sequence,atomBlotexValue,ac_blotexValue,
       nc_abandonmentInfo)) {
     case ANSWER__YES:
     break; case ANSWER__NO:
