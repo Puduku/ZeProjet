@@ -18,52 +18,68 @@
 // I. Blot expressions (blotex) 
 // ----------------------------
 // Legend:
-// - <entity name>   => "soft" lexeme ; leading white spaces REMOVED 
-// - <<single char>> => "hard" lexeme ; leading white spaces NOT REMOVED
+// - <entity name>   => "soft" lexeme ; leading white spaces are systematically REMOVED 
+// - <<single char>> => "hard" lexeme ; leading white spaces are NOT REMOVED
 //
-// There two types of blot expressions: 
+// There two main types of blot expressions: 
 // - "string" blotex => "strex" type
-// - "blotval" blotex: signed integer => "intex" type
+// - "blotval" blotex: (signed) integer => "intex" type:
 // <blotex> ::= <intex> | <strex> 
 //
-// Blot expressions are made of "atoms" :
-// <intex> ::= <intex atom> ( <int 2op> <intex atom> )*  
-// <strex> ::= <strex atom> ( <str 2op> <strex atom> )*  
+// Blot expressions are made of operations on terms:
+// <intex> ::= <intex term> ( <int term op> <intex term> )*  
+// <strex> ::= <strex term> ( <str term op> <strex term> )*  
+// <int term op> ::= '+' | '-' | '&&' | '||'
+// Pseudo-logical operators '&&' (logical AND) and '||' (logical OR) combine integer expressions
+// together, "seen" as booleans.
+// <str term op> ::= '+' 
+// '+' operator applied on strings is a concatenation.
 //
-// Expressions operators allows to combine expression atoms together 
-// <int 1op> ::= '!' | '+' | '-' 
+// Integer terms are made of operations on (integer) factors:
+// <intex term> ::= <fact> ( <fact op> <fact> )*  
+// Integer comparisons are assimilated to factoral operations:
+// <fact op> ::= '*' | '/' | <comp op> 
+// General comparision operators are:
 // <comp op> ::= '>' | '<' | '>=' | '<=' | '==' | '!='
-// <int 2op> ::= '+' | '-' | '*' | '/' | '&&' | '||' | <comp op> 
-// Pseudo-logical operators ('!', '&&' and '||') combine integer expressions together, "seen" as
-// booleans.
+// A comparison result is a "pseudo-boolean" blotval integer.
+// Reminder: blotval's convention : 
+// - 0 : represents "true" boolean value
+// - !=0 : represents "false" boolean value
 //
-// '+' operator applied on strings is a concatenation
-// <str 2op> ::= '+' 
+// Factors are made of integer atoms and integer expressions between brackets: 
+// <fact> ::= '(' <intex> ')' | <intex atom> 
 //
-// The atoms are made of constants, variables references, strings comparisons, "register" and
-// "table" operations.
+// String terms are made of string atoms and string expressions between brackets:
+// <strex term> ::= '(' <strex> ')' | <strex atom> 
+//
+// Integer and string atoms are made of constants, variables references, strings comparisons,
+// "register" and "table" operations:
 // <intex atom> ::= [ <int 1op> ] ( <int constant> | <blotvar as int> | <blotvar entry> |
 //   <blotvar id> | <blotreg int> | <blottab int>  | <strex comp> ) 
 // <strex atom> ::= <str constant> | <blotvar as str> | <blotvar name> | <blotreg str> |
 //   <blottab str>
-// <strex comp> ::= <strex> <str comp op> <strex>
 //
-// Constant expressions
+// Unary operators modify integer atoms. Pseudo-logical operator '!' "negates" the integer
+// expression "seen" as boolean:
+// <int 1op> ::= '!' | '+' | '-' 
+//
+// A string comparison is handled as (pseudo-boolean) integer atom:
+// <strex comp> ::= <strex> <str comp op> <strex>
+// <str comp op> ::=  <comp op>  | '===' 
+// '===' corresponds to "like" comparison
+//
+// Constant expressions:
 // <int constant> : any integer constants of C language... 
 // <str constant> ::= '"' ( <<single char>> )* '"'
-// String example: "Julie" 
-// Integer examples: 69 , 0xCACABEBE
-// Reminder: blotval's convention : 
-// - 0 : represents "true" boolean value
-// - !=0 : represents "false" boolean value
+// String constant example: "Julie" 
+// Integer constant examples: 69 , 0xCACABEBE
 //
 // Entities. The different entities:
 // - blotreg (blot register)
 // - blotvar (blot variable)
 // - blottab (blot table)
 // - blottab element
-// are identified by their name (may be empty).
-//
+// are identified by their name (may be empty):
 // <entity name> ::= ( <<letter>> | <<digit>> | '_' )*
 //
 // Variables and registers
@@ -125,7 +141,6 @@
 //
 // <comp op> ::= '>' | '<' | '>=' | '<=' | '==' | '!='
 // <logical 2op> ::= 'and' | 'or'
-// <str comp op> ::=  <comp op>  | '===' 
 //
 // Examples
 // recettes?: !$ === "*bolo*" and # >= 69 :?       => new register selection 
