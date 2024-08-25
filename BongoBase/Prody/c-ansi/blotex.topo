@@ -26,17 +26,16 @@
 // - "blotval" blotex: (signed) integer => "intex" type:
 // <blotex> ::= <intex> | <strex> 
 //
-// Blot expressions are made of operations on terms:
-// <intex> ::= <intex term> ( <int term op> <intex term> )*  
-// <strex> ::= <strex term> ( <str term op> <strex term> )*  
-// <int term op> ::= '+' | '-' | '&&' | '||'
+// Blot expressions are made of operations:
+// <intex> ::= <intex term> ( <term op> <intex term> )*  
+// <strex> ::= <strex atom> ( '+' <strex atom> )*  
+// '+' operator applied on string atoms is a concatenation.
+// <term op> ::= '+' | '-' | '&&' | '||'
 // Pseudo-logical operators '&&' (logical AND) and '||' (logical OR) combine integer expressions
 // together, "seen" as booleans.
-// <str term op> ::= '+' 
-// '+' operator applied on strings is a concatenation.
 //
-// Integer terms are made of operations on (integer) factors:
-// <intex term> ::= <fact> ( <fact op> <fact> )*  
+// Integer terms are made of factoral operations on (integer) atoms:
+// <intex term> ::= <intex atom> ( <fact op> <intex atom> )*  
 // Integer comparisons are assimilated to factoral operations:
 // <fact op> ::= '*' | '/' | <comp op> 
 // General comparision operators are:
@@ -46,18 +45,12 @@
 // - 0 : represents "true" boolean value
 // - !=0 : represents "false" boolean value
 //
-// Factors are made of integer atoms and integer expressions between brackets: 
-// <fact> ::= '(' <intex> ')' | <intex atom> 
-//
-// String terms are made of string atoms and string expressions between brackets:
-// <strex term> ::= '(' <strex> ')' | <strex atom> 
-//
-// Integer and string atoms are made of constants, variables references, strings comparisons,
-// "register" and "table" operations:
-// <intex atom> ::= [ <int 1op> ] ( <int constant> | <blotvar as int> | <blotvar entry> |
-//   <blotvar id> | <blotreg int> | <blottab int>  | <strex comp> ) 
-// <strex atom> ::= <str constant> | <blotvar as str> | <blotvar name> | <blotreg str> |
-//   <blottab str>
+// Integer and string atoms are made of constants, blot expressions between brackets, variables
+// references, strings comparisons, "register" and "table" operations:
+// <intex atom> ::= [ <int 1op> ] ( ( '(' <intex> ')' ) | <int constant> | <blotvar as int> |
+//   <blotvar entry> | <blotvar id> | <blotreg int> | <blottab int>  | <strex comp> ) 
+// <strex atom> ::= ( '(' <strex> ')' ) | <str constant> | <blotvar as str> | <blotvar name> |
+//   <blotreg str> | <blottab str>
 //
 // Unary operators modify integer atoms. Pseudo-logical operator '!' "negates" the integer
 // expression "seen" as boolean:

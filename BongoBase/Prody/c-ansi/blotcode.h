@@ -82,6 +82,9 @@ typedef GENERIC_INTEGER gen_BLOTVAL;
 #define   BREAK_LOOP__BLOTVAL  FALSE__BLOTVAL
 
 
+#define BOOLEAN_BLOTVAL(b_boolean) ((b_boolean)? TRUE__BLOTVAL0: FALSE__BLOTVAL)
+
+
 // #REF BLOTLIB_EXECUTOR__EXECUTE_C_FUNCTION <blotlib>
 // C function implementing the <blotlib> function.
 //
