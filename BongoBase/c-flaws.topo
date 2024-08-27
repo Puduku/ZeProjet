@@ -175,7 +175,7 @@
 // casting (pseudo-)operations DISABLES any data type consistency CONTROLS made by the compiler, and
 // by the way transform simple compilation problems into application crashes that must, of course, be
 // avoided).  
-// So, 'const' does provides effective protection against invalid data changes, which are specific
+// So, 'const' does provide effective protection against invalid data changes, which are specific
 // forms of data corruption, but the price to pay for this protection is a real risk of causing
 // application crashes, which are "generalized" forms of data corruption... (**)
 // So, in such circumstances, the wisest course is to simply forego the "protection" offered by
@@ -223,7 +223,7 @@
 
 // Moralited:
 // C, qualified (ag l'edpoque du moins) de langage "edvolued", est en redalited passablement
-// rustique. Les puristes que nous sommes demeurons toujours surpris par ces notations edtranges et
+// rustique. Les puristes que nous sommes restons toujours surpris par ces notations edtranges et
 // cette syntaxe archaitque..
 // En dedpit de ses imperfections origineles et d'une edvolution parfois cahotique - voire
 // contre-productive, C reste, dans l'ensemble, raisonnablement cohedrent et conserve son
