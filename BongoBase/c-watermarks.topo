@@ -61,12 +61,11 @@
 // g_ indicator - "give change for ..." ("surrogate", "substitute", "alias") : remove abstraction of
 //   type definition (the type definition is well a SUB TYPE definition - NOT an abstraction) 
 // h_ indicator - "head" ("representative", "delegate", "proponent", ...): indicates that the variable
-//   is the "head" handle of some allocated resource - or "instance". 
+//   is the "head" handle of some allocated resource or instance. 
 //   NB: "handle" must be understood in a wide meaning: all these variables are "handles" :
 //   - file descriptor: allocated resources are process's and system's "open file" entries
 //   - "malloced" memory pointer: allocated resource is part of the heap memory
-//   - formal handles (which are generally pointers to some hidden structure): compound or "basic
-//     handles" (open files and heap memory) 
+//   - formal handles (which are generally pointers to some hidden structure)
 //   The "head" indicator simply designates among the multiple "handles" that can point out   
 //   one given instance WHICH ONE is that formally chosen to "represent" the instance. That is,    
 //   by convention, lifespan of the instance is tied to that of its "head" variable. In particular,
@@ -77,10 +76,6 @@
 //   "fragments" "crap" "trash" "bits"...) : in combination with h_ and x_ indicators, indicates
 //   uncomplete deallocation (i.e potential memory leak) ; "junk" will be simply cleared with 
 //   death of process. 
-// k_ indicator (?) : indicates a function (generally static) that is only called once (by another
-//   function of the module). The idea is to stress that this function does not correspond to
-//   real "factorization" in the code, but is only defined to reduce the size (and "cyclomatic 
-//   complexity") of the calling function...
 // m_ 1. (original meaning) : "pure macro" indicator. Indicates that the macro is a "pure" macro of
 //   the pre-processor.
 //   A pure macro leverages all the portable features of the C preprocessor. However, pure macros,
@@ -103,13 +98,13 @@
 //     char *c_password; // NOT significant in anonymous connection 
 // o_ indicator (?) : indicates that validity of parameter is explicitly checked
 // p_ indicator - "protected": in basic cases, warrants protection against modification ; 
-//   in which case, that indicator is often added in coordination with "const" type qualifier... 
+//   in such case, that indicator is often added in coordination with "const" type qualifier... 
 //   In specific cases (POSIX code) "protected" just means "thread safe" (either the instance data
 //   is not changed or is protected by ad hoc mechanism like a mutex)
 //   Note: thread safety is required with singletons (see d_ indicator).  
-// r_ indicator "raw" (generic): in generic programming (virtual functions, etc.) indicates a
-//   generic parameter. This indicator acts as "barrier" between generic and specific indicators.
-//   - indicators placed at the left of the raw indicator apply generically 
+// r_ indicator "raw" : in generic programming context - virtual functions, etc., that flag designs
+//   a generic parameter. 'r' indicator acts as "barrier" between generic and specific indicators.
+//   - indicators placed at the left of the raw indicator are "generic" to the parameter 
 //   - indicator cannot exist at the right of the raw indicator 
 //   - however, when a real function implements a generic function, real parameters can overwrite
 //     generic parameters ; for these parameters:
