@@ -22,8 +22,8 @@
 // 'good'/'bad', 'all'/'nothing', 'on'/'off', ... not forgetting the digital 0/1 bit avatar - seem
 /  to derive. Even more practical dualities such as 'day'/'night', 'win'/'lose', 'rich'/'poor',
 // 'white'/'black' or 'beautiful'/'ugly' can be trivially reduced to a 'true'/'false' opposition (
-// e.g., the duality 'day'/'night' can be simply restated with "[it's day is] true" / "[it's day
-// is] false").
+// e.g., the duality 'day'/'night' can be simply restated with "it's day" is 'true' / "it's day" is
+// 'false').
 // Yet, those logical dualities will be genuinely equivalent once we have determined a rule that
 // uniquely associates each single verity value between two given dualities.
 // So, for example, when comparing the two dualities 'yes'/'no' and 'day'/'night', why assimilate
