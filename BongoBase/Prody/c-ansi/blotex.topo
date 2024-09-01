@@ -18,7 +18,7 @@
 // I. Blot expressions (blotex) 
 // ----------------------------
 // Legend:
-// - <entity name>   => "soft" lexeme ; leading white spaces are systematically REMOVED 
+// - <entity>   => "soft" lexeme ; leading white spaces are systematically REMOVED 
 // - <<single char>> => "hard" lexeme ; leading white spaces are NOT REMOVED
 //
 // There two main types of blot expressions: 
@@ -56,7 +56,7 @@
 // expression "seen" as boolean:
 // <int 1op> ::= '!' | '+' | '-' 
 //
-// A string comparison is handled as (pseudo-boolean) integer atom:
+// A string comparison is valued as (pseudo-boolean) integer atom:
 // <strex comp> ::= <strex> <str comp op> <strex>
 // <str comp op> ::=  <comp op>  | '===' 
 // '===' corresponds to "like" comparison
@@ -73,7 +73,7 @@
 // - blottab (blot table)
 // - blottab element
 // are identified by their name (may be empty):
-// <entity name> ::= ( <<letter>> | <<digit>> | '_' )*
+// <entity> ::= ( <<letter>> | <<digit>> | '_' )*
 //
 // Variables and registers
 // A blot variable (blotvar) stores a blotex value.
@@ -81,7 +81,7 @@
 // (the register with empty entity name is called the global register)
 //
 // Formally a blotvar is referenced as following (in which the 1st entity name identifies the register) :
-// <blotvar> ::= <entity name> ( '.' <entity name>  | '[' <intex> ']' ) 
+// <blotvar> ::= <entity> ( '.' <entity>  | '[' <intex> ']' ) 
 // Blotvar examples: 
 // .toto => toto blotvar of global register
 // recettes.bolo => bolo blotvar of recettes register
@@ -89,23 +89,31 @@
 // [1] => 2nd blotvar stored in global register 
 // recettes[.toto] => recettes register's blotvar indexed by toto global blotvar   
 //
+// "As" suffixes allow to qualify integer and string entities:
+// <<as value int>> ::= '#'
+// <<as entry int>> ::= '!#'
+// <<as id int>> ::= '!'
+// <<as value str>> ::= '$'
+// <<as name str>> ::= '!$'
+// 
 // Blotvar implicit and explicit integer value
 // A blotvar value is implicitly an integer value
 // However, reference to integer value of a blotvar may be explicit
-// <blotvar as int> ::= <blotvar> [ '#' ]
+// <blotvar as int> ::= <blotvar> [ <<as value int>> ]
+// <blotvar id> ::= <blotvar> <<as id int>>
 // Examples:
 // .toto => toto global blotvar's integer value 
 // .toto# => ALSO toto global blotvar's integer value
 //
 // Blotvar string value 
-// <blotvar as str> ::= <blotvar> '$' 
+// <blotvar as str> ::= <blotvar> <<as value str>> 
 // Examples:
 // .toto$           => toto global blotvar string value 
 // recettes[.toto]$ => string value of recettes register's blotvar indexed by toto global blotvar
 //
 // Blotvar name and entry
-// <blotvar name> ::= <blotvar> '!$'
-// <blotvar entry> ::= <blotvar> '!#'
+// <blotvar name> ::= <blotvar> <<as name str>>
+// <blotvar entry> ::= <blotvar> <<as entry int>>
 // Examples
 // .toto!$ => toto global blotvar's name, that is "toto"
 // recettes[0]!$ => name of 1st blotvar stored in recettes register   
@@ -113,24 +121,25 @@
 // .toto!# => index (entry) of toto global blotvar 
 //
 // Register operations 
-// <blotreg int> ::= <entity name> '?' <blotreg ops int>  
+// <blotreg int> ::= <entity> '?' <blotreg ops int>  
 // <blotreg ops int> ::= [ <blotreg op select> ] [ [ <blotreg op reset> ] [ <blotreg op next> ]
 //   <blotreg op read int> ] 
 // <blotreg op select> ::= ':' <blotreg request>
 // <blotreg op reset> ::= '^'
 // <blotreg op next> ::= '+'
-// <blotreg op read int> ::= '=' [ ( '#' | '!#' ) ]
+// <blotreg op read int> ::= '=' [ <<as value int>> | <<as entry int>> | <<as id int>> ]
 //
-// <blotreg str> ::= <entity name> '?' <blotreg ops str>  
+// <blotreg str> ::= <entity> '?' <blotreg ops str>  
 // <blotreg ops str> ::= [ <blotreg op select> ] [ <blotreg op reset> ] [ <blotreg op next> ]
 //   <blotreg op read str>
-// <blotreg op read str> ::= '=' ( '$' | '!$' )  
+// <blotreg op read str> ::= '=' ( <<as value str>> | <<as name str>> )  
 //
 // Blotreg requests are made of "atoms" : 
 // <blotreg request> ::= <blotreg request atom> ( <logical 2op> <blotreg request> )* ':?'
 // <blotreg request atom> ::= <int blotreg request atom> | <str blotreg request atom>
-// <int blotreg request atom> ::= ( '#' | '!#' ) <comp op> <intex> 
-// <str blotreg request atom> ::= ( '$' | '!$' ) <str comp op> <strex> 
+// <int blotreg request atom> ::= [ <<as value int>> | <<as entry int>> | <<as id int>> ] <comp op>
+//   <intex>
+// <str blotreg request atom> ::= ( <<as value str>> | <<as name str>> ) <str comp op> <strex> 
 //
 // <comp op> ::= '>' | '<' | '>=' | '<=' | '==' | '!='
 // <logical 2op> ::= 'and' | 'or'
@@ -151,20 +160,20 @@
 // A blot table (blottab) is a collection of blotsets 
 // (the table with empty entity name is called the global table)
 //
-// <blottab int> ::= '^' <entity name> '?' <blottab ops int>  
+// <blottab int> ::= '^' <entity> '?' <blottab ops int>  
 // <blottab ops int> ::= <blottab op create> | ( [ <blottab op select> ] [ <blottab op reset> ]
 //   [ <blottab op insert> ] [ <blottab op next> ] [ <blottab op read int> ] ) 
-// <blottab op create> ::=  '[' ( <entity name> )+ ']?' 
+// <blottab op create> ::=  '[' ( <entity> )+ ']?' 
 // <blottab op select> ::= ':' <blottab request> ':?'
 // <blottab op reset> ::= '^'
 // <blottab op next> ::= '+'
 // <blottab op insert> ::= '@'
 // <blottab op read int> ::= '=' <int blottab element>
 //
-// <int blottab element> ::= <entity name> [ '#' ] 
-// <str blottab element> ::= <entity name> '$'
+// <int blottab element> ::= <entity> [ <<as value int>> ] 
+// <str blottab element> ::= <entity> <<as value str>>
 //
-// <blottab str> ::= '^' <entity name> '?' <blottab ops str>  
+// <blottab str> ::= '^' <entity> '?' <blottab ops str>  
 // <blottab ops str> ::= [ <blottab op select> ] [ <blottab op reset> ] [ <blottab op next> ]
 //   [ <blottab op insert> ] <blottab op read str>
 // <blottab op read str> ::= '=' <str blottab element> 
