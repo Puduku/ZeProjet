@@ -735,15 +735,15 @@ static int BlotexlibExecutorComputeBlotex(BLOTEXLIB_EXECUTOR_HANDLE handle,
 // Passed:
 // - handle:
 // - *a_sequence: expect <blotreg request>  
-// - blotregHandle: register 
+// - blotregHandle: register for request 
 //
 // Changed:
 // - *a_sequence: after parsing 
-// - blotregHandle: request initialised in register  
+// - blotregHandle: request initiated in register  
 // - nc_abandonmentInfo: only significant if "computing abandoned"
 //
-// Ret: Computed successfully ? 
-// - ANSWER__YES: Ok,
+// Ret: Parsed and computed successfully ? 
+// - ANSWER__YES: success
 // - ANSWER__NO: 'syntax' error; abandon processing 
 // - -1: unexpected problem
 static inline int m_BlotexlibExecutorComputeBlotregRequest(BLOTEXLIB_EXECUTOR_HANDLE handle,
