@@ -515,10 +515,10 @@ struct BLOTEX_VALUE {
 
 enum {
   AS__VALUE_INT, // [ '#' ]
-  AS__ENTRY_INT, // '!#' 
-  AS__ID_INT,    // '!'
+  AS__ENTRY,     // '!#' 
+  AS__ID,        // '!'
   AS__VALUE_STR, // '$'
-  AS__NAME_STR,  // '!$'
+  AS__NAME,      // '!$'
 } ;
 
 // Parse "as" specifier (not present : default to '#" value int) 
@@ -542,7 +542,7 @@ static int ParseAs(struct P_STRING *a_sequence, int *a_as) {
   if (!b_EMPTY_P_STRING(lexeme)) *a_as = AS__VALUE_INT;
   else {
     m_PARSE_MATCH_C(*a_sequence,"!#",NULL,&lexeme) 
-    if (!b_EMPTY_P_STRING(lexeme)) *a_as = AS__ENTRY_INT;
+    if (!b_EMPTY_P_STRING(lexeme)) *a_as = AS__ENTRY;
     else {
       m_PARSE_MATCH_C(*a_sequence,"$",NULL,&lexeme) 
       if (!b_EMPTY_P_STRING(lexeme)) *a_as = AS__VALUE_STR;
@@ -551,10 +551,10 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
         m_PARSE_MATCH_C(*a_sequence,"!$",NULL,&lexeme) 
 m_DIGGY_VAR_P_STRING(*a_sequence)
 m_DIGGY_VAR_P_STRING(lexeme)
-        if (!b_EMPTY_P_STRING(lexeme)) *a_as = AS__NAME_STR;
+        if (!b_EMPTY_P_STRING(lexeme)) *a_as = AS__NAME;
         else {
           m_PARSE_MATCH_C(*a_sequence,"!",NULL,&lexeme) 
-          if (!b_EMPTY_P_STRING(lexeme)) *a_as = AS__ID_INT;
+          if (!b_EMPTY_P_STRING(lexeme)) *a_as = AS__ID;
           else  *a_as = AS__VALUE_INT;
         } // if
       } // if
@@ -588,19 +588,18 @@ static int IsCompOpChar(int c) {
   return (c == '*' || c == '/' || c == '=' || c == '!' || c == '>' || c == '<');
 } // IsCompOpChar
 
-// Parse <comp op> | <str comp op> | <fact op> if present
+// Parse comparison operator, if present...
 //
 // Passed:
 // - compOpExtension: + NO__COMP_OP_EXTENSION: parse <comp op>
 //   + STR__COMP_OP_EXTENSION: parse <str comp op>
 //   + FACT_OP__COMP_OP_EXTENSION: parse <fact op>
-// - *a_sequence: before parsing
+// - *a_sequence: expected (eventually) : <comp op> | <str comp op> | <fact op>  
 //
 // Changed:
 // - *a_sequence: after parsing 
-// - *an_compOp:
-//   + -1: special value: <int 2op> NOT present
-//   + >=0 : corresponding int 2op 
+// - *an_compOp: + -1: special value: comparison operator NOT present
+//   + >=0 : corresponding comparison operator 
 //
 // Ret:
 // - RETURNED: Ok
@@ -648,16 +647,16 @@ m_DIGGY_VAR_D(*an_compOp)
 } // ParseCompOp
 
 
-// Parse request   
-// Notice: also suitable for <request comp op>
+// Parse comparison operator in register/table request, if present... 
 //
 // Passed:
-// - *a_sequence: expexted: <str request comp op> 
-// - b_str : TRUE => <str request comp op> ; FALSE => <request comp op>
+// - *a_sequence: expect <str comp op> | <comp op> 
+// - b_str : TRUE => expect <str comp op> ; FALSE => expect <comp op>
 //
 // Changed:
 // - *a_sequence: after parsing 
-// - *an_indexSeekFlags: corresponding comp. op. (-1 special value if not found) 
+// - *an_indexSeekFlags: + -1 special value: comparison operator not present
+//   + >= 0: seek flags corresponding to comparison operator
 // 
 // Ret:
 // - RETURNED: Ok
@@ -783,10 +782,10 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(indexSeekFlags)
         if (blotexValue.b_strex) m_ABANDON(EXPECT_INTEX__ABANDONMENT_CAUSE)
         blotregIndexLabel = INT_VALUE__BLOTREG_INDEX_LABEL; 
         m_ASSIGN_G_KEY__ACOLYT_VALUE(gKey,blotexValue.select.c_blotval) 
-      break; case AS__ENTRY_INT: // '!#' 
+      break; case AS__ENTRY: // '!#' 
         if (blotexValue.b_strex) m_ABANDON(EXPECT_INTEX__ABANDONMENT_CAUSE)
         m_RAISE(ANOMALY__NOT_AVAILABLE)
-      break; case AS__ID_INT: // '!' 
+      break; case AS__ID: // '!' 
         blotregIndexLabel = TOKEN_ID__BLOTREG_INDEX_LABEL; 
         m_ASSIGN_G_KEY__ACOLYT_VALUE(gKey,blotexValue.select.c_blotval) 
       break; case AS__VALUE_STR: // '$'
@@ -794,7 +793,7 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(indexSeekFlags)
 m_DIGGY_VAR_P_STRING(blotexValue.select.c_str)
         blotregIndexLabel = STR_VALUE__BLOTREG_INDEX_LABEL; 
         m_ASSIGN_G_KEY__P_STRING(gKey,blotexValue.select.c_str)
-      break; case AS__NAME_STR:  // '!$'
+      break; case AS__NAME:  // '!$'
         if (!blotexValue.b_strex) m_ABANDON(EXPECT_STREX__ABANDONMENT_CAUSE)
 m_DIGGY_VAR_P_STRING(blotexValue.select.c_str)
         blotregIndexLabel = NAME__BLOTREG_INDEX_LABEL;
@@ -904,10 +903,10 @@ m_DIGGY_VAR_D(as)
       case AS__VALUE_INT:
         ac_blotexValue->b_strex = b_FALSE0; 
         ac_blotexValue->select.c_blotval = ct_blotvarStuff[G_PARAM_VALUE_ELEMENT].acolyt.cen_value;
-      break; case AS__ENTRY_INT:
+      break; case AS__ENTRY:
         ac_blotexValue->b_strex = b_FALSE0; 
         ac_blotexValue->select.c_blotval = c_entry; 
-      break; case AS__ID_INT:
+      break; case AS__ID:
         ac_blotexValue->b_strex = b_FALSE0; 
 m_RAISE(ANOMALY__NOT_AVAILABLE)
       break; case AS__VALUE_STR:
@@ -917,7 +916,7 @@ m_DIGGY_VAR_P_STRING(ct_blotvarStuff[G_PARAM_NAME_ELEMENT].cv_pString)
 m_DIGGY_VAR_D((int)ct_blotvarStuff[G_PARAM_NAME_ELEMENT].acolyt.cen_value)
         ac_blotexValue->b_strex = b_TRUE; 
         ac_blotexValue->select.c_str = ct_blotvarStuff[G_PARAM_VALUE_ELEMENT].cv_pString ; 
-      break; case AS__NAME_STR:
+      break; case AS__NAME:
         ac_blotexValue->b_strex = b_TRUE; 
         ac_blotexValue->select.c_str = ct_blotvarStuff[G_PARAM_NAME_ELEMENT].cv_pString ; 
       break; default: 
@@ -925,7 +924,7 @@ m_DIGGY_VAR_D((int)ct_blotvarStuff[G_PARAM_NAME_ELEMENT].acolyt.cen_value)
       } // switch
 
     break; case RESULT__NOT_FOUND:
-      if ((ac_blotexValue->b_strex = (as == AS__VALUE_STR || as == AS__NAME_STR)))
+      if ((ac_blotexValue->b_strex = (as == AS__VALUE_STR || as == AS__NAME)))
         m_ASSIGN_EMPTY_P_STRING(ac_blotexValue->select.c_str)
       else ac_blotexValue->select.c_blotval = FALSE__BLOTVAL; 
     break; default:
@@ -1000,17 +999,17 @@ m_DIGGY_VAR_D(cvn_entry)
   case AS__VALUE_INT: // [ '#' ] <blotvar as int>
     ac_blotexAtomValue->select.c_blotval =
       cvnt_blotvarStuff[G_PARAM_VALUE_ELEMENT].acolyt.cen_value;
-  break; case AS__ID_INT: // '!'  <blotvar id>
+  break; case AS__ID: // '!'  <blotvar id>
     ac_blotexAtomValue->select.c_blotval =
       cvnt_blotvarStuff[G_PARAM_NAME_ELEMENT].acolyt.cen_value;
-  break; case AS__ENTRY_INT: // '!#' <blotvar entry> 
+  break; case AS__ENTRY: // '!#' <blotvar entry> 
     m_ASSERT(cvn_entry >= 0)
     ac_blotexAtomValue->select.c_blotval = cvn_entry;
   break; case AS__VALUE_STR: // '$' // <blotvar strex> 
     ac_blotexAtomValue->b_strex = b_TRUE;
     ac_blotexAtomValue->select.c_str =
       cvnt_blotvarStuff[G_PARAM_VALUE_ELEMENT].cv_pString; 
-  break; case AS__NAME_STR:  // '!$' <blotvar name> 
+  break; case AS__NAME:  // '!$' <blotvar name> 
     ac_blotexAtomValue->b_strex = b_TRUE;
     ac_blotexAtomValue->select.c_str =
       cvnt_blotvarStuff[G_PARAM_NAME_ELEMENT].cv_pString; 
@@ -1062,7 +1061,7 @@ static int BlotexlibExecutorProbeBlotexAtom(BLOTEXLIB_EXECUTOR_HANDLE handle,
 
 m_DIGGY_VAR_P_STRING(*a_sequence)
   m_PARSE_GENERIC_INTEGER(*a_sequence,ac_blotexAtomValue->select.c_blotval,&lexeme)
-m_DIGGY_VAR_LD(ac_blotexAtomValue->select.c_blotval)
+m_DIGGY_VAR_GEN(ac_blotexAtomValue->select.c_blotval,ld)
 m_DIGGY_VAR_P_STRING(lexeme)
   if (!b_EMPTY_P_STRING(lexeme)) ac_blotexAtomValue->b_strex = b_FALSE0; // <int constant>
   else { 
@@ -1557,10 +1556,10 @@ m_DIGGY_VAR_P(&(t_blotvarStuff[G_PARAM_VALUE_ELEMENT].cv_pString))
 
   if (c_blotexValue.b_strex) {
     *ac_blotval = TRUE__BLOTVAL0;
-m_DIGGY_VAR_LD(*ac_blotval)
+m_DIGGY_VAR_GEN(*ac_blotval,ld)
   } else {
     *ac_blotval = c_blotexValue.select.c_blotval;
-m_DIGGY_VAR_LD(*ac_blotval)
+m_DIGGY_VAR_GEN(*ac_blotval,ld)
   } // if
 
   m_DIGGY_RETURN(ANSWER__YES)

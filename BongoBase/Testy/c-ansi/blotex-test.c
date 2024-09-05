@@ -119,28 +119,39 @@ m_DIGGY_VAR_STRING(ccp_expectedOutput)
 #define DUMMY_TEMPLATE3 "Que la ##<< loop be.Eval(69) >>Beauted##<<endLoop>> du corps est un sublime don"
 #define DUMMY_OUTPUT3 "Que la  du corps est un sublime don"
 
-#define DUMMY_TEMPLATE4 "##<< be.Eval(.toto := 69)>>Que la "\
-"##<<loop be.Eval(.toto)>>"\
-"Beauted##<<endLoop>> du corps est un sublime don"
+#define DUMMY_TEMPLATE4 \
+  "##<< be.Eval(.toto := 69)>>Que la "\
+  "##<<loop be.Eval(.toto)>>"\
+  "Beauted##<<endLoop>> du corps est un sublime don"
 #define DUMMY_OUTPUT4 "Que la  du corps est un sublime don"
 
-#define DUMMY_TEMPLATE5 "Que la ##<< be.Eval(.toto := 3)>>"\
-"##<< loop be.Eval(.toto > 0) >>"\
-"Beauted##<< be.Eval(.toto := .toto - 1)>>"\
-"##<<endLoop>> du corps est un sublime don"
+#define DUMMY_TEMPLATE5 \
+  "Que la ##<< be.Eval(.toto := 3)>>"\
+  "##<< loop be.Eval(.toto > 0) >>"\
+  "Beauted##<< be.Eval(.toto := .toto - 1)>>"\
+  "##<<endLoop>> du corps est un sublime don"
 #define DUMMY_OUTPUT5 "Que la BeautedBeautedBeauted du corps est un sublime don"
 
-#define DUMMY_TEMPLATE6 "##<<be.Eval(.julie$ := \"Beauted\")>>Que la "\
-"##<< be.OutputF(%s, .julie$) >> du corps est un sublime don"
+#define DUMMY_TEMPLATE6 \
+  "##<<be.Eval(.julie$ := \"Beauted\")>>Que la "\
+  "##<< be.OutputF(%s, .julie$) >> du corps est un sublime don"
 #define DUMMY_OUTPUT6 "Que la Beauted du corps est un sublime don"
 
-#define DUMMY_TEMPLATE7 "##<<be.Eval(.julie$ := \"Beauté\")>>##<< be.OutputF(%s, .julie!$) >> "\
-"est une ##<< be.OutputF(%s, .julie$) >>."
-#define DUMMY_OUTPUT7 "julie est une Beauté."
+#define DUMMY_TEMPLATE7 \
+  "##<<be.Eval(.Julie$ := \"Beauté\")>>##<< be.OutputF(%s, .Julie!$) >> "\
+  "est une ##<< be.OutputF(%s, .julie$) >>."
+#define DUMMY_OUTPUT7 "Julie est une Beauted."
 
-#define DUMMY_TEMPLATE8 "##<<be.Eval(.rulie$ := \"Beauted\")>>Que la "\
-"##<<be.OutputF(%s, ?: !$ == \"rulie\" :?+=$)>> du corps est un sublime don"
+#define DUMMY_TEMPLATE8 \
+  "##<<be.Eval(.Julie$ := \"Beauted\")>>Que la "\
+  "##<<be.OutputF(%s, ?: !$ == \"Julie\" :?+=$)>> du corps est un sublime don"
 #define DUMMY_OUTPUT8 "Que la Beauted du corps est un sublime don"
+
+#define DUMMY_TEMPLATE9 \
+  "##<<be.Eval(recettes.bolo$ := \"Pastes, frometon et sauce tomate\")>>"\
+  "##<<be.Eval(recettes.galettes$ := \"Farine de Sarrasin, sel et eau\")>>"\
+  "##<<be.OutputF(%s, ?: !$ == \"Julie\" :?+=$)>> du corps est un sublime don"
+#define DUMMY_OUTPUT9 "Que la Beauted du corps est un sublime don"
 
 
 int main (int argc, char** argv) {

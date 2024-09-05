@@ -91,16 +91,16 @@
 //
 // "As" suffixes allow to qualify integer and string entities:
 // <<as value int>> ::= '#'
-// <<as entry int>> ::= '!#'
-// <<as id int>> ::= '!'
+// <<as entry>> ::= '!#'
+// <<as id>> ::= '!'
 // <<as value str>> ::= '$'
-// <<as name str>> ::= '!$'
+// <<as name>> ::= '!$'
 // 
 // Blotvar implicit and explicit integer value
 // A blotvar value is implicitly an integer value
 // However, reference to integer value of a blotvar may be explicit
 // <blotvar as int> ::= <blotvar> [ <<as value int>> ]
-// <blotvar id> ::= <blotvar> <<as id int>>
+// <blotvar id> ::= <blotvar> <<as id>>
 // Examples:
 // .toto => toto global blotvar's integer value 
 // .toto# => ALSO toto global blotvar's integer value
@@ -112,8 +112,8 @@
 // recettes[.toto]$ => string value of recettes register's blotvar indexed by toto global blotvar
 //
 // Blotvar name and entry
-// <blotvar name> ::= <blotvar> <<as name str>>
-// <blotvar entry> ::= <blotvar> <<as entry int>>
+// <blotvar name> ::= <blotvar> <<as name>>
+// <blotvar entry> ::= <blotvar> <<as entry>>
 // Examples
 // .toto!$ => toto global blotvar's name, that is "toto"
 // recettes[0]!$ => name of 1st blotvar stored in recettes register   
@@ -127,19 +127,19 @@
 // <blotreg op select> ::= ':' <blotreg request>
 // <blotreg op reset> ::= '^'
 // <blotreg op next> ::= '+'
-// <blotreg op read int> ::= '=' [ <<as value int>> | <<as entry int>> | <<as id int>> ]
+// <blotreg op read int> ::= '=' [ <<as value int>> | <<as entry>> | <<as id>> ]
 //
 // <blotreg str> ::= <entity> '?' <blotreg ops str>  
 // <blotreg ops str> ::= [ <blotreg op select> ] [ <blotreg op reset> ] [ <blotreg op next> ]
 //   <blotreg op read str>
-// <blotreg op read str> ::= '=' ( <<as value str>> | <<as name str>> )  
+// <blotreg op read str> ::= '=' ( <<as value str>> | <<as name>> )  
 //
 // Blotreg requests are made of "atoms" : 
 // <blotreg request> ::= <blotreg request atom> ( <logical 2op> <blotreg request> )* ':?'
 // <blotreg request atom> ::= <int blotreg request atom> | <str blotreg request atom>
-// <int blotreg request atom> ::= [ <<as value int>> | <<as entry int>> | <<as id int>> ] <comp op>
+// <int blotreg request atom> ::= [ <<as value int>> | <<as entry>> | <<as id>> ] <comp op>
 //   <intex>
-// <str blotreg request atom> ::= ( <<as value str>> | <<as name str>> ) <str comp op> <strex> 
+// <str blotreg request atom> ::= ( <<as value str>> | <<as name>> ) <str comp op> <strex> 
 //
 // <comp op> ::= '>' | '<' | '>=' | '<=' | '==' | '!='
 // <logical 2op> ::= 'and' | 'or'

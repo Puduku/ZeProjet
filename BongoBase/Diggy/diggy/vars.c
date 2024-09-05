@@ -43,11 +43,11 @@ void DiggyPrintStringImage(const char *np_string) {
     if (displayedLength > MAX_STRING_LENGTH_DISPLAYED) {
       displayedLength = MAX_STRING_LENGTH_DISPLAYED;
     } // if
-    const char *ptr = np_string;
+    const unsigned char *ptr = (const unsigned char *) np_string;
     int i = 0;
     for ( ; i < displayedLength ; i++, ptr++) {
       if (*ptr < 32 || *ptr > 126) {
-        putchar('.') ;
+        printf("\\x%02x",*ptr);
       } else {
         putchar(*ptr) ;
       } // if
