@@ -7,7 +7,7 @@
 1.a The original story - more or less... 
 Support the katzenjammer kids in their (cunning) plots...
 Landscape:
-- garden: place where the katzenjammer kids execute their plots (directory position)
+- garden: place where the katzenjammer kids execute their tours (directory position)
 - creek: specific path within garden (regarding plot execution) 
 - island: all gardens' place (main directory position)
   The island is not so huge. It is easy to find your way around - especially when moving from one
@@ -18,7 +18,7 @@ Landscape:
 Characters:
 - Mama: she's a naive lady, but she's nevertheless the real "boss"...
 - Hans & Fritz: (the katzenjammer kids) are the stars of the series. These two rascals have all
-  sorts of plans for the pranks (done to the whole family) they carry out in the gardens.
+  sorts of tours for the pranks (done to the whole family) they carry out in the gardens.
 - Lena: she is a nice little girl who often helps Hans and Fritz to get back at der Captain and der
   Inspector...
 - Adolf (Rollo) : he is a hypocritical, boastful, and prankster boy who likes to put the blame on
@@ -35,22 +35,22 @@ Characters:
 An island is nothing but a hierarchy of basic directories (the gardens) and files. For instance: 
 ~/Projects/Bongo/
   ISLAND 
-  Garden1/
+  Eden/
     hans.sh
-  Garden2/
+  Majorelle/
     hans.sh
     fritz.sh
-  OtherGardens/
-    Garden3/
+  Brusel/
+    Botanique/
       hans.sh
       fritz.sh 
       der-inspector 
-    Garden4/
+    Luxenbourg/
       fritz.sh 
       der-inspector.sh 
 
 To extend the metaphor, a creek corresponds to a particular path within a garden ; the idea is to 
-let follow different creeks at the same time while executing a plot... 
+let follow different creeks at the same time while playing a tour... 
 
 2. Configuration guide 
 ----------------------
@@ -60,29 +60,24 @@ $ export BONGO=~/Bongo
 (You can add the line above in your profile)
 Create location (directory) :
 $ mkdir $BONGO
-Create the 'ISLAND' file (the content of the file does not matter) :
-$ touch $BONGO/ISLAND
-or 
+Create 'ISLAND' beacon file (the content of the file does not matter) :
 $ echo 'Bongo is the actual name of the island in the real story.' > $BONGO/ISLAND
-Notes:
-- Possible (totally equivalent) file names are :
-  "ISLAND", "Island", "island", ".ISLAND", ".Island", or ".island"
-- file content is totally arbitrary (may be empty)
-- There is NO real obligation to define $ISLAND environemental variable.
+Note: possible (totally equivalent) file names are:
+  "ISLAND", "Island", "island", ".ISLAND", ".Island", or ".island".
 
-2.b Creating a new garden (e.g "Thabor" in "Bongo" island)
+2.b Creating a new garden (e.g "Thabor") in "Bongo" island
 Create garden location (directory) within the island:
 $ cd $BONGO
 $ mkdir Thabor
 $ cd Thabor
 You may need to define some "katzenjammer" scripts:
-If you need to compile some code of the garden, you can create "hans.sh" exclusive script from model :
-$ cp "$MAMA/hans.sh.mod" hans.sh
-If you need to run tests in the garden, you can create "fritz.sh" exclusive script from model :
-$ cp "$MAMA/fritz.sh.mod" fritz.sh
-If you want to maintain code's documentation comments (so-called "coconuts"), you can create
-"der-inspector.sh" exclusive script from model (based on "coco" tool) :
-$ cp "$MAMA/der-inspector.sh.mod" der-inspector.sh
+- If you need to compile some code in the garden, you can create "hans.sh" exclusive script from model :
+  $ cp "$MAMA/hans.sh.mod" hans.sh
+- If you need to run tests in the garden, you can create "fritz.sh" exclusive script from model :
+  $ cp "$MAMA/fritz.sh.mod" fritz.sh
+- If you want to maintain code's documentation comments (so-called "coconuts"), you can create
+  "der-inspector.sh" exclusive script from model (based on "coco" tool) :
+  $ cp "$MAMA/der-inspector.sh.mod" der-inspector.sh
 Then edit and adapt your exclusive script(s). The following command shows the environment (bash
 functions and variables) usable by these exclusive scripts:  
 $ mama.sh -i
@@ -92,18 +87,20 @@ $ chmod u+x hans.sh
 
 3. User guide
 -------------
-To execute a "plot", run the corresponding exclusive script of the garden. The script must be referenced
-by its location. For instance, in island of § 1.b, to execute Fritz's plot of Garden4 :
-$ cd $BONGO/OtherGarden/Garden4
-$ ./fritz.sh
+To play a "tour", run the corresponding exclusive script of the garden. The script must be referenced
+by its location. For instance, in island of § 1.b, to execute Fritz's tour of Botanique :
+- $ cd $BONGO/Brusel/Botanique
+  $ ./fritz.sh
 or
-$ cd $BONGO/OtherGarden
-$ ./Garden4/fritz.sh
+$ cd $BONGO/Brusel
+$ ./Botanique/fritz.sh
 or
 $ cd $BONGO 
-$ ./OtherGardens/Garden4/fritz
+$ ./Brusel/Botanique/fritz
 etc.
-Hint1: any katzenjammer script recognizes the -h (help display) option.
-Hint2: at any time, you can issue "miss-ross.sh" command to verify 'Mama's  installation ;
-if that command is not recognized, then your 'Mama' installation is not correct; please check
-$MAMA/insall.log file.
+
+Hints:
+- Any katzenjammer script recognizes the -h (help display) option.
+- At any time, you can issue "miss-ross.sh" command to verify 'Mama's  installation ;
+  if that command is not recognized, then your 'Mama' installation is not correct; please check
+  README-INSTALL.TXT file (present in Mama's base).
