@@ -33,19 +33,19 @@ Characters:
 
 1.b Island metaphor in projects.
 An island is nothing but a hierarchy of basic directories (the gardens) and files. For instance: 
-~/Projects/Bongo/
+~/Projects/Montreal/
   ISLAND 
-  Eden/
+  LaFontaine/
     hans.sh
-  Majorelle/
+  Connaught/
     hans.sh
     fritz.sh
-  Brusel/
+  Rosemont/
     Botanique/
       hans.sh
       fritz.sh 
       der-inspector 
-    Luxenbourg/
+    Japonais/
       fritz.sh 
       der-inspector.sh 
 
@@ -55,19 +55,19 @@ let follow different creeks at the same time while playing a tour...
 2. Configuration guide 
 ----------------------
 2.a Creating a new island
-Choose a directory position name for the island - e.g ~/Bongo
-$ export BONGO=~/Bongo 
+Choose a directory position name for the island - e.g ~/Montreal
+$ export MONTREAL=~/Montreal 
 (You can add the line above in your profile)
 Create location (directory) :
-$ mkdir $BONGO
+$ mkdir $MONTREAL
 Create 'ISLAND' beacon file (the content of the file does not matter) :
-$ echo 'Bongo is the actual name of the island in the real story.' > $BONGO/ISLAND
+$ echo 'Montreal is the actual name of the island in the real story.' > $MONTREAL/ISLAND
 Note: possible (totally equivalent) file names are:
   "ISLAND", "Island", "island", ".ISLAND", ".Island", or ".island".
 
-2.b Creating a new garden (e.g "Thabor") in "Bongo" island
+2.b Creating a new garden (e.g "Thabor") in "Montreal" island
 Create garden location (directory) within the island:
-$ cd $BONGO
+$ cd $MONTREAL
 $ mkdir Thabor
 $ cd Thabor
 You may need to define some "katzenjammer" scripts:
@@ -89,14 +89,14 @@ $ chmod u+x hans.sh
 -------------
 To play a "tour", run the corresponding exclusive script of the garden. The script must be referenced
 by its location. For instance, in island of § 1.b, to execute Fritz's tour of Botanique :
-- $ cd $BONGO/Brusel/Botanique
+- $ cd $MONTREAL/Rosemont/Botanique
   $ ./fritz.sh
 or
-$ cd $BONGO/Brusel
+$ cd $MONTREAL/Rosemont
 $ ./Botanique/fritz.sh
 or
-$ cd $BONGO 
-$ ./Brusel/Botanique/fritz
+$ cd $MONTREAL 
+$ ./Rosemont/Botanique/fritz
 etc.
 
 Hints:
