@@ -55,8 +55,8 @@ let follow different creeks at the same time while playing a tour...
 2. Configuration guide 
 ----------------------
 2.a Creating a new island ("Montreal" in this example) 
-Choose a position directory for the island - e.g ~/Montreal
-$ export MONTREAL=~/Montreal 
+Choose a position directory for the island - e.g ~/Projects/Montreal
+$ export MONTREAL=~/Projects/Montreal 
 (You can add the line above in your profile)
 Create location (directory) :
 $ mkdir $MONTREAL
@@ -89,9 +89,9 @@ $ chmod u+x hans.sh
 -------------
 To play a "tour", run the corresponding exclusive script of the garden. The script must be referenced
 by its location. For instance, in Montreal island of § 1.b, to execute Fritz's tour in Botanique garden :
-- From ~/Montreal/Rosemont/Botanique/ directory, type ./fritz.sh
-- From ~/Montreal/Rosemont/ directory, type ./Botanique/fritz.sh
-- From ~/Montreal/ directory, type ./Rosemont/Botanique/fritz.sh
+- From $MONTREAL/Rosemont/Botanique/ directory, type ./fritz.sh
+- From $MONTREAL/Rosemont/ directory, type ./Botanique/fritz.sh
+- From $MONTREAL/ directory, type ./Rosemont/Botanique/fritz.sh
 - etc.
 
 Hints:
