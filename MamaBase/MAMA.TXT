@@ -61,15 +61,15 @@ $ export MONTREAL=~/Montreal
 Create location (directory) :
 $ mkdir $MONTREAL
 Create 'ISLAND' beacon file (the content of the file does not matter) :
-$ echo 'Montreal is the actual name of the island in the real story.' > $MONTREAL/ISLAND
+$ echo 'Bongo is the actual name of the island in the real story.' > $MONTREAL/ISLAND
 Note: possible (totally equivalent) file names are:
   "ISLAND", "Island", "island", ".ISLAND", ".Island", or ".island".
 
-2.b Creating a new garden (e.g "Thabor") in "Montreal" island
+2.b Creating a new garden (e.g "MontRoyal") in "Montreal" island
 Create garden location (directory) within the island:
 $ cd $MONTREAL
-$ mkdir Thabor
-$ cd Thabor
+$ mkdir MontRoyal
+$ cd MontRoyal
 You may need to define some "katzenjammer" scripts:
 - If you need to compile some code in the garden, you can create "hans.sh" exclusive script from model :
   $ cp "$MAMA/hans.sh.mod" hans.sh
