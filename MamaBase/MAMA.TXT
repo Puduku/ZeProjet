@@ -62,8 +62,8 @@ Create location (directory) :
 $ mkdir $MONTREAL
 Create 'ISLAND' beacon file (the content of the file does not matter) :
 $ echo 'Bongo is the actual name of the island in the real story.' > $MONTREAL/ISLAND
-Note: possible (totally equivalent) file names are:
-  "ISLAND", "Island", "island", ".ISLAND", ".Island", or ".island".
+Note: possible (totally equivalent) file names of island's beacon file are:
+  'ISLAND', 'Island', 'island', '.ISLAND', '.Island', or '.island'.
 
 2.b Creating a new garden (e.g "MontRoyal" in "Montreal" island)
 Create garden location (directory) within the island:
