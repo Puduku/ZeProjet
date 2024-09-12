@@ -54,8 +54,8 @@ let follow different creeks at the same time while playing a tour...
 
 2. Configuration guide 
 ----------------------
-2.a Creating a new island
-Choose a directory position name for the island - e.g ~/Montreal
+2.a Creating a new island ("Montreal" in this example) 
+Choose a position directory for the island - e.g ~/Montreal
 $ export MONTREAL=~/Montreal 
 (You can add the line above in your profile)
 Create location (directory) :
@@ -65,7 +65,7 @@ $ echo 'Bongo is the actual name of the island in the real story.' > $MONTREAL/I
 Note: possible (totally equivalent) file names are:
   "ISLAND", "Island", "island", ".ISLAND", ".Island", or ".island".
 
-2.b Creating a new garden (e.g "MontRoyal") in "Montreal" island
+2.b Creating a new garden (e.g "MontRoyal" in "Montreal" island)
 Create garden location (directory) within the island:
 $ cd $MONTREAL
 $ mkdir MontRoyal
@@ -88,16 +88,11 @@ $ chmod u+x hans.sh
 3. User guide
 -------------
 To play a "tour", run the corresponding exclusive script of the garden. The script must be referenced
-by its location. For instance, in island of § 1.b, to execute Fritz's tour of Botanique :
-- $ cd $MONTREAL/Rosemont/Botanique
-  $ ./fritz.sh
-or
-$ cd $MONTREAL/Rosemont
-$ ./Botanique/fritz.sh
-or
-$ cd $MONTREAL 
-$ ./Rosemont/Botanique/fritz
-etc.
+by its location. For instance, in Montreal island of § 1.b, to execute Fritz's tour in Botanique garden :
+- From ~/Montreal/Rosemont/Botanique/ directory, type ./fritz.sh
+- From ~/Montreal/Rosemont/ directory, type ./Botanique/fritz.sh
+- From ~/Montreal/ directory, type ./Rosemont/Botanique/fritz.sh
+- etc.
 
 Hints:
 - Any katzenjammer script recognizes the -h (help display) option.
