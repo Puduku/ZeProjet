@@ -8,7 +8,7 @@
 Support the katzenjammer kids in their (cunning) plots...
 Landscape:
 - garden: place where the katzenjammer kids execute their tours (directory position)
-- creek: specific path within garden (regarding plot execution) 
+- creek: specific path within garden (regarding tour execution) 
 - island: all gardens' place (main directory position)
   The island is not so huge. It is easy to find your way around - especially when moving from one
   garden to another.
