@@ -20,6 +20,9 @@
 // Legend:
 // - <entity>   => "soft" lexeme ; leading white spaces are systematically REMOVED 
 // - <<single char>> => "hard" lexeme ; leading white spaces are NOT REMOVED
+// - [ <int 1op> ] => no or one occurence of <int 1op>
+// - ( <entity> )+ => one occurence of <entity> at least
+// - ( <<single char>> )* => any occurence(s) number of <<single char>> 
 //
 // There two main types of blot expressions: 
 // - "string" blotex => "strex" type
@@ -122,8 +125,8 @@
 //
 // Register operations 
 // <blotreg int> ::= <entity> '?' <blotreg ops int>  
-// <blotreg ops int> ::= [ <blotreg op select> ] [ [ <blotreg op reset> ] [ <blotreg op next> ]
-//   <blotreg op read int> ] 
+// <blotreg ops int> ::=  [ <blotreg op select> ] [ <blotreg op reset> ] [ <blotreg op next> ]
+//   [ <blotreg op read int> ] 
 // <blotreg op select> ::= ':' <blotreg request>
 // <blotreg op reset> ::= '^'
 // <blotreg op next> ::= '+'
@@ -135,16 +138,16 @@
 // <blotreg op read str> ::= '=' ( <<as value str>> | <<as name>> )  
 //
 // Blotreg requests are made of "atoms" : 
-// <blotreg request> ::= <blotreg request atom> ( <logical 2op> <blotreg request> )* ':?'
+// <blotreg request> ::= '*' | ( <blotreg request atom> ( <logical 2op> <blotreg request> )* ':?' )
 // <blotreg request atom> ::= <int blotreg request atom> | <str blotreg request atom>
 // <int blotreg request atom> ::= [ <<as value int>> | <<as entry>> | <<as id>> ] <comp op>
 //   <intex>
 // <str blotreg request atom> ::= ( <<as value str>> | <<as name>> ) <str comp op> <strex> 
 //
-// <comp op> ::= '>' | '<' | '>=' | '<=' | '==' | '!='
 // <logical 2op> ::= 'and' | 'or'
 //
 // Examples
+// recettes?:*                                     => select all items  
 // recettes?: !$ === "*bolo*" and # >= 69 :?       => new register selection 
 // recettes?: !$ === "*bolo*" or $ === "*bolo*" :? => new register selection (2nd exemple)
 // recettes?^                                      => single reset, ascending 

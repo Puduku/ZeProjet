@@ -29,7 +29,7 @@ void DiggyPrintDataImage(const char* p_data, int length) {
 } // DiggyPrintDataImage
 
 
-#define MAX_STRING_LENGTH_DISPLAYED 60 
+#define MAX_STRING_LENGTH_DISPLAYED 80 
 
 // Public function; see .h
 // #SEE DIGGY_PRINT_IMAGE_FUNCTION @ diggy/vars.h

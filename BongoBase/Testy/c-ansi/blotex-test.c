@@ -150,8 +150,11 @@ m_DIGGY_VAR_STRING(ccp_expectedOutput)
 #define DUMMY_TEMPLATE9 \
   "##<<be.Eval(recettes.bolo$ := \"Pastes, frometon et sauce tomate\")>>"\
   "##<<be.Eval(recettes.galettes$ := \"Farine de Sarrasin, sel et eau\")>>"\
-  "##<<be.OutputF(%s, ?: !$ == \"Julie\" :?+=$)>> du corps est un sublime don"
-#define DUMMY_OUTPUT9 "Que la Beauted du corps est un sublime don"
+  "##<<be.Eval(recettes?:* )>>"\
+  "##<<loop be.Eval(recettes?+ )>>"\
+  "##<<be.OutputF(%s, recettes?=$)>>-"\
+  "##<<endLoop>>"
+#define DUMMY_OUTPUT9 "Pastes, frometon et sauce tomate-Farine de Sarrasin, sel et eau-"
 
 
 int main (int argc, char** argv) {
@@ -238,6 +241,10 @@ int main (int argc, char** argv) {
   m_TRACK_IF(BlotcodeExecutorTest(8,h_blotcodeExecutorHandle, h_outputSuckerHandle,
     h_outputGStringStuff, DUMMY_TEMPLATE8, ANSWER__YES,  BLOTCODE_CONSTRUCTION_STATUS__OK,
     DUMMY_OUTPUT8) != RETURNED) 
+
+  m_TRACK_IF(BlotcodeExecutorTest(9,h_blotcodeExecutorHandle, h_outputSuckerHandle,
+    h_outputGStringStuff, DUMMY_TEMPLATE9, ANSWER__YES,  BLOTCODE_CONSTRUCTION_STATUS__OK,
+    DUMMY_OUTPUT9) != RETURNED) 
 
   m_TRACK_IF(G_STRING_DESTROY_INSTANCE(h_outputGStringStuff) != RETURNED)
 

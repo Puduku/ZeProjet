@@ -32,6 +32,7 @@
 //
 // Passed:
 // - m_sequence: as passed 
+// - n_isCharFunction: (NULL pointer if not used) 
 // - c_char: only significant if n_isCharFunction == NULL 
 // - na_lexeme: NULL if not used
 //
