@@ -18,15 +18,15 @@
 // I. Blot expressions (blotex) 
 // ----------------------------
 // Legend:
-// - <entity>   => "soft" lexeme ; leading white spaces are systematically REMOVED 
-// - <<single char>> => "hard" lexeme ; leading white spaces are NOT REMOVED
-// - [ <int 1op> ] => no or one occurence of <int 1op>
-// - ( <entity> )+ => one occurence of <entity> at least
+// - <entity>             => "soft" lexeme ; leading white spaces are systematically REMOVED
+// - <<single char>>      => "hard" lexeme ; leading white spaces are NOT REMOVED
+// - [ <int 1op> ]        => zero or one occurence of <int 1op>
+// - ( <entity> )+        => one occurence of <entity> at least
 // - ( <<single char>> )* => any occurence(s) number of <<single char>> 
 //
 // There two main types of blot expressions: 
-// - "string" blotex => "strex" type
-// - "blotval" blotex: (signed) integer => "intex" type:
+// - "string" blot expression => "strex" type
+// - "blotval" (aka. signed integer) blot expression => "intex" type:
 // <blotex> ::= <intex> | <strex> 
 //
 // Blot expressions are made of operations:
@@ -41,7 +41,7 @@
 // <intex term> ::= <intex atom> ( <fact op> <intex atom> )*  
 // Integer comparisons are assimilated to factoral operations:
 // <fact op> ::= '*' | '/' | <comp op> 
-// General comparision operators are:
+// General comparison operators are:
 // <comp op> ::= '>' | '<' | '>=' | '<=' | '==' | '!='
 // A comparison result is a "pseudo-boolean" blotval integer.
 // Reminder: blotval's convention : 
@@ -99,57 +99,66 @@
 // <<as value str>> ::= '$'
 // <<as name>> ::= '!$'
 // 
-// Blotvar implicit and explicit integer value
-// A blotvar value is implicitly an integer value
-// However, reference to integer value of a blotvar may be explicit
+// Blotvar implicit and explicit integer value:
+// A blotvar value is implicitly an integer value.
+// However, reference to integer value of a blotvar may be explicit:
 // <blotvar as int> ::= <blotvar> [ <<as value int>> ]
 // <blotvar id> ::= <blotvar> <<as id>>
 // Examples:
-// .toto => toto global blotvar's integer value 
-// .toto# => ALSO toto global blotvar's integer value
+// .toto => 'toto' global blotvar's integer value 
+// .toto# => ALSO 'toto' global blotvar's integer value
 //
-// Blotvar string value 
+// Blotvar string value: 
 // <blotvar as str> ::= <blotvar> <<as value str>> 
 // Examples:
 // .toto$           => toto global blotvar string value 
 // recettes[.toto]$ => string value of recettes register's blotvar indexed by toto global blotvar
 //
-// Blotvar name and entry
+// Blotvar name and entry:
 // <blotvar name> ::= <blotvar> <<as name>>
 // <blotvar entry> ::= <blotvar> <<as entry>>
-// Examples
+// Examples:
 // .toto!$ => toto global blotvar's name, that is "toto"
 // recettes[0]!$ => name of 1st blotvar stored in recettes register   
 // recettes.bolo!# => index (entry) of bolo blotvar in recettes register
 // .toto!# => index (entry) of toto global blotvar 
 //
-// Register operations 
+// Register operations:
+// Register operations may be combined together in a sequence.
+// The global value of the operations corresponds to that of the last operation of the sequence.
+// Most of register operations have an integer value: 
 // <blotreg int> ::= <entity> '?' <blotreg ops int>  
 // <blotreg ops int> ::=  [ <blotreg op select> ] [ <blotreg op reset> ] [ <blotreg op next> ]
 //   [ <blotreg op read int> ] 
+// Selection operation; value is pseudo-boolean "true" blotval: 
 // <blotreg op select> ::= ':' <blotreg request>
+// Reset operation; value is pseudo-boolean "true" blotval: 
 // <blotreg op reset> ::= '^'
+// Reset operation; value is pseudo-boolean blotval ("false" when no more):
 // <blotreg op next> ::= '+'
+// Read current integer value operation: 
 // <blotreg op read int> ::= '=' [ <<as value int>> | <<as entry>> | <<as id>> ]
 //
+// When the last operation of the sequence reads a string value, the global value of the operations
+// sequence is that string value: 
 // <blotreg str> ::= <entity> '?' <blotreg ops str>  
 // <blotreg ops str> ::= [ <blotreg op select> ] [ <blotreg op reset> ] [ <blotreg op next> ]
 //   <blotreg op read str>
 // <blotreg op read str> ::= '=' ( <<as value str>> | <<as name>> )  
 //
 // Blotreg requests are made of "atoms" : 
-// <blotreg request> ::= '*' | ( <blotreg request atom> ( <logical 2op> <blotreg request> )* ':?' )
+// <blotreg request> ::= <blotreg request atom> ( <logical 2op> <blotreg request atom> )* ':?'
 // <blotreg request atom> ::= <int blotreg request atom> | <str blotreg request atom>
-// <int blotreg request atom> ::= [ <<as value int>> | <<as entry>> | <<as id>> ] <comp op>
-//   <intex>
-// <str blotreg request atom> ::= ( <<as value str>> | <<as name>> ) <str comp op> <strex> 
+// <int blotreg request atom> ::= [ <<as value int>> | <<as entry>> | <<as id>> ] ( '*' | (
+//   <comp op> <intex> ) )
+// <str blotreg request atom> ::= ( <<as value str>> | <<as name>> ) ( '*' | ( <str comp op> <strex>
+//   ) )
 //
 // <logical 2op> ::= 'and' | 'or'
 //
-// Examples
-// recettes?:*                                     => select all items  
+// Examples:
+// recettes?: !$ * :$                              => select all items, ordered by name  
 // recettes?: !$ === "*bolo*" and # >= 69 :?       => new register selection 
-// recettes?: !$ === "*bolo*" or $ === "*bolo*" :? => new register selection (2nd exemple)
 // recettes?^                                      => single reset, ascending 
 // recettes?+                                      => fetch next one
 // recettes?=                                      => read current int value 

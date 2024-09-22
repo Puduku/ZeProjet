@@ -150,11 +150,16 @@ m_DIGGY_VAR_STRING(ccp_expectedOutput)
 #define DUMMY_TEMPLATE9 \
   "##<<be.Eval(recettes.bolo$ := \"Pastes, frometon et sauce tomate\")>>"\
   "##<<be.Eval(recettes.galettes$ := \"Farine de Sarrasin, sel et eau\")>>"\
-  "##<<be.Eval(recettes?:* )>>"\
+  "##<<be.Eval(recettes?:!$* :?)>>"\
+  "##<<loop be.Eval(recettes?+ )>>"\
+  "##<<be.OutputF(%s, recettes?=$)>>-"\
+  "##<<endLoop>>"\
+  "##<<be.Eval(recettes?:$* :?)>>"\
   "##<<loop be.Eval(recettes?+ )>>"\
   "##<<be.OutputF(%s, recettes?=$)>>-"\
   "##<<endLoop>>"
-#define DUMMY_OUTPUT9 "Pastes, frometon et sauce tomate-Farine de Sarrasin, sel et eau-"
+#define DUMMY_OUTPUT9 "Pastes, frometon et sauce tomate-Farine de Sarrasin, sel et eau-"\
+  "Farine de Sarrasin, sel et eau-Pastes, frometon et sauce tomate-"
 
 
 int main (int argc, char** argv) {
