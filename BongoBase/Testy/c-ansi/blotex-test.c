@@ -160,6 +160,16 @@ m_DIGGY_VAR_STRING(ccp_expectedOutput)
   "##<<endLoop>>"
 #define DUMMY_OUTPUT9 "Pastes, frometon et sauce tomate-Farine de Sarrasin, sel et eau-"\
   "Farine de Sarrasin, sel et eau-Pastes, frometon et sauce tomate-"
+// TODO blotprog : ;; terminator
+
+#define DUMMY_TEMPLATE10 \
+  "##<<be.Eval(recettes?^+)>>"\
+  "##<<be.Eval(recettes?=$ := \"Farine de bled noir, sel et eau\")>>"\
+  "##<<be.Eval(recettes?^)>>"\
+  "##<<loop be.Eval(recettes?+ )>>"\
+  "##<<be.OutputF(%s, recettes?=$)>>-"\
+  "##<<endLoop>>"
+#define DUMMY_OUTPUT10 "Farine de bled noir, sel et eau-Pastes, frometon et sauce tomate-"
 
 
 int main (int argc, char** argv) {
@@ -250,6 +260,10 @@ int main (int argc, char** argv) {
   m_TRACK_IF(BlotcodeExecutorTest(9,h_blotcodeExecutorHandle, h_outputSuckerHandle,
     h_outputGStringStuff, DUMMY_TEMPLATE9, ANSWER__YES,  BLOTCODE_CONSTRUCTION_STATUS__OK,
     DUMMY_OUTPUT9) != RETURNED) 
+
+  m_TRACK_IF(BlotcodeExecutorTest(10,h_blotcodeExecutorHandle, h_outputSuckerHandle,
+    h_outputGStringStuff, DUMMY_TEMPLATE10, ANSWER__YES,  BLOTCODE_CONSTRUCTION_STATUS__OK,
+    DUMMY_OUTPUT10) != RETURNED) 
 
   m_TRACK_IF(G_STRING_DESTROY_INSTANCE(h_outputGStringStuff) != RETURNED)
 

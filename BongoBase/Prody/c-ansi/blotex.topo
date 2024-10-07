@@ -48,10 +48,15 @@
 // - 0 : represents "true" boolean value
 // - !=0 : represents "false" boolean value
 //
+// "int" blotvar references are usable as 'l-value' :
+// <int blotvar ref> ::= <blotvar as int> | <blotvar id> | <blotreg ref int> | <blottab ref int>
+// "str" blotvar references are usable as 'l-value' :
+// <str blotvar ref> ::= <blotvar as str> | <blotvar name> | <blotreg ref str> | <blottab ref str>
+//
 // Integer and string atoms are made of constants, blot expressions between brackets, variables
 // references, strings comparisons, "register" and "table" operations:
 // <intex atom> ::= [ <int 1op> ] ( ( '(' <intex> ')' ) | <int constant> | <blotvar as int> |
-//   <blotvar entry> | <blotvar id> | <blotreg int> | <blottab int>  | <strex comp> ) 
+//   <blotvar entry> | <blotvar id> | <blotreg int> | <blottab int> | <strex comp> ) 
 // <strex atom> ::= ( '(' <strex> ')' ) | <str constant> | <blotvar as str> | <blotvar name> |
 //   <blotreg str> | <blottab str>
 //
@@ -83,7 +88,8 @@
 // A blot register (blotreg) is a collection of blovars
 // (the register with empty entity name is called the global register)
 //
-// Formally a blotvar is referenced as following (in which the 1st entity name identifies the register) :
+// Formally a "simple" blotvar is referenced as following (in which the 1st entity name identifies
+// the register) :
 // <blotvar> ::= <entity> ( '.' <entity>  | '[' <intex> ']' ) 
 // Blotvar examples: 
 // .toto => toto blotvar of global register
@@ -126,6 +132,7 @@
 // Register operations:
 // Register operations may be combined together in a sequence.
 // The global value of the operations corresponds to that of the last operation of the sequence.
+// Note: without explicit operation, the default global value is the 'false' pseudo-boolean blotval.
 // Most of register operations have an integer value: 
 // <blotreg int> ::= <entity> '?' <blotreg ops int>  
 // <blotreg ops int> ::=  [ <blotreg op select> ] [ <blotreg op reset> ] [ <blotreg op next> ]
@@ -136,11 +143,19 @@
 // <blotreg op reset> ::= '^'
 // Reset operation; value is pseudo-boolean blotval ("false" when no more):
 // <blotreg op next> ::= '+'
-// Read current integer value operation: 
+// Read current integer value operation (r-value): 
 // <blotreg op read int> ::= '=' [ <<as value int>> | <<as entry>> | <<as id>> ]
 //
+// Read current integer value operation (l-value): 
+// <blotreg ref op read int> ::= '=' [ <<as value int>> | <<as id>> ]
+// Only the read int as value or read int as id operation has a 'l-value' :
+// <blotreg ref int> ::= <entity> '?' <blotreg ref op read int>
+//
+// Only the read str operation has a 'l-value' :
+// <blotreg ref str> ::= <entity> '?' <blotreg op read str> 
+//
 // When the last operation of the sequence reads a string value, the global value of the operations
-// sequence is that string value: 
+// sequence is that string value (or 'l-value'): 
 // <blotreg str> ::= <entity> '?' <blotreg ops str>  
 // <blotreg ops str> ::= [ <blotreg op select> ] [ <blotreg op reset> ] [ <blotreg op next> ]
 //   <blotreg op read str>
@@ -210,14 +225,16 @@
 // II. "blotex" library's functions (those to be placed in blot code)
 // --------------------------------
 //
-// Eval ([ <blotvar as int> := ] <intex>)
-// Eval ([ <blotvar as str> := ] <strex>)
+// Eval ([ <int blotvar ref> := ] <intex>)
+// Eval ([ <str blotvar ref> := ] <strex>)
 // ---- 
 //
 // Evaluate the blotex and eventually assign the result into a blotvar.
 //
 // Passed:
-// - blotvar: variable name (if passed)
+// - int blotvar ref: int blotvar reference (if passed)
+//   If the blotvar was not existing, it is automatically allocated by the function
+// - str blotvar ref: str blotvar reference (if passed)
 //   If the blotvar was not existing, it is automatically allocated by the function
 // - intex: blotex integer expression
 // - strex: blotex string expression
@@ -241,15 +258,10 @@
 //
 // Examples:
 //   Eval (recettes?: !$ === "*bolo*" and # >= 69 :?) => new register selection 
-//   Eval (recettes?: !$ === "*bolo*" or $ === "*bolo*" :?) => new register selection (2nd exemple)
-//   Eval (recettes?^) => single reset, ascending 
-//   Eval (recettes?+) => fetch next one
-//   Eval (var := recettes?=) => read current int value 
+//   Eval (var := recettes?+=) => fetch and read int value 
 //   Eval (var$ := recettes?=$) => read current str value 
-//   Eval (^recettes2?[ name price ]? => Create recettes2 table with two fields name and price 
+//   Eval (recettes?: name$ == "*bolo*" :? := 2) => new table selection FOIREUX 
 //   Eval (^recettes2?: name$ == "*bolo*" or price < 10 :?) => new table selection 
-//   Eval (^recettes?^) => single reset, ascending 
-//   Eval (^recettes2?+) => fetch next one 
 //   Eval (var$ := ^recettes?=name$) => read current name 
 //   Eval (^recettes2?=price := 15) => update current price 
 //   Eval (^recettes2?@) => insert new table record  
