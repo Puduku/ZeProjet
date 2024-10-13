@@ -3,9 +3,11 @@
 
 // Goal: Handle ordinary parsings without excessive headaches...
 // Idea: give up distinction made a priori between syntactic and lexical analyses.
-// Principle: some parsing = mixed hierarchical and sequential assembly of elementary parsing steps...
+// Principle: some parsing = mixed hierarchical and sequential assembly of elementary parsing
+// steps...
 
-// A parsing step is thus an elementary operation which extracts "head" lexeme from a sequence (of characters)
+// A parsing step is thus an elementary operation which extracts "head" lexeme from a sequence (of
+// characters)
 // <PARSE-STEP>(S,L) : 
 // - S:sequence:
 //   + Passed: initial sequence
@@ -15,17 +17,19 @@
 
 // Notes:
 // - The parsing step is, in essence, always a "successful" operation.
-// - Hence, there is no intrinsic reason to consider "limit" cases (such as empty lexeme with unchanged
-//   sequence and emptied sequence with lexeme corresponding to the initial sequence) as "parsing errors".
+// - Hence, there is no intrinsic reason to consider "limit" cases (such as empty lexeme with
+//   unchanged sequence and emptied sequence with lexeme corresponding to the initial sequence) as
+//   "parsing errors".
 
 // The two "ways" to assemble parsing steps are:
-// - In a purely sequential assemblage, the sequence of characters passed in (and updated by) the 1st step is
-//   passed in the 2nd step :
+// - In a purely sequential assemblage, the sequence of characters passed in (and updated by) the
+//   1st step is passed in the 2nd step :
 //   <PARSE-STEP-A>(S,L); <PARSE-STEP-B>(S,L);
-// - In a hierarchical assemblage, the lexeme extracted in the 1st step becomes the initial sequence in the 2nd
-//   step :
+// - In a hierarchical assemblage, the lexeme extracted in the 1st step becomes the initial sequence
+//   in the 2nd step :
 //   <PARSE-STEP-A>(S,LS); <PARSE-STEP-B>(LS,LL);
 
-// Typical parsing "operations" are made of two elementary steps in a sequence. For instance, to "read" a token:
+// Typical parsing "operations" are made of two elementary steps in a sequence. For instance, to
+// "read" a token:
 // - In 1st step, we "locate" the (begin of) token 
 // - In 2nd step, we pass (aka "read") the token...

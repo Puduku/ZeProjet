@@ -14,6 +14,8 @@
 #include "testy/getopts.h"
 #include "diggy/vars.h"
 
+#include "c-ansi/testy-diggy.h"
+
 static int testNumber = 0;
 
 #define DUMMY_BLOTLIB_EXECUTOR_FACTORY_HANDLE (void *)0xCACABEBE
@@ -128,10 +130,14 @@ static int BlotcodeExecutorTest (int expectedTestNumber, BLOTCODE_EXECUTOR_HANDL
   m_ASSIGN_LOCAL_C_P_STRING(localTemplate,p_template)
   m_ASSERT(expectedTestNumber == ++testNumber)
   m_DIGGY_VAR_D(testNumber)
+  G_STRING_STUFF nh_parsingErrorInfo = NULL;
+
+  if (nh_parsingErrorInfo == NULL) m_TRACK_IF(G_STRING_CREATE_INSTANCE(&nh_parsingErrorInfo) < 0)
 
 m_DIGGY_VAR_GEN(p_template,s)
-  int answer = BlotcodeExecutorParseTemplate(handle,  localTemplate, NULL, NULL);
+  int answer = BlotcodeExecutorParseTemplate(handle,  localTemplate, NULL, nh_parsingErrorInfo);
   m_TRACK_IF(answer < 0)
+  if (answer == ANSWER__NO) m_DIGGY_VAR_P_STRING(nh_parsingErrorInfo->cv_pString)
   m_ASSERT(answer == expectedAnswer)
   if (answer == ANSWER__YES) {
     m_G_STRING_CLEAR(outputGStringStuff)
@@ -153,6 +159,7 @@ m_DIGGY_VAR_STRING(ccp_expectedOutput)
 
 #define DUMMY_TEMPLATE "La Nature est un temple oug de vivants piliers"
 #define DUMMY_OUTPUT DUMMY_TEMPLATE
+
 #define DUMMY_TEMPLATE2 "Elle croit, elle ##<< lib2.Verbe(savoir, 1ps) >> cette vierge infedconde"
 #define DUMMY_OUTPUT2 "Elle croit, elle sait cette vierge infedconde"
 
@@ -171,26 +178,41 @@ m_DIGGY_VAR_STRING(ccp_expectedOutput)
 "##<<endLoop>> du corps est un sublime don"
 #define DUMMY_OUTPUT6 "Que la BeautedBeautedBeauted du corps est un sublime don"
 
-#define DUMMY_TEMPLATE7 "Qui de toute ##<< switch lib2.Nombre(69) >>##<<case 68>>connerie##<<case 69>>infasmie##<<defaultCase>>prout##<<endSwitch>> arrache le pardon"
-#define DUMMY_OUTPUT7 "Qui de toute infasmie arrache le pardon"
+#define DUMMY_TEMPLATE7 "Que la ##<< lib1.InitUnDeuxTrois(4) ;;\n loop lib1.UnDeuxTrois()>>"\
+"Beauted##<<endLoop>> du corps est un sublime don"
+#define DUMMY_OUTPUT7 "Que la BeautedBeautedBeautedBeauted du corps est un sublime don"
 
-#define DUMMY_TEMPLATE8 "Elle ##<<switch lib2.Nombre(3)>>##<<case 4>>Dedconne##<<case 3>>##<<loop 4>>ignore##<<endLoop>>##<<endSwitch>> l'Enfer comme le Purgatoire."
-#define DUMMY_OUTPUT8 "Elle ignoreignoreignoreignore l'Enfer comme le Purgatoire."
+#define DUMMY_TEMPLATE8 "Qui de toute ##<< switch lib2.Nombre(69) >>##<<case 68>>connerie##<<case 69>>infasmie##<<defaultCase>>prout##<<endSwitch>> arrache le pardon"
+#define DUMMY_OUTPUT8 "Qui de toute infasmie arrache le pardon"
 
-#define DUMMY_TEMPLATE9 "Elle " \
-"##<<switch lib2.Nombre(3)>>" \
-"##<<case 4>>Dedconne" \
-"##<<case 3>>" \
+#define DUMMY_TEMPLATE9 "Elle ##<<switch lib2.Nombre(3)>>##<<case 4>>Dedconne##<<case 3>>##<<loop 4>>ignore##<<endLoop>>##<<endSwitch>> l'Enfer comme le Purgatoire."
+#define DUMMY_OUTPUT9 "Elle ignoreignoreignoreignore l'Enfer comme le Purgatoire."
+
+#define DUMMY_TEMPLATE10 "Elle "\
+"##<<switch lib2.Nombre(3)>>"\
+"##<<case 4>>Dedconne"\
+"##<<case 3>>"\
   "##<< lib1.InitUnDeuxTrois(5) >>"\
-  "##<<loop lib1.UnDeuxTrois()>>" \
-    "ignore" \
-  "##<<endLoop>>" \
-"##<<endSwitch>>" \
+  "##<<loop lib1.UnDeuxTrois()>>"\
+    "ignore"\
+  "##<<endLoop>>"\
+"##<<endSwitch>>"\
 " l'Enfer comme le Purgatoire."
-#define DUMMY_OUTPUT9 "Elle ignoreignoreignoreignoreignore l'Enfer comme le Purgatoire."
+#define DUMMY_OUTPUT10 "Elle ignoreignoreignoreignoreignore l'Enfer comme le Purgatoire."
+
+#define DUMMY_TEMPLATE11 "Elle "\
+"##<<switch lib2.Nombre(3);;\n"\
+"    case 4;;\n"\
+"    case 3;;\n"\
+"      lib1.InitUnDeuxTrois(5);;\n"\
+"      loop lib1.UnDeuxTrois()>>ignore##<<\n"\
+"      endLoop;;\n"\
+"    endSwitch\n>>"\
+" l'Enfer comme le Purgatoire."
+#define DUMMY_OUTPUT11 "Elle ignoreignoreignoreignoreignore l'Enfer comme le Purgatoire."
 
 
-#define DUMMY_TEMPLATE10 "Et quand l'" \
+#define DUMMY_TEMPLATE12 "Et quand l'" \
 "##<<loop 3>>" \
   "heure " \
   "##<<loop 2>>" \
@@ -198,8 +220,7 @@ m_DIGGY_VAR_STRING(ccp_expectedOutput)
   "##<<endLoop>>" \
 "##<<endLoop>>" \
 "d'entrer dans la Nuit Noire,"
-// "Et quand l'##<<loop 3>>heure ##<<loop 2>>viendra ##<<endLoop>>##<<endLoop>>d'entrer dans la Nuit Noire,"
-#define DUMMY_OUTPUT10 "Et quand l'heure viendra viendra heure viendra viendra heure viendra viendra d'entrer dans la Nuit Noire,"
+#define DUMMY_OUTPUT12 "Et quand l'heure viendra viendra heure viendra viendra heure viendra viendra d'entrer dans la Nuit Noire,"
 
 
 int main (int argc, char** argv) {
@@ -283,6 +304,14 @@ int main (int argc, char** argv) {
   m_TRACK_IF(BlotcodeExecutorTest(10,h_blotcodeExecutorHandle, h_outputSuckerHandle,
     h_outputGStringStuff, DUMMY_TEMPLATE10, ANSWER__YES,  BLOTCODE_CONSTRUCTION_STATUS__OK,
     DUMMY_OUTPUT10) != RETURNED) 
+
+  m_TRACK_IF(BlotcodeExecutorTest(11,h_blotcodeExecutorHandle, h_outputSuckerHandle,
+    h_outputGStringStuff, DUMMY_TEMPLATE11, ANSWER__YES,  BLOTCODE_CONSTRUCTION_STATUS__OK,
+    DUMMY_OUTPUT11) != RETURNED) 
+
+  m_TRACK_IF(BlotcodeExecutorTest(12,h_blotcodeExecutorHandle, h_outputSuckerHandle,
+    h_outputGStringStuff, DUMMY_TEMPLATE12, ANSWER__YES,  BLOTCODE_CONSTRUCTION_STATUS__OK,
+    DUMMY_OUTPUT12) != RETURNED) 
 
   m_TRACK_IF(G_STRING_DESTROY_INSTANCE(h_outputGStringStuff) != RETURNED)
 

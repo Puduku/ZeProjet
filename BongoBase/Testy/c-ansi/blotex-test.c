@@ -148,27 +148,27 @@ m_DIGGY_VAR_STRING(ccp_expectedOutput)
 #define DUMMY_OUTPUT8 "Que la Beauted du corps est un sublime don"
 
 #define DUMMY_TEMPLATE9 \
-  "##<<be.Eval(recettes.bolo$ := \"Pastes, frometon et sauce tomate\")>>"\
-  "##<<be.Eval(recettes.galettes$ := \"Farine de Sarrasin, sel et eau\")>>"\
-  "##<<be.Eval(recettes?:!$* :?)>>"\
-  "##<<loop be.Eval(recettes?+ )>>"\
-  "##<<be.OutputF(%s, recettes?=$)>>-"\
-  "##<<endLoop>>"\
-  "##<<be.Eval(recettes?:$* :?)>>"\
-  "##<<loop be.Eval(recettes?+ )>>"\
-  "##<<be.OutputF(%s, recettes?=$)>>-"\
-  "##<<endLoop>>"
+  "##<<be.Eval(recettes.bolo$ := \"Pastes, frometon et sauce tomate\");;"\
+  "    be.Eval(recettes.galettes$ := \"Farine de Sarrasin, sel et eau\");;"\
+  "    be.Eval(recettes?:!$* :?);;"\
+  "    loop be.Eval(recettes?+ );;"\
+  "      be.OutputF(%s, recettes?=$)>>-##<<"\
+  "    endLoop;;"\
+  "    be.Eval(recettes?:$* :?);;"\
+  "    loop be.Eval(recettes?+ );;"\
+  "      be.OutputF(%s, recettes?=$)>>-##<<"\
+  "    endLoop>>"
 #define DUMMY_OUTPUT9 "Pastes, frometon et sauce tomate-Farine de Sarrasin, sel et eau-"\
   "Farine de Sarrasin, sel et eau-Pastes, frometon et sauce tomate-"
 // TODO blotprog : ;; terminator
 
 #define DUMMY_TEMPLATE10 \
-  "##<<be.Eval(recettes?^+)>>"\
-  "##<<be.Eval(recettes?=$ := \"Farine de bled noir, sel et eau\")>>"\
-  "##<<be.Eval(recettes?^)>>"\
-  "##<<loop be.Eval(recettes?+ )>>"\
-  "##<<be.OutputF(%s, recettes?=$)>>-"\
-  "##<<endLoop>>"
+  "##<<be.Eval(recettes?^+);;\n"\
+  "    be.Eval(recettes?=$ := \"Farine de bled noir, sel et eau\");;\n"\
+  "    be.Eval(recettes?^);;\n"\
+  "    loop be.Eval(recettes?+ );;\n"\
+  "      be.OutputF(%s, recettes?=$)>>-##<<"\
+  "    endLoop>>"
 #define DUMMY_OUTPUT10 "Farine de bled noir, sel et eau-Pastes, frometon et sauce tomate-"
 
 

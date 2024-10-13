@@ -145,7 +145,7 @@ struct BLOTFUNC_KEY_NAME {
 // GREEN_HANDLER__COMPARE_FUNCTION
 static int BlotfuncsHandlerCompare (void *cpr_handle,  char b_frozen, int indexLabel,  int keyRank,
   char *pr_aGreenItemStuff,  char *npr_bGreenItemStuff, void *cpr_bKeys) {
-  m_DIGGY_BOLLARD_S()
+  //m_DIGGY_BOLLARD_S()
   struct BLOTFUNCS_HANDLER *p_handle = (struct BLOTFUNCS_HANDLER *)cpr_handle; // protected
     // instance (safe for freeze) 
 
@@ -176,7 +176,8 @@ static int BlotfuncsHandlerCompare (void *cpr_handle,  char b_frozen, int indexL
       &(bBlotfuncKeyName.name), (IS_CHAR_FUNCTION)NULL,  (TO_CHAR_FUNCTION)NULL);
   } //if
   
-  m_DIGGY_RETURN(comparison)
+  //m_DIGGY_RETURN(comparison)
+  return comparison;
 } // BlotfuncsHandlerCompare
 
 
@@ -625,27 +626,40 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
   struct P_STRING dummy; // UNDEFINED 
   m_ASSIGN_P_STRING(dummy,"N/A",-1)
 
+  char b_blotblog = b_FALSE0;
   while (answer == ANSWER__YES && !b_EMPTY_P_STRING(fp_template)) {
-
     // Stage 1: Locate new blotinst "sequence" 
+m_DIGGY_VAR_P_STRING(fp_template)
+m_DIGGY_VAR_D(b_blotblog)
+    if (!b_blotblog) {
+      m_PARSE_TILL_MATCH_C(fp_template,"##<<",NULL, &decor)
+      if (!b_EMPTY_P_STRING(decor)) {
+        v_templatePartitionEntry = GreenCollectionFetch(handle->h_templatePartitionsHandle, -1,
+          (char**)&ti_templatePartitionStuff);
+        m_TRACK_IF(v_templatePartitionEntry < 0)
+        m_ASSIGN_DECOR_TEMPLATE_PARTITION(*ti_templatePartitionStuff, decor)
+      } // if
+      if (b_EMPTY_P_STRING(fp_template)) { // "##<<' NOT located 
+        break;
+      } // if
+      m_PARSE_OFFSET(fp_template,4, NULL)
+    } // if 
 
-    m_PARSE_TILL_MATCH_C(fp_template,"##<<",NULL, &decor)
-    if (!b_EMPTY_P_STRING(decor)) {
-      v_templatePartitionEntry = GreenCollectionFetch(handle->h_templatePartitionsHandle, -1,
-        (char**)&ti_templatePartitionStuff);
-      m_TRACK_IF(v_templatePartitionEntry < 0)
-      m_ASSIGN_DECOR_TEMPLATE_PARTITION(*ti_templatePartitionStuff, decor)
+    int c_delimitorEntry = UNDEFINED ;
+m_DIGGY_VAR_P_STRING(fp_template)
+    m_PARSE_TILL_MATCH_FIRST_C(fp_template,";;",">>",NULL, c_delimitorEntry, blotinstSequence)
+    if (b_EMPTY_P_STRING(fp_template)) { // NO ending ";;" or ">>" located 
+      m_REPORT_ERROR(dummy,"Missing " DELIMITOR__S, ";; or >>")
     } // if
-    if (b_EMPTY_P_STRING(fp_template)) { // "##<<' NOT located 
-      continue;
+m_DIGGY_VAR_P_STRING(fp_template)
+m_DIGGY_VAR_D(c_delimitorEntry)
+m_DIGGY_VAR_P_STRING(blotinstSequence)
+    if ((b_blotblog = (c_delimitorEntry == 0))) { // ending ";;" located 
+      m_PARSE_OFFSET(fp_template,2, NULL)
+    } else { // // ending ">>" located  
+      m_ASSERT(c_delimitorEntry == 1)
+      m_PARSE_OFFSET(fp_template,2, NULL)
     } // if
-    m_PARSE_OFFSET(fp_template,4, NULL)
-
-    m_PARSE_TILL_MATCH_C(fp_template,">>",NULL, &blotinstSequence)
-    if (b_EMPTY_P_STRING(fp_template)) { // ending ">>" not located 
-      m_REPORT_ERROR(dummy,"Missing " DELIMITOR__S, ">>")
-    } // if
-    m_PARSE_OFFSET(fp_template,2, NULL)
 
     // blotinstSequence: complete blotinst "sequence"
 
@@ -920,7 +934,6 @@ int BlotcodeExecutorConstructPage (BLOTCODE_EXECUTOR_HANDLE handle,
         handle->hshr_blotlibExecutorHandles[blotlibEntry],  a_blotfunc,
         handle->h_blotfuncSurrogate,  &blotinstPtr->c_blotval, nc_abandonmentInfo)) {
       case ANSWER__YES: // Blot function completed
-m_DIGGY_VAR_GEN(blotinstPtr->c_blotval,ld)
         if (handle->h_blotfuncSurrogate->c_copiedLength > 0) {
           m_TRACK_IF(SuckerFillDButt(outputSuckerHandle, 
             m_GStringGetLogicalPString(handle->h_blotfuncSurrogate),  NULL) != 0)

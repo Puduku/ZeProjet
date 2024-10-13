@@ -137,6 +137,35 @@
   m_PARSE_TILL_MATCH(m_sequence,em_localSubPString,n_toCharFunction,na_lexeme) \
 }   
 
+// TODO: ScanPStringTillFirstMatch()
+// Same as m_PARSE_TILL_MATCH_C() above, except that find FIRST between
+// two possible sub-strings.
+// NOTICE: lexeme is MANDATORY
+//
+// Passed:
+// - p_subCString0: 1st possible sub-string
+// - p_subCString1: 2nd possible sub-string
+//
+// Changed:
+// - mc_entry: only significant if sequence NOT emptied:  
+//   + 0 => 1st sub-string FIRST matched
+//   + 1 => 2nd sub-string FIRST matched
+#define m_PARSE_TILL_MATCH_FIRST_C(/*struct P_STRING*/m_sequence, \
+  /*const char* */p_subCString0, /*const char* */p_subCString1,\
+  /*TO_CHAR_FUNCTION*/n_toCharFunction, /*int*/mc_entry, /*struct P_STRING* */m_lexeme) {\
+  struct P_STRING em_origSequence = (m_sequence);\
+  m_PARSE_TILL_MATCH_C(m_sequence,p_subCString0, n_toCharFunction,&(m_lexeme)) \
+  struct P_STRING em_lexeme0 = (m_lexeme);\
+  struct P_STRING em_sequence0 = (m_sequence);\
+  (m_sequence) = em_origSequence;\
+  m_PARSE_TILL_MATCH_C(m_sequence,p_subCString1, n_toCharFunction,&(m_lexeme)) \
+  if ((m_sequence).string > em_sequence0.string) {\
+    (mc_entry) = 0;\
+    (m_sequence) = em_sequence0; \
+    (m_lexeme) = em_lexeme0; \
+  } else mc_entry = 1;\
+} 
+
 // Parse a string portion sequence: match token 
 //
 // Passed:

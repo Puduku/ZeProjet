@@ -11,7 +11,7 @@
 // A priori, output is a verbatim copy of input (seen as opaque binary content)... 
 // Yet, the parser has the ability to discern special directives nested in input (so-called "blots").
 // Each time the parser encounters a "blot", dynamic treatment is undertaken.
-// A "blot" is something starting with "##<<" and finished by ">>".
+// A "blot" is something starting with "##<<" lexeme and finished by ">>" lexeme.
 // A "blot" is an elementary instruction of "blot code" and may comprise:
 // - a control statement : : "loop", "endLoop", "switch", "case", etc.
 // followed by 
@@ -24,8 +24,11 @@
 
 // "Blot functions" correspond to the dynamic part in a template:
 // - they can provide dynamic values to control statements;
-// - they can generate content: the complete "blot" found in input is replaced by the content provided by
-//   the function in the output.
+// - they can generate content: the complete "blot" found in input is replaced by the content
+//   provided by the function in the output.
+
+// A "Blotblob" allows to gather blots together: the trick is based on the ";;" lexeme which
+// replaces the ">>" "##<<" lexeme sequence...
 
 // Blot libraries:
 // --------------
