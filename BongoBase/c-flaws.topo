@@ -23,7 +23,9 @@
 // programming in C) or "innovative" (by getting rid of C for good), we must first point out the
 // real flaws of C. ..
 
-// Note: Portability issues are marked with (P)
+// Legend: 
+// - Portability issues are marked with (P)
+// - Regressions (problems created by inadequate evolutions) are marked with (R)
 
 // Number 10: impossibility to specify directly the values of the fields of a 'struct' parameter in
 // the function calls.
@@ -191,7 +193,7 @@
 // programmer to anticipate. Such approach remains reasonable and applicable while programmers keep
 // control on the nature of integer data (size and  signedness). However, inopportune typedefs
 // (which "opacify" without reason - just for the pleasure - the data types) complicate the
-// situation...
+// situation... (R)
 // (*) This serious problem persists in C++. C++ does well provide a mechanism that mimics ADA's
 // exceptions, but that mechanism is actually useless regarding numbers' OVERFLOWS. The problem is
 // that, though an 'overflow_error' is well defined with the C++ standard, we still have to raise it
@@ -200,7 +202,7 @@
 // the hood - you have to pedal (and to simulate the engine noise with your mouth) to move
 // forward...
 
-// Number 1: Unreadable C interface headers - mess with portability flags. 
+// Number 1: Unreadable C interface headers - mess with portability flags. (R)
 // This is not an originel flaw of the language. But now, after more than forty years of (often
 // benevolent) "cow-boys" interventions, all standard and system (.h) headers - which directly
 // affect the quality of the C programming environment - have ended up looking like nothing and are
