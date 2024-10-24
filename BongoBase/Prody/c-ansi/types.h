@@ -25,21 +25,26 @@ m_DEFINE_UNARY_ENUM(ReturnedImage,
 
 // Binary statuses...
 
+// Dual verity values for the (cute) girls:
 m_DEFINE_BINARY_ENUM(AnswerImage,
   ANSWER__YES,,// procedure completed ...and the answer is "YES !!"
   ANSWER__NO,) // procedure completed ...and the answer is "NO !!"
 
+// Dual verity values for the (heavies / bullies / nerds) guys:
 m_DEFINE_BINARY_ENUM(AttemptImage,
   ATTEMPT__SUCCESSFUL,,// this try is successful
   ATTEMPT__TRY_AGAIN,) // this try was not lucky
 
+// Dual verity values in European institutions
 m_DEFINE_BINARY_ENUM(CompletedImage,
   COMPLETED__OK,, // procedure completed,
-  COMPLETED__BUT,)// procedure completed, but we want to point something...
+  COMPLETED__BUT,)// procedure completed, but we want to point something ; we all agree (OK) 
+    // to the fact that we don't agree (BUT)...
 
+// Dual verity values that everyone can understand ? 
 m_DEFINE_BINARY_ENUM(ResultImage,
-  RESULT__FOUND,,    // "research" completed and is fruitful 
-  RESULT__NOT_FOUND,)// "research" completed, but is UNfruitful  
+  RESULT__FOUND,,    // completed and fruitful research
+  RESULT__NOT_FOUND,)// completed research, but did not come to fruition
 
 
 // Ternary "comparison" status...
