@@ -232,4 +232,10 @@
 //   limited... To give it a use, we common programmers know no other way than to spoil this perfect
 //   program with our rotten lines of code...
 // 
-// - Usage of verity values in C-programs: see c-monism.topo 
+// - Usage of verity values in C-programs: see also c-monism.topo
+//   Usage of accurate binary verity values is important to avoid the two following anti-patterns :
+//   + Programs that hangs (and by the way eat up the resources) instead of handling problem properly
+//     NEVER: implement "guy" interpretation of "girl" status
+//     BEWARE: when implementing "girl" interpretation of "guy" status.
+//   + Programs that simply propose a bogus action to ‘solve’ a problem. 
+//     NEVER: be satisfied with the appearance of a solution 
