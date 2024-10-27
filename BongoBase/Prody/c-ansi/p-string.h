@@ -52,19 +52,21 @@ struct P_STRING { // #REF struct-P_STRING
 // Assign a string portion.
 // 
 // Passed:
-// - m_pString
-// - p_string:
+// - mu_pString: (once evaluated parameter)
+// - up_string: (once evaluated parameter)
 // - un_length: (once evaluated parameter)
 //   + >= 0: raw string length (may include '\0' chars)
 //   + -1 special value: '\0'-terminated C string
 // 
 // Assigned:
-// - m_pString: 
-#define m_ASSIGN_P_STRING(/*struct P_STRING*/m_pString,\
-  /*const char* */p_string, /*int*/un_length) {\
+// - mu_pString: 
+#define m_ASSIGN_P_STRING(/*struct P_STRING*/mu_pString,\
+  /*const char* */up_string, /*int*/un_length) {\
+  struct P_STRING *em_pStringPtr = &(mu_pString);\
   int em_length = (un_length);\
-  if (em_length < 0) em_length = strlen(p_string);\
-  (m_pString).stop = ((m_pString).string = (p_string)) + (em_length);\
+  const char *emp_string = (up_string);\
+  if (em_length < 0) em_length = strlen(emp_string);\
+  em_pStringPtr->stop = (em_pStringPtr->string = emp_string) + (em_length);\
 }
 
 // Assign a local string portion.
@@ -101,28 +103,66 @@ struct P_STRING { // #REF struct-P_STRING
 // Assign simple "C-string" to "string portion" 
 // 
 // Passed:
-// - m_pString: 
+// - mu_pString: 
 // - p_cString: c string (buffer start address)
 //
 // Assigned:
 // - m_pString:
-#define m_ASSIGN_C_P_STRING(/*struct P_STRING*/m_pString,\
+#define m_ASSIGN_C_P_STRING(/*struct P_STRING*/mu_pString,\
   /*const char* */p_cString) {\
-  m_ASSIGN_P_STRING(m_pString,p_cString, -1)\
+  m_ASSIGN_P_STRING(mu_pString,p_cString, -1)\
 }
 
 // Assign simple "C-string" to local "string portion" 
 // 
 // Passed:
-// - m_pString: local var to create
+// - m_localPString: local var to create
 // (other params : see m_ASSIGN_P_STRING() above) 
 //
 // Assigned (local var):
-// - m_pString:
+// - m_localPString:
 #define m_ASSIGN_LOCAL_C_P_STRING(/*struct P_STRING*/m_localPString,\
   /*const char* */p_cString) \
   struct P_STRING m_localPString;\
   m_ASSIGN_C_P_STRING(m_localPString,  p_cString)
+
+
+// Assign simple "C-strings" to "string portions".
+//
+// Passed: 
+// - s_pStrings: array of p-strings to assign 
+// - stringsCount: (>0) number of strings
+// - p_cString0: 1st c-string
+// - ...: other c-string(s) 
+//
+// Assigned :
+// - s_pStrings:
+static inline int m_AssignPStrings(struct P_STRING* s_pStrings, int stringsCount,
+  /*const char* p_cString0 ,*/ ...) {
+  va_list cStrings;
+  struct P_STRING *pStringsPtr = s_pStrings;
+  va_start(cStrings,stringsCount);
+  int i = 0; while(i++ < stringsCount) m_ASSIGN_P_STRING(*(pStringsPtr++),va_arg(cStrings,
+    const char*),-1);
+  va_end(cStrings);
+  return RETURNED;
+} // m_AssignPStrings
+
+
+// Assign simple "C-strings" to LOCAL "string portions".
+//
+// Passed: 
+// - m_localPStrings: 
+// - stringsCount: (>0) number of strings; 
+// - m_cString0: 1st c-string
+// - ...: other c-string(s)
+//
+// Assigned (local var):
+// - m_pString:
+#define m_ASSIGN_LOCAL_P_STRINGS(/*struct P_STRING* */m_localPStrings,/*int*/ stringsCount,...)\
+  struct P_STRING m_localPStrings[stringsCount]; m_ASSERT(m_AssignPStrings(m_localPStrings,\
+  stringsCount,__VA_ARGS__) == RETURNED)
+
 
 
 // String portions properties
@@ -393,6 +433,51 @@ const char *ScanPStringTillMatch(const struct P_STRING *ap_pString,
 const char *ParanoidScanPStringTillMatch(const struct P_STRING *ap_pString, 
   const struct P_STRING *ap_subPString,  TO_CHAR_FUNCTION n_toCharFunction) ;
 
+// Extend ScanPStringTillMatch "scanning" function : 
+// Locate first matching sub-string, among DIFFERENT sub-strings. 
+//
+// Passed:
+// - ap_pString: string to scan #SEE struct-P_STRING
+// - n_toCharFunction: 
+//   + NULL: not provided; no conversion before  comparison 
+//   + != NULL: conversion applied on (each char of) both strings before comparison ; "binary"
+//     comparison is NOT possible
+// - subStringsCount: >0
+// - subPString0: 1st possible sub string to locate
+// - other possible sub strings (...) : indicate all other possible sub-strings to match ;
+//
+// Changed:
+// - *a_matchedEntry : entry for sub-string which was FIRST matched (may be any entry if none of 
+//   sub-strings is located) 
+//   
+//
+// Returned:
+// (!= NULL) scanning position; use b_SCAN_P_STRING_LOCATED() below to check whether
+// sub-string is actually located. 
+const char *ScanPStringTillFirstMatch(const struct P_STRING *ap_pString,
+  TO_CHAR_FUNCTION n_toCharFunction, int *a_matchedEntry, int subStringsCount,
+  /*struct P_STRING subPString0,*/ ...);
+
+// See ScanPStringTillFirstMatch()
+// 
+// Passed:
+// - subPStrings:
+// (Instead of:)
+// - subPString0: 1st possible sub string to locate
+// - other possible sub strings (...) : indicate all other possible sub-strings to match ;
+const char *ScanPStringTillFirstMatchV(const struct P_STRING *ap_pString,
+  TO_CHAR_FUNCTION n_toCharFunction, int *a_matchedEntry, int subStringsCount,
+  va_list subPStrings);
+
+// See ScanPStringTillFirstMatchV()
+// 
+// Passed:
+// - sp_subPStrings:
+// (Instead of:)
+// - subPStrings:
+const char *ScanPStringTillFirstMatchR(const struct P_STRING *ap_pString,
+  TO_CHAR_FUNCTION n_toCharFunction, int *a_matchedEntry, int subStringsCount, 
+  const struct P_STRING sp_subPStrings[]) ;
 
 // Boolean interpretation (located or not) of scan pointer returned by ScanPString*()
 // functions.

@@ -13,7 +13,6 @@
 #include "c-ansi/diggy.h"
 #include "c-ansi/testy-diggy.h"
 
-
 // Public function: see .h
 int VerifyCPString(struct P_STRING *a_pString) { 
   m_DIGGY_BOLLARD()
@@ -251,7 +250,7 @@ const char *ParanoidScanPStringTillMatch(const struct P_STRING *ap_pString,
 
   const char *scanPtr1 = ScanPStringTillMatch(ap_pString,ap_subPString,
     n_toCharFunction);
-  m_TRACK_IF(scanPtr1 < 0) 
+  m_ASSERT(scanPtr1 != NULL) 
 
   if (n_toCharFunction == NULL) {
     const char* scanPtr2 = ScanPStringTillMatch(ap_pString,ap_subPString,
@@ -262,6 +261,59 @@ const char *ParanoidScanPStringTillMatch(const struct P_STRING *ap_pString,
     
   m_DIGGY_RETURN(scanPtr1) 
 } // ParanoidScanPStringTillMatch
+
+
+// Public function : see description in .h
+const char *ScanPStringTillFirstMatchR(const struct P_STRING *ap_pString,
+  TO_CHAR_FUNCTION n_toCharFunction, int *a_matchedEntry, int subStringsCount, 
+  const struct P_STRING sp_subPStrings[]) {
+  m_DIGGY_BOLLARD()
+  const char *scanPtrs[subStringsCount] ;
+
+  m_ASSERT(subStringsCount > 0)
+m_DIGGY_VAR_D(subStringsCount)   
+  const struct P_STRING *subPStringPtr = sp_subPStrings;
+  int i = 0; while (i < subStringsCount) {
+m_DIGGY_VAR_P_STRING(*subPStringPtr)
+    scanPtrs[i++] = ScanPStringTillMatch(ap_pString,subPStringPtr++, n_toCharFunction);
+  } // while 
+
+  *a_matchedEntry = 0; // a priori
+  for (i = 1; i < subStringsCount; i++) {
+    if (scanPtrs[i] < scanPtrs[*a_matchedEntry]) *a_matchedEntry = i; 
+  } // for 
+m_DIGGY_VAR_D(*a_matchedEntry)   
+  m_DIGGY_RETURN(scanPtrs[*a_matchedEntry]) 
+} // ScanPStringTillFirstMatchR
+
+// Public function : see description in .h
+const char *ScanPStringTillFirstMatchV(const struct P_STRING *ap_pString,
+  TO_CHAR_FUNCTION n_toCharFunction, int *a_matchedEntry, int subStringsCount,
+  va_list subPStrings) {
+  m_DIGGY_BOLLARD()
+  struct P_STRING s_subPStrings[subStringsCount];
+  struct P_STRING *subPStringPtr = s_subPStrings;
+  int i = 0; while (i++ < subStringsCount) *(subPStringPtr++) = va_arg(subPStrings,
+    struct P_STRING);
+  m_DIGGY_RETURN(ScanPStringTillFirstMatchR(ap_pString,n_toCharFunction,a_matchedEntry,
+    subStringsCount,s_subPStrings))
+} // ScanPStringTillFirstMatchV
+
+// Public function : see description in .h
+const char *ScanPStringTillFirstMatch(const struct P_STRING *ap_pString,
+  TO_CHAR_FUNCTION n_toCharFunction, int *a_matchedEntry, int subStringsCount,
+  /*struct P_STRING subPString0,*/ ...) {
+  m_DIGGY_BOLLARD()
+  va_list subPStrings;
+  va_start(subPStrings,subStringsCount);
+
+  const char *scanPtr = ScanPStringTillFirstMatchV(ap_pString,n_toCharFunction,a_matchedEntry,
+    subStringsCount,subPStrings);
+   
+  va_end(subPStrings);
+
+  m_DIGGY_RETURN(scanPtr)
+} // ScanPStringTillFirstMatch
 
 #undef CURRENT_TRACKING_VALUE
 #define CURRENT_TRACKING_VALUE DEFAULT_TRACKING_VALUE

@@ -102,7 +102,7 @@ CommandCompileTests () {
         dobjs=("${dobjs[@]}" c-ansi-p-string-diggy.o)
       fi
       if [ "$_te" = "c-ansi-blotcode-test" ] ;then
-        #dobjs=("${dobjs[@]}" c-posix-sucker-diggy.o)
+        dobjs=("${dobjs[@]}" c-ansi-p-string-diggy.o)
         #dobjs=("${dobjs[@]}" c-ansi-green-diggy.o c-ansi-g-string-diggy.o)
         echo "BIDON"
       fi

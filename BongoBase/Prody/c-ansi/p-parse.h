@@ -137,34 +137,43 @@
   m_PARSE_TILL_MATCH(m_sequence,em_localSubPString,n_toCharFunction,na_lexeme) \
 }   
 
-// TODO: ScanPStringTillFirstMatch()
-// Same as m_PARSE_TILL_MATCH_C() above, except that find FIRST between
-// two possible sub-strings.
-// NOTICE: lexeme is MANDATORY
+// Parse a string portion sequence according to sub string list scanned by
+// ScanPStringTillFirstMatchR() function. 
 //
 // Passed:
-// - p_subCString0: 1st possible sub-string
-// - p_subCString1: 2nd possible sub-string
+// - m_sequence: as passed to (and updated by) ScanPString*() function
+// - n_toCharFunction:
+// - na_lexeme: NULL if not used
+// - subStringsCount: (>0) number of sub-strings 
+// - sp_subPStrings: possible sub-strings (p-strings) 
 //
 // Changed:
-// - mc_entry: only significant if sequence NOT emptied:  
-//   + 0 => 1st sub-string FIRST matched
-//   + 1 => 2nd sub-string FIRST matched
-#define m_PARSE_TILL_MATCH_FIRST_C(/*struct P_STRING*/m_sequence, \
-  /*const char* */p_subCString0, /*const char* */p_subCString1,\
-  /*TO_CHAR_FUNCTION*/n_toCharFunction, /*int*/mc_entry, /*struct P_STRING* */m_lexeme) {\
-  struct P_STRING em_origSequence = (m_sequence);\
-  m_PARSE_TILL_MATCH_C(m_sequence,p_subCString0, n_toCharFunction,&(m_lexeme)) \
-  struct P_STRING em_lexeme0 = (m_lexeme);\
-  struct P_STRING em_sequence0 = (m_sequence);\
-  (m_sequence) = em_origSequence;\
-  m_PARSE_TILL_MATCH_C(m_sequence,p_subCString1, n_toCharFunction,&(m_lexeme)) \
-  if ((m_sequence).string > em_sequence0.string) {\
-    (mc_entry) = 0;\
-    (m_sequence) = em_sequence0; \
-    (m_lexeme) = em_lexeme0; \
-  } else mc_entry = 1;\
+// - m_sequence: parsed lexeme removed in the sequence 
+// - mc_matchedEntry: entry for sub-string which was FIRST matched 
+// - *na_lexeme: (if used) parsed lexeme (aka token) 
+#define m_PARSE_TILL_FIRST_MATCH_R(/*struct P_STRING*/m_sequence,\
+  /*TO_CHAR_FUNCTION*/n_toCharFunction, /*int*/mc_matchedEntry, /*struct P_STRING* */na_lexeme,\
+  /*int*/subStringsCount, /*struct P_STRING* */sp_subPStrings) {\
+  const char *em_scanPtr = ScanPStringTillFirstMatchR(&m_sequence,n_toCharFunction,\
+    &(mc_matchedEntry),subStringsCount,sp_subPStrings);\
+  m_PARSE_SEQUENCE(m_sequence,em_scanPtr, na_lexeme)\
+}
+
+// Wrap m_PARSE_TILL_FIRST_MATCH_R above: use C-strings as sub-strings in lieu of string portions.
+//
+// Passed: 
+// - subCString0: 1st C sub-string 
+// - other C sub-strings 
+// (Instead of:)
+// - sp_subPStrings: possible sub-strings (p-strings) 
+#define m_PARSE_TILL_FIRST_MATCH_C(/*struct P_STRING*/ m_sequence,\
+  /*TO_CHAR_FUNCTION*/ n_toCharFunction,/*int*/mc_matchedEntry, /*struct P_STRING* */na_lexeme,\
+  /*int*/ subStringsCount, /*const char* p_subCString0 ,*/ ...) {\
+  m_ASSIGN_LOCAL_P_STRINGS(sp_subPStrings,subStringsCount,__VA_ARGS__)\
+  m_PARSE_TILL_FIRST_MATCH_R(m_sequence,n_toCharFunction,mc_matchedEntry,na_lexeme,\
+    subStringsCount, sp_subPStrings)\
 } 
+
 
 // Parse a string portion sequence: match token 
 //

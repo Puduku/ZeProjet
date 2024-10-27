@@ -217,7 +217,6 @@ static int TestsComparePStrings(void) {
 
 
 #define b_EXPECT_LOCATED b_TRUE
-#define b_EXPECT_NOT_LOCATED b_FALSE0
 
 
 // Ret: 
@@ -250,14 +249,14 @@ static int TestsScanPString(void) {
   m_DIGGY_BOLLARD()
 
   m_TEST_SCAN_C_P_STRING(VERS1,b_PASS_CHARS_WHILE,isdigit ,0       ,b_EXPECT_LOCATED)
-  m_TEST_SCAN_C_P_STRING(VERS1,b_PASS_CHARS_TILL ,isdigit ,vers1Len,b_EXPECT_NOT_LOCATED)
+  m_TEST_SCAN_C_P_STRING(VERS1,b_PASS_CHARS_TILL ,isdigit ,vers1Len,!b_EXPECT_LOCATED)
   m_TEST_SCAN_C_P_STRING(VERS1,b_PASS_CHARS_TILL ,isLowerC,5       ,b_EXPECT_LOCATED)
   m_TEST_SCAN_C_P_STRING(VERS1,b_PASS_CHARS_WHILE,isupper ,1       ,b_EXPECT_LOCATED)
 
   m_TEST_REGULAR_SCAN_P_STRING("Tout cela..." , 4, b_PASS_CHARS_TILL , isLowerC,
-    4, b_EXPECT_NOT_LOCATED)
+    4, !b_EXPECT_LOCATED)
   m_TEST_REGULAR_SCAN_P_STRING("Tout cela..." , 5, b_PASS_CHARS_TILL , isLowerC,
-    5, b_EXPECT_NOT_LOCATED)
+    5, !b_EXPECT_LOCATED)
   m_TEST_REGULAR_SCAN_P_STRING("Tout cela..." , 6, b_PASS_CHARS_TILL , isLowerC,
     5, b_EXPECT_LOCATED)
   m_TEST_REGULAR_SCAN_P_STRING("Tout cela..." , 7, b_PASS_CHARS_TILL , isLowerC,
@@ -267,7 +266,7 @@ static int TestsScanPString(void) {
   m_TEST_REGULAR_SCAN_P_STRING("Tout\0cela...", 7, b_PASS_CHARS_TILL , isLowerC,
     5, b_EXPECT_LOCATED)
   m_TEST_REGULAR_SCAN_P_STRING("Tout\0cela...",-1, b_PASS_CHARS_TILL , isLowerC,
-    4, b_EXPECT_NOT_LOCATED)
+    4, !b_EXPECT_LOCATED)
 
   m_DIGGY_RETURN(RETURNED)
 #undef m_TEST_SCAN_P_STRING
@@ -275,6 +274,44 @@ static int TestsScanPString(void) {
 #undef m_TEST_SCAN_C_P_STRING
 } // TestsScanPString
 
+
+// Ret: 
+// - RETURNED: Ok
+// - -1: anomaly is raised
+static int TestsScanPStringTillFirstMatch(void) {
+#define m_TEST_SCAN_P_STRING_TILL_FIRST_MATCH(/*const char* */p_cString,\
+  /*int*/expectedOffset, b_expectLocated, /*int*/expectedMatchedEntry,\
+  /*const char* */p_subCString0, /*const char* */p_subCString1, /*const char* */p_subCString2) {\
+  m_ASSIGN_LOCAL_P_STRING(pString,p_cString,-1)\
+  m_ASSIGN_LOCAL_P_STRING(subPString0,p_subCString0,-1)\
+  m_ASSIGN_LOCAL_P_STRING(subPString1,p_subCString1,-1)\
+  m_ASSIGN_LOCAL_P_STRING(subPString2,p_subCString2,-1)\
+  int em_matchedEntry = UNDEFINED;\
+  retScan = ScanPStringTillFirstMatch(&pString,NULL,&em_matchedEntry,3,subPString0,subPString1,\
+    subPString2);\
+  m_ASSERT((expectedOffset) == (retScan - p_cString)) \
+  m_ASSERT(retScan <= pString.stop) \
+  int emb_located = b_SCAN_P_STRING_LOCATED(pString, retScan);\
+  if (b_expectLocated) {\
+    m_ASSERT(emb_located)\
+    m_ASSERT((expectedMatchedEntry) == em_matchedEntry)\
+  }\
+  else m_ASSERT(!emb_located) \
+} 
+
+  m_DIGGY_BOLLARD()
+
+  m_TEST_SCAN_P_STRING_TILL_FIRST_MATCH("Tout cela ne...",5,b_EXPECT_LOCATED,0, "cela","ceci",
+   "CELA")
+  m_TEST_SCAN_P_STRING_TILL_FIRST_MATCH("Tout cela ne...",5,b_EXPECT_LOCATED,2, "CELA","ceci",
+   "cela")
+  m_TEST_SCAN_P_STRING_TILL_FIRST_MATCH("Tout cela ne...",15,!b_EXPECT_LOCATED,UNDEFINED, "CELA",
+   "ceci", "Cela")
+  m_TEST_SCAN_P_STRING_TILL_FIRST_MATCH("Tout cela ne...",0,b_EXPECT_LOCATED,1, "CELA",
+   "", "Cela")
+
+  m_DIGGY_RETURN(RETURNED)
+} // TestsScanPStringTillFirstMatch
 
 // Ret: 
 // - RETURNED: Ok
@@ -313,16 +350,16 @@ static int TestsScanPStringTillMatch(void) {
   m_DIGGY_BOLLARD()
 
   m_TEST_SCAN_C_P_STRING_TILL_MATCH("Tout cela ne..." ,"cela",  5,b_EXPECT_LOCATED)
-  m_TEST_SCAN_C_P_STRING_TILL_MATCH("Tout cela ne..." ,"Cela", 15,b_EXPECT_NOT_LOCATED)
-  m_TEST_SCAN_C_P_STRING_TILL_MATCH("Tout cela ne..." ,"ne " , 15,b_EXPECT_NOT_LOCATED)
+  m_TEST_SCAN_C_P_STRING_TILL_MATCH("Tout cela ne..." ,"Cela", 15,!b_EXPECT_LOCATED)
+  m_TEST_SCAN_C_P_STRING_TILL_MATCH("Tout cela ne..." ,"ne " , 15,!b_EXPECT_LOCATED)
   m_TEST_SCAN_C_P_STRING_TILL_MATCH("Tout cela ne..." ,""    ,  0,b_EXPECT_LOCATED)
 
   m_CHARS_TEST_SCAN_P_STRING_TILL_MATCH("Tout cela ne..." ,"Cela", toupper,\
     5 ,b_EXPECT_LOCATED)
   m_CHARS_TEST_SCAN_P_STRING_TILL_MATCH("Tout cela ne..." ,"XCela", toupper,\
-    15,b_EXPECT_NOT_LOCATED)
+    15,!b_EXPECT_LOCATED)
   m_CHARS_TEST_SCAN_P_STRING_TILL_MATCH("Tout cela ne..." ,"Cila", toupper,\
-    15,b_EXPECT_NOT_LOCATED)
+    15,!b_EXPECT_LOCATED)
 
   m_LENGTHS_TEST_SCAN_P_STRING_TILL_MATCH("Tout cela ne..." ,12 ,"cela",4,\
     5,b_EXPECT_LOCATED) 
@@ -331,11 +368,11 @@ static int TestsScanPStringTillMatch(void) {
   m_LENGTHS_TEST_SCAN_P_STRING_TILL_MATCH("Tout cela ne..." ,9  ,"cela",4,\
     5,b_EXPECT_LOCATED) 
   m_LENGTHS_TEST_SCAN_P_STRING_TILL_MATCH("Tout cela ne..." ,8  ,"cela",4,\
-    8,b_EXPECT_NOT_LOCATED) 
+    8,!b_EXPECT_LOCATED) 
   m_LENGTHS_TEST_SCAN_P_STRING_TILL_MATCH("Tout cela ne..." ,12 ,"cela",0,\
     0,b_EXPECT_LOCATED) 
   m_LENGTHS_TEST_SCAN_P_STRING_TILL_MATCH("Tout cela ne..." , 0 ,"cela",0,\
-    0,b_EXPECT_NOT_LOCATED) 
+    0,!b_EXPECT_LOCATED) 
   m_LENGTHS_TEST_SCAN_P_STRING_TILL_MATCH("Tout\0cela ne...",12 ,"cela",4,\
     5,b_EXPECT_LOCATED) 
 
@@ -445,6 +482,7 @@ int main(int argc, char** argv) {
   m_TRACK_IF(TestsComparePStrings() != RETURNED)
   m_TRACK_IF(TestsScanPString() != RETURNED)
   m_TRACK_IF(TestsScanPStringTillMatch() != RETURNED)
+  m_TRACK_IF(TestsScanPStringTillFirstMatch() != RETURNED)
   m_TRACK_IF(TestsConvertPString() != RETURNED)
   m_TRACK_IF(TestsReadGenericIntegerPString() != RETURNED)
 
