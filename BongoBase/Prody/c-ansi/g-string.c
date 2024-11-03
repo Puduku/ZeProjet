@@ -306,7 +306,7 @@ m_DIGGY_INFO("ap_keySettings->gKeysComparison=%d",ap_keySettings->gKeysCompariso
   case P_STRING__G_KEYS_COMPARISON:
     comparison = ComparePStrings(&aBareGKey.cp_pString,  &bBareGKey.cp_pString,
       ap_keySettings->select.pStringComparison.cn_isNeutralCharFunction,
-      ap_keySettings->select.pStringComparison.cn_toCharFunction); 
+      ap_keySettings->select.pStringComparison.cn_toCharFunction,!b_SUB_STRING_2); 
   break; case INTRINSIC_VALUE__G_KEYS_COMPARISON:
     comparison = GET_COMPARISON(aBareGKey.cen_intrinsicValue,bBareGKey.cen_intrinsicValue);
   break; case ACOLYT_TOKEN_ID__G_KEYS_COMPARISON:

@@ -170,10 +170,10 @@ static int BlotfuncsHandlerCompare (void *cpr_handle,  char b_frozen, int indexL
   } else bBlotfuncKeyName = *((struct BLOTFUNC_KEY_NAME*)cpr_bKeys); 
 
   int comparison = ComparePStrings(&(aBlotfuncKeyName.prefix),
-    &(bBlotfuncKeyName.prefix),  (IS_CHAR_FUNCTION)NULL,  (TO_CHAR_FUNCTION)NULL);
+    &(bBlotfuncKeyName.prefix),  (IS_CHAR_FUNCTION)NULL,  (TO_CHAR_FUNCTION)NULL,!b_SUB_STRING_2);
   if (comparison == EQUAL_TO__COMPARISON) {
     comparison = ComparePStrings(&(aBlotfuncKeyName.name),
-      &(bBlotfuncKeyName.name), (IS_CHAR_FUNCTION)NULL,  (TO_CHAR_FUNCTION)NULL);
+      &(bBlotfuncKeyName.name), (IS_CHAR_FUNCTION)NULL,  (TO_CHAR_FUNCTION)NULL,!b_SUB_STRING_2);
   } //if
   
   //m_DIGGY_RETURN(comparison)

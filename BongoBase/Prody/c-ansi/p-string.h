@@ -310,6 +310,7 @@ typedef int (*IS_CHAR_FUNCTION) (int c) ;
 // Ret: converted character
 typedef int (*TO_CHAR_FUNCTION) (int c) ;
 
+#define b_SUB_STRING_2 b_TRUE
 
 // #REF ComparePStrings
 // Lexical comparison of raw strings:
@@ -327,20 +328,21 @@ typedef int (*TO_CHAR_FUNCTION) (int c) ;
 //   + NULL: NO char conversion applied before comparison
 //   + != NULL: conversion applied on each char of both strings before comparison ; "binary"
 //     comparison is NOT possible
+// - b_subString2: + b_SUB_STRING2 (TRUE): compare 2nd string candidates as a sub-string of 1st
+//   string
 // 
 // Returned:
 // - >=0: "comparison" between string 1 and string 2: 
 //   + LESS_THAN__COMPARISON : string 1 'less than' string 2
 //   + EQUAL_TO__COMPARISON : strings are "identical"
 //   + GREATER_THAN__COMPARISON : string 1 'greater than' string 2
-int ComparePStrings(const struct P_STRING *ap_pString1, 
-  const struct P_STRING *ap_pString2,  IS_CHAR_FUNCTION n_isNeutralCharFunction,
-  TO_CHAR_FUNCTION n_toCharFunction) ; 
+int ComparePStrings(const struct P_STRING *ap_pString1, const struct P_STRING *ap_pString2,
+  IS_CHAR_FUNCTION n_isNeutralCharFunction, TO_CHAR_FUNCTION n_toCharFunction, char b_subString2);
 
 // ComparePStrings() wrapper ; compare a string portion with a c-string...
 static inline int m_CompareWithCString(const struct P_STRING *ap_pString1, const char *ap_cString2) {
   m_ASSIGN_LOCAL_C_P_STRING(pString2,ap_cString2)
-  return ComparePStrings(ap_pString1, &pString2,  NULL, NULL) ;
+  return ComparePStrings(ap_pString1, &pString2,  NULL, NULL, !b_SUB_STRING_2) ;
 } 
 
 // m_CompareWithCString() wrapper ; indicates whether string portion matches with a c-string...
@@ -367,9 +369,43 @@ static inline int mb_EqualToCString(const struct P_STRING *ap_pString1,
 // Ret:
 // - >0 : LESS_THAN__COMPARISON / EQUAL_TO__COMPARISON / GREATER_THAN__COMPARISON 
 // - -1: unexpected problem, anomaly is raised
-int ParanoidComparePStrings(const struct P_STRING *ap_pString1,
-  const struct P_STRING *ap_pString2,
-  IS_CHAR_FUNCTION n_isNeutralCharFunction,  TO_CHAR_FUNCTION n_toCharFunction) ; 
+int ParanoidComparePStrings(const struct P_STRING *ap_pString1, const struct P_STRING *ap_pString2,
+  IS_CHAR_FUNCTION n_isNeutralCharFunction, TO_CHAR_FUNCTION n_toCharFunction, char b_subString2) ;
+
+// #REF ComparePStringsAmong
+// Lexical comparison of strings (among a list):
+// - "binary" comparison when possible (i.e memcmp()-based => more efficient) 
+// - otherwize, "char to char" comparison of raw strings.
+//
+// Passed:
+// - ap_pString1 : 1st string to compare #SEE struct-P_STRING
+// - n_isNeutralCharFunction: handling of "neutral" chars (white spaces, etc.) 
+//   + NULL: NO char elimination applied before comparison 
+//   + != NULL: elimination of each "neutral" char of both strings before comparison ; "binary"
+//     comparison is NOT possible
+// - n_toCharFunction:
+//   + NULL: NO char conversion applied before comparison
+//   + != NULL: conversion applied on each char of both strings before comparison ; "binary"
+//     comparison is NOT possible
+// - b_subString2: + b_SUB_STRING2 (TRUE): compare 2nd string candidates as a sub-string of 1st
+//   string
+// - string2sCount: number of 2nd string candidates... (> 0) 
+// - sp_pString2s : array of 2nd strings candidates used for comparison #SEE struct-P_STRING
+// - a_string2Entry :
+// - >=0: entry of matching 2nd string in the list of candidates... 
+// 
+// Changed:
+// - *a_matchedEntry : entry for 2nd string candidate which (first) matched (set to 1st entry (0)
+//   if none of 2nd strings matched) 
+// 
+// Returned: 
+// - >=0: "comparison" between 1st string and matched 2nd (sub-)string: 
+//   + LESS_THAN__COMPARISON : 1st string 'lexilically before' 2nd (sub-)string
+//   + EQUAL_TO__COMPARISON : 1st string and 2nd (sub)-string "match" 
+//   + GREATER_THAN__COMPARISON : string 1 'lexilically  after' (sub-)string 2
+int ComparePStringsAmongR(const struct P_STRING *ap_pString1, 
+  IS_CHAR_FUNCTION n_isNeutralCharFunction, TO_CHAR_FUNCTION n_toCharFunction, char b_subString2,
+  int *a_matchedEntry, int string2sCount, const struct P_STRING sp_pString2s[]) ;
 
 
 // Scanning string portions
@@ -423,21 +459,11 @@ const char *ScanPStringTillMatch(const struct P_STRING *ap_pString,
   const struct P_STRING *ap_subPString,  TO_CHAR_FUNCTION n_toCharFunction);
 
 
-// Paranoid wrapper of ScanPStringTillMatch() (testing/critical embedded purpose)
-// Ensure that the optmized forms of the fonction (i.e called without filter) behave identically
-// to general one... 
-// 
-// Ret:
-// - != NULL: scanning position... 
-// - NULL: unexpected problem, anomaly is raised
-const char *ParanoidScanPStringTillMatch(const struct P_STRING *ap_pString, 
-  const struct P_STRING *ap_subPString,  TO_CHAR_FUNCTION n_toCharFunction) ;
-
 // Extend ScanPStringTillMatch "scanning" function : 
 // Locate first matching sub-string, among DIFFERENT sub-strings. 
 //
 // Passed:
-// - ap_pString: string to scan #SEE struct-P_STRING
+// - pString: string to scan #SEE struct-P_STRING
 // - n_toCharFunction: 
 //   + NULL: not provided; no conversion before  comparison 
 //   + != NULL: conversion applied on (each char of) both strings before comparison ; "binary"
@@ -449,14 +475,12 @@ const char *ParanoidScanPStringTillMatch(const struct P_STRING *ap_pString,
 // Changed:
 // - *a_matchedEntry : entry for sub-string which was FIRST matched (may be any entry if none of 
 //   sub-strings is located) 
-//   
 //
 // Returned:
 // (!= NULL) scanning position; use b_SCAN_P_STRING_LOCATED() below to check whether
 // sub-string is actually located. 
-const char *ScanPStringTillFirstMatch(const struct P_STRING *ap_pString,
-  TO_CHAR_FUNCTION n_toCharFunction, int *a_matchedEntry, int subStringsCount,
-  /*struct P_STRING subPString0,*/ ...);
+const char *ScanPStringTillFirstMatch(struct P_STRING pString, TO_CHAR_FUNCTION n_toCharFunction,
+  int *a_matchedEntry, int subStringsCount, /*struct P_STRING subPString0,*/ ...);
 
 // See ScanPStringTillFirstMatch()
 // 
@@ -465,9 +489,8 @@ const char *ScanPStringTillFirstMatch(const struct P_STRING *ap_pString,
 // (Instead of:)
 // - subPString0: 1st possible sub string to locate
 // - other possible sub strings (...) : indicate all other possible sub-strings to match ;
-const char *ScanPStringTillFirstMatchV(const struct P_STRING *ap_pString,
-  TO_CHAR_FUNCTION n_toCharFunction, int *a_matchedEntry, int subStringsCount,
-  va_list subPStrings);
+const char *ScanPStringTillFirstMatchV(struct P_STRING pString, TO_CHAR_FUNCTION n_toCharFunction,
+  int *a_matchedEntry, int subStringsCount, va_list subPStrings);
 
 // See ScanPStringTillFirstMatchV()
 // 
@@ -475,9 +498,8 @@ const char *ScanPStringTillFirstMatchV(const struct P_STRING *ap_pString,
 // - sp_subPStrings:
 // (Instead of:)
 // - subPStrings:
-const char *ScanPStringTillFirstMatchR(const struct P_STRING *ap_pString,
-  TO_CHAR_FUNCTION n_toCharFunction, int *a_matchedEntry, int subStringsCount, 
-  const struct P_STRING sp_subPStrings[]) ;
+const char *ScanPStringTillFirstMatchR(struct P_STRING pString, TO_CHAR_FUNCTION n_toCharFunction,
+  int *a_matchedEntry, int subStringsCount, const struct P_STRING sp_subPStrings[]) ;
 
 // Boolean interpretation (located or not) of scan pointer returned by ScanPString*()
 // functions.

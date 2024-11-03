@@ -154,7 +154,7 @@
 #define m_PARSE_TILL_FIRST_MATCH_R(/*struct P_STRING*/m_sequence,\
   /*TO_CHAR_FUNCTION*/n_toCharFunction, /*int*/mc_matchedEntry, /*struct P_STRING* */na_lexeme,\
   /*int*/subStringsCount, /*struct P_STRING* */sp_subPStrings) {\
-  const char *em_scanPtr = ScanPStringTillFirstMatchR(&m_sequence,n_toCharFunction,\
+  const char *em_scanPtr = ScanPStringTillFirstMatchR(m_sequence,n_toCharFunction,\
     &(mc_matchedEntry),subStringsCount,sp_subPStrings);\
   m_PARSE_SEQUENCE(m_sequence,em_scanPtr, na_lexeme)\
 }
@@ -191,7 +191,7 @@
   const char *em_scanPtr = (m_sequence).string;\
   int em_length = m_PStringLength(&(p_token));\
   struct P_STRING em_subSequence = m_SubPString(m_sequence,0,em_length);\
-  switch (ComparePStrings(&(em_subSequence),&p_token,NULL,n_toCharFunction)) {\
+  switch (ComparePStrings(&(em_subSequence),&p_token,NULL,n_toCharFunction,!b_SUB_STRING_2)) {\
   case LESS_THAN__COMPARISON :\
   case GREATER_THAN__COMPARISON :\
   break; case EQUAL_TO__COMPARISON :\

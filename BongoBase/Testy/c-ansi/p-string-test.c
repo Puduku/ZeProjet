@@ -155,7 +155,7 @@ static int TestsComparePStrings(void) {
   m_ASSIGN_LOCAL_P_STRING(pString1,p_string1,n_length1)\
   m_ASSIGN_LOCAL_P_STRING(pString2,p_string2,n_length2)\
   ret = ParanoidComparePStrings(&pString1,&pString2, n_isNeutralCharFunction,\
-    n_toCharFunction);\
+    n_toCharFunction,!b_SUB_STRING_2);\
   m_TRACK_IF(ret < 0)\
   m_COMPARISON_2_DIFFERENCE(ret,difference)\
   m_ASSERT(difference m_expectedComparison 0) \
@@ -278,51 +278,13 @@ static int TestsScanPString(void) {
 // Ret: 
 // - RETURNED: Ok
 // - -1: anomaly is raised
-static int TestsScanPStringTillFirstMatch(void) {
-#define m_TEST_SCAN_P_STRING_TILL_FIRST_MATCH(/*const char* */p_cString,\
-  /*int*/expectedOffset, b_expectLocated, /*int*/expectedMatchedEntry,\
-  /*const char* */p_subCString0, /*const char* */p_subCString1, /*const char* */p_subCString2) {\
-  m_ASSIGN_LOCAL_P_STRING(pString,p_cString,-1)\
-  m_ASSIGN_LOCAL_P_STRING(subPString0,p_subCString0,-1)\
-  m_ASSIGN_LOCAL_P_STRING(subPString1,p_subCString1,-1)\
-  m_ASSIGN_LOCAL_P_STRING(subPString2,p_subCString2,-1)\
-  int em_matchedEntry = UNDEFINED;\
-  retScan = ScanPStringTillFirstMatch(&pString,NULL,&em_matchedEntry,3,subPString0,subPString1,\
-    subPString2);\
-  m_ASSERT((expectedOffset) == (retScan - p_cString)) \
-  m_ASSERT(retScan <= pString.stop) \
-  int emb_located = b_SCAN_P_STRING_LOCATED(pString, retScan);\
-  if (b_expectLocated) {\
-    m_ASSERT(emb_located)\
-    m_ASSERT((expectedMatchedEntry) == em_matchedEntry)\
-  }\
-  else m_ASSERT(!emb_located) \
-} 
-
-  m_DIGGY_BOLLARD()
-
-  m_TEST_SCAN_P_STRING_TILL_FIRST_MATCH("Tout cela ne...",5,b_EXPECT_LOCATED,0, "cela","ceci",
-   "CELA")
-  m_TEST_SCAN_P_STRING_TILL_FIRST_MATCH("Tout cela ne...",5,b_EXPECT_LOCATED,2, "CELA","ceci",
-   "cela")
-  m_TEST_SCAN_P_STRING_TILL_FIRST_MATCH("Tout cela ne...",15,!b_EXPECT_LOCATED,UNDEFINED, "CELA",
-   "ceci", "Cela")
-  m_TEST_SCAN_P_STRING_TILL_FIRST_MATCH("Tout cela ne...",0,b_EXPECT_LOCATED,1, "CELA",
-   "", "Cela")
-
-  m_DIGGY_RETURN(RETURNED)
-} // TestsScanPStringTillFirstMatch
-
-// Ret: 
-// - RETURNED: Ok
-// - -1: anomaly is raised
 static int TestsScanPStringTillMatch(void) {
 #define m_TEST_SCAN_P_STRING_TILL_MATCH(/*const char* */p_string, /*int*/n_length,\
   /*const char* */p_subString, /*int*/n_subLength,\
   /*TO_CHAR_FUNCTION*/ n_toCharFunction,  /*int*/expectedOffset, b_expectLocated) {\
   m_ASSIGN_LOCAL_P_STRING(pString,p_string,n_length)\
   m_ASSIGN_LOCAL_P_STRING(subPString,p_subString,n_subLength)\
-  retScan = ParanoidScanPStringTillMatch(&pString, &subPString, n_toCharFunction);\
+  retScan = ScanPStringTillMatch(&pString, &subPString, n_toCharFunction);\
   m_ASSERT((expectedOffset) == (retScan - p_string)) \
   m_ASSERT(retScan <= pString.stop) \
   int emb_located = b_SCAN_P_STRING_LOCATED(pString, retScan);\
@@ -383,6 +345,44 @@ static int TestsScanPStringTillMatch(void) {
 #undef m_TEST_SCAN_C_P_STRING_TILL_MATCH
 } // TestsScanPStringTillMatch
 
+
+// Ret: 
+// - RETURNED: Ok
+// - -1: anomaly is raised
+static int TestsScanPStringTillFirstMatch(void) {
+#define m_TEST_SCAN_P_STRING_TILL_FIRST_MATCH(/*const char* */p_cString,\
+  /*int*/expectedOffset, b_expectLocated, /*int*/expectedMatchedEntry,\
+  /*const char* */p_subCString0, /*const char* */p_subCString1, /*const char* */p_subCString2) {\
+  m_ASSIGN_LOCAL_P_STRING(pString,p_cString,-1)\
+  m_ASSIGN_LOCAL_P_STRING(subPString0,p_subCString0,-1)\
+  m_ASSIGN_LOCAL_P_STRING(subPString1,p_subCString1,-1)\
+  m_ASSIGN_LOCAL_P_STRING(subPString2,p_subCString2,-1)\
+  int em_matchedEntry = UNDEFINED;\
+  retScan = ScanPStringTillFirstMatch(pString,NULL,&em_matchedEntry,3,subPString0,subPString1,\
+    subPString2);\
+  m_ASSERT((expectedOffset) == (retScan - p_cString)) \
+  m_ASSERT(retScan <= pString.stop) \
+  int emb_located = b_SCAN_P_STRING_LOCATED(pString, retScan);\
+  if (b_expectLocated) {\
+    m_ASSERT(emb_located)\
+    m_ASSERT((expectedMatchedEntry) == em_matchedEntry)\
+  }\
+  else m_ASSERT(!emb_located) \
+} 
+
+  m_DIGGY_BOLLARD()
+
+  m_TEST_SCAN_P_STRING_TILL_FIRST_MATCH("Tout cela ne...",5,b_EXPECT_LOCATED,0, "cela","ceci",
+   "CELA")
+  m_TEST_SCAN_P_STRING_TILL_FIRST_MATCH("Tout cela ne...",5,b_EXPECT_LOCATED,2, "CELA","ceci",
+   "cela")
+  m_TEST_SCAN_P_STRING_TILL_FIRST_MATCH("Tout cela ne...",15,!b_EXPECT_LOCATED,UNDEFINED, "CELA",
+   "ceci", "Cela")
+  m_TEST_SCAN_P_STRING_TILL_FIRST_MATCH("Tout cela ne...",0,b_EXPECT_LOCATED,1, "CELA",
+   "", "Cela")
+
+  m_DIGGY_RETURN(RETURNED)
+} // TestsScanPStringTillFirstMatch
 
 // Ret: 
 // - RETURNED: Ok
