@@ -34,7 +34,7 @@ int StandardAlarmSystemCreateInstance (ALARM_SYSTEM_HANDLE *azdh_handle) {
   const struct sigaction sigAction = {
     .sa_handler = SigalrmHandler  ,
     //.sa_mask = 0 ,
-    .sa_flags = SA_RESTART ,
+    //.sa_flags = SA_RESTART ,
   } ;
 
   m_ASSERT(n_uniqueAlarmSystemHandle == NULL)
