@@ -27,9 +27,9 @@ int SynchronizeONonblock (int descriptor, const struct WAITING_PLAN *afp_waiting
   m_PERROR_VERBATIM_IF((newFlags = descriptorFlags = fcntl(descriptor,F_GETFL)) == -1)
 
   if (afp_waitingPlan->waitingPlan == NON_BLOCKING__WAITING_PLAN) {
-    newFlags &= ~O_NONBLOCK ; // Remove flag
-  } else {
     newFlags |= O_NONBLOCK ; // enable flag
+  } else {
+    newFlags &= ~O_NONBLOCK ; // Remove flag
   } // if
   if (newFlags != descriptorFlags) {
     m_PERROR_VERBATIM_IF(fcntl(descriptor,F_SETFL,newFlags) == -1)
