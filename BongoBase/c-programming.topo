@@ -97,13 +97,16 @@
 /    not obsolete with respect to more recent concepts, such as "class models" developed in
 //   so-called "object-oriented" programming... Modules remain the "essence" of preliminary
 //   software design (*).
-//   "Classes" may only make sense far later, during the "detailed" design process...
+//   "Classes" may only make sense far later, during the "detailed" design process... (**)
 //   => Practical convention: one module <mod> exactly corresponds to:
 //   - single <mod>.h header file OR
 //   - <mod>.h header and <mod>.c source files (most common case) OR
 //   - single <mod>.c source file if and only if it implements main() function.
 //   (*) "Preliminary" does not just mean "draft" - immediatly forgotten when the "real"
 //       developement starts. "Preliminary" really means "fundamental"...
+//   (**) I actually think that classes are a complete aberration in software design. It has to
+//        do with the confusion between analytical and synthetic thinking (judgement). TODO:
+//        develop this point ‘somewhere’... 
 //
 // - C-Ansi / C-Posix split: the sources are splitted between "c-posix" and "c-ansi"
 //   sub-directories.
