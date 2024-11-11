@@ -140,22 +140,37 @@ int ParanoidComparePStrings(const struct P_STRING *ap_pString1, const struct P_S
   m_DIGGY_RETURN(comparison1)
 } // ParanoidComparePStrings
 
-// Public function : see description in .h
+
+// Public function: see .h
 int ComparePStringsAmongR(const struct P_STRING *ap_pString1, 
   IS_CHAR_FUNCTION n_isNeutralCharFunction, TO_CHAR_FUNCTION n_toCharFunction, char b_subString2,
-  int *a_matchedEntry, int string2sCount, const struct P_STRING sp_pString2s[]) {
-  m_DIGGY_BOLLARD()
+  int *nac_matchedEntry, int *cnac_matchedId, int string2sCount, const struct P_STRING sp_pString2s[],
+  int nsn_ids[]) {
+  m_DIGGY_BOLLARD_S()
 m_DIGGY_VAR_P_STRING(*ap_pString1)
 m_DIGGY_VAR_D(string2sCount)
-  *a_matchedEntry = 0; // a priori
+m_DIGGY_VAR_P(nsn_ids)
   int comparison = UNDEFINED; 
-  const struct P_STRING *p_pString2Ptr = sp_pString2s;
   m_ASSERT(string2sCount > 0)
-  int i = 0; for (; i < string2sCount ; i++) { 
-    if ((comparison = ComparePStrings(ap_pString1, p_pString2Ptr++, n_isNeutralCharFunction,
-      n_toCharFunction,b_subString2)) == EQUAL_TO__COMPARISON) break;
-  } // while 
-  if (i < string2sCount) *a_matchedEntry = i;
+  int i = 0;
+  if (nsn_ids != NULL) {
+    for (; i < string2sCount ; i++) { 
+m_DIGGY_VAR_D(i)
+      if (nsn_ids[i] < 0) continue;
+      if ((comparison = ComparePStrings(ap_pString1, sp_pString2s+i, n_isNeutralCharFunction,
+        n_toCharFunction,b_subString2)) == EQUAL_TO__COMPARISON) break;
+    } // for 
+  } else {
+    for (; i < string2sCount ; i++) { 
+      if ((comparison = ComparePStrings(ap_pString1, sp_pString2s+i, n_isNeutralCharFunction,
+        n_toCharFunction,b_subString2)) == EQUAL_TO__COMPARISON) break;
+    } // for 
+  } // if
+  if (i < string2sCount) {
+    m_ASSERT(comparison == EQUAL_TO__COMPARISON)
+    if (nac_matchedEntry != NULL) *nac_matchedEntry = i;
+    if (nsn_ids != NULL && cnac_matchedId != NULL) *cnac_matchedId = nsn_ids[i];
+  } // if 
 
   m_DIGGY_RETURN(comparison)
 } // ComparePStringsAmongR
@@ -239,12 +254,13 @@ const char *ScanPStringTillMatch(const struct P_STRING *ap_pString,
 
 // Public function : see description in .h
 const char *ScanPStringTillFirstMatchR(struct P_STRING pString, TO_CHAR_FUNCTION n_toCharFunction,
-  int *a_matchedEntry, int subStringsCount, const struct P_STRING sp_subPStrings[]) {
+  int *nac_matchedEntry, int *cnac_matchedId, int subStringsCount,
+  const struct P_STRING sp_subPStrings[], int nsn_ids[]) {
   m_DIGGY_BOLLARD()
 
   while (!b_EMPTY_P_STRING(pString)) {
     int comparison = ComparePStringsAmongR(&pString,(IS_CHAR_FUNCTION)NULL,n_toCharFunction,
-      b_SUB_STRING_2,a_matchedEntry, subStringsCount,sp_subPStrings);
+      b_SUB_STRING_2,nac_matchedEntry,cnac_matchedId, subStringsCount,sp_subPStrings, nsn_ids);
     if (comparison == EQUAL_TO__COMPARISON) break ;
     pString.string++; 
   } // while 
@@ -254,27 +270,30 @@ const char *ScanPStringTillFirstMatchR(struct P_STRING pString, TO_CHAR_FUNCTION
 
 // Public function : see description in .h
 const char *ScanPStringTillFirstMatchV(struct P_STRING pString, TO_CHAR_FUNCTION n_toCharFunction,
-  int *a_matchedEntry, int subStringsCount, va_list subPStrings) {
+  int *nac_matchedEntry, int *nac_matchedId, int subStringsCount, va_list subPStringsIds) {
   m_DIGGY_BOLLARD()
   struct P_STRING s_subPStrings[subStringsCount];
   struct P_STRING *subPStringPtr = s_subPStrings;
-  int i = 0; while (i++ < subStringsCount) *(subPStringPtr++) = va_arg(subPStrings,
-    struct P_STRING);
-  m_DIGGY_RETURN(ScanPStringTillFirstMatchR(pString,n_toCharFunction,a_matchedEntry,
-    subStringsCount,s_subPStrings))
+  int sn_ids[subStringsCount];
+  int *n_idPtr = sn_ids; 
+  int i = 0; while (i++ < subStringsCount) *(subPStringPtr++) = va_arg(subPStringsIds,
+    struct P_STRING), *(n_idPtr++) = va_arg(subPStringsIds,int) ;
+  m_DIGGY_RETURN(ScanPStringTillFirstMatchR(pString,n_toCharFunction,nac_matchedEntry,
+    nac_matchedId,subStringsCount,s_subPStrings,sn_ids))
 } // ScanPStringTillFirstMatchV
 
 // Public function : see description in .h
 const char *ScanPStringTillFirstMatch(struct P_STRING pString, TO_CHAR_FUNCTION n_toCharFunction,
-  int *a_matchedEntry, int subStringsCount, /*struct P_STRING subPString0,*/ ...) {
+  int *nac_matchedEntry, int *nac_matchedId, int subStringsCount, /*struct P_STRING subPString0,
+  int n_id0, */ ...) {
   m_DIGGY_BOLLARD()
-  va_list subPStrings;
-  va_start(subPStrings,subStringsCount);
+  va_list subPStringsIds;
+  va_start(subPStringsIds,subStringsCount);
 
-  const char *scanPtr = ScanPStringTillFirstMatchV(pString,n_toCharFunction,a_matchedEntry,
-    subStringsCount,subPStrings);
+  const char *scanPtr = ScanPStringTillFirstMatchV(pString,n_toCharFunction,nac_matchedEntry,
+    nac_matchedId, subStringsCount,subPStringsIds);
    
-  va_end(subPStrings);
+  va_end(subPStringsIds);
 
   m_DIGGY_RETURN(scanPtr)
 } // ScanPStringTillFirstMatch

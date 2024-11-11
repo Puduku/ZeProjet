@@ -647,7 +647,7 @@ m_DIGGY_VAR_D(b_blotblog)
 
     int c_delimitorEntry = UNDEFINED ;
 m_DIGGY_VAR_P_STRING(fp_template)
-    m_PARSE_TILL_FIRST_MATCH_C(fp_template,NULL, c_delimitorEntry, &blotinstSequence,2,";;",">>")
+    m_PARSE_TILL_FIRST_MATCH_C(fp_template,NULL, &c_delimitorEntry, &blotinstSequence,2,";;",">>")
     if (b_EMPTY_P_STRING(fp_template)) { // NO ending ";;" or ">>" located 
       m_REPORT_ERROR(dummy,"Missing " DELIMITOR__S, ";; or >>")
     } // if

@@ -358,8 +358,9 @@ static int TestsScanPStringTillFirstMatch(void) {
   m_ASSIGN_LOCAL_P_STRING(subPString1,p_subCString1,-1)\
   m_ASSIGN_LOCAL_P_STRING(subPString2,p_subCString2,-1)\
   int em_matchedEntry = UNDEFINED;\
-  retScan = ScanPStringTillFirstMatch(pString,NULL,&em_matchedEntry,3,subPString0,subPString1,\
-    subPString2);\
+  int em_matchedId = UNDEFINED;\
+  retScan = ScanPStringTillFirstMatch(pString,NULL,&em_matchedEntry,&em_matchedId,3,subPString0,0,\
+    subPString1,0, subPString2,0);\
   m_ASSERT((expectedOffset) == (retScan - p_cString)) \
   m_ASSERT(retScan <= pString.stop) \
   int emb_located = b_SCAN_P_STRING_LOCATED(pString, retScan);\

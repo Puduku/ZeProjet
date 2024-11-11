@@ -109,12 +109,12 @@
 }
 
 
-// Parse a string portion sequence according to sub string scanned by ScanPStringTillMatch()
+// Parse a string portion sequence according to sub string (token) scanned by ScanPStringTillMatch()
 // function. 
 //
 // Passed:
 // - m_sequence: as passed to (and updated by) ScanPString*() function
-// - a_subPString:
+// - a_token:
 // - n_toCharFunction:
 // - na_lexeme: NULL if not used
 //
@@ -122,56 +122,62 @@
 // - m_sequence: parsed lexeme removed in the sequence 
 // - *na_lexeme: (if used) parsed lexeme (aka token) 
 #define m_PARSE_TILL_MATCH(/*struct P_STRING*/m_sequence, \
-  /*struct P_STRING*/p_subPString, /*TO_CHAR_FUNCTION*/n_toCharFunction,\
+  /*struct P_STRING*/p_token, /*TO_CHAR_FUNCTION*/n_toCharFunction,\
   /*struct P_STRING* */na_lexeme) {\
-  const char *em_scanPtr = ScanPStringTillMatch(&m_sequence,&p_subPString,\
+  const char *em_scanPtr = ScanPStringTillMatch(&m_sequence,&p_token,\
     n_toCharFunction);\
   m_PARSE_SEQUENCE(m_sequence,em_scanPtr, na_lexeme)\
 }
 
 // Wrap m_PARSE_TILL_MATCH above
 #define m_PARSE_TILL_MATCH_C(/*struct P_STRING*/m_sequence, \
-  /*const char* */p_subCString, /*TO_CHAR_FUNCTION*/n_toCharFunction,\
+  /*const char* */p_token, /*TO_CHAR_FUNCTION*/n_toCharFunction,\
   /*struct P_STRING* */na_lexeme) {\
-  m_ASSIGN_LOCAL_C_P_STRING(em_localSubPString,p_subCString) \
-  m_PARSE_TILL_MATCH(m_sequence,em_localSubPString,n_toCharFunction,na_lexeme) \
+  m_ASSIGN_LOCAL_C_P_STRING(em_localToken,p_token) \
+  m_PARSE_TILL_MATCH(m_sequence,em_localToken,n_toCharFunction,na_lexeme) \
 }   
 
-// Parse a string portion sequence according to sub string list scanned by
+// Parse a string portion sequence according to sub strings (tokens) list scanned by
 // ScanPStringTillFirstMatchR() function. 
 //
 // Passed:
 // - m_sequence: as passed to (and updated by) ScanPString*() function
 // - n_toCharFunction:
+// - nac_matchedEntry: NULL pointer if not used 
+// - cnac_matchedId: Not significant if tokens ids not used; NULL pointer if not used 
 // - na_lexeme: NULL if not used
-// - subStringsCount: (>0) number of sub-strings 
-// - sp_subPStrings: possible sub-strings (p-strings) 
+// - tokensCount: (>0) number of sub-strings 
+// - sp_tokens: possible sub-strings (p-strings) 
+// - nsn_ids: (NULL pointer if not used) tokens ids (-1 special value to SKIP  token)
 //
 // Changed:
 // - m_sequence: parsed lexeme removed in the sequence 
-// - mc_matchedEntry: entry for sub-string which was FIRST matched 
+// - *nac_matchedEntry: (when significant) entry for sub-string which was FIRST matched 
+// - *cnac_matchedId: (when significant) entry for sub-string which was FIRST matched 
 // - *na_lexeme: (if used) parsed lexeme (aka token) 
 #define m_PARSE_TILL_FIRST_MATCH_R(/*struct P_STRING*/m_sequence,\
-  /*TO_CHAR_FUNCTION*/n_toCharFunction, /*int*/mc_matchedEntry, /*struct P_STRING* */na_lexeme,\
-  /*int*/subStringsCount, /*struct P_STRING* */sp_subPStrings) {\
+  /*TO_CHAR_FUNCTION*/n_toCharFunction, /*int* */nac_matchedEntry, /*int* */cnac_matchedId,\
+  /*struct P_STRING* */na_lexeme, /*int*/tokensCount, /*struct P_STRING* */sp_tokens,\
+  /*int* */nsn_ids) {\
   const char *em_scanPtr = ScanPStringTillFirstMatchR(m_sequence,n_toCharFunction,\
-    &(mc_matchedEntry),subStringsCount,sp_subPStrings);\
+    nac_matchedEntry,cnac_matchedId,tokensCount,sp_tokens,nsn_ids);\
   m_PARSE_SEQUENCE(m_sequence,em_scanPtr, na_lexeme)\
 }
 
 // Wrap m_PARSE_TILL_FIRST_MATCH_R above: use C-strings as sub-strings in lieu of string portions.
+// Note: tokens ids NOT supported
 //
 // Passed: 
-// - subCString0: 1st C sub-string 
+// - p_token0: 1st token (C string) 
 // - other C sub-strings 
 // (Instead of:)
-// - sp_subPStrings: possible sub-strings (p-strings) 
+// - sp_tokens: possible sub-strings (p-strings) 
 #define m_PARSE_TILL_FIRST_MATCH_C(/*struct P_STRING*/ m_sequence,\
-  /*TO_CHAR_FUNCTION*/ n_toCharFunction,/*int*/mc_matchedEntry, /*struct P_STRING* */na_lexeme,\
-  /*int*/ subStringsCount, /*const char* p_subCString0 ,*/ ...) {\
-  m_ASSIGN_LOCAL_P_STRINGS(sp_subPStrings,subStringsCount,__VA_ARGS__)\
-  m_PARSE_TILL_FIRST_MATCH_R(m_sequence,n_toCharFunction,mc_matchedEntry,na_lexeme,\
-    subStringsCount, sp_subPStrings)\
+  /*TO_CHAR_FUNCTION*/ n_toCharFunction,/*int* */nac_matchedEntry, /*struct P_STRING* */na_lexeme,\
+  /*int*/ tokensCount, /*const char* p_token0, */ ...) {\
+  m_ASSIGN_LOCAL_P_STRINGS(sp_localTokens,tokensCount,__VA_ARGS__)\
+  m_PARSE_TILL_FIRST_MATCH_R(m_sequence,n_toCharFunction,nac_matchedEntry,(int*)UNDEFINED,\
+    na_lexeme, tokensCount, sp_localTokens, NULL)\
 } 
 
 
@@ -190,8 +196,7 @@
   /*TO_CHAR_FUNCTION*/n_toCharFunction, /*struct P_STRING* */na_lexeme) {\
   const char *em_scanPtr = (m_sequence).string;\
   int em_length = m_PStringLength(&(p_token));\
-  struct P_STRING em_subSequence = m_SubPString(m_sequence,0,em_length);\
-  switch (ComparePStrings(&(em_subSequence),&p_token,NULL,n_toCharFunction,!b_SUB_STRING_2)) {\
+  switch (ComparePStrings(&(m_sequence),&(p_token),NULL,n_toCharFunction,b_SUB_STRING_2)) {\
   case LESS_THAN__COMPARISON :\
   case GREATER_THAN__COMPARISON :\
   break; case EQUAL_TO__COMPARISON :\
@@ -208,6 +213,49 @@
   /*struct P_STRING* */na_lexeme) {\
   m_ASSIGN_LOCAL_C_P_STRING(em_localToken,p_token) \
   m_PARSE_MATCH(m_sequence,em_localToken,n_toCharFunction,na_lexeme) \
+}   
+
+
+// Parse a string portion sequence: match token (among candidates) 
+//
+// Passed:
+// - m_sequence: as passed 
+// - n_toCharFunction:
+// - cnac_matchedId: Not significant if tokens ids not used; NULL pointer if not used 
+// - na_lexeme: NULL if not used
+// - tokensCount: >0 
+// - sp_tokens: possible tokens (p-strings) 
+// - nsn_ids: ids for possible tokens (-1 special value => skip that token) 
+// #SEE Strings-First-Match @ c-ansi/p-string.h
+//
+// Changed:
+// - m_sequence: parsed lexeme removed in the sequence 
+// - *ac_matchedEntry: (when significant) entry of sub-string  which was FIRST matched 
+// - *cnac_matchedId:  (if used) sub-string's id which was FIRST matched 
+// - *na_lexeme: (if used) parsed lexeme (aka token) 
+#define m_PARSE_MATCH_AMONG_R(/*struct P_STRING*/m_sequence, /*TO_CHAR_FUNCTION*/n_toCharFunction,\
+  /*int* */ac_matchedEntry,/*int* */cnac_matchedId,/*struct P_STRING* */na_lexeme,\
+  /*int*/tokensCount, /*struct P_STRING* */sp_tokens, /*int* */nsn_ids) {\
+  const char *em_scanPtr = (m_sequence).string;\
+  switch (ComparePStringsAmongR(&(m_sequence),NULL,n_toCharFunction,b_SUB_STRING_2,\
+    ac_matchedEntry, cnac_matchedId, tokensCount, sp_tokens, nsn_ids)) {\
+  case LESS_THAN__COMPARISON :\
+  case GREATER_THAN__COMPARISON :\
+  break; case EQUAL_TO__COMPARISON :\
+    em_scanPtr += m_PStringLength((sp_tokens)+*(ac_matchedEntry));\
+  break; default:\
+    m_TRACK()\
+  } \
+  m_PARSE_SEQUENCE(m_sequence,em_scanPtr, na_lexeme)\
+}
+
+// Wrap m_PARSE_MATCH_AMONG above
+#define m_PARSE_MATCH_AMONG_C(/*struct P_STRING*/m_sequence, /*TO_CHAR_FUNCTION*/n_toCharFunction,\
+  /*int*/ac_matchedEntry,/*int* */nac_matchedId,/*struct P_STRING* */na_lexeme,\
+  /*int*/ tokensCount,/*const char* p_token0, int n_id0, */ ...) {\
+  m_ASSIGN_LOCAL_P_STRINGS_IDS(sp_localTokens,sn_localIds,tokensCount,__VA_ARGS__)\
+  m_PARSE_MATCH_AMONG_R(m_sequence,n_toCharFunction,ac_matchedEntry,nac_matchedId,na_lexeme,\
+    tokensCount, sp_localTokens,sn_localIds)\
 }   
 
 // Parse a string portion sequence according to offset (as if was "scanned" position) 

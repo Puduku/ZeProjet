@@ -133,35 +133,83 @@ struct P_STRING { // #REF struct-P_STRING
 // - s_pStrings: array of p-strings to assign 
 // - stringsCount: (>0) number of strings
 // - p_cString0: 1st c-string
-// - ...: other c-string(s) 
+// - ...: other c-string(s) / id(s) 
 //
 // Assigned :
 // - s_pStrings:
 static inline int m_AssignPStrings(struct P_STRING* s_pStrings, int stringsCount,
-  /*const char* p_cString0 ,*/ ...) {
-  va_list cStrings;
+  /*const char* p_cString0, */ ...) {
+  va_list cStringsIds;
   struct P_STRING *pStringsPtr = s_pStrings;
-  va_start(cStrings,stringsCount);
-  int i = 0; while(i++ < stringsCount) m_ASSIGN_P_STRING(*(pStringsPtr++),va_arg(cStrings,
-    const char*),-1);
-  va_end(cStrings);
+  va_start(cStringsIds,stringsCount);
+  int i = 0; while(i++ < stringsCount) {
+    m_ASSIGN_P_STRING(*(pStringsPtr++),va_arg(cStringsIds, const char*),-1)
+  } // while
+  va_end(cStringsIds);
   return RETURNED;
-} // m_AssignPStrings
+} // m_AssignPStringsIds
 
-
-// Assign simple "C-strings" to LOCAL "string portions".
+// Assign simple "C-strings" to LOCAL "string portions". 
+// (Wraps m_AssignPStringsIds()) 
 //
 // Passed: 
-// - m_localPStrings: 
+// - ms_localPStrings: 
 // - stringsCount: (>0) number of strings; 
-// - m_cString0: 1st c-string
-// - ...: other c-string(s)
+// - p_cString0: 1st c-string
+// - ...: other c-string(s) / id(s)
 //
 // Assigned (local var):
 // - m_pString:
-#define m_ASSIGN_LOCAL_P_STRINGS(/*struct P_STRING* */m_localPStrings,/*int*/ stringsCount,...)\
-  struct P_STRING m_localPStrings[stringsCount]; m_ASSERT(m_AssignPStrings(m_localPStrings,\
-  stringsCount,__VA_ARGS__) == RETURNED)
+#define m_ASSIGN_LOCAL_P_STRINGS(/*struct P_STRING* */ms_localPStrings,/*int*/stringsCount,\
+  /*const char* p_cString0, */ ...)\
+  struct P_STRING ms_localPStrings[stringsCount];\
+  m_ASSERT(m_AssignPStrings(ms_localPStrings, stringsCount,__VA_ARGS__) == RETURNED)
+
+
+// Assign simple "C-strings" to "string portions" (with ids).
+//
+// Passed: 
+// - s_pStrings: array of p-strings to assign 
+// - sn_ids: array of string ids to assign 
+// - stringsCount: (>0) number of strings
+// - p_cString0: 1st c-string
+// - n_id0: 1st c-string (-1 special value to SKIP item)
+// - ...: other c-string(s) / id(s) 
+//
+// Assigned :
+// - s_pStrings:
+static inline int m_AssignPStringsIds(struct P_STRING* s_pStrings, int* sn_ids, int stringsCount,
+  /*const char* p_cString0 ,int n_id0, */ ...) {
+  va_list cStringsIds;
+  struct P_STRING *pStringsPtr = s_pStrings;
+  int *n_idPtr = sn_ids;  
+  va_start(cStringsIds,stringsCount);
+  int i = 0; while(i++ < stringsCount) {
+    m_ASSIGN_P_STRING(*(pStringsPtr++),va_arg(cStringsIds, const char*),-1)
+    *(n_idPtr)++ = va_arg(cStringsIds, int);
+  } // while
+  va_end(cStringsIds);
+  return RETURNED;
+} // m_AssignPStringsIds
+
+
+// Assign simple "C-strings" to LOCAL "string portions" (with ids).
+// (Wraps m_AssignPStringsIds()) 
+//
+// Passed: 
+// - ms_localPStrings: 
+// - ms_localIds: 
+// - stringsCount: (>0) number of strings; 
+// - p_cString0: 1st c-string
+// - n_id0: 1st c-string's id
+// - ...: other c-string(s) / id(s)
+//
+// Assigned (local var):
+// - m_pString:
+#define m_ASSIGN_LOCAL_P_STRINGS_IDS(/*struct P_STRING* */ms_localPStrings,/*int* */ms_localIds,\
+  /*int*/ stringsCount,/*const char* p_cString0 ,int n_id0, */ ...)\
+  struct P_STRING ms_localPStrings[stringsCount]; int ms_localIds[stringsCount];\
+  m_ASSERT(m_AssignPStringsIds(ms_localPStrings,ms_localIds, stringsCount,__VA_ARGS__) == RETURNED)
 
 
 
@@ -372,7 +420,9 @@ static inline int mb_EqualToCString(const struct P_STRING *ap_pString1,
 int ParanoidComparePStrings(const struct P_STRING *ap_pString1, const struct P_STRING *ap_pString2,
   IS_CHAR_FUNCTION n_isNeutralCharFunction, TO_CHAR_FUNCTION n_toCharFunction, char b_subString2) ;
 
-// #REF ComparePStringsAmong
+// #REF Strings-First-Match 
+// To avoid wrong match, always sort list of candidates by length (longuest strings first) 
+
 // Lexical comparison of strings (among a list):
 // - "binary" comparison when possible (i.e memcmp()-based => more efficient) 
 // - otherwize, "char to char" comparison of raw strings.
@@ -387,16 +437,21 @@ int ParanoidComparePStrings(const struct P_STRING *ap_pString1, const struct P_S
 //   + NULL: NO char conversion applied before comparison
 //   + != NULL: conversion applied on each char of both strings before comparison ; "binary"
 //     comparison is NOT possible
+// - nac_matchedEntry: NULL pointer if not used 
+// - cnac_matchedId: NULL pointer if not used 
 // - b_subString2: + b_SUB_STRING2 (TRUE): compare 2nd string candidates as a sub-string of 1st
 //   string
 // - string2sCount: number of 2nd string candidates... (> 0) 
 // - sp_pString2s : array of 2nd strings candidates used for comparison #SEE struct-P_STRING
-// - a_string2Entry :
-// - >=0: entry of matching 2nd string in the list of candidates... 
+// #SEE Strings-First-Match 
+// - nsn_ids : ids of strings candidates used for comparison (-1 special value: SKIP
+//   corresponding candidate)
 // 
 // Changed:
-// - *a_matchedEntry : entry for 2nd string candidate which (first) matched (set to 1st entry (0)
-//   if none of 2nd strings matched) 
+// - *nac_matchedEntry: (if used) only significant if match found; entry for 2nd string candidate
+//   which (first) matched 
+// - *cnac_matchedId: (if used) only significant if match found; entry for 2nd string candidate
+//   which (first) matched 
 // 
 // Returned: 
 // - >=0: "comparison" between 1st string and matched 2nd (sub-)string: 
@@ -405,7 +460,8 @@ int ParanoidComparePStrings(const struct P_STRING *ap_pString1, const struct P_S
 //   + GREATER_THAN__COMPARISON : string 1 'lexilically  after' (sub-)string 2
 int ComparePStringsAmongR(const struct P_STRING *ap_pString1, 
   IS_CHAR_FUNCTION n_isNeutralCharFunction, TO_CHAR_FUNCTION n_toCharFunction, char b_subString2,
-  int *a_matchedEntry, int string2sCount, const struct P_STRING sp_pString2s[]) ;
+  int *nac_matchedEntry, int *cnac_matchedId, int string2sCount, const struct P_STRING sp_pString2s[],
+  int nsn_ids[]) ;
 
 
 // Scanning string portions
@@ -468,38 +524,48 @@ const char *ScanPStringTillMatch(const struct P_STRING *ap_pString,
 //   + NULL: not provided; no conversion before  comparison 
 //   + != NULL: conversion applied on (each char of) both strings before comparison ; "binary"
 //     comparison is NOT possible
+// - nac_matchedEntry: NULL pointer if not used 
+// - cnac_matchedId: NULL pointer if not used 
 // - subStringsCount: >0
 // - subPString0: 1st possible sub string to locate
+// - n_id0: id of 1st possible sub string to locate (-1 special value to SKIP that sub-string)
+// #SEE Strings-First-Match 
 // - other possible sub strings (...) : indicate all other possible sub-strings to match ;
 //
 // Changed:
-// - *a_matchedEntry : entry for sub-string which was FIRST matched (may be any entry if none of 
-//   sub-strings is located) 
+// - *nac_matchedEntry: (if used) only significant if sub-string located; entry for sub-string
+//   which was FIRST matched 
+// - *cnac_matchedId: (if used) only significant if sub-string located; id for 2nd string candidate
+//   which (first) matched 
 //
 // Returned:
 // (!= NULL) scanning position; use b_SCAN_P_STRING_LOCATED() below to check whether
 // sub-string is actually located. 
 const char *ScanPStringTillFirstMatch(struct P_STRING pString, TO_CHAR_FUNCTION n_toCharFunction,
-  int *a_matchedEntry, int subStringsCount, /*struct P_STRING subPString0,*/ ...);
+  int *nac_matchedEntry, int *nac_matchedId, int subStringsCount, /*struct P_STRING subPString0,
+  int sn_id0, */ ...);
 
 // See ScanPStringTillFirstMatch()
 // 
 // Passed:
-// - subPStrings:
+// - subPStringsIds:
 // (Instead of:)
 // - subPString0: 1st possible sub string to locate
+// - n_id0: id of 1st possible sub string to locate (-1 special value to SKIP that sub-string)
 // - other possible sub strings (...) : indicate all other possible sub-strings to match ;
 const char *ScanPStringTillFirstMatchV(struct P_STRING pString, TO_CHAR_FUNCTION n_toCharFunction,
-  int *a_matchedEntry, int subStringsCount, va_list subPStrings);
+  int *nac_matchedEntry, int *nac_matchedId, int subStringsCount, va_list subPStringsIds);
 
 // See ScanPStringTillFirstMatchV()
 // 
 // Passed:
 // - sp_subPStrings:
+// - nsn_ids:
 // (Instead of:)
-// - subPStrings:
+// - subPStringsIds:
 const char *ScanPStringTillFirstMatchR(struct P_STRING pString, TO_CHAR_FUNCTION n_toCharFunction,
-  int *a_matchedEntry, int subStringsCount, const struct P_STRING sp_subPStrings[]) ;
+  int *nac_matchedEntry, int *nac_matchedId, int subStringsCount,
+  const struct P_STRING sp_subPStrings[], int nsn_ids[]) ;
 
 // Boolean interpretation (located or not) of scan pointer returned by ScanPString*()
 // functions.

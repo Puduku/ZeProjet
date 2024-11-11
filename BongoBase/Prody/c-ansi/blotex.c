@@ -551,11 +551,11 @@ struct BLOTEX_VALUE {
 
 
 enum {
-  AS__VALUE_INT,      // [ '#' ]
-  AS__R_VALUE__ENTRY, // '!#' 
-  AS__ID,             // '!'
-  AS__VALUE_STR,      // '$'
-  AS__NAME,           // '!$'
+  AS__R_VALUE__ENTRY,// '!#' 
+  AS__NAME,          // '!$'
+  AS__VALUE_INT,     // [ '#' ]
+  AS__ID,            // '!'
+  AS__VALUE_STR,     // '$'
 } ;
 
 // Parse "as" specifier (not present : default to '#" value int) 
@@ -574,29 +574,16 @@ enum {
 static int ParseAs(char b_lValue, struct P_STRING *a_sequence, int *a_as) {
   m_DIGGY_BOLLARD()
   struct P_STRING lexeme; // UNDEFINED
-// TODO: utiliser collection de token
   m_PARSE_PASS_SPACES(*a_sequence,NULL)
-  m_PARSE_MATCH_C(*a_sequence,"#",NULL,&lexeme) 
-  if (!b_EMPTY_P_STRING(lexeme)) *a_as = AS__VALUE_INT;
-  else {
-    if (!b_lValue) m_PARSE_MATCH_C(*a_sequence,"!#",NULL,&lexeme) 
-    if (!b_EMPTY_P_STRING(lexeme)) *a_as = AS__R_VALUE__ENTRY;
-    else {
-      m_PARSE_MATCH_C(*a_sequence,"$",NULL,&lexeme) 
-      if (!b_EMPTY_P_STRING(lexeme)) *a_as = AS__VALUE_STR;
-      else {
-        m_PARSE_MATCH_C(*a_sequence,"!$",NULL,&lexeme) 
+m_DIGGY_VAR_P_STRING(*a_sequence)
+  int c_matchedEntry = UNDEFINED;
+  m_PARSE_MATCH_AMONG_C(*a_sequence,NULL,&c_matchedEntry,a_as,&lexeme, 5,
+    "!#",b_lValue? -1:AS__R_VALUE__ENTRY, "!$",AS__NAME, "#",AS__VALUE_INT, "!",AS__ID,
+    "$",AS__VALUE_STR)
+  if (b_EMPTY_P_STRING(lexeme)) *a_as = AS__VALUE_INT;
 m_DIGGY_VAR_P_STRING(*a_sequence)
 m_DIGGY_VAR_P_STRING(lexeme)
-        if (!b_EMPTY_P_STRING(lexeme)) *a_as = AS__NAME;
-        else {
-          m_PARSE_MATCH_C(*a_sequence,"!",NULL,&lexeme) 
-          if (!b_EMPTY_P_STRING(lexeme)) *a_as = AS__ID;
-          else  *a_as = AS__VALUE_INT;
-        } // if
-      } // if
-    } // if
-  } // if
+m_DIGGY_VAR_D(*a_as)
   m_DIGGY_RETURN(RETURNED)
 } // ParseAs 
 
@@ -620,11 +607,6 @@ enum {
   FACT_OP__COMP_OP_EXTENSION,
 } ;
 
-// IS_CHAR_FUNCTION:/
-static int IsCompOpChar(int c) {
-  return (c == '*' || c == '/' || c == '=' || c == '!' || c == '>' || c == '<');
-} // IsCompOpChar
-
 // Parse comparison operator, if present...
 //
 // Passed:
@@ -644,42 +626,14 @@ static int IsCompOpChar(int c) {
 static int ParseCompOp(int compOpExtension, struct P_STRING *a_sequence, int *an_compOp) {
   m_DIGGY_BOLLARD()
   struct P_STRING lexeme; // UNDEFINED
-  struct P_STRING initialSequence = *a_sequence;
-
-  *an_compOp = -1;
-  m_PARSE_PASS_CHARS(*a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_WHILE,IsCompOpChar,UNDEFINED,
-    &lexeme) 
-m_DIGGY_VAR_P_STRING(lexeme)
-  int length = m_PStringLength(&lexeme);
-  if (length >= 1) { 
-    switch (lexeme.string[0]) {
-    break; case '!':
-      if (length == 2 && lexeme.string[1] == '=') *an_compOp = NOT_EQUAL__COMP_OP;
-    break; case '>':
-      if (length == 1) *an_compOp = GREATER__COMP_OP;
-      else if (length == 2 && lexeme.string[1] == '=') *an_compOp = GREATER_EQUAL__COMP_OP;
-    break; case '<':
-      if (length == 1) *an_compOp = LESS__COMP_OP;
-      else if (length == 2 && lexeme.string[1] == '=') *an_compOp = LESS_EQUAL__COMP_OP;
-    break; case '=':
-      if (length >= 2 && lexeme.string[1] == '=') {
-        if (length == 2) *an_compOp = EQUAL__COMP_OP;
-        else if (compOpExtension == STR__COMP_OP_EXTENSION && length == 3 && lexeme.string[2] ==
-          '=') *an_compOp = LIKE__STR__COMP_OP;
-      } // if
-    break; case '*':
-      if (compOpExtension == FACT_OP__COMP_OP_EXTENSION && length == 1) *an_compOp =
-        MULTIPLY__FACT_OP__COMP_OP;
-    break; case '/':
-      if (compOpExtension == FACT_OP__COMP_OP_EXTENSION && length == 1) *an_compOp =
-        DIVIDE__FACT_OP__COMP_OP;
-    break; 
-      m_RAISE(ANOMALY__VALUE__D,lexeme.string[0])
-    } // switch
-  } // if  
-m_DIGGY_VAR_D(*an_compOp)
-  
-  if (*an_compOp == -1) *a_sequence = initialSequence;
+  int c_matchedEntry = UNDEFINED;
+  m_PARSE_MATCH_AMONG_C(*a_sequence,NULL,&c_matchedEntry,an_compOp,&lexeme, 9,
+    "===", compOpExtension == STR__COMP_OP_EXTENSION? LIKE__STR__COMP_OP: -1,
+    "!=",NOT_EQUAL__COMP_OP, ">=",GREATER_EQUAL__COMP_OP, "<=",LESS_EQUAL__COMP_OP,
+    "==",EQUAL__COMP_OP, "<",LESS__COMP_OP, ">",GREATER__COMP_OP,
+    "*",compOpExtension == FACT_OP__COMP_OP_EXTENSION? MULTIPLY__FACT_OP__COMP_OP: -1,
+    "/",compOpExtension == FACT_OP__COMP_OP_EXTENSION? DIVIDE__FACT_OP__COMP_OP: -1)
+  if (b_EMPTY_P_STRING(lexeme)) *an_compOp = -1;
   m_DIGGY_RETURN(RETURNED)
 } // ParseCompOp
 
@@ -1225,11 +1179,6 @@ m_DIGGY_VAR_P_STRING(lexeme)
 } // BlotexlibExecutorProbeBlotexAtom
 
 
-// IS_CHAR_FUNCTION:/
-static int IsTermOpChar(int c) {
-  return (c == '+' || c == '-' || c == '&' || c == '|');
-} // IsTermOpChar
-
 // Terminal symbols (of <int 2op> terminal symbol)
 enum {
             ADD__TERM_OP,
@@ -1251,31 +1200,11 @@ enum {
 static inline int m_ParseTermOp(struct P_STRING *a_sequence, int *an_termOp) {
   m_DIGGY_BOLLARD()
   struct P_STRING lexeme; // UNDEFINED
-  struct P_STRING initialSequence = *a_sequence;
-m_DIGGY_VAR_P_STRING(*a_sequence)
-
-  *an_termOp = -1;
-  m_PARSE_PASS_CHARS(*a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_WHILE,IsTermOpChar,UNDEFINED,
-    &lexeme) 
-m_DIGGY_VAR_P_STRING(lexeme)
-  int length = m_PStringLength(&lexeme);
-  if (length >= 1) { 
-    switch (lexeme.string[0]) {
-    case '+': 
-      if (length == 1) *an_termOp = ADD__TERM_OP; // TODO: FOIREUX !!!! "++" sera rejeted !!!!!!!!!!!!!!!
-    break; case '-':
-      if (length == 1) *an_termOp = SUBTRACT__TERM_OP;
-    break; case '&':
-      if (length == 2 && lexeme.string[1] == '&') *an_termOp = AND__TERM_OP;
-    break; case '|':
-      if (length == 2 && lexeme.string[1] == '|') *an_termOp = OR__TERM_OP;
-    break; 
-      m_RAISE(ANOMALY__VALUE__D,lexeme.string[0])
-    } // switch
-  } // if  
-m_DIGGY_VAR_D(*an_termOp)
-  
-  if (*an_termOp == -1) *a_sequence = initialSequence;
+  int c_matchedEntry = UNDEFINED;
+  m_PARSE_MATCH_AMONG_C(*a_sequence,NULL,&c_matchedEntry,an_termOp,&lexeme, 4,
+    "&&",AND__TERM_OP, "||",OR__TERM_OP, "+",ADD__TERM_OP, "-",SUBTRACT__TERM_OP)
+  if (b_EMPTY_P_STRING(lexeme)) *an_termOp = -1;
+  // TODO: FOIREUX !!!!???? "++" sera rejeted !!!!!!????
   m_DIGGY_RETURN(RETURNED)
 } // m_ParseTermOp
 
