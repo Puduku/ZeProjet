@@ -2,8 +2,8 @@
 // (c) Atos-Euronext Belgium - 2001, 2002, 2003
 // (c) Puduku - 2023
 
-// "Top ten (+ two)" C's REAL flaws
-// ================================
+// "Top ten (plus two, minus one)" C's REAL flaws
+// ==============================================
 
 // Idea: Ok, we admit the fact : C is far to be a flaw free programming language...
 // However, our belief is that:
@@ -29,16 +29,19 @@
 
 // Number 10: impossibility to specify directly the values of the fields of a 'struct' parameter in
 // the function calls.
-// Suppose the function DisplayPoint (int x, int y) ; we can easily call the function with
-// explicit coordinates values like DisplayPoint(10,69);
+// Suppose the function DisplayPoint (int x, int y); we can easily call the function with
+// explicit coordinates values like DisplayPoint(19,69);
 // We now consider using compound parameter (based on simple 'struct' definition) for the
 // coordinates...
 // However, we hesitate to take the decision, because we know well that in C, we could not call
 // the function with explicit coordinates values (like above) anymore.
 // Eg. with  struct coord { int x, int y };  DisplayPoint(struct coord *a_p); declaration, 
-// we cannot make direct call like  DisplayPoint({10,69}) ;
+// we cannot make direct call like  DisplayPoint({19,69});
 // we must define a (constant) structure and then make the call with (pointer to) that constant.
 // This is of course not a big deal, but that loss of flexibility may be frustating...
+// Update (15 Nov. 2024): actually that's NO MORE an issue since... C99 !!... The syntax to use is 
+// DisplayPoint((struct coord){19,69}); So, we have no more excuse not using compound parameters 
+// properly...
 
 // Number 9: impossibility to indicate directly for which "typedef'ed" function ("pointer") an 
 // ordinary function is defined.
