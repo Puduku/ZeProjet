@@ -66,7 +66,7 @@ static int TestsVerifyCPString(void) {
   // TODO: ag complester...
   struct P_STRING pString; 
   int completed = UNDEFINED; 
-  m_ASSIGN_P_STRING(pString,"aaaaa",-1)
+  pString = m_PString("aaaaa",-1);
   completed = VerifyCPString(&pString);
   m_ASSERT(completed == COMPLETED__OK);
 
@@ -78,7 +78,7 @@ static int TestsVerifyCPString(void) {
 static int TestsCopyPString(void) {
 #define m_TEST_COPY_P_STRING(/*const char* */p_string, /*int*/n_length,\
   /*int*/expectedRet) {\
-  m_ASSIGN_LOCAL_P_STRING(pString,p_string,n_length)\
+  struct P_STRING pString = m_PString(p_string,n_length);\
   ret = CopyPString(s32,sizeof(s32),&pString) ;\
   m_TRACK_IF(ret < 0) \
   m_ASSERT(ret == expectedRet) \
@@ -152,8 +152,8 @@ static int TestsComparePStrings(void) {
 #define m_TEST_COMPARE_P_STRINGS(/*const char* */p_string1, /*int*/n_length1,\
   /*const char* */p_string2, /*int*/n_length2,  /*IS_CHAR_FUNCTION*/n_isNeutralCharFunction,\
   /*TO_CHAR_FUNCTION*/n_toCharFunction,  m_expectedComparison) {\
-  m_ASSIGN_LOCAL_P_STRING(pString1,p_string1,n_length1)\
-  m_ASSIGN_LOCAL_P_STRING(pString2,p_string2,n_length2)\
+  struct P_STRING pString1 = m_PString(p_string1,n_length1);\
+  struct P_STRING pString2 = m_PString(p_string2,n_length2);\
   ret = ParanoidComparePStrings(&pString1,&pString2, n_isNeutralCharFunction,\
     n_toCharFunction,!b_SUB_STRING_2);\
   m_TRACK_IF(ret < 0)\
@@ -225,7 +225,7 @@ static int TestsComparePStrings(void) {
 static int TestsScanPString(void) {
 #define m_TEST_SCAN_P_STRING(/*const char* */p_string, /*int*/n_length, b_regularScan,\
   b_passCharsTill,  /*IS_CHAR_FUNCTION*/isCharFunction, /*int*/expectedOffset, b_expectLocated) {\
-  m_ASSIGN_LOCAL_P_STRING(pString, p_string,n_length)\
+  struct P_STRING pString = m_PString(p_string,n_length);\
   retScan = ScanPString(&pString,b_regularScan,b_passCharsTill,isCharFunction,UNDEFINED);\
   m_ASSERT((expectedOffset) == (retScan - p_string)) \
   m_ASSERT(retScan <= pString.stop) \
@@ -282,8 +282,8 @@ static int TestsScanPStringTillMatch(void) {
 #define m_TEST_SCAN_P_STRING_TILL_MATCH(/*const char* */p_string, /*int*/n_length,\
   /*const char* */p_subString, /*int*/n_subLength,\
   /*TO_CHAR_FUNCTION*/ n_toCharFunction,  /*int*/expectedOffset, b_expectLocated) {\
-  m_ASSIGN_LOCAL_P_STRING(pString,p_string,n_length)\
-  m_ASSIGN_LOCAL_P_STRING(subPString,p_subString,n_subLength)\
+  struct P_STRING pString = m_PString(p_string,n_length);\
+  struct P_STRING subPString = m_PString(p_subString,n_subLength);\
   retScan = ScanPStringTillMatch(&pString, &subPString, n_toCharFunction);\
   m_ASSERT((expectedOffset) == (retScan - p_string)) \
   m_ASSERT(retScan <= pString.stop) \
@@ -353,10 +353,10 @@ static int TestsScanPStringTillFirstMatch(void) {
 #define m_TEST_SCAN_P_STRING_TILL_FIRST_MATCH(/*const char* */p_cString,\
   /*int*/expectedOffset, b_expectLocated, /*int*/expectedMatchedEntry,\
   /*const char* */p_subCString0, /*const char* */p_subCString1, /*const char* */p_subCString2) {\
-  m_ASSIGN_LOCAL_P_STRING(pString,p_cString,-1)\
-  m_ASSIGN_LOCAL_P_STRING(subPString0,p_subCString0,-1)\
-  m_ASSIGN_LOCAL_P_STRING(subPString1,p_subCString1,-1)\
-  m_ASSIGN_LOCAL_P_STRING(subPString2,p_subCString2,-1)\
+  struct P_STRING pString = m_PString(p_cString,-1);\
+  struct P_STRING subPString0 = m_PString(p_subCString0,-1);\
+  struct P_STRING subPString1 = m_PString(p_subCString1,-1);\
+  struct P_STRING subPString2 = m_PString(p_subCString2,-1);\
   int em_matchedEntry = UNDEFINED;\
   int em_matchedId = UNDEFINED;\
   retScan = ScanPStringTillFirstMatch(pString,NULL,&em_matchedEntry,&em_matchedId,3,subPString0,0,\
@@ -397,7 +397,7 @@ static int TestsConvertPString(void) {
   m_ASSERT(em_length < sizeof(s256));\
   memcpy(s256,p_string,em_length);\
   s256[em_length] = n_length < 0? '\0': DUMMY_CHAR;\
-  m_ASSIGN_LOCAL_P_STRING(pString,s256,n_length)\
+  struct P_STRING pString = m_PString(s256,n_length);\
   ret = ParanoidConvertPString(&pString,(n_length < 0),n_isNeutralCharFunction,\
     toCharFunction) ; \
   m_TRACK_IF(ret < 0) \
@@ -430,7 +430,7 @@ static int TestsConvertPString(void) {
 static int TestsReadGenericIntegerPString(void) {
 #define m_TEST_READ_C_LONG_P_STRING(/*const char* */p_string, /*int*/n_length,\
   /*int*/expectedAnswer, /*long*/c_expectedValue, /*int*/c_expectedParsedLength) {\
-  m_ASSIGN_LOCAL_P_STRING(pString,p_string,n_length)\
+  struct P_STRING pString = m_PString(p_string,n_length);\
   answer = ReadGenericIntegerPString(pString,&c_value,&c_parsedLength);\
   m_ASSERT(answer == expectedAnswer) \
   if (answer == ANSWER__YES) { \

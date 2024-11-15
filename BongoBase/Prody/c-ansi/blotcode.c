@@ -135,11 +135,11 @@ struct BLOTFUNC_KEY_NAME {
 #define m_ASSIGN_BLOTFUNC_KEY_NAME(/*struct BLOTFUNC_KEY_NAME*/m_blotfuncKeyName,\
   /*char* */n_prefix, /*char* */m_name) {\
   if (n_prefix != NULL) {\
-    m_ASSIGN_C_P_STRING(m_blotfuncKeyName.prefix, n_prefix)\
+    m_blotfuncKeyName.prefix = m_PString(n_prefix,-1);\
   } else {\
-    m_ASSIGN_EMPTY_P_STRING(m_blotfuncKeyName.prefix) \
+    m_blotfuncKeyName.prefix = m_PString(m_EMPTY_STRING_ARGS);\
   }\
-  m_ASSIGN_C_P_STRING(m_blotfuncKeyName.name, m_name) \
+  m_blotfuncKeyName.name = m_PString(m_name,-1); \
 } 
 
 // GREEN_HANDLER__COMPARE_FUNCTION
@@ -361,7 +361,7 @@ m_DIGGY_VAR_P_STRING(referral)
   m_PARSE_PASS_CHARS(referral,b_REGULAR_SCAN,b_PASS_CHARS_TILL,NULL,'.',&(blotfuncKeyName.prefix))
   if (b_EMPTY_P_STRING(referral)) {
     blotfuncKeyName.name = blotfuncKeyName.prefix; 
-    m_ASSIGN_EMPTY_P_STRING(blotfuncKeyName.prefix)
+    blotfuncKeyName.prefix = m_PString(m_EMPTY_STRING_ARGS);
   } else {
     m_PARSE_OFFSET(referral,1,NULL)
     blotfuncKeyName.name = referral;
@@ -587,7 +587,7 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
   m_C_STACK_CLEAR(handle->h_flowControlStack)
 
   struct P_STRING blotinstSequence; 
-  m_ASSIGN_EMPTY_P_STRING(blotinstSequence)
+  blotinstSequence = m_PString(m_EMPTY_STRING_ARGS);
 
 // Report error in some Blot instruction
 // (Do nothing if some error is ALREADY reported...)
@@ -624,7 +624,7 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
   struct BLOTINST *vc_blotinstPtr = (struct BLOTINST *) UNDEFINED;
   struct P_STRING decor; // UNDEFINED 
   struct P_STRING dummy; // UNDEFINED 
-  m_ASSIGN_P_STRING(dummy,"N/A",-1)
+  dummy = m_PString("N/A",-1);
 
   char b_blotblog = b_FALSE0;
   while (answer == ANSWER__YES && !b_EMPTY_P_STRING(fp_template)) {
@@ -699,9 +699,9 @@ m_DIGGY_VAR_P_STRING(blotinstSequence)
 
     // Stage 3: Finding actual "tokens" within blotinst "sequence" 
     struct P_STRING litteralKeyw, referral, litteralBlotval; 
-    m_ASSIGN_EMPTY_P_STRING(litteralKeyw)
-    m_ASSIGN_EMPTY_P_STRING(referral)
-    m_ASSIGN_EMPTY_P_STRING(litteralBlotval)
+    litteralKeyw = m_PString(m_EMPTY_STRING_ARGS);
+    referral = m_PString(m_EMPTY_STRING_ARGS);
+    litteralBlotval = m_PString(m_EMPTY_STRING_ARGS);
 
     if (b_arguments) { // Found '(' <arguments> ')' 
       if (!b_EMPTY_P_STRING(basicToken2)) { // two tokens 

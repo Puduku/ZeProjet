@@ -241,7 +241,8 @@ const char *ScanPStringTillMatch(const struct P_STRING *ap_pString,
   // invariant: No match in portion [ap_pString->string:ptr[ 
   while (++ptr < ap_pString->stop) {
     if (ptr+subLength <= ap_pString->stop) {
-      m_ASSIGN_LOCAL_P_STRING(ptrPString,  ptr,subLength)
+      //TODO: utiliser les sub-strings ?
+      struct P_STRING ptrPString = m_PString(ptr,subLength);
       int comparison = ComparePStrings(&ptrPString,  ap_subPString,  NULL,
         n_toCharFunction, !b_SUB_STRING_2); 
       if (comparison == EQUAL_TO__COMPARISON) break ;

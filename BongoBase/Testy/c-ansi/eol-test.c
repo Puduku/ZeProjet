@@ -27,7 +27,7 @@ int main (int argc, char **argv) {
   m_ASSERT(ret == 0)
   
   struct P_STRING pString ;
-  m_ASSIGN_C_P_STRING(pString,p_s) 
+  pString = m_PString(p_s,-1); 
   m_TRACK_IF((ret2 = ParseAsciiLines(pString,-1, &parsedLength, linesPartition)) < 0)
   m_ASSERT(ret2 == 3)
 
@@ -42,7 +42,7 @@ int main (int argc, char **argv) {
 
   m_TRACK_IF(GreenCollectionClear(linesPartition) != RETURNED)
   
-  m_ASSIGN_C_P_STRING(pString,p_s2) 
+  pString = m_PString(p_s2,-1); 
   ret2 = ParseAsciiLines(pString, 0,&parsedLength, linesPartition) ;
   m_TRACK_IF((ret = LINES_PARTITION_GET_COUNT(linesPartition,&lineDelimitor)) < 0)
   m_ASSERT(ret == 2)

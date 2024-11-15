@@ -68,7 +68,7 @@ int FileButtAdeptSuck(void *r_handle,  char b_kickButt, struct P_STRING *ac_chun
 
   int ret = fread(handle->ch_readBuffer,handle->n_readBufferSize,1,handle->nh_file);
   m_ASSERT(ret >= 0)
-  m_ASSIGN_P_STRING(*ac_chunk,handle->ch_readBuffer,ret) 
+  *ac_chunk = m_PString(handle->ch_readBuffer,ret);
 
   m_DIGGY_RETURN(ANSWER__YES)
 } // FileButtAdeptSuck
@@ -140,7 +140,7 @@ int GStringButtAdeptSuck(void *r_handle,  char b_kickButt, struct P_STRING *ac_c
   if (b_kickButt) {
     *ac_chunk = handle->gStringStuff->cv_pString;
   } else {
-    m_ASSIGN_EMPTY_P_STRING(*ac_chunk)
+    *ac_chunk = m_PString(m_EMPTY_STRING_ARGS) ;
   } // if
 
   m_DIGGY_RETURN(ANSWER__YES)

@@ -969,7 +969,7 @@ m_DIGGY_VAR_P_STRING(blotregName)
   
       break; case RESULT__NOT_FOUND:
         if ((cac_blotexValue->b_strex = (n_as == AS__VALUE_STR || n_as == AS__NAME)))
-          m_ASSIGN_EMPTY_P_STRING(cac_blotexValue->select.c_str)
+          cac_blotexValue->select.c_str = m_PString(m_EMPTY_STRING_ARGS) ;
         else cac_blotexValue->select.c_blotval = FALSE__BLOTVAL; 
       break; default: m_TRACK()
       } // switch

@@ -49,82 +49,20 @@ struct P_STRING { // #REF struct-P_STRING
 // Assigning string portions
 // -------------------------
 
-// Assign a string portion.
+// Establish (regular) string portion.
 // 
 // Passed:
-// - mu_pString: (once evaluated parameter)
-// - up_string: (once evaluated parameter)
-// - un_length: (once evaluated parameter)
+// - p_string: raw string (pointer)
+// - n_length: 
 //   + >= 0: raw string length (may include '\0' chars)
 //   + -1 special value: '\0'-terminated C string
-// 
-// Assigned:
-// - mu_pString: 
-#define m_ASSIGN_P_STRING(/*struct P_STRING*/mu_pString,\
-  /*const char* */up_string, /*int*/un_length) {\
-  struct P_STRING *em_pStringPtr = &(mu_pString);\
-  int em_length = (un_length);\
-  const char *emp_string = (up_string);\
-  if (em_length < 0) em_length = strlen(emp_string);\
-  em_pStringPtr->stop = (em_pStringPtr->string = emp_string) + (em_length);\
-}
+static inline struct P_STRING m_PString(const char *p_string, int n_length) {
+  struct P_STRING pString = { .string = p_string, .stop = p_string + (n_length<0? strlen(p_string):
+    n_length), } ;
+  return pString; 
+} // m_PString
 
-// Assign a local string portion.
-// 
-// Passed:
-// - m_pString: local var to create
-// (other params : see m_ASSIGN_P_STRING() above) 
-//
-// Created (local var):
-// - m_pString: 
-#define m_ASSIGN_LOCAL_P_STRING(/*struct P_STRING*/m_localPString,\
-  /*const char* */p_string, /*int*/un_length) \
-  struct P_STRING m_localPString;\
-  m_ASSIGN_P_STRING(m_localPString, p_string, un_length)
-
-// Assign "empty string" to "string portion" 
-// TODO: use "trivial" empty string instead 
-// 
-// Passed:
-// - m_pString: 
-//
-// Assigned:
-// - m_pString: 
-#define m_ASSIGN_EMPTY_P_STRING(/*struct P_STRING*/m_pString) \
-  m_ASSIGN_P_STRING(m_pString, GOOD_OLD_EMPTY_C_STRING,\
-    EMPTY_STRING_LENGTH0)
-
-// Assign "empty string" to LOCAL "string portion" 
-// See m_ASSIGN_EMPTY_P_STRING() above.
-#define m_ASSIGN_LOCAL_EMPTY_P_STRING(/*struct P_STRING*/m_localPString) \
-  struct P_STRING m_localPString;\
-  m_ASSIGN_EMPTY_P_STRING(m_localPString)
-
-// Assign simple "C-string" to "string portion" 
-// 
-// Passed:
-// - mu_pString: 
-// - p_cString: c string (buffer start address)
-//
-// Assigned:
-// - m_pString:
-#define m_ASSIGN_C_P_STRING(/*struct P_STRING*/mu_pString,\
-  /*const char* */p_cString) {\
-  m_ASSIGN_P_STRING(mu_pString,p_cString, -1)\
-}
-
-// Assign simple "C-string" to local "string portion" 
-// 
-// Passed:
-// - m_localPString: local var to create
-// (other params : see m_ASSIGN_P_STRING() above) 
-//
-// Assigned (local var):
-// - m_localPString:
-#define m_ASSIGN_LOCAL_C_P_STRING(/*struct P_STRING*/m_localPString,\
-  /*const char* */p_cString) \
-  struct P_STRING m_localPString;\
-  m_ASSIGN_C_P_STRING(m_localPString,  p_cString)
+#define m_EMPTY_STRING_ARGS GOOD_OLD_EMPTY_C_STRING , EMPTY_STRING_LENGTH0
 
 
 // Assign simple "C-strings" to "string portions".
@@ -143,11 +81,11 @@ static inline int m_AssignPStrings(struct P_STRING* s_pStrings, int stringsCount
   struct P_STRING *pStringsPtr = s_pStrings;
   va_start(cStringsIds,stringsCount);
   int i = 0; while(i++ < stringsCount) {
-    m_ASSIGN_P_STRING(*(pStringsPtr++),va_arg(cStringsIds, const char*),-1)
+    *(pStringsPtr++) = m_PString(va_arg(cStringsIds, const char*),-1);
   } // while
   va_end(cStringsIds);
   return RETURNED;
-} // m_AssignPStringsIds
+} // m_AssignPStrings
 
 // Assign simple "C-strings" to LOCAL "string portions". 
 // (Wraps m_AssignPStringsIds()) 
@@ -185,7 +123,7 @@ static inline int m_AssignPStringsIds(struct P_STRING* s_pStrings, int* sn_ids, 
   int *n_idPtr = sn_ids;  
   va_start(cStringsIds,stringsCount);
   int i = 0; while(i++ < stringsCount) {
-    m_ASSIGN_P_STRING(*(pStringsPtr++),va_arg(cStringsIds, const char*),-1)
+    *(pStringsPtr++) = m_PString(va_arg(cStringsIds, const char*),-1);
     *(n_idPtr)++ = va_arg(cStringsIds, int);
   } // while
   va_end(cStringsIds);
@@ -388,8 +326,8 @@ int ComparePStrings(const struct P_STRING *ap_pString1, const struct P_STRING *a
   IS_CHAR_FUNCTION n_isNeutralCharFunction, TO_CHAR_FUNCTION n_toCharFunction, char b_subString2);
 
 // ComparePStrings() wrapper ; compare a string portion with a c-string...
-static inline int m_CompareWithCString(const struct P_STRING *ap_pString1, const char *ap_cString2) {
-  m_ASSIGN_LOCAL_C_P_STRING(pString2,ap_cString2)
+static inline int m_CompareWithCString(const struct P_STRING *ap_pString1, const char *p_cString2) {
+  struct P_STRING pString2 = m_PString(p_cString2,-1);
   return ComparePStrings(ap_pString1, &pString2,  NULL, NULL, !b_SUB_STRING_2) ;
 } 
 
@@ -647,7 +585,7 @@ int ParanoidConvertPString(struct P_STRING *aep_pString, char b_cTerminated,
   } else emep_string = emc_localString_ ## m_pString;\
   m_ASSERT(CopyPString(emep_string, em_requiredBufferSize,  &m_pString) == \
     em_requiredBufferSize-1)\
-  m_ASSIGN_P_STRING(m_pString,emep_string,em_requiredBufferSize-1)\
+  m_pString = m_PString(emep_string,em_requiredBufferSize-1);\
 
 // 
 // Passed:

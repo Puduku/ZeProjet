@@ -133,7 +133,7 @@
 #define m_PARSE_TILL_MATCH_C(/*struct P_STRING*/m_sequence, \
   /*const char* */p_token, /*TO_CHAR_FUNCTION*/n_toCharFunction,\
   /*struct P_STRING* */na_lexeme) {\
-  m_ASSIGN_LOCAL_C_P_STRING(em_localToken,p_token) \
+  struct P_STRING em_localToken = m_PString(p_token,-1); \
   m_PARSE_TILL_MATCH(m_sequence,em_localToken,n_toCharFunction,na_lexeme) \
 }   
 
@@ -211,7 +211,7 @@
 #define m_PARSE_MATCH_C(/*struct P_STRING*/m_sequence, \
   /*const char* */p_token, /*TO_CHAR_FUNCTION*/n_toCharFunction,\
   /*struct P_STRING* */na_lexeme) {\
-  m_ASSIGN_LOCAL_C_P_STRING(em_localToken,p_token) \
+  struct P_STRING em_localToken = m_PString(p_token,-1); \
   m_PARSE_MATCH(m_sequence,em_localToken,n_toCharFunction,na_lexeme) \
 }   
 

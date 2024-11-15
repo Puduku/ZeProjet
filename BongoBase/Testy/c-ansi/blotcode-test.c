@@ -127,7 +127,7 @@ static int BlotcodeExecutorTest (int expectedTestNumber, BLOTCODE_EXECUTOR_HANDL
   SUCKER_HANDLE outputSuckerHandle, G_STRING_STUFF outputGStringStuff,  const char *p_template,
   int expectedAnswer, int c_expectedBlotcodeConstructionStatus,  const char *ccp_expectedOutput) {
   m_DIGGY_BOLLARD()
-  m_ASSIGN_LOCAL_C_P_STRING(localTemplate,p_template)
+  struct P_STRING localTemplate = m_PString(p_template,-1);
   m_ASSERT(expectedTestNumber == ++testNumber)
   m_DIGGY_VAR_D(testNumber)
   G_STRING_STUFF nh_parsingErrorInfo = NULL;
