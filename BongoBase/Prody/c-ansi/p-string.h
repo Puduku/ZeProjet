@@ -56,13 +56,22 @@ struct P_STRING { // #REF struct-P_STRING
 // - n_length: 
 //   + >= 0: raw string length (may include '\0' chars)
 //   + -1 special value: '\0'-terminated C string
-static inline struct P_STRING m_PString(const char *p_string, int n_length) {
+static inline struct P_STRING m_PString2(const char *p_string, int n_length) {
   struct P_STRING pString = { .string = p_string, .stop = p_string + (n_length<0? strlen(p_string):
     n_length), } ;
   return pString; 
+} // m_PString2
+
+// Establish (regular) string portion.
+// 
+// Passed:
+// - p_cString: '\0'-terminated C-string (pointer)
+static inline struct P_STRING m_PString(const char *p_cString) {
+  struct P_STRING pString = { .string = p_cString, .stop = p_cString + strlen(p_cString), } ;
+  return pString; 
 } // m_PString
 
-#define m_EMPTY_STRING_ARGS GOOD_OLD_EMPTY_C_STRING , EMPTY_STRING_LENGTH0
+//#define m_EMPTY_STRING_ARGS GOOD_OLD_EMPTY_C_STRING , EMPTY_STRING_LENGTH0
 
 
 // Assign simple "C-strings" to "string portions".
@@ -81,7 +90,7 @@ static inline int m_AssignPStrings(struct P_STRING* s_pStrings, int stringsCount
   struct P_STRING *pStringsPtr = s_pStrings;
   va_start(cStringsIds,stringsCount);
   int i = 0; while(i++ < stringsCount) {
-    *(pStringsPtr++) = m_PString(va_arg(cStringsIds, const char*),-1);
+    *(pStringsPtr++) = m_PString(va_arg(cStringsIds, const char*));
   } // while
   va_end(cStringsIds);
   return RETURNED;
@@ -103,7 +112,6 @@ static inline int m_AssignPStrings(struct P_STRING* s_pStrings, int stringsCount
   struct P_STRING ms_localPStrings[stringsCount];\
   m_ASSERT(m_AssignPStrings(ms_localPStrings, stringsCount,__VA_ARGS__) == RETURNED)
 
-
 // Assign simple "C-strings" to "string portions" (with ids).
 //
 // Passed: 
@@ -123,7 +131,7 @@ static inline int m_AssignPStringsIds(struct P_STRING* s_pStrings, int* sn_ids, 
   int *n_idPtr = sn_ids;  
   va_start(cStringsIds,stringsCount);
   int i = 0; while(i++ < stringsCount) {
-    *(pStringsPtr++) = m_PString(va_arg(cStringsIds, const char*),-1);
+    *(pStringsPtr++) = m_PString(va_arg(cStringsIds, const char*));
     *(n_idPtr)++ = va_arg(cStringsIds, int);
   } // while
   va_end(cStringsIds);
@@ -158,12 +166,11 @@ static inline int m_AssignPStringsIds(struct P_STRING* s_pStrings, int* sn_ids, 
 // Note: pathetic case in which stop ptr preceeds start ptr is considered as empty string...
 //
 // Passed:
-// TODO: why pass pointer ???
-// - ap_pString: 
+// - pString: 
 // 
 // Ret: string portion length (ALWAYS >= 0)
-static inline int m_PStringLength(const struct P_STRING *ap_pString) { 
-  int length = ap_pString->stop - ap_pString->string;
+static inline int m_PStringLength(struct P_STRING pString) { 
+  int length = pString.stop - pString.string;
   if (length < 0) length = 0;
   return length;
 } // m_PStringLength
@@ -177,7 +184,7 @@ static inline int m_PStringLength(const struct P_STRING *ap_pString) {
 // - TRUE: the pString is empty (length == 0)
 // - FALSE: the pString is not empty (length > 0)
 #define b_EMPTY_P_STRING(/*const struct P_STRING*/p_pString) \
-  (m_PStringLength(&(p_pString)) == 0)
+  (m_PStringLength(p_pString) == 0)
 
 
 // Extract sub string portion
@@ -205,7 +212,7 @@ static inline struct P_STRING m_SubPString(struct P_STRING pString,int offset,in
 // Passed:
 // - p_pString: string portion 
 #define m_P_STRING_2_BUFFER_LENGTH(/*const struct P_STRING*/p_pString) \
- (p_pString).string , m_PStringLength(&(p_pString))
+ (p_pString).string , m_PStringLength(p_pString)
 
 
 // Verify if string portion corresponds well to C-string (i.e exempted of '\0' chars)
@@ -233,7 +240,7 @@ int VerifyCPString(struct P_STRING *a_pString);
 // Passed:
 // - p_pString: string portion passed in printf() subsequent argument(s) 
 #define m_P_STRING_2_FMT_ARGS(/*const struct P_STRING*/p_pString) \
- m_PStringLength(&(p_pString)) , (p_pString).string
+ m_PStringLength(p_pString) , (p_pString).string
 
 
 // Copy string portions 
@@ -304,8 +311,8 @@ typedef int (*TO_CHAR_FUNCTION) (int c) ;
 // - otherwize, "char to char" comparison of raw strings.
 //
 // Passed:
-// - ap_pString1 : 1st string to compare #SEE struct-P_STRING
-// - ap_pString2 : 2nd string to compare #SEE struct-P_STRING
+// - pString1 : 1st string to compare #SEE struct-P_STRING
+// - pString2 : 2nd string to compare #SEE struct-P_STRING
 // - n_isNeutralCharFunction: handling of "neutral" chars (white spaces, etc.) 
 //   + NULL: NO char elimination applied before comparison 
 //   + != NULL: elimination of each "neutral" char of both strings before comparison ; "binary"
@@ -322,21 +329,20 @@ typedef int (*TO_CHAR_FUNCTION) (int c) ;
 //   + LESS_THAN__COMPARISON : string 1 'less than' string 2
 //   + EQUAL_TO__COMPARISON : strings are "identical"
 //   + GREATER_THAN__COMPARISON : string 1 'greater than' string 2
-int ComparePStrings(const struct P_STRING *ap_pString1, const struct P_STRING *ap_pString2,
+int ComparePStrings(struct P_STRING pString1, struct P_STRING pString2,
   IS_CHAR_FUNCTION n_isNeutralCharFunction, TO_CHAR_FUNCTION n_toCharFunction, char b_subString2);
 
 // ComparePStrings() wrapper ; compare a string portion with a c-string...
-static inline int m_CompareWithCString(const struct P_STRING *ap_pString1, const char *p_cString2) {
-  struct P_STRING pString2 = m_PString(p_cString2,-1);
-  return ComparePStrings(ap_pString1, &pString2,  NULL, NULL, !b_SUB_STRING_2) ;
+static inline int m_CompareWithCString(struct P_STRING pString1, const char *p_cString2) {
+  struct P_STRING pString2 = m_PString(p_cString2);
+  return ComparePStrings(pString1, pString2,  NULL, NULL, !b_SUB_STRING_2) ;
 } 
 
 // m_CompareWithCString() wrapper ; indicates whether string portion matches with a c-string...
 // 
 // Ret: boolean value (TRUE when strings matches)
-static inline int mb_EqualToCString(const struct P_STRING *ap_pString1,
-  const char *ap_cString2) {
-  int comparison = m_CompareWithCString(ap_pString1,ap_cString2);
+static inline int mb_EqualToCString(struct P_STRING pString1, const char *p_cString2) {
+  int comparison = m_CompareWithCString(pString1,p_cString2);
   switch (comparison) {
   case LESS_THAN__COMPARISON:
   case GREATER_THAN__COMPARISON:
@@ -355,7 +361,7 @@ static inline int mb_EqualToCString(const struct P_STRING *ap_pString1,
 // Ret:
 // - >0 : LESS_THAN__COMPARISON / EQUAL_TO__COMPARISON / GREATER_THAN__COMPARISON 
 // - -1: unexpected problem, anomaly is raised
-int ParanoidComparePStrings(const struct P_STRING *ap_pString1, const struct P_STRING *ap_pString2,
+int ParanoidComparePStrings(struct P_STRING pString1, struct P_STRING pString2,
   IS_CHAR_FUNCTION n_isNeutralCharFunction, TO_CHAR_FUNCTION n_toCharFunction, char b_subString2) ;
 
 // #REF Strings-First-Match 
@@ -439,8 +445,8 @@ const char *ScanPString(const struct P_STRING *ap_pString,
 // - "char to char" comparison otherwise.
 //
 // Passed:
-// - ap_pString: string to scan #SEE struct-P_STRING
-// - ap_subPString: sub string to locate
+// - pString: string to scan #SEE struct-P_STRING
+// - subPString: sub string to locate
 // - n_toCharFunction: 
 //   + NULL: not provided; no conversion before  comparison 
 //   + != NULL: conversion applied on (each char of) both strings before comparison ; "binary"
@@ -449,8 +455,8 @@ const char *ScanPString(const struct P_STRING *ap_pString,
 // Returned:
 // (!= NULL) scanning position; use b_SCAN_P_STRING_LOCATED() below to check whether
 // sub-string is actually located. 
-const char *ScanPStringTillMatch(const struct P_STRING *ap_pString,
-  const struct P_STRING *ap_subPString,  TO_CHAR_FUNCTION n_toCharFunction);
+const char *ScanPStringTillMatch(struct P_STRING pString, struct P_STRING subPString,
+  TO_CHAR_FUNCTION n_toCharFunction);
 
 
 // Extend ScanPStringTillMatch "scanning" function : 
@@ -578,14 +584,14 @@ int ParanoidConvertPString(struct P_STRING *aep_pString, char b_cTerminated,
   char emc_localString_ ## m_pString [LOCAL_STRING_AUTO_BUFFER_SIZE] ;\
   char *emnh_heapString_ ## m_pString = NULL;\
   int em_requiredBufferSize = OPTIMAL_BUFFER_SIZE_4_P_STRING_COPY(m_PStringLength(\
-    &(m_pString))); \
+    m_pString)); \
   char* emep_string = (char*)UNDEFINED; \
   if (em_requiredBufferSize > LOCAL_STRING_AUTO_BUFFER_SIZE) {\
     m_MALLOC(emep_string = emnh_heapString_ ## m_pString,  em_requiredBufferSize)\
   } else emep_string = emc_localString_ ## m_pString;\
   m_ASSERT(CopyPString(emep_string, em_requiredBufferSize,  &m_pString) == \
     em_requiredBufferSize-1)\
-  m_pString = m_PString(emep_string,em_requiredBufferSize-1);\
+  m_pString = m_PString2(emep_string,em_requiredBufferSize-1);\
 
 // 
 // Passed:

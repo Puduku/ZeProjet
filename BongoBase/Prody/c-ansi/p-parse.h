@@ -91,6 +91,7 @@
   /*struct P_STRING* */na_lexeme)  m_PARSE_PASS_CHARS(m_sequence,b_REGULAR_SCAN,\
   b_PASS_CHARS_WHILE,isspace,UNDEFINED, na_lexeme)
 
+// TODO: ag revoir...
 // Parse twice a string portion sequence :
 // 1. pass all (leading) white spaces... 
 // 2. remove ending white space of sequence 
@@ -124,18 +125,10 @@
 #define m_PARSE_TILL_MATCH(/*struct P_STRING*/m_sequence, \
   /*struct P_STRING*/p_token, /*TO_CHAR_FUNCTION*/n_toCharFunction,\
   /*struct P_STRING* */na_lexeme) {\
-  const char *em_scanPtr = ScanPStringTillMatch(&m_sequence,&p_token,\
+  const char *em_scanPtr = ScanPStringTillMatch(m_sequence,p_token,\
     n_toCharFunction);\
   m_PARSE_SEQUENCE(m_sequence,em_scanPtr, na_lexeme)\
 }
-
-// Wrap m_PARSE_TILL_MATCH above
-#define m_PARSE_TILL_MATCH_C(/*struct P_STRING*/m_sequence, \
-  /*const char* */p_token, /*TO_CHAR_FUNCTION*/n_toCharFunction,\
-  /*struct P_STRING* */na_lexeme) {\
-  struct P_STRING em_localToken = m_PString(p_token,-1); \
-  m_PARSE_TILL_MATCH(m_sequence,em_localToken,n_toCharFunction,na_lexeme) \
-}   
 
 // Parse a string portion sequence according to sub strings (tokens) list scanned by
 // ScanPStringTillFirstMatchR() function. 
@@ -195,8 +188,8 @@
 #define m_PARSE_MATCH(/*struct P_STRING*/m_sequence, /*const struct P_STRING*/p_token,\
   /*TO_CHAR_FUNCTION*/n_toCharFunction, /*struct P_STRING* */na_lexeme) {\
   const char *em_scanPtr = (m_sequence).string;\
-  int em_length = m_PStringLength(&(p_token));\
-  switch (ComparePStrings(&(m_sequence),&(p_token),NULL,n_toCharFunction,b_SUB_STRING_2)) {\
+  int em_length = m_PStringLength(p_token);\
+  switch (ComparePStrings(m_sequence,p_token,NULL,n_toCharFunction,b_SUB_STRING_2)) {\
   case LESS_THAN__COMPARISON :\
   case GREATER_THAN__COMPARISON :\
   break; case EQUAL_TO__COMPARISON :\
@@ -206,15 +199,6 @@
   } \
   m_PARSE_SEQUENCE(m_sequence,em_scanPtr, na_lexeme)\
 }
-
-// Wrap m_PARSE_MATCH above
-#define m_PARSE_MATCH_C(/*struct P_STRING*/m_sequence, \
-  /*const char* */p_token, /*TO_CHAR_FUNCTION*/n_toCharFunction,\
-  /*struct P_STRING* */na_lexeme) {\
-  struct P_STRING em_localToken = m_PString(p_token,-1); \
-  m_PARSE_MATCH(m_sequence,em_localToken,n_toCharFunction,na_lexeme) \
-}   
-
 
 // Parse a string portion sequence: match token (among candidates) 
 //
@@ -242,7 +226,7 @@
   case LESS_THAN__COMPARISON :\
   case GREATER_THAN__COMPARISON :\
   break; case EQUAL_TO__COMPARISON :\
-    em_scanPtr += m_PStringLength((sp_tokens)+*(ac_matchedEntry));\
+    em_scanPtr += m_PStringLength((sp_tokens)[*(ac_matchedEntry)]);\
   break; default:\
     m_TRACK()\
   } \

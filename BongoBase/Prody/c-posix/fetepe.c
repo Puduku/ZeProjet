@@ -158,7 +158,7 @@ static int CheckReadFtpCommandStatus (void * r_virtualHandle, const char *p_read
   int answer = ANSWER__NO; // a priori 
 
   m_ASSERT(readLength > 0)
-  struct P_STRING readPortion = m_PString(p_readBuffer,readLength);
+  struct P_STRING readPortion = m_PString2(p_readBuffer,readLength);
   int count = ParseAsciiLines(readPortion,0,ac_messageLength,linesPartitionHandle);
   m_TRACK_IF(count < 0)
 
@@ -167,7 +167,7 @@ static int CheckReadFtpCommandStatus (void * r_virtualHandle, const char *p_read
 
   if (n_lastLineDelimitorStuff != NULL) {
     int practicalLength = UNDEFINED;
-    practicalLength = m_PStringLength(&n_lastLineDelimitorStuff->practicalLine);
+    practicalLength = m_PStringLength(n_lastLineDelimitorStuff->practicalLine);
     if (practicalLength >= 4 && isdigit(n_lastLineDelimitorStuff->practicalLine.string[0]) && 
       isdigit(n_lastLineDelimitorStuff->practicalLine.string[1]) && 
       isdigit(n_lastLineDelimitorStuff->practicalLine.string[2]) &&

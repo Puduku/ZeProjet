@@ -69,7 +69,7 @@ typedef struct LINE_DELIMITOR* LINE_DELIMITOR_STUFF;
 // - m_physicalLength:
 #define m_GET_LINE_DELIMITOR_PHYSICAL_LENGTH(/*struct LINE_DELIMITOR*/m_lineDelimitor,\
   /*int*/m_physicalLength) {\
-  m_physicalLength = m_PStringLength(&(m_lineDelimitor).practicalLine);\
+  m_physicalLength = m_PStringLength((m_lineDelimitor).practicalLine);\
   (m_physicalLength) += (m_lineDelimitor).eolLength;\
 }
 

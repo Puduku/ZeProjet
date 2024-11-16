@@ -135,11 +135,11 @@ struct BLOTFUNC_KEY_NAME {
 #define m_ASSIGN_BLOTFUNC_KEY_NAME(/*struct BLOTFUNC_KEY_NAME*/m_blotfuncKeyName,\
   /*char* */n_prefix, /*char* */m_name) {\
   if (n_prefix != NULL) {\
-    m_blotfuncKeyName.prefix = m_PString(n_prefix,-1);\
+    m_blotfuncKeyName.prefix = m_PString(n_prefix);\
   } else {\
-    m_blotfuncKeyName.prefix = m_PString(m_EMPTY_STRING_ARGS);\
+    m_blotfuncKeyName.prefix = m_PString(GOOD_OLD_EMPTY_C_STRING);\
   }\
-  m_blotfuncKeyName.name = m_PString(m_name,-1); \
+  m_blotfuncKeyName.name = m_PString(m_name); \
 } 
 
 // GREEN_HANDLER__COMPARE_FUNCTION
@@ -169,11 +169,11 @@ static int BlotfuncsHandlerCompare (void *cpr_handle,  char b_frozen, int indexL
       blotlibStuff->cp_localBlotfuncNames[p_blotfuncEntryStuff->localBlotfuncNameEntry])
   } else bBlotfuncKeyName = *((struct BLOTFUNC_KEY_NAME*)cpr_bKeys); 
 
-  int comparison = ComparePStrings(&(aBlotfuncKeyName.prefix),
-    &(bBlotfuncKeyName.prefix),  (IS_CHAR_FUNCTION)NULL,  (TO_CHAR_FUNCTION)NULL,!b_SUB_STRING_2);
+  int comparison = ComparePStrings(aBlotfuncKeyName.prefix, bBlotfuncKeyName.prefix,
+    (IS_CHAR_FUNCTION)NULL,  (TO_CHAR_FUNCTION)NULL,!b_SUB_STRING_2);
   if (comparison == EQUAL_TO__COMPARISON) {
-    comparison = ComparePStrings(&(aBlotfuncKeyName.name),
-      &(bBlotfuncKeyName.name), (IS_CHAR_FUNCTION)NULL,  (TO_CHAR_FUNCTION)NULL,!b_SUB_STRING_2);
+    comparison = ComparePStrings(aBlotfuncKeyName.name, bBlotfuncKeyName.name,
+      (IS_CHAR_FUNCTION)NULL,  (TO_CHAR_FUNCTION)NULL,!b_SUB_STRING_2);
   } //if
   
   //m_DIGGY_RETURN(comparison)
@@ -361,7 +361,7 @@ m_DIGGY_VAR_P_STRING(referral)
   m_PARSE_PASS_CHARS(referral,b_REGULAR_SCAN,b_PASS_CHARS_TILL,NULL,'.',&(blotfuncKeyName.prefix))
   if (b_EMPTY_P_STRING(referral)) {
     blotfuncKeyName.name = blotfuncKeyName.prefix; 
-    blotfuncKeyName.prefix = m_PString(m_EMPTY_STRING_ARGS);
+    blotfuncKeyName.prefix = m_PString(GOOD_OLD_EMPTY_C_STRING);
   } else {
     m_PARSE_OFFSET(referral,1,NULL)
     blotfuncKeyName.name = referral;
@@ -587,7 +587,7 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
   m_C_STACK_CLEAR(handle->h_flowControlStack)
 
   struct P_STRING blotinstSequence; 
-  blotinstSequence = m_PString(m_EMPTY_STRING_ARGS);
+  blotinstSequence = m_PString(GOOD_OLD_EMPTY_C_STRING);
 
 // Report error in some Blot instruction
 // (Do nothing if some error is ALREADY reported...)
@@ -624,7 +624,7 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
   struct BLOTINST *vc_blotinstPtr = (struct BLOTINST *) UNDEFINED;
   struct P_STRING decor; // UNDEFINED 
   struct P_STRING dummy; // UNDEFINED 
-  dummy = m_PString("N/A",-1);
+  dummy = m_PString("N/A");
 
   char b_blotblog = b_FALSE0;
   while (answer == ANSWER__YES && !b_EMPTY_P_STRING(fp_template)) {
@@ -632,7 +632,7 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
 m_DIGGY_VAR_P_STRING(fp_template)
 m_DIGGY_VAR_D(b_blotblog)
     if (!b_blotblog) {
-      m_PARSE_TILL_MATCH_C(fp_template,"##<<",NULL, &decor)
+      m_PARSE_TILL_MATCH(fp_template,m_PString("##<<"),NULL, &decor)
       if (!b_EMPTY_P_STRING(decor)) {
         v_templatePartitionEntry = GreenCollectionFetch(handle->h_templatePartitionsHandle, -1,
           (char**)&ti_templatePartitionStuff);
@@ -699,9 +699,9 @@ m_DIGGY_VAR_P_STRING(blotinstSequence)
 
     // Stage 3: Finding actual "tokens" within blotinst "sequence" 
     struct P_STRING litteralKeyw, referral, litteralBlotval; 
-    litteralKeyw = m_PString(m_EMPTY_STRING_ARGS);
-    referral = m_PString(m_EMPTY_STRING_ARGS);
-    litteralBlotval = m_PString(m_EMPTY_STRING_ARGS);
+    litteralKeyw = m_PString(GOOD_OLD_EMPTY_C_STRING);
+    referral = m_PString(GOOD_OLD_EMPTY_C_STRING);
+    litteralBlotval = m_PString(GOOD_OLD_EMPTY_C_STRING);
 
     if (b_arguments) { // Found '(' <arguments> ')' 
       if (!b_EMPTY_P_STRING(basicToken2)) { // two tokens 
@@ -751,7 +751,7 @@ m_DIGGY_VAR_P_STRING(blotinstSequence)
         &parsedLength)) {
       case ANSWER__YES: 
         vc_blotinstPtr->b_blotval = b_TRUE;
-        if (parsedLength < m_PStringLength(&litteralBlotval)) {
+        if (parsedLength < m_PStringLength(litteralBlotval)) {
           m_REPORT_ERROR(litteralBlotval, "Trailing chars in blotval")
         } // if
       break; case ANSWER__NO: 

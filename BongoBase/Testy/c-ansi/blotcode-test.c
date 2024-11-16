@@ -99,7 +99,7 @@ static int Blotlib2ExecutorExecuteC(void *r_handle, const struct BLOTFUNC *ap_bl
   int answer = ANSWER__YES; // a priori
   switch (ap_blotfunc->entry.localBlotfuncNameEntry) {
   case 1:  // Verbe
-    { int comparison = m_CompareWithCString(&ap_blotfunc->call.arguments, "savoir, 1ps");
+    { int comparison = m_CompareWithCString(ap_blotfunc->call.arguments, "savoir, 1ps");
       m_ASSERT(comparison == EQUAL_TO__COMPARISON)
     } // comparison 
     m_ASSERT(m_GStringCCopy(c_surrogate,0,"sait") >= 0)
@@ -127,7 +127,7 @@ static int BlotcodeExecutorTest (int expectedTestNumber, BLOTCODE_EXECUTOR_HANDL
   SUCKER_HANDLE outputSuckerHandle, G_STRING_STUFF outputGStringStuff,  const char *p_template,
   int expectedAnswer, int c_expectedBlotcodeConstructionStatus,  const char *ccp_expectedOutput) {
   m_DIGGY_BOLLARD()
-  struct P_STRING localTemplate = m_PString(p_template,-1);
+  struct P_STRING localTemplate = m_PString(p_template);
   m_ASSERT(expectedTestNumber == ++testNumber)
   m_DIGGY_VAR_D(testNumber)
   G_STRING_STUFF nh_parsingErrorInfo = NULL;

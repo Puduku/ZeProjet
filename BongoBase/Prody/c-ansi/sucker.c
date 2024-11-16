@@ -68,7 +68,7 @@ int FileButtAdeptSuck(void *r_handle,  char b_kickButt, struct P_STRING *ac_chun
 
   int ret = fread(handle->ch_readBuffer,handle->n_readBufferSize,1,handle->nh_file);
   m_ASSERT(ret >= 0)
-  *ac_chunk = m_PString(handle->ch_readBuffer,ret);
+  *ac_chunk = m_PString2(handle->ch_readBuffer,ret);
 
   m_DIGGY_RETURN(ANSWER__YES)
 } // FileButtAdeptSuck
@@ -88,10 +88,10 @@ int FileButtAdeptFill(void *r_handle,  struct P_STRING chunk, int *nar_flopCause
     m_DIGGY_RETURN(ANSWER__NO)
   } // if
 
-  int ret = fwrite(chunk.string,m_PStringLength(&chunk),1,handle->nh_file);
+  int ret = fwrite(chunk.string,m_PStringLength(chunk),1,handle->nh_file);
   m_ASSERT(ret >= 0)
   // TODO: gedrer edcritures partielles...
-  m_ASSERT(ret == m_PStringLength(&chunk)) 
+  m_ASSERT(ret == m_PStringLength(chunk)) 
 
   m_DIGGY_RETURN(ANSWER__YES)
 } // FileButtAdeptFill  
@@ -140,7 +140,7 @@ int GStringButtAdeptSuck(void *r_handle,  char b_kickButt, struct P_STRING *ac_c
   if (b_kickButt) {
     *ac_chunk = handle->gStringStuff->cv_pString;
   } else {
-    *ac_chunk = m_PString(m_EMPTY_STRING_ARGS) ;
+    *ac_chunk = m_PString(GOOD_OLD_EMPTY_C_STRING) ;
   } // if
 
   m_DIGGY_RETURN(ANSWER__YES)
@@ -258,7 +258,7 @@ int SuckerSuckOut (SUCKER_HANDLE handle, int *na_suckedOutLength, int *nar_flopC
     switch (handle->sButtAdeptSuckFunction(handle->r_sButtAdeptSuckHandle, suckedOutLength==0,
        &c_chunk, nar_flopCause)) {
     case ANSWER__YES:
-      suckedLength = m_PStringLength(&c_chunk);
+      suckedLength = m_PStringLength(c_chunk);
       if (b_EMPTY_P_STRING(c_chunk)) {
         n_suckerStatus = SUCKER_STATUS__OK;
       } else if (handle->suckingLimit > 0 && suckedOutLength + suckedLength > handle->suckingLimit) {

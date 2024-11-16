@@ -76,7 +76,7 @@ int GStringCopy(G_STRING_STUFF stuff, int n_offset, const struct P_STRING *ap_pS
 // See GStringCopy() above
 static inline int m_GStringCCopy(G_STRING_STUFF stuff, int n_offset, const char* p_cString) {
   m_DIGGY_BOLLARD()
-  struct P_STRING pString = m_PString(p_cString,-1);
+  struct P_STRING pString = m_PString(p_cString);
   m_DIGGY_RETURN(GStringCopy(stuff, n_offset, &pString))
 } // m_GStringCCopy
 
@@ -113,7 +113,7 @@ int GStringImport(G_STRING_STUFF stuff, const struct P_STRING *afp_pString);
 // See GStringImport() above
 static inline int m_GStringCImport(G_STRING_STUFF stuff, const char* fp_cString) {
   m_DIGGY_BOLLARD()
-  struct P_STRING pString = m_PString(fp_cString,-1);
+  struct P_STRING pString = m_PString(fp_cString);
   m_DIGGY_RETURN(GStringImport(stuff, &pString))
 } // m_GStringCImport
 

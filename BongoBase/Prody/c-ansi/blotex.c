@@ -705,10 +705,10 @@ static inline int m_ParseLogical2Op(struct P_STRING *a_sequence,
   m_DIGGY_BOLLARD()
   struct P_STRING lexeme; // UNDEFINED
   m_PARSE_PASS_SPACES(*a_sequence,NULL)
-  m_PARSE_MATCH_C(*a_sequence,"and",NULL,&lexeme)
+  m_PARSE_MATCH(*a_sequence,m_PString("and"),NULL,&lexeme)
   if (!b_EMPTY_P_STRING(lexeme)) *a_criteriaOpFlags = CRITERIA_OP_FLAGS__AND;
   else { 
-    m_PARSE_MATCH_C(*a_sequence,"or",NULL,&lexeme) 
+    m_PARSE_MATCH(*a_sequence,m_PString("or"),NULL,&lexeme) 
     if (!b_EMPTY_P_STRING(lexeme)) *a_criteriaOpFlags = CRITERIA_OP_FLAGS__OR;
     else *a_criteriaOpFlags = ALL_FLAGS_OFF0;
   } // if
@@ -749,7 +749,7 @@ static inline int m_BlotexlibExecutorComputeBlotregRequest(BLOTEXLIB_EXECUTOR_HA
   struct P_STRING lexeme;
   struct P_STRING subSequence; 
 
-  m_PARSE_TILL_MATCH_C(*a_sequence,":?",NULL, &subSequence)
+  m_PARSE_TILL_MATCH(*a_sequence,m_PString(":?"),NULL, &subSequence)
 m_DIGGY_VAR_P_STRING(subSequence)
 m_DIGGY_VAR_P_STRING(*a_sequence)
   if (b_EMPTY_P_STRING(*a_sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
@@ -969,7 +969,7 @@ m_DIGGY_VAR_P_STRING(blotregName)
   
       break; case RESULT__NOT_FOUND:
         if ((cac_blotexValue->b_strex = (n_as == AS__VALUE_STR || n_as == AS__NAME)))
-          cac_blotexValue->select.c_str = m_PString(m_EMPTY_STRING_ARGS) ;
+          cac_blotexValue->select.c_str = m_PString(GOOD_OLD_EMPTY_C_STRING) ;
         else cac_blotexValue->select.c_blotval = FALSE__BLOTVAL; 
       break; default: m_TRACK()
       } // switch
@@ -1572,7 +1572,7 @@ static inline int m_BlotexlibExecutorExecuteCFunctionEval(BLOTEXLIB_EXECUTOR_HAN
   m_PREPARE_ABANDON(&arguments, "Eval") 
   m_PARSE_PASS_SPACES(arguments,NULL)
   { struct P_STRING subSequence; // UNDEFINED
-    m_PARSE_TILL_MATCH_C(arguments,":=",NULL, &subSequence)
+    m_PARSE_TILL_MATCH(arguments,m_PString(":="),NULL, &subSequence)
     if (b_EMPTY_P_STRING(arguments)) { // NO ':=' 
       arguments = subSequence;
     } else { // Expect <blotvar ref> [ '$' ] ':=' <blotex>
@@ -1684,7 +1684,7 @@ static inline int m_ParseFormat(struct P_STRING *a_sequence, int *avn_format,
   if (b_EMPTY_P_STRING(lexeme)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
   m_PARSE_PASS_CHARS(*a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_WHILE,IsFormatSpecifierChar,UNDEFINED,
     &lexeme)
-  int length = m_PStringLength(&lexeme);
+  int length = m_PStringLength(lexeme);
   switch (lexeme.string[0]) {
   case 'd': 
     if (length == 1) *avn_format = D__FORMAT;

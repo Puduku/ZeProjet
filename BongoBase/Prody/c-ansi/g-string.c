@@ -24,7 +24,7 @@
 #define m_G_STRING_SET_INITIAL_BUFFER(/*G_STRING_STUFF*/stuff, /*int*/u_minimalInitialBufferSize) {\
   if (stuff->nhi_string == NULL) {\
     int em_initialBufferSize = u_minimalInitialBufferSize; \
-    int em_pStringLength = m_PStringLength(&stuff->cv_pString);\
+    int em_pStringLength = m_PStringLength(stuff->cv_pString);\
     if (em_initialBufferSize < OPTIMAL_BUFFER_SIZE_4_P_STRING_COPY(em_pStringLength)) \
       em_initialBufferSize = OPTIMAL_BUFFER_SIZE_4_P_STRING_COPY(em_pStringLength);\
     m_MALLOC((stuff)->nhi_string, (stuff)->c_bufferSize = em_initialBufferSize)\
@@ -48,7 +48,7 @@ int GStringCopy(G_STRING_STUFF stuff, int n_offset, const struct P_STRING *ap_pS
   m_DIGGY_BOLLARD()
 
   int requiredBufferSize = OPTIMAL_BUFFER_SIZE_4_P_STRING_COPY(m_PStringLength(
-    ap_pString));
+    *ap_pString));
   m_G_STRING_SET_INITIAL_BUFFER(stuff, requiredBufferSize)
   m_G_STRING_ADJUST_COPY_OFFSET(stuff,n_offset) 
   requiredBufferSize += n_offset;
@@ -58,7 +58,7 @@ int GStringCopy(G_STRING_STUFF stuff, int n_offset, const struct P_STRING *ap_pS
   stuff->c_copiedLength = CopyPString(stuff->nhi_string + (n_offset),
     stuff->c_bufferSize - (n_offset),  ap_pString) + (n_offset);
 
-  stuff->cv_pString = m_PString(stuff->nhi_string,stuff->c_copiedLength);
+  stuff->cv_pString = m_PString2(stuff->nhi_string,stuff->c_copiedLength);
 
   m_DIGGY_RETURN(stuff->c_copiedLength)
 } // GStringCopy
@@ -102,7 +102,7 @@ int GStringPrintf(G_STRING_STUFF stuff,  int n_offset,  const char *p_format, ..
   } // for
   stuff->c_copiedLength = n_offset + ret;
 
-  stuff->cv_pString = m_PString(stuff->nhi_string,stuff->c_copiedLength);
+  stuff->cv_pString = m_PString2(stuff->nhi_string,stuff->c_copiedLength);
   m_DIGGY_RETURN(stuff->c_copiedLength)
 } // GStringPrintf
 
@@ -304,7 +304,7 @@ m_DIGGY_INFO("indexLabel=%d keyRank=%d",indexLabel,keyRank)
 m_DIGGY_INFO("ap_keySettings->gKeysComparison=%d",ap_keySettings->gKeysComparison)
   switch (ap_keySettings->gKeysComparison) {
   case P_STRING__G_KEYS_COMPARISON:
-    comparison = ComparePStrings(&aBareGKey.cp_pString,  &bBareGKey.cp_pString,
+    comparison = ComparePStrings(aBareGKey.cp_pString,  bBareGKey.cp_pString,
       ap_keySettings->select.pStringComparison.cn_isNeutralCharFunction,
       ap_keySettings->select.pStringComparison.cn_toCharFunction,!b_SUB_STRING_2); 
   break; case INTRINSIC_VALUE__G_KEYS_COMPARISON:

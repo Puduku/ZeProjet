@@ -35,7 +35,7 @@ int CopyPString(char *dstRawString, int dstBufferSize,
   const struct P_STRING *ap_srcPString) {
   m_DIGGY_BOLLARD()
 
-  int copyLength = m_PStringLength(ap_srcPString);
+  int copyLength = m_PStringLength(*ap_srcPString);
   if (copyLength >= dstBufferSize) copyLength = dstBufferSize-1;
   m_ASSERT(copyLength >= 0)
   memcpy(dstRawString,  ap_srcPString->string,  copyLength);
@@ -46,35 +46,35 @@ int CopyPString(char *dstRawString, int dstBufferSize,
 
 
 // Public function : see description in .h
-int ComparePStrings(const struct P_STRING *ap_pString1, const struct P_STRING *ap_pString2,
+int ComparePStrings(struct P_STRING pString1, struct P_STRING pString2,
   IS_CHAR_FUNCTION n_isNeutralCharFunction, TO_CHAR_FUNCTION n_toCharFunction, char b_subString2) {
   m_DIGGY_BOLLARD()
-m_DIGGY_VAR_P_STRING(*ap_pString1)
-m_DIGGY_VAR_P_STRING(*ap_pString2)
+m_DIGGY_VAR_P_STRING(pString1)
+m_DIGGY_VAR_P_STRING(pString2)
   int difference = 0; // No difference a priori...
 
   if (n_isNeutralCharFunction == NULL && n_toCharFunction == NULL) {
-    int length1 = m_PStringLength(ap_pString1);
-    int length2 = m_PStringLength(ap_pString2);
+    int length1 = m_PStringLength(pString1);
+    int length2 = m_PStringLength(pString2);
 
     int minLength = length1 < length2 ? length1 : length2 ;
-    if ((difference = memcmp(ap_pString1->string,ap_pString2->string, minLength)) == 0) {
+    if ((difference = memcmp(pString1.string,pString2.string, minLength)) == 0) {
       int lengthsDifference = length1 - length2; 
       if (lengthsDifference < 0) difference = -1;
       else if ((!b_subString2) && lengthsDifference > 0) difference = 1;
     } // if
 
   } else {
-    const char *ptr1 = ap_pString1->string;
-    const char *ptr2 = ap_pString2->string;
-    // Invariant: portions [ap_pString1:ptr1[ and [ap_pString2:ptr2[ are identical
+    const char *ptr1 = pString1.string;
+    const char *ptr2 = pString2.string;
+    // Invariant: portions [pString1:ptr1[ and [pString2:ptr2[ are identical
     while (b_TRUE) {
       if (n_isNeutralCharFunction != NULL) {
-        if (ptr1 < ap_pString1->stop && n_isNeutralCharFunction(*ptr1)) { ptr1++; continue; }
-        if (ptr2 < ap_pString2->stop && n_isNeutralCharFunction(*ptr2)) { ptr2++; continue; } 
+        if (ptr1 < pString1.stop && n_isNeutralCharFunction(*ptr1)) { ptr1++; continue; }
+        if (ptr2 < pString2.stop && n_isNeutralCharFunction(*ptr2)) { ptr2++; continue; } 
       } // if
 
-      if (ptr1 >= ap_pString1->stop || ptr2 >= ap_pString2->stop) break; 
+      if (ptr1 >= pString1.stop || ptr2 >= pString2.stop) break; 
       if (n_toCharFunction != NULL) {
         if ((difference = n_toCharFunction(*ptr1) - n_toCharFunction(*ptr2)) != 0) break;
       } else {
@@ -83,16 +83,16 @@ m_DIGGY_VAR_P_STRING(*ap_pString2)
       ptr1++, ptr2++;
     } // while
 
-    m_ASSERT(ptr1 <= ap_pString1->stop)
-    m_ASSERT(ptr2 <= ap_pString2->stop)
-    if (ptr1 == ap_pString1->stop) {
+    m_ASSERT(ptr1 <= pString1.stop)
+    m_ASSERT(ptr2 <= pString2.stop)
+    if (ptr1 == pString1.stop) {
       m_ASSERT(difference == 0)
-      if (ptr2 < ap_pString2->stop) { 
+      if (ptr2 < pString2.stop) { 
         m_ASSERT(n_isNeutralCharFunction != NULL? !n_isNeutralCharFunction(*ptr2): b_TRUE)
         difference = -1; 
       } // if
     } else {
-      if (ptr2 == ap_pString2->stop) { 
+      if (ptr2 == pString2.stop) { 
         m_ASSERT(difference == 0)
         if (!b_subString2) difference = 1; 
       } else m_ASSERT(difference != 0)
@@ -114,26 +114,26 @@ static int ToSameChar (int c) {
 } // ToSameChar  
 
 // Public function : see description in .h
-int ParanoidComparePStrings(const struct P_STRING *ap_pString1, const struct P_STRING *ap_pString2,
+int ParanoidComparePStrings(struct P_STRING pString1, struct P_STRING pString2,
   IS_CHAR_FUNCTION n_isNeutralCharFunction, TO_CHAR_FUNCTION n_toCharFunction, char b_subString2) {
   m_DIGGY_BOLLARD()
-  int comparison1 = ComparePStrings(ap_pString1, ap_pString2, n_isNeutralCharFunction,
+  int comparison1 = ComparePStrings(pString1, pString2, n_isNeutralCharFunction,
     n_toCharFunction, b_subString2);
   m_ASSERT(comparison1 >= 0) ; 
 
   int comparison2 = UNDEFINED; 
   if (n_isNeutralCharFunction == NULL) {
-    comparison2 = ComparePStrings(ap_pString1, ap_pString2, IsNeverChar, n_toCharFunction,
+    comparison2 = ComparePStrings(pString1, pString2, IsNeverChar, n_toCharFunction,
       b_subString2);
     m_ASSERT(comparison1 == comparison2) 
   } // if
   if (n_toCharFunction == NULL) {
-    comparison2 = ComparePStrings(ap_pString1, ap_pString2, n_isNeutralCharFunction, ToSameChar,
+    comparison2 = ComparePStrings(pString1, pString2, n_isNeutralCharFunction, ToSameChar,
       b_subString2);
     m_ASSERT(comparison1 == comparison2) 
   } // if
   if (n_isNeutralCharFunction == NULL && n_toCharFunction == NULL) {
-    comparison2 = ComparePStrings(ap_pString1, ap_pString2, IsNeverChar, ToSameChar, b_subString2);
+    comparison2 = ComparePStrings(pString1, pString2, IsNeverChar, ToSameChar, b_subString2);
     m_ASSERT(comparison1 == comparison2) 
   } // if
 //m_DIGGY_VAR_COMPARISON(comparison1)
@@ -157,12 +157,12 @@ m_DIGGY_VAR_P(nsn_ids)
     for (; i < string2sCount ; i++) { 
 m_DIGGY_VAR_D(i)
       if (nsn_ids[i] < 0) continue;
-      if ((comparison = ComparePStrings(ap_pString1, sp_pString2s+i, n_isNeutralCharFunction,
+      if ((comparison = ComparePStrings(*ap_pString1, sp_pString2s[i], n_isNeutralCharFunction,
         n_toCharFunction,b_subString2)) == EQUAL_TO__COMPARISON) break;
     } // for 
   } else {
     for (; i < string2sCount ; i++) { 
-      if ((comparison = ComparePStrings(ap_pString1, sp_pString2s+i, n_isNeutralCharFunction,
+      if ((comparison = ComparePStrings(*ap_pString1, sp_pString2s[i], n_isNeutralCharFunction,
         n_toCharFunction,b_subString2)) == EQUAL_TO__COMPARISON) break;
     } // for 
   } // if
@@ -231,19 +231,19 @@ const char *ScanPString(const struct P_STRING *ap_pString, char b_regularScan, c
 
 
 // Public function : see description in .h
-const char *ScanPStringTillMatch(const struct P_STRING *ap_pString, 
-  const struct P_STRING *ap_subPString, TO_CHAR_FUNCTION n_toCharFunction) {
+const char *ScanPStringTillMatch(struct P_STRING pString, struct P_STRING subPString,
+  TO_CHAR_FUNCTION n_toCharFunction) {
   m_DIGGY_BOLLARD()
 
-  int subLength = m_PStringLength(ap_subPString);
-  const char *ptr = ap_pString->string - 1;
+  int subLength = m_PStringLength(subPString);
+  const char *ptr = pString.string - 1;
 
-  // invariant: No match in portion [ap_pString->string:ptr[ 
-  while (++ptr < ap_pString->stop) {
-    if (ptr+subLength <= ap_pString->stop) {
+  // invariant: No match in portion [pString.string:ptr[ 
+  while (++ptr < pString.stop) {
+    if (ptr+subLength <= pString.stop) {
       //TODO: utiliser les sub-strings ?
-      struct P_STRING ptrPString = m_PString(ptr,subLength);
-      int comparison = ComparePStrings(&ptrPString,  ap_subPString,  NULL,
+      struct P_STRING ptrPString = m_PString2(ptr,subLength);
+      int comparison = ComparePStrings(ptrPString,  subPString,  NULL,
         n_toCharFunction, !b_SUB_STRING_2); 
       if (comparison == EQUAL_TO__COMPARISON) break ;
     }  // if
