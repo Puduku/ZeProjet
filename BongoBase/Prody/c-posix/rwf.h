@@ -200,7 +200,7 @@ enum {
 // Passed:
 // - fileDescriptor : file to be locked
 // - pdHandle : see PdCreateInstance() in  c-posix/tryagain.h
-// - ap_waitingPlan: specify behavior if currently locked by another process ;
+// - waitingPlan: specify behavior if currently locked by another process ;
 //   #SEE struct-WAITING_PLAN@c-posix/tryagain.h <file lock>
 // - aflock: see also fcntl() doc (F_SETLK / F_SETLKW cmd) for details;
 //   + a_flock->l_type:
@@ -223,9 +223,8 @@ enum {
 //   Note: if your action is to remove a lock (F_UNLCK), that case seems weird ; consider raising
 //   ANOMALY__CANNOT_UNLOCK
 // - -1 : unexpected problem; anomaly is raised
-int ProtectedFcntlFSetlk (int fileDescriptor,
-                          PD_HANDLE pdHandle, const struct WAITING_PLAN *ap_waitingPlan,
-                          struct flock *a_flock) ;
+int ProtectedFcntlFSetlk (int fileDescriptor, PD_HANDLE pdHandle, struct WAITING_PLAN waitingPlan,
+  struct flock *a_flock) ;
 
 
 // II.2 "BSD" (advisory) locks
@@ -242,7 +241,7 @@ int ProtectedFcntlFSetlk (int fileDescriptor,
 //   + LOCK_EX: place an exclusive lock
 //   + LOCK_UN: remove an existing lock
 // - pdHandle : see PdCreateInstance() in  c-posix/tryagain.h
-// - ap_waitingPlan: specify behavior if currently locked by another process ;
+// - waitingPlan: specify behavior if currently locked by another process ;
 //   #SEE struct-WAITING_PLAN@c-posix/tryagain.h <file lock>
 //
 // Returned:
@@ -250,9 +249,8 @@ int ProtectedFcntlFSetlk (int fileDescriptor,
 // - ATTEMPT__TRY_AGAIN: if your action is to remove (LOCK_UN) a lock you are certain to have
 //   locked (LOCK_SH / LOCK_EX) before, consider raising ANOMALY__CANNOT_UNLOCK 
 // - -1 : unexpected problem; anomaly is raised
-int ProtectedFlock (int fileDescriptor,
-                    PD_HANDLE pdHandle, const struct WAITING_PLAN *ap_waitingPlan,
-                    int operation) ;
+int ProtectedFlock (int fileDescriptor, PD_HANDLE pdHandle, struct WAITING_PLAN waitingPlan,
+  int operation) ;
 
 
 

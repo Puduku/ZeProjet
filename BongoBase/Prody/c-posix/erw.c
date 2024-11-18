@@ -45,7 +45,7 @@ typedef struct RDH *RDH_HANDLE;
 
 
 // CHECK_READ_FUNCTION
-static int TrivialCheckRead (void *nr_handle, const char *p_readBuffer, int readLength,
+static int TrivialCheckRead(void *nr_handle, const char *p_readBuffer, int readLength,
   int attemptsCount, int *ac_messageLength) {
   m_DIGGY_BOLLARD()
   m_ASSERT(nr_handle == NULL)
@@ -63,7 +63,7 @@ static int TrivialCheckRead (void *nr_handle, const char *p_readBuffer, int read
 // Ret:
 // - RETURNED:
 // - -1: unexpected problem
-static int RdhCreateInstance (RDH_HANDLE *azh_handle, int readBufferSize,
+static int RdhCreateInstance(RDH_HANDLE *azh_handle, int readBufferSize,
   char *nf_traditionalReadBuffer, CHECK_READ_FUNCTION n_checkReadFunction,
   void *cnfr_checkReadHandle) {
   m_DIGGY_BOLLARD_S()
@@ -111,7 +111,7 @@ static int RdhCreateInstance (RDH_HANDLE *azh_handle, int readBufferSize,
 // Ret:
 // - RETURNED:
 // - -1: unexpected problem
-static int RdhPrepareRead (RDH_HANDLE handle, char **anf_newReadBuffer, int *ac_newReadBufferSize) {
+static int RdhPrepareRead(RDH_HANDLE handle, char **anf_newReadBuffer, int *ac_newReadBufferSize) {
   m_DIGGY_BOLLARD_S()
   if (handle->messageLength > 0) { // previous message read succesfully
     handle->readLength -= handle->messageLength;
@@ -150,7 +150,7 @@ static int RdhPrepareRead (RDH_HANDLE handle, char **anf_newReadBuffer, int *ac_
 // Ret:
 // - RETURNED:
 // - -1: unexpected problem
-static int RdhUpdateRead (RDH_HANDLE handle, int newReadLength) {
+static int RdhUpdateRead(RDH_HANDLE handle, int newReadLength) {
   m_DIGGY_BOLLARD_S()
   m_ASSERT((handle->readLength += newReadLength) <= handle->bufferCurrentSize)
   
@@ -174,7 +174,7 @@ static int RdhUpdateRead (RDH_HANDLE handle, int newReadLength) {
 // - ANSWER__YES:
 // - ANSWER__NO:
 // - -1: unexpected problem
-static int RdhCheckRead (RDH_HANDLE handle, char **nac_messageBuffer, int *ac_messageLength) {
+static int RdhCheckRead(RDH_HANDLE handle, char **nac_messageBuffer, int *ac_messageLength) {
   m_DIGGY_BOLLARD_S()
   int rsAnswer ;
   switch (rsAnswer = handle->checkReadFunction(handle->nr_checkReadHandle, handle->cv_buffer,
@@ -209,7 +209,7 @@ static int RdhCheckRead (RDH_HANDLE handle, char **nac_messageBuffer, int *ac_me
 // Ret:
 // - RETURNED:
 // - -1: unexpected problem
-static int RdhFlush (RDH_HANDLE handle, char **na_messageBuffer, int *a_messageLength) {
+static int RdhFlush(RDH_HANDLE handle, char **na_messageBuffer, int *a_messageLength) {
   m_DIGGY_BOLLARD_S()
   if (na_messageBuffer != NULL) {
     *na_messageBuffer = handle->cv_buffer ;
@@ -229,7 +229,7 @@ static int RdhFlush (RDH_HANDLE handle, char **na_messageBuffer, int *a_messageL
 // - COMPLETED__OK:
 // - COMPLETED__BUT:
 // - -1: unexpected problem
-static int RdhReset (RDH_HANDLE handle) {
+static int RdhReset(RDH_HANDLE handle) {
   m_DIGGY_BOLLARD_S()
   int completed = COMPLETED__OK ; // a priori
   if (b_RDH_RESIDUE(handle)) {
@@ -244,7 +244,7 @@ static int RdhReset (RDH_HANDLE handle) {
 
 // Ret:
 // - RETURNED:
-static int RdhDestroyInstance (RDH_HANDLE xh_handle) {
+static int RdhDestroyInstance(RDH_HANDLE xh_handle) {
   m_DIGGY_BOLLARD_S()
 
   if (xh_handle->nih_resizableBuffer != NULL) {
@@ -283,7 +283,7 @@ typedef struct WRH *WRH_HANDLE;
 // Ret:
 // - RETURNED:
 // - -1: unexpected problem
-static int WrhCreateInstance (WRH_HANDLE *azh_handle) {
+static int WrhCreateInstance(WRH_HANDLE *azh_handle) {
   m_DIGGY_BOLLARD_S()
   struct WRH *ha_wrh = (struct WRH*) UNDEFINED;
   m_MALLOC_INSTANCE(ha_wrh)
@@ -299,7 +299,7 @@ static int WrhCreateInstance (WRH_HANDLE *azh_handle) {
 // Ret:
 // - RETURNED:
 // - -1: unexpected problem
-static int WrhSynchronizeFirstMessagePart (WRH_HANDLE handle, const char *fp_messagePartBuffer,
+static int WrhSynchronizeFirstMessagePart(WRH_HANDLE handle, const char *fp_messagePartBuffer,
   int messagePartLength) {
   m_DIGGY_BOLLARD_S()
   handle->messagePartsNumber = 0;
@@ -314,7 +314,7 @@ static int WrhSynchronizeFirstMessagePart (WRH_HANDLE handle, const char *fp_mes
 // Ret:
 // - RETURNED:
 // - -1: unexpected problem
-static int WrhSynchronizeNextMessagePart (WRH_HANDLE handle, const char *fp_messagePartBuffer,
+static int WrhSynchronizeNextMessagePart(WRH_HANDLE handle, const char *fp_messagePartBuffer,
   int messagePartLength) {
   m_DIGGY_BOLLARD_S()
   int i = handle->messagePartsNumber++ ;
@@ -329,7 +329,7 @@ static int WrhSynchronizeNextMessagePart (WRH_HANDLE handle, const char *fp_mess
 // Ret:
 // - RETURNED:
 // - -1: unexpected problem
-static int WrhPrepareWrite (WRH_HANDLE handle, const char **ap_writeBuffer, int *a_writeLength) {
+static int WrhPrepareWrite(WRH_HANDLE handle, const char **ap_writeBuffer, int *a_writeLength) {
   m_DIGGY_BOLLARD_S()
   int i = handle->writtenMessagePartsCount ;
   m_ASSERT(i >= 0 && i < handle->messagePartsNumber && 
@@ -348,7 +348,7 @@ static int WrhPrepareWrite (WRH_HANDLE handle, const char **ap_writeBuffer, int 
 // - ANSWER__YES:
 // - ANSWER__NO:
 // - -1: unexpected problem
-static int WrhCheckWrite (WRH_HANDLE handle, int writtenLength) {
+static int WrhCheckWrite(WRH_HANDLE handle, int writtenLength) {
   m_DIGGY_BOLLARD_S()
   m_RAISE_IF(writtenLength <= 0,ANOMALY__VALUE__D,writtenLength)
   handle->messagePartWrittenLength += writtenLength;
@@ -378,7 +378,7 @@ static int WrhCheckWrite (WRH_HANDLE handle, int writtenLength) {
 // - COMPLETED__BUT: a message partially written message was trailing (SHOULD NOT happen if all messages 
 //   were succesfully "written") 
 // - -1: unexpected problem
-static int WrhReset (WRH_HANDLE handle) {
+static int WrhReset(WRH_HANDLE handle) {
   m_DIGGY_BOLLARD_S()
   int completed = COMPLETED__OK ; // a priori
   if (b_WRH_RESIDUE(handle)) {
@@ -393,7 +393,7 @@ static int WrhReset (WRH_HANDLE handle) {
 
 // Ret:
 // - RETURNED:
-static int WrhDestroyInstance (WRH_HANDLE xh_handle) {
+static int WrhDestroyInstance(WRH_HANDLE xh_handle) {
   m_DIGGY_BOLLARD_S()
 
   free(xh_handle) ;
@@ -405,10 +405,7 @@ static int WrhDestroyInstance (WRH_HANDLE xh_handle) {
 // ERW
 // ===
 
-static const struct WAITING_PLAN p_defaultErwWaitingPlan = {
-  .waitingPlan = LIGHTLY_BLOCKING__WAITING_PLAN ,
-  .c_deadline = 10 ,
-} ;
+#define DEFAULT_ERW_WAITING_PLAN_ARGS LIGHTLY_BLOCKING__WAITING_PLAN, 10
 
 
 struct ERW {
@@ -423,10 +420,10 @@ struct ERW {
 
 
 // Public function : see description in .h
-int ErwCreateInstance (ERW_HANDLE *azh_handle, BROKEN_PIPE_FIX_HANDLE f_brokenPipeFixHandle,
+int ErwCreateInstance(ERW_HANDLE *azh_handle, BROKEN_PIPE_FIX_HANDLE f_brokenPipeFixHandle,
   ALARM_SYSTEM_HANDLE nf_alarmSystemHandle, int n_readBufferSize, char *cnf_traditionalReadBuffer,
   CHECK_READ_FUNCTION cn_checkReadFunction, void *ccnfr_checkReadHandle,
-  const struct WAITING_PLAN *nap_defaultWaitingPlan) {
+  struct WAITING_PLAN defaultWaitingPlan) {
   m_DIGGY_BOLLARD()
   struct ERW *ha_erw = (struct ERW *) UNDEFINED;
   m_MALLOC_INSTANCE(ha_erw)
@@ -444,8 +441,7 @@ int ErwCreateInstance (ERW_HANDLE *azh_handle, BROKEN_PIPE_FIX_HANDLE f_brokenPi
   m_TRACK_IF(WrhCreateInstance(&(ha_erw->h_wrhHandle)) != RETURNED)
 
   ha_erw->n_descriptor = -1 ;
-  if (nap_defaultWaitingPlan != NULL) ha_erw->defaultWaitingPlan = *nap_defaultWaitingPlan;
-  else ha_erw->defaultWaitingPlan = p_defaultErwWaitingPlan ;
+  ha_erw->defaultWaitingPlan = defaultWaitingPlan;
 
   *azh_handle = ha_erw ;
 
@@ -454,8 +450,7 @@ int ErwCreateInstance (ERW_HANDLE *azh_handle, BROKEN_PIPE_FIX_HANDLE f_brokenPi
 
 
 // Public function : see description in .h
-int ErwReset (ERW_HANDLE handle, int f_descriptor,
-  const struct WAITING_PLAN *nap_defaultWaitingPlan) {
+int ErwReset(ERW_HANDLE handle, int f_descriptor) {
   m_DIGGY_BOLLARD()
   int completed = COMPLETED__OK ; // a priori
 
@@ -477,7 +472,6 @@ int ErwReset (ERW_HANDLE handle, int f_descriptor,
     } // switch 
   } // if
 
-  if (nap_defaultWaitingPlan != NULL) handle->defaultWaitingPlan = *nap_defaultWaitingPlan;
   handle->n_descriptor = f_descriptor ;
   handle->cb_synchronizedDefaultWaitingPlan = b_FALSE0 ;
 
@@ -496,19 +490,19 @@ int ErwReset (ERW_HANDLE handle, int f_descriptor,
 #define m_CHECK_O_NONBLOCK_SYNCHRONIZATION() {\
   m_ASSERT(handle->n_descriptor >= 0) \
   if (nap_waitingPlan != NULL) {\
-    m_TRACK_IF(SynchronizeONonblock(handle->n_descriptor,nap_waitingPlan) != RETURNED)\
+    m_TRACK_IF(SynchronizeONonblock(handle->n_descriptor,*nap_waitingPlan) != RETURNED)\
     handle->cb_synchronizedDefaultWaitingPlan = b_FALSE0;\
   } else  {\
     nap_waitingPlan = &handle->defaultWaitingPlan;\
     if (! handle->cb_synchronizedDefaultWaitingPlan) {\
-      m_TRACK_IF(SynchronizeONonblock(handle->n_descriptor,nap_waitingPlan) != RETURNED)\
+      m_TRACK_IF(SynchronizeONonblock(handle->n_descriptor,*nap_waitingPlan) != RETURNED)\
       handle->cb_synchronizedDefaultWaitingPlan = b_TRUE;\
     } \
   }\
 }
 
 // Public function : see description in .h
-int ErwRead (ERW_HANDLE handle, const struct WAITING_PLAN *nap_waitingPlan,
+int ErwRead(ERW_HANDLE handle, const struct WAITING_PLAN *nap_waitingPlan,
   char **na_messageBuffer, int *a_messageLength) {
   m_DIGGY_BOLLARD()
   m_ASSERT(handle->nh_rdhHandle != NULL)
@@ -525,7 +519,7 @@ int ErwRead (ERW_HANDLE handle, const struct WAITING_PLAN *nap_waitingPlan,
       int c_newReadLength ;
 
       switch (n_rwStatus = ProtectedRead2(handle->n_descriptor, handle->h_pdHandle,
-        nap_waitingPlan, nf_newReadBuffer,c_newReadBufferSize, &c_newReadLength)) {
+        *nap_waitingPlan, nf_newReadBuffer,c_newReadBufferSize, &c_newReadLength)) {
       case RW_STATUS__OK:
         m_TRACK_IF(RdhUpdateRead(handle->nh_rdhHandle,c_newReadLength) != RETURNED)
       break; case RW_STATUS__TERMINATING:
@@ -562,7 +556,7 @@ int ErwRead (ERW_HANDLE handle, const struct WAITING_PLAN *nap_waitingPlan,
 
 
 // Public function : see description in .h
-int ErwWrite2 (ERW_HANDLE handle, const struct WAITING_PLAN *nap_waitingPlan, const char *p_messageBuffer,
+int ErwWrite2(ERW_HANDLE handle, const struct WAITING_PLAN *nap_waitingPlan, const char *p_messageBuffer,
   int messageLength, ...) {
   m_DIGGY_BOLLARD()
   m_CHECK_O_NONBLOCK_SYNCHRONIZATION()
@@ -599,7 +593,7 @@ int ErwWrite2 (ERW_HANDLE handle, const struct WAITING_PLAN *nap_waitingPlan, co
 
     n_rwStatus =
     ProtectedWrite2(handle->brokenPipeFixHandle,handle->n_descriptor, handle->h_pdHandle,
-      nap_waitingPlan, p_writeBuffer,writeLength, &c_writtenLength) ;
+      *nap_waitingPlan, p_writeBuffer,writeLength, &c_writtenLength) ;
     switch (n_rwStatus) {
     case RW_STATUS__OK:
       switch (WrhCheckWrite(handle->h_wrhHandle,c_writtenLength)) {
@@ -622,7 +616,7 @@ int ErwWrite2 (ERW_HANDLE handle, const struct WAITING_PLAN *nap_waitingPlan, co
 
 
 // Public function : see description in .h
-int ErwWrite (ERW_HANDLE handle, const struct WAITING_PLAN *nap_waitingPlan,
+int ErwWrite(ERW_HANDLE handle, const struct WAITING_PLAN *nap_waitingPlan,
   const char *p_messageBuffer, int messageLength) {
   m_DIGGY_BOLLARD()
   int rwStatus = ErwWrite2 (handle,nap_waitingPlan,p_messageBuffer,messageLength,NULL) ;
@@ -640,7 +634,7 @@ int ErwWrite (ERW_HANDLE handle, const struct WAITING_PLAN *nap_waitingPlan,
 
 
 // Public function : see description in .h
-int ErwDestroyInstance (ERW_HANDLE xh_handle) {
+int ErwDestroyInstance(ERW_HANDLE xh_handle) {
   m_DIGGY_BOLLARD()
 
   if (xh_handle->nh_rdhHandle != NULL) {

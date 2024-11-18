@@ -64,6 +64,13 @@ struct WAITING_PLAN {
   // control, there is NO POINT to express such deadline more precisely...
 } ;
 
+// Establish (regular) waitin plan.
+static inline struct WAITING_PLAN m_WaitingPlan(int waitingPlan, int c_deadline) {
+  struct WAITING_PLAN _waitingPlan = { .waitingPlan = waitingPlan, .c_deadline = c_deadline,};
+  return _waitingPlan;
+} // m_WaitingPlan
+
+
 
 // PD (pretty descriptor) : offers temporization support for file descriptors...
 
@@ -100,7 +107,7 @@ int PdCreateInstance (PD_HANDLE *azh_handle, ALARM_SYSTEM_HANDLE nf_alarmSystemH
 // Returned:
 // - RETURNED
 // - -1: unexpected problem ; anomaly is raised
-int SynchronizeONonblock (int descriptor, const struct WAITING_PLAN *afp_waitingPlan) ;
+int SynchronizeONonblock (int descriptor, struct WAITING_PLAN waitingPlan) ;
 
 
 // Prepare wrapping <function> according to "waiting plan".
@@ -109,12 +116,12 @@ int SynchronizeONonblock (int descriptor, const struct WAITING_PLAN *afp_waiting
 //
 // Passed:
 // - handle: see PdCreateInstance()
-// - afp_waitingPlan: waiting plan to the resource (reachable with the system call) ;
+// - waitingPlan: waiting plan to the resource (reachable with the system call) ;
 //
 // Return:
 // - RETURNED:
 // - -1: unexpected problem ; anomaly is raised
-int PdSetDeadline (PD_HANDLE handle, const struct WAITING_PLAN *afp_waitingPlan) ;
+int PdSetDeadline (PD_HANDLE handle, struct WAITING_PLAN waitingPlan) ;
 
 
 

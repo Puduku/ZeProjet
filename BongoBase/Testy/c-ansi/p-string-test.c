@@ -226,7 +226,7 @@ static int TestsScanPString(void) {
 #define m_TEST_SCAN_P_STRING(/*const char* */p_string, /*int*/n_length, b_regularScan,\
   b_passCharsTill,  /*IS_CHAR_FUNCTION*/isCharFunction, /*int*/expectedOffset, b_expectLocated) {\
   struct P_STRING pString = m_PString2(p_string,n_length);\
-  retScan = ScanPString(&pString,b_regularScan,b_passCharsTill,isCharFunction,UNDEFINED);\
+  retScan = ScanPString(pString,b_regularScan,b_passCharsTill,isCharFunction,UNDEFINED);\
   m_ASSERT((expectedOffset) == (retScan - p_string)) \
   m_ASSERT(retScan <= pString.stop) \
   int emb_located = b_SCAN_P_STRING_LOCATED(pString, retScan);\

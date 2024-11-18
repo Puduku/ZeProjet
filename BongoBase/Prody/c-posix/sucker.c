@@ -34,10 +34,10 @@ int StreamButtAdeptCreateInstance(STREAM_BUTT_ADEPT_HANDLE *azh_handle,
   STREAM_BUTT_ADEPT_HANDLE handle = *azh_handle;
   m_ASSIGN_MAGIC_FIELD(STREAM_BUTT_ADEPT_HANDLE,handle)
   m_TRACK_IF(ErwCreateInstance(&handle->h_erwHandle, f_brokenPipeFixHandle,
-    nf_alarmSystemHandle, n_readBufferSize, NULL, NULL, (void *)UNDEFINED, &waitingPlan) != RETURNED)
+    nf_alarmSystemHandle, n_readBufferSize, NULL, NULL, (void *)UNDEFINED, waitingPlan) != RETURNED)
   
   if (nf_openDescriptor != -1) {
-    switch (ErwReset(handle->h_erwHandle, nf_openDescriptor, &waitingPlan)) {
+    switch (ErwReset(handle->h_erwHandle, nf_openDescriptor)) {
     case COMPLETED__OK:
     break; case COMPLETED__BUT:
       m_RAISE(ANOMALY__TRAILING_DATA)
@@ -53,7 +53,7 @@ int StreamButtAdeptCreateInstance(STREAM_BUTT_ADEPT_HANDLE *azh_handle,
 // Public function: see .h
 int StreamButtAdeptKick(STREAM_BUTT_ADEPT_HANDLE handle, int f_openDescriptor) {
   m_DIGGY_BOLLARD()
-  switch (ErwReset(handle->h_erwHandle, f_openDescriptor, NULL)) {
+  switch (ErwReset(handle->h_erwHandle, f_openDescriptor)) {
   case COMPLETED__OK:
   break; case COMPLETED__BUT:
     m_RAISE(ANOMALY__TRAILING_DATA)
@@ -134,7 +134,6 @@ int StreamButtAdeptDestroyInstance(STREAM_BUTT_ADEPT_HANDLE xh_handle) {
 
   m_DIGGY_RETURN(RETURNED)
 } // StreamButtAdeptDestroyInstance
-
 
 
 // Public function: see .h

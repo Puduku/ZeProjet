@@ -18,13 +18,13 @@
 
 
 // Public function : see .h
-int ProtectedRead2 (int descriptor, PD_HANDLE pdHandle, const struct WAITING_PLAN *ap_waitingPlan,
+int ProtectedRead2 (int descriptor, PD_HANDLE pdHandle, struct WAITING_PLAN waitingPlan,
   char *readBuffer, int readBufferSize, int *ac_readLength) {
   m_DIGGY_BOLLARD()
 
   m_ASSERT(readBufferSize != 0)
 
-  m_TRACK_IF(PdSetDeadline(pdHandle,ap_waitingPlan) < 0)
+  m_TRACK_IF(PdSetDeadline(pdHandle,waitingPlan) < 0)
 
   int n_rwStatus = -1 ; // Unknown status for the moment
   while (n_rwStatus == -1) {
@@ -74,13 +74,13 @@ int ProtectedRead2 (int descriptor, PD_HANDLE pdHandle, const struct WAITING_PLA
 
 
 // Public function : see .h
-int ProtectedRead (int descriptor, PD_HANDLE pdHandle, const struct WAITING_PLAN *ap_waitingPlan,
+int ProtectedRead (int descriptor, PD_HANDLE pdHandle, struct WAITING_PLAN waitingPlan,
   char *readBuffer, int readBufferSize, int *ac_readLength) {
   m_DIGGY_BOLLARD()
-  m_TRACK_IF(SynchronizeONonblock(descriptor,ap_waitingPlan) != RETURNED)
+  m_TRACK_IF(SynchronizeONonblock(descriptor,waitingPlan) != RETURNED)
 
   int rwStatus =
-  ProtectedRead2(descriptor,pdHandle,ap_waitingPlan,readBuffer,readBufferSize,ac_readLength);
+  ProtectedRead2(descriptor,pdHandle,waitingPlan,readBuffer,readBufferSize,ac_readLength);
   m_TRACK_IF(rwStatus < 0)
 
   m_DIGGY_RETURN(rwStatus)
@@ -118,11 +118,11 @@ int BrokenPipeFixDestroyInstance (BROKEN_PIPE_FIX_HANDLE xdh_handle) {
 
 
 // Public function : see description in .h
-int ProtectedWrite2 (BROKEN_PIPE_FIX_HANDLE brokenPipeFixHandle, int descriptor,
-  PD_HANDLE pdHandle, const struct WAITING_PLAN *ap_waitingPlan,
-  const char *p_writeBuffer, int writeLength, int *ac_writtenLength) {
+int ProtectedWrite2 (BROKEN_PIPE_FIX_HANDLE brokenPipeFixHandle, int descriptor, PD_HANDLE pdHandle,
+  struct WAITING_PLAN waitingPlan, const char *p_writeBuffer, int writeLength,
+  int *ac_writtenLength) {
   m_DIGGY_BOLLARD()
-  m_TRACK_IF(PdSetDeadline(pdHandle,ap_waitingPlan) < 0) 
+  m_TRACK_IF(PdSetDeadline(pdHandle,waitingPlan) < 0) 
 
   m_ASSERT(writeLength != 0)
 
@@ -176,14 +176,14 @@ int ProtectedWrite2 (BROKEN_PIPE_FIX_HANDLE brokenPipeFixHandle, int descriptor,
 } // ProtectedWrite2
 
 // Public function: see .h
-int ProtectedWrite (BROKEN_PIPE_FIX_HANDLE brokenPipeFixHandle, int descriptor,
-  PD_HANDLE pdHandle, const struct WAITING_PLAN *ap_waitingPlan,
-  const char *p_writeBuffer, int writeLength, int *ac_writtenLength) {
+int ProtectedWrite (BROKEN_PIPE_FIX_HANDLE brokenPipeFixHandle, int descriptor, PD_HANDLE pdHandle,
+  struct WAITING_PLAN waitingPlan, const char *p_writeBuffer, int writeLength,
+  int *ac_writtenLength) {
   m_DIGGY_BOLLARD()
-  m_TRACK_IF(SynchronizeONonblock(descriptor,ap_waitingPlan) != RETURNED)
+  m_TRACK_IF(SynchronizeONonblock(descriptor,waitingPlan) != RETURNED)
 
   int rwStatus =
-  ProtectedWrite2(brokenPipeFixHandle,descriptor,pdHandle,ap_waitingPlan,
+  ProtectedWrite2(brokenPipeFixHandle,descriptor,pdHandle,waitingPlan,
     p_writeBuffer,writeLength,ac_writtenLength);
   switch (rwStatus) {
   case RW_STATUS__OK :

@@ -178,11 +178,6 @@ static int CheckReadFtpCommandStatus (void * r_virtualHandle, const char *p_read
 } // CheckReadFtpCommandStatus 
 
 
-static const struct WAITING_PLAN p_fetepeWaitingPlan = {
-  .waitingPlan = DEEPLY_BLOCKING__WAITING_PLAN ,
-  .c_deadline = 30 ,
-} ;
-  
 
 // Public function: see .h
 int FetepeCreateInstance (FETEPE_HANDLE *azh_handle, ALARM_SYSTEM_HANDLE nf_alarmSystemHandle,
@@ -206,16 +201,17 @@ int FetepeCreateInstance (FETEPE_HANDLE *azh_handle, ALARM_SYSTEM_HANDLE nf_alar
   handle->command.socket.nh_connectedDescriptor = -1;
   m_TRACK_IF(ErwCreateInstance(&handle->command.socket.h_erwHandle, f_brokenPipeFixHandle,
     nf_alarmSystemHandle, 256,NULL, CheckReadFtpCommandStatus,
-    (void *) handle->command.status.h_linesPartitionHandle, NULL) != RETURNED)
+    (void *) handle->command.status.h_linesPartitionHandle, m_WaitingPlan(
+    DEEPLY_BLOCKING__WAITING_PLAN,30)) != RETURNED)
 
   // data:
   handle->data.nh_streamDescriptor = -1;
   m_TRACK_IF(StreamButtAdeptCreateInstance(&handle->data.h_streamButtAdeptHandle,
-    nf_alarmSystemHandle, f_brokenPipeFixHandle,
-    p_fetepeWaitingPlan, BATEAU__FILE_BUTT_ADEPT__READ_BUFFER_SIZE, -1) != RETURNED)
+    nf_alarmSystemHandle, f_brokenPipeFixHandle, m_WaitingPlan(DEEPLY_BLOCKING__WAITING_PLAN,30),
+    BATEAU__FILE_BUTT_ADEPT__READ_BUFFER_SIZE, -1) != RETURNED)
   m_TRACK_IF(StreamButtAdeptCreateInstance(&handle->data.h_localStreamButtAdeptHandle,
-    nf_alarmSystemHandle, f_brokenPipeFixHandle,
-    p_fetepeWaitingPlan, BATEAU__FILE_BUTT_ADEPT__READ_BUFFER_SIZE, -1) != RETURNED)
+    nf_alarmSystemHandle, f_brokenPipeFixHandle, m_WaitingPlan(DEEPLY_BLOCKING__WAITING_PLAN,30),
+    BATEAU__FILE_BUTT_ADEPT__READ_BUFFER_SIZE, -1) != RETURNED)
   handle->data.nonPosixOpenFlags = 0;
   m_TRACK_IF(PdCreateInstance(&handle->data.h_listeningSocketPdHandle,nf_alarmSystemHandle) != RETURNED)
   m_TRACK_IF(SuckerCreateInstance(&handle->data.h_suckerHandle, transferSizeLimit) != RETURNED)
@@ -587,7 +583,7 @@ int FetepeConnect (FETEPE_HANDLE handle, const char *p_hostIpAddress, const char
     fetepeStatus = FETEPE_STATUS__NO_COMMAND_CHANNEL;
   } else {
     switch (ErwReset(handle->command.socket.h_erwHandle,
-      handle->command.socket.nh_connectedDescriptor, &p_fetepeWaitingPlan)) {
+      handle->command.socket.nh_connectedDescriptor)) {
     case COMPLETED__OK:
     case COMPLETED__BUT:
     break; default :
@@ -877,7 +873,7 @@ static int FetepeOpenDataStream (FETEPE_HANDLE handle, int *a_fetepeStatus,
 
   if ((!handle->b_passive) && *a_fetepeStatus == FETEPE_STATUS__OK) {
     switch (handle->data.outline.rwnAcceptStatus = ProtectedAccept(nh_listeningSocketDescriptor,
-      handle->data.h_listeningSocketPdHandle, &p_fetepeWaitingPlan,
+      handle->data.h_listeningSocketPdHandle,m_WaitingPlan(DEEPLY_BLOCKING__WAITING_PLAN,30),
       &(handle->data.nh_streamDescriptor), NULL,NULL,NULL)) {
     case RWN_ACCEPT_STATUS__OK :
     break; case RWN_ACCEPT_STATUS__TRY_AGAIN :

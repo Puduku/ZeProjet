@@ -21,11 +21,8 @@
 #define BLAME__FCNTL	"fcntl()"
 #define BLAME__FLOCK	"flock()"
 
-const struct WAITING_PLAN p_fileStreamSimpleWaitingPlan = { 
-  .waitingPlan = DEEPLY_BLOCKING__WAITING_PLAN ,
-  .c_deadline = 30 ,
-} ;
-
+const struct WAITING_PLAN p_fileStreamSimpleWaitingPlan = { .waitingPlan = 
+  DEEPLY_BLOCKING__WAITING_PLAN, .c_deadline = 10, };
 
 // Public function : see .h
 int ProtectedOpenFile (const char *p_filePathname, int flags, mode_t creationMode,
@@ -72,14 +69,13 @@ int ProtectedOpenFile (const char *p_filePathname, int flags, mode_t creationMod
 
 
 // Public function : see .h
-int ProtectedFcntlFSetlk (int fileDescriptor,
-                          PD_HANDLE pdHandle, const struct WAITING_PLAN *ap_waitingPlan,
-                          struct flock *a_flock) {
+int ProtectedFcntlFSetlk (int fileDescriptor, PD_HANDLE pdHandle, struct WAITING_PLAN waitingPlan,
+  struct flock *a_flock) {
   m_DIGGY_BOLLARD()
-  m_TRACK_IF(PdSetDeadline(pdHandle,ap_waitingPlan) < 0)
+  m_TRACK_IF(PdSetDeadline(pdHandle,waitingPlan) < 0)
 
   int request = F_SETLKW ;
-  if (ap_waitingPlan->waitingPlan == NON_BLOCKING__WAITING_PLAN) {
+  if (waitingPlan.waitingPlan == NON_BLOCKING__WAITING_PLAN) {
     request = F_SETLK ;
   } // if
 
@@ -125,13 +121,12 @@ int ProtectedFcntlFSetlk (int fileDescriptor,
 
 
 // Public function : see .h
-int ProtectedFlock (int fileDescriptor,
-                    PD_HANDLE pdHandle, const struct WAITING_PLAN *ap_waitingPlan,
-                    int operation) {
+int ProtectedFlock (int fileDescriptor, PD_HANDLE pdHandle, struct WAITING_PLAN waitingPlan,
+  int operation) {
   m_DIGGY_BOLLARD()
-  m_TRACK_IF(PdSetDeadline(pdHandle,ap_waitingPlan) != RETURNED)
+  m_TRACK_IF(PdSetDeadline(pdHandle,waitingPlan) != RETURNED)
 
-  if (ap_waitingPlan->waitingPlan == NON_BLOCKING__WAITING_PLAN) {
+  if (waitingPlan.waitingPlan == NON_BLOCKING__WAITING_PLAN) {
     operation |= LOCK_NB;
   } // if
   // Attempt to set the lock

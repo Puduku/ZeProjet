@@ -99,9 +99,7 @@ static int Blotlib2ExecutorExecuteC(void *r_handle, const struct BLOTFUNC *ap_bl
   int answer = ANSWER__YES; // a priori
   switch (ap_blotfunc->entry.localBlotfuncNameEntry) {
   case 1:  // Verbe
-    { int comparison = m_CompareWithCString(ap_blotfunc->call.arguments, "savoir, 1ps");
-      m_ASSERT(comparison == EQUAL_TO__COMPARISON)
-    } // comparison 
+    m_ASSERT(b_EqualToCString(ap_blotfunc->call.arguments,"savoir, 1ps"))
     m_ASSERT(m_GStringCCopy(c_surrogate,0,"sait") >= 0)
   break; case 2: // Nombre
     answer = ReadGenericIntegerPString(ap_blotfunc->call.arguments, ac_blotval,(int*)NULL);

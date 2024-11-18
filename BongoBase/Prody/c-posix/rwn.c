@@ -181,16 +181,16 @@ int CreateBindAndListen (int *aczh_listeningTcpIpSocketDescriptor, in_port_t ine
 
 // Public function : see description in .h
 int ProtectedAccept (int listeningTcpIpSocketDescriptor, PD_HANDLE pdHandle, 
-  const struct WAITING_PLAN *ap_waitingPlan, int *aczh_slaveTcpIpSocketDescriptor,
+  struct WAITING_PLAN waitingPlan, int *aczh_slaveTcpIpSocketDescriptor,
   in_addr_t *nac_clientInetAddr, in_port_t *nac_clientInetPort, int *na_acceptErrno) {
   m_DIGGY_BOLLARD()
-  m_TRACK_IF(SynchronizeONonblock(listeningTcpIpSocketDescriptor,ap_waitingPlan) != RETURNED)
+  m_TRACK_IF(SynchronizeONonblock(listeningTcpIpSocketDescriptor,waitingPlan) != RETURNED)
 
   struct sockaddr_in slaveTcpIpSocketPeerAddr ;
   socklen_t size = sizeof(slaveTcpIpSocketPeerAddr) ;
   int n_rwnAcceptStatus = -1; // Unknown
 
-  m_TRACK_IF(PdSetDeadline(pdHandle,ap_waitingPlan) < 0)
+  m_TRACK_IF(PdSetDeadline(pdHandle,waitingPlan) < 0)
 
   while (n_rwnAcceptStatus == -1) {
     m_TRACK_IF(PdSetAlarm(pdHandle) != RETURNED)

@@ -49,7 +49,7 @@ typedef struct ERW *ERW_HANDLE ;
 // - ANSWER__NO: message is not complete
 // - -1: unexpected problem; anomaly is raised
 typedef int (*CHECK_READ_FUNCTION) (void *nr_handle, const char *p_readBuffer, int readLength,
-  int attemptsCount, int *ac_messageLength) ;
+  int attemptsCount, int *ac_messageLength);
 
 
 // Create and initialize "enhanced read/write" handle.
@@ -78,9 +78,7 @@ typedef int (*CHECK_READ_FUNCTION) (void *nr_handle, const char *p_readBuffer, i
 //   Private handle passed to the "complete read message delimiting" function. Checking input 
 //   data may require complex parsing of data. This parameter allows not to lose that work once 
 //   ErwRead() function gets back the message.
-// - nap_defaultWaitingPlan: default "waiting plan" when reading / writing messages.
-//   + NULL special pointer: not provided => no DEFAULT waiting plan
-//   + non NULL pointer: DEFAULT waiting plan to be applied  
+// - defaultWaitingPlan: default "waiting plan" when reading / writing messages.
 //
 // Modified:
 // - *azh_handle: "enhanced r/w" handle initialized 
@@ -88,10 +86,10 @@ typedef int (*CHECK_READ_FUNCTION) (void *nr_handle, const char *p_readBuffer, i
 // Returned:
 // - RETURNED: initialized
 // - -1: unexpected problem; anomaly is raised
-int ErwCreateInstance (ERW_HANDLE *azh_handle, BROKEN_PIPE_FIX_HANDLE f_brokenPipeFixHandle,
+int ErwCreateInstance(ERW_HANDLE *azh_handle, BROKEN_PIPE_FIX_HANDLE f_brokenPipeFixHandle,
   ALARM_SYSTEM_HANDLE nf_alarmSystemHandle, int n_readBufferSize, char *cnf_traditionalReadBuffer,
   CHECK_READ_FUNCTION cn_checkReadFunction, void *ccnfr_checkReadHandle,
-  const struct WAITING_PLAN *nap_defaultWaitingPlan) ;
+  struct WAITING_PLAN defaultWaitingPlan);
 
 
 // Link file descriptor to "Enhanced R/W handle" and reset R/W.
@@ -99,9 +97,6 @@ int ErwCreateInstance (ERW_HANDLE *azh_handle, BROKEN_PIPE_FIX_HANDLE f_brokenPi
 // Passed:
 // - handle: 
 // - f_descriptor: "connected" descriptor (must stay open while linked) 
-// - nap_defaultWaitingPlan: default "waiting plan" when reading / writing messages.
-//   + NULL special pointer: not provided => no DEFAULT waiting plan
-//   + non NULL pointer: DEFAULT waiting plan to be applied  
 //
 // Returned :
 // - COMPLETED__OK: handle is "reset" (linked with new descriptor)
@@ -112,8 +107,7 @@ int ErwCreateInstance (ERW_HANDLE *azh_handle, BROKEN_PIPE_FIX_HANDLE f_brokenPi
 //   (Write) This case might occur if you call this function before complete sending of a message
 //   => in brief, should NOT happen UNLESS you "break" the connection 
 // - -1: unexpected problem; anomaly is raised
-int ErwReset (ERW_HANDLE handle, int f_descriptor,
-  const struct WAITING_PLAN *nap_defaultWaitingPlan) ;
+int ErwReset(ERW_HANDLE handle, int f_descriptor);
  
 
 // If you do not expect ErwReset() to clean "pending data", you can raise that anomaly...
@@ -126,7 +120,7 @@ int ErwReset (ERW_HANDLE handle, int f_descriptor,
 // Passed:
 // - handle: ERW instance, ENABLED for read() ; see ErwCreateInstance() 
 // - nap_waitingPlan:
-//   + NULL special pointer: take default waiting plan specified in ErwReset()
+//   + NULL special pointer: take default waiting plan 
 //   + non NULL address: #SEE struct-WAITING_PLAN@c-posix/tryagain.h <message to read>
 // - na_messageBuffer: "address of message buffer" 
 //   + NULL special pointer: when don't need to get the message buffer address (usage of
@@ -149,8 +143,8 @@ int ErwReset (ERW_HANDLE handle, int f_descriptor,
 //   fragment may be internally present, but is not exploitable. #SEE RW_STATUS__TRY_AGAIN@c-posix/rw.h
 //   Further ErwRead() calls would allow to get the complete message.
 // #SEE ProtectedRead-RW_STATUS__TERMINATING-CONNECTION_LOST@c-posix/rw.h
-int ErwRead (ERW_HANDLE handle, const struct WAITING_PLAN *nap_waitingPlan,
-  char **na_messageBuffer, int *a_messageLength) ;
+int ErwRead(ERW_HANDLE handle, const struct WAITING_PLAN *nap_waitingPlan,
+  char **na_messageBuffer, int *a_messageLength);
 
 
 // This function enhances ProtectedWrite():
@@ -159,7 +153,7 @@ int ErwRead (ERW_HANDLE handle, const struct WAITING_PLAN *nap_waitingPlan,
 // Passed:
 // - handle: ERW instance ; see ErwCreateInstance() 
 // - nap_waitingPlan:
-//   + NULL special pointer: default waiting plan - see ErwReset()
+//   + NULL special pointer: default waiting plan 
 //   + non NULL address: #SEE struct-WAITING_PLAN@c-posix/tryagain.h <room for message to write>
 // - p_messageBuffer: the message to write ; you are expected to present the same message after a
 //   "TRY AGAIN!" status...
@@ -179,14 +173,14 @@ int ErwRead (ERW_HANDLE handle, const struct WAITING_PLAN *nap_waitingPlan,
 //   message not yet (completely) written. Present your message again in next call!
 //   #SEE RW_STATUS__TRY_AGAIN@c-posix/rw.h
 // #SEE ProtectedWrite-RW_STATUS__TERMINATING-CONNECTION_LOST@c-posix/rw.h
-int ErwWrite2 (ERW_HANDLE handle, const struct WAITING_PLAN *nap_waitingPlan,
-  const char *p_messageBuffer, int messageLength, ...) ;
+int ErwWrite2(ERW_HANDLE handle, const struct WAITING_PLAN *nap_waitingPlan,
+  const char *p_messageBuffer, int messageLength, ...);
 
 // This function wraps ErwWrite2() above.
 // The function allows to write a message presented in ONE single part.
 // (I.e there no variadic parameters ; hence no need add final NULL argument)
-int ErwWrite (ERW_HANDLE handle, const struct WAITING_PLAN *nap_waitingPlan,
-  const char *p_messageBuffer, int messageLength) ;
+int ErwWrite(ERW_HANDLE handle, const struct WAITING_PLAN *nap_waitingPlan,
+  const char *p_messageBuffer, int messageLength);
 
 
 
@@ -203,7 +197,7 @@ int ErwWrite (ERW_HANDLE handle, const struct WAITING_PLAN *nap_waitingPlan,
 //   EnrdRead() returned with "HANG UP" or "CONNECTION LOST")
 //   (Write) This case might occur if you call this function before complete sending of a message
 // - -1: unexpected problem; anomaly is raised
-int ErwDestroyInstance (ERW_HANDLE xh_handle) ;
+int ErwDestroyInstance(ERW_HANDLE xh_handle);
 
 
 #endif // __C_POSIX_ERW_H_INCLUDED__

@@ -71,8 +71,6 @@ static inline struct P_STRING m_PString(const char *p_cString) {
   return pString; 
 } // m_PString
 
-//#define m_EMPTY_STRING_ARGS GOOD_OLD_EMPTY_C_STRING , EMPTY_STRING_LENGTH0
-
 
 // Assign simple "C-strings" to "string portions".
 //
@@ -332,27 +330,10 @@ typedef int (*TO_CHAR_FUNCTION) (int c) ;
 int ComparePStrings(struct P_STRING pString1, struct P_STRING pString2,
   IS_CHAR_FUNCTION n_isNeutralCharFunction, TO_CHAR_FUNCTION n_toCharFunction, char b_subString2);
 
-// ComparePStrings() wrapper ; compare a string portion with a c-string...
-static inline int m_CompareWithCString(struct P_STRING pString1, const char *p_cString2) {
-  struct P_STRING pString2 = m_PString(p_cString2);
-  return ComparePStrings(pString1, pString2,  NULL, NULL, !b_SUB_STRING_2) ;
-} 
-
-// m_CompareWithCString() wrapper ; indicates whether string portion matches with a c-string...
+// ComparePStrings() wrapper ; indicates whether string portion matches with a c-string...
 // 
 // Ret: boolean value (TRUE when strings matches)
-static inline int mb_EqualToCString(struct P_STRING pString1, const char *p_cString2) {
-  int comparison = m_CompareWithCString(pString1,p_cString2);
-  switch (comparison) {
-  case LESS_THAN__COMPARISON:
-  case GREATER_THAN__COMPARISON:
-  case EQUAL_TO__COMPARISON:
-  break; default: 
-    m_RAISE_FATAL(ANOMALY__VALUE__D,comparison) 
-  } // switch
-  return comparison == EQUAL_TO__COMPARISON; 
-}  
-
+int b_EqualToCString(struct P_STRING pString1, const char *p_cString2) ;
 
 // Paranoid wrapper of ComparePStrings() (testing/critical embedded purpose)
 // Ensure that the optmized forms of the fonction (i.e called without filter) behave identically
@@ -372,7 +353,7 @@ int ParanoidComparePStrings(struct P_STRING pString1, struct P_STRING pString2,
 // - otherwize, "char to char" comparison of raw strings.
 //
 // Passed:
-// - ap_pString1 : 1st string to compare #SEE struct-P_STRING
+// - pString1 : 1st string to compare #SEE struct-P_STRING
 // - n_isNeutralCharFunction: handling of "neutral" chars (white spaces, etc.) 
 //   + NULL: NO char elimination applied before comparison 
 //   + != NULL: elimination of each "neutral" char of both strings before comparison ; "binary"
@@ -402,7 +383,7 @@ int ParanoidComparePStrings(struct P_STRING pString1, struct P_STRING pString2,
 //   + LESS_THAN__COMPARISON : 1st string 'lexilically before' 2nd (sub-)string
 //   + EQUAL_TO__COMPARISON : 1st string and 2nd (sub)-string "match" 
 //   + GREATER_THAN__COMPARISON : string 1 'lexilically  after' (sub-)string 2
-int ComparePStringsAmongR(const struct P_STRING *ap_pString1, 
+int ComparePStringsAmongR(struct P_STRING pString1, 
   IS_CHAR_FUNCTION n_isNeutralCharFunction, TO_CHAR_FUNCTION n_toCharFunction, char b_subString2,
   int *nac_matchedEntry, int *cnac_matchedId, int string2sCount, const struct P_STRING sp_pString2s[],
   int nsn_ids[]) ;
@@ -422,7 +403,7 @@ int ComparePStringsAmongR(const struct P_STRING *ap_pString1,
 // NOTE: not be confused with SScanfPString() declared below... 
 //
 // Passed:
-// - ap_pString : string portion to scan. 
+// - pString : string portion to scan. 
 // - b_regularScan 
 //   + b_REGULAR_SCAN (TRUE) :
 //   + b_REVERTED_SCAN (FALSE) :
@@ -435,7 +416,7 @@ int ComparePStringsAmongR(const struct P_STRING *ap_pString1,
 // Returned:
 // (!= NULL) scanning position ; use b_SCAN_P_STRING_LOCATED() below to check whether char
 // is actually located. 
-const char *ScanPString(const struct P_STRING *ap_pString,
+const char *ScanPString(struct P_STRING pString,
   char b_regularScan, char b_passCharsTill, IS_CHAR_FUNCTION n_isCharFunction, int c_char);
 
 
@@ -632,7 +613,8 @@ int SScanfPString(struct P_STRING pString, const char *p_format, ...) ;
 //   characters have been ignored) 
 // - ANSWER__NO : C number not recognized or too big for long integer 
 // - -1: unexpected problem ; anomaly is raised
-int ReadGenericIntegerCString(const char *p_cString,  GENERIC_INTEGER *ac_value, int *nac_parsedLength);
+int ReadGenericIntegerCString(const char *p_cString,  GENERIC_INTEGER *ac_value,
+  int *nac_parsedLength);
 
 
 // Wraps ReadGenericIntegerCString() above ;

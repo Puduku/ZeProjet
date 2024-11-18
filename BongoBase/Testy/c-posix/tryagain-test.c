@@ -22,7 +22,7 @@ int main (int argc, char** argv) {
   m_TRACK_IF(PdCreateInstance(&h_handle,h_alarmSystemHandle) != RETURNED)
 
   m_DIGGY_VAR_D(waitingPlan.waitingPlan)
-  m_TRACK_IF(PdSetDeadline(h_handle,&waitingPlan) != RETURNED)
+  m_TRACK_IF(PdSetDeadline(h_handle,waitingPlan) != RETURNED)
 
   m_TRACK_IF(PdSetAlarm(h_handle) != RETURNED)
   ret = PdCheckTimeout(h_handle) ;

@@ -83,7 +83,7 @@ enum {
 // Passed:
 // - descriptor: file to "read()"
 // - pdHandle: linked with file descriptor to "read()"...
-// - ap_waitingPlan: #SEE struct-WAITING_PLAN @ c-posix/tryagain.h <data to read>
+// - waitingPlan: #SEE struct-WAITING_PLAN @ c-posix/tryagain.h <data to read>
 // - readBuffer: data buffer (fixed size) for getting the message part
 // - readBufferSize: above buffer's size (> 0 (*)) 
 //   (*) in order to avoid ambivalent behavior, the function explicitly refuses 0 value 
@@ -106,12 +106,12 @@ enum {
 //   to a "ROUGH" termination.
 // - RW_STATUS__CONNECTION_LOST: #SEE RW_STATUS__CONNECTION_LOST
 // - -1 : unexpected problem ; anomaly is raised
-int ProtectedRead (int descriptor, PD_HANDLE pdHandle, const struct WAITING_PLAN *ap_waitingPlan,
+int ProtectedRead (int descriptor, PD_HANDLE pdHandle, struct WAITING_PLAN waitingPlan,
   char *readBuffer, int readBufferSize, int *ac_readLength) ;
 
 
 // Same function but DO NOT synchronize O_NONBLOCK flag of the descriptor...
-int ProtectedRead2 (int descriptor, PD_HANDLE pdHandle, const struct WAITING_PLAN *ap_waitingPlan,
+int ProtectedRead2 (int descriptor, PD_HANDLE pdHandle, struct WAITING_PLAN waitingPlan,
   char *readBuffer, int readBufferSize, int *ac_readLength) ;
 
 
@@ -173,7 +173,7 @@ int BrokenPipeFixDestroyInstance (BROKEN_PIPE_FIX_HANDLE xdh_handle) ;
 // - brokenPipeFixHandle: this handle is necessary to protect your process against SIGPIPE...
 // - descriptor:
 // - pdHandle: linked with file descriptor to "write()"...
-// - ap_waitingPlan: #SEE struct-WAITING_PLAN @ c-posix/tryagain.h <room for data>
+// - waitingPlan: #SEE struct-WAITING_PLAN @ c-posix/tryagain.h <room for data>
 // - p_writeBuffer: the message to write
 // - writeLength: > 0 (*) ;
 //   (*) in order to avoid ambivalent behaviour (or infernal loops hogging the CPU...), the 
@@ -196,15 +196,15 @@ int BrokenPipeFixDestroyInstance (BROKEN_PIPE_FIX_HANDLE xdh_handle) ;
 //     has closed the connection (or the pipe)
 // - RW_STATUS__CONNECTION_LOST: #SEE RW_STATUS__CONNECTION_LOST
 // - -1 : unexpected problem ; anomaly is raised
-int ProtectedWrite (BROKEN_PIPE_FIX_HANDLE brokenPipeFixHandle, int descriptor,
-  PD_HANDLE pdHandle, const struct WAITING_PLAN *ap_waitingPlan,
-  const char *p_writeBuffer, int writeLength, int *ac_writtenLength) ;
+int ProtectedWrite (BROKEN_PIPE_FIX_HANDLE brokenPipeFixHandle, int descriptor, PD_HANDLE pdHandle,
+  struct WAITING_PLAN waitingPlan, const char*p_writeBuffer, int writeLength,
+  int *ac_writtenLength);
 
 
 // Same function but DO NOT synchronize O_NONBLOCK flag of the descriptor...
 int ProtectedWrite2 (BROKEN_PIPE_FIX_HANDLE brokenPipeFixHandle, int descriptor,
-  PD_HANDLE pdHandle, const struct WAITING_PLAN *ap_waitingPlan,
-  const char *p_writeBuffer, int writeLength, int *ac_writtenLength) ;
+  PD_HANDLE pdHandle, struct WAITING_PLAN waitingPlan, const char *p_writeBuffer, int writeLength,
+  int *ac_writtenLength) ;
 
 
 // close() wrapper

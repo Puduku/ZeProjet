@@ -118,8 +118,8 @@ enum {
 //
 // Returned:
 // - RWN_CONNECT_STATUS__OK: connected!
-// - RWN_CONNECT_STATUS__CURRENTLY_NOT_POSSIBLE: either the remote host is not reachable via the network
-//   or the remote host is available, but no-one is listening on the port.
+// - RWN_CONNECT_STATUS__CURRENTLY_NOT_POSSIBLE: either the remote host is not reachable via the
+//   network or the remote host is available, but no-one is listening on the port.
 //   => you can consult "errno" to get the details on that "network error"...
 //      Note: EINTR case (which means underlying connect() has been interrupted by a signal) ; this
 //      case is quite "borderline" vis-a-vis the notion of "network error"... 
@@ -257,7 +257,7 @@ enum {
 // Passed:
 // - listeningTcpIpSocketPdHandle: see above BindAndListen() / CreateBindAndListen()
 // - pdHandle: "pretty descriptor" (PD) handle - see PdCreateInstance()
-// - ap_waitingPlan: #SEE struct-WAITING_PLAN@c-posix/tryagain.h <client>
+// - waitingPlan: #SEE struct-WAITING_PLAN@c-posix/tryagain.h <client>
 // - nac_clientInetAddr:
 //   + NULL pointer: you don't care about the IP address of the client
 //   + non NULL: you want to know the IP address of the client
@@ -286,13 +286,13 @@ enum {
 //   => you can still consult "errno" to get the details on that "error"...
 // - -1: unexpected problem ; anomaly is raised
 int ProtectedAccept (int listeningTcpIpSocketDescriptor, PD_HANDLE pdHandle, 
-  const struct WAITING_PLAN *ap_waitingPlan, int *aczh_slaveTcpIpSocketDescriptor,
+  struct WAITING_PLAN waitingPlan, int *aczh_slaveTcpIpSocketDescriptor,
   in_addr_t *nac_clientInetAddr, in_port_t *nac_clientInetPort, int *na_acceptErrno) ;
 
 
 // Same function but DO NOT synchronize O_NONBLOCK flag of the descriptor...
 int ProtectedAccept2 (int listeningTcpIpSocketDescriptor, PD_HANDLE pdHandle,
-  const struct WAITING_PLAN *ap_waitingPlan, int *aczh_slaveTcpIpSocketDescriptor,
+  struct WAITING_PLAN waitingPlan, int *aczh_slaveTcpIpSocketDescriptor,
   in_addr_t *nac_clientInetAddr, in_port_t *nac_clientInetPort, int *na_acceptErrno) ;
 
 #endif // __C_POSIX_RWN_H_INCLUDED__
