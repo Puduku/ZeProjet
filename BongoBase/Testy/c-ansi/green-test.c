@@ -25,7 +25,7 @@ static int testNumber = 0;
 
 // #SEE GREEN_HANDLER__COMPARE_FUNCTION @ c-ansi/green.h
 static int TestItemHandlerCompare(void *cpr_handle,  char b_frozen,  int indexLabel,
-  int keyRank, char *pr_aGreenItemStuff,  char *npr_bGreenItemStuff, void *cpr_bKeys) {
+  int keyRank, char *pr_aGreenItemStuff,  char *npr_bGreenItemStuff, const void *cpr_bKeys) {
   m_DIGGY_BOLLARD()
   m_ASSERT(keyRank == 0)
 

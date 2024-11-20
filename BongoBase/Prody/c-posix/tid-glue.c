@@ -35,7 +35,7 @@ struct TID_GLUE {
 
 // #see GREEN_HANDLER__COMPARE_FUNCTION @ c-ansi/green.h
 static int TidGlueCompare (void *cpr_handle, char b_frozen, int indexLabel, int keyRank,
-  char *pr_aGreenItemStuff, char *npr_bGreenItemStuff, void *cpr_bKeys) {
+  char *pr_aGreenItemStuff, char *npr_bGreenItemStuff, const void *cpr_bKeys) {
   m_ASSERT(keyRank == 0)
 
   tid_t aKeyTid = ((PTHREAD_VS_TID_STUFF) pr_aGreenItemStuff)->tid;

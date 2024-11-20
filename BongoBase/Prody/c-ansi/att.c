@@ -33,7 +33,7 @@ struct ALARM_TIMETABLE {
 
 // #see GREEN_HANDLER__COMPARE_FUNCTION @ c-ansi/green.h
 static int AlarmTimetableCompare (void *nr_privateHandle, char b_frozen, int indexLabel,
-  int keyRank, char *pr_aGreenItemStuff, char *npr_bGreenItemStuff, void *cpr_bKeys) {
+  int keyRank, char *pr_aGreenItemStuff, char *npr_bGreenItemStuff, const void *cpr_bKeys) {
   m_DIGGY_BOLLARD_S()
 m_DIGGY_INFO("indexLabel=%d",indexLabel)
   ALARM_TIMETABLE_HANDLE handle = (ALARM_TIMETABLE_HANDLE) nr_privateHandle;

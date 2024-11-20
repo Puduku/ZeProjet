@@ -263,7 +263,7 @@ static int GStringsDisengage(void *r_handle,  char *r_greenItemStuff) {
 
 // #SEE GREEN_ITEM_HANDLER__COMPARE_FUNCTION @ c-ansi/green.h
 static int GStringsCompare(void *cpr_handle,  char b_frozen, int indexLabel,  int keyRank,
-  char *pr_aGreenItemStuff,  char *npr_bGreenItemStuff,  void *cpr_bKeys) {
+  char *pr_aGreenItemStuff,  char *npr_bGreenItemStuff,  const void *cpr_bKeys) {
   m_DIGGY_BOLLARD()
   G_STRINGS_HANDLE p_handle = (G_STRINGS_HANDLE) cpr_handle;
   m_CHECK_MAGIC_FIELD(G_STRINGS_HANDLE,p_handle)
@@ -343,7 +343,8 @@ int GStringsCreateInstance(G_STRINGS_HANDLE* azh_handle,  int expectedItemsNumbe
   handle->vnhs_indexesProperties = NULL;
 
   m_TRACK_IF(GreenCollectionCreateInstance(&handle->h_greenCollectionHandle,  expectedItemsNumber,
-    sizeof(struct G_STRING) * gStringSetCardinality,  GStringsDisengage,  GStringsCompare, NULL, handle) != RETURNED)
+    sizeof(struct G_STRING) * gStringSetCardinality,  GStringsDisengage,  GStringsCompare, NULL,
+    handle) != RETURNED)
 
   m_ASSIGN_MAGIC_FIELD(G_STRINGS_HANDLE,handle)
 

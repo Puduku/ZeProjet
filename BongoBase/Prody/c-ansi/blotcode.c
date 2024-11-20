@@ -144,7 +144,7 @@ struct BLOTFUNC_KEY_NAME {
 
 // GREEN_HANDLER__COMPARE_FUNCTION
 static int BlotfuncsHandlerCompare (void *cpr_handle,  char b_frozen, int indexLabel,  int keyRank,
-  char *pr_aGreenItemStuff,  char *npr_bGreenItemStuff, void *cpr_bKeys) {
+  char *pr_aGreenItemStuff,  char *npr_bGreenItemStuff, const void *cpr_bKeys) {
   //m_DIGGY_BOLLARD_S()
   struct BLOTFUNCS_HANDLER *p_handle = (struct BLOTFUNCS_HANDLER *)cpr_handle; // protected
     // instance (safe for freeze) 

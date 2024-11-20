@@ -73,7 +73,7 @@ typedef int (*GREEN_HANDLER__DISENGAGE_FUNCTION) (void *r_handle, char *r_greenI
 // - -1: unexpected problem; anomaly is raised
 typedef int (*GREEN_HANDLER__COMPARE_FUNCTION) (void *cpr_handle,  char b_frozen,
   int indexLabel, int keyRank,  char *pr_aGreenItemStuff,  char *npr_bGreenItemStuff,
-  void *cpr_bKeys) ;
+  const void *cpr_bKeys) ;
 
 
 // #REF GREEN_HANDLER__EQUATE_FUNCTION <GreenItem> - Custom function definition...
@@ -93,7 +93,7 @@ typedef int (*GREEN_HANDLER__COMPARE_FUNCTION) (void *cpr_handle,  char b_frozen
 //   + ANSWER__NO : "A" item and "B" key(s) are NOT similar 
 // - -1: unexpected problem; anomaly is raised
 typedef int (*GREEN_HANDLER__EQUATE_FUNCTION) (void *cpr_handle,  char b_frozen,
-  int indexLabel, int keyRank,  char *pr_aGreenItemStuff, void *pr_bKeys) ;
+  int indexLabel, int keyRank,  char *pr_aGreenItemStuff, const void *pr_bKeys) ;
 
  
 // Green collections
@@ -399,28 +399,30 @@ int GreenCollectionIndexRequestV(GREEN_COLLECTION_HANDLE cp_handle,
 struct G_REQUEST_CRITERIUM {
   int indexLabel;
   unsigned int indexSeekFlags;
-  void *cfpr_keys; // Only significant with Key-based seek flag(s)
+  const void *cfpr_keys; // Only significant with Key-based seek flag(s)
   unsigned int criteriaOpFlags;
 } ;
 
-// #REF  m_ASSIGN_G_REQUEST_CRITERIUM <keys>
-// Passed:
-// - u_indexLabel:
-// - u_indexSeekFlags:
-// - m_keyType: 
-// - ucfpr_keys: 
-// - u_criteriaOpFlags:
+// #REF m_GRequestCriterium <keys>
+// Establish request criterium
 //
-// Changed:
-// - mu_criterium
-#define m_ASSIGN_G_REQUEST_CRITERIUM(/*struct G_INDEX_CRITERIUM*/mu_criterium, /*int*/u_indexLabel,\
-  /*unsigned int*/u_indexSeekFlags, m_keyType, ucfpr_keys, /*unsigned int*/u_criteriaOpFlags) {\
-  struct G_REQUEST_CRITERIUM *em_criteriumPtr = &(mu_criterium);\
-  (em_criteriumPtr)->indexLabel = (u_indexLabel);\
-  (em_criteriumPtr)->indexSeekFlags = (u_indexSeekFlags);\
-  (em_criteriumPtr)->cfpr_keys = (void *)(const m_keyType *)(ucfpr_keys);\
-  (em_criteriumPtr)->criteriaOpFlags = (u_criteriaOpFlags);\
-}
+// Passed:
+// - indexLabel:
+// - indexSeekFlags:
+// - cfpr_keys: only significant with Key-based seek flag(s) 
+// - criteriaOpFlags:
+//
+// Returned:
+// - request criterium
+// TODO: is the function really USEFUL????
+static inline struct G_REQUEST_CRITERIUM m_GRequestCriterium(int indexLabel,
+   unsigned int indexSeekFlags, const void* cfpr_keys, unsigned int criteriaOpFlags) {
+  struct G_REQUEST_CRITERIUM requestCriterium = { .indexLabel = indexLabel,
+    .indexSeekFlags = indexSeekFlags, .cfpr_keys = cfpr_keys, .criteriaOpFlags = criteriaOpFlags };
+  return requestCriterium;
+ } // m_GRequestCriterium
+
+
 
 //  #SEE GreenCollectionIndexRequest <greenItem> <keys>
 int GreenCollectionIndexRequestR(GREEN_COLLECTION_HANDLE cp_handle,

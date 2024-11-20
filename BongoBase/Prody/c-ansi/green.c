@@ -46,7 +46,7 @@ char b_diggyGreenCollectionExam = b_TRUE;
 //   + GREATER_THAN__COMPARISON : "A" 'greater than' "B" 
 // - -1: unexpected problem; anomaly is raised
 typedef int (*ENTRY_COMPARE_FUNCTION) (void *r_handle, int indexLabel, int aEntry, int n_bEntry,
-  void *cpr_bKeys) ;
+  const void *cpr_bKeys) ;
 
 
 struct GREEN_INDEX {
@@ -90,7 +90,7 @@ struct GREEN_INDEX {
 //   + EQUAL_TO__COMPARISON : "A" and "B" are "identical"
 //   + GREATER_THAN__COMPARISON : "A" 'greater than' "B" 
 #define m_GREEN_INDEX_COMPARE(/*struct GREEN_INDEX* */a_index, /*int*/aIndexEntry, /*int*/n_bEntry,\
-  /*void* */cpr_bKeys, /*int*/m_comparison) {\
+  /*const void* */cpr_bKeys, /*int*/m_comparison) {\
   int em_aEntry = a_index->hsc_array[aIndexEntry];\
     m_TRACK_IF((m_comparison = (a_index)->entryCompareFunction((a_index)->r_entryFunctionsHandle,\
       (a_index)->indexLabel, em_aEntry, n_bEntry,cpr_bKeys)) < 0)\
@@ -125,7 +125,7 @@ struct INDEX_ENTRIES {
 // - RETURNED
 // - -1: anomaly is raised
 static int GreenIndexBSearch(struct GREEN_INDEX *a_index,
-  int n_bEntry, void *cpr_bKeys, int *an_indexEntry, int *a_top,
+  int n_bEntry, const void *cpr_bKeys, int *an_indexEntry, int *a_top,
   struct INDEX_ENTRIES *cac_indexEntries) {
   m_DIGGY_BOLLARD_S()
   int comparison = UNDEFINED;
@@ -274,7 +274,7 @@ static inline int m_GreenIndexCurrent(struct GREEN_INDEX* a_index,
 // - c_indexSeekFlags: seek flags for sequence request ; only significant with "new sequence" case;
 //   + INDEX_SEEK_FLAGS__ANY : NOT key-based selection 
 //   + other flags : key-based selection
-// - ccr_keys: search key(s) ; only significant with new sequence's key-based selection 
+// - ccpr_keys: search key(s) ; only significant with new sequence's key-based selection 
 // - a_indexSequence-> : current state of sequence
 // - nan_entry: 
 //   + == NULL:  "new sequence" (aka "soft reset") case
@@ -290,7 +290,7 @@ static inline int m_GreenIndexCurrent(struct GREEN_INDEX* a_index,
 // - RETURNED: Ok
 // - -1: anomaly is raised
 static int GreenIndexSeek(struct GREEN_INDEX* a_index, char b_descending,
-  unsigned int c_indexSeekFlags, void *ccr_keys, struct INDEX_SEQUENCE *a_indexSequence,
+  unsigned int c_indexSeekFlags, const void *ccpr_keys, struct INDEX_SEQUENCE *a_indexSequence,
   int *nan_entry) {
   m_DIGGY_BOLLARD_S()
 
@@ -357,7 +357,7 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(c_indexSeekFlags)
         int top = UNDEFINED;
         int n_indexEntry = UNDEFINED;
         struct INDEX_ENTRIES c_indexEntries; // UNDEFINED
-        m_TRACK_IF(GreenIndexBSearch(a_index, -1,ccr_keys, &n_indexEntry,&top,
+        m_TRACK_IF(GreenIndexBSearch(a_index, -1,ccpr_keys, &n_indexEntry,&top,
           &c_indexEntries) != RETURNED);
         switch (c_indexSeekFlags) {
         case INDEX_SEEK_FLAGS__EQUAL:
@@ -490,7 +490,7 @@ static int GreenIndexVerifyEntry(struct GREEN_INDEX *a_index, int entry, int exp
 ///////////// 2. GREEN INDEXES "proto" object //////////////
 
 typedef int (*ENTRY_RAW_COMPARE_FUNCTION) (void *r_handle, int indexLabel, int keyRank,
-  int aEntry, int n_bEntry, void *cpr_bKeys) ;
+  int aEntry, int n_bEntry, const void *cpr_bKeys) ;
 
 // Index's virtual function to adequate an item with a key.
 //
@@ -506,7 +506,7 @@ typedef int (*ENTRY_RAW_COMPARE_FUNCTION) (void *r_handle, int indexLabel, int k
 // - ANSWER__NO: 
 // - -1: unexpected problem; anomaly is raised
 typedef int (*ENTRY_RAW_EQUATE_FUNCTION) (void *r_handle, int indexLabel, int keyRank,
-  int aEntry, void *pr_bKeys);
+  int aEntry, const void *pr_bKeys);
 
 struct GREEN_INDEXES {
   ENTRY_RAW_COMPARE_FUNCTION entryRawCompareFunction;
@@ -519,7 +519,7 @@ struct GREEN_INDEXES {
 
 // ENTRY_COMPARE_FUNCTION
 static int GreenIndexesEntryCompare (void *r_handle, int indexLabel, int aEntry,
-  int n_bEntry, void *cpr_bKeys) {
+  int n_bEntry, const void *cpr_bKeys) {
   m_DIGGY_BOLLARD_S()
   struct GREEN_INDEXES *a_indexes = (struct GREEN_INDEXES *)r_handle;  
   int comparison = UNDEFINED;
@@ -545,7 +545,7 @@ static int GreenIndexesEntryCompare (void *r_handle, int indexLabel, int aEntry,
 // - ANSWER__NO: 
 // - -1: unexpected problem; anomaly is raised
 static int GreenIndexesEntryEquate(struct GREEN_INDEXES *a_indexes, int indexLabel, int aEntry,
-  void *pr_bKeys) {
+  const void *pr_bKeys) {
   int answer = UNDEFINED;
   m_ASSERT(indexLabel < a_indexes->indexesNumber) 
   int j = 0; for ( ; j < a_indexes->vnhs_keysNumbers[indexLabel] ; j++) {
@@ -718,7 +718,7 @@ struct INDEX_ITERATOR {
 //   + ANSWER__NO : "A" item and "B" key(s) are NOT similar 
 // - -1: unexpected problem; anomaly is raised
 static int GreenIndexesSeekEntryEquate(struct GREEN_INDEXES* a_indexes, int indexLabel, int aEntry,
-  unsigned int indexSeekFlags, void *pr_bKeys) {
+  unsigned int indexSeekFlags, const void *pr_bKeys) {
   m_DIGGY_BOLLARD_S()
   if (indexSeekFlags == INDEX_SEEK_FLAGS__ANY) return ANSWER__YES;
 
@@ -1237,13 +1237,13 @@ struct GREEN_COLLECTION {
 
 // typedef GREEN_HANDLER__COMPARE_FUNCTION
 static int NotEnabledCompare(void *cpr_handle, char b_frozen, int indexLabel, int keyRank,
-  char *pr_aGreenItemStuff, char *npr_bGreenItemStuff, void *cpr_bKeys) {
+  char *pr_aGreenItemStuff, char *npr_bGreenItemStuff, const void *cpr_bKeys) {
   m_RAISE(ANOMALY__SHOULD_NOT_BE_HERE)
 } // NotEnabledCompare
 
 // typedef GREEN_HANDLER__EQUATE_FUNCTION
 static int  NotEnabledEquate(void *cpr_handle,  char b_frozen,
-  int indexLabel, int keyRank,  char *pr_aGreenItemStuff, void *pr_bKeys) {
+  int indexLabel, int keyRank,  char *pr_aGreenItemStuff, const void *pr_bKeys) {
   m_RAISE(ANOMALY__SHOULD_NOT_BE_HERE)
 } // NotEnabledEquate
 
@@ -1259,7 +1259,7 @@ static int  NotEnabledEquate(void *cpr_handle,  char b_frozen,
 
 // ENTRY_RAW_COMPARE_FUNCTION
 static int GreenCollectionEntryRawCompare (void *r_handle, int indexLabel, int keyRank, int aEntry,
-  int n_bEntry, void *cpr_bKeys) {
+  int n_bEntry, const void *cpr_bKeys) {
   m_DIGGY_BOLLARD_S()
   GREEN_COLLECTION_HANDLE handle = (GREEN_COLLECTION_HANDLE) r_handle;
 
@@ -1276,7 +1276,7 @@ static int GreenCollectionEntryRawCompare (void *r_handle, int indexLabel, int k
 
 // ENTRY_RAW_EQUATE_FUNCTION
 static int GreenCollectionEntryRawEquate (void *r_handle, int indexLabel, int keyRank, int aEntry,
-  void *pr_bKeys) {
+  const void *pr_bKeys) {
   m_DIGGY_BOLLARD_S()
   GREEN_COLLECTION_HANDLE handle = (GREEN_COLLECTION_HANDLE) r_handle;
 
@@ -1363,9 +1363,8 @@ int GreenCollectionCreateInstance(GREEN_COLLECTION_HANDLE *azh_handle,  int expe
   m_GREEN_INDEXES_INIT(handle->indexes,GreenCollectionEntryRawCompare,
     GreenCollectionEntryRawEquate, (void *) handle)
   m_GAPS_STACK_INIT(handle->h_gaps,handle->itemsPhysicalNumber)
-  struct G_REQUEST_CRITERIUM defaultCriterium ;
-  m_ASSIGN_G_REQUEST_CRITERIUM(defaultCriterium,INDEX_LABEL0,ALL_FLAGS_OFF0,void,(void*)UNDEFINED,
-    ALL_FLAGS_OFF0)
+  struct G_REQUEST_CRITERIUM defaultCriterium = m_GRequestCriterium(INDEX_LABEL0,ALL_FLAGS_OFF0,
+    (void*)UNDEFINED, ALL_FLAGS_OFF0) ;
   m_INIT_INDEX_REQUEST(handle->internalIndexRequest,defaultCriterium)
 
   m_MALLOC_ARRAY(handle->h_fetched4ChangeEntries,handle->fetched4ChangeEntriesPhysicalNumber =
@@ -1706,11 +1705,11 @@ int GreenCollectionIndexRequestV(GREEN_COLLECTION_HANDLE cp_handle,
 
   unsigned int criteriaOpFlags = ALL_FLAGS_OFF0;
   if (criteriaNumber > 1) criteriaOpFlags = va_arg(extraCriteria,unsigned int);
-  m_ASSIGN_G_REQUEST_CRITERIUM(*criteriumPtr,indexLabel1,indexSeekFlags1,void,cfpr_keys1,criteriaOpFlags)
+  *criteriumPtr = m_GRequestCriterium(indexLabel1,indexSeekFlags1,cfpr_keys1,criteriaOpFlags);
 
-  int i = 1; for (; i < criteriaNumber;  i++) m_ASSIGN_G_REQUEST_CRITERIUM(*(++criteriumPtr),
-    va_arg(extraCriteria,int), va_arg(extraCriteria,unsigned int),void,va_arg(extraCriteria,void *),
-    va_arg(extraCriteria,unsigned int))
+  int i = 1; for (; i < criteriaNumber;  i++) *(++criteriumPtr) = m_GRequestCriterium(va_arg(
+    extraCriteria,int), va_arg(extraCriteria,unsigned int),va_arg(extraCriteria,void *),
+    va_arg(extraCriteria,unsigned int));
 
   m_TRACK_IF(GreenCollectionIndexRequestR(cp_handle,nf_indexRequestAutomaticBuffer,
     criteriaNumber,s_criteria) != RETURNED) 

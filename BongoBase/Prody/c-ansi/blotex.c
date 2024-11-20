@@ -821,8 +821,8 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(n_indexSeekFlags)
 m_DIGGY_VAR_P_STRING(subSequence)
 
     m_ASSERT(criteriaNumber < 5)
-    m_ASSIGN_G_REQUEST_CRITERIUM__G_KEYS(criteria5[criteriaNumber++],blotregIndexLabel,
-      n_indexSeekFlags,&gKey, criteriaOpFlags)
+    criteria5[criteriaNumber++] = m_GRequestCriterium_GKeys(blotregIndexLabel,
+      n_indexSeekFlags,&gKey, criteriaOpFlags);
     m_PARSE_PASS_SPACES(subSequence,NULL)
   } while (!b_EMPTY_P_STRING(subSequence)) ; 
 

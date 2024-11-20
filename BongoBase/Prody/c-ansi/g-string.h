@@ -423,11 +423,12 @@ int GStringsIndexRequest(G_STRINGS_HANDLE cp_handle,
   INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaNumber,
   int indexLabel1, unsigned int indexSeekFlags1, const struct G_KEY *cfps_keys1, ...);
 
-// #SEE m_ASSIGN_G_REQUEST_CRITERIUM @ c-ansi/green.h <G_KEYS>
-#define m_ASSIGN_G_REQUEST_CRITERIUM__G_KEYS(/*struct G_INDEX_CRITERIUM*/mu_criterium,\
-  /*int*/u_indexLabel, /*unsigned int*/u_indexSeekFlags, /*const struct G_KEY* */ucfps_keys,\
-  /*unsigned int*/u_criteriaOpFlags)  m_ASSIGN_G_REQUEST_CRITERIUM(mu_criterium,u_indexLabel,\
-  u_indexSeekFlags,struct G_KEY,ucfps_keys, u_criteriaOpFlags)
+
+// #SEE m_GRequestCriterium  
+static inline struct G_REQUEST_CRITERIUM m_GRequestCriterium_GKeys(int indexLabel,
+  unsigned int indexSeekFlags, const struct G_KEY* cfps_keys, unsigned int u_criteriaOpFlags) {
+  return m_GRequestCriterium(indexLabel,indexSeekFlags, cfps_keys, u_criteriaOpFlags);
+} // m_GRequestCriterium_GKeys
 
 // #SEE GStringsIndexRequest <gStringSet>
 int GStringsIndexRequestR(G_STRINGS_HANDLE cp_handle,
