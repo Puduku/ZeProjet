@@ -61,7 +61,7 @@ static inline struct P_STRING m_GStringGetLogicalPString(G_STRING_STUFF stuff) {
 //   + -1 special value (*) : "end of string"; set to current copied length => i.e concatenation
 //   + >= 0: "offset copy" ; 0 corresponds to "ordinary" copy ;
 //     REM: if offset > current copied length, the offset is rectified (concatenation)
-// - ap_pString: 
+// - pString: 
 //   (*) empty string for neutral operation
 //
 // Modified:
@@ -70,15 +70,8 @@ static inline struct P_STRING m_GStringGetLogicalPString(G_STRING_STUFF stuff) {
 // Returned:
 // - >= 0: OK, copied (copied length of dest string)
 // - -1: unexpected problem
-int GStringCopy(G_STRING_STUFF stuff, int n_offset, const struct P_STRING *ap_pString);
+int GStringCopy(G_STRING_STUFF stuff, int n_offset, struct P_STRING pString);
 
-// Copy (or concatenate...) a '\0'-terminated C string g into a "g-string"
-// See GStringCopy() above
-static inline int m_GStringCCopy(G_STRING_STUFF stuff, int n_offset, const char* p_cString) {
-  m_DIGGY_BOLLARD()
-  struct P_STRING pString = m_PString(p_cString);
-  m_DIGGY_RETURN(GStringCopy(stuff, n_offset, &pString))
-} // m_GStringCCopy
 
 // Copy (or concatenate...) a g-string into a "g-string"
 // Note1: the acolyt is NOT copied
@@ -86,7 +79,7 @@ static inline int m_GStringCCopy(G_STRING_STUFF stuff, int n_offset, const char*
 static inline int m_GStringGCopy(G_STRING_STUFF stuff, int n_offset, G_STRING_STUFF p_gStringStuff) {
   m_DIGGY_BOLLARD()
   struct P_STRING pString =  m_GStringGetLogicalPString(p_gStringStuff);
-  m_DIGGY_RETURN(GStringCopy(stuff,n_offset,&pString))
+  m_DIGGY_RETURN(GStringCopy(stuff,n_offset,pString))
 } // m_GStringGCopy
 
 
@@ -97,7 +90,7 @@ static inline int m_GStringGCopy(G_STRING_STUFF stuff, int n_offset, G_STRING_ST
 // 
 // Passed:
 // - stuff:
-// - afp_pString:
+// - f_pString:
 // 
 // Changed:
 // - stuff: remains pure "logical" if possible
@@ -107,17 +100,10 @@ static inline int m_GStringGCopy(G_STRING_STUFF stuff, int n_offset, G_STRING_ST
 // - COMPLETED__BUT: imported, but "physical" copy was needed ; if it's not normal, don't
 //   hesitate to raise ANOMALY__NON_PURE_LOGICAL_G_STRING ...
 // - -1: unexpected problem
-int GStringImport(G_STRING_STUFF stuff, const struct P_STRING *afp_pString);
+int GStringImport(G_STRING_STUFF stuff, struct P_STRING f_pString);
 
-// Import a '\0'-terminated C string g into a "g-string" token
-// See GStringImport() above
-static inline int m_GStringCImport(G_STRING_STUFF stuff, const char* fp_cString) {
-  m_DIGGY_BOLLARD()
-  struct P_STRING pString = m_PString(fp_cString);
-  m_DIGGY_RETURN(GStringImport(stuff, &pString))
-} // m_GStringCImport
 
-// See GStringImport() / m_GStringCImport() above...
+// See GStringImport() above...
 #define ANOMALY__NON_PURE_LOGICAL_G_STRING "NOT a pure logical g-string"
 
 
@@ -167,7 +153,7 @@ int GStringConvert(G_STRING_STUFF stuff,  IS_CHAR_FUNCTION n_isNeutralCharFuncti
 // Modified:
 // - stuff: "logically" empty string with "initial" acolyt
 #define m_G_STRING_CLEAR(/*G_STRING_STUFF*/stuff) {\
-  m_TRACK_IF(m_GStringCImport(stuff,GOOD_OLD_EMPTY_C_STRING) < 0)\
+  m_TRACK_IF(GStringImport(stuff,m_PString(GOOD_OLD_EMPTY_C_STRING)) < 0)\
   memset(&(stuff)->acolyt,0,sizeof((stuff)->acolyt));\
 }
   
@@ -358,57 +344,70 @@ struct G_KEY { //
   union BARE_G_KEY bare ;// bare g-key 
 }; 
 
-// Assign a g-key for string (lexical) comparison
+// Establish a g-key for string (lexical) comparison
 //
 // Passed:
-// - m_gKey: 
-// - up_pString:
-#define m_ASSIGN_G_KEY__P_STRING(/*struct G_KEY */m_gKey, /*const struct P_STRING*/up_pString) {\
-  (m_gKey).gKeysComparison = P_STRING__G_KEYS_COMPARISON;\
-  (m_gKey).bare.cp_pString = up_pString ; \
-} 
+// - p_pString:
+//
+// Ret:
+// - g-key
+static inline struct G_KEY m_GKey_PString(const struct P_STRING p_pString) {\
+  struct G_KEY gKey = { .gKeysComparison = P_STRING__G_KEYS_COMPARISON,
+    .bare.cp_pString = p_pString }; 
+  return gKey;
+} // GKey_PString 
 
-// Assign a g-key for 'intrinsic (generic) values' comparison
+// Establish a g-key for 'intrinsic (generic) values' comparison
 //
 // Passed:
-// - m_gKeys: 
-// - uen_intrinsicValue:
-#define m_ASSIGN_G_KEY__INTRINSIC_VALUE(/*struct G_KEY */m_gKey,\
-  /*GENERIC_INTEGER*/uen_intrinsicValue) {\
-  (m_gKey).gKeysComparison = INTRINSIC_VALUE__G_KEYS_COMPARISON;\
-  (m_gKey).bare.cen_intrinsicValue = uen_intrinsicValue; \
-} 
+// - en_intrinsicValue:
+//
+// Ret:
+// - g-key
+static inline struct G_KEY m_GKey_IntrinsicValue(GENERIC_INTEGER en_intrinsicValue) {\
+  struct G_KEY gKey = { .gKeysComparison = INTRINSIC_VALUE__G_KEYS_COMPARISON,
+    .bare.cen_intrinsicValue = en_intrinsicValue }; 
+  return gKey;
+} // GKey_PString 
 
-// Assign a g-key for 'acolyt token ids' comparison
+// Establish a g-key for 'acolyt token ids' comparison
 //
 // Passed:
-// - m_gKeys: 
 // - u_tokenId:
-#define m_ASSIGN_G_KEY__ACOLYT_TOKEN_ID(/*struct G_KEY */m_gKey,\
-  /*int*/u_tokenId) {\
-  (m_gKey).gKeysComparison = ACOLYT_TOKEN_ID__G_KEYS_COMPARISON;\
-  (m_gKey).bare.c_acolytTokenId = u_tokenId; \
-} 
+//
+// Ret:
+// - g-key
+static inline struct G_KEY m_GKey_AcolytTokenId(int tokenId) {\
+  struct G_KEY gKey = { .gKeysComparison = ACOLYT_TOKEN_ID__G_KEYS_COMPARISON,
+    .bare.c_acolytTokenId = tokenId }; 
+  return gKey;
+} // GKey_PString 
 
-// Assign a g-key for 'acolyt (generic) values' comparison
+// Establish a g-key for 'acolyt (generic) values' comparison
 //
 // Passed:
-// - m_gKeys:
 // - uen_acolytValue:
-#define m_ASSIGN_G_KEY__ACOLYT_VALUE(/*struct G_KEY */m_gKey, /*GENERIC_INTEGER*/uen_acolytValue) {\
-  (m_gKey).gKeysComparison = ACOLYT_VALUE__G_KEYS_COMPARISON;\
-  (m_gKey).bare.cen_acolytValue = uen_acolytValue; \
-} 
+//
+// Ret:
+// - g-key
+static inline struct G_KEY m_GKey_AcolytValue(GENERIC_INTEGER en_acolytValue) {\
+  struct G_KEY gKey = { .gKeysComparison = ACOLYT_VALUE__G_KEYS_COMPARISON,
+    .bare.cen_acolytValue = en_acolytValue }; 
+  return gKey;
+} // GKey_PString 
 
-// Assign a g-key for 'acolyt handles' comparison
+// Establish a g-key for 'acolyt handles' comparison
 //
 // Passed:
-// - m_gKeys:
 // - unr_acolytHandle:
-#define m_ASSIGN_G_KEY__ACOLYT_HANDLE(/*struct G_KEY */m_gKey, /*void* */unr_acolytHandle) {\
-  (m_gKey).gKeysComparison = ACOLYT_HANDLE__G_KEYS_COMPARISON;\
-  (m_gKey).bare.cnr_acolytHandle = unr_acolytHandle; \
-} 
+//
+// Ret:
+// - g-key
+static inline struct G_KEY m_GKey_AcolytHandle(void* nr_acolytHandle) {\
+  struct G_KEY gKey = { .gKeysComparison = ACOLYT_HANDLE__G_KEYS_COMPARISON,
+    .bare.cnr_acolytHandle = nr_acolytHandle }; 
+  return gKey;
+} // GKey_PString 
 
 
 // #REF GStringsIndexRequest <gStringSet>

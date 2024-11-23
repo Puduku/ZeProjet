@@ -263,19 +263,16 @@ int VerifyCPString(struct P_STRING *a_pString);
 // - dstRawString : target string (buffer address)
 // - dstBufferSize : target string's buffer size; > 0 (CANNOT be == 0) ; see 
 //   OPTIMAL_BUFFER_SIZE_4_P_STRING_COPY() macro above.
-// - ap_srcPString : source string portion 
+// - srcPString : source string portion 
 //
 // Modified:
 // - dstString : copy of 'source string' (limited to dst buffer size); ==> ALWAYS '\0' terminated.
-// - *na_dstPString : (if explicit target used) target string portion 
 //
 // Returned:
 // - >= 0 and < dstBufferSize: copied length (not taking into account the extra '\0'
 //   ending char) (the copy is COMPLETE if and only 'destination' buffer is big enough) 
 // - -1: unexpected problem; anomaly is raised
-// TODO: supprimer ap_ ???
-int CopyPString(char *dstRawString, int dstBufferSize, 
-  const struct P_STRING *ap_srcPString);
+int CopyPString(char *dstRawString, int dstBufferSize, struct P_STRING srcPString);
 
 
 // Compare string portions
@@ -570,7 +567,7 @@ int ParanoidConvertPString(struct P_STRING *aep_pString, char b_cTerminated,
   if (em_requiredBufferSize > LOCAL_STRING_AUTO_BUFFER_SIZE) {\
     m_MALLOC(emep_string = emnh_heapString_ ## m_pString,  em_requiredBufferSize)\
   } else emep_string = emc_localString_ ## m_pString;\
-  m_ASSERT(CopyPString(emep_string, em_requiredBufferSize,  &m_pString) == \
+  m_ASSERT(CopyPString(emep_string, em_requiredBufferSize, m_pString) == \
     em_requiredBufferSize-1)\
   m_pString = m_PString2(emep_string,em_requiredBufferSize-1);\
 

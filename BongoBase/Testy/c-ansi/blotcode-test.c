@@ -100,7 +100,7 @@ static int Blotlib2ExecutorExecuteC(void *r_handle, const struct BLOTFUNC *ap_bl
   switch (ap_blotfunc->entry.localBlotfuncNameEntry) {
   case 1:  // Verbe
     m_ASSERT(b_EqualToCString(ap_blotfunc->call.arguments,"savoir, 1ps"))
-    m_ASSERT(m_GStringCCopy(c_surrogate,0,"sait") >= 0)
+    m_ASSERT(GStringCopy(c_surrogate,0,m_PString("sait")) >= 0)
   break; case 2: // Nombre
     answer = ReadGenericIntegerPString(ap_blotfunc->call.arguments, ac_blotval,(int*)NULL);
     m_TRACK_IF(answer < 0)

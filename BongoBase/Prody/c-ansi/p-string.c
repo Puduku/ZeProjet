@@ -31,14 +31,13 @@ int VerifyCPString(struct P_STRING *a_pString) {
 
 
 // Public function: see .h
-int CopyPString(char *dstRawString, int dstBufferSize,
-  const struct P_STRING *ap_srcPString) {
+int CopyPString(char *dstRawString, int dstBufferSize, struct P_STRING srcPString) {
   m_DIGGY_BOLLARD()
 
-  int copyLength = m_PStringLength(*ap_srcPString);
+  int copyLength = m_PStringLength(srcPString);
   if (copyLength >= dstBufferSize) copyLength = dstBufferSize-1;
   m_ASSERT(copyLength >= 0)
-  memcpy(dstRawString,  ap_srcPString->string,  copyLength);
+  memcpy(dstRawString,  srcPString.string,  copyLength);
   dstRawString[copyLength] = '\0';
 
   m_DIGGY_RETURN(copyLength)

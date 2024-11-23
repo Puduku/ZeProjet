@@ -153,7 +153,7 @@ int GStringButtAdeptFill(void *r_handle, struct P_STRING chunk, int *nar_flopCau
   G_STRING_BUTT_ADEPT_HANDLE handle = (G_STRING_BUTT_ADEPT_HANDLE)r_handle;
   m_CHECK_MAGIC_FIELD(G_STRING_BUTT_ADEPT_HANDLE,handle)
 
-  m_TRACK_IF(GStringCopy(handle->gStringStuff, -1, &chunk) < 0) 
+  m_TRACK_IF(GStringCopy(handle->gStringStuff, -1,chunk) < 0) 
 
   m_DIGGY_RETURN(ANSWER__YES)
 } // GStringButtAdeptFill

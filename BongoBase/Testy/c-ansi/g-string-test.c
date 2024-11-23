@@ -22,7 +22,7 @@ static int GStringTest (const char *p_vers3) {
   G_STRING_STUFF h_gString = (G_STRING_STUFF) UNDEFINED;
   m_TRACK_IF(G_STRING_CREATE_INSTANCE(&h_gString) != RETURNED)
 
-  m_ASSERT(m_GStringCCopy(h_gString,0,VERS1) >= 0)
+  m_ASSERT(GStringCopy(h_gString,0,m_PString(VERS1)) >= 0)
   m_ASSERT(h_gString->nhi_string != NULL)
   m_ASSERT(strcmp(h_gString->nhi_string,VERS1) == 0)
   m_ASSERT(strlen(VERS1) == h_gString->c_copiedLength)
@@ -44,9 +44,9 @@ static int GParamTest (const char *p_vers3) {
   G_STRING_SET_STUFF h_gParam = (G_STRING_SET_STUFF) UNDEFINED;
   m_TRACK_IF(GStringSetCreateInstance(&h_gParam,G_PARAM_CARDINALITY) != RETURNED)
 
-  int ret = m_GStringCCopy(h_gParam + G_PARAM_NAME_ELEMENT, 0, "VERS1"); 
+  int ret = GStringCopy(h_gParam + G_PARAM_NAME_ELEMENT, 0, m_PString("VERS1")); 
   m_TRACK_IF(ret < 0)
-  ret = m_GStringCCopy(h_gParam + G_PARAM_VALUE_ELEMENT, 0, VERS1); 
+  ret = GStringCopy(h_gParam + G_PARAM_VALUE_ELEMENT, 0, m_PString(VERS1)); 
   m_TRACK_IF(ret < 0)
   m_ASSERT(ret == strlen(VERS1))
 
@@ -81,16 +81,16 @@ static int GStringsTest (const char *p_vers3) {
 
 
   m_TRACK_IF(GStringsFetch(h_gStrings,  -1,  &gStringStuff) < 0) 
-  m_TRACK_IF(m_GStringCCopy(gStringStuff,0, VERS1) < 0)
+  m_TRACK_IF(GStringCopy(gStringStuff,0, m_PString(VERS1)) < 0)
 
   m_TRACK_IF(GStringsFetch(h_gStrings,  -1,  &gStringStuff) < 0) 
-  m_TRACK_IF(m_GStringCCopy(gStringStuff,0, VERS2) < 0)	
+  m_TRACK_IF(GStringCopy(gStringStuff,0, m_PString(VERS2)) < 0)	
 
   m_TRACK_IF(GStringsFetch(h_gStrings,  -1,  &gStringStuff) < 0)
   m_TRACK_IF(GStringPrintf(gStringStuff,  0,  VERS3_FORMAT_S_S,VERS3_S1,VERS3_S2) < 0)
 
   m_TRACK_IF(GStringsFetch(h_gStrings,  -1,  &gStringStuff) < 0)
-  m_TRACK_IF(m_GStringCCopy(gStringStuff,0, LOWER_FOOTER) < 0)
+  m_TRACK_IF(GStringCopy(gStringStuff,0, m_PString(LOWER_FOOTER)) < 0)
 
   int completed = GStringsVerifyIndexes(h_gStrings); 
   m_TRACK_IF(completed < 0)

@@ -29,7 +29,7 @@
       em_initialBufferSize = OPTIMAL_BUFFER_SIZE_4_P_STRING_COPY(em_pStringLength);\
     m_MALLOC((stuff)->nhi_string, (stuff)->c_bufferSize = em_initialBufferSize)\
     stuff->c_copiedLength = CopyPString(stuff->nhi_string,(stuff)->c_bufferSize,\
-      &(stuff)->cv_pString);\
+      (stuff)->cv_pString);\
     m_TRACK_IF(stuff->c_copiedLength < 0) \
   } \
 }
@@ -44,11 +44,10 @@
 
 
 // Public function : see .h
-int GStringCopy(G_STRING_STUFF stuff, int n_offset, const struct P_STRING *ap_pString) {
+int GStringCopy(G_STRING_STUFF stuff, int n_offset, struct P_STRING pString) {
   m_DIGGY_BOLLARD()
 
-  int requiredBufferSize = OPTIMAL_BUFFER_SIZE_4_P_STRING_COPY(m_PStringLength(
-    *ap_pString));
+  int requiredBufferSize = OPTIMAL_BUFFER_SIZE_4_P_STRING_COPY(m_PStringLength(pString));
   m_G_STRING_SET_INITIAL_BUFFER(stuff, requiredBufferSize)
   m_G_STRING_ADJUST_COPY_OFFSET(stuff,n_offset) 
   requiredBufferSize += n_offset;
@@ -56,7 +55,7 @@ int GStringCopy(G_STRING_STUFF stuff, int n_offset, const struct P_STRING *ap_pS
     m_REALLOC(stuff->nhi_string, stuff->c_bufferSize = requiredBufferSize)
   } 
   stuff->c_copiedLength = CopyPString(stuff->nhi_string + (n_offset),
-    stuff->c_bufferSize - (n_offset),  ap_pString) + (n_offset);
+    stuff->c_bufferSize - (n_offset),pString) + (n_offset);
 
   stuff->cv_pString = m_PString2(stuff->nhi_string,stuff->c_copiedLength);
 
@@ -64,14 +63,14 @@ int GStringCopy(G_STRING_STUFF stuff, int n_offset, const struct P_STRING *ap_pS
 } // GStringCopy
 
 // Public function : see .h
-int GStringImport(G_STRING_STUFF stuff, const struct P_STRING *afp_pString) {
+int GStringImport(G_STRING_STUFF stuff, struct P_STRING f_pString) {
   m_DIGGY_BOLLARD()
   
   if (stuff->nhi_string == NULL) {
-    stuff->cv_pString = *afp_pString;
+    stuff->cv_pString = f_pString;
     m_DIGGY_RETURN(COMPLETED__OK)
   } // if
-  int ret = GStringCopy(stuff,0,afp_pString);
+  int ret = GStringCopy(stuff,0,f_pString);
   m_TRACK_IF(ret < 0) 
   m_DIGGY_RETURN(COMPLETED__BUT)
 } // GStringImport
@@ -456,11 +455,6 @@ int GStringsIndexRequest(G_STRINGS_HANDLE cp_handle,
   INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaNumber,
   int indexLabel1, unsigned int indexSeekFlags1, const struct G_KEY *cfps_keys1, ...) {
   m_DIGGY_BOLLARD()
-
-  //  va_list ap ;
-  //  va_start(ap,cafp_key1_1) ;
-  //      cap_key1 = va_arg(ap,const struct G_KEY*) ;
-  //  va_end(ap) ;
 
   { va_list arguments;
     va_start(arguments,cfps_keys1);

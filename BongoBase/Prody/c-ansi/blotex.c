@@ -144,8 +144,7 @@ int BlotexlibExecutorGetBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
 m_DIGGY_VAR_P_STRING(blotregName)
 //DumpBlotregs(handle->h_blotregsHandle,"GET blotreg BEFORE SEARCH");
   G_STRING_STUFF ct_namedBlotregStuff = (G_STRING_STUFF)UNDEFINED; 
-  struct G_KEY gKey ;
-  m_ASSIGN_G_KEY__P_STRING(gKey,blotregName)
+  struct G_KEY gKey = m_GKey_PString(blotregName);
   int result = m_GStringsIndexSingleFetch(handle->h_blotregsHandle,NULL,INDEX_LABEL0,
     INDEX_SEEK_FLAGS__EQUAL,&gKey, INDEX_FETCH_FLAGS__SEEK_ONLY,&ct_namedBlotregStuff, NULL);
   switch (result) {
@@ -201,8 +200,7 @@ int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
 m_DIGGY_VAR_P_STRING(blotregName)
   int completed = COMPLETED__OK; // a priori
   G_STRING_STUFF t_namedBlotregStuff = (G_STRING_STUFF)UNDEFINED; 
-  struct G_KEY gKey ;
-  m_ASSIGN_G_KEY__P_STRING(gKey,blotregName)
+  struct G_KEY gKey = m_GKey_PString(blotregName);
   int result = m_GStringsIndexSingleFetch(handle->h_blotregsHandle,NULL,INDEX_LABEL0,
     INDEX_SEEK_FLAGS__EQUAL,&gKey, INDEX_FETCH_FLAGS__FETCH,&t_namedBlotregStuff,NULL);
   switch (result) {
@@ -230,7 +228,7 @@ m_DIGGY_VAR_P_STRING(blotregName)
         (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) ==
         STR_VALUE__BLOTREG_INDEX_LABEL)
 
-      m_TRACK_IF(GStringCopy(t_namedBlotregStuff,0,&blotregName) < 0)
+      m_TRACK_IF(GStringCopy(t_namedBlotregStuff,0,blotregName) < 0)
       m_TRACK_IF(m_GStringAsNamedObject(t_namedBlotregStuff,h_blotregHandle,
         handle->h_blotregsHandle) != RETURNED)
       //t_namedBlotregStuff->acolyt.cnhr_handle = h_blotregHandle;
@@ -251,8 +249,7 @@ int BlotexlibExecutorGetBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle,
   m_DIGGY_BOLLARD()
 
   G_STRING_STUFF ct_namedBlottabStuff = (G_STRING_STUFF)UNDEFINED; 
-  struct G_KEY gKey ;
-  m_ASSIGN_G_KEY__P_STRING(gKey,blottabName)
+  struct G_KEY gKey = m_GKey_PString(blottabName);
   int result = m_GStringsIndexSingleFetch(handle->h_blottabsHandle,NULL,INDEX_LABEL0,
     INDEX_SEEK_FLAGS__EQUAL,&gKey, INDEX_FETCH_FLAGS__SEEK_ONLY,&ct_namedBlottabStuff, NULL);
   switch (result) {
@@ -273,8 +270,7 @@ int BlotexlibExecutorCreateBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle,
 
   int completed = COMPLETED__OK; // a priori
   G_STRING_STUFF t_namedBlottabStuff = (G_STRING_STUFF)UNDEFINED; 
-  struct G_KEY gKey ;
-  m_ASSIGN_G_KEY__P_STRING(gKey,blottabName)
+  struct G_KEY gKey = m_GKey_PString(blottabName);
   int result = m_GStringsIndexSingleFetch(handle->h_blottabsHandle,NULL,INDEX_LABEL0,
     INDEX_SEEK_FLAGS__EQUAL,&gKey, INDEX_FETCH_FLAGS__FETCH,&t_namedBlottabStuff,NULL);
   switch (result) {
@@ -495,10 +491,10 @@ static int FetchBlotvar(const struct BLOTVAR_REFERENCE *ap_blotvarReference,
       if (ap_blotvarReference->blotvarReference == NAME__BLOTVAR_REFERENCE) {
         indexLabel = NAME__BLOTREG_INDEX_LABEL;
 m_DIGGY_VAR_P_STRING(ap_blotvarReference->c_select.c_name)
-        m_ASSIGN_G_KEY__P_STRING(gKey,ap_blotvarReference->c_select.c_name)
+        gKey = m_GKey_PString(ap_blotvarReference->c_select.c_name);
       } else {
         indexLabel = TOKEN_ID__BLOTREG_INDEX_LABEL;
-        m_ASSIGN_G_KEY__ACOLYT_TOKEN_ID(gKey,ap_blotvarReference->c_select.c_tokenId)
+        gKey = m_GKey_AcolytTokenId(ap_blotvarReference->c_select.c_tokenId);
       } // if
       switch (result = m_GStringsIndexSingleFetch(ap_blotvarReference->blotregHandle,NULL,indexLabel,
         INDEX_SEEK_FLAGS__EQUAL,&gKey,ap_blotvarReference->cb_lValue? INDEX_FETCH_FLAGS__FETCH:
@@ -509,7 +505,7 @@ m_DIGGY_VAR_P_STRING(ap_blotvarReference->c_select.c_name)
           m_ASSERT(*acvnt_blotvarStuff != NULL)
           if (ap_blotvarReference->blotvarReference == NAME__BLOTVAR_REFERENCE)
             m_TRACK_IF(GStringCopy((*acvnt_blotvarStuff)+G_PARAM_NAME_ELEMENT,0,
-              &(ap_blotvarReference->c_select.c_name)) < 0)
+              ap_blotvarReference->c_select.c_name) < 0)
           else { // TOKEN_ID__BLOTVAR_REFERENCE 
             m_TRACK_IF(m_GStringAsGParamName((*acvnt_blotvarStuff)+G_PARAM_NAME_ELEMENT,
               ap_blotvarReference->c_select.c_tokenId, ap_blotvarReference->blotregHandle) < 0)
@@ -793,20 +789,20 @@ m_DIGGY_VAR_P_STRING(lexeme)
         switch (as) {
         case AS__VALUE_INT: // [ '#' ]
           if (blotexValue.b_strex) m_ABANDON(EXPECT_INTEX__ABANDONMENT_CAUSE)
-          m_ASSIGN_G_KEY__ACOLYT_VALUE(gKey,blotexValue.select.c_blotval) 
+          gKey = m_GKey_AcolytValue(blotexValue.select.c_blotval); 
         break; case AS__R_VALUE__ENTRY: // '!#' 
           if (blotexValue.b_strex) m_ABANDON(EXPECT_INTEX__ABANDONMENT_CAUSE)
 m_RAISE(ANOMALY__NOT_AVAILABLE)
         break; case AS__ID: // '!' 
-          m_ASSIGN_G_KEY__ACOLYT_VALUE(gKey,blotexValue.select.c_blotval) 
+          gKey = m_GKey_AcolytValue(blotexValue.select.c_blotval); 
         break; case AS__VALUE_STR: // '$'
           if (!blotexValue.b_strex) m_ABANDON(EXPECT_STREX__ABANDONMENT_CAUSE)
 m_DIGGY_VAR_P_STRING(blotexValue.select.c_str)
-          m_ASSIGN_G_KEY__P_STRING(gKey,blotexValue.select.c_str)
+          gKey = m_GKey_PString(blotexValue.select.c_str);
         break; case AS__NAME:  // '!$'
           if (!blotexValue.b_strex) m_ABANDON(EXPECT_STREX__ABANDONMENT_CAUSE)
 m_DIGGY_VAR_P_STRING(blotexValue.select.c_str)
-          m_ASSIGN_G_KEY__P_STRING(gKey,blotexValue.select.c_str)
+          gKey = m_GKey_PString(blotexValue.select.c_str);
         break; default: m_RAISE(ANOMALY__VALUE__D,as)
         } // switch
       break; case ANSWER__NO:
@@ -1400,8 +1396,8 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
       if (!strexAtomValue.b_strex) m_ABANDON(EXPECT_STREX__ABANDONMENT_CAUSE)
       G_STRING_STUFF t_workingGStringStuff = (G_STRING_STUFF)UNDEFINED;
       m_TRACK_IF(GStringsFetch(handle->h_workingGStringsHandle,-1, &t_workingGStringStuff) < 0)
-      m_TRACK_IF(GStringCopy(t_workingGStringStuff,0, &ac_strexValue->select.c_str) < 0)
-      m_TRACK_IF(GStringCopy(t_workingGStringStuff,-1, &strexAtomValue.select.c_str) < 0)
+      m_TRACK_IF(GStringCopy(t_workingGStringStuff,0, ac_strexValue->select.c_str) < 0)
+      m_TRACK_IF(GStringCopy(t_workingGStringStuff,-1, strexAtomValue.select.c_str) < 0)
       ac_strexValue->select.c_str = t_workingGStringStuff->cv_pString;
     break; case ANSWER__NO:
       m_DIGGY_RETURN(ANSWER__NO)
@@ -1624,7 +1620,7 @@ m_RAISE(ANOMALY__NOT_AVAILABLE)
     break; case AS__VALUE_STR: // '$'
       if (! c_blotexValue.b_strex) m_ABANDON(EXPECT_STREX__ABANDONMENT_CAUSE)
       m_TRACK_IF(GStringCopy(cvnt_blotvarStuff+G_PARAM_VALUE_ELEMENT,0,
-        &c_blotexValue.select.c_str) < 0)
+        c_blotexValue.select.c_str) < 0)
     break; case AS__NAME:  // '!$'
 m_RAISE(ANOMALY__NOT_AVAILABLE)
     break; default: m_RAISE(ANOMALY__VALUE__D,c_as)

@@ -59,7 +59,7 @@ static inline int m_GStringAsToken(G_STRING_STUFF stuff, int tokenId,
   int entry = UNDEFINED;\
   for (; i < tokensNumber; i++) {\
     m_TRACK_IF((entry = GStringsFetch(handle,-1,&gStringStuff)) < 0);\
-    switch (m_GStringCImport(gStringStuff, mp_tokenDefinitions[i].p_litteral)) {\
+    switch (GStringImport(gStringStuff, m_PString(mp_tokenDefinitions[i].p_litteral))) {\
     case COMPLETED__OK: \
       m_TRACK_IF(m_GStringAsToken(gStringStuff, mp_tokenDefinitions[i].tokenId, handle) !=\
         RETURNED)\

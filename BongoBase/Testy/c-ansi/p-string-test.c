@@ -79,7 +79,7 @@ static int TestsCopyPString(void) {
 #define m_TEST_COPY_P_STRING(/*const char* */p_string, /*int*/n_length,\
   /*int*/expectedRet) {\
   struct P_STRING pString = m_PString2(p_string,n_length);\
-  ret = CopyPString(s32,sizeof(s32),&pString) ;\
+  ret = CopyPString(s32,sizeof(s32),pString) ;\
   m_TRACK_IF(ret < 0) \
   m_ASSERT(ret == expectedRet) \
   m_ASSERT(ret < sizeof(s32)) \
@@ -95,7 +95,7 @@ static int TestsCopyPString(void) {
 #define m_TEST_COPY_CRAZY_P_STRING(/*const char* */p_string, /*int*/negativeOffset) {\
   struct P_STRING crazyPString;\
   m_ASSIGN_CRAZY_P_STRING(crazyPString,p_string, negativeOffset)\
-  ret = CopyPString(s32,sizeof(s32),&crazyPString) ;\
+  ret = CopyPString(s32,sizeof(s32),crazyPString) ;\
   m_TRACK_IF(ret < 0) \
   m_ASSERT(ret == 0) \
   m_ASSERT(s32[0] == '\0') \
@@ -104,7 +104,7 @@ static int TestsCopyPString(void) {
 #define m_TEST_COPY_TRIVIAL_P_STRING() {\
   struct P_STRING trivialPString;\
   m_ASSIGN_TRIVIAL_P_STRING(trivialPString)\
-  ret = CopyPString(s32,sizeof(s32),&trivialPString) ;\
+  ret = CopyPString(s32,sizeof(s32),trivialPString) ;\
   m_TRACK_IF(ret < 0) \
   m_ASSERT(ret == 0) \
   m_ASSERT(s32[0] == '\0') \

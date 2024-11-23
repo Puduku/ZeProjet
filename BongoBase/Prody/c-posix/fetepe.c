@@ -1117,7 +1117,7 @@ static int FetepeNListDir (FETEPE_HANDLE handle, const char *p_cmd, const char *
       m_TRACK_IF(LINES_PARTITION_FETCH(handle->data.h_lsLines,i,&t_lsLine) != i)
       m_TRACK_IF(GStringsFetch(list,-1,&t_item) != i)
       m_ASSERT(t_item != NULL)
-      m_TRACK_IF(GStringCopy(t_item, 0, &t_lsLine->practicalLine) < 0)
+      m_TRACK_IF(GStringCopy(t_item, 0, t_lsLine->practicalLine) < 0)
       if (corrections != NO__FILE_NAME_CORRECTION) {
         m_TRACK_IF(CorrectFilename(t_item,corrections) != RETURNED)
       } // if
