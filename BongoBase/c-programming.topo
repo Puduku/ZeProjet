@@ -229,16 +229,19 @@
 //   (*) It is therefore very regrettable that in most database operating languages (SQL in particular),
 //   the 'dual' nature (logical and physical) of all data is overlooked to such an extent! 
 //
-// - Empty program model: A simple "trick" to keep in mind to refrain from writing too much "crap"...
+// - General tips for achieving a roughly acceptable programming quality:
+//   + Empty program model: A simple "trick" to keep in mind to refrain from writing too much "crap"...
 //   The pure and perfect program exists. It is still unique but universal. This is of course the
 //   "empty" program - without a single line of code. Obviously its practical usefulness is very
 //   limited... To give it a use, we common programmers know no other way than to spoil this perfect
 //   program with our rotten lines of code...
-// 
-// - Usage of verity values in C-programs: see also c-monism.topo
-//   Usage of accurate binary verity values is important to avoid the two following anti-patterns :
-//   + Programs that hangs (and by the way eat up the resources) instead of handling problem properly
-//     NEVER: implement "guy" interpretation of "girl" status
-//     BEWARE: when implementing "girl" interpretation of "guy" status.
-//   + Programs that simply propose a bogus action to ‘solve’ a problem. 
-//     NEVER: be satisfied with the appearance of a solution 
+//   + Good usage of binary statutes in C-programs - see also c-monism.topo, § "Why guys so often harass
+//     girls ???"
+//     Hanging programms (with possible full consumption of the resources) may be simple consequence of a bad
+//     re-interpration of (yes/no way - girl verity perception) binary status as a "guy" (success/try again - 
+//     guy verity perception) 
+//     Unexpected crashes may a contrario results of a wrong re-interpreation (success/try again) binary statuses
+//     as (yes/no way) 
+//     Inefficient program may be caused by abusive re-interpretation of (ok/ok, but) binary status into 
+//     unary ok status (ike the european union, which reinterprets a total failure to reach agreement as the
+//     success of unanimous agreement (we absolutely all agree that we agree on nothing)
