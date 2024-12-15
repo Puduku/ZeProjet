@@ -451,10 +451,10 @@ static inline int m_GStringsIndexSingleFetch(G_STRINGS_HANDLE cp_handle,
   m_DIGGY_BOLLARD_S() 
   m_TRACK_IF(GStringsIndexRequest(cp_handle,nf_indexRequestAutomaticBuffer,1,indexLabel,
     indexSeekFlags, cfps_keys) != RETURNED) 
-  int answer = GStringsIndexFetch(cp_handle,nf_indexRequestAutomaticBuffer,indexFetchFlags,
+  int result = GStringsIndexFetch(cp_handle,nf_indexRequestAutomaticBuffer,indexFetchFlags,
     acvnt_gStringSetStuff,nacvn_entry);
-  m_TRACK_IF(answer < 0)
-  m_DIGGY_RETURN(answer)
+  m_TRACK_IF(result < 0)
+  m_DIGGY_RETURN(result)
 } // m_GStringsIndexSingleFetch
   
 

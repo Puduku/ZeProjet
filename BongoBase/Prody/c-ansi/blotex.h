@@ -130,42 +130,58 @@ int BlotexlibExecutorGetBlotreg (BLOTEXLIB_EXECUTOR_HANDLE handle,
 // - COMPLETED__BUT: the register already exists 
 // - -1: unexpected problem; anomaly is raised
 int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING blotregName, G_STRINGS_HANDLE *na_blotregHandle);
+  struct P_STRING blottabName, G_STRINGS_HANDLE *na_blotregHandle);
+
 
 // Retrieve some blot table.
 // 
 // Passed:
 // - handle:
-// - blotregName: blot table's name 
+// - blottabName: blot table's name 
 //
 // Changed:
-// - *ac_blotregHandle: (only significant when retrieved : RESULT__FOUND) 
+// - *ac_tableHandle: (only significant when retrieved : RESULT__FOUND) 
 //   blot table's handle
+// - *acp_fieldsHandle: (only significant when retrieved : RESULT__FOUND)
 //
 // Ret:
 // - RESULT__FOUND: OK
 // - RESULT__NOT_FOUND: 
 // - -1: unexpected problem; anomaly is raised
-int BlotexlibExecutorGetBlottab (BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING blotregName, G_STRINGS_HANDLE *ac_blotregHandle) ;
+int BlotexlibExecutorGetBlottab (BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING blottabName,
+  G_STRINGS_HANDLE *ac_tableHandle, G_STRINGS_HANDLE *acp_fieldsHandle);
+
+
+enum { // #REF BLOTTAB_INDEX_TYPE
+  NONE__BLOTTAB_INDEX_TYPE,
+  STR__BLOTTAB_INDEX_TYPE,
+  INT__BLOTTAB_INDEX_TYPE,
+} ;
 
 // Create blot table.
 // Note: blot tables are based on g-string set collections. 
 // 
 // Passed:
 // - handle:
-// - blotregName: blot table's name 
-// - na_blotregHandle: NULL special pointer: not used
+// - blottabName: blot table's name 
+// - elementsNumber:
+// - s_names:
+// - s_blottabIndexTypes: #SEE BLOTTAB_INDEX_TYPE 
+// - na_tableHandle: NULL special pointer: not used
+// - nap_fieldsHandle: NULL special pointer: not used
 //
 // Changed:
-// - *na_blotregHandle: (if used) blot table 's handle
+// - *na_tableHandle: (if used) blot table 's handle
+// - *nap_fieldsHandle: (if used)
 //
 // Ret:
 // - COMPLETED__OK: OK
 // - COMPLETED__BUT: the table already exists 
 // - -1: unexpected problem; anomaly is raised
-int BlotexlibExecutorCreateBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING blotregName, G_STRINGS_HANDLE *na_blotregHandle);
+int BlotexlibExecutorCreateBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING blottabName,
+  int elementsNumber, struct P_STRING* s_names, int* s_blottabIndexTypes,
+  G_STRINGS_HANDLE *na_tableHandle, G_STRINGS_HANDLE *nap_fieldsHandle) ;
+
 
 
 #endif // __BLOTEX_C_ANSI_H_INCLUDED__

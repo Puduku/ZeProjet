@@ -61,15 +61,15 @@ int ParseMatch(struct P_STRING* a_sequence, const struct P_STRING p_token,
 
 // Public function: see .h
 int ParseMatchAmongR(struct P_STRING* a_sequence, TO_CHAR_FUNCTION n_toCharFunction,
-  int* ac_matchedEntry, int* cnac_matchedId, struct P_STRING* na_lexeme, int tokensCount,
+  int* avn_matchedEntry, int* cnavn_matchedId, struct P_STRING* na_lexeme, int tokensCount,
   struct P_STRING*  sp_tokens, int*  nsn_ids) {
   const char *scanPtr = a_sequence->string;
   switch (ComparePStringsAmongR(*a_sequence,NULL,n_toCharFunction,b_SUB_STRING_2,
-    ac_matchedEntry, cnac_matchedId, tokensCount, sp_tokens, nsn_ids)) {
+    avn_matchedEntry, cnavn_matchedId, tokensCount, sp_tokens, nsn_ids)) {
   case LESS_THAN__COMPARISON :
   case GREATER_THAN__COMPARISON :
   break; case EQUAL_TO__COMPARISON :
-    scanPtr += m_PStringLength((sp_tokens)[*(ac_matchedEntry)]);
+    scanPtr += m_PStringLength((sp_tokens)[*(avn_matchedEntry)]);
   break; default:
     m_TRACK()
   } // switch 
@@ -85,10 +85,10 @@ int ParseTillMatch(struct P_STRING* a_sequence, struct P_STRING p_token,
 
 // Public function: see .h
 int ParseTillFirstMatchR(struct P_STRING* a_sequence, TO_CHAR_FUNCTION n_toCharFunction,
-  int* nac_matchedEntry, int* cnac_matchedId, struct P_STRING* na_lexeme, int tokensCount,
+  int* navn_matchedEntry, int* cnavn_matchedId, struct P_STRING* na_lexeme, int tokensCount,
   struct P_STRING*  sp_tokens, int*  nsn_ids) {
   const char *scanPtr = ScanPStringTillFirstMatchR(*a_sequence,n_toCharFunction,
-    nac_matchedEntry,cnac_matchedId,tokensCount,sp_tokens,nsn_ids);
+    navn_matchedEntry,cnavn_matchedId,tokensCount,sp_tokens,nsn_ids);
   return ParseSequence(a_sequence,scanPtr, na_lexeme);
 } // ParseTillFirstMatchR
 

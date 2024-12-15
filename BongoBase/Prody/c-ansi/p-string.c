@@ -155,7 +155,7 @@ int b_EqualToCString(struct P_STRING pString1, const char *p_cString2) {
 // Public function: see .h
 int ComparePStringsAmongR(struct P_STRING pString1, 
   IS_CHAR_FUNCTION n_isNeutralCharFunction, TO_CHAR_FUNCTION n_toCharFunction, char b_subString2,
-  int *nac_matchedEntry, int *cnac_matchedId, int string2sCount, const struct P_STRING sp_pString2s[],
+  int *navn_matchedEntry, int *cnavn_matchedId, int string2sCount, const struct P_STRING sp_pString2s[],
   int nsn_ids[]) {
   m_DIGGY_BOLLARD_S()
 m_DIGGY_VAR_P_STRING(pString1)
@@ -164,7 +164,9 @@ m_DIGGY_VAR_P(nsn_ids)
   int comparison = UNDEFINED; 
   m_ASSERT(string2sCount > 0)
   int i = 0;
+  if (navn_matchedEntry != NULL) *navn_matchedEntry = -1; // a priori
   if (nsn_ids != NULL) {
+    if (cnavn_matchedId != NULL) *cnavn_matchedId = -1; // a priori
     for (; i < string2sCount ; i++) { 
 m_DIGGY_VAR_D(i)
       if (nsn_ids[i] < 0) continue;
@@ -179,8 +181,8 @@ m_DIGGY_VAR_D(i)
   } // if
   if (i < string2sCount) {
     m_ASSERT(comparison == EQUAL_TO__COMPARISON)
-    if (nac_matchedEntry != NULL) *nac_matchedEntry = i;
-    if (nsn_ids != NULL && cnac_matchedId != NULL) *cnac_matchedId = nsn_ids[i];
+    if (navn_matchedEntry != NULL) *navn_matchedEntry = i;
+    if (nsn_ids != NULL && cnavn_matchedId != NULL) *cnavn_matchedId = nsn_ids[i];
   } // if 
 
   m_DIGGY_RETURN(comparison)
@@ -266,13 +268,16 @@ const char *ScanPStringTillMatch(struct P_STRING pString, struct P_STRING subPSt
 
 // Public function : see description in .h
 const char *ScanPStringTillFirstMatchR(struct P_STRING pString, TO_CHAR_FUNCTION n_toCharFunction,
-  int *nac_matchedEntry, int *cnac_matchedId, int subStringsCount,
+  int *navn_matchedEntry, int *cnavn_matchedId, int subStringsCount,
   const struct P_STRING sp_subPStrings[], int nsn_ids[]) {
   m_DIGGY_BOLLARD()
 
+  if (navn_matchedEntry != NULL) *navn_matchedEntry = -1; // a priori
+  if (nsn_ids != NULL && cnavn_matchedId != NULL) *cnavn_matchedId = -1; // a priori
+
   while (!b_EMPTY_P_STRING(pString)) {
     int comparison = ComparePStringsAmongR(pString,(IS_CHAR_FUNCTION)NULL,n_toCharFunction,
-      b_SUB_STRING_2,nac_matchedEntry,cnac_matchedId, subStringsCount,sp_subPStrings, nsn_ids);
+      b_SUB_STRING_2,navn_matchedEntry,cnavn_matchedId, subStringsCount,sp_subPStrings, nsn_ids);
     if (comparison == EQUAL_TO__COMPARISON) break ;
     pString.string++; 
   } // while 
@@ -282,28 +287,29 @@ const char *ScanPStringTillFirstMatchR(struct P_STRING pString, TO_CHAR_FUNCTION
 
 // Public function : see description in .h
 const char *ScanPStringTillFirstMatchV(struct P_STRING pString, TO_CHAR_FUNCTION n_toCharFunction,
-  int *nac_matchedEntry, int *nac_matchedId, int subStringsCount, va_list subPStringsIds) {
+  int *navn_matchedEntry, int *navn_matchedId, int subStringsCount, va_list subPStringsIds) {
   m_DIGGY_BOLLARD()
+  m_ASSERT(subStringsCount > 0)
   struct P_STRING s_subPStrings[subStringsCount];
   struct P_STRING *subPStringPtr = s_subPStrings;
   int sn_ids[subStringsCount];
   int *n_idPtr = sn_ids; 
   int i = 0; while (i++ < subStringsCount) *(subPStringPtr++) = va_arg(subPStringsIds,
     struct P_STRING), *(n_idPtr++) = va_arg(subPStringsIds,int) ;
-  m_DIGGY_RETURN(ScanPStringTillFirstMatchR(pString,n_toCharFunction,nac_matchedEntry,
-    nac_matchedId,subStringsCount,s_subPStrings,sn_ids))
+  m_DIGGY_RETURN(ScanPStringTillFirstMatchR(pString,n_toCharFunction,navn_matchedEntry,
+    navn_matchedId,subStringsCount,s_subPStrings,sn_ids))
 } // ScanPStringTillFirstMatchV
 
 // Public function : see description in .h
 const char *ScanPStringTillFirstMatch(struct P_STRING pString, TO_CHAR_FUNCTION n_toCharFunction,
-  int *nac_matchedEntry, int *nac_matchedId, int subStringsCount, /*struct P_STRING subPString0,
+  int *navn_matchedEntry, int *navn_matchedId, int subStringsCount, /*struct P_STRING subPString0,
   int n_id0, */ ...) {
   m_DIGGY_BOLLARD()
   va_list subPStringsIds;
   va_start(subPStringsIds,subStringsCount);
 
-  const char *scanPtr = ScanPStringTillFirstMatchV(pString,n_toCharFunction,nac_matchedEntry,
-    nac_matchedId, subStringsCount,subPStringsIds);
+  const char *scanPtr = ScanPStringTillFirstMatchV(pString,n_toCharFunction,navn_matchedEntry,
+    navn_matchedId, subStringsCount,subPStringsIds);
    
   va_end(subPStringsIds);
 

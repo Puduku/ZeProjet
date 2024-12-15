@@ -359,8 +359,8 @@ int ParanoidComparePStrings(struct P_STRING pString1, struct P_STRING pString2,
 //   + NULL: NO char conversion applied before comparison
 //   + != NULL: conversion applied on each char of both strings before comparison ; "binary"
 //     comparison is NOT possible
-// - nac_matchedEntry: NULL pointer if not used 
-// - cnac_matchedId: NULL pointer if not used 
+// - navn_matchedEntry: NULL pointer if not used 
+// - cnavn_matchedId: NULL pointer if not used 
 // - b_subString2: + b_SUB_STRING2 (TRUE): compare 2nd string candidates as a sub-string of 1st
 //   string
 // - string2sCount: number of 2nd string candidates... (> 0) 
@@ -370,10 +370,10 @@ int ParanoidComparePStrings(struct P_STRING pString1, struct P_STRING pString2,
 //   corresponding candidate)
 // 
 // Changed:
-// - *nac_matchedEntry: (if used) only significant if match found; entry for 2nd string candidate
-//   which (first) matched 
-// - *cnac_matchedId: (if used) only significant if match found; entry for 2nd string candidate
-//   which (first) matched 
+// - *navn_matchedEntry: (if used) (set to -1 special value if no match found) entry for 2nd string
+//   candidate which (first) matched 
+// - *cnavn_matchedId: (if used) (set to -1 special value if no match found) entry for 2nd string
+//   candidate which (first) matched 
 // 
 // Returned: 
 // - >=0: "comparison" between 1st string and matched 2nd (sub-)string: 
@@ -382,7 +382,7 @@ int ParanoidComparePStrings(struct P_STRING pString1, struct P_STRING pString2,
 //   + GREATER_THAN__COMPARISON : string 1 'lexilically  after' (sub-)string 2
 int ComparePStringsAmongR(struct P_STRING pString1, 
   IS_CHAR_FUNCTION n_isNeutralCharFunction, TO_CHAR_FUNCTION n_toCharFunction, char b_subString2,
-  int *nac_matchedEntry, int *cnac_matchedId, int string2sCount, const struct P_STRING sp_pString2s[],
+  int *navn_matchedEntry, int *cnavn_matchedId, int string2sCount, const struct P_STRING sp_pString2s[],
   int nsn_ids[]) ;
 
 
@@ -446,8 +446,8 @@ const char *ScanPStringTillMatch(struct P_STRING pString, struct P_STRING subPSt
 //   + NULL: not provided; no conversion before  comparison 
 //   + != NULL: conversion applied on (each char of) both strings before comparison ; "binary"
 //     comparison is NOT possible
-// - nac_matchedEntry: NULL pointer if not used 
-// - cnac_matchedId: NULL pointer if not used 
+// - navn_matchedEntry: NULL pointer if not used 
+// - cnavn_matchedId: NULL pointer if not used 
 // - subStringsCount: >0
 // - subPString0: 1st possible sub string to locate
 // - n_id0: id of 1st possible sub string to locate (-1 special value to SKIP that sub-string)
@@ -455,16 +455,16 @@ const char *ScanPStringTillMatch(struct P_STRING pString, struct P_STRING subPSt
 // - other possible sub strings (...) : indicate all other possible sub-strings to match ;
 //
 // Changed:
-// - *nac_matchedEntry: (if used) only significant if sub-string located; entry for sub-string
-//   which was FIRST matched 
-// - *cnac_matchedId: (if used) only significant if sub-string located; id for 2nd string candidate
-//   which (first) matched 
+// - *navn_matchedEntry: (if used) (set to -1 special value if no sub-string located) entry for
+//   sub-string which was FIRST matched 
+// - *cnavn_matchedId: (if used) (set to -1 special value if no sub-string located) id for 2nd
+//   string candidate which (first) matched 
 //
 // Returned:
 // (!= NULL) scanning position; use b_SCAN_P_STRING_LOCATED() below to check whether
 // sub-string is actually located. 
 const char *ScanPStringTillFirstMatch(struct P_STRING pString, TO_CHAR_FUNCTION n_toCharFunction,
-  int *nac_matchedEntry, int *nac_matchedId, int subStringsCount, /*struct P_STRING subPString0,
+  int *navn_matchedEntry, int *navn_matchedId, int subStringsCount, /*struct P_STRING subPString0,
   int sn_id0, */ ...);
 
 // See ScanPStringTillFirstMatch()
@@ -476,7 +476,7 @@ const char *ScanPStringTillFirstMatch(struct P_STRING pString, TO_CHAR_FUNCTION 
 // - n_id0: id of 1st possible sub string to locate (-1 special value to SKIP that sub-string)
 // - other possible sub strings (...) : indicate all other possible sub-strings to match ;
 const char *ScanPStringTillFirstMatchV(struct P_STRING pString, TO_CHAR_FUNCTION n_toCharFunction,
-  int *nac_matchedEntry, int *nac_matchedId, int subStringsCount, va_list subPStringsIds);
+  int *navn_matchedEntry, int *navn_matchedId, int subStringsCount, va_list subPStringsIds);
 
 // See ScanPStringTillFirstMatchV()
 // 
@@ -486,7 +486,7 @@ const char *ScanPStringTillFirstMatchV(struct P_STRING pString, TO_CHAR_FUNCTION
 // (Instead of:)
 // - subPStringsIds:
 const char *ScanPStringTillFirstMatchR(struct P_STRING pString, TO_CHAR_FUNCTION n_toCharFunction,
-  int *nac_matchedEntry, int *nac_matchedId, int subStringsCount,
+  int *navn_matchedEntry, int *navn_matchedId, int subStringsCount,
   const struct P_STRING sp_subPStrings[], int nsn_ids[]) ;
 
 // Boolean interpretation (located or not) of scan pointer returned by ScanPString*()
