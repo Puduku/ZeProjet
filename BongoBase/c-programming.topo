@@ -212,38 +212,42 @@
 // - Data logical value type vs. data physical content type
 //   Idea: The very simple concept of "data type" is not always an accurate concept...
 //   A distinction must be made between
-//   + the physical composition (or constitution) of the data (its "materialization" in memory) on one hand,
+//   + the physical composition (or constitution) of the data (its "materialization" in memory) on
+//     one hand,
 //   + the logical value that this data represents (in the program), on the other hand
-//   In computing, we usually define 'types', which are abstractions that allow all sorts of entities
-//   to be associated with each other.
+//   In computing, we usually define 'types', which are abstractions that allow all sorts of
+//   entities to be associated with each other.
 //   When, in simple cases, we can confuse the physical composition with the logical value of the
 //   data, defining "data types" makes sense.
 //   However, in the 'general' case (for example, when working with databases (*) ), it is no longer
-//   possible to confuse the two aspects (physical and logical) of data. As a result, the very notion of
-//   'data type' is is effectively meaningless. However, if we make a clear distinction between the
-//   physical composition of a piece of data and its logical value, it makes perfect sense to be
-//   interested in the types of its physical composition on the one hand and its logical value on the other. 
+//   possible to confuse the two aspects (physical and logical) of data. As a result, the very
+//   notion of 'data type' is is effectively meaningless. However, if we make a clear distinction
+//   between the physical composition of a piece of data and its logical value, it makes perfect
+//   sense to be interested in the types of its physical composition on the one hand and its logical
+//   value on the other. 
 //   Thus, two pieces of data d1 and d2 are perfectly - and simply - comparable, provided that their
-//   logical value is of the same type (e.g. a "date") regardless of their physical composition types, which
-//   may be totally different (e.g. "ASCII" and "BINARY").
-//   (*) It is therefore very regrettable that in most database operating languages (SQL in particular),
-//   the 'dual' nature (logical and physical) of all data is overlooked to such an extent! 
+//   logical value is of the same type (e.g. a "date") regardless of their physical composition
+//   types, which may be totally different (e.g. "ASCII" and "BINARY").
+//   (*) It is therefore very regrettable that in most database operating languages (SQL in
+//   particular), the 'dual' nature (logical and physical) of all data is overlooked to such an
+//   extent! 
 //
 // - General tips for achieving a roughly acceptable programming quality:
-//   + Empty program model: A simple "trick" to keep in mind to refrain from writing too much "crap"...
+//   + Empty program model: A simple "trick" to keep in mind to refrain from writing too much
+//     "crap"...
 //     The pure and perfect program exists. It is still unique but universal. This is of course the
 //     "empty" program - without a single line of code. Obviously its practical usefulness is very
-//     limited... To give it a use, we common programmers know no other way than to spoil this perfect
-//     program with our rotten lines of code...
-//   + Have good usage of binary statutes in C-programs - see also c-monism.topo, § "Why guys so often harass
-//     girls ???"
-//     . Hanging programms (with possible massive consumption of the resources) may be simple consequence of a
-//       bad re-interpration of ('yes'/'no way' - girl verity perception) binary status as a ('success'/'try
-//       again' - guy verity perception). 
-//       Unexpected crashes may a contrario results of a wrong re-interpreation ('success'/'try again') binary
-//       statuses as ('yes'/'no way' - shy people verity perception).
+//     limited... To give it a use, we common programmers know no other way than to spoil this
+//     perfect program with our rotten lines of code...
+//   + Have good usage of binary statutes in C-programs - see also c-monism.topo, § "Why guys so
+//     often harass girls ???"
+//     . Hanging programms (with possible massive consumption of the resources) may be simple
+//       consequence of a bad re-interpration of ('yes'/'no way' - girl verity perception) binary
+//       status as a ('success'/'try again' - guy verity perception). 
+//       Unexpected crashes may a contrario results of a wrong re-interpreation ('success'/'try
+//       again') binary statuses as ('yes'/'no way' - shy people verity perception).
 //       Note: in many applications, there is a often mix of the two confusions....
-//     . Inefficient programs (senile "assitants", etc.)  may be caused by abusive re-interpretation of ('ok'/'ok,
-//       but') binary status into unary 'ok' status (like the European Union, with his habit of presenting a
-//       total failure to reach agreement as the success of plenary agreement - "We unanimously all agreed...
-//       that we agree on nothing...")
+//     . Inefficient programs (senile "assitants", etc.)  may be caused by abusive re-interpretation
+//       of ('ok'/'ok, but') binary status into unary 'ok' status (like the European Union, with his
+//       habit of presenting a total failure to reach agreement as the success of plenary agreement
+//       - "We unanimously all agreed... that we agree on nothing...")
