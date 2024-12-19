@@ -248,8 +248,6 @@ static int GStringsDisengage(void *r_handle,  char *r_greenItemStuff) {
   break; case INTRINSIC_VALUE__G_KEYS_COMPARISON:\
     (m_bareGKey).cen_intrinsicValue = (c_pStringIntrinsicValueFunction)\
       (cpr_pStringIntrinsicValueFunctionHandle,&(p_gStringStuff)->cv_pString);\
-  break; case ACOLYT_TOKEN_ID__G_KEYS_COMPARISON:\
-    (m_bareGKey).c_acolytTokenId = (p_gStringStuff)->acolyt.c_tokenId;\
   break; case ACOLYT_VALUE__G_KEYS_COMPARISON:\
     (m_bareGKey).cen_acolytValue = (p_gStringStuff)->acolyt.cen_value;\
   break; case ACOLYT_HANDLE__G_KEYS_COMPARISON:\
@@ -308,8 +306,6 @@ m_DIGGY_INFO("ap_keySettings->gKeysComparison=%d",ap_keySettings->gKeysCompariso
       ap_keySettings->select.pStringComparison.cn_toCharFunction,!b_SUB_STRING_2); 
   break; case INTRINSIC_VALUE__G_KEYS_COMPARISON:
     comparison = GET_COMPARISON(aBareGKey.cen_intrinsicValue,bBareGKey.cen_intrinsicValue);
-  break; case ACOLYT_TOKEN_ID__G_KEYS_COMPARISON:
-    comparison = GET_COMPARISON(aBareGKey.c_acolytTokenId,bBareGKey.c_acolytTokenId);
   break; case ACOLYT_VALUE__G_KEYS_COMPARISON:
     comparison = GET_COMPARISON(aBareGKey.cen_acolytValue,bBareGKey.cen_acolytValue);
   break; case ACOLYT_HANDLE__G_KEYS_COMPARISON:
@@ -333,7 +329,7 @@ int GStringsCreateInstance(G_STRINGS_HANDLE* azh_handle,  int expectedItemsNumbe
 
   handle->gStringSetCardinality = gStringSetCardinality;
   if (n_gStringConveyance == -1 && cnfps_gStringConveyances == NULL) n_gStringConveyance =
-    TOKEN__G_STRING_CONVEYANCE ;
+    VALUED_STRING__G_STRING_CONVEYANCE ;
   handle->n_gStringConveyance = n_gStringConveyance; 
   handle->cps_gStringConveyances = cnfps_gStringConveyances; 
   handle->c_namedObjectDestroyInstanceFunction = c_namedObjectDestroyInstanceFunction;
@@ -418,8 +414,6 @@ m_DIGGY_INFO("i=%d, keysNumber=%d",i,keysNumber)
         c_key1PStringIntrinsicValueFunction;
       s_keysSettings->select.intrinsicValueComparison.pr_pStringIntrinsicValueFunctionHandle =
         cfpr_key1PStringIntrinsicValueFunctionHandle;
-    break; case ACOLYT_TOKEN_ID__G_KEYS_COMPARISON:
-      m_ASSERT(gStringConveyance == TOKEN__G_STRING_CONVEYANCE)
     break; case ACOLYT_VALUE__G_KEYS_COMPARISON:
       m_ASSERT(gStringConveyance == VALUED_STRING__G_STRING_CONVEYANCE)
     break; case ACOLYT_HANDLE__G_KEYS_COMPARISON:

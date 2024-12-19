@@ -13,8 +13,6 @@
 #include "c-ansi/p-string.h"
 
 
-#define ANONYMOUS_TOKEN_ID0 0
-
 // structure of g-string instance (GREEN item) :
 struct G_STRING { // #REF struct-G_STRING
   // GREEN conventions for g-string:
@@ -31,7 +29,6 @@ struct G_STRING { // #REF struct-G_STRING
     // -when g-string is "copied" (nhi_string != NULL) : corresponds to g-string "physical" value
     // -when g-string is not "copied" (nhi_string == NULL) : pure "logical" string portion 
   union { // according to g-string's conveyance:
-    int c_tokenId; // 'token' : its id ; default value is 0
     GENERIC_INTEGER cen_value; // 'valued string' : its acolyt value ; default value is 0
     void *cnhr_handle; // 'named object' : its head handle ; NULL means no head handle 
   } acolyt; 
@@ -219,7 +216,6 @@ typedef struct G_STRINGS * G_STRINGS_HANDLE; // Public handle
 
 // #REF enum-G_STRING_CONVEYANCE
 enum { //
-          TOKEN__G_STRING_CONVEYANCE, // acolyt is token id
   VALUED_STRING__G_STRING_CONVEYANCE, // acolyt is value
    NAMED_OBJECT__G_STRING_CONVEYANCE, // acolyt is object handle
 } ;
@@ -276,7 +272,6 @@ int GStringsGetCount (G_STRINGS_HANDLE cp_handle,  G_STRING_SET_STUFF *navnt_gSt
 enum { // #REF enum-G_KEYS_COMPARISON 
         P_STRING__G_KEYS_COMPARISON, //
  INTRINSIC_VALUE__G_KEYS_COMPARISON, //
- ACOLYT_TOKEN_ID__G_KEYS_COMPARISON, // mutually exclusive with other ACOLYT_*__G_KEYS_COMPARISON 
     ACOLYT_VALUE__G_KEYS_COMPARISON, // mutually exclusive with other ACOLYT_*__G_KEYS_COMPARISON
    ACOLYT_HANDLE__G_KEYS_COMPARISON, // mutually exclusive with other ACOLYT_*__G_KEYS_COMPARISON
 } ;
@@ -301,7 +296,6 @@ typedef GENERIC_INTEGER (*P_STRING_INTRINSIC_VALUE_FUNCTION) (void *pr_handle,
 // - key1GStringSetElement: between [0 ; <g-string set cardinality>[ ; the g-string set's
 //   element serving as first key of the index
 // - key1GKeysComparison: #see enum-G_KEYS_COMPARISON
-//   ACOLYT_TOKEN_ID__G_KEYS_COMPARISON : only possible with TOKEN__G_STRING_CONVEYANCE
 //   ACOLYT_VALUE__G_KEYS_COMPARISON : only possible with VALUED_STRING__G_STRING_CONVEYANCE
 //   ACOLYT_HANDLE__G_KEYS_COMPARISON : only possible with NAMED_OBJECT__G_STRING_CONVEYANCE
 // - cn_key1IsNeutralCharFunction: only significant with P_STRING__G_KEYS_COMPARISON 
@@ -333,7 +327,6 @@ int GStringsAddIndex(G_STRINGS_HANDLE handle,  int keysNumber, int key1GStringSe
 union BARE_G_KEY {
   struct P_STRING cp_pString; // with P_STRING__G_KEYS_COMPARISON
   GENERIC_INTEGER cen_intrinsicValue; // with INTRINSIC_VALUE___G_KEYS_COMPARISON
-  int c_acolytTokenId; // with ACOLYT_TOKEN_ID__G_KEYS_COMPARISON
   GENERIC_INTEGER cen_acolytValue; // with ACOLYT_VALUE__G_KEYS_COMPARISON 
   void *cnr_acolytHandle; // with ACOLYT_HANDLE__G_KEYS_COMPARISON
 }; 
@@ -370,18 +363,6 @@ static inline struct G_KEY m_GKey_IntrinsicValue(GENERIC_INTEGER en_intrinsicVal
   return gKey;
 } // GKey_PString 
 
-// Establish a g-key for 'acolyt token ids' comparison
-//
-// Passed:
-// - u_tokenId:
-//
-// Ret:
-// - g-key
-static inline struct G_KEY m_GKey_AcolytTokenId(int tokenId) {\
-  struct G_KEY gKey = { .gKeysComparison = ACOLYT_TOKEN_ID__G_KEYS_COMPARISON,
-    .bare.c_acolytTokenId = tokenId }; 
-  return gKey;
-} // GKey_PString 
 
 // Establish a g-key for 'acolyt (generic) values' comparison
 //

@@ -11,6 +11,7 @@
 
 // "g-token" == "g-string" with non-anonymous token id
 
+#define ANONYMOUS_TOKEN_ID0 0
 
 struct TOKEN_DEFINITION {
   const char *p_litteral;
@@ -23,7 +24,7 @@ struct TOKEN_DEFINITION {
 // Note: TOKEN__G_STRING_CONVEYANCE => token id acolyt 
 #define /*int*/ G_TOKENS_CREATE_INSTANCE(/*G_STRINGS_HANDLE*/ azh_handle,\
   /*int*/ expectedItemsNumber)  GStringsCreateInstance(azh_handle, expectedItemsNumber, 1,\
-  TOKEN__G_STRING_CONVEYANCE,(const int *)UNDEFINED,(NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION)UNDEFINED)
+  VALUED_STRING__G_STRING_CONVEYANCE,(const int *)UNDEFINED,(NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION)UNDEFINED)
 
 
 // Manipulate g-string as 'token'
@@ -39,8 +40,8 @@ struct TOKEN_DEFINITION {
 static inline int m_GStringAsToken(G_STRING_STUFF stuff, int tokenId, 
   G_STRINGS_HANDLE n_gStringsHandle) {
   m_CHECK_G_STRINGS_COLLECTION_CONVEYANCE(n_gStringsHandle,FIRST_ELEMENT0,
-    TOKEN__G_STRING_CONVEYANCE)
-  stuff->acolyt.c_tokenId = tokenId;
+    VALUED_STRING__G_STRING_CONVEYANCE)
+  stuff->acolyt.cen_value = tokenId;
   return RETURNED;
 } // m_GStringAsToken
 

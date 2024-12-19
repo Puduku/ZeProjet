@@ -164,7 +164,7 @@ enum { // #REF BLOTTAB_INDEX_TYPE
 // Passed:
 // - handle:
 // - blottabName: blot table's name 
-// - elementsNumber:
+// - fieldsNumber:
 // - s_names:
 // - s_blottabIndexTypes: #SEE BLOTTAB_INDEX_TYPE 
 // - na_tableHandle: NULL special pointer: not used
@@ -179,7 +179,7 @@ enum { // #REF BLOTTAB_INDEX_TYPE
 // - COMPLETED__BUT: the table already exists 
 // - -1: unexpected problem; anomaly is raised
 int BlotexlibExecutorCreateBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING blottabName,
-  int elementsNumber, struct P_STRING* s_names, int* s_blottabIndexTypes,
+  int fieldsNumber, struct P_STRING* s_names, int* s_blottabIndexTypes,
   G_STRINGS_HANDLE *na_tableHandle, G_STRINGS_HANDLE *nap_fieldsHandle) ;
 
 

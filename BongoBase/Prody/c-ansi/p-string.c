@@ -48,8 +48,6 @@ int CopyPString(char *dstRawString, int dstBufferSize, struct P_STRING srcPStrin
 int ComparePStrings(struct P_STRING pString1, struct P_STRING pString2,
   IS_CHAR_FUNCTION n_isNeutralCharFunction, TO_CHAR_FUNCTION n_toCharFunction, char b_subString2) {
   m_DIGGY_BOLLARD()
-m_DIGGY_VAR_P_STRING(pString1)
-m_DIGGY_VAR_P_STRING(pString2)
   int difference = 0; // No difference a priori...
 
   if (n_isNeutralCharFunction == NULL && n_toCharFunction == NULL) {
@@ -158,9 +156,6 @@ int ComparePStringsAmongR(struct P_STRING pString1,
   int *navn_matchedEntry, int *cnavn_matchedId, int string2sCount, const struct P_STRING sp_pString2s[],
   int nsn_ids[]) {
   m_DIGGY_BOLLARD_S()
-m_DIGGY_VAR_P_STRING(pString1)
-m_DIGGY_VAR_D(string2sCount)
-m_DIGGY_VAR_P(nsn_ids)
   int comparison = UNDEFINED; 
   m_ASSERT(string2sCount > 0)
   int i = 0;
@@ -168,7 +163,6 @@ m_DIGGY_VAR_P(nsn_ids)
   if (nsn_ids != NULL) {
     if (cnavn_matchedId != NULL) *cnavn_matchedId = -1; // a priori
     for (; i < string2sCount ; i++) { 
-m_DIGGY_VAR_D(i)
       if (nsn_ids[i] < 0) continue;
       if ((comparison = ComparePStrings(pString1, sp_pString2s[i], n_isNeutralCharFunction,
         n_toCharFunction,b_subString2)) == EQUAL_TO__COMPARISON) break;

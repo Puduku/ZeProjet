@@ -579,7 +579,6 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
   struct P_STRING fp_template, struct P_STRING *nac_parsingErrorLocalization,
   G_STRING_STUFF nc_parsingErrorInfo) {
   m_DIGGY_BOLLARD()
-  int answer = ANSWER__YES; // a priori
   
   m_TRACK_IF(GreenCollectionClear(handle->h_templatePartitionsHandle) != RETURNED)
 
@@ -589,7 +588,6 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
   blotinstSequence = m_PString(GOOD_OLD_EMPTY_C_STRING);
 
 // Report error in some Blot instruction
-// (Do nothing if some error is ALREADY reported...)
 //
 // Passed:
 // lexeme:
@@ -597,22 +595,19 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
 // ...: 
 //
 // Uses:
-// - answer 
 // - nac_parsingErrorLocalization
 // - blotinstSequence 
 #define m_REPORT_ERROR(/*const struct P_STRING */lexeme,\
   /*const char* */p_format, ...) {\
-  if (answer == ANSWER__YES) { \
-    answer = ANSWER__NO ;\
-    if (nac_parsingErrorLocalization != NULL) {\
-      *nac_parsingErrorLocalization = blotinstSequence;\
-    }\
-    if (nc_parsingErrorInfo != NULL) {\
-      m_TRACK_IF(GStringPrintf(nc_parsingErrorInfo,0,p_format, ##__VA_ARGS__) < 0)\
-      m_TRACK_IF(GStringPrintf(nc_parsingErrorInfo,-1," [" FMT_P_STRING "]",\
-        m_P_STRING_2_FMT_ARGS(lexeme)) < 0)\
-    }\
+  if (nac_parsingErrorLocalization != NULL) {\
+    *nac_parsingErrorLocalization = blotinstSequence;\
   }\
+  if (nc_parsingErrorInfo != NULL) {\
+    m_TRACK_IF(GStringPrintf(nc_parsingErrorInfo,0,p_format, ##__VA_ARGS__) < 0)\
+    m_TRACK_IF(GStringPrintf(nc_parsingErrorInfo,-1," [" FMT_P_STRING "]",\
+      m_P_STRING_2_FMT_ARGS(lexeme)) < 0)\
+  }\
+  m_DIGGY_RETURN(ANSWER__NO)\
 }
 
 #define DELIMITOR__S "**%s** delimitor"
@@ -626,7 +621,7 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
   dummy = m_PString("N/A");
 
   char b_blotblog = b_FALSE0;
-  while (answer == ANSWER__YES && !b_EMPTY_P_STRING(fp_template)) {
+  while (!b_EMPTY_P_STRING(fp_template)) {
     // Stage 1: Locate new blotinst "sequence" 
 m_DIGGY_VAR_P_STRING(fp_template)
 m_DIGGY_VAR_D(b_blotblog)
@@ -648,6 +643,7 @@ m_DIGGY_VAR_D(b_blotblog)
 m_DIGGY_VAR_P_STRING(fp_template)
     m_PARSE_TILL_FIRST_MATCH_C(fp_template,NULL, &c_delimitorEntry, &blotinstSequence,2,";;",">>")
     if (b_EMPTY_P_STRING(fp_template)) { // NO ending ";;" or ">>" located 
+m_DIGGY_VAR_P_STRING(fp_template)
       m_REPORT_ERROR(dummy,"Missing " DELIMITOR__S, ";; or >>")
     } // if
 m_DIGGY_VAR_P_STRING(fp_template)
@@ -866,7 +862,7 @@ m_DIGGY_VAR_P_STRING(blotinstSequence)
 #undef DELIMITOR__S
 #undef DELIMITOR__C 
 #undef m_REPORT_ERROR
-  m_DIGGY_RETURN(answer)
+  m_DIGGY_RETURN(ANSWER__YES)
 } // BlotcodeExecutorParseTemplate 
 
 

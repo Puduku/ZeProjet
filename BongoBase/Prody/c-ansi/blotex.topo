@@ -193,27 +193,30 @@
 // <int blottab> ::= '^' <entity> '?' <int blottab ops>  
 // <int blottab ops> ::= <blottab op create> | ( [ <blottab op select> ] [ <blottab op reset> ]
 //   [ <blottab op insert> ] [ <blottab op next> ] [ <blottab op read int> ] ) 
-// <blottab op create> ::=  '[' ( <entity> [ <<as value int>> | <<as value str>> ] )+ ']?' 
+// <blottab op create> ::=  '[' <blottab creation> 
 // <blottab op select> ::= ':' <blottab request>
 // <blottab op reset> ::= '^'
 // <blottab op next> ::= '+'
 // <blottab op insert> ::= '@'
-// <blottab op read int> ::= '=' <entity> <<as value int>> 
+// <blottab op read int> ::= '=' <entity> [ <<as value int>> ] 
 //
 // <str blottab> ::= '^' <entity> '?' <str blottab ops>  
 // <str blottab ops> ::= [ <blottab op select> ] [ <blottab op reset> ] [ <blottab op next> ]
 //   [ <blottab op insert> ] <blottab op read str>
 // <blottab op read str> ::= '=' <entity> <<as value str>> 
 //
+// Blottabs must be explicitely created
+// <blottab creation> ::= ( <entity> [ <<as value int>> | <<as value str>> ] )+ ']?' 
+
 // Like blotreg requests, blottab requests are made of "atoms" : 
 // <blottab request> ::= <blottab request atom> ( <logical 2op> <blottab request atom> )* ':?'
 // <blottab request atom> ::= <blottab request atom int> | <blottab request atom str>
-// <blottab request atom int> ::= <entity> <<as value int>> ( '*' | ( <comp op> <intex> ) )
+// <blottab request atom int> ::= <entity> [ <<as value int>> ] ( '*' | ( <comp op> <intex> ) )
 // <blottab request atom str> ::= <entity> <<as value str>> ( '*' | ( <str comp op> <strex> ) )
 //
 // Blot table 'l-value' operations :
 // Set current int value operation (l-value): 
-// <blottab ref op set int> ::= '=' <entity> <<as value int>> 
+// <blottab ref op set int> ::= '=' <entity> [ <<as value int>> ] 
 // <int blottab ref> ::= '^' <entity> '?' <blottab ref op set int>
 //
 // Set current str value operation (l-value): 

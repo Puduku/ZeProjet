@@ -15,7 +15,7 @@
 // name AND value conveyance : VALUED_STRING__G_STRING_CONVEYANCE
 
 const int ps_gParamGStringConveyances[G_PARAM_CARDINALITY] = { 
-   TOKEN__G_STRING_CONVEYANCE, 
+   VALUED_STRING__G_STRING_CONVEYANCE, // "Token id." 
    VALUED_STRING__G_STRING_CONVEYANCE, 
 } ; 
 
@@ -57,8 +57,8 @@ static inline int m_GStringAsGParamValue(G_STRING_STUFF stuff, GENERIC_INTEGER e
 static inline int m_GStringAsGParamName(G_STRING_STUFF stuff, int tokenId, 
   G_STRINGS_HANDLE n_gStringsHandle) {
   m_CHECK_G_STRINGS_COLLECTION_CONVEYANCE(n_gStringsHandle,G_PARAM_NAME_ELEMENT,
-   TOKEN__G_STRING_CONVEYANCE)
-  stuff->acolyt.c_tokenId = tokenId;
+   VALUED_STRING__G_STRING_CONVEYANCE)
+  stuff->acolyt.cen_value = tokenId;
   return RETURNED;
 } // m_GStringAsGParamValue
 

@@ -171,6 +171,10 @@ m_DIGGY_VAR_STRING(ccp_expectedOutput)
   "    endLoop>>"
 #define DUMMY_OUTPUT10 "Farine de bled noir, sel et eau-Pastes, frometon et sauce tomate-"
 
+#define DUMMY_TEMPLATE11 \
+  "##<<be.Eval(^recettes2?[ name$ price# ]?) >>" 
+#define DUMMY_OUTPUT11 ""\
+  ""
 
 int main (int argc, char** argv) {
   unsigned int dgFlags = ParseTestyCommandArguments(argc,argv,ALL_FLAGS_OFF0) ;
@@ -264,6 +268,10 @@ int main (int argc, char** argv) {
   m_TRACK_IF(BlotcodeExecutorTest(10,h_blotcodeExecutorHandle, h_outputSuckerHandle,
     h_outputGStringStuff, DUMMY_TEMPLATE10, ANSWER__YES,  BLOTCODE_CONSTRUCTION_STATUS__OK,
     DUMMY_OUTPUT10) != RETURNED) 
+
+  m_TRACK_IF(BlotcodeExecutorTest(11,h_blotcodeExecutorHandle, h_outputSuckerHandle,
+    h_outputGStringStuff, DUMMY_TEMPLATE11, ANSWER__YES,  BLOTCODE_CONSTRUCTION_STATUS__OK,
+    DUMMY_OUTPUT11) != RETURNED) 
 
   m_TRACK_IF(G_STRING_DESTROY_INSTANCE(h_outputGStringStuff) != RETURNED)
 
