@@ -49,11 +49,11 @@
 // |                                              | - standard values                            |
 // +----------------------------------------------+----------------------------------------------+
 // | struct (union)                               | - private instances                          |
-// |                                              | - compound parameters (3)                    |
-// |                                              | - description of data formats (4)            |
+// |                                              | - compound parameters                        |
+// |                                              | - description of data formats (3)            |
 // +----------------------------------------------+----------------------------------------------+
 // | pointer (entity on which * operator is       | - address variables                          |
-// | applicable) (5)                              |   + single entity address (a_ indicator)     |
+// | applicable) (4)                              |   + single entity address (a_ indicator)     |
 // |                                              |   + array address: (s_ indicator)            |
 // |                                              | - generic (r_ indicator) parameter           |
 // |                                              | - handles                                    |
@@ -75,9 +75,7 @@
 //     (*) to emphasize our point of view, "typedef" is a CARICATURE of type definition ; the point
 //     is just to understand and keep in mind the limitations (from 'P' perspective) of that
 //     'L'-level mechanism.
-// (3) Maybe a regret in C is that it's not possible to pass constant struct-based compound
-//     parameters to C functions.
-// (4) that is representation of "shared" data structures (protocol messages, EDI, etc.).
+// (3) that is representation of "shared" data structures (protocol messages, EDI, etc.).
 //     The method imposes STRICT control of data alignment, structure padding and packing in memory.
 //     The techniques "of course" exist (#pragma) in C, but generally have very bad impact on
 //     process performance, and, above all, are not portable - what is quite paradoxical when your
@@ -86,7 +84,7 @@
 //     example of "false good idea"...  Finally, it's less complicated to rely on "grassroots"
 //     methods - those based on explicit "offset" and  "data length" definitions and
 //     manipulations...
-// (5) That pointer definition given at L-level is disputable. Fortunately, our P-abstraction
+// (4) That pointer definition given at L-level is disputable. Fortunately, our P-abstraction
 //     let us NOT having to deal with such philosophical (and somewhat vain) questions...
 
 
