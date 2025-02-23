@@ -195,7 +195,7 @@ int main (int argc, char** argv) {
 
 #define BLOTEXLIB_PREFIX "be"
 
-  int blotexlibLabel = BlotcodeLinkBlotexlib(h_blotcodeHandle, BLOTEXLIB_PREFIX,
+  int blotexlibLabel = l_BlotcodeLinkBlotexlib(h_blotcodeHandle, BLOTEXLIB_PREFIX,
     h_blotexlibExecutorFactoryHandle) ;
   m_ASSERT(blotexlibLabel == BLOTLIB_ENTRY0 + 1)
 
@@ -215,7 +215,7 @@ int main (int argc, char** argv) {
     RETURNED)
 
   BLOTEXLIB_EXECUTOR_HANDLE blotexlibExecutorHandle = (BLOTEXLIB_EXECUTOR_HANDLE)UNDEFINED;
-  m_ASSERT(BlotcodeExecutorGetBlotexlibExecutorHandle(h_blotcodeExecutorHandle,blotexlibLabel,
+  m_ASSERT(l_BlotcodeExecutorGetBlotexlibExecutorHandle(h_blotcodeExecutorHandle,blotexlibLabel,
     &blotexlibExecutorHandle) == RETURNED)
 
 

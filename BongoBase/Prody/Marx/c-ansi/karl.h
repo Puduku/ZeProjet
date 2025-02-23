@@ -1,29 +1,30 @@
-// blotex.h, version 1.92 (ANSI)
+// karl.h, version 1.92 (ANSI)
 // (c) Atos-Euronext Belgium - 2008
-// (c) Puduku - 2023
+// (c) Puduku - 2025
 
-#ifndef __C_ANSI_BLOTEX_H_INCLUDED__
-#define __C_ANSI_BLOTEX_H_INCLUDED__
+#ifndef __C_ANSI_KARL_H_INCLUDED__
+#define __C_ANSI_KARL_H_INCLUDED__
 
 /////////////////////////////
-#include "c-ansi/blotex.topo"
+#include "c-ansi/karl.topo"
 /////////////////////////////
 
 #include "c-ansi/blotcode.h"
 #include "c-ansi/g-string.h"
 
 
-// blotex library executor 
+// karl library executor 
 // =======================
 
-struct BLOTEXLIB_EXECUTOR_FACTORY ; // Private
-typedef struct BLOTEXLIB_EXECUTOR_FACTORY *BLOTEXLIB_EXECUTOR_FACTORY_HANDLE; // Public
+struct KARLLIB_EXECUTOR_FACTORY ; // Private
+typedef struct KARLLIB_EXECUTOR_FACTORY *KARLLIB_EXECUTOR_FACTORY_HANDLE; // Public
 
  
-// Create blotex library executor factory
+// Create karl library executor factory
 //
 // Passed:
 // - *azh_handle: "un-initialized" handle
+// - blotexlibLabel: label of linked blotex lib (see m_BlotcodeLinkBlotexlib() in c-ansi/blotex.h)
 //
 // Changed:
 // - *azh_handle: "factory" instance handle
@@ -31,10 +32,10 @@ typedef struct BLOTEXLIB_EXECUTOR_FACTORY *BLOTEXLIB_EXECUTOR_FACTORY_HANDLE; //
 // Returned:
 // - RETURNED: OK, created and initialized
 // - -1: unexpected problem
-int BlotexlibExecutorFactoryCreateInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE *azh_handle);
+int KarllibExecutorFactoryCreateInstance(KARLLIB_EXECUTOR_FACTORY_HANDLE *azh_handle, int blotexlibLabel);
 
 
-// Destroy blotex library executor factory
+// Destroy karl library executor factory
 //
 // Passed:
 // - xh_handle: 
@@ -42,50 +43,48 @@ int BlotexlibExecutorFactoryCreateInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE *az
 // Returned:
 // - RETURNED: OK, destroyed 
 // - -1: unexpected problem ; anomaly is raised
-int BlotexlibExecutorFactoryDestroyInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE xh_handle) ;
+int KarllibExecutorFactoryDestroyInstance(KARLLIB_EXECUTOR_FACTORY_HANDLE xh_handle) ;
 
 
-// Link blotex library
-// (Hides "details" for linking blotex lib...) 
+// Link karl (blotpam) library to blotcode instance.
 // 
 // Passed:
 // - ep_handle: blotcode instance handle created by BlotcodeCreateInstance()
-// - nfp_blotlibPrefix: prefix used for blotex library (NULL if NO prefix) 
-// - fp_blotexlibExecutorFactoryHandle: see BlotexlibExecutorFactoryCreateInstance()
+// - nfp_blotlibPrefix: prefix used for karl library (NULL if NO prefix)
+// - fp_karllibExecutorFactoryHandle: see KarllibExecutorFactoryCreateInstance()
 //
 // Returned: 
 // - >= 0: entry (label) of library (BLOTLIB_ENTRY0 for 1st blotlib, etc.)
 // - -1: unexpected problem ; anomaly is raised
-int l_BlotcodeLinkBlotexlib(BLOTCODE_HANDLE ep_handle, const char* nfp_blotlibPrefix,
-  BLOTEXLIB_EXECUTOR_FACTORY_HANDLE fp_blotexlibExecutorFactoryHandle) ;
+int l_BlotcodeLinkKarllib(BLOTCODE_HANDLE ep_handle, const char* nfp_blotlibPrefix,
+  KARLLIB_EXECUTOR_FACTORY_HANDLE fp_karllibExecutorFactoryHandle) ;
 
 
 
 // Interface with other blotlibs
 // =============================
 
-// Allow access to blotex variables... 
+// Allow access to karl variables... 
 
-struct BLOTEXLIB_EXECUTOR; // Private structure 
-typedef struct BLOTEXLIB_EXECUTOR *BLOTEXLIB_EXECUTOR_HANDLE; // Public handle
+struct KARLLIB_EXECUTOR; // Private structure 
+typedef struct KARLLIB_EXECUTOR *KARLLIB_EXECUTOR_HANDLE; // Public handle
 
 // This function, which wraps BlotcodeExecutorGetBlotlibExecutorHandle(), retrieves the executor
-// handle of =>blotex<= library.
-// This function is useful to access to all blotex variables... 
-// TODO: indiquer que cette medthode n'est pas "native" de blotcode executor ???
+// handle of =>karl<= library.
+// This function is useful to access to all pamphlets... 
 //
 // Passed:
 // - handle: see BlotcodeExecutorCreateInstance() 
-// - blotexLibEntry: entry (label) of blotex library (see BlotcodeLinkBlotexlib() above) 
+// - karlLibEntry: entry (label) of karl library (see BlotcodeLinkKarllib() above) 
 //
 // Modified:
-// - *a_blotexlibExecutorHandle: blotex executor library handle 
+// - *a_karllibExecutorHandle: karl executor library handle 
 //
 // Returned: 
 // - RETURNED: Ok
 // - -1: unexpected problem ; anomaly is raised
-int l_BlotcodeExecutorGetBlotexlibExecutorHandle(BLOTCODE_EXECUTOR_HANDLE handle, int blotexlibEntry,
-  BLOTEXLIB_EXECUTOR_HANDLE *a_blotexlibExecutorHandle) ;
+int l_BlotcodeExecutorGetKarllibExecutorHandle(BLOTCODE_EXECUTOR_HANDLE handle, int karllibEntry,
+  KARLLIB_EXECUTOR_HANDLE *a_karllibExecutorHandle) ;
 												  
 
 #define GLOBAL_BLOTREG_NAME GOOD_OLD_EMPTY_C_STRING
@@ -93,7 +92,7 @@ int l_BlotcodeExecutorGetBlotexlibExecutorHandle(BLOTCODE_EXECUTOR_HANDLE handle
 #define BLOTVAR_NAME_ELEMENT G_PARAM_NAME_ELEMENT
 #define BLOTVAR_VALUE_ELEMENT G_PARAM_VALUE_ELEMENT 
 
-// Retrieve some blot register.
+// Retrieve some blot pamphlet.
 // 
 // Passed:
 // - handle:
@@ -107,7 +106,7 @@ int l_BlotcodeExecutorGetBlotexlibExecutorHandle(BLOTCODE_EXECUTOR_HANDLE handle
 // - RESULT__FOUND: OK
 // - RESULT__NOT_FOUND: 
 // - -1: unexpected problem; anomaly is raised
-int BlotexlibExecutorGetBlotreg (BLOTEXLIB_EXECUTOR_HANDLE handle,
+int KarllibExecutorGetBlotpam (KARLLIB_EXECUTOR_HANDLE handle,
   struct P_STRING blotregName, G_STRINGS_HANDLE *ac_blotregHandle) ;
 
 // Create blot register.
@@ -125,7 +124,7 @@ int BlotexlibExecutorGetBlotreg (BLOTEXLIB_EXECUTOR_HANDLE handle,
 // - COMPLETED__OK: OK
 // - COMPLETED__BUT: the register already exists 
 // - -1: unexpected problem; anomaly is raised
-int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
+int KarllibExecutorCreateBlotpam(KARLLIB_EXECUTOR_HANDLE handle,
   struct P_STRING blottabName, G_STRINGS_HANDLE *na_blotregHandle);
 
 
@@ -144,7 +143,7 @@ int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
 // - RESULT__FOUND: OK
 // - RESULT__NOT_FOUND: 
 // - -1: unexpected problem; anomaly is raised
-int BlotexlibExecutorGetBlottab (BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING blottabName,
+int KarllibExecutorGetBlottab (KARLLIB_EXECUTOR_HANDLE handle, struct P_STRING blottabName,
   G_STRINGS_HANDLE *ac_tableHandle, G_STRINGS_HANDLE *acp_fieldsHandle);
 
 
@@ -174,10 +173,10 @@ enum { // #REF BLOTTAB_INDEX_TYPE
 // - COMPLETED__OK: OK
 // - COMPLETED__BUT: the table already exists 
 // - -1: unexpected problem; anomaly is raised
-int BlotexlibExecutorCreateBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING blottabName,
+int KarllibExecutorCreateBlottab(KARLLIB_EXECUTOR_HANDLE handle, struct P_STRING blottabName,
   int fieldsNumber, struct P_STRING* s_names, int* s_blottabIndexTypes,
   G_STRINGS_HANDLE *na_tableHandle, G_STRINGS_HANDLE *nap_fieldsHandle) ;
 
 
 
-#endif // __BLOTEX_C_ANSI_H_INCLUDED__
+#endif // __KARL_C_ANSI_H_INCLUDED__
