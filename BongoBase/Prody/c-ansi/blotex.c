@@ -130,14 +130,14 @@ static int BlottabDestroyInstance(void *xhr_handle) {
 static int BlotexlibExecutorFactoryCreateProductInstance(void *pr_handle,
   void **azhr_blotlibExecutorHandle) {
   m_DIGGY_BOLLARD()
+
   BLOTEXLIB_EXECUTOR_FACTORY_HANDLE p_handle = (BLOTEXLIB_EXECUTOR_FACTORY_HANDLE)pr_handle;
   m_CHECK_MAGIC_FIELD(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE,p_handle)
 
   m_MALLOC_INSTANCE(*(BLOTEXLIB_EXECUTOR_HANDLE*)azhr_blotlibExecutorHandle)
-  m_ASSIGN_MAGIC_FIELD(BLOTEXLIB_EXECUTOR_HANDLE,
-    *(BLOTEXLIB_EXECUTOR_HANDLE*)azhr_blotlibExecutorHandle)
-
   BLOTEXLIB_EXECUTOR_HANDLE productHandle = *azhr_blotlibExecutorHandle;
+
+  m_ASSIGN_MAGIC_FIELD(BLOTEXLIB_EXECUTOR_HANDLE,productHandle)
 
   m_TRACK_IF(NAMED_OBJECTS_CREATE_INSTANCE(&(productHandle->h_blotregsHandle), 10,
     BlotregDestroyInstance) != RETURNED)

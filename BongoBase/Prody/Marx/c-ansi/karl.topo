@@ -10,25 +10,25 @@
 //
 // Blot pamplets operations
 //
-// See engels.topo for the description of pamphlets structure (field / group / aggregate...) 
+// See engels.topo for the description of pamphlets structure (point / group / aggregate...) 
 // NOTICE: contrary to blotregs and blottabs, there is NO "global" blotpam. Hence a blotpam with
 // empty entity name is simply a notation to refer the "current" blotpam (cursor) 
 //
-// Blot pamphlet field  :
+// Blot pamphlet point  :
 // <prot intex> ::= <int constant> | ( '(' <intex> ')' )  
 // <blotpam portion> ::= '{' <prot intex> [ ( ':' | '-' ) <prot intex> ] '}'  
-// <blotpam field ref> ::= ( '.' <entity>  | '@' <prot intex> ']' [ '[' <prot intex> ']' ] [
+// <blotpam point ref> ::= ( '.' <entity>  | '@' <prot intex> ']' [ '[' <prot intex> ']' ] [
 //   <blotpam portion> ] )* 
 //
-// <int blotpam field> ::= [ <blotpam field ref> ] '=' <int blotpam spec> 
+// <int blotpam point> ::= [ <blotpam point ref> ] '=' <int blotpam spec> 
 // <int blotpam spec> ::= 'L' | 't' | 'z' | 'O' | 'i' | 'j' | 'p' | 'e' | 'l' | 'o' | 's'
 //
-// <str blotpam field> ::= [ <blotpam field ref> ] '=' <str blotpam spec> 
+// <str blotpam point> ::= [ <blotpam point ref> ] '=' <str blotpam spec> 
 // <str blotpam spec> ::= 'P' | 'T' | 'N' | 'd' | 'n' | 'r' | 'D' | 'I' | 'v' | 'V' | 'w'
 //
 //
-// Blot pamphlet ('r-value') field references and operations :
-// <int blotpam> ::= '^^' <entity> ( ( '?' <int blotpam ops> ) | <int blotpam field> )
+// Blot pamphlet ('r-value') point references and operations :
+// <int blotpam> ::= '^^' <entity> ( ( '?' <int blotpam ops> ) | <int blotpam point> )
 // <int blotpam ops> ::= [ <blotpam op select> ] [ <blotpam op reset> ] [ <blotpam op next> ]
 //   [ <blotpam op read int> ] 
 // <blotpam op select> ::= ':' <blotpam request>
@@ -36,13 +36,13 @@
 // <blotpam op next> ::= '+'
 // <blotpam op read int> ::= '=' <entity> [ <<as value int>> ] 
 //
-// <str blotpam> ::= '^^' <entity> ( ( '?' <str blotpam ops> ) | <str blotpam field> )
+// <str blotpam> ::= '^^' <entity> ( ( '?' <str blotpam ops> ) | <str blotpam point> )
 // <str blotpam ops> ::= [ <blotpam op select> ] [ <blotpam op reset> ] [ <blotpam op next> ]
 //   [ <blotpam op insert> ] <blotpam op read str>
 // <blotpam op read str> ::= '=' <entity> <<as value str>> 
 //
 // Selections based on physical filel types ('#' => INT(LE/BE) '$' => chars)
-// pamphlet physical field type : byte sequence ($) or int (BE / LE) (#)
+// pamphlet physical point type : byte sequence ($) or int (BE / LE) (#)
 // TODO: logical selections (based on logical data type) ?)
 // Like blotreg and blottabs requests, blotpam requests are made of "atoms" : 
 // <blotpam request> ::= <blotpam request atom> ( <logical 2op> <blotpam request atom> )* ':?'
@@ -55,64 +55,64 @@
 
 // EXAMPLES:
 //   ^^RLCM1K?: * :?       => dumping pamphlet RLCM1K
-//   ^^RLCM1K?: >2 :?    => dumping pamphlet RLCM1K, limited to pamphlet fields having 2 depth
-//   ^^RLCM1K?: $ === "*bolo*" :?  => dumping pamphlet RLCM1K, limited to pamphlet fields containing "bolo"
-//   ^^RLCM1K?: # === 69 :?        => dumping pamphlet RLCM1K, limited to integer pamphlet fields equal to 69 
-//   ^^RLCM1K?: !$ == "CIdAdfEmetOm" :?  => dumping pamphlet RLCM1K, limited to fields "CIdAdfEmetOm"
+//   ^^RLCM1K?: >2 :?    => dumping pamphlet RLCM1K, limited to pamphlet points having 2 depth
+//   ^^RLCM1K?: $ === "*bolo*" :?  => dumping pamphlet RLCM1K, limited to pamphlet points containing "bolo"
+//   ^^RLCM1K?: # === 69 :?        => dumping pamphlet RLCM1K, limited to integer pamphlet points equal to 69 
+//   ^^RLCM1K?: !$ == "CIdAdfEmetOm" :?  => dumping pamphlet RLCM1K, limited to points "CIdAdfEmetOm"
 //   ^^RLCM1K?: !$ == "CIdAdfEmetOm" and >2 :? 
 //   ^^RLCM1K?^          => reset 
 //   ^^RLCM1K?+          =>  fetch 
 //   ^^?+                => fetch (implicit RLCM1K) 
-//   ^^?=n               => read field name (implicit RLCM1K) 
-//   ^^RLC04K.AMeLim=l      => the length of 6 occurences of the AMeLim field
+//   ^^?=n               => read point name (implicit RLCM1K) 
+//   ^^RLC04K.AMeLim=l      => the length of 6 occurences of the AMeLim point
 //   ^^RLC04K.AMeLim[1]=V   => the value of the 1st occurence of AMeLim
 //   ^^RLC04K=V        => the complete RLC04K pamphlet
-//   ^^RLCM1K@232=V                        => the CIdAdfEmetOm field of the ACarOmDenAcKL aggregate
-//   ^^RLCM1K.ACarOmDenAcKL.CIdAdfEmetOm=V => also the CIdAdfEmetOm field of the ACarOmDenAcKL aggreg
+//   ^^RLCM1K@232=V                        => the CIdAdfEmetOm point of the ACarOmDenAcKL aggregate
+//   ^^RLCM1K.ACarOmDenAcKL.CIdAdfEmetOm=V => also the CIdAdfEmetOm point of the ACarOmDenAcKL aggreg
 //   ^^RLCM1K.ACarOmDenAcKL=V              => the ACarOmDenAcKL as aggregate 
 //   ^^RLC01K.DHTran{9-14}=V 
 //   ^^RLC01K.DHTran{9:6}=V
 ////   ^^RLC04K?:.AMeLim[1] :?+=V   => the value of the 1st occurence of AMeLim 
 ////   ^^RLCM1K@232>1=V          => designates the ACarOmDenAcKL aggregate.
-////   ^^RLCM1K@427&.CIdAdfEmetOm=V => (indicates both name and position of a field)
-////   ^^RLCM1K.CIdAdfEmetOm=V => also designates the CIdAdfEmetOm field of the ACarOmDenAcKL aggreg
+////   ^^RLCM1K@427&.CIdAdfEmetOm=V => (indicates both name and position of a point)
+////   ^^RLCM1K.CIdAdfEmetOm=V => also designates the CIdAdfEmetOm point of the ACarOmDenAcKL aggreg
 
 // Notice: blot pamphlet operations are NOT supported as 'l-value' operations.
 
-// List of convertors utilizable in field read op 
+// List of convertors utilizable in point read op 
 //   =r : raw reference
 //   =D : pamphlet description
 //   =L : pamphlet length
 //   =N : pamphlet name
-//   =d : field description
-//   =n : field name
-//   =t : field type 
-//   =z : field depth in pamphlet
-//   =T : field expansion (tree representation) in pamphlet (with pamphlet fields iterator)
-//   =P : field path in pamphlet
-//   =O : field occurences specifier in pamphlet or aggregate 
-//   =i : field's occurence specifier in pamphlet or aggregate 
-//   =j : field's portion specifier 
-//   =p : field position in pamphlet (first char, taking into account the
+//   =d : point description
+//   =n : point name
+//   =t : point type 
+//   =z : point depth in pamphlet
+//   =T : point expansion (tree representation) in pamphlet (with pamphlet points iterator)
+//   =P : point path in pamphlet
+//   =O : point occurences specifier in pamphlet or aggregate 
+//   =i : point's occurence specifier in pamphlet or aggregate 
+//   =j : point's portion specifier 
+//   =p : point position in pamphlet (first char, taking into account the
 //        portion specifier)
-//   =e : field's last char position in pamphlet (taking into account the
+//   =e : point's last char position in pamphlet (taking into account the
 //        portion specifier) 
-//   =l : field length (taking into account the portion specifier) 
-//   =o : field offset position in pamphlet (first char, taking into account the
+//   =l : point length (taking into account the portion specifier) 
+//   =o : point offset position in pamphlet (first char, taking into account the
 //        portion specifier) 
-//   =s : field's last char offset position in pamphlet (taking into account the
+//   =s : point's last char offset position in pamphlet (taking into account the
 //        portion specifier) 
-//   =v : field's value, narrowest representation, taking into account the intrinsic representation rules
+//   =v : point's value, narrowest representation, taking into account the intrinsic representation rules
 //        +bytes string: trimmed to min length 
-//         Note: in case you work on field portion ({<portion>} specifier in field reference), the 
+//         Note: in case you work on point portion ({<portion>} specifier in point reference), the 
 //         narrowest representation does not applies; =v is equivalent to =V
 //        +binary integer: as is (strict binary content); =v is equivalent to =V 
-//   =V : field's verbatim value
+//   =V : point's verbatim value
 //        +bytes string: as is
 //        +binary integer: as is (strict binary content) 
-//   =w : field's value, widest representation, taking into account the intrinsic representation rules 
-//        +bytes string: padded to max field length 
-//         Note: in case you work on field portion ({<portion>} specifier in field reference), the 
+//   =w : point's value, widest representation, taking into account the intrinsic representation rules 
+//        +bytes string: padded to max point length 
+//         Note: in case you work on point portion ({<portion>} specifier in point reference), the 
 //         widest representation does not applies; =w is equivalent to =V
 //        +binary integer: as is (strict binary content); =w is equivalent to =V 
-//   =I : field's raw binary value displayable image
+//   =I : point's raw binary value displayable image

@@ -125,7 +125,7 @@ int KarllibExecutorGetBlotpam (KARLLIB_EXECUTOR_HANDLE handle,
 // - COMPLETED__BUT: the register already exists 
 // - -1: unexpected problem; anomaly is raised
 int KarllibExecutorCreateBlotpam(KARLLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING blottabName, G_STRINGS_HANDLE *na_blotregHandle);
+  struct P_STRING blottabName, G_STRINGS_HANDLE *na_pointsHandle);
 
 
 // Retrieve some blot table.
