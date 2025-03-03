@@ -4,8 +4,8 @@
 
 // Using stylistic devices in C (and other programmming languages)
 
-// In Programming/software development, we roughly distinct the two following phase
-// - conception/desing 
+// In Programming/software development, we roughly distinct the two following phase:
+// - conception/design 
 // - writing code
 //
 // During conception phase...
@@ -13,6 +13,14 @@
 // (generalization or specification) of existing general concepts. General concepts are ideas, principles, objects, descrptions of phenomenons,etc.
 // The main "engine" to derive new concepts are the metaphors...
 
-// writing code phase...
+// Writing code phase...
+// An important aspect of writing code is "good" naming. 
+// The difficulty of naming is that rigid and dogmatic naming conventions are totally counter-productive. In particular the two extreme :
+// - most simmplistic naming conventions (very short single  names without hierarchisation) are not legible (no description of concern) and unavoidly lead to grave naming conflicts
+// - the other extreme (long descriptive names with systematic hierarchzation) is also unmanageable : gigantic full qualified names are no more legible to humans and lead to unreasonably
+//   verbosity
+// Legible code must be both consise and not ambivalent (clear of concern). Again, stylistic devices come to our rescue and allow us to “reconcile the irreconcilable”.  
 // naming of new concept : simply use the methaphor
-// problem: rigorous namming : huge hierarchization of terms ; parade : use metonymy (or synecdoche) 
+// another simple parade : using metonymies and synecdoches. That is, when applicable, name a concept by a specialisation/generalization/part when applicable.
+// We often unconsciously make such metonymies. The danger, then, is of creating serious confusion. 
+// To make metonymies our real "friends",  the point is simply to GET AWARE of their using...
