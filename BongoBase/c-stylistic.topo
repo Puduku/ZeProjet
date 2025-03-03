@@ -15,8 +15,8 @@
 
 // Writing code phase...
 // An important aspect of writing code is "good" naming. 
-// The difficulty of naming is that rigid and dogmatic naming conventions are totally counter-productive. In particular the two extreme :
-// - most simmplistic naming conventions (very short single  names without hierarchisation) are not legible (no description of concern) and unavoidly lead to grave naming conflicts
+// The difficulty of naming is that rigid and dogmatic naming conventions are totally counter-productive. In particular the two extremes :
+// - most rudimentary naming conventions (very short single  names without hierarchisation) are not legible (no description of concern) and unavoidly lead to grave naming conflicts
 // - the other extreme (long descriptive names with systematic hierarchzation) is also unmanageable : gigantic full qualified names are absolutely NOT legible to humans and lead to unreasonably
 //   verbosity of the code . In addition, such code is simply not presentable because of too long (more than 100 chars) lines of code.  
 // Legible code must be both consise and not ambivalent (clear of concern). Again, stylistic devices come to our rescue and allow us to “reconcile the irreconcilable”.  
