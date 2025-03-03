@@ -4,11 +4,15 @@
 
 // Using stylistic devices in C (and other programmming languages)
 
-// Programming : conception + writing
+// In Programming/software development, we roughly distinct the two following phase
+// - conception/desing 
+// - writing code
+//
+// During conception phase...
+// A new design does not emerges from nothing. Rather, new programming concepts (modules, classes, applications and so on) are based on adaptation and extension
+// (generalization or specification) of existing general concepts. General concepts are ideas, principles, objects, descrptions of phenomenons,etc.
+// The main "engine" to derive new concepts are the metaphors...
 
-// conception phase...
-// A new concept : application and adaptation or extension (generalization / specification) of existing concepts (ideas, principles, objects, phenomenons,etc.) => main "engine" are metaphors
-
-// writing phase...
+// writing code phase...
 // naming of new concept : simply use the methaphor
 // problem: rigorous namming : huge hierarchization of terms ; parade : use metonymy (or synecdoche) 
