@@ -4,19 +4,20 @@
 
 // Using stylistic devices in C (and other programmming languages)
 
-// In Programming/software development, we very roughly distinct the two following phases:
+// In Programming/software development, we (very roughly) distinct the two following phases:
 // - conception/design 
 // - writing the code
 //
 // During conception phase...
 // A new design does not emerges from nothing. Rather, new programming concepts (modules, classes, applications and so on) are based on adaptation and extension
-// (generalization or specification) of existing, general concepts. General concepts are ideas, principles, objects, descrptions of phenomenons, theories, etc. developped by (human) minds. 
+// (generalization or specification) of existing, general concepts. General concepts are any ideas, principles, objects, descrptions of phenomenons, theories, etc. developped by (human) minds. 
 // The major "engines" used to derive new concepts from existing ones are the metaphors and the metonymies...
 
 // Writing code phase...
-// An important aspect of writing code is about applying "good" naming convetions. 
-// The difficulty of such exercise is that too rigid or dogmatic naming conventions are totally counter-productive. In particular these two "extremes" :
-// - minimalist naming conventions (very short single names without hierarchisation) are not legible (due lack of description of concern) and unavoidly lead to grave naming conflicts
+// An important aspect of code writing is about applying "good" naming conventions. 
+// The difficulty of such exercise is that too rigid or dogmatic naming conventions are totally counter-productive.
+// In particular these two "extremes" :
+// - minimalist naming conventions, based on (very) short single names without hierarchization of such names are not legible (due lack of description of concern) and unavoidly lead to grave naming conflicts
 // - the other extreme (long descriptive names with systematic hierarchization) is also not manageable properly : gigantic full qualified names are absolutely NOT legible to humans and increase
 //   artificially and unreasonably the weight of the code. In particular, the exscessive length of the lines of such code (200 characters and more) is a big concern, 
 //   because it makes most routine operations - especially visual comparison between versions - very painful.
@@ -30,4 +31,5 @@
 // during coding, the magic of stylistic devices is the following: replacing a long descriptive periphrase with a single term. The problem is to ensure that anyone 
 // Examples of useful figures of speech:
 // - Personification: using a knowm character to name your application
-// - Private joke: given the stato quo that we program in English, non English-
+// - Private joke: given the stato quo that we program in English, non English-native programmers use that opportunity to hide (dirty) slan words (in their mother tongue)  within obscure acronyms to
+//   programmmers from the "rest of the world"....
