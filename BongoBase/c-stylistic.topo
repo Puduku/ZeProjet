@@ -11,14 +11,15 @@
 // During conception phase...
 // A new design does not emerges from nothing. Rather, new programming concepts (modules, classes, applications and so on) are based on adaptation and extension
 // (generalization or specification) of existing, general concepts. General concepts are any ideas, principles, objects, descrptions of phenomenons, theories, etc. developped by (human) minds. 
-// The major "engines" used to derive new concepts from existing ones are the metaphors and the metonymies...
+// The major "engines" used by humans to derive new concepts from existing ones are the metaphors and the metonymies...
 
 // Writing code phase...
 // An important aspect of code writing is about applying "good" naming conventions. 
-// The difficulty of such exercise is that too rigid or dogmatic naming conventions are totally counter-productive.
+// The un-ending debate related to the "good naming convetions" in software is as old as software itself...
+// The difficulty of the exercise is that, programmers, indeed,  HAVE TO be rigorous with the naming conventions... But too rigid or dogmatic naming conventions are also totally counter-productive.
 // In particular these two "extremes" :
 // - minimalist naming conventions, based on (very) short single names without hierarchization of such names are not legible (due lack of description of concern) and unavoidly lead to grave naming conflicts
-// - the other extreme (long descriptive names with systematic hierarchization) is also not manageable properly : gigantic full qualified names are absolutely NOT legible to humans and increase
+// - the other extreme (systematic long descriptive names with hierarchization) is also not manageable properly : longer Multiple-words identifiers are NOT legible to humans and increase
 //   artificially and unreasonably the weight of the code. In particular, the exscessive length of the lines of such code (200 characters and more) is a big concern, 
 //   because it makes most routine operations - especially visual comparison between versions - very painful.
 // Hense, legible code must be both consise but not ambivalent (with "speaking" names). 
