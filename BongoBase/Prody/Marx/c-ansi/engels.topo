@@ -1,0 +1,11 @@
+// engels.topo, version 1.92 (ANSI)
+// (c) Atos-Euronext Belgium - 2008
+// (c) Puduku - 2025
+
+// ENGELS: TODO: trouver une dedfinition ag la con pour "construire les pamphlets" 
+// Build pamphlets
+//
+// What is a "pamphlet" ? 
+// ======================
+
+// a pamphlet === a message based on fields (so-called "points") 

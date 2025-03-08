@@ -9,6 +9,7 @@
 #include "c-ansi/g-string.h"
 #include "c-ansi/g-param.h"
 #include "c-ansi/named-object.h"
+#include "c-ansi/engels.h"
 #include "c-ansi/stderr.h"
 
 #include "c-ansi/testy-diggy.h"
@@ -47,129 +48,9 @@ struct KARLLIB_EXECUTOR {
 
 
 // Blotpams: 
-
-struct PAMPHLET_EXAMPLAR_POINT_OCCURENCE {
-  // Localization 
-  int offset ; // >= 0 (vis-a-vis point) 
-} ;
-typedef struct PAMPHLET_EXAMPLAR_POINT_OCCURENCE *PAMPHLET_EXAMPLAR_POINT_OCCURENCE_STUFF;
-
-struct PAMPHLET_EXAMPLAR_POINT {
-  // Localization 
-  int offset ; // >= 0 (vis-a-vis parent point) 
-  int depth ; // >= 0 
-  int totalLength ; // >= 0 (all occurences)
-
-  // Entry in "pamphlet point descriptions"
-  int descriptionEntry ;
-
-  GREEN_COLLECTION_HANDLE h_occurencesHandle; 
-
-  G_STRINGS_HANDLE h_subPointsHandle ; // PAMPHLET_EXAMPLAR_POINT as NAMED_OBJECT
-  m_DECLARE_MAGIC_FIELD(PAMPHLET_EXAMPLAR_POINT_HANDLE)
-} ;
-typedef struct PAMPHLET_EXAMPLAR_POINT *PAMPHLET_EXAMPLAR_POINT_HANDLE;
-
-// NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION
-static int PamphletExamplarPointDestroyInstance(void *xhr_handle) {
-  m_DIGGY_BOLLARD_S()
-
-  PAMPHLET_EXAMPLAR_POINT_HANDLE xh_handle = (PAMPHLET_EXAMPLAR_POINT_HANDLE) xhr_handle;
-  m_CHECK_MAGIC_FIELD(PAMPHLET_EXAMPLAR_POINT_HANDLE,xh_handle)
-  m_TRACK_IF(GreenCollectionDestroyInstance(xh_handle->h_occurencesHandle) != RETURNED)
-  m_TRACK_IF(GStringsDestroyInstance(xh_handle->h_subPointsHandle) != RETURNED)
-  
-  free(xh_handle);
-
-  m_DIGGY_RETURN(RETURNED)
-} // PamphletExamplarPointDestroyInstance
-
-// Ret:
-// - RETURNED: Ok
-// - -1 special value: anomaly raised
-static int PamphletExamplarPointCreateInstance(PAMPHLET_EXAMPLAR_POINT_HANDLE *azh_handle,
-   int fieldsNumber) {
-  m_DIGGY_BOLLARD_S()
-
-  m_MALLOC_INSTANCE(*azh_handle)
-  PAMPHLET_EXAMPLAR_POINT_HANDLE handle = *azh_handle;
-  m_ASSIGN_MAGIC_FIELD(PAMPHLET_EXAMPLAR_POINT_HANDLE,handle)
-
-  handle->offset = 0;
-  handle->depth = 0;
-  handle->totalLength = 0;
-  handle->descriptionEntry = 0;
- 
-  m_TRACK_IF(GreenCollectionCreateInstance(&handle->h_occurencesHandle, BATEAU__EXPECTED_ITEMS_NUMBER,
-    sizeof(struct PAMPHLET_EXAMPLAR_POINT_OCCURENCE), (GREEN_HANDLER__DISENGAGE_FUNCTION)NULL,
-    (GREEN_HANDLER__COMPARE_FUNCTION)NULL,(GREEN_HANDLER__EQUATE_FUNCTION)NULL,
-    (void*)UNDEFINED) != RETURNED) 
-
-  m_TRACK_IF(NAMED_OBJECTS_CREATE_INSTANCE(&handle->h_subPointsHandle, BATEAU__EXPECTED_ITEMS_NUMBER,
-    PamphletExamplarPointDestroyInstance) != RETURNED)
-  //GStringsAddIndex(handle->h_pointsHandle);
-
-  //m_TRACK_IF(GStringsFreeze(handle->hp_fieldsHandle,NULL) < 0)
-  m_DIGGY_RETURN(RETURNED)
-} // PamphletExamplarPointCreateInstance
-
-
-//struct PAMPHLET_EXAMPLAR {
-//  struct P_STRING examplar ;
-//  // description entry in "pamphlets" descriptions
-//  int pamphletDescriptionEntry ;
-//  G_STRINGS_HANDLE *h_pointsHandle ; // PAMPHLET_EXAMPLAR_POINT as NAMED_OBJECT
-//} ;
-
-
 ////////////////////////////////
 // blotpam <=> pamphlet examplar
 ////////////////////////////////
-struct BLOTPAM {
-  m_DECLARE_MAGIC_FIELD(BLOTPAM_HANDLE)
-  //G_STRINGS_HANDLE h_tableHandle;
-  //G_STRINGS_HANDLE hp_fieldsHandle;
-  struct P_STRING examplar ;
-  // description entry in "pamphlets" descriptions
-  int pamphletDescriptionEntry ;
-  G_STRINGS_HANDLE h_pointsHandle ; // PAMPHLET_EXAMPLAR_POINT as NAMED_OBJECT
-} ; 
-typedef struct BLOTPAM* BLOTPAM_HANDLE;
-
-
-
-// Ret:
-// - RETURNED: Ok
-// - -1 special value: anomaly raised
-static int BlotpamCreateInstance(BLOTPAM_HANDLE *azh_handle, int dummy) {
-  m_DIGGY_BOLLARD_S()
-
-  m_MALLOC_INSTANCE(*azh_handle)
-  BLOTPAM_HANDLE handle = *azh_handle;
-  m_ASSIGN_MAGIC_FIELD(BLOTPAM_HANDLE,handle)
-
-  m_TRACK_IF(NAMED_OBJECTS_CREATE_INSTANCE(&handle->h_pointsHandle, BATEAU__EXPECTED_ITEMS_NUMBER,
-    PamphletExamplarPointDestroyInstance) != RETURNED)
-  //GStringsAddIndex(handle->h_pointsHandle);
-
-  //m_TRACK_IF(GStringsFreeze(handle->hp_fieldsHandle,NULL) < 0)
-
-  m_DIGGY_RETURN(RETURNED)
-} // BlotpamCreateInstance
-
-
-// NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION
-static int BlotpamDestroyInstance(void *xhr_handle) {
-  m_DIGGY_BOLLARD_S()
-
-  BLOTPAM_HANDLE xh_handle = (BLOTPAM_HANDLE) xhr_handle;
-  m_CHECK_MAGIC_FIELD(BLOTPAM_HANDLE,xh_handle)
-  m_TRACK_IF(GStringsDestroyInstance(xh_handle->h_pointsHandle) != RETURNED)
-
-  free(xh_handle);
-
-  m_DIGGY_RETURN(RETURNED)
-} // BlotpamDestroyInstance
 
 
 // #SEE BLOTLIB_EXECUTOR_FACTORY__CREATE_PRODUCT_INSTANCE_FUNCTION <karl>
@@ -186,7 +67,7 @@ static int KarllibExecutorFactoryCreateProductInstance(void *pr_handle,
   m_ASSIGN_MAGIC_FIELD(KARLLIB_EXECUTOR_HANDLE, productHandle)
 
   m_TRACK_IF(NAMED_OBJECTS_CREATE_INSTANCE(&(productHandle->h_blotpamsHandle), 10,
-    BlotpamDestroyInstance) != RETURNED)
+    PamphletExamplarDestroyInstance) != RETURNED)
   m_ASSERT(G_STRINGS_ADD_PLAIN_LEXICAL_INDEX(productHandle->h_blotpamsHandle, NULL,NULL) ==
     INDEX_LABEL0)
 
@@ -221,7 +102,7 @@ int l_BlotcodeExecutorGetKarllibExecutorHandle(BLOTCODE_EXECUTOR_HANDLE handle, 
 
 // Public function; see .h
 int KarllibExecutorGetBlotpam(KARLLIB_EXECUTOR_HANDLE handle, struct P_STRING blotpamName,
-  G_STRINGS_HANDLE *ac_pointsHandle) {
+  PAMPHLET_EXAMPLAR_HANDLE *ac_blotpamHandle) {
   m_DIGGY_BOLLARD()
 
   G_STRING_STUFF ct_namedBlotpamStuff = (G_STRING_STUFF)UNDEFINED;
@@ -230,10 +111,8 @@ int KarllibExecutorGetBlotpam(KARLLIB_EXECUTOR_HANDLE handle, struct P_STRING bl
     INDEX_SEEK_FLAGS__EQUAL,&gKey, INDEX_FETCH_FLAGS__SEEK_ONLY,&ct_namedBlotpamStuff, NULL);
   switch (result) {
   case RESULT__FOUND:
-    { BLOTPAM_HANDLE blotpamHandle = (BLOTPAM_HANDLE)ct_namedBlotpamStuff->acolyt.cnhr_handle;
-      m_ASSERT(blotpamHandle != NULL)
-      *ac_pointsHandle = blotpamHandle->h_pointsHandle;
-    } // blotpamHandle
+    *ac_blotpamHandle = (PAMPHLET_EXAMPLAR_HANDLE)ct_namedBlotpamStuff->acolyt.cnhr_handle;
+    m_ASSERT(*ac_blotpamHandle != NULL)
   break; case RESULT__NOT_FOUND:
   break; default:
     m_TRACK()
@@ -245,29 +124,27 @@ int KarllibExecutorGetBlotpam(KARLLIB_EXECUTOR_HANDLE handle, struct P_STRING bl
 
 // Public function; see .h
 int KarllibExecutorCreateBlotpam(KARLLIB_EXECUTOR_HANDLE handle, struct P_STRING blotpamName,
-  G_STRINGS_HANDLE *na_pointsHandle) { 
+  PAMPHLET_EXAMPLAR_HANDLE *a_blotpamHandle) { 
   m_DIGGY_BOLLARD()
 
   int completed = COMPLETED__OK; // a priori
   G_STRING_STUFF t_namedBlotpamStuff = (G_STRING_STUFF)UNDEFINED;
-  BLOTPAM_HANDLE h_blotpamHandle = (BLOTPAM_HANDLE)UNDEFINED;
   struct G_KEY gKey = m_GKey_PString(blotpamName);
   int result = m_GStringsIndexSingleFetch(handle->h_blotpamsHandle,NULL,INDEX_LABEL0,
     INDEX_SEEK_FLAGS__EQUAL,&gKey, INDEX_FETCH_FLAGS__FETCH,&t_namedBlotpamStuff,NULL);
+
+  PAMPHLET_EXAMPLAR_HANDLE h_pamphletExamplarHandle = (PAMPHLET_EXAMPLAR_HANDLE)UNDEFINED;
   switch (result) {
   case RESULT__FOUND:
-    m_ASSERT(t_namedBlotpamStuff->acolyt.cnhr_handle != NULL)
-    h_blotpamHandle = (BLOTPAM_HANDLE) t_namedBlotpamStuff->acolyt.cnhr_handle;
     completed = COMPLETED__BUT;
   break; case RESULT__NOT_FOUND:
-    m_TRACK_IF(BlotpamCreateInstance(&h_blotpamHandle,1969) !=
-      RETURNED)
-    t_namedBlotpamStuff->acolyt.cnhr_handle = h_blotpamHandle;
+    m_TRACK_IF(PamphletExamplarCreateInstance(&h_pamphletExamplarHandle,1969) != RETURNED)
+    t_namedBlotpamStuff->acolyt.cnhr_handle = h_pamphletExamplarHandle;
   break; default:
     m_TRACK()
   } // switch
-  //if (na_blotpamHandle != NULL) *na_blotpamHandle = t_namedBlotpamStuff->acolyt.cnhr_handle;
-  if (na_pointsHandle != NULL) *na_pointsHandle = h_blotpamHandle->h_pointsHandle;
+  m_ASSERT((*a_blotpamHandle = (PAMPHLET_EXAMPLAR_HANDLE)t_namedBlotpamStuff->acolyt.cnhr_handle) 
+    != NULL)
 
   m_DIGGY_RETURN(completed)
 } // KarllibExecutorCreateBlotpam

@@ -11,6 +11,7 @@
 
 #include "c-ansi/blotcode.h"
 #include "c-ansi/g-string.h"
+#include "c-ansi/engels.h"
 
 
 // karl library executor 
@@ -87,96 +88,39 @@ int l_BlotcodeExecutorGetKarllibExecutorHandle(BLOTCODE_EXECUTOR_HANDLE handle, 
   KARLLIB_EXECUTOR_HANDLE *a_karllibExecutorHandle) ;
 												  
 
-#define GLOBAL_BLOTREG_NAME GOOD_OLD_EMPTY_C_STRING
-
-#define BLOTVAR_NAME_ELEMENT G_PARAM_NAME_ELEMENT
-#define BLOTVAR_VALUE_ELEMENT G_PARAM_VALUE_ELEMENT 
-
 // Retrieve some blot pamphlet.
 // 
 // Passed:
 // - handle:
-// - blotregName: blot register's name 
+// - blotpamName: blotpam's name 
 //
 // Changed:
-// - *ac_blotregHandle: (only significant when retrieved : RESULT__FOUND) 
-//   blot register's handle
+// - *ac_blotpamHandle: (only significant when retrieved : RESULT__FOUND) 
+//   blotpam's handle
 //
 // Ret:
 // - RESULT__FOUND: OK
 // - RESULT__NOT_FOUND: 
 // - -1: unexpected problem; anomaly is raised
-int KarllibExecutorGetBlotpam (KARLLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING blotregName, G_STRINGS_HANDLE *ac_blotregHandle) ;
+int KarllibExecutorGetBlotpam (KARLLIB_EXECUTOR_HANDLE handle, struct P_STRING blotpamName,
+  PAMPHLET_EXAMPLAR_HANDLE *ac_blotpamHandle) ;
 
 // Create blot register.
 // Note: blot registers are based g-params (specialised g-string set collections) 
 // 
 // Passed:
 // - handle:
-// - blotregName: blot register's name 
-// - na_blotregHandle: NULL special pointer: not used
+// - blotpamName: blotpam's name 
 //
 // Changed:
-// - *na_blotregHandle: (if used) blot register 's handle
+// - *a_blotpamHandle: blotpam's handle
 //
 // Ret:
 // - COMPLETED__OK: OK
 // - COMPLETED__BUT: the register already exists 
 // - -1: unexpected problem; anomaly is raised
-int KarllibExecutorCreateBlotpam(KARLLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING blottabName, G_STRINGS_HANDLE *na_pointsHandle);
+int KarllibExecutorCreateBlotpam(KARLLIB_EXECUTOR_HANDLE handle, struct P_STRING blotpamName,
+  PAMPHLET_EXAMPLAR_HANDLE *a_blotpamHandle);
 
 
-// Retrieve some blot table.
-// 
-// Passed:
-// - handle:
-// - blottabName: blot table's name 
-//
-// Changed:
-// - *ac_tableHandle: (only significant when retrieved : RESULT__FOUND) 
-//   blot table's handle
-// - *acp_fieldsHandle: (only significant when retrieved : RESULT__FOUND)
-//
-// Ret:
-// - RESULT__FOUND: OK
-// - RESULT__NOT_FOUND: 
-// - -1: unexpected problem; anomaly is raised
-int KarllibExecutorGetBlottab (KARLLIB_EXECUTOR_HANDLE handle, struct P_STRING blottabName,
-  G_STRINGS_HANDLE *ac_tableHandle, G_STRINGS_HANDLE *acp_fieldsHandle);
-
-
-enum { // #REF BLOTTAB_INDEX_TYPE
-  NONE__BLOTTAB_INDEX_TYPE,
-  STR__BLOTTAB_INDEX_TYPE,
-  INT__BLOTTAB_INDEX_TYPE,
-} ;
-
-// Create blot table.
-// Note: blot tables are based on g-string set collections. 
-// 
-// Passed:
-// - handle:
-// - blottabName: blot table's name 
-// - fieldsNumber:
-// - s_names:
-// - s_blottabIndexTypes: #SEE BLOTTAB_INDEX_TYPE 
-// - na_tableHandle: NULL special pointer: not used
-// - nap_fieldsHandle: NULL special pointer: not used
-//
-// Changed:
-// - *na_tableHandle: (if used) blot table 's handle
-// - *nap_fieldsHandle: (if used)
-//
-// Ret:
-// - COMPLETED__OK: OK
-// - COMPLETED__BUT: the table already exists 
-// - -1: unexpected problem; anomaly is raised
-int KarllibExecutorCreateBlottab(KARLLIB_EXECUTOR_HANDLE handle, struct P_STRING blottabName,
-  int fieldsNumber, struct P_STRING* s_names, int* s_blottabIndexTypes,
-  G_STRINGS_HANDLE *na_tableHandle, G_STRINGS_HANDLE *nap_fieldsHandle) ;
-
-
-
-#endif // __KARL_C_ANSI_H_INCLUDED__
+#endif // __C_ANSI_KARL_H_INCLUDED__
