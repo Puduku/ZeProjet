@@ -25,7 +25,8 @@ typedef struct KARLLIB_EXECUTOR_FACTORY *KARLLIB_EXECUTOR_FACTORY_HANDLE; // Pub
 //
 // Passed:
 // - *azh_handle: "un-initialized" handle
-// - blotexlibLabel: label of linked blotex lib (see m_BlotcodeLinkBlotexlib() in c-ansi/blotex.h)
+// - blotexlibLabel: label (entry) of linked blotex lib (see l_BlotcodeLinkBlotexlib() in
+//   c-ansi/blotex.h)
 //
 // Changed:
 // - *azh_handle: "factory" instance handle
@@ -55,7 +56,7 @@ int KarllibExecutorFactoryDestroyInstance(KARLLIB_EXECUTOR_FACTORY_HANDLE xh_han
 // - fp_karllibExecutorFactoryHandle: see KarllibExecutorFactoryCreateInstance()
 //
 // Returned: 
-// - >= 0: entry (label) of library (BLOTLIB_ENTRY0 for 1st blotlib, etc.)
+// - >= 0: (label) (entry) of library (BLOTLIB_ENTRY0 for 1st blotlib, etc.)
 // - -1: unexpected problem ; anomaly is raised
 int l_BlotcodeLinkKarllib(BLOTCODE_HANDLE ep_handle, const char* nfp_blotlibPrefix,
   KARLLIB_EXECUTOR_FACTORY_HANDLE fp_karllibExecutorFactoryHandle) ;
@@ -76,7 +77,7 @@ typedef struct KARLLIB_EXECUTOR *KARLLIB_EXECUTOR_HANDLE; // Public handle
 //
 // Passed:
 // - handle: see BlotcodeExecutorCreateInstance() 
-// - karlLibEntry: entry (label) of karl library (see BlotcodeLinkKarllib() above) 
+// - karllibLabel: label (entry) of karl library (see l_BlotcodeLinkKarllib() above) 
 //
 // Modified:
 // - *a_karllibExecutorHandle: karl executor library handle 
@@ -84,7 +85,7 @@ typedef struct KARLLIB_EXECUTOR *KARLLIB_EXECUTOR_HANDLE; // Public handle
 // Returned: 
 // - RETURNED: Ok
 // - -1: unexpected problem ; anomaly is raised
-int l_BlotcodeExecutorGetKarllibExecutorHandle(BLOTCODE_EXECUTOR_HANDLE handle, int karllibEntry,
+int l_BlotcodeExecutorGetKarllibExecutorHandle(BLOTCODE_EXECUTOR_HANDLE handle, int karlibLabel,
   KARLLIB_EXECUTOR_HANDLE *a_karllibExecutorHandle) ;
 												  
 

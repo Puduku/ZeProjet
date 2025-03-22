@@ -5,6 +5,7 @@
 #include <stdio.h>
 
 #include "c-ansi/blotex.h"
+#include "c-ansi/blottab.h"
 #include "c-posix/sucker.h"
 
 #include "c-ansi/alloc.h"
@@ -185,7 +186,8 @@ int main (int argc, char** argv) {
   
   BLOTEXLIB_EXECUTOR_FACTORY_HANDLE h_blotexlibExecutorFactoryHandle =
     (BLOTEXLIB_EXECUTOR_FACTORY_HANDLE)UNDEFINED;
-  m_TRACK_IF(BlotexlibExecutorFactoryCreateInstance(&h_blotexlibExecutorFactoryHandle) != RETURNED)
+  m_TRACK_IF(BlotexlibExecutorFactoryCreateInstance(&h_blotexlibExecutorFactoryHandle,
+    BlottabDestroyInstance) != RETURNED)
 
   int blotlibLabel = UNDEFINED; 
   blotlibLabel = BlotcodeLinkBlotlib(h_blotcodeHandle,  "lib1", 4, s_localBlotfuncsName1,

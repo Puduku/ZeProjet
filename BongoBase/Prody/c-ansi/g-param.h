@@ -14,16 +14,23 @@
 
 // name AND value conveyance : VALUED_STRING__G_STRING_CONVEYANCE
 
-const int ps_gParamGStringConveyances[G_PARAM_CARDINALITY] = { 
-   VALUED_STRING__G_STRING_CONVEYANCE, // "Token id." 
-   VALUED_STRING__G_STRING_CONVEYANCE, 
-} ; 
-
 // #REF G_PARAMS_CREATE_INSTANCE <named-object>
 // #SEE GStringsCreateInstance@c-ansi/g-string.h  <g-string>
-#define /*int*/ G_PARAMS_CREATE_INSTANCE(/*G_STRINGS_HANDLE*/azh_handle,/*int*/expectedItemsNumber)\
-  GStringsCreateInstance(azh_handle, expectedItemsNumber,G_PARAM_CARDINALITY,-1,\
-  ps_gParamGStringConveyances,(NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION)UNDEFINED)
+//#define /*int*/ G_PARAMS_CREATE_INSTANCE(/*G_STRINGS_HANDLE*/azh_handle,/*int*/expectedItemsNumber)\
+//  GStringsCreateInstance(azh_handle, expectedItemsNumber,G_PARAM_CARDINALITY,-1,\
+//  ps_gParamGStringConveyances,(NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION)UNDEFINED)
+
+// #REF m_GParamsCreateInstance <named-object>
+// #SEE GStringsCreateInstance@c-ansi/g-string.h  <g-string>
+static inline int m_GParamsCreateInstance(G_STRINGS_HANDLE *azh_handle,int expectedItemsNumber) {
+  static const int ps_gParamGStringConveyances[G_PARAM_CARDINALITY] = { 
+     VALUED_STRING__G_STRING_CONVEYANCE, // "Token id." 
+     VALUED_STRING__G_STRING_CONVEYANCE, 
+  } ; 
+
+  return GStringsCreateInstance(azh_handle, expectedItemsNumber,G_PARAM_CARDINALITY,-1,
+    ps_gParamGStringConveyances,(NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION)UNDEFINED);
+} // m_GParamsCreateInstance
 
 // Manipulate g-string as 'g-param's value'
 // 

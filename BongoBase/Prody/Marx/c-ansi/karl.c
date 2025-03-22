@@ -77,11 +77,11 @@ static int KarllibExecutorFactoryCreateProductInstance(void *pr_handle,
 } // KarllibExecutorFactoryCreateProductInstance
 
 // Public function; see .h
-int l_BlotcodeExecutorGetKarllibExecutorHandle(BLOTCODE_EXECUTOR_HANDLE handle, int karllibEntry,
+int l_BlotcodeExecutorGetKarllibExecutorHandle(BLOTCODE_EXECUTOR_HANDLE handle, int karlibLabel,
   KARLLIB_EXECUTOR_HANDLE *a_karllibExecutorHandle) {
   m_DIGGY_BOLLARD()
   void *r_karllibExecutorHandle = (void *)UNDEFINED;
-  int result = BlotcodeExecutorGetBlotlibExecutorHandle(handle,karllibEntry,
+  int result = BlotcodeExecutorGetBlotlibExecutorHandle(handle,karlibLabel,
     &r_karllibExecutorHandle);
   switch (result) {
   case RESULT__FOUND:
@@ -133,13 +133,14 @@ int KarllibExecutorCreateBlotpam(KARLLIB_EXECUTOR_HANDLE handle, struct P_STRING
   int result = m_GStringsIndexSingleFetch(handle->h_blotpamsHandle,NULL,INDEX_LABEL0,
     INDEX_SEEK_FLAGS__EQUAL,&gKey, INDEX_FETCH_FLAGS__FETCH,&t_namedBlotpamStuff,NULL);
 
-  PAMPHLET_EXAMPLAR_HANDLE h_pamphletExamplarHandle = (PAMPHLET_EXAMPLAR_HANDLE)UNDEFINED;
   switch (result) {
   case RESULT__FOUND:
     completed = COMPLETED__BUT;
   break; case RESULT__NOT_FOUND:
-    m_TRACK_IF(PamphletExamplarCreateInstance(&h_pamphletExamplarHandle,1969) != RETURNED)
-    t_namedBlotpamStuff->acolyt.cnhr_handle = h_pamphletExamplarHandle;
+    { PAMPHLET_EXAMPLAR_HANDLE h_pamphletExamplarHandle = (PAMPHLET_EXAMPLAR_HANDLE)UNDEFINED;
+      m_TRACK_IF(PamphletExamplarCreateInstance(&h_pamphletExamplarHandle,1969) != RETURNED)
+      t_namedBlotpamStuff->acolyt.cnhr_handle = h_pamphletExamplarHandle;
+    } // h_pamphletExamplarHandle
   break; default:
     m_TRACK()
   } // switch
