@@ -26,9 +26,9 @@
 //
 // Ret:
 // - RETURNED
-int ParseSequence(struct P_STRING *a_sequence, const char* scanPtr, struct P_STRING* na_lexeme); 
+int PParseSequence(struct P_STRING *a_sequence, const char* scanPtr, struct P_STRING* na_lexeme); 
 
-// 2. ParsePass*() functions: pass specific characters
+// 2. PParsePass*() functions: pass specific characters
 
 // Parse a single char within string portion sequence. 
 //
@@ -44,7 +44,7 @@ int ParseSequence(struct P_STRING *a_sequence, const char* scanPtr, struct P_STR
 //
 // Ret:
 // - RETURNED
-int ParsePassSingleChar(struct P_STRING *a_sequence, IS_CHAR_FUNCTION n_isCharFunction, char c_char,
+int PParsePassSingleChar(struct P_STRING *a_sequence, IS_CHAR_FUNCTION n_isCharFunction, char c_char,
   struct P_STRING* na_lexeme) ;
 
 // Parse a string portion sequence according to chars scanned by ScanPString() function. 
@@ -67,7 +67,7 @@ int ParsePassSingleChar(struct P_STRING *a_sequence, IS_CHAR_FUNCTION n_isCharFu
 //
 // Ret:
 // - RETURNED
-int ParsePassChars(struct P_STRING* a_sequence, char b_regularScan, char b_passCharsTill,
+int PParsePassChars(struct P_STRING* a_sequence, char b_regularScan, char b_passCharsTill,
   IS_CHAR_FUNCTION n_isCharFunction, char c_char, struct P_STRING* na_lexeme) ;
 
 // Parse a string portion sequence : pass all white spaces... 
@@ -82,13 +82,13 @@ int ParsePassChars(struct P_STRING* a_sequence, char b_regularScan, char b_passC
 //
 // Ret:
 // - RETURNED
-static inline int m_ParsePassSpaces(struct P_STRING* a_sequence, struct P_STRING* na_lexeme) {
-  return ParsePassChars(a_sequence,b_REGULAR_SCAN, b_PASS_CHARS_WHILE,isspace,(char)UNDEFINED,
+static inline int m_PParsePassSpaces(struct P_STRING* a_sequence, struct P_STRING* na_lexeme) {
+  return PParsePassChars(a_sequence,b_REGULAR_SCAN, b_PASS_CHARS_WHILE,isspace,(char)UNDEFINED,
     na_lexeme);
-} // m_ParsePassSpaces
+} // m_PParsePassSpaces
 
 
-// 3. ParseMatch*() functions: pass matching tokens 
+// 3. PParseMatch*() functions: pass matching tokens 
 
 // Parse a string portion sequence: match token 
 //
@@ -104,7 +104,7 @@ static inline int m_ParsePassSpaces(struct P_STRING* a_sequence, struct P_STRING
 //
 // Ret:
 // - RETURNED
-int ParseMatch(struct P_STRING* a_sequence, const struct P_STRING p_token,
+int PParseMatch(struct P_STRING* a_sequence, const struct P_STRING p_token,
   TO_CHAR_FUNCTION n_toCharFunction, struct P_STRING*  na_lexeme) ;
 
 // Parse a string portion sequence: match token (among candidates) 
@@ -129,21 +129,21 @@ int ParseMatch(struct P_STRING* a_sequence, const struct P_STRING p_token,
 //
 // Ret:
 // - RETURNED
-int ParseMatchAmongR(struct P_STRING* a_sequence, TO_CHAR_FUNCTION n_toCharFunction,
+int PParseMatchAmongR(struct P_STRING* a_sequence, TO_CHAR_FUNCTION n_toCharFunction,
   int* avn_matchedEntry, int* cnavn_matchedId, struct P_STRING* na_lexeme, int tokensCount,
   struct P_STRING*  sp_tokens, int*  nsn_ids) ;
 
 
-// Wrap ParseMatchAmongR() above
-#define m_PARSE_MATCH_AMONG_C(/*struct P_STRING*/m_sequence, /*TO_CHAR_FUNCTION*/n_toCharFunction,\
+// Wrap PParseMatchAmongR() above
+#define m_P_PARSE_MATCH_AMONG_C(/*struct P_STRING*/m_sequence, /*TO_CHAR_FUNCTION*/n_toCharFunction,\
   /*int*/avn_matchedEntry,/*int* */navn_matchedId,/*struct P_STRING* */na_lexeme,\
   /*int*/ tokensCount,/*const char* p_token0, int n_id0, */ ...) {\
   m_ASSIGN_LOCAL_P_STRINGS_IDS(sp_localTokens,sn_localIds,tokensCount,__VA_ARGS__)\
-  ParseMatchAmongR(&(m_sequence),n_toCharFunction,avn_matchedEntry,navn_matchedId,na_lexeme,\
+  PParseMatchAmongR(&(m_sequence),n_toCharFunction,avn_matchedEntry,navn_matchedId,na_lexeme,\
     tokensCount, sp_localTokens,sn_localIds);\
 }   
 
-// 4. ParseTill*Match*() functions: scan till matching tokens 
+// 4. PParseTill*Match*() functions: scan till matching tokens 
 
 // Parse a string portion sequence according to sub string (token) scanned by ScanPStringTillMatch()
 // function. 
@@ -160,7 +160,7 @@ int ParseMatchAmongR(struct P_STRING* a_sequence, TO_CHAR_FUNCTION n_toCharFunct
 //
 // Ret:
 // - RETURNED
-int ParseTillMatch(struct P_STRING* a_sequence, struct P_STRING p_token,
+int PParseTillMatch(struct P_STRING* a_sequence, struct P_STRING p_token,
   TO_CHAR_FUNCTION n_toCharFunction, struct P_STRING*  na_lexeme) ;
 
 // Parse a string portion sequence according to sub strings (tokens) list scanned by
@@ -186,11 +186,11 @@ int ParseTillMatch(struct P_STRING* a_sequence, struct P_STRING p_token,
 //
 // Ret:
 // - RETURNED
-int ParseTillFirstMatchR(struct P_STRING* a_sequence, TO_CHAR_FUNCTION n_toCharFunction,
+int PParseTillFirstMatchR(struct P_STRING* a_sequence, TO_CHAR_FUNCTION n_toCharFunction,
   int* navn_matchedEntry, int* cnavn_matchedId, struct P_STRING* na_lexeme, int tokensCount,
   struct P_STRING*  sp_tokens, int*  nsn_ids) ;
 
-// Wraps ParseTillFirstMatchR() above: use C-strings as sub-strings in lieu of string portions.
+// Wraps PParseTillFirstMatchR() above: use C-strings as sub-strings in lieu of string portions.
 // Note: tokens ids NOT supported
 //
 // Passed: 
@@ -198,15 +198,15 @@ int ParseTillFirstMatchR(struct P_STRING* a_sequence, TO_CHAR_FUNCTION n_toCharF
 // - other C sub-strings 
 // (Instead of:)
 // - sp_tokens: possible sub-strings (p-strings) 
-#define m_PARSE_TILL_FIRST_MATCH_C(/*struct P_STRING*/ m_sequence,\
+#define m_P_PARSE_TILL_FIRST_MATCH_C(/*struct P_STRING*/ m_sequence,\
   /*TO_CHAR_FUNCTION*/ n_toCharFunction,/*int* */navn_matchedEntry, /*struct P_STRING* */na_lexeme,\
   /*int*/ tokensCount, /*const char* p_token0, */ ...) {\
   m_ASSIGN_LOCAL_P_STRINGS(sp_localTokens,tokensCount,__VA_ARGS__)\
-  ParseTillFirstMatchR(&(m_sequence),n_toCharFunction,navn_matchedEntry,(int*)UNDEFINED,\
+  PParseTillFirstMatchR(&(m_sequence),n_toCharFunction,navn_matchedEntry,(int*)UNDEFINED,\
     na_lexeme, tokensCount, sp_localTokens, NULL);\
 } 
 
-// 5. Parse*() functions: miscellaneous parsing 
+// 5. PParse*() functions: miscellaneous parsing 
 
 // Parse a string portion sequence according to offset (as if was "scanned" position) 
 //
@@ -222,7 +222,7 @@ int ParseTillFirstMatchR(struct P_STRING* a_sequence, TO_CHAR_FUNCTION n_toCharF
 //
 // Ret:
 // - RETURNED
-int ParseOffset(struct P_STRING* a_sequence,  int offset, struct P_STRING* na_lexeme) ;
+int PParseOffset(struct P_STRING* a_sequence,  int offset, struct P_STRING* na_lexeme) ;
 
 
 // Parse a C integer value within string portion sequence. 
@@ -238,7 +238,7 @@ int ParseOffset(struct P_STRING* a_sequence,  int offset, struct P_STRING* na_le
 //
 // Ret:
 // - RETURNED
-int ParseGenericInteger(struct P_STRING* a_sequence, GENERIC_INTEGER* ac_value,
+int PParseGenericInteger(struct P_STRING* a_sequence, GENERIC_INTEGER* ac_value,
   struct P_STRING* na_lexeme) ;
 
 #endif // __C_ANSI_P_PARSE_H_INCLUDED

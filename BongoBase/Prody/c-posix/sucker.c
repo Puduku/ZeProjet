@@ -137,7 +137,7 @@ int StreamButtAdeptDestroyInstance(STREAM_BUTT_ADEPT_HANDLE xh_handle) {
 
 
 // Public function: see .h
-int SuckerCopy (SUCKER_HANDLE handle, ALARM_SYSTEM_HANDLE n_alarmSystemHandle,
+int l_SuckerCopy (SUCKER_HANDLE handle, ALARM_SYSTEM_HANDLE n_alarmSystemHandle,
    BROKEN_PIPE_FIX_HANDLE brokenPipeFixHandle,
    const char *p_sFilePathname, const char *p_dFilePathname,
    int *na_copiedLength, int *na_streamFlopCause) {
@@ -182,5 +182,5 @@ int SuckerCopy (SUCKER_HANDLE handle, ALARM_SYSTEM_HANDLE n_alarmSystemHandle,
   m_TRACK_IF(StreamButtAdeptDestroyInstance(dSreamButtAdeptHandle) != RETURNED)
 
   m_DIGGY_RETURN(suckerStatus)
-} // SuckerCopy
+} // l_SuckerCopy
 

@@ -6,7 +6,7 @@
 #include "c-ansi/p-string.h"
 
 // Public function: see .h
-int ParseSequence(struct P_STRING *a_sequence, const char* scanPtr,
+int PParseSequence(struct P_STRING *a_sequence, const char* scanPtr,
   struct P_STRING* na_lexeme) {
   m_TRACK_IF(scanPtr == NULL) // TODO: ag virer
   if ((na_lexeme) != NULL) {
@@ -16,11 +16,11 @@ int ParseSequence(struct P_STRING *a_sequence, const char* scanPtr,
   a_sequence->string = scanPtr ;
 
   return RETURNED;
-} // ParseSequence
+} // PParseSequence
 
 
 // Public function: see .h
-int ParsePassSingleChar(struct P_STRING *a_sequence, IS_CHAR_FUNCTION n_isCharFunction, char c_char,
+int PParsePassSingleChar(struct P_STRING *a_sequence, IS_CHAR_FUNCTION n_isCharFunction, char c_char,
   struct P_STRING* na_lexeme) {
   const char *scanPtr = a_sequence->string;
   if (scanPtr < a_sequence->stop) {
@@ -30,20 +30,20 @@ int ParsePassSingleChar(struct P_STRING *a_sequence, IS_CHAR_FUNCTION n_isCharFu
       if (*scanPtr == (c_char)) scanPtr++;
     } // if
   } // if
-  return ParseSequence(a_sequence,scanPtr, na_lexeme);
-} // ParsePassSingleChar
+  return PParseSequence(a_sequence,scanPtr, na_lexeme);
+} // PParsePassSingleChar
 
 // Public function: see .h
-int ParsePassChars(struct P_STRING* a_sequence, char b_regularScan, char b_passCharsTill,
+int PParsePassChars(struct P_STRING* a_sequence, char b_regularScan, char b_passCharsTill,
   IS_CHAR_FUNCTION n_isCharFunction, char c_char, struct P_STRING* na_lexeme) {
   const char *scanPtr = ScanPString(*a_sequence,b_regularScan,b_passCharsTill, n_isCharFunction,
     c_char);
-  return ParseSequence(a_sequence,scanPtr, na_lexeme);
-} // ParsePassChars
+  return PParseSequence(a_sequence,scanPtr, na_lexeme);
+} // PParsePassChars
 
 
 // Public function: see .h
-int ParseMatch(struct P_STRING* a_sequence, const struct P_STRING p_token,
+int PParseMatch(struct P_STRING* a_sequence, const struct P_STRING p_token,
   TO_CHAR_FUNCTION n_toCharFunction, struct P_STRING*  na_lexeme) {
   const char *scanPtr = a_sequence->string;
   int length = m_PStringLength(p_token);
@@ -55,12 +55,12 @@ int ParseMatch(struct P_STRING* a_sequence, const struct P_STRING p_token,
   break; default:
     m_TRACK()
   } // switch 
-  return ParseSequence(a_sequence,scanPtr, na_lexeme);
-} // ParseMatch
+  return PParseSequence(a_sequence,scanPtr, na_lexeme);
+} // PParseMatch
 
 
 // Public function: see .h
-int ParseMatchAmongR(struct P_STRING* a_sequence, TO_CHAR_FUNCTION n_toCharFunction,
+int PParseMatchAmongR(struct P_STRING* a_sequence, TO_CHAR_FUNCTION n_toCharFunction,
   int* avn_matchedEntry, int* cnavn_matchedId, struct P_STRING* na_lexeme, int tokensCount,
   struct P_STRING*  sp_tokens, int*  nsn_ids) {
   const char *scanPtr = a_sequence->string;
@@ -73,36 +73,36 @@ int ParseMatchAmongR(struct P_STRING* a_sequence, TO_CHAR_FUNCTION n_toCharFunct
   break; default:
     m_TRACK()
   } // switch 
-  return ParseSequence(a_sequence,scanPtr, na_lexeme);
-} // ParseMatchAmongR
+  return PParseSequence(a_sequence,scanPtr, na_lexeme);
+} // PParseMatchAmongR
 
 // Public function: see .h
-int ParseTillMatch(struct P_STRING* a_sequence, struct P_STRING p_token,
+int PParseTillMatch(struct P_STRING* a_sequence, struct P_STRING p_token,
   TO_CHAR_FUNCTION n_toCharFunction, struct P_STRING*  na_lexeme) {
   const char *scanPtr = ScanPStringTillMatch(*a_sequence,p_token, n_toCharFunction);
-  return ParseSequence(a_sequence,scanPtr, na_lexeme);
-} // ParseTillMatch
+  return PParseSequence(a_sequence,scanPtr, na_lexeme);
+} // PParseTillMatch
 
 // Public function: see .h
-int ParseTillFirstMatchR(struct P_STRING* a_sequence, TO_CHAR_FUNCTION n_toCharFunction,
+int PParseTillFirstMatchR(struct P_STRING* a_sequence, TO_CHAR_FUNCTION n_toCharFunction,
   int* navn_matchedEntry, int* cnavn_matchedId, struct P_STRING* na_lexeme, int tokensCount,
   struct P_STRING*  sp_tokens, int*  nsn_ids) {
   const char *scanPtr = ScanPStringTillFirstMatchR(*a_sequence,n_toCharFunction,
     navn_matchedEntry,cnavn_matchedId,tokensCount,sp_tokens,nsn_ids);
-  return ParseSequence(a_sequence,scanPtr, na_lexeme);
-} // ParseTillFirstMatchR
+  return PParseSequence(a_sequence,scanPtr, na_lexeme);
+} // PParseTillFirstMatchR
 
 
 // Public function: see .h
-int ParseOffset(struct P_STRING* a_sequence,  int offset, struct P_STRING* na_lexeme) {
+int PParseOffset(struct P_STRING* a_sequence,  int offset, struct P_STRING* na_lexeme) {
   const char *scanPtr = a_sequence->string + offset;
   m_ASSERT(scanPtr >= a_sequence->string)
-  return ParseSequence(a_sequence,scanPtr, na_lexeme);
-} // ParseOffset
+  return PParseSequence(a_sequence,scanPtr, na_lexeme);
+} // PParseOffset
 
 
 // Public function: see .h
-int ParseGenericInteger(struct P_STRING* a_sequence, GENERIC_INTEGER* ac_value,
+int PParseGenericInteger(struct P_STRING* a_sequence, GENERIC_INTEGER* ac_value,
   struct P_STRING* na_lexeme) {
   const char *scanPtr = a_sequence->string;
   int c_parsedLength;
@@ -113,6 +113,6 @@ int ParseGenericInteger(struct P_STRING* a_sequence, GENERIC_INTEGER* ac_value,
   break; default:
     m_TRACK()
   } // switch
-  return ParseSequence(a_sequence,scanPtr, na_lexeme);
-} // ParseGenericInteger
+  return PParseSequence(a_sequence,scanPtr, na_lexeme);
+} // PParseGenericInteger
 

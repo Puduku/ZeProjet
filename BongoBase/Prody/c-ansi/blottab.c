@@ -121,7 +121,7 @@ static int ParseBlottabElement(struct P_STRING *a_sequence, G_STRINGS_HANDLE np_
   int n_asValue = UNDEFINED;
  
   m_PREPARE_ABANDON(a_sequence,"<entity> [ <<as value int>> | <<as value str>> ]")
-  ParsePassChars(a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_WHILE,IsEntityNameChar,
+  PParsePassChars(a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_WHILE,IsEntityNameChar,
     (char)UNDEFINED,&fieldName); // <entity>
 
   if (np_fieldsHandle != NULL) { // Seek for table
@@ -204,11 +204,11 @@ static inline int ml_BlotexlibExecutorComputeBlottabRequest(BLOTEXLIB_EXECUTOR_H
   struct P_STRING lexeme;
   struct P_STRING subSequence; 
 
-  ParseTillMatch(a_sequence,m_PString(":?"),NULL, &subSequence);
+  PParseTillMatch(a_sequence,m_PString(":?"),NULL, &subSequence);
 m_DIGGY_VAR_P_STRING(subSequence)
 m_DIGGY_VAR_P_STRING(*a_sequence)
   if (b_EMPTY_P_STRING(*a_sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
-  ParseOffset(a_sequence,2,NULL);
+  PParseOffset(a_sequence,2,NULL);
   m_PRECISE_ABANDON(&subSequence, "<blottab request atom>") 
   struct BLOTEX_VALUE blotexValue; // UNDEFINED
   struct G_KEY gKey; // UNDEFINED
@@ -227,7 +227,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
 m_DIGGY_VAR_P_STRING(subSequence)
     
     int n_indexSeekFlags = UNDEFINED;
-    ParsePassSingleChar(&subSequence,NULL,'*',&lexeme);
+    PParsePassSingleChar(&subSequence,NULL,'*',&lexeme);
 m_DIGGY_VAR_P_STRING(lexeme)
     if (!b_EMPTY_P_STRING(lexeme)) n_indexSeekFlags = INDEX_SEEK_FLAGS__ANY;
     else {  // select with actual criterium
@@ -262,7 +262,7 @@ m_DIGGY_VAR_P_STRING(subSequence)
     m_ASSERT(criteriaNumber < 5)
     criteria5[criteriaNumber++] = m_GRequestCriterium_GKeys(tableIndexLabel,
       n_indexSeekFlags,&gKey, criteriaOpFlags);
-    m_ParsePassSpaces(&subSequence,NULL);
+    m_PParsePassSpaces(&subSequence,NULL);
   } while (!b_EMPTY_P_STRING(subSequence)) ; 
 
 m_DIGGY_INFO("Before GStringsIndexRequestR(tableHandle=%p)...",tableHandle)
@@ -303,11 +303,11 @@ static inline int ml_BlotexlibExecutorComputeBlottabCreation(BLOTEXLIB_EXECUTOR_
 
   struct P_STRING subSequence; 
 
-  ParseTillMatch(a_sequence,m_PString("]?"),NULL, &subSequence);
+  PParseTillMatch(a_sequence,m_PString("]?"),NULL, &subSequence);
 m_DIGGY_VAR_P_STRING(subSequence)
 m_DIGGY_VAR_P_STRING(*a_sequence)
   if (b_EMPTY_P_STRING(*a_sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
-  ParseOffset(a_sequence,2,NULL);
+  PParseOffset(a_sequence,2,NULL);
 
   struct P_STRING s_names10[10];
   int s_blottabIndexTypes10[10];
@@ -322,7 +322,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
     break; default:
       m_TRACK()
     } // switch
-    m_ParsePassSpaces(&subSequence,NULL);
+    m_PParsePassSpaces(&subSequence,NULL);
   } while (!b_EMPTY_P_STRING(subSequence)) ; 
 
   BLOTTAB_HANDLE blottabHandle = (BLOTTAB_HANDLE) blottabHandle;
@@ -370,10 +370,10 @@ m_DIGGY_VAR_P_STRING(blottabName)
     cac_blotexValue->select.c_blotval = TRUE__BLOTVAL0; // a priori
   } // if
   int n_indexFetchFlags = -1; // a priori 
-  m_ParsePassSpaces(a_sequence,NULL);
+  m_PParsePassSpaces(a_sequence,NULL);
 
   if (!b_lValue) {
-    ParsePassSingleChar(a_sequence,NULL,'[',&lexeme); 
+    PParsePassSingleChar(a_sequence,NULL,'[',&lexeme); 
     if (!b_EMPTY_P_STRING(lexeme)) { // <blottab op create> ...
       if (n_tableHandle != NULL) m_ABANDON(ALREADY_EXISTS_BLOTTAB__ABANDONMENT_CAUSE)
       switch (ml_BlotexlibExecutorComputeBlottabCreation(handle,a_sequence,blottabName,
@@ -387,7 +387,7 @@ m_DIGGY_VAR_P_STRING(blottabName)
 
     } else {
       if (n_tableHandle == NULL) m_ABANDON(UNKNOWN_BLOTTAB__ABANDONMENT_CAUSE) 
-      ParsePassSingleChar(a_sequence,NULL,':',&lexeme); 
+      PParsePassSingleChar(a_sequence,NULL,':',&lexeme); 
       if (!b_EMPTY_P_STRING(lexeme)) { // <blottab op select> ...
         switch (ml_BlotexlibExecutorComputeBlottabRequest(handle,a_sequence,n_tableHandle,
           cp_fieldsHandle, nc_abandonmentInfo)) {
@@ -398,11 +398,11 @@ m_DIGGY_VAR_P_STRING(blottabName)
           m_TRACK()
         } // switch
       } // if
-      ParsePassSingleChar(a_sequence,NULL,'^',&lexeme);
+      PParsePassSingleChar(a_sequence,NULL,'^',&lexeme);
       if (!b_EMPTY_P_STRING(lexeme)) { // <blottab op reset>
         n_indexFetchFlags = INDEX_FETCH_FLAG__RESET; 
       } // if
-      ParsePassSingleChar(a_sequence,NULL,'+',&lexeme);
+      PParsePassSingleChar(a_sequence,NULL,'+',&lexeme);
       if (!b_EMPTY_P_STRING(lexeme)) { // <blottab op next>
         if (n_indexFetchFlags < 0) n_indexFetchFlags = ALL_FLAGS_OFF0;
         m_SET_FLAG_ON(n_indexFetchFlags,INDEX_FETCH_FLAG__NEXT)
@@ -410,7 +410,7 @@ m_DIGGY_VAR_P_STRING(blottabName)
     } // if
   } // if
   int n_asValue = -1; // No blottab read/set op a priori 
-  ParsePassSingleChar(a_sequence,NULL,'=',&lexeme); 
+  PParsePassSingleChar(a_sequence,NULL,'=',&lexeme); 
   int c_element = UNDEFINED; // Only significant with blottab read/set op
   if (!b_EMPTY_P_STRING(lexeme)) { // <blottab op read int> | <blottab op read str> (R-value)
     // <blottab ref op set int> | <blottab ref op set str> (L-value)... 

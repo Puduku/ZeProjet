@@ -357,12 +357,12 @@ static int BlotcodeFindBlotfunc(BLOTCODE_HANDLE p_handle, struct P_STRING referr
   m_ASSERT(p_handle->b_frozen) 
   m_INDEX_REQUEST_AUTOMATIC_BUFFER(indexRequestAutomaticBuffer)
 m_DIGGY_VAR_P_STRING(referral)
-  ParsePassChars(&referral,b_REGULAR_SCAN,b_PASS_CHARS_TILL,NULL,'.',&(blotfuncKeyName.prefix));
+  PParsePassChars(&referral,b_REGULAR_SCAN,b_PASS_CHARS_TILL,NULL,'.',&(blotfuncKeyName.prefix));
   if (b_EMPTY_P_STRING(referral)) {
     blotfuncKeyName.name = blotfuncKeyName.prefix; 
     blotfuncKeyName.prefix = m_PString(GOOD_OLD_EMPTY_C_STRING);
   } else {
-    ParseOffset(&referral,1,NULL);
+    PParseOffset(&referral,1,NULL);
     blotfuncKeyName.name = referral;
   } // if
 m_DIGGY_VAR_P_STRING(blotfuncKeyName.prefix)
@@ -626,7 +626,7 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
 m_DIGGY_VAR_P_STRING(fp_template)
 m_DIGGY_VAR_D(b_blotblog)
     if (!b_blotblog) {
-      ParseTillMatch(&fp_template,m_PString("##<<"),NULL, &decor);
+      PParseTillMatch(&fp_template,m_PString("##<<"),NULL, &decor);
       if (!b_EMPTY_P_STRING(decor)) {
         v_templatePartitionEntry = GreenCollectionFetch(handle->h_templatePartitionsHandle, -1,
           (char**)&ti_templatePartitionStuff);
@@ -636,12 +636,12 @@ m_DIGGY_VAR_D(b_blotblog)
       if (b_EMPTY_P_STRING(fp_template)) { // "##<<' NOT located 
         break;
       } // if
-      ParseOffset(&fp_template,4, NULL);
+      PParseOffset(&fp_template,4, NULL);
     } // if 
 
     int c_delimitorEntry = UNDEFINED ;
 m_DIGGY_VAR_P_STRING(fp_template)
-    m_PARSE_TILL_FIRST_MATCH_C(fp_template,NULL, &c_delimitorEntry, &blotinstSequence,2,";;",">>")
+    m_P_PARSE_TILL_FIRST_MATCH_C(fp_template,NULL, &c_delimitorEntry, &blotinstSequence,2,";;",">>")
     if (b_EMPTY_P_STRING(fp_template)) { // NO ending ";;" or ">>" located 
 m_DIGGY_VAR_P_STRING(fp_template)
       m_REPORT_ERROR(dummy,"Missing " DELIMITOR__S, ";; or >>")
@@ -650,10 +650,10 @@ m_DIGGY_VAR_P_STRING(fp_template)
 m_DIGGY_VAR_D(c_delimitorEntry)
 m_DIGGY_VAR_P_STRING(blotinstSequence)
     if ((b_blotblog = (c_delimitorEntry == 0))) { // ending ";;" located 
-      ParseOffset(&fp_template,2, NULL);
+      PParseOffset(&fp_template,2, NULL);
     } else { // // ending ">>" located  
       m_ASSERT(c_delimitorEntry == 1)
-      ParseOffset(&fp_template,2, NULL);
+      PParseOffset(&fp_template,2, NULL);
     } // if
 
     // blotinstSequence: complete blotinst "sequence"
@@ -662,27 +662,27 @@ m_DIGGY_VAR_P_STRING(blotinstSequence)
     // Parsing <basic token 1> [ <basic token 2> ] [ '(' <arguments> ')' ]
     char b_arguments = b_FALSE0; // No arguments lexeme a priori
     struct P_STRING basicToken1, basicToken2, c_arguments ;
-    m_ParsePassSpaces(&blotinstSequence, NULL);
-    ParsePassChars(&blotinstSequence,b_REGULAR_SCAN, b_PASS_CHARS_WHILE,IsBasicTokenChar,
+    m_PParsePassSpaces(&blotinstSequence, NULL);
+    PParsePassChars(&blotinstSequence,b_REGULAR_SCAN, b_PASS_CHARS_WHILE,IsBasicTokenChar,
       (char)UNDEFINED, &basicToken1);
 
-    m_ParsePassSpaces(&blotinstSequence, NULL);
-    ParsePassChars(&blotinstSequence,b_REGULAR_SCAN, b_PASS_CHARS_WHILE,IsBasicTokenChar,
+    m_PParsePassSpaces(&blotinstSequence, NULL);
+    PParsePassChars(&blotinstSequence,b_REGULAR_SCAN, b_PASS_CHARS_WHILE,IsBasicTokenChar,
       (char)UNDEFINED, &basicToken2);
 
-    m_ParsePassSpaces(&blotinstSequence, NULL);
-    ParsePassChars(&blotinstSequence,b_REGULAR_SCAN, b_PASS_CHARS_TILL,NULL,'(', &dummy);
+    m_PParsePassSpaces(&blotinstSequence, NULL);
+    PParsePassChars(&blotinstSequence,b_REGULAR_SCAN, b_PASS_CHARS_TILL,NULL,'(', &dummy);
     if (!b_EMPTY_P_STRING(dummy)) {
       m_REPORT_ERROR(dummy,"Unexpected content before " DELIMITOR__C,'(')
     } // if
     if ((b_arguments = !b_EMPTY_P_STRING(blotinstSequence))) {
-      ParseOffset(&blotinstSequence,1, NULL);
-      ParsePassChars(&blotinstSequence,b_REVERTED_SCAN, b_PASS_CHARS_TILL,NULL,')', &c_arguments);
+      PParseOffset(&blotinstSequence,1, NULL);
+      PParsePassChars(&blotinstSequence,b_REVERTED_SCAN, b_PASS_CHARS_TILL,NULL,')', &c_arguments);
       if (b_EMPTY_P_STRING(blotinstSequence)) {
         m_REPORT_ERROR(c_arguments,"Missing " DELIMITOR__C, ')')
       } // if
-      ParseOffset(&blotinstSequence,1, NULL);
-      m_ParsePassSpaces(&blotinstSequence, NULL);
+      PParseOffset(&blotinstSequence,1, NULL);
+      m_PParsePassSpaces(&blotinstSequence, NULL);
       if (!b_EMPTY_P_STRING(blotinstSequence)) {
         m_REPORT_ERROR(blotinstSequence,"Trailing content after " DELIMITOR__C, ')')
       } // if

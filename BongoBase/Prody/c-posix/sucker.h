@@ -124,7 +124,7 @@ int StreamButtAdeptDestroyInstance(STREAM_BUTT_ADEPT_HANDLE xh_handle);
 // Return:
 // #SEE enum-SUCKER_STATUS @ c-ansi/sucker.h
 // - -1 : unexpected problem; anomaly is raised
-int SuckerCopy (SUCKER_HANDLE handle,  ALARM_SYSTEM_HANDLE n_alarmSystemHandle,
+int l_SuckerCopy (SUCKER_HANDLE handle,  ALARM_SYSTEM_HANDLE n_alarmSystemHandle,
    BROKEN_PIPE_FIX_HANDLE brokenPipeFixHandle,  
    const char *p_sFilePathname, const char *p_dFilePathname,
    int *na_copiedLength, int *na_streamFlopCause) ;

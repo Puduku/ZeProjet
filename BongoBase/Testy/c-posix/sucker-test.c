@@ -44,7 +44,7 @@ int main (int argc, char** argv) {
   int r_flopCause = UNDEFINED;
   int openErrno = UNDEFINED;
 
-  ret = SuckerCopy(h_handle,h_alarmSystemHandle,h_brokenPipeFixHandle,
+  ret = l_SuckerCopy(h_handle,h_alarmSystemHandle,h_brokenPipeFixHandle,
     h_dummySFilePathnameStuff->nhi_string,dummyCopyFilePathname,
     &suckedLength,&r_flopCause) ;
   m_TRACK_IF(ret < 0)
