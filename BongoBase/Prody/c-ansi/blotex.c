@@ -242,7 +242,7 @@ m_DIGGY_VAR_P_STRING(blotregName)
 
 
 // Public function; see .h
-int BlotexlibExecutorGetBlottabsHandle(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING blottabName,
+int BlotexlibExecutorGetBlottabsHandle(BLOTEXLIB_EXECUTOR_HANDLE handle,
   G_STRINGS_HANDLE *a_blottabsHandle) {
   m_DIGGY_BOLLARD()
   *a_blottabsHandle = handle->h_blottabsHandle;
@@ -440,9 +440,27 @@ m_ASSERT(ret == ap_blotvarReference->c_select.c_entry)
   m_DIGGY_RETURN(result)
 } // FetchBlotvar
 
+#define  AS__R_VALUE__ENTRY__XX "!#" 
+#define  AS__NAME__XX           "!$"
+#define  AS__VALUE_INT__X       "#" 
+#define  AS__ID__X              "!"
+#define  AS__VALUE_STR__X       "$"
 
+
+// Parse "as" specifier (not present : default to '#" value int) 
+//
+// Passed:
+// - *a_sequence: before parsing
+// - b_lValue: TRUE => "as entry" not accepted 
+//
+// Changed:
+// - *a_sequence: after parsing 
+// - *a_as: (>=0) corresponding "as" specifier 
 // 
-int ParseAs(char b_lValue, struct P_STRING *a_sequence, int *a_as) {
+// Ret:
+// - RETURNED: Ok
+// - 1: unexpected problem; anomaly is raised
+static int ParseAs(char b_lValue, struct P_STRING *a_sequence, int *a_as) {
   m_DIGGY_BOLLARD()
   struct P_STRING lexeme; // UNDEFINED
   m_PParsePassSpaces(a_sequence,NULL);
@@ -458,18 +476,7 @@ m_DIGGY_VAR_D(*a_as)
   m_DIGGY_RETURN(RETURNED)
 } // ParseAs 
 
-// Parse "as" "value" specifier if present
-//
-// Passed:
-// - *a_sequence: before parsing
-//
-// Changed:
-// - *a_sequence: after parsing 
-// - *an_as: (>=0) corresponding "as" "value" specifier (-1 if not present) 
-// 
-// Ret:
-// - RETURNED: Ok
-// - 1: unexpected problem; anomaly is raised
+// See .h 
 int ParseAsValue(struct P_STRING *a_sequence, int *an_as) {
   m_DIGGY_BOLLARD()
   struct P_STRING lexeme; // UNDEFINED

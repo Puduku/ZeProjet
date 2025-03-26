@@ -134,40 +134,9 @@ int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct P_STRING blotregName, G_STRINGS_HANDLE *na_blotregHandle);
 
 
-// Parsing blot regs : helpers
-// ---------------------------
+// Parsing blot expressions  : helpers
+// -----------------------------------
 
-enum {
-  NAME__BLOTVAR_REFERENCE, // Simple blotvar: '.' <entity> 
-  ENTRY__BLOTVAR_REFERENCE, // Simple blotvar: '[' <intex> ']'
-  TOKEN_ID__BLOTVAR_REFERENCE, // Simple blotvar: '{' <intex> '}'
-  SET_CURRENT__L_VALUE__BLOTVAR_REFERENCE // '?=' 
-};
-
-struct BLOTVAR_REFERENCE {
-  int in_blottabElement; // -1 special value => BLOTREG
-  union {
-    G_STRINGS_HANDLE c_blotregHandle; // BLOTREG
-    struct { 
-      G_STRINGS_HANDLE tableHandle; 
-      G_STRINGS_HANDLE p_fieldsHandle; 
-    } c_blottab; // BLOTTAB
-  } select; 
-  int cv_blotvarReference; // Always SET_CURRENT__L_VALUE__BLOTVAR_REFERENCE with BLOTTAB
-  union {
-    struct P_STRING c_name; // Only significant with NAME__BLOTVAR_REFERENCE
-    int c_entry; // Only significant with ENTRY__BLOTVAR_REFERENCE
-    int c_tokenId; // Only significant with TOKEN_ID__BLOTVAR_REFERENCE
-  } c_select; // NOT significant with SET_CURRENT__L_VALUE__BLOTVAR_REFERENCE
-} ;
-
-struct BLOTEX_VALUE {
-  char b_strex;
-  union {
-    gen_BLOTVAL c_blotval;
-    struct P_STRING c_str;
-  } select ;
-} ;
 
 // Passed:
 // - a_sequence: parsed sequence address
@@ -184,6 +153,17 @@ struct BLOTEX_VALUE {
   /*const char* */p_sequenceType) \
   ema_sequence = (a_sequence);\
   emp_sequenceType = (p_sequenceType);\
+
+
+#define SYNTAX_ERROR__ABANDONMENT_CAUSE "Syntax error"
+#define NOT_PARSABLE__ABANDONMENT_CAUSE "Not parsable"
+#define VALUE_ERROR__ABANDONMENT_CAUSE "Value error"
+#define EXPECT_STREX__ABANDONMENT_CAUSE "Expect strex value"
+#define EXPECT_INTEX__ABANDONMENT_CAUSE "Expect strex value"
+#define UNKNOWN_BLOTVAR__ABANDONMENT_CAUSE "Unknown blotvar"
+#define UNKNOWN_BLOTREG__ABANDONMENT_CAUSE "Unknown blotreg"
+#define INVALID_FORMAT__ABANDONMENT_CAUSE "Invalid format"
+#define NOT_EXISTING__ABANDONMENT_CAUSE "Not existing l-value"
 
 // Passed:
 // - p_cause : parsing abandonment cause format 
@@ -207,6 +187,14 @@ struct BLOTEX_VALUE {
 // IS_CHAR_FUNCTION:
 int IsEntityNameChar(int c) ;
 
+enum {
+  AS__R_VALUE__ENTRY,// '!#' 
+  AS__NAME,          // '!$'
+  AS__VALUE_INT,     // [ '#' ]
+  AS__ID,            // '!'
+  AS__VALUE_STR,     // '$'
+} ;
+
 // Parse "as" "value" specifier if present
 //
 // Passed:
@@ -221,44 +209,6 @@ int IsEntityNameChar(int c) ;
 // - 1: unexpected problem; anomaly is raised
 int ParseAsValue(struct P_STRING *a_sequence, int *an_as) ;
 
-enum {
-  AS__R_VALUE__ENTRY,// '!#' 
-  AS__NAME,          // '!$'
-  AS__VALUE_INT,     // [ '#' ]
-  AS__ID,            // '!'
-  AS__VALUE_STR,     // '$'
-} ;
-
-#define  AS__R_VALUE__ENTRY__XX "!#" 
-#define  AS__NAME__XX           "!$"
-#define  AS__VALUE_INT__X       "#" 
-#define  AS__ID__X              "!"
-#define  AS__VALUE_STR__X       "$"
-
-// Parse "as" specifier (not present : default to '#" value int) 
-//
-// Passed:
-// - *a_sequence: before parsing
-// - b_lValue: TRUE => "as entry" not accepted 
-//
-// Changed:
-// - *a_sequence: after parsing 
-// - *a_as: (>=0) corresponding "as" specifier 
-// 
-// Ret:
-// - RETURNED: Ok
-// - 1: unexpected problem; anomaly is raised
-int ParseAs(char b_lValue, struct P_STRING *a_sequence, int *a_as) ;
-
-#define SYNTAX_ERROR__ABANDONMENT_CAUSE "Syntax error"
-#define NOT_PARSABLE__ABANDONMENT_CAUSE "Not parsable"
-#define VALUE_ERROR__ABANDONMENT_CAUSE "Value error"
-#define EXPECT_STREX__ABANDONMENT_CAUSE "Expect strex value"
-#define EXPECT_INTEX__ABANDONMENT_CAUSE "Expect strex value"
-#define UNKNOWN_BLOTVAR__ABANDONMENT_CAUSE "Unknown blotvar"
-#define UNKNOWN_BLOTREG__ABANDONMENT_CAUSE "Unknown blotreg"
-#define INVALID_FORMAT__ABANDONMENT_CAUSE "Invalid format"
-#define NOT_EXISTING__ABANDONMENT_CAUSE "Not existing l-value"
 
 // Parse comparison operator in register/table request, if present... 
 //
@@ -294,6 +244,14 @@ int ParseLogical2Op(struct P_STRING *a_sequence,
   int *a_criteriaOpFlags) ;
 
 
+struct BLOTEX_VALUE {
+  char b_strex;
+  union {
+    gen_BLOTVAL c_blotval;
+    struct P_STRING c_str;
+  } select ;
+} ;
+
 // Parse <blotex> 
 //
 // Passed:
@@ -326,8 +284,33 @@ int BlotexlibExecutorComputeBlotex(BLOTEXLIB_EXECUTOR_HANDLE handle,
 // Ret:
 // - RETURNED: Ok
 // - -1: unexpected problem; anomaly is raised
-int BlotexlibExecutorGetBlottabsHandle(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING blottabName,
+int BlotexlibExecutorGetBlottabsHandle(BLOTEXLIB_EXECUTOR_HANDLE handle, 
   G_STRINGS_HANDLE *a_blottabsHandle) ;
+
+ struct BLOTTAB ;
+ typedef struct BLOTTAB* BLOTTAB_HANDLE;
+
+
+enum {
+  NAME__BLOTVAR_REFERENCE, // Simple blotvar: '.' <entity> 
+  ENTRY__BLOTVAR_REFERENCE, // Simple blotvar: '[' <intex> ']'
+  TOKEN_ID__BLOTVAR_REFERENCE, // Simple blotvar: '{' <intex> '}'
+  SET_CURRENT__L_VALUE__BLOTVAR_REFERENCE // '?=' 
+};
+
+struct BLOTVAR_REFERENCE {
+  int in_blottabElement; // -1 special value => BLOTREG
+  union {
+    G_STRINGS_HANDLE c_blotregHandle; // BLOTREG
+    BLOTTAB_HANDLE c_blottabHandle; // BLOTTAB
+  } select; 
+  int cv_blotvarReference; // Always SET_CURRENT__L_VALUE__BLOTVAR_REFERENCE with BLOTTAB
+  union {
+    struct P_STRING c_name; // Only significant with NAME__BLOTVAR_REFERENCE
+    int c_entry; // Only significant with ENTRY__BLOTVAR_REFERENCE
+    int c_tokenId; // Only significant with TOKEN_ID__BLOTVAR_REFERENCE
+  } c_select; // NOT significant with SET_CURRENT__L_VALUE__BLOTVAR_REFERENCE
+} ;
 
 // ===> To be implemented by blottab module:
 // Parse and compute blottab operations:

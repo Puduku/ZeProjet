@@ -19,9 +19,6 @@
 
 // Blottabs: 
 
-struct BLOTTAB ;
-typedef struct BLOTTAB* BLOTTAB_HANDLE;
-
 
 // Ret:
 // - RETURNED: Ok
