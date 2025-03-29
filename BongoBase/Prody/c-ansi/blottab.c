@@ -179,7 +179,6 @@ m_DIGGY_VAR_D(n_asValue)
 int l_BlotexlibExecutorCreateBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING blottabName,
   int fieldsNumber, struct P_STRING* s_names, int* s_blottabIndexTypes,
   BLOTTAB_HANDLE *a_blottabHandle) {
-  //G_STRINGS_HANDLE *na_tableHandle, G_STRINGS_HANDLE *nap_fieldsHandle) {
   m_DIGGY_BOLLARD()
 
   G_STRINGS_HANDLE blottabsHandle = (G_STRINGS_HANDLE)UNDEFINED;
@@ -392,7 +391,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
 // Public function: see .h
 int l_BlotexlibExecutorComputeBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
   char b_lValue, struct P_STRING *a_sequence, struct P_STRING blottabName,
-  struct BLOTEX_VALUE *cac_blotexValue, struct BLOTVAR_REFERENCE *cac_blotvarReference,
+  struct BLOTEX_VALUE *cac_blotexValue, struct BLOTTAB_REFERENCE *cac_blottabReference,
   int *cac_asValue, G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
   struct P_STRING lexeme;
@@ -474,9 +473,8 @@ m_DIGGY_VAR_P_STRING(blottabName)
   if (b_lValue) {
     if (n_asValue == -1) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
     if (n_blottabHandle == NULL) m_ABANDON(UNKNOWN_BLOTTAB__ABANDONMENT_CAUSE) 
-    cac_blotvarReference->in_blottabElement = c_element;
-    cac_blotvarReference->select.c_blottabHandle = n_blottabHandle; 
-    cac_blotvarReference->cv_blotvarReference = SET_CURRENT__L_VALUE__BLOTVAR_REFERENCE;
+    cac_blottabReference->element = c_element;
+    cac_blottabReference->blottabHandle = n_blottabHandle; 
     *cac_asValue = n_asValue ;
   } else {
     if (n_indexFetchFlags < 0) {

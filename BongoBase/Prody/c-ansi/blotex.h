@@ -290,27 +290,11 @@ int BlotexlibExecutorGetBlottabsHandle(BLOTEXLIB_EXECUTOR_HANDLE handle,
  struct BLOTTAB ;
  typedef struct BLOTTAB* BLOTTAB_HANDLE;
 
-
-enum {
-  NAME__BLOTVAR_REFERENCE, // Simple blotvar: '.' <entity> 
-  ENTRY__BLOTVAR_REFERENCE, // Simple blotvar: '[' <intex> ']'
-  TOKEN_ID__BLOTVAR_REFERENCE, // Simple blotvar: '{' <intex> '}'
-  SET_CURRENT__L_VALUE__BLOTVAR_REFERENCE // '?=' 
-};
-
-struct BLOTVAR_REFERENCE {
-  int in_blottabElement; // -1 special value => BLOTREG
-  union {
-    G_STRINGS_HANDLE c_blotregHandle; // BLOTREG
-    BLOTTAB_HANDLE c_blottabHandle; // BLOTTAB
-  } select; 
-  int cv_blotvarReference; // Always SET_CURRENT__L_VALUE__BLOTVAR_REFERENCE with BLOTTAB
-  union {
-    struct P_STRING c_name; // Only significant with NAME__BLOTVAR_REFERENCE
-    int c_entry; // Only significant with ENTRY__BLOTVAR_REFERENCE
-    int c_tokenId; // Only significant with TOKEN_ID__BLOTVAR_REFERENCE
-  } c_select; // NOT significant with SET_CURRENT__L_VALUE__BLOTVAR_REFERENCE
+struct BLOTTAB_REFERENCE {
+  int element; 
+  BLOTTAB_HANDLE blottabHandle; // BLOTTAB
 } ;
+
 
 // ===> To be implemented by blottab module:
 // Parse and compute blottab operations:
@@ -341,11 +325,8 @@ struct BLOTVAR_REFERENCE {
 // - -1: unexpected problem
 int l_BlotexlibExecutorComputeBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
   char b_lValue, struct P_STRING *a_sequence, struct P_STRING blottabName,
-  struct BLOTEX_VALUE *cac_blotexValue, struct BLOTVAR_REFERENCE *cac_blotvarReference,
+  struct BLOTEX_VALUE *cac_blotexValue, struct BLOTTAB_REFERENCE *cac_blottabReference,
   int *cac_asValue, G_STRING_STUFF nc_abandonmentInfo) ;
-
-
-
 
 
 #endif // __BLOTEX_C_ANSI_H_INCLUDED__
