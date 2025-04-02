@@ -78,12 +78,20 @@ int l_BlotexlibExecutorCreateBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_
   int fieldsNumber, struct P_STRING* s_names, int* s_blottabIndexTypes,
   BLOTTAB_HANDLE *a_blottabHandle) ;
 
+struct BLOTTAB_REFERENCE {
+  int element;
+  BLOTTAB_HANDLE blottabHandle; // BLOTTAB
+} ;
 
 // ==== SEE c-ansi/blotex.h
 int l_BlotexlibExecutorComputeBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
   char b_lValue, struct P_STRING *a_sequence, struct P_STRING blottabName,
   struct BLOTEX_VALUE *cac_blotexValue, struct BLOTTAB_REFERENCE *cac_blottabReference,
   int *cac_asValue, G_STRING_STUFF nc_abandonmentInfo) ;
+
+
+int UpdateBlottabField(const struct BLOTTAB_REFERENCE* ap_blottabReference, int as,
+ struct BLOTEX_VALUE blotexValue) ;
 
 
 #endif // __BLOTTAB_C_ANSI_H_INCLUDED__

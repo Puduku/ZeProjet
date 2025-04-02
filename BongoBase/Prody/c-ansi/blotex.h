@@ -18,7 +18,6 @@
 
 struct BLOTEXLIB_EXECUTOR_FACTORY ; // Private
 typedef struct BLOTEXLIB_EXECUTOR_FACTORY *BLOTEXLIB_EXECUTOR_FACTORY_HANDLE; // Public
-
  
 // Create blotex library executor factory
 //
@@ -276,10 +275,14 @@ int BlotexlibExecutorComputeBlotex(BLOTEXLIB_EXECUTOR_HANDLE handle,
 // blottabs:
 // ---------
 
+
 // Get all blotabs' handle 
 // 
 // Passed:
 // - handle:
+//
+// Changed:
+// - *a_blottabsHandle: NAMED OBJECTS collection handle
 //
 // Ret:
 // - RETURNED: Ok
@@ -287,13 +290,11 @@ int BlotexlibExecutorComputeBlotex(BLOTEXLIB_EXECUTOR_HANDLE handle,
 int BlotexlibExecutorGetBlottabsHandle(BLOTEXLIB_EXECUTOR_HANDLE handle, 
   G_STRINGS_HANDLE *a_blottabsHandle) ;
 
- struct BLOTTAB ;
- typedef struct BLOTTAB* BLOTTAB_HANDLE;
+// ===> To be implemented by blottab module:
+struct BLOTTAB ;
+typedef struct BLOTTAB* BLOTTAB_HANDLE;
 
-struct BLOTTAB_REFERENCE {
-  int element; 
-  BLOTTAB_HANDLE blottabHandle; // BLOTTAB
-} ;
+struct BLOTTAB_REFERENCE ;
 
 
 // ===> To be implemented by blottab module:
@@ -328,5 +329,8 @@ int l_BlotexlibExecutorComputeBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct BLOTEX_VALUE *cac_blotexValue, struct BLOTTAB_REFERENCE *cac_blottabReference,
   int *cac_asValue, G_STRING_STUFF nc_abandonmentInfo) ;
 
+
+int UpdateBlottabField(const struct BLOTTAB_REFERENCE* ap_blottabReference, int as,
+ struct BLOTEX_VALUE blotexValue) ;
 
 #endif // __BLOTEX_C_ANSI_H_INCLUDED__

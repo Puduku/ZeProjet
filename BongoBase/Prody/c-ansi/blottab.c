@@ -517,3 +517,10 @@ m_DIGGY_VAR_P_STRING(blottabName)
 } // l_BlotexlibExecutorComputeBlottabOps
 
 
+// See .h
+int UpdateBlottabField(const struct BLOTTAB_REFERENCE* ap_blottabReference, int as,
+  struct BLOTEX_VALUE blotexValue) {
+  m_DIGGY_BOLLARD()
+  m_DIGGY_RETURN(ANSWER__NO)
+} // UpdateBlottabField
+
