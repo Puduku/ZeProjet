@@ -10,7 +10,7 @@
 // In C code, what we call a "watermark" is a bunch of small letters (terminated with '_') prefixing 
 // different entities names (mostly variables, but also macros and functions).
 // Each small letter of a watermark corresponds to an individual indicator.
-// The order of the indicators in the watermark reflects the hierarchical dependency (if any)
+// The order of the indicators in the watermark reflects the logical dependency (if any)
 // between the indicators of the entity. That is, the "general" indicators appear on "the left"
 // of the watermark whilst "depending" and "specific" indicators are put on "the right" in the
 // watermark.
