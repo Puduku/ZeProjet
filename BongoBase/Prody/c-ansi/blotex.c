@@ -270,22 +270,22 @@ int IsEntityNameChar(int c) {
 #define b_R_VALUE b_FALSE0 
 
 
-
+// specific blotvar reference (of a register) 
 enum {
-  NAME__BLOTVAR_REFERENCE, // Simple blotvar: '.' <entity> 
-  ENTRY__BLOTVAR_REFERENCE, // Simple blotvar: '[' <intex> ']'
-  TOKEN_ID__BLOTVAR_REFERENCE, // Simple blotvar: '{' <intex> '}'
-  SET_CURRENT__L_VALUE__BLOTVAR_REFERENCE // '?=' 
+  NAME__BLOTVAR_REFERENCE, // blotvar identified as '.' <entity> 
+  ENTRY__BLOTVAR_REFERENCE, // blotvar identified as '[' <intex> ']'
+  TOKEN_ID__BLOTVAR_REFERENCE, // blotvar identified as {' <intex> '}'
+  CURRENT__BLOTVAR_REFERENCE // Current blotvar '?=' 
 };
 
 struct BLOTVAR_REFERENCE {
-    G_STRINGS_HANDLE blotregHandle; // BLOTREG
-  int blotvarReference; // Always SET_CURRENT__L_VALUE__BLOTVAR_REFERENCE with BLOTTAB
+  G_STRINGS_HANDLE blotregHandle;
+  int blotvarReference; 
   union {
     struct P_STRING c_name; // Only significant with NAME__BLOTVAR_REFERENCE
     int c_entry; // Only significant with ENTRY__BLOTVAR_REFERENCE
     int c_tokenId; // Only significant with TOKEN_ID__BLOTVAR_REFERENCE
-  } c_select; // NOT significant with SET_CURRENT__L_VALUE__BLOTVAR_REFERENCE
+  } c_select; // NOT significant with CURRENT__BLOTVAR_REFERENCE
 } ;
 
 
@@ -344,7 +344,6 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
     } // switch
   } // if
 
-  // ac_blotvarReference->select.c_blotregHandle established 
   // Retrieve blotvar reference:
   PParseOffset(a_sequence,1,&lexeme);
   if (b_EMPTY_P_STRING(lexeme)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE) 
@@ -444,7 +443,8 @@ m_DIGGY_VAR_P_STRING(ap_blotvarReference->c_select.c_name)
     m_TRACK_IF(ret < 0)
 m_ASSERT(ret == ap_blotvarReference->c_select.c_entry)
     result = (acvnt_blotvarStuff == NULL? RESULT__NOT_FOUND: RESULT__NOT_FOUND);
-  break; case SET_CURRENT__L_VALUE__BLOTVAR_REFERENCE:
+  break; case CURRENT__BLOTVAR_REFERENCE:
+m_ASSERT(b_lValue)
     switch (result = GStringsIndexFetch(ap_blotvarReference->blotregHandle,NULL,
       INDEX_FETCH_FLAGS__CURRENT, acvnt_blotvarStuff, nacvn_entry)){
     case RESULT__FOUND:
@@ -733,7 +733,7 @@ m_DIGGY_INFO("Before GStringsIndexRequestR(blotregHandle=%p)...",blotregHandle)
 // Parse and compute blotreg operations:
 // - as r-value of blotex atom => expect <int blotreg ops> | <str blotreg ops>
 // or
-// - as l-value of blotvar reference => expect <blotreg ref op set int> | <blotreg op read str> 
+// - as l-value of blotvar reference => expect <blotreg ref op set int> | <blotreg ref op set str> 
 //
 // Passed:
 // - handle: 
@@ -763,7 +763,7 @@ static int BlotexlibExecutorComputeBlotregOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
   m_DIGGY_BOLLARD()
   struct P_STRING lexeme;
 
-  m_PREPARE_ABANDON(a_sequence, b_lValue? "<blotreg ref op set int> | <blotreg op read str>":
+  m_PREPARE_ABANDON(a_sequence, b_lValue? "<blotreg ref op set int> | <blotreg ref op set str>":
     "<int blotreg ops> | <str blotreg ops>") 
 
   G_STRINGS_HANDLE blotregHandle = (G_STRINGS_HANDLE)UNDEFINED; 
@@ -778,8 +778,8 @@ m_DIGGY_VAR_P_STRING(blotregName)
 
   if (b_lValue) {
     cac_blotvarReference->blotregHandle = blotregHandle; 
-    cac_blotvarReference->blotvarReference = SET_CURRENT__L_VALUE__BLOTVAR_REFERENCE;
-    *cac_as = UNDEFINED;
+    cac_blotvarReference->blotvarReference = CURRENT__BLOTVAR_REFERENCE;
+    *cac_as = UNDEFINED; // For the moment 
   } else {
     cac_blotexValue->b_strex = b_FALSE0; // a priori 
     cac_blotexValue->select.c_blotval = TRUE__BLOTVAL0; // a priori

@@ -521,6 +521,33 @@ m_DIGGY_VAR_P_STRING(blottabName)
 int UpdateBlottabField(const struct BLOTTAB_REFERENCE* ap_blottabReference, int as,
   struct BLOTEX_VALUE blotexValue) {
   m_DIGGY_BOLLARD()
+#if 0
+  //ap_blottabReference->blottabHandle 
+  //G_STRINGS_HANDLE h_tableHandle;
+  //G_STRINGS_HANDLE hp_fieldsHandle;
+  //ap_blottabReference->element 
+  G_STRING_SET_STUFF nt_gStringSetStuff;
+  int n_entry;
+  switch (m_GStringsIndexiSingleFetch(ap_blottabReference->blottabHandle.h_tableHandle,NULL,
+    INDEX_LABEL0,
+    INDEX_FETCH_FLAGS__CURRENT, G_STRING_SET_STUFF &nt_gStringSetStuff, &n_entry)) {
+  case RESULT__FOUND:
+    switch (as) {
+    case AS__VALUE_INT: // [ '#' ]
+    break; case AS__ID: // '!' 
+m_RAISE(ANOMALY__NOT_AVAILABLE)
+    break; case AS__VALUE_STR: // '$'
+    break; case AS__NAME:  // '!$'
+m_RAISE(ANOMALY__NOT_AVAILABLE)
+    break; default: m_RAISE(ANOMALY__VALUE__D,c_as)
+    } // switch
+
+  break; case RESULT__NOT_FOUND:
+  break; default:
+    m_TRACK()
+  } // switch
+#endif 
+
   m_DIGGY_RETURN(ANSWER__NO)
 } // UpdateBlottabField
 

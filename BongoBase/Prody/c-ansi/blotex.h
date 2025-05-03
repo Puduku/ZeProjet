@@ -224,8 +224,7 @@ int ParseAsValue(struct P_STRING *a_sequence, int *an_as) ;
 // Ret:
 // - RETURNED: Ok
 // - 1: unexpected problem; anomaly is raised
-int ParseRequestCompOp(struct P_STRING *a_sequence, char b_str,
-  int *an_indexSeekFlags) ;
+int ParseRequestCompOp(struct P_STRING *a_sequence, char b_str, int *an_indexSeekFlags);
 
 // Parse <logical 2op>  
 //
@@ -239,8 +238,7 @@ int ParseRequestCompOp(struct P_STRING *a_sequence, char b_str,
 // Ret:
 // - RETURNED: Ok
 // - 1: unexpected problem; anomaly is raised
-int ParseLogical2Op(struct P_STRING *a_sequence,
-  int *a_criteriaOpFlags) ;
+int ParseLogical2Op(struct P_STRING *a_sequence, int *a_criteriaOpFlags);
 
 
 struct BLOTEX_VALUE {
@@ -266,9 +264,8 @@ struct BLOTEX_VALUE {
 // - ANSWER__YES: Ok,
 // - ANSWER__NO: 'syntax' 'not found' error; abandon processing 
 // - -1: unexpected problem
-int BlotexlibExecutorComputeBlotex(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING *a_sequence, struct BLOTEX_VALUE *ac_blotexValue,
-  G_STRING_STUFF nc_abandonmentInfo) ;
+int BlotexlibExecutorComputeBlotex(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING *a_sequence,
+  struct BLOTEX_VALUE *ac_blotexValue, G_STRING_STUFF nc_abandonmentInfo) ;
 
 
 

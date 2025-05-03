@@ -146,7 +146,7 @@
 // <blotreg op read int> ::= '=' [ <<as value int>> | <<as entry>> | <<as id>> ]
 //
 // When the last operation of the sequence reads a string value, the global value of the operations
-// sequence is that string value (or 'l-value'): 
+// sequence is that string value: 
 // <str blotreg> ::= <entity> '?' <str blotreg ops>  
 // <str blotreg ops> ::= [ <blotreg op select> ] [ <blotreg op reset> ] [ <blotreg op next> ]
 //   <blotreg op read str>
