@@ -291,14 +291,36 @@ int BlotexlibExecutorGetBlottabsHandle(BLOTEXLIB_EXECUTOR_HANDLE handle,
 struct BLOTTAB ;
 typedef struct BLOTTAB* BLOTTAB_HANDLE;
 
-struct BLOTTAB_REFERENCE ;
+
+// Retrieve some blot table.
+// 
+// Passed:
+// - handle:
+// - blottabName: blot table's name 
+//
+// Changed:
+// - *ac_blottabHandle: (only significant when retrieved : RESULT__FOUND) 
+//
+// Ret:
+// - RESULT__FOUND: OK
+// - RESULT__NOT_FOUND: 
+// - -1: unexpected problem; anomaly is raised
+int BlotexlibExecutorGetBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING blottabName,
+  BLOTTAB_HANDLE *ac_blottabHandle) ;
+
+
+struct BLOTTAB_FIELD_REFERENCE {
+  int element;
+  BLOTTAB_HANDLE blottabHandle;
+} ;
 
 
 // ===> To be implemented by blottab module:
+// #REF l_BlotexlibExecutorComputeBlottabOps
 // Parse and compute blottab operations:
 // - as r-value of blotex atom => expect <int blottab ops> | <str blottab ops>
 // or
-// - as l-value of blotvar reference => expect <blottab ref op read int> | <blottab op read str> 
+// - as l-value of blotex reference => expect <blottab ref op set int> | <blottab ref op set str> 
 //
 // Passed:
 // - handle: 
@@ -312,22 +334,32 @@ struct BLOTTAB_REFERENCE ;
 // Changed:
 // - *a_sequence: after parsing 
 // - *cac_blotexValue: only significant if "success" (r-value) ; value corresponding to blottab ops
-// - *cac_blotvarReference: only significant if "success" (l-value) ; corresponding blotvar
-//   reference (BLOTTAB ref)
+// - *cac_blottabFieldReference: only significant if "success" (l-value) 
 // - *cac_asValue: only significant if "success" (l-value) 
 // - nc_abandonmentInfo: 
 //
 // Ret: Computed successfully ? 
 // - ANSWER__YES: Ok,
-// - ANSWER__NO: 'syntax' 'not found' error; abandon processing 
+// - ANSWER__NO: 'syntax' 'not found' 'already exist' error; abandon processing 
 // - -1: unexpected problem
 int l_BlotexlibExecutorComputeBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
   char b_lValue, struct P_STRING *a_sequence, struct P_STRING blottabName,
-  struct BLOTEX_VALUE *cac_blotexValue, struct BLOTTAB_REFERENCE *cac_blottabReference,
+  struct BLOTEX_VALUE *cac_blotexValue, struct BLOTTAB_FIELD_REFERENCE *cac_blottabFieldReference,
   int *cac_asValue, G_STRING_STUFF nc_abandonmentInfo) ;
 
 
-int UpdateBlottabField(const struct BLOTTAB_REFERENCE* ap_blottabReference, int as,
+// ===> To be implemente by blottab module
+// #REF UpdateBlottabField
+// Passed:
+// - ap_blottabFieldReference: 
+// - as: 
+// - blotexValue:
+// 
+// Ret:
+// - ANSWER__YES:
+// - ANSWER__NO:
+// - -1: unexpected problem; anomaly is raised
+int UpdateBlottabField(const struct BLOTTAB_FIELD_REFERENCE* ap_blottabFieldReference, int as,
  struct BLOTEX_VALUE blotexValue) ;
 
 #endif // __BLOTEX_C_ANSI_H_INCLUDED__

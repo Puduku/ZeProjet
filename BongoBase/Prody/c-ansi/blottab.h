@@ -31,22 +31,6 @@ int BlottabCreateInstance(BLOTTAB_HANDLE *azh_handle, int fieldsNumber,
 int BlottabDestroyInstance(void *xhr_handle) ;
 
 
-// Retrieve some blot table.
-// 
-// Passed:
-// - handle:
-// - blottabName: blot table's name 
-//
-// Changed:
-// - *ac_blottabHandle: (only significant when retrieved : RESULT__FOUND) 
-//
-// Ret:
-// - RESULT__FOUND: OK
-// - RESULT__NOT_FOUND: 
-// - -1: unexpected problem; anomaly is raised
-int l_BlotexlibExecutorGetBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING blottabName,
-  BLOTTAB_HANDLE *ac_blottabHandle) ;
-
 
 enum { // #REF BLOTTAB_INDEX_TYPE
   NONE__BLOTTAB_INDEX_TYPE,
@@ -78,19 +62,14 @@ int l_BlotexlibExecutorCreateBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_
   int fieldsNumber, struct P_STRING* s_names, int* s_blottabIndexTypes,
   BLOTTAB_HANDLE *a_blottabHandle) ;
 
-struct BLOTTAB_REFERENCE {
-  int element;
-  BLOTTAB_HANDLE blottabHandle; // BLOTTAB
-} ;
-
-// ==== SEE c-ansi/blotex.h
+// #SEE l_BlotexlibExecutorComputeBlottabOps@c-ansi/blotex.h
 int l_BlotexlibExecutorComputeBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  char b_lValue, struct P_STRING *a_sequence, struct P_STRING blottabName,
-  struct BLOTEX_VALUE *cac_blotexValue, struct BLOTTAB_REFERENCE *cac_blottabReference,
+  char b_lValue, struct P_STRING *a_sequence, struct P_STRING blottabName, 
+  struct BLOTEX_VALUE *cac_blotexValue, struct BLOTTAB_FIELD_REFERENCE *cac_blottabFieldReference,
   int *cac_asValue, G_STRING_STUFF nc_abandonmentInfo) ;
 
-
-int UpdateBlottabField(const struct BLOTTAB_REFERENCE* ap_blottabReference, int as,
+// #SEE UpdateBlottabField @c-ansi/blotex.h
+int UpdateBlottabField(const struct BLOTTAB_FIELD_REFERENCE* ap_blottabFieldReference, int as,
  struct BLOTEX_VALUE blotexValue) ;
 
 

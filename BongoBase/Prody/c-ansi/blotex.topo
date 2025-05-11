@@ -48,18 +48,18 @@
 // - 0 : represents "true" boolean value
 // - !=0 : represents "false" boolean value
 //
-// NOTICE: see also extensions c-ansi/blottab.topo 
-// "int" blotvar references are usable as 'l-value' :
-// <int blotvar ref> ::= <blotvar as int> | <blotvar id> | <int blotreg ref>
-// "str" blotvar references are usable as 'l-value' :
-// <str blotvar ref> ::= <blotvar as str> | <blotvar name> | <str blotreg ref>
+// NOTICE: see blottab extensions in c-ansi/blottab.topo 
+// "int" blotex references are (usable as 'l-value') :
+// <int blotex ref> ::= <blotvar as int> | <blotvar id> | <int blotreg ref> | <int blottab ref>
+// "str" blotex references are usable as 'l-value' :
+// <str blotex ref> ::= <blotvar as str> | <blotvar name> | <str blotreg ref> | <str blottab ref>
 //
 // Integer and string atoms are made of constants, blot expressions between brackets, variables
 // references, strings comparisons, "register" and "table" operations:
 // <intex atom> ::= [ <int 1op> ] ( ( '(' <intex> ')' ) | <int constant> | <blotvar as int> |
-//   <blotvar entry> | <blotvar id> | <int blotreg> | <strex comp> ) 
+//   <blotvar entry> | <blotvar id> | <int blotreg> | <int blottab> | <strex comp> ) 
 // <strex atom> ::= ( '(' <strex> ')' ) | <str constant> | <blotvar as str> | <blotvar name> |
-//   <str blotreg>
+//   <str blotreg> | <str blottab>
 //
 // Unary operators modify integer atoms. Pseudo-logical operator '!' "negates" the integer
 // expression "seen" as boolean:
@@ -171,6 +171,16 @@
 // <blotreg ref op set str> ::= '=' ( <<as value str>> | <<as name>> )  
 // <str blotreg ref> ::= <entity> '?' <blotreg ref op set str> 
 //
+//
+// Blot table 'r-value' operations :
+// <int blottab> ::= '^' <entity> '?' <int blottab ops>  
+// <str blottab> ::= '^' <entity> '?' <str blottab ops>  
+//
+// Blot table 'l-value' operations :
+// <int blottab ref> ::= '^' <entity> '?' <blottab ref op set int>
+// <str blottab ref> ::= '^' <entity> '?' <blottab ref op set str>
+//
+//
 // Examples:
 // recettes?: !$ * :$                              => select all items, ordered by name  
 // recettes?: !$ === "*bolo*" and # >= 69 :?       => new register selection 
@@ -185,16 +195,16 @@
 // II. "blotex" library's functions (those to be placed in blot code)
 // --------------------------------
 //
-// Eval ([ <int blotvar ref> := ] <intex>)
-// Eval ([ <str blotvar ref> := ] <strex>)
+// Eval ([ <int blotex ref> := ] <intex>)
+// Eval ([ <str blotex ref> := ] <strex>)
 // ---- 
 //
 // Evaluate the blotex and eventually assign the result into a blotvar.
 //
 // Passed:
-// - int blotvar ref: int blotvar reference (if passed)
+// - int blotex ref: int blotex reference (if passed)
 //   If the blotvar was not existing, it is automatically allocated by the function
-// - str blotvar ref: str blotvar reference (if passed)
+// - str blotex ref: str blotex reference (if passed)
 //   If the blotvar was not existing, it is automatically allocated by the function
 // - intex: blotex integer expression
 // - strex: blotex string expression
