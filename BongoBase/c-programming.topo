@@ -20,11 +20,11 @@
 // paradigms (like "functional" paradigm)
 
 // This table shows main cases of correspondence between 'L' and 'P' concepts.
-// What must be understood is that the "P" concepts derived from a given "L" concept are usually
-// very different "P" concepts. For example, from the point of view of 'P', 'functional macros' have
+// What must be understood is that the 'P' concepts derived from a given 'L' concept are usually
+// very different 'P' concepts. For example, from the point of view of 'P', 'functional macros' have
 // little to do with 'pure macros' - and yet both are just ordinary macros of the C preprocessor...
 // +----------------------------------------------+----------------------------------------------+
-// | L : preprocessor / compiler                  | P: programming layer ("procedural            |
+// | 'L': preprocessor / compiler                 | 'P': programming layer ("procedural          |
 // |                                              | programming" orientation)                    |
 // +----------------------------------------------+----------------------------------------------+
 // | preprocessor macros                          | - constants & functional macros              |
