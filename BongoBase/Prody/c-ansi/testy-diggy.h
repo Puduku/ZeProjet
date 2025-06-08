@@ -51,6 +51,8 @@
 
 #define m_DIGGY_VAR_ANSWER(m_var) ;
 
+#define m_DIGGY_VAR_RESULT(m_var) ;
+
 #define m_DIGGY_VAR_COMPARISON(m_var) ;
 
 #define m_DIGGY_VAR_P_STRING(m_var) ;

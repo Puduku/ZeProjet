@@ -6,6 +6,7 @@
 #define __C_ANSI_NAMED_OBJECT_H_INCLUDED
 
 #include "c-ansi/g-string.h" 
+#include "c-ansi/testy-diggy.h"
 
 
 // #REF NAMED_OBJECTS_CREATE_INSTANCE <named-object>
@@ -30,10 +31,12 @@
 // - -1: unexpected problem; anomaly is raised...
 static inline int m_GStringAsNamedObject(G_STRING_STUFF stuff, void *nhr_handle,
   G_STRINGS_HANDLE n_gStringsHandle) {
+  m_DIGGY_BOLLARD_S()
   m_CHECK_G_STRINGS_COLLECTION_CONVEYANCE(n_gStringsHandle,FIRST_ELEMENT0,
     NAMED_OBJECT__G_STRING_CONVEYANCE)
+  stuff->acolyt.cnhr_handle = NULL;
   stuff->acolyt.cnhr_handle = nhr_handle;
-  return RETURNED;
+  m_DIGGY_RETURN(RETURNED)
 } // m_GStringAsNamedObject 
 
 #endif // __C_ANSI_NAMED_OBJECT_H_INCLUDED

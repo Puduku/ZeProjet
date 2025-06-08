@@ -65,8 +65,6 @@ int l_BlotcodeLinkBlotexlib(BLOTCODE_HANDLE ep_handle, const char* nfp_blotlibPr
 // Interface with other blotlibs
 // =============================
 
-// Allow access to blotex variables... 
-
 struct BLOTEXLIB_EXECUTOR; // Private structure 
 typedef struct BLOTEXLIB_EXECUTOR *BLOTEXLIB_EXECUTOR_HANDLE; // Public handle
 
@@ -97,6 +95,10 @@ int l_BlotcodeExecutorGetBlotexlibExecutorHandle(BLOTCODE_EXECUTOR_HANDLE handle
 // blotregs:
 // ---------
 
+// Notice: blot registers are based on g-params 
+// blotvar <=> g-param 
+// blotreg <=> g-params (i.e g-param collection)
+
 // Retrieve some blot register.
 // 
 // Passed:
@@ -115,7 +117,6 @@ int BlotexlibExecutorGetBlotreg (BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct P_STRING blotregName, G_STRINGS_HANDLE *ac_blotregHandle) ;
 
 // Create blot register.
-// Note: blot registers are based g-params (specialised g-string set collections) 
 // 
 // Passed:
 // - handle:
@@ -133,21 +134,24 @@ int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct P_STRING blotregName, G_STRINGS_HANDLE *na_blotregHandle);
 
 
-// Parsing blot expressions  : helpers
-// -----------------------------------
+// Parsing blot expressions: helpers
+// ---------------------------------
 
-
+// Prepare parsing function for potential abandonment.   
+//
 // Passed:
 // - a_sequence: parsed sequence address
-// - p_sequenceType:  
+// - p_sequenceType: expected sequence type 
 #define m_PREPARE_ABANDON(/*struct P_STRING* */a_sequence,\
   /*const char* */p_sequenceType) \
   struct P_STRING *ema_sequence = (a_sequence);\
   const char *emp_sequenceType = (p_sequenceType);\
   
+// Precise sequence description of parsing function.
+//
 // Passed:
 // - a_sequence: parsed sequence address 
-// - p_sequenceType:  
+// - p_sequenceType: expected sequence type 
 #define m_PRECISE_ABANDON(/*struct P_STRING* */a_sequence,\
   /*const char* */p_sequenceType) \
   ema_sequence = (a_sequence);\
@@ -164,6 +168,8 @@ int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
 #define INVALID_FORMAT__ABANDONMENT_CAUSE "Invalid format"
 #define NOT_EXISTING__ABANDONMENT_CAUSE "Not existing l-value"
 
+// Make function abandon parsing (return ANSWER__NO)
+//
 // Passed:
 // - p_cause : parsing abandonment cause format 
 // - ... : parsing abandonment cause:
@@ -184,6 +190,7 @@ int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
 }
  
 // IS_CHAR_FUNCTION:
+// Recognize any character corresponding to <entity>
 int IsEntityNameChar(int c) ;
 
 enum {
@@ -249,7 +256,7 @@ struct BLOTEX_VALUE {
   } select ;
 } ;
 
-// Parse <blotex> 
+// Parse <blotex>
 //
 // Passed:
 // - handle:
@@ -272,6 +279,9 @@ int BlotexlibExecutorComputeBlotex(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_ST
 // blottabs:
 // ---------
 
+// Notice: blot tables "details" are actually handled by external (so-called "blottab") module.
+// The blotex module simply manages the blottab identification within blot expressions (seen as
+// some <entity> prefixed with '^' token). 
 
 // Get all blotabs' handle 
 // 
@@ -310,7 +320,7 @@ int BlotexlibExecutorGetBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRIN
 
 
 struct BLOTTAB_FIELD_REFERENCE {
-  int element;
+  int element; // field identification
   BLOTTAB_HANDLE blottabHandle;
 } ;
 

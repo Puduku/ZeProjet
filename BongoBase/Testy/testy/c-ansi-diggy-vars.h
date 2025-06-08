@@ -26,6 +26,14 @@
   m_DIGGY_VAR_VALUE(m_var,AnswerImage)
 
 
+// "result" (enum) var display
+//
+// Passed
+// - m_var: common var expression to display
+#define m_DIGGY_VAR_RESULT(m_var) \
+  m_DIGGY_VAR_VALUE(m_var,ResultImage)
+
+
 // "comparison" (enum) var display
 //
 // Passed

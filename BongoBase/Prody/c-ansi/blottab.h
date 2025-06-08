@@ -1,4 +1,4 @@
-// blottab.h, version 1.92 (ANSI)
+// c-ansi/blottab.h, version 1.92 (ANSI)
 // (c) Atos-Euronext Belgium - 2008
 // (c) Puduku - 2024
 
