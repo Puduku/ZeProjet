@@ -79,7 +79,7 @@ int BlottabDestroyInstance(void *xhr_handle) {
 
 
 
-// Blot expressions parsing:
+// Blottab expressions parsing:
 
 #define NO_BLOTTAB_INDEX__ABANDONMENT_CAUSE "No index in table"
 #define EXPECT_INT_BLOTTAB_INDEX__ABANDONMENT_CAUSE "Integer index expected in table"
@@ -90,94 +90,93 @@ int BlottabDestroyInstance(void *xhr_handle) {
 
 // Passed:
 // - *a_sequence: before parsing
-// - np_fieldsHandle:
-//   + NULL: only parse field name and type...
-//   + != NULL: parse field name and seek element in table...
-// - cnac_tableIndexLabel: (significant when seek element in table)
-//   + NULL special value: seek element in table element 
-//   + != NULL: seek element in table index label
-// - ccac_element: (when seek element in table element; only significant if no abandon) 
-// - cac_asValue: (when seek element in table; only significant if no abandon) default to "as value int"
-// - cac_fieldName: only significant when only parse element name and type
-// - cac_blottabIndexType: only significant when only parse field name and type 
-// - nc_abandonmentInfo: 
 //
 // Changed:
 // - *a_sequence: after parsing
-// - *cnac_tableIndexLabel: (when seek element in table index label; only significant if no abandon)
-// - *ccac_element: (when seek element in table element; only significant if no abandon) 
-// - *cac_asValue: (when seek element in table; only significant if no abandon) default to "as value int"
-// - *cac_fieldName: (when parse only field name and type) only significant if no abandon)
-// - *cac_blottabIndexType: (when parse only field name an type) only significant if no abandon)
-// - nc_abandonmentInfo: 
+// - *a_fieldName: 
+// - *an_asValue: -1 special value if not specified 
+//
+// Ret:
+// - RETURNED: Ok
+static int ParseBlottabElement(struct P_STRING *a_sequence, struct P_STRING *a_fieldName, 
+  int *an_asValue) {
+  m_DIGGY_BOLLARD()
+m_DIGGY_VAR_P_STRING(*a_sequence)
+  m_PParsePassSpaces(a_sequence,NULL);
+  PParsePassChars(a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_WHILE,IsEntityNameChar,
+    (char)UNDEFINED,a_fieldName); // <entity>
+m_DIGGY_VAR_P_STRING(*a_fieldName)
+
+  m_TRACK_IF(ParseAsValue(a_sequence, an_asValue) != RETURNED)  
+m_DIGGY_VAR_D(*an_asValue)
+
+  m_DIGGY_RETURN(RETURNED)
+} // ParseBlottabElement 
+
+
+// Parse and retrieve blottab element
+// Passed:
+// - *a_sequence: before parsing
+// - fieldsHandle: 
+// - nac_tableIndexLabel: 
+//   + NULL special value: seek element in table element 
+//   + != NULL: seek element in table index label
+// - cac_element: 
+// - ac_asValue: 
+//
+// Changed:
+// - *a_sequence: after parsing
+// - *nac_tableIndexLabel: (when seek element in table index label; only significant if no abandon)
+// - *cac_element: (when seek element in table element; only significant if no abandon) 
+// - *ac_asValue: (when seek element in table; only significant if no abandon) default to "as value int"
+// - nc_abandonmentInfo: only significant when parsing abandoned 
 //
 // Ret:
 // - ANSWER__YES: Ok
 // - ANSWER__NO: parsing abandoned
-static int ParseBlottabElement(struct P_STRING *a_sequence, G_STRINGS_HANDLE np_fieldsHandle,
-  int *cnac_tableIndexLabel, int *ccac_element, int *cac_asValue, struct P_STRING *cac_fieldName,
-  int *cac_blottabIndexType, G_STRING_STUFF nc_abandonmentInfo) {
+static int RetrieveBlottabElement(struct P_STRING *a_sequence, G_STRINGS_HANDLE fieldsHandle,
+  int *nac_tableIndexLabel, int *cac_element, int *ac_asValue, G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
 m_DIGGY_VAR_P_STRING(*a_sequence)
-  G_STRING_SET_STUFF p_fieldStuff; // UNDEFINED
+  G_STRING_SET_STUFF fieldStuff; // UNDEFINED
   struct P_STRING fieldName; //UNDEFINED
-  int n_asValue = UNDEFINED;
+  *ac_asValue = UNDEFINED;
  
   m_PREPARE_ABANDON(a_sequence,"<entity> [ <<as value int>> | <<as value str>> ]")
-  m_PParsePassSpaces(a_sequence,NULL);
-  PParsePassChars(a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_WHILE,IsEntityNameChar,
-    (char)UNDEFINED,&fieldName); // <entity>
-m_DIGGY_VAR_P_STRING(fieldName)
-  if (np_fieldsHandle != NULL) { // Seek element in table
-    const struct G_KEY p_fieldKey = m_GKey_PString(fieldName);
-    int result = UNDEFINED;
-    int entry = UNDEFINED;
-    switch (result = m_GStringsIndexSingleFetch(np_fieldsHandle,(INDEX_REQUEST_AUTOMATIC_BUFFER)NULL,
-      INDEX_LABEL0, INDEX_SEEK_FLAGS__EQUAL, &p_fieldKey, INDEX_FETCH_FLAGS__READ_ONLY, 
-      &p_fieldStuff, &entry)) {
-    case RESULT__FOUND:
-      m_ASSERT(p_fieldStuff != NULL)
-      m_ASSERT(entry >= 0)
-    break; case RESULT__NOT_FOUND:
-      m_ABANDON(UNKNOWN_BLOTTAB_FIELD__ABANDONMENT_CAUSE) 
-    break; default: m_TRACK()
-    } // switch 
-    if (cnac_tableIndexLabel != NULL) {
-      if (p_fieldStuff->acolyt.cen_value == NONE__BLOTTAB_INDEX_TYPE) m_ABANDON(
-        NO_BLOTTAB_INDEX__ABANDONMENT_CAUSE) 
-      *cnac_tableIndexLabel = p_fieldStuff[1].acolyt.cen_value ;
-    } else *ccac_element = entry;
-  } // if
+  ParseBlottabElement(a_sequence,&fieldName,ac_asValue); 
+  if (*ac_asValue == -1) *ac_asValue = AS__VALUE_INT;
+  const struct G_KEY p_fieldKey = m_GKey_PString(fieldName);
+  int result = UNDEFINED;
+  int entry = UNDEFINED;
+  switch (result = m_GStringsIndexSingleFetch(fieldsHandle,(INDEX_REQUEST_AUTOMATIC_BUFFER)NULL,
+    INDEX_LABEL0, INDEX_SEEK_FLAGS__EQUAL, &p_fieldKey, INDEX_FETCH_FLAGS__READ_ONLY, 
+    &fieldStuff, &entry)) {
+  case RESULT__FOUND:
+    m_ASSERT(fieldStuff != NULL)
+    m_ASSERT(entry >= 0)
+  break; case RESULT__NOT_FOUND:
+    m_ABANDON(UNKNOWN_BLOTTAB_FIELD__ABANDONMENT_CAUSE) 
+  break; default: m_TRACK()
+  } // switch 
 
-  m_TRACK_IF(ParseAsValue(a_sequence, &n_asValue) != RETURNED)  
-m_DIGGY_VAR_D(n_asValue)
-  if (np_fieldsHandle != NULL) { // Seek element in table
-    if (n_asValue == -1) n_asValue = AS__VALUE_INT;
-    *cac_asValue = n_asValue ;
-m_DIGGY_VAR_D(n_asValue)
-    if (cnac_tableIndexLabel != NULL) {
-      switch (n_asValue) {
-      case AS__VALUE_INT: // '#'
-        if (p_fieldStuff->acolyt.cen_value != INT__BLOTTAB_INDEX_TYPE) m_ABANDON(
-          EXPECT_INT_BLOTTAB_INDEX__ABANDONMENT_CAUSE) 
-      break; case AS__VALUE_STR: // '$'
-        if (p_fieldStuff->acolyt.cen_value != STR__BLOTTAB_INDEX_TYPE) m_ABANDON(
-          EXPECT_STR_BLOTTAB_INDEX__ABANDONMENT_CAUSE) 
-      break; default: m_RAISE(ANOMALY__VALUE__D,n_asValue)
-      } // switch
-    } // if
-  } else {
-    switch (n_asValue) {
-    case -1:  *cac_blottabIndexType = NONE__BLOTTAB_INDEX_TYPE; 
-    break; case AS__VALUE_INT: *cac_blottabIndexType = INT__BLOTTAB_INDEX_TYPE; 
-    break; case AS__VALUE_STR: *cac_blottabIndexType = STR__BLOTTAB_INDEX_TYPE; 
-    break; default: m_RAISE(ANOMALY__VALUE__D,n_asValue)
+  if (nac_tableIndexLabel != NULL) {
+    if (fieldStuff->acolyt.cen_value == NONE__BLOTTAB_INDEX_TYPE) m_ABANDON(
+      NO_BLOTTAB_INDEX__ABANDONMENT_CAUSE) 
+    *nac_tableIndexLabel = fieldStuff[1].acolyt.cen_value ;
+
+    switch (*ac_asValue) {
+    case AS__VALUE_INT: // '#'
+      if (fieldStuff->acolyt.cen_value != INT__BLOTTAB_INDEX_TYPE) m_ABANDON(
+        EXPECT_INT_BLOTTAB_INDEX__ABANDONMENT_CAUSE) 
+    break; case AS__VALUE_STR: // '$'
+      if (fieldStuff->acolyt.cen_value != STR__BLOTTAB_INDEX_TYPE) m_ABANDON(
+        EXPECT_STR_BLOTTAB_INDEX__ABANDONMENT_CAUSE) 
+    break; default: m_RAISE(ANOMALY__VALUE__D,*ac_asValue)
     } // switch
-    *cac_fieldName = fieldName;
-  } // if
+  } else *cac_element = entry;
 
   m_DIGGY_RETURN(ANSWER__YES)
-} // ParseBlottabElement 
+} // RetrieveBlottabElement 
 
 // Public function; see .h
 int l_BlotexlibExecutorCreateBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING blottabName,
@@ -252,8 +251,8 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
     int asValue = UNDEFINED;  
     int tableIndexLabel = UNDEFINED ;
     // <blottab request atom int> | <blottab request atom str> ...
-    switch (ParseBlottabElement(&subSequence, blottabHandle->hp_fieldsHandle, &tableIndexLabel, (int*)UNDEFINED,
-      &asValue,(struct P_STRING*)UNDEFINED,(int*)UNDEFINED,nc_abandonmentInfo)) {
+    switch (RetrieveBlottabElement(&subSequence, blottabHandle->hp_fieldsHandle, &tableIndexLabel,
+      (int*)UNDEFINED, &asValue,nc_abandonmentInfo)) {
     case ANSWER__YES:
     break; case ANSWER__NO:
       m_DIGGY_RETURN(ANSWER__NO)
@@ -346,16 +345,16 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
 
   struct P_STRING s_names10[10];
   int s_blottabIndexTypes10[10];
+  int n_asValue = UNDEFINED;
   int i = -1;
   do {
     m_ASSERT(++i < 10)
-    switch (ParseBlottabElement(&subSequence, NULL, (int*)UNDEFINED, (int*)UNDEFINED,
-       (int*)UNDEFINED, s_names10 + i, s_blottabIndexTypes10 + i,nc_abandonmentInfo)) {
-    case ANSWER__YES:
-    break; case ANSWER__NO:
-      m_DIGGY_RETURN(ANSWER__NO)
-    break; default:
-      m_TRACK()
+    ParseBlottabElement(&subSequence, s_names10 + i, &n_asValue);
+    switch (n_asValue) {
+    case -1: s_blottabIndexTypes10[i] = NONE__BLOTTAB_INDEX_TYPE;
+    break; case AS__VALUE_INT: s_blottabIndexTypes10[i] = INT__BLOTTAB_INDEX_TYPE;
+    break; case AS__VALUE_STR: s_blottabIndexTypes10[i] = STR__BLOTTAB_INDEX_TYPE;
+    break; default: m_RAISE(ANOMALY__VALUE__D,n_asValue)
     } // switch
     m_PParsePassSpaces(&subSequence,NULL);
   } while (!b_EMPTY_P_STRING(subSequence)) ; 
@@ -442,8 +441,8 @@ m_DIGGY_VAR_P_STRING(blottabName)
   int c_element = UNDEFINED; // Only significant with blottab read/set op
   if (!b_EMPTY_P_STRING(lexeme)) { // <blottab op read int> | <blottab op read str> (R-value)
     // <blottab ref op set int> | <blottab ref op set str> (L-value)... 
-    switch (ParseBlottabElement(a_sequence, n_blottabHandle->hp_fieldsHandle, NULL,&c_element, &n_asValue,
-      (struct P_STRING*)UNDEFINED,(int*)UNDEFINED,nc_abandonmentInfo)) {
+    switch (RetrieveBlottabElement(a_sequence, n_blottabHandle->hp_fieldsHandle, NULL,&c_element,
+      &n_asValue, nc_abandonmentInfo)) {
     case ANSWER__YES:
     break; case ANSWER__NO:
       m_DIGGY_RETURN(ANSWER__NO)
