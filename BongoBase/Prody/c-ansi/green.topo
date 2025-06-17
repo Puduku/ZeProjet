@@ -7,10 +7,10 @@
 // GREEN INSTANCE / GREEN COLLECTION...
 // ====================================
 // 
-// Principle : strict "data encapsulation" in "classes" - or similar object-oriented paradigm,
+// Purpose : strict "data encapsulation" in "classes" - or similar object-oriented paradigm,
 // is a safe (and popular) approach to represent and manage various data entities.   
 // However, that approach is not very efficient when dealing with "collections" of such entities.
-// The idea is to define a specific model of data entities - the "GREEN ITEM" - that easily aggregates  
+// The idea is to define a simpler model of data entities - the "GREEN ITEM" - that easily aggregates  
 // into collections... 
 
 // 1. GREEN ITEM
@@ -26,7 +26,7 @@
 //   - "disengaged" => (initial state after ZEROIZATION) "instanced" WITHOUT associated memory 
 //     (or resource) to free
 //   - "engaged" => specific disengaging actions required BEFORE destroying the instance 
-// => a green instance is naturally referenced with an "handle" - we rather call a "stuff", that 
+// => a green instance is naturally referenced with a "handle" - we rather call a "stuff", that 
 //    is a pointer to the instance's area in memory. 
 // => Since we explicitly forbid the "0 instance size" corner case, a "green" stuff is necessarily
 //    distinct of the technical "NULL pointer" - which is thus usable to represent (semantic) "special"
