@@ -170,10 +170,10 @@
 //     cycle.
 //   + Pure constructors and destructors. Constructors and destructors are two "special" methods of
 //     our objects; their objective is purely "technical" and must be clearly distinguished from
-//     other "functional" methods... Therefore, from a functional point of view, such constructors
-//     and destructors may not fail. In practice, this means that the C functions which implement
-//     them always return the unary status "RETURNED"; any "technical" problem would give rise of
-//     an ANOMALY...
+//     other "functional" methods... Therefore, from a functional point of view, such methods may
+//     not fail. In practice, this means that the C functions which implement constructors and
+//     destructors always return the unary status "RETURNED"; any "technical" problem would give
+//     rise of an ANOMALY...
 //   + Factories: a "factory" instance is meant to create "product" instances.
 //     In most cases, we do not distinguish "factory" with "product" instances as objects; the
 //     "product" instance constructor remains a method of the "product" object. With the factory
