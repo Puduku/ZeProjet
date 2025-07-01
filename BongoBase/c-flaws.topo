@@ -214,7 +214,7 @@
 // Number 0: Desesperatly poor makeup of many standard C libraries (string handling, etc...) =>
 // rather dishonest argument (against the C LANGUAGE) of C++ bigots.
 
-// Number -1: '\0'-terminated strings convention (inheritance of assembly languages ?) 
+// Number -1: '\0'-terminated strings convention (legacy of assembly languages ?) 
 // Practical problem in brief: crappy representation of strings => crappy code and functions
 // manipulating strings => presence of a lot of crappy code in C programs "in general"...
 // The convention of strings terminated with '\0' is never questionned by programmers because it
