@@ -24,19 +24,15 @@
 // - RETURNED: Ok
 // - -1 special value: anomaly raised
 int BlottabCreateInstance(BLOTTAB_HANDLE *azh_handle, int fieldsNumber,
-  struct P_STRING* s_names, int* s_blottabIndexTypes);
+  struct P_STRING* s_names, int* s_blottabIndexFlags);
 
 
 // NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION
 int BlottabDestroyInstance(void *xhr_handle) ;
 
-
-
-enum { // #REF BLOTTAB_INDEX_TYPE
-  NONE__BLOTTAB_INDEX_TYPE,
-  STR__BLOTTAB_INDEX_TYPE,
-  INT__BLOTTAB_INDEX_TYPE,
-} ;
+// #REF BLOTTAB_INDEX_FLAG
+#define STR__BLOTTAB_INDEX_FLAG 0x01
+#define INT__BLOTTAB_INDEX_FLAG 0x02
 
 
 // Create blot table.
@@ -47,7 +43,7 @@ enum { // #REF BLOTTAB_INDEX_TYPE
 // - blottabName: blot table's name 
 // - fieldsNumber:
 // - s_names:
-// - s_blottabIndexTypes: #SEE BLOTTAB_INDEX_TYPE 
+// - s_blottabIndexFlags: #SEE BLOTTAB_INDEX_FLAG
 // - na_tableHandle: NULL special pointer: not used
 // - nap_fieldsHandle: NULL special pointer: not used
 //
@@ -59,7 +55,7 @@ enum { // #REF BLOTTAB_INDEX_TYPE
 // - COMPLETED__BUT: the table already exists 
 // - -1: unexpected problem; anomaly is raised
 int l_BlotexlibExecutorCreateBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING blottabName,
-  int fieldsNumber, struct P_STRING* s_names, int* s_blottabIndexTypes,
+  int fieldsNumber, struct P_STRING* s_names, int* s_blottabIndexFlags,
   BLOTTAB_HANDLE *a_blottabHandle) ;
 
 // #SEE l_BlotexlibExecutorComputeBlottabOps@c-ansi/blotex.h

@@ -18,11 +18,12 @@
 // I. Blot expressions (blotex) 
 // ----------------------------
 // Legend:
-// - <entity>             => "soft" lexeme ; leading white spaces are systematically REMOVED
-// - <<single char>>      => "hard" lexeme ; leading white spaces are NOT REMOVED
-// - [ <int 1op> ]        => zero or one occurence of <int 1op>
-// - ( <entity> )+        => one occurence of <entity> at least
-// - ( <<single char>> )* => any occurence(s) number of <<single char>> 
+// - <entity>              => "soft" lexeme ; leading white spaces are systematically REMOVED
+// - <<single char>>       => "hard" lexeme ; leading white spaces are NOT REMOVED
+// - [ <int 1op> ]         => zero or one occurence of <int 1op>
+// - ( <entity> )+         => one occurence of <entity> at least
+// - ( <<single char>> )*  => any occurence(s) number of <<single char>> 
+// - [ <<single char>>> ]2 => zero, one or two occurence(s) of <<as value>>
 //
 // There two main types of blot expressions: 
 // - "string" blot expression => "strex" type

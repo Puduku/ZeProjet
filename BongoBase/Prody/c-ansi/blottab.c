@@ -25,10 +25,18 @@ struct BLOTTAB {
 } ; 
 typedef struct BLOTTAB* BLOTTAB_HANDLE;
 
+//#define BLOTTAB_FIELDS_MAX_NUMBER 10
+
+
+enum {
+  BLOTTAB_FIELD_STR_INDEX_ELEMENT = 1,
+  BLOTTAB_FIELD_INT_INDEX_ELEMENT,
+  BLOTTAB_FIELD_ELEMENTS_NUMBER 
+} ;
 
 // Public function; see .h
 int BlottabCreateInstance(BLOTTAB_HANDLE *azh_handle, int fieldsNumber,
-  struct P_STRING* s_names, int* s_blottabIndexTypes) {
+  struct P_STRING* s_names, int* s_blottabIndexFlags) {
   m_DIGGY_BOLLARD_S()
 
   m_MALLOC_INSTANCE(*azh_handle)
@@ -39,7 +47,7 @@ int BlottabCreateInstance(BLOTTAB_HANDLE *azh_handle, int fieldsNumber,
     fieldsNumber, VALUED_STRING__G_STRING_CONVEYANCE, (const int *)UNDEFINED,
     (NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION) UNDEFINED) != RETURNED)
 
-  m_TRACK_IF(GStringsCreateInstance(&handle->hp_fieldsHandle,10,2,
+  m_TRACK_IF(GStringsCreateInstance(&handle->hp_fieldsHandle,fieldsNumber,BLOTTAB_FIELD_ELEMENTS_NUMBER,
     VALUED_STRING__G_STRING_CONVEYANCE, (const int *)UNDEFINED,
     (NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION)UNDEFINED) != RETURNED)
   m_ASSERT(GStringsAddIndex(handle->hp_fieldsHandle,1,
@@ -49,15 +57,18 @@ int BlottabCreateInstance(BLOTTAB_HANDLE *azh_handle, int fieldsNumber,
   G_STRING_SET_STUFF fieldStuff = (G_STRING_SET_STUFF)UNDEFINED; 
   int c_indexLabel = UNDEFINED;
   int i = 0; for (; i < fieldsNumber; i++) {
-    if (s_blottabIndexTypes[i] != NONE__BLOTTAB_INDEX_TYPE) m_TRACK_IF((c_indexLabel =
-      GStringsAddIndex(handle->h_tableHandle,1,i,s_blottabIndexTypes[i] == STR__BLOTTAB_INDEX_TYPE?
-      P_STRING__G_KEYS_COMPARISON: ACOLYT_VALUE__G_KEYS_COMPARISON ,NULL,NULL,
-      (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED)) < 0)
     m_TRACK_IF(GStringsFetch(handle->hp_fieldsHandle, -1, &fieldStuff) != i)
     m_ASSERT(fieldStuff != NULL)
     m_TRACK_IF(GStringCopy(fieldStuff,0, s_names[i]) < 0) 
-    fieldStuff->acolyt.cen_value = s_blottabIndexTypes[i] ; 
-    fieldStuff[1].acolyt.cen_value = c_indexLabel ;
+    fieldStuff->acolyt.cen_value = s_blottabIndexFlags[i] ; 
+    if (b_FLAG_SET_ON(s_blottabIndexFlags[i],STR__BLOTTAB_INDEX_FLAG)) m_TRACK_IF((c_indexLabel =
+      GStringsAddIndex(handle->h_tableHandle,1,i, P_STRING__G_KEYS_COMPARISON,NULL,NULL,
+      (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED, (void*)UNDEFINED)) < 0)
+    fieldStuff[BLOTTAB_FIELD_STR_INDEX_ELEMENT].acolyt.cen_value = c_indexLabel ;
+    if (b_FLAG_SET_ON(s_blottabIndexFlags[i],INT__BLOTTAB_INDEX_FLAG)) m_TRACK_IF((c_indexLabel =
+      GStringsAddIndex(handle->h_tableHandle,1,i,ACOLYT_VALUE__G_KEYS_COMPARISON ,NULL,NULL,
+      (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED)) < 0)
+    fieldStuff[BLOTTAB_FIELD_INT_INDEX_ELEMENT].acolyt.cen_value = c_indexLabel ;
   } // for
 
   m_DIGGY_RETURN(RETURNED)
@@ -82,60 +93,34 @@ int BlottabDestroyInstance(void *xhr_handle) {
 // Blottab expressions parsing:
 
 #define NO_BLOTTAB_INDEX__ABANDONMENT_CAUSE "No index in table"
-#define EXPECT_INT_BLOTTAB_INDEX__ABANDONMENT_CAUSE "Integer index expected in table"
-#define EXPECT_STR_BLOTTAB_INDEX__ABANDONMENT_CAUSE "String index expected in table"
+#define MISSING_STR_BLOTTAB_INDEX__ABANDONMENT_CAUSE "Missing string index in table"
+#define MISSING_INT_BLOTTAB_INDEX__ABANDONMENT_CAUSE "Missing integer index in table"
 #define UNKNOWN_BLOTTAB__ABANDONMENT_CAUSE "Unknown blottab"
 #define UNKNOWN_BLOTTAB_FIELD__ABANDONMENT_CAUSE "Unknown blottab field"
 #define ALREADY_EXISTS_BLOTTAB__ABANDONMENT_CAUSE "Blottab already exists"
 
-// Passed:
-// - *a_sequence: before parsing
-//
-// Changed:
-// - *a_sequence: after parsing
-// - *a_fieldName: 
-// - *an_asValue: -1 special value if not specified 
-//
-// Ret:
-// - RETURNED: Ok
-static int ParseBlottabElement(struct P_STRING *a_sequence, struct P_STRING *a_fieldName, 
-  int *an_asValue) {
-  m_DIGGY_BOLLARD()
-m_DIGGY_VAR_P_STRING(*a_sequence)
-  m_PParsePassSpaces(a_sequence,NULL);
-  PParsePassChars(a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_WHILE,IsEntityNameChar,
-    (char)UNDEFINED,a_fieldName); // <entity>
-m_DIGGY_VAR_P_STRING(*a_fieldName)
-
-  m_TRACK_IF(ParseAsValue(a_sequence, an_asValue) != RETURNED)  
-m_DIGGY_VAR_D(*an_asValue)
-
-  m_DIGGY_RETURN(RETURNED)
-} // ParseBlottabElement 
-
 
 // Parse and retrieve blottab element
+//
 // Passed:
 // - *a_sequence: before parsing
-// - fieldsHandle: 
-// - nac_tableIndexLabel: 
-//   + NULL special value: seek element in table element 
-//   + != NULL: seek element in table index label
-// - cac_element: 
-// - ac_asValue: 
+// - fieldsHandle: blottab fields definition 
+// - nac_fieldStuff: NULL special value if not asked
+// - nac_element: NULL special value if not asked
 //
 // Changed:
 // - *a_sequence: after parsing
-// - *nac_tableIndexLabel: (when seek element in table index label; only significant if no abandon)
-// - *cac_element: (when seek element in table element; only significant if no abandon) 
-// - *ac_asValue: (when seek element in table; only significant if no abandon) default to "as value int"
+// - *nac_fieldStuff: (when asked) only significant if no abandon
+// - *nac_element: (when asked) only significant if no abandon
+// - *ac_asValue: only significant if no abandon; default to "as value int"
 // - nc_abandonmentInfo: only significant when parsing abandoned 
 //
 // Ret:
 // - ANSWER__YES: Ok
 // - ANSWER__NO: parsing abandoned
 static int RetrieveBlottabElement(struct P_STRING *a_sequence, G_STRINGS_HANDLE fieldsHandle,
-  int *nac_tableIndexLabel, int *cac_element, int *ac_asValue, G_STRING_STUFF nc_abandonmentInfo) {
+  G_STRING_SET_STUFF *nac_fieldStuff, int *nac_element, int *ac_asValue,
+  G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
 m_DIGGY_VAR_P_STRING(*a_sequence)
   G_STRING_SET_STUFF fieldStuff; // UNDEFINED
@@ -143,8 +128,12 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
   *ac_asValue = UNDEFINED;
  
   m_PREPARE_ABANDON(a_sequence,"<entity> [ <<as value int>> | <<as value str>> ]")
-  ParseBlottabElement(a_sequence,&fieldName,ac_asValue); 
+  m_PParsePassSpaces(a_sequence,NULL);
+  PParsePassChars(a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_WHILE,IsEntityNameChar,
+    (char)UNDEFINED,&fieldName); // <entity>
+  m_TRACK_IF(ParseAsValue(a_sequence, ac_asValue) != RETURNED)  
   if (*ac_asValue == -1) *ac_asValue = AS__VALUE_INT;
+
   const struct G_KEY p_fieldKey = m_GKey_PString(fieldName);
   int result = UNDEFINED;
   int entry = UNDEFINED;
@@ -154,33 +143,40 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
   case RESULT__FOUND:
     m_ASSERT(fieldStuff != NULL)
     m_ASSERT(entry >= 0)
+    if (nac_fieldStuff != NULL) *nac_fieldStuff = fieldStuff;
+    if (nac_element != NULL) *nac_element = entry;
   break; case RESULT__NOT_FOUND:
     m_ABANDON(UNKNOWN_BLOTTAB_FIELD__ABANDONMENT_CAUSE) 
   break; default: m_TRACK()
   } // switch 
 
+
+#if 0
   if (nac_tableIndexLabel != NULL) {
-    if (fieldStuff->acolyt.cen_value == NONE__BLOTTAB_INDEX_TYPE) m_ABANDON(
+    if (fieldStuff->acolyt.cen_value == ALL_FLAGS_OFF0) m_ABANDON(
       NO_BLOTTAB_INDEX__ABANDONMENT_CAUSE) 
     *nac_tableIndexLabel = fieldStuff[1].acolyt.cen_value ;
 
-    switch (*ac_asValue) {
+    switch (*ac_asValue) { // blottabIndexSingleFlag
     case AS__VALUE_INT: // '#'
-      if (fieldStuff->acolyt.cen_value != INT__BLOTTAB_INDEX_TYPE) m_ABANDON(
-        EXPECT_INT_BLOTTAB_INDEX__ABANDONMENT_CAUSE) 
+      if (!b_FLAG_SET_ON(fieldStuff->acolyt.cen_value,INT__BLOTTAB_INDEX_FLAG)) m_ABANDON(
+        MISSING_STR_BLOTTAB_INDEX__ABANDONMENT_CAUSE)
     break; case AS__VALUE_STR: // '$'
-      if (fieldStuff->acolyt.cen_value != STR__BLOTTAB_INDEX_TYPE) m_ABANDON(
-        EXPECT_STR_BLOTTAB_INDEX__ABANDONMENT_CAUSE) 
+      if (!b_FLAG_SET_ON(fieldStuff->acolyt.cen_value,STR__BLOTTAB_INDEX_FLAG)) m_ABANDON(
+        MISSING_INT_BLOTTAB_INDEX__ABANDONMENT_CAUSE) 
     break; default: m_RAISE(ANOMALY__VALUE__D,*ac_asValue)
     } // switch
   } else *cac_element = entry;
+#endif
+
+
 
   m_DIGGY_RETURN(ANSWER__YES)
 } // RetrieveBlottabElement 
 
 // Public function; see .h
 int l_BlotexlibExecutorCreateBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING blottabName,
-  int fieldsNumber, struct P_STRING* s_names, int* s_blottabIndexTypes,
+  int fieldsNumber, struct P_STRING* s_names, int* s_blottabIndexFlags,
   BLOTTAB_HANDLE *a_blottabHandle) {
   m_DIGGY_BOLLARD()
 m_DIGGY_VAR_P_STRING(blottabName)
@@ -198,7 +194,7 @@ m_DIGGY_VAR_RESULT(result)
     m_ASSERT((*a_blottabHandle = (BLOTTAB_HANDLE) t_namedBlottabStuff->acolyt.cnhr_handle) != NULL)
     completed = COMPLETED__BUT;
   break; case RESULT__NOT_FOUND:
-    m_TRACK_IF(BlottabCreateInstance(a_blottabHandle,fieldsNumber, s_names,s_blottabIndexTypes) !=
+    m_TRACK_IF(BlottabCreateInstance(a_blottabHandle,fieldsNumber, s_names,s_blottabIndexFlags) !=
       RETURNED)
     m_TRACK_IF(GStringCopy(t_namedBlottabStuff,0,blottabName) < 0)
     m_TRACK_IF(m_GStringAsNamedObject(t_namedBlottabStuff,*a_blottabHandle,
@@ -249,11 +245,25 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
   struct G_KEY gKey; // UNDEFINED
   do {
     int asValue = UNDEFINED;  
-    int tableIndexLabel = UNDEFINED ;
+    int tableIndexLabel = UNDEFINED;
     // <blottab request atom int> | <blottab request atom str> ...
-    switch (RetrieveBlottabElement(&subSequence, blottabHandle->hp_fieldsHandle, &tableIndexLabel,
-      (int*)UNDEFINED, &asValue,nc_abandonmentInfo)) {
+    G_STRING_SET_STUFF c_fieldStuff = (G_STRING_SET_STUFF)UNDEFINED;
+    switch (RetrieveBlottabElement(&subSequence, blottabHandle->hp_fieldsHandle, &c_fieldStuff, 
+      NULL, &asValue,nc_abandonmentInfo)) {
     case ANSWER__YES:
+      if (c_fieldStuff->acolyt.cen_value == ALL_FLAGS_OFF0) m_ABANDON(
+        NO_BLOTTAB_INDEX__ABANDONMENT_CAUSE) 
+      tableIndexLabel = c_fieldStuff[1].acolyt.cen_value ;
+
+      switch (asValue) { // blottabIndexSingleFlag
+      case AS__VALUE_INT: // '#'
+        if (!b_FLAG_SET_ON(c_fieldStuff->acolyt.cen_value,INT__BLOTTAB_INDEX_FLAG)) m_ABANDON(
+          MISSING_STR_BLOTTAB_INDEX__ABANDONMENT_CAUSE)
+      break; case AS__VALUE_STR: // '$'
+        if (!b_FLAG_SET_ON(c_fieldStuff->acolyt.cen_value,STR__BLOTTAB_INDEX_FLAG)) m_ABANDON(
+          MISSING_INT_BLOTTAB_INDEX__ABANDONMENT_CAUSE) 
+      break; default: m_RAISE(ANOMALY__VALUE__D,asValue)
+      } // switch
     break; case ANSWER__NO:
       m_DIGGY_RETURN(ANSWER__NO)
     break; default:
@@ -344,23 +354,37 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
   PParseOffset(a_sequence,2,NULL);
 
   struct P_STRING s_names10[10];
-  int s_blottabIndexTypes10[10];
-  int n_asValue = UNDEFINED;
+  int s_blottabIndexFlags10[10] ;
+  int n_asValue = UNDEFINED, n_asValue2 = UNDEFINED;
   int i = -1;
   do {
     m_ASSERT(++i < 10)
-    ParseBlottabElement(&subSequence, s_names10 + i, &n_asValue);
+    s_blottabIndexFlags10[i] = ALL_FLAGS_OFF0;
+    m_PParsePassSpaces(&subSequence,NULL);
+    PParsePassChars(&subSequence,b_REGULAR_SCAN,b_PASS_CHARS_WHILE,IsEntityNameChar,
+      (char)UNDEFINED,s_names10 + i); // <entity>
+m_DIGGY_VAR_P_STRING(s_names10[i])
+    m_TRACK_IF(ParseAsValue(&subSequence, &n_asValue) != RETURNED)  
+m_DIGGY_VAR_D(n_asValue)
+    m_TRACK_IF(ParseAsValue(a_sequence, &n_asValue2) != RETURNED)  
+m_DIGGY_VAR_D(n_asValue2)
     switch (n_asValue) {
-    case -1: s_blottabIndexTypes10[i] = NONE__BLOTTAB_INDEX_TYPE;
-    break; case AS__VALUE_INT: s_blottabIndexTypes10[i] = INT__BLOTTAB_INDEX_TYPE;
-    break; case AS__VALUE_STR: s_blottabIndexTypes10[i] = STR__BLOTTAB_INDEX_TYPE;
+    case -1: ;
+    break; case AS__VALUE_INT: m_SET_FLAG_ON(s_blottabIndexFlags10[i],INT__BLOTTAB_INDEX_FLAG)
+    break; case AS__VALUE_STR: m_SET_FLAG_ON(s_blottabIndexFlags10[i],STR__BLOTTAB_INDEX_FLAG)
     break; default: m_RAISE(ANOMALY__VALUE__D,n_asValue)
+    } // switch
+    switch (n_asValue2) {
+    case -1: ;
+    break; case AS__VALUE_INT: m_SET_FLAG_ON(s_blottabIndexFlags10[i],INT__BLOTTAB_INDEX_FLAG)
+    break; case AS__VALUE_STR: m_SET_FLAG_ON(s_blottabIndexFlags10[i],STR__BLOTTAB_INDEX_FLAG)
+    break; default: m_RAISE(ANOMALY__VALUE__D,n_asValue2)
     } // switch
     m_PParsePassSpaces(&subSequence,NULL);
   } while (!b_EMPTY_P_STRING(subSequence)) ; 
 
   switch(l_BlotexlibExecutorCreateBlottab(handle, nonExistingBlottabName, i+1, s_names10,
-    s_blottabIndexTypes10, ac_blottabHandle)) {
+    s_blottabIndexFlags10, ac_blottabHandle)) {
   case COMPLETED__OK:
   break; case COMPLETED__BUT:
     m_RAISE(ANOMALY__VALUE__D,COMPLETED__BUT)
@@ -444,6 +468,7 @@ m_DIGGY_VAR_P_STRING(blottabName)
     switch (RetrieveBlottabElement(a_sequence, n_blottabHandle->hp_fieldsHandle, NULL,&c_element,
       &n_asValue, nc_abandonmentInfo)) {
     case ANSWER__YES:
+      m_ASSERT(n_asValue != -1)
     break; case ANSWER__NO:
       m_DIGGY_RETURN(ANSWER__NO)
     break; default:

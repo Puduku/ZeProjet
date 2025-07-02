@@ -40,7 +40,7 @@
 // <blottab op read str> ::= '=' <entity> <<as value str>> 
 //
 // Blottabs must be explicitely created
-// <blottab creation> ::= ( <entity> [ <<as value int>> | <<as value str>> ] )+ ']?' 
+// <blottab creation> ::= ( <entity> [ <<as value int>> | <<as value str>> ]2 )+ ']?' 
 //
 // Like blotreg requests, blottab requests are made of "atoms" : 
 // <blottab request> ::= <blottab request atom> ( <logical 2op> <blottab request atom> )* ':?'
@@ -60,11 +60,16 @@
 // ^recettes2?[ name$ price# ]?                     => Create table of elements 'name' and 'price'
 //                                                     with lexical 'name' index and numeric 'price'
 //                                                     index
-// ^recettes2?: name$ * :?                          => select all ordered by 'name' element 
+// ^recettes2?: name$ * :?                          => select all items ordered by 'name' lexical element 
 // ^recettes2?: name$ === "*bolo*" or price < 10 :? => new table selection 
 // ^recettes2?^                                     => single reset, ascending 
 // ^recettes2?+                                     => fetch next one 
 // ^recettes2?@                                     => insert new table record  
+// ^recettes3?[ name-and-price$# ]?                 => Create table of single element 'name-and-price'
+//                                                     with lexical AND numeric indexes
+// ^recettes3?: name-and-price$ * :?                => select all items ordered by lexical index 
+// ^recettes3?: name-and-price$ === "*bolo*" or name-and-price < 10 :?
+//                                                  => new table selection 
 // (See below for assignation examples)
 //
 // II. "blotex" examples 
