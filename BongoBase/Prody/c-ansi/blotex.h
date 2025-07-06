@@ -283,26 +283,28 @@ int BlotexlibExecutorComputeBlotex(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_ST
 // The blotex module simply manages the blottab identification within blot expressions (seen as
 // some <entity> prefixed with '^' token). 
 
-// Get all blotabs' handle 
-// 
-// Passed:
-// - handle:
-//
-// Changed:
-// - *a_blottabsHandle: NAMED OBJECTS collection handle
-//
-// Ret:
-// - RETURNED: Ok
-// - -1: unexpected problem; anomaly is raised
-int BlotexlibExecutorGetBlottabsHandle(BLOTEXLIB_EXECUTOR_HANDLE handle, 
-  G_STRINGS_HANDLE *a_blottabsHandle) ;
 
 // ===> To be implemented by blottab module:
 struct BLOTTAB ;
 typedef struct BLOTTAB* BLOTTAB_HANDLE;
 
+// Add new blottab in blotex executor's blot tables.
+// 
+// Passed:
+// - handle:
+// - h_blottabHandle: new blotab handle 
+//
+// Changed:
+// - *a_blottabHandle: created blottab's handle 
+//
+// Ret:
+// - RETURNED: Ok
+// - -1: unexpected problem; anomaly is raised
+int BlotexlibExecutorAddBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING blottabName,
+  BLOTTAB_HANDLE h_blottabHandle) ;
 
-// Retrieve some blot table.
+
+// Retrieve some blot table of blotex executor...
 // 
 // Passed:
 // - handle:

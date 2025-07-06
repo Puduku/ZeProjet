@@ -174,30 +174,13 @@ int l_BlotexlibExecutorCreateBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_
   BLOTTAB_HANDLE *a_blottabHandle) {
   m_DIGGY_BOLLARD()
 m_DIGGY_VAR_P_STRING(blottabName)
-  G_STRINGS_HANDLE blottabsHandle = (G_STRINGS_HANDLE)UNDEFINED;
-  m_TRACK_IF(BlotexlibExecutorGetBlottabsHandle(handle,&blottabsHandle) != RETURNED)
-m_DIGGY_VAR_P(blottabsHandle)
-  int completed = COMPLETED__OK; // a priori
-  G_STRING_STUFF t_namedBlottabStuff = (G_STRING_STUFF)UNDEFINED;
-  struct G_KEY gKey = m_GKey_PString(blottabName);
-  int result = m_GStringsIndexSingleFetch(blottabsHandle,NULL,INDEX_LABEL0,
-    INDEX_SEEK_FLAGS__EQUAL,&gKey, INDEX_FETCH_FLAGS__FETCH,&t_namedBlottabStuff,NULL);
-m_DIGGY_VAR_RESULT(result)
-  switch (result) {
-  case RESULT__FOUND:
-    m_ASSERT((*a_blottabHandle = (BLOTTAB_HANDLE) t_namedBlottabStuff->acolyt.cnhr_handle) != NULL)
-    completed = COMPLETED__BUT;
-  break; case RESULT__NOT_FOUND:
-    m_TRACK_IF(BlottabCreateInstance(a_blottabHandle,fieldsNumber, s_names,s_blottabIndexFlags) !=
-      RETURNED)
-    m_TRACK_IF(GStringCopy(t_namedBlottabStuff,0,blottabName) < 0)
-    m_TRACK_IF(m_GStringAsNamedObject(t_namedBlottabStuff,*a_blottabHandle,
-      blottabsHandle) != RETURNED)
-  break; default:
-    m_TRACK()
-  } // switch
 
-  m_DIGGY_RETURN(completed)
+  m_TRACK_IF(BlottabCreateInstance(a_blottabHandle,fieldsNumber, s_names,s_blottabIndexFlags) !=
+    RETURNED)
+
+  m_TRACK_IF(BlotexlibExecutorAddBlottab(handle, blottabName, *a_blottabHandle) != RETURNED)
+
+  m_DIGGY_RETURN(RETURNED)
 } // l_BlotexlibExecutorCreateBlottab
 
 

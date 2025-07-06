@@ -20,6 +20,8 @@
 // Blottabs: 
 
 
+// Note: blot tables are based on g-string set collections. 
+//
 // Ret:
 // - RETURNED: Ok
 // - -1 special value: anomaly raised
@@ -35,12 +37,11 @@ int BlottabDestroyInstance(void *xhr_handle) ;
 #define INT__BLOTTAB_INDEX_FLAG 0x02
 
 
-// Create blot table.
-// Note: blot tables are based on g-string set collections. 
+// Create NEW blot table and add it in blotex executor's blot tables.
 // 
 // Passed:
 // - handle:
-// - blottabName: blot table's name 
+// - blottabName: NON EXISTING blot table's name 
 // - fieldsNumber:
 // - s_names:
 // - s_blottabIndexFlags: #SEE BLOTTAB_INDEX_FLAG
@@ -48,11 +49,10 @@ int BlottabDestroyInstance(void *xhr_handle) ;
 // - nap_fieldsHandle: NULL special pointer: not used
 //
 // Changed:
-// - *a_blottabHandle: 
+// - *a_blottabHandle: created blottab's handle 
 //
 // Ret:
-// - COMPLETED__OK: OK
-// - COMPLETED__BUT: the table already exists 
+// - RETURNED: Ok
 // - -1: unexpected problem; anomaly is raised
 int l_BlotexlibExecutorCreateBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING blottabName,
   int fieldsNumber, struct P_STRING* s_names, int* s_blottabIndexFlags,

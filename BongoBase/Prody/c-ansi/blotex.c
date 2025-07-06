@@ -241,15 +241,6 @@ m_DIGGY_VAR_P_STRING(blotregName)
 // Blottabs:
 
 
-// Public function; see .h
-int BlotexlibExecutorGetBlottabsHandle(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  G_STRINGS_HANDLE *a_blottabsHandle) {
-  m_DIGGY_BOLLARD()
-  *a_blottabsHandle = handle->h_blottabsHandle;
-  m_DIGGY_RETURN(RETURNED)
-} // BlotexlibExecutorGetBlottabsHandle
-
-
 
 // Public function; see .h
 int BlotexlibExecutorGetBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING blottabName,
@@ -259,10 +250,7 @@ int BlotexlibExecutorGetBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRIN
   G_STRING_STUFF ct_namedBlottabStuff = (G_STRING_STUFF)UNDEFINED;
   struct G_KEY gKey = m_GKey_PString(blottabName);
 
-  G_STRINGS_HANDLE blottabsHandle = (G_STRINGS_HANDLE)UNDEFINED;
-  m_TRACK_IF(BlotexlibExecutorGetBlottabsHandle(handle,&blottabsHandle) != RETURNED)
-
-  int result = m_GStringsIndexSingleFetch(blottabsHandle,NULL,INDEX_LABEL0,
+  int result = m_GStringsIndexSingleFetch(handle->h_blottabsHandle,NULL,INDEX_LABEL0,
     INDEX_SEEK_FLAGS__EQUAL,&gKey, INDEX_FETCH_FLAGS__SEEK_ONLY,&ct_namedBlottabStuff, NULL);
   switch (result) {
   case RESULT__FOUND:
@@ -275,7 +263,28 @@ int BlotexlibExecutorGetBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRIN
   m_DIGGY_RETURN(result)
 } // BlotexlibExecutorGetBlottab
 
+// Public function; see .h
+int BlotexlibExecutorAddBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING blottabName,
+  BLOTTAB_HANDLE h_blottabHandle) {
+  m_DIGGY_BOLLARD()
+m_DIGGY_VAR_P_STRING(blottabName)
+m_DIGGY_VAR_P(handle->h_blottabsHandle)
+  G_STRING_STUFF t_namedBlottabStuff = (G_STRING_STUFF)UNDEFINED;
+  struct G_KEY gKey = m_GKey_PString(blottabName);
+  switch (m_GStringsIndexSingleFetch(handle->h_blottabsHandle,NULL,INDEX_LABEL0,
+    INDEX_SEEK_FLAGS__EQUAL,&gKey, INDEX_FETCH_FLAGS__FETCH,&t_namedBlottabStuff,NULL)) {
+  case RESULT__FOUND:
+    m_RAISE(ANOMALY__UNEXPECTED_CASE)
+  break; case RESULT__NOT_FOUND:
+    m_TRACK_IF(GStringCopy(t_namedBlottabStuff,0,blottabName) < 0)
+    m_TRACK_IF(m_GStringAsNamedObject(t_namedBlottabStuff,h_blottabHandle,
+      handle->h_blottabsHandle) != RETURNED)
+  break; default:
+    m_TRACK()
+  } // switch
 
+  m_DIGGY_RETURN(RETURNED)
+} // BlotexlibExecutorAddBlottab
 
 
 // Blot expressions parsing:
