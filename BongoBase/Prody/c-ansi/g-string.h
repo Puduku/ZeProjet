@@ -47,19 +47,17 @@ static inline struct P_STRING m_GStringGetLogicalPString(G_STRING_STUFF stuff) {
 // #REF GStringCopy
 // Copy (or concatenate...) a string portion into a "g-string".
 // ATTENTION: source and destination MAY NOT overlap
-// Note1: (*) mark useful values for  neutral operation  - i.e do not alter "destination" g-string; 
-// unless of course "destination" was "disengaged" (nhi_string == NULL) ; in such case, an empty
-// string is copied in destination. 
+// Note1: concatenation of empty string is a neutral operation; however, if  "destination" was 
+// "disengaged" (nhi_string == NULL), an empty string is well COPIED in destination. 
 // Note2: the acolyt is NOT changed.
 //
 // Passed:
 // - stuff : "destination" g-string
 // - n_<offset>: offset in destination g-string to apply the copy
-//   + -1 special value (*) : "end of string"; set to current copied length => i.e concatenation
+//   + -1 special value: "end of string"; set to current copied length => i.e concatenation
 //   + >= 0: "offset copy" ; 0 corresponds to "ordinary" copy ;
 //     REM: if offset > current copied length, the offset is rectified (concatenation)
-// - pString: 
-//   (*) empty string for neutral operation
+// - pString: use empty string for neutral operation
 //
 // Modified:
 // - stuff: ALWAYS in "copied" state (i.e nhi_string != NULL, whatever!)
