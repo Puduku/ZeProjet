@@ -45,7 +45,7 @@
 
 // Number 9: impossibility to indicate directly for which "typedef'ed" function ("pointer") an 
 // ordinary function is defined.
-// Suppose the following declaration: (NB: that example of "function pointer" was stolen on Internet)
+// Suppose the following declaration: (NB: this example of "function pointer" was stolen on Internet)
 //
 //   typedef int (*add_integer_t)(int, int); //declaration of function pointer
 //
