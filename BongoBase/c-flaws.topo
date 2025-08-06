@@ -20,8 +20,8 @@
 //   + We must also learn to QUESTION our programming methods before blaming the language itself.
 //   Only then can we hope for real PROGRESS - and avoid the eternal FIASCOS of the C++ genre...
 // In short, if we sincerely want to move forward, whether we are "conservative" (by persisting on
-// programming in C) or "innovative" (by getting rid of C for good), we must first point out the
-// real flaws of C. ..
+// programming in C) or "innovative" (by getting rid of C for good), we must therefore first point
+// out the flaws that are truly specific to the C language.
 
 // Legend: 
 // - Portability issues are marked with (P)
