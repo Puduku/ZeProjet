@@ -10,15 +10,15 @@
 //
 // During conception phase...
 // A new design does not emerges from nothing. Rather, new programming concepts (modules,
-// classes, processes and so on) are based on adaptation and extension
-// (generalization or specification) of existing concepts (ideas, principles, theories) and
-// artifacts (devices and natural phenomena).
+// classes, processes and so on) are based on adaptation and extension (generalization or
+// specification) of existing concepts (ideas, principles, theories) and artifacts
+// (devices and natural phenomena).
 // The major "engines" used by humans to derive new concepts from existing ones are the
 // metaphors and the metonymies...
 // Sometimes, the link between the new concept and the one to which it refers can be tenuous.
 // As such, it is common to name a new application concept with regard to history and
-// mythology. Finally, our brains assimilate new concepts more easily when the references
-///are simple and striking.
+// mythology. Indeed, our brains assimilate new concepts more easily when the references
+// are simple and striking.
 
 // Writing code phase...
 // It directly appears that an important aspect of code writing is about applying "good"
