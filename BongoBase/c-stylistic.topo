@@ -6,22 +6,42 @@
 
 // In Programming/software development, we (very roughly) distinct the two following phases:
 // - conception/design 
-// - writing the code
+// - writing and compiling the code (including testing and debugging)
 //
 // During conception phase...
-// A new design does not emerges from nothing. Rather, new programming concepts (modules, classes, applications and so on) are based on adaptation and extension
-// (generalization or specification) of existing, general concepts. General concepts are any ideas, principles, objects, descrptions of phenomenons, theories, etc. developped by (human) minds. 
-// The major "engines" used by humans to derive new concepts from existing ones are the metaphors and the metonymies...
+// A new design does not emerges from nothing. Rather, new programming concepts (modules,
+// classes, processes and so on) are based on adaptation and extension
+// (generalization or specification) of existing concepts (ideas, principles, theories) and
+// artifacts (devices and natural phenomena).
+// The major "engines" used by humans to derive new concepts from existing ones are the
+// metaphors and the metonymies...
+// Sometimes, the link between the new concept and the one to which it refers can be tenuous.
+// As such, it is common to name a new application concept with regard to history and
+// mythology. Finally, our brains assimilate new concepts more easily when the references
+///are simple and striking.
 
 // Writing code phase...
-// An important aspect of code writing is about applying "good" naming conventions. 
-// The un-ending debate related to the "good naming convetions" in software is as old as software itself...
-// The difficulty of the exercise is that, programmers, indeed,  HAVE TO be rigorous with the naming conventions... But too rigid or dogmatic naming conventions are also totally counter-productive.
-// In particular these two "extremes" :
-// - minimalist naming conventions, based on (very) short single names without hierarchization of such names are not legible (due lack of description of concern) and unavoidly lead to grave naming conflicts
-// - the other extreme (systematic long descriptive names with hierarchization) is also not manageable properly : longer Multiple-words identifiers are NOT legible to humans and increase
-//   artificially and unreasonably the weight of the code. In particular, the exscessive length of the lines of such code (200 characters and more) is a big concern, 
-//   because it makes most routine operations - especially visual comparison between versions - very painful.
+// It directly appears that an important aspect of code writing is about applying "good"
+// naming conventions. 
+// The never-ending debate about ‘good naming conventions’ in the realm of software is as
+// old as the software industry itself...
+// The difficulty of the exercise lies in the fact that programmers DO need to be rigorous
+// in their naming conventions... But naming conventions that are too rigid or dogmatic 
+// are also completely counterproductive...
+// Let us consider two particular ‘extremes’:
+-12345789-12 345789-12345789-12345789-12345789-12345789-12345789-12345789-12345789-12345789
+// - minimalist naming conventions, based on simple, short names with no hierarchy, make
+//   the code far too obscure and inevitably lead to endless naming conflicts;
+// - the other extreme, based on descriptive names (which are therefore very long) and
+//   using systematic hierarchy, is no more manageable:
+//   + long names composed of several words are NOT easily identified by humans and
+//     unreasonably increase the weight of the code. 
+//   + The excessive length of such code lines (200 characters or more) is also a concern, as
+//     it makes routine operations—such as visual comparison (side by side) between versions—very tedious.
+
+
+
+
 // Hense, legible code must be both consise but not ambivalent (with "speaking" names). 
 // The two goals seem contradictory and therefore impossible to achieve at the same time.
 // Fortunately, figures of speech come to our rescue, allowing us to "reconcile the irreconcilable"...
