@@ -98,7 +98,7 @@
 // source of profound confusion...
 // Personal interpretation: 'typedef' doesn't look very natural in C and gives the impression of
 // having been added to the language in a hurry; probably a clumsy response to the competing
-// languages of the time - those providing real type definitions (in particular, sub-types and
+// languages of the time - those that provided real type definitions (in particular, sub-types and
 // abstractions) ...
 
 // Number 6: "Pointer, what pointer ?..." The numerous ambivalences of the pointer concept.
@@ -141,7 +141,7 @@
 // "abstractions", it becomes rapidly complicated to construct and maintain consistent 'printf
 // clauses'. 
 // Fortunately, modern C compilers detect 99.9% of the problems...
-// However, a problem remain: as long as we use a type 'abstraction' in the arguments, such clause
+// However, a problem remains: as long as we use a type 'abstraction' in the arguments, such clause
 // is not portable... (P)
 // Example: time_t t; ... printf("t=%d\n", t); is adapted to "signed" time_t, but actually time_t
 // is not always signed. To avoid compiler complaining, you can of course 'cast' the "abstracted"
