@@ -29,7 +29,6 @@
 // in their naming conventions... But naming conventions that are too rigid or dogmatic 
 // are also completely counterproductive...
 // Let us consider two particular ‘extremes’:
--12345789-12 345789-12345789-12345789-12345789-12345789-12345789-12345789-12345789-12345789
 // - minimalist naming conventions, based on simple, short names with no hierarchy, make
 //   the code far too obscure and inevitably lead to endless naming conflicts;
 // - the other extreme, based on descriptive names (which are therefore very long) and
@@ -37,19 +36,31 @@
 //   + long names composed of several words are NOT easily identified by humans and
 //     unreasonably increase the weight of the code. 
 //   + The excessive length of such code lines (200 characters or more) is also a concern, as
-//     it makes routine operations—such as visual comparison (side by side) between versions—very tedious.
+//     it makes routine operations—such as visual comparison (side by side) between
+//     versions—very tedious.
 
+// Therefore, legible code must be both concise and unambiguous (with names that ‘speak’ to
+// us). How can we achieve two seemingly contradictory goals at the same time?
+// Fortunately, figures of speech come to our rescue, allowing us to ‘reconcile the
+// irreconcilable’...
 
+// The basic rule is: when referring to (and therefore naming) an entity, avoid 
+// circumlocutions and compound names. Use simple metaphors as much as possible.
 
+// Another simple technique is to use metonymies and synecdoches.
+// In fact, we often use metonymies unconsciously. In particular, when, in a (laudable)
+// effort to be concise, we name the main module of our project after the project itself, we
+// are using metonymy.
+// However, it is important to bear in mind that this stylistic device can also create
+// unfortunate confusion.
+// Let me give you a simple example. A project I worked on for many years consisted of
+// software AND specific hardware. The software part was (quite naturally) named after the
+// project itself. Unfortunately, management quickly ended up confusing the software part of
+// the project with the whole thing. The head of the development team became the de facto
+// manager of the entire project (including the hardware part) without this ever being
+// clearly formalised. This explains many of the erratic decisions that ensued.
 
-// Hense, legible code must be both consise but not ambivalent (with "speaking" names). 
-// The two goals seem contradictory and therefore impossible to achieve at the same time.
-// Fortunately, figures of speech come to our rescue, allowing us to "reconcile the irreconcilable"...
-// naming of new concept : simply use the methaphor
-// another simple parade : using metonymies and synecdoches. That is, when applicable, name a concept by a specialisation/generalization/part when applicable.
-// We often unconsciously make such metonymies. The danger, then, is of creating serious confusion. 
-// To make metonymies our real "friends",  the point is simply to GET AWARE of their using...
-// during coding, the magic of stylistic devices is the following: replacing a long descriptive periphrase with a single term. The problem is to ensure that anyone 
+-12345789-12345789-12345789-12345789-12345789-12345789-12345789-12345789-12345789-12345789
 // Examples of useful figures of speech:
 // - Personification: using a knowm character to name your application
 // - Private joke: given the stato quo that we program in English, non English-native programmers use that opportunity to hide (dirty) slan words (in their mother tongue)  within obscure acronyms to
