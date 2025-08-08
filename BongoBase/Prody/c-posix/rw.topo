@@ -12,9 +12,9 @@
 //   communicates with the "other peer" using read() and write() system calls.
 // - the "other peer" is the "alter ego" of my peer in the connection paradigm ; however the precise
 //   nature of the "other peer" is ABSOLUTELY NOT defined in the paradigm.
-//   Of course, the knowledge of the descriptor - more precisely, the conditions under which that
-//   descriptor has been created or opened - allows my peer's programmer to figure out more or 
-//   less precisely what the other peer corresponds to:
+//   Of course, the knowledge of the descriptor passed to read() and write() system calls (or more 
+//   exactly, the conditions under which that descriptor has been created or opened) allows my
+//   peer's programmer to figure out more or less precisely what the other peer corresponds to:
 //   + when descriptor is bond to a "regular file" => the programmer can easily imagine that the "os"
 //     is somewhere behind the "other peer" ;
 //   + when descriptor is bond to a pipe or a FIFO => the other peer should be a local (POSIX) 
@@ -338,3 +338,4 @@
 // are aware of the limitations of the traditional "master" / "slave" repartition ; only the "equal" /
 // "equal" repartition is applicable to "full duplex" session protocols.
 // 
+
