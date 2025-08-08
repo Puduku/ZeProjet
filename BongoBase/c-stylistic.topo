@@ -15,7 +15,8 @@
 // (devices and natural phenomena).
 // The major "engines" used by humans to derive new concepts from existing ones are the
 // metaphors and the metonymies...
-// Sometimes, the link between the new concept and the one to which it refers can be tenuous.
+// Sometimes, however, the figure of speech is not obvious; the link between the new
+// concept and the one to which it refers can be tenuous.
 // As such, it is common to name a new application concept with regard to history and
 // mythology. Indeed, our brains assimilate new concepts more easily when the references
 // are simple and striking.
@@ -49,7 +50,7 @@
 
 // Another simple technique is to use metonymies and synecdoches.
 // In fact, we often use metonymies unconsciously. In particular, when, in a (laudable)
-// effort to be concise, we name the main module of our project after the project itself, we
+// effort to be concise, we name the master module of our project after the project itself, we
 // are using metonymy.
 // However, it is important to bear in mind that this stylistic device can also create
 // unfortunate confusion.
