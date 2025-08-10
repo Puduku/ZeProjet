@@ -492,7 +492,7 @@ m_DIGGY_VAR_P_STRING(blottabName)
 
 
 // See .h
-int UpdateBlottabField(const struct BLOTTAB_FIELD_REFERENCE* ap_blottabFieldReference, int as,
+int UpdateCurrentBlotsetField(struct BLOTTAB_FIELD_REFERENCE blottabFieldReference, int as,
   struct BLOTEX_VALUE blotexValue) {
   m_DIGGY_BOLLARD()
 #if 0
@@ -523,5 +523,5 @@ m_RAISE(ANOMALY__NOT_AVAILABLE)
 #endif 
 
   m_DIGGY_RETURN(ANSWER__NO)
-} // UpdateBlottabField
+} // UpdateCurrentBlotsetField
 

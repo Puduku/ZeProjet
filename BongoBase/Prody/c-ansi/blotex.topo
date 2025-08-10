@@ -182,7 +182,7 @@
 // <str blottab ref> ::= '^' <entity> '?' <blottab ref op set str>
 //
 //
-// Examples:
+// Examples of <blotex> :
 // recettes?: !$ * :$                              => select all items, ordered by name  
 // recettes?: !$ === "*bolo*" and # >= 69 :?       => new register selection 
 // recettes?^                                      => single reset, ascending 
@@ -229,6 +229,8 @@
 //
 // Examples:
 //   Eval (.var$ := "craboutchas")         => assign "craboutchas" to 'var' global variable 
+//   Eval (recettes?=!$ := "bolo")         => assign "bolo" name to current blotvar of 'recettes'
+//                                            register
 //
 //
 // OutputF (<format> ',' <blotex> ) 

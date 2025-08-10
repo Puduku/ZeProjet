@@ -64,8 +64,8 @@ int l_BlotexlibExecutorComputeBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct BLOTEX_VALUE *cac_blotexValue, struct BLOTTAB_FIELD_REFERENCE *cac_blottabFieldReference,
   int *cac_asValue, G_STRING_STUFF nc_abandonmentInfo) ;
 
-// #SEE UpdateBlottabField @c-ansi/blotex.h
-int UpdateBlottabField(const struct BLOTTAB_FIELD_REFERENCE* ap_blottabFieldReference, int as,
+// #SEE UpdateCurrentBlotsetField @c-ansi/blotex.h
+int UpdateCurrentBlotsetField(struct BLOTTAB_FIELD_REFERENCE blottabFieldReference, int as,
  struct BLOTEX_VALUE blotexValue) ;
 
 

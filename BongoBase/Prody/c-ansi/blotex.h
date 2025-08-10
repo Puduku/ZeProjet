@@ -292,6 +292,7 @@ typedef struct BLOTTAB* BLOTTAB_HANDLE;
 // 
 // Passed:
 // - handle:
+// - blottabName:
 // - h_blottabHandle: new blotab handle 
 //
 // Changed:
@@ -323,7 +324,7 @@ int BlotexlibExecutorGetBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRIN
 
 struct BLOTTAB_FIELD_REFERENCE {
   int element; // field identification
-  BLOTTAB_HANDLE blottabHandle;
+  BLOTTAB_HANDLE blottabHandle; // Current 
 } ;
 
 
@@ -361,9 +362,11 @@ int l_BlotexlibExecutorComputeBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
 
 
 // ===> To be implemente by blottab module
-// #REF UpdateBlottabField
+// #REF UpdateBlotsetField
+// Update some field of current blotset of a blottab.
+//
 // Passed:
-// - ap_blottabFieldReference: 
+// - blottabFieldReference: 
 // - as: 
 // - blotexValue:
 // 
@@ -371,7 +374,7 @@ int l_BlotexlibExecutorComputeBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
 // - ANSWER__YES:
 // - ANSWER__NO:
 // - -1: unexpected problem; anomaly is raised
-int UpdateBlottabField(const struct BLOTTAB_FIELD_REFERENCE* ap_blottabFieldReference, int as,
+int UpdateCurrentBlotsetField(struct BLOTTAB_FIELD_REFERENCE blottabFieldReference, int as,
  struct BLOTEX_VALUE blotexValue) ;
 
 #endif // __BLOTEX_C_ANSI_H_INCLUDED__
