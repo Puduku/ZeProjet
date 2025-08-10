@@ -522,6 +522,6 @@ m_RAISE(ANOMALY__NOT_AVAILABLE)
   } // switch
 #endif 
 
-  m_DIGGY_RETURN(ANSWER__NO)
+  m_DIGGY_RETURN(RESULT__NOT_FOUND)
 } // UpdateCurrentBlotsetField
 

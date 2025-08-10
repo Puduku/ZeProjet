@@ -166,7 +166,7 @@ int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
 #define UNKNOWN_BLOTVAR__ABANDONMENT_CAUSE "Unknown blotvar"
 #define UNKNOWN_BLOTREG__ABANDONMENT_CAUSE "Unknown blotreg"
 #define INVALID_FORMAT__ABANDONMENT_CAUSE "Invalid format"
-#define NOT_EXISTING__ABANDONMENT_CAUSE "Not existing l-value"
+#define NOT_EXISTING_L_VALUE__ABANDONMENT_CAUSE "Not existing l-value"
 
 // Make function abandon parsing (return ANSWER__NO)
 //
@@ -371,8 +371,8 @@ int l_BlotexlibExecutorComputeBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
 // - blotexValue:
 // 
 // Ret:
-// - ANSWER__YES:
-// - ANSWER__NO:
+// - RESULT__FOUND:
+// - RESULT__NOT_FOUND: no current blotset
 // - -1: unexpected problem; anomaly is raised
 int UpdateCurrentBlotsetField(struct BLOTTAB_FIELD_REFERENCE blottabFieldReference, int as,
  struct BLOTEX_VALUE blotexValue) ;

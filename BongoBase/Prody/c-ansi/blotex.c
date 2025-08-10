@@ -420,23 +420,21 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
 // - ap_blotvarReference: blotvar reference 
 // - cb_lValue: ONLY significant with NAME__BLOTVAR_REFERENCE / TOKEN_ID__BLOTVAR_REFERENCE; 
 //   r-value=>do not create if not found ; l-value=>do create if not found
-// - nacvn_entry: NULL address if not used
+// - navn_entry: NULL address if not used
 // 
 // Changed:
-// - *acvnt_blotvarStuff: if not found and seek only, set to NULL
-// - *nacvn_entry: if not found  and seek only, set to -1  
+// - *ant_blotvarStuff: if not found and seek only, set to NULL
+// - *navn_entry: if not found  and seek only, set to -1  
 //
-// Ret: Found ? 
-// - RESULT__FOUND:
-// - RESULT__NOT_FOUND: NEW blotvar created if asked 
-//   NOTICE: with  
+// Ret: 
+// - RETURNED: Ok
 // - -1: unexpected problem
 static int FetchBlotvar(const struct BLOTVAR_REFERENCE *ap_blotvarReference, char cb_lValue,
-  G_STRING_SET_STUFF *acvnt_blotvarStuff, int *nacvn_entry) {
+  G_STRING_SET_STUFF *ant_blotvarStuff, int *navn_entry) {
   m_DIGGY_BOLLARD_S()
 
-  int result =  UNDEFINED, ret = UNDEFINED;
-  *acvnt_blotvarStuff = (G_STRING_SET_STUFF)UNDEFINED;
+  int ret = UNDEFINED;
+  *ant_blotvarStuff = (G_STRING_SET_STUFF)UNDEFINED;
   switch (ap_blotvarReference->blotvarReference) {
   case NAME__BLOTVAR_REFERENCE:
   case TOKEN_ID__BLOTVAR_REFERENCE:
@@ -450,18 +448,18 @@ m_DIGGY_VAR_P_STRING(ap_blotvarReference->c_select.c_name)
         indexLabel = TOKEN_ID__BLOTREG_INDEX_LABEL;
         gKey = m_GKey_AcolytValue(ap_blotvarReference->c_select.c_tokenId);
       } // if
-      switch (result = m_GStringsIndexSingleFetch(ap_blotvarReference->blotregHandle,NULL,
-        indexLabel,INDEX_SEEK_FLAGS__EQUAL,&gKey,cb_lValue?  INDEX_FETCH_FLAGS__FETCH:
-        INDEX_FETCH_FLAGS__SEEK_ONLY, acvnt_blotvarStuff, nacvn_entry)) {
+      switch (m_GStringsIndexSingleFetch(ap_blotvarReference->blotregHandle,NULL,indexLabel,
+        INDEX_SEEK_FLAGS__EQUAL,&gKey,cb_lValue?  INDEX_FETCH_FLAGS__FETCH:
+        INDEX_FETCH_FLAGS__SEEK_ONLY, ant_blotvarStuff, navn_entry)) {
       case RESULT__FOUND:
       break; case RESULT__NOT_FOUND:
         if (cb_lValue) { 
-          m_ASSERT(*acvnt_blotvarStuff != NULL)
+          m_ASSERT(*ant_blotvarStuff != NULL)
           if (ap_blotvarReference->blotvarReference == NAME__BLOTVAR_REFERENCE)
-            m_TRACK_IF(GStringCopy((*acvnt_blotvarStuff)+G_PARAM_NAME_ELEMENT,0,
+            m_TRACK_IF(GStringCopy((*ant_blotvarStuff)+G_PARAM_NAME_ELEMENT,0,
               ap_blotvarReference->c_select.c_name) < 0)
           else { // TOKEN_ID__BLOTVAR_REFERENCE 
-            m_TRACK_IF(m_GStringAsGParamName((*acvnt_blotvarStuff)+G_PARAM_NAME_ELEMENT,
+            m_TRACK_IF(m_GStringAsGParamName((*ant_blotvarStuff)+G_PARAM_NAME_ELEMENT,
               ap_blotvarReference->c_select.c_tokenId, ap_blotvarReference->blotregHandle)
               < 0)
           } // if
@@ -472,17 +470,16 @@ m_DIGGY_VAR_P_STRING(ap_blotvarReference->c_select.c_name)
     } // gKey 
   break; case ENTRY__BLOTVAR_REFERENCE:
     ret = GStringsFetch(ap_blotvarReference->blotregHandle,
-      ap_blotvarReference->c_select.c_entry, acvnt_blotvarStuff);
+      ap_blotvarReference->c_select.c_entry, ant_blotvarStuff);
     m_TRACK_IF(ret < 0)
 m_ASSERT(ret == ap_blotvarReference->c_select.c_entry)
-    result = (acvnt_blotvarStuff == NULL? RESULT__NOT_FOUND: RESULT__NOT_FOUND);
   break; case CURRENT__BLOTVAR_REFERENCE:
-    switch (result = GStringsIndexFetch(ap_blotvarReference->blotregHandle,NULL,
-      INDEX_FETCH_FLAGS__CURRENT, acvnt_blotvarStuff, nacvn_entry)){
+    switch (GStringsIndexFetch(ap_blotvarReference->blotregHandle,NULL,
+      INDEX_FETCH_FLAGS__CURRENT, ant_blotvarStuff, navn_entry)){
     case RESULT__FOUND:
-m_ASSERT(*acvnt_blotvarStuff != NULL)
+m_ASSERT(*ant_blotvarStuff != NULL)
     break; case RESULT__NOT_FOUND:
-m_ASSERT(*acvnt_blotvarStuff == NULL)
+m_ASSERT(*ant_blotvarStuff == NULL)
     break; default: m_TRACK() 
     } // switch   
  
@@ -490,7 +487,7 @@ m_ASSERT(*acvnt_blotvarStuff == NULL)
     m_RAISE(ANOMALY__VALUE__D,ap_blotvarReference->blotvarReference)  
   } // switch
 
-  m_DIGGY_RETURN(result)
+  m_DIGGY_RETURN(RETURNED)
 } // FetchBlotvar
 
 #define  AS__R_VALUE__ENTRY__XX "!#" 
@@ -944,7 +941,7 @@ static inline int m_BlotexlibExecutorComputeBlotexAtomBlotvar(BLOTEXLIB_EXECUTOR
   m_DIGGY_BOLLARD()
 
   struct BLOTVAR_REFERENCE c_blotvarReference; // UNDEFINED 
-  G_STRING_SET_STUFF vnt_blotvarStuff = (G_STRING_SET_STUFF)UNDEFINED;
+  G_STRING_SET_STUFF nt_blotvarStuff = (G_STRING_SET_STUFF)UNDEFINED;
   int vn_entry = UNDEFINED; 
   m_PREPARE_ABANDON(a_sequence,
     "<blotvar as int> | <blotvar entry> | <blotvar id> | <blotvar as str> | <blotvar name>") 
@@ -952,15 +949,9 @@ static inline int m_BlotexlibExecutorComputeBlotexAtomBlotvar(BLOTEXLIB_EXECUTOR
   switch (BlotexlibExecutorParseSimpleBlotvar(handle, b_R_VALUE, a_sequence, &blotregName,
     &c_blotvarReference, nc_abandonmentInfo)) {
   case ANSWER__YES: 
-    switch (FetchBlotvar(&c_blotvarReference, b_R_VALUE,&vnt_blotvarStuff, &vn_entry)){
-    case RESULT__FOUND:
-    break; case RESULT__NOT_FOUND:
+    m_TRACK_IF(FetchBlotvar(&c_blotvarReference, b_R_VALUE,&nt_blotvarStuff, &vn_entry) != RETURNED)
 m_DIGGY_VAR_D(vn_entry)
-m_ASSERT(vn_entry == -1)
-      m_ABANDON(UNKNOWN_BLOTVAR__ABANDONMENT_CAUSE) 
-    break; default:
-      m_TRACK()
-    } // switch
+    if (nt_blotvarStuff == NULL) m_ABANDON(UNKNOWN_BLOTVAR__ABANDONMENT_CAUSE) 
   break; case ANSWER__NO:
     m_DIGGY_RETURN(ANSWER__NO)
   break; default:
@@ -974,21 +965,21 @@ m_ASSERT(vn_entry == -1)
   switch (as) {
   case AS__VALUE_INT: // <blotvar as int>
     ac_blotexAtomValue->select.c_blotval =
-      vnt_blotvarStuff[G_PARAM_VALUE_ELEMENT].acolyt.cen_value;
+      nt_blotvarStuff[G_PARAM_VALUE_ELEMENT].acolyt.cen_value;
   break; case AS__ID: // <blotvar id>
     ac_blotexAtomValue->select.c_blotval =
-      vnt_blotvarStuff[G_PARAM_NAME_ELEMENT].acolyt.cen_value;
+      nt_blotvarStuff[G_PARAM_NAME_ELEMENT].acolyt.cen_value;
   break; case AS__R_VALUE__ENTRY: // <blotvar entry> 
     m_ASSERT(vn_entry >= 0)
     ac_blotexAtomValue->select.c_blotval = vn_entry;
   break; case AS__VALUE_STR: // <blotvar strex> 
     ac_blotexAtomValue->b_strex = b_TRUE;
     ac_blotexAtomValue->select.c_str =
-      vnt_blotvarStuff[G_PARAM_VALUE_ELEMENT].cv_pString; 
+      nt_blotvarStuff[G_PARAM_VALUE_ELEMENT].cv_pString; 
   break; case AS__NAME:  // <blotvar name> 
     ac_blotexAtomValue->b_strex = b_TRUE;
     ac_blotexAtomValue->select.c_str =
-      vnt_blotvarStuff[G_PARAM_NAME_ELEMENT].cv_pString; 
+      nt_blotvarStuff[G_PARAM_NAME_ELEMENT].cv_pString; 
   break; default:
     m_RAISE(ANOMALY__VALUE__D,as)
   } // switch
@@ -1516,7 +1507,7 @@ static inline int m_BlotexlibExecutorExecuteCFunctionEval(BLOTEXLIB_EXECUTOR_HAN
   m_PREPARE_ABANDON(&arguments, "Eval") 
   m_PParsePassSpaces(&arguments,NULL);
   { struct P_STRING subSequence; // UNDEFINED
-    PParseTillMatch(&arguments,m_PString(":="),NULL, &subSequence);
+    PParseTillMatch(&arguments,m_PString(":="),NULL, &subSequence); // TODO: improve; i.e: "joker" sequences???...
     if (b_EMPTY_P_STRING(arguments)) arguments = subSequence; // No assignation
     else { // Assignation 
       b_lValueReference = b_TRUE;
@@ -1552,28 +1543,24 @@ static inline int m_BlotexlibExecutorExecuteCFunctionEval(BLOTEXLIB_EXECUTOR_HAN
       switch (UpdateCurrentBlotsetField(cc_lValueBlottabFieldReference, c_as, c_blotexValue)) {
       case RESULT__FOUND:
       break; case RESULT__NOT_FOUND:
+        m_ABANDON(NOT_EXISTING_L_VALUE__ABANDONMENT_CAUSE)
       break; default:
         m_TRACK() 
       } // switch
     } else {
-      G_STRING_SET_STUFF cvnt_blotvarStuff = (G_STRING_SET_STUFF)UNDEFINED;
-      switch (FetchBlotvar(&cc_lValueBlotvarReference, b_L_VALUE,&cvnt_blotvarStuff,NULL)) {
-      case RESULT__FOUND:
-        m_ASSERT(cvnt_blotvarStuff != NULL)
-      break; case RESULT__NOT_FOUND:
-      break; default:
-        m_TRACK() 
-      } // switch
-      if (cvnt_blotvarStuff == NULL) m_ABANDON(NOT_EXISTING__ABANDONMENT_CAUSE)
+      G_STRING_SET_STUFF cnt_blotvarStuff = (G_STRING_SET_STUFF)UNDEFINED;
+      m_TRACK_IF(FetchBlotvar(&cc_lValueBlotvarReference, b_L_VALUE,&cnt_blotvarStuff,NULL) !=
+        RETURNED)
+      if (cnt_blotvarStuff == NULL) m_ABANDON(NOT_EXISTING_L_VALUE__ABANDONMENT_CAUSE)
       switch (c_as) {
       case AS__VALUE_INT: // [ '#' ]
         if (c_blotexValue.b_strex) m_ABANDON(EXPECT_INTEX__ABANDONMENT_CAUSE)
-        cvnt_blotvarStuff[G_PARAM_VALUE_ELEMENT].acolyt.cen_value = c_blotexValue.select.c_blotval;
+        cnt_blotvarStuff[G_PARAM_VALUE_ELEMENT].acolyt.cen_value = c_blotexValue.select.c_blotval;
       break; case AS__ID: // '!' 
   m_RAISE(ANOMALY__NOT_AVAILABLE)
       break; case AS__VALUE_STR: // '$'
         if (! c_blotexValue.b_strex) m_ABANDON(EXPECT_STREX__ABANDONMENT_CAUSE)
-        m_TRACK_IF(GStringCopy(cvnt_blotvarStuff+G_PARAM_VALUE_ELEMENT,0,
+        m_TRACK_IF(GStringCopy(cnt_blotvarStuff+G_PARAM_VALUE_ELEMENT,0,
           c_blotexValue.select.c_str) < 0)
       break; case AS__NAME:  // '!$'
   m_RAISE(ANOMALY__NOT_AVAILABLE)
