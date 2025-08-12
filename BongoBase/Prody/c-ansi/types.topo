@@ -22,7 +22,8 @@
 // 3.A : "status" versus "value"
 // - "status" ==  C-values used in logical expressions for the FLOW CONTROL ; a "status" is NOT
 //   meant to be passed (directly or indirectly) in FUNCTIONS ARGUMENTS.
-//   (in other words, a "status" is an elementary information allowing to "take immediate decisions")
+//   (in other words, a "status" is an elementary information allowing to take immediate decisions
+//   ACCURATELY)
 // - "(pure) value" == C-value that is NOT a "status" ; hence "(pure) values" take place in
 //   general expressions such as ASSIGNATIONS and FUNCTION ARGUMENTS. Of course, "pure values" are
 //   also present in logical expressions (for the FLOW CONTROL) that use comparator(s)...
@@ -59,4 +60,5 @@
 // => Beyond the "conceptual" clarification, the clear distinction between "procedures" and "(pure)
 // functions" is needed regarding the techniques we adopted to deal with program's ANOMALIES (see
 // c-ansi/stderr.topo). 
+
 
