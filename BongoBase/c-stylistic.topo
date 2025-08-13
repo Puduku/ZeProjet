@@ -5,10 +5,10 @@
 // Using stylistic devices in C (and other programmming languages)
 
 // In Programming/software development, we (very roughly) distinct the two following phases:
-// - conception/design 
+// - preliminary conception/design 
 // - writing and compiling the code (including testing and debugging)
 //
-// During conception phase...
+// During preliminary conception phase...
 // A new design does not emerges from nothing. Rather, new programming concepts (modules,
 // classes, processes and so on) are based on adaptation and extension (generalization or
 // specification) of existing concepts (ideas, principles, theories) and artifacts
