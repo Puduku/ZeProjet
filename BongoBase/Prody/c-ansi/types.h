@@ -40,7 +40,7 @@ m_DEFINE_BINARY_ENUM(AttemptImage,
 m_DEFINE_BINARY_ENUM(CompletedImage,
   COMPLETED__OK,, // procedure completed,
   COMPLETED__BUT,)// procedure completed, but we want to point something (like "we all agree..." 
-    but, "we all agree that we agreed on nothing.")
+    // but, "we all agree that we agreed on nothing.")
 
 // Preferred dual verity values of the "constructivists"
 m_DEFINE_BINARY_ENUM(ResultImage,
@@ -125,6 +125,7 @@ break; default:\
 
 
 #endif // __C_ANSI_TYPES_H_INCLUDED__
+
 
 
 
