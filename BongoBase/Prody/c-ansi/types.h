@@ -25,7 +25,7 @@ m_DEFINE_UNARY_ENUM(ReturnedImage,
 
 // Binary statuses...
 
-// "Natural" dual verity values of the girls:
+// "Natural" dual verity values of the babes:
 m_DEFINE_BINARY_ENUM(AnswerImage,
   ANSWER__YES,,// procedure completed ...and the answer is "YES !!"
   ANSWER__NO,) // procedure completed ...and the answer is "NO (WAY)!!"
@@ -125,6 +125,7 @@ break; default:\
 
 
 #endif // __C_ANSI_TYPES_H_INCLUDED__
+
 
 
 
