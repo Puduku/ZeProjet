@@ -44,7 +44,7 @@ m_DEFINE_BINARY_ENUM(CompletedImage,
 
 // Preferred dual verity values of the "constructivists"
 m_DEFINE_BINARY_ENUM(ResultImage,
-  RESULT__FOUND,,    // (so, does exist)
+  RESULT__FOUND,,    // (so, does exist, for sure)
   RESULT__NOT_FOUND,)// (so, doesn't exist according to the constructivits...) 
 
 
@@ -125,5 +125,6 @@ break; default:\
 
 
 #endif // __C_ANSI_TYPES_H_INCLUDED__
+
 
 
