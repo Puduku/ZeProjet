@@ -28,24 +28,24 @@ m_DEFINE_UNARY_ENUM(ReturnedImage,
 // "Natural" dual verity values of the girls:
 m_DEFINE_BINARY_ENUM(AnswerImage,
   ANSWER__YES,,// procedure completed ...and the answer is "YES !!"
-  ANSWER__NO,) // procedure completed ...and the answer is "NO !!"
+  ANSWER__NO,) // procedure completed ...and the answer is "NO (WAY)!!"
 
 // "Natural" dual verity values of the guys:
 m_DEFINE_BINARY_ENUM(AttemptImage,
   ATTEMPT__SUCCESSFUL,,// this try is successful
-  ATTEMPT__TRY_AGAIN,) // this try was not lucky
+  ATTEMPT__TRY_AGAIN,) // this try is just not lucky
 
-// Dual verity values allowing the ‘glass half full’ case to be expressed. (and easily transformed
+// Dual verity values allowing the "glass half full" case to be expressed. (and easily transformed
 // in unary verity by European Institutions)
 m_DEFINE_BINARY_ENUM(CompletedImage,
   COMPLETED__OK,, // procedure completed,
-  COMPLETED__BUT,)// procedure completed, but we want to point something ; we all agree (OK) 
-    // to the fact that we don't agree (BUT)...
+  COMPLETED__BUT,)// procedure completed, but we want to point something (like "we all agree..." 
+    but, "we all agree that we agreed on nothing.")
 
-// Universal dual verity values of the "constructivists"
+// Preferred dual verity values of the "constructivists"
 m_DEFINE_BINARY_ENUM(ResultImage,
-  RESULT__FOUND,,    // completed and fruitful research
-  RESULT__NOT_FOUND,)// completed research, but did not come to fruition
+  RESULT__FOUND,,    // (so, does exist)
+  RESULT__NOT_FOUND,)// (so, doesn't exist according to the constructivits...) 
 
 
 // Ternary "comparison" status...
@@ -125,4 +125,5 @@ break; default:\
 
 
 #endif // __C_ANSI_TYPES_H_INCLUDED__
+
 
