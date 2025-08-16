@@ -496,13 +496,25 @@ int UpdateCurrentBlotsetField(struct BLOTTAB_FIELD_REFERENCE blottabFieldReferen
   struct BLOTEX_VALUE blotexValue) {
   m_DIGGY_BOLLARD()
 #if 0
+  G_STRING_SET_STUFF *vnt_blotsetStuff;
+  switch (GStringsIndexFetch(blottabFieldReference.blottabHandle,NULL,
+    INDEX_FETCH_FLAGS__CURRENT, &vnt_blotvarStuff, navn_entry)){
+  case RESULT__FOUND:
+m_ASSERT(*ant_blotvarStuff != NULL)
+  break; case RESULT__NOT_FOUND:
+m_ASSERT(*ant_blotvarStuff == NULL)
+  break; default: m_TRACK()
+  } // switch   
+
+
+
   //ap_blottabReference->blottabHandle 
   //G_STRINGS_HANDLE h_tableHandle;
   //G_STRINGS_HANDLE hp_fieldAttributesHandle;
   //ap_blottabReference->element 
   G_STRING_SET_STUFF nt_gStringSetStuff;
   int n_entry;
-  switch (m_GStringsIndexiSingleFetch(ap_blottabReference->blottabHandle.h_tableHandle,NULL,
+  switch (m_GStringsIndexSingleFetch(ap_blottabReference->blottabHandle.h_tableHandle,NULL,
     INDEX_LABEL0,
     INDEX_FETCH_FLAGS__CURRENT, G_STRING_SET_STUFF &nt_gStringSetStuff, &n_entry)) {
   case RESULT__FOUND:

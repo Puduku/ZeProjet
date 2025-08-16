@@ -9,6 +9,7 @@
 #include "c-ansi/blotex.topo"
 /////////////////////////////
 
+#include "c-ansi/blotex-kitchen.h"
 #include "c-ansi/blotcode.h"
 #include "c-ansi/g-string.h"
 
@@ -137,117 +138,6 @@ int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
 // Parsing blot expressions: helpers
 // ---------------------------------
 
-// Prepare parsing function for potential abandonment.   
-//
-// Passed:
-// - a_sequence: parsed sequence address
-// - p_sequenceType: expected sequence type 
-#define m_PREPARE_ABANDON(/*struct P_STRING* */a_sequence,\
-  /*const char* */p_sequenceType) \
-  struct P_STRING *ema_sequence = (a_sequence);\
-  const char *emp_sequenceType = (p_sequenceType);\
-  
-// Precise sequence description of parsing function.
-//
-// Passed:
-// - a_sequence: parsed sequence address 
-// - p_sequenceType: expected sequence type 
-#define m_PRECISE_ABANDON(/*struct P_STRING* */a_sequence,\
-  /*const char* */p_sequenceType) \
-  ema_sequence = (a_sequence);\
-  emp_sequenceType = (p_sequenceType);\
-
-
-#define SYNTAX_ERROR__ABANDONMENT_CAUSE "Syntax error"
-#define NOT_PARSABLE__ABANDONMENT_CAUSE "Not parsable"
-#define VALUE_ERROR__ABANDONMENT_CAUSE "Value error"
-#define EXPECT_STREX__ABANDONMENT_CAUSE "Expect strex value"
-#define EXPECT_INTEX__ABANDONMENT_CAUSE "Expect strex value"
-#define UNKNOWN_BLOTVAR__ABANDONMENT_CAUSE "Unknown blotvar"
-#define UNKNOWN_BLOTREG__ABANDONMENT_CAUSE "Unknown blotreg"
-#define INVALID_FORMAT__ABANDONMENT_CAUSE "Invalid format"
-#define NOT_EXISTING_L_VALUE__ABANDONMENT_CAUSE "Not existing l-value"
-
-// Make function abandon parsing (return ANSWER__NO)
-//
-// Passed:
-// - p_cause : parsing abandonment cause format 
-// - ... : parsing abandonment cause:
-//  + mandatory const char* : parsing abandonment cause format
-//  + cause format's optional variable arguments
-// - ema_sequence : implicit variable 
-// - emp_sequenceType: implicit variable
-//
-// Changed (Implicit) variables:
-// - nc_abandonmentInfo:
-#define m_ABANDON(...) {\
-  if (nc_abandonmentInfo != NULL) {\
-    m_TRACK_IF(GStringPrintf(nc_abandonmentInfo,0,"In %s [" FMT_P_STRING "] : ",\
-      emp_sequenceType, m_P_STRING_2_FMT_ARGS((*ema_sequence))) < 0)\
-    m_TRACK_IF(GStringPrintf(nc_abandonmentInfo,-1, __VA_ARGS__) < 0)\
-  } \
-  m_DIGGY_RETURN(ANSWER__NO)\
-}
- 
-// IS_CHAR_FUNCTION:
-// Recognize any character corresponding to <entity>
-int IsEntityNameChar(int c) ;
-
-enum {
-  AS__R_VALUE__ENTRY,// '!#' 
-  AS__NAME,          // '!$'
-  AS__VALUE_INT,     // [ '#' ]
-  AS__ID,            // '!'
-  AS__VALUE_STR,     // '$'
-} ;
-
-// Parse "as" "value" specifier if present
-//
-// Passed:
-// - *a_sequence: before parsing
-//
-// Changed:
-// - *a_sequence: after parsing 
-// - *an_as: (>=0) corresponding "as" "value" specifier (-1 if not present) 
-// 
-// Ret:
-// - RETURNED: Ok
-// - 1: unexpected problem; anomaly is raised
-int ParseAsValue(struct P_STRING *a_sequence, int *an_as) ;
-
-
-// Parse comparison operator in register/table request, if present... 
-//
-// Passed:
-// - *a_sequence: expect <str comp op> | <comp op> 
-// - b_str : TRUE => expect <str comp op> ; FALSE => expect <comp op>
-//
-// Changed:
-// - *a_sequence: after parsing 
-// - *an_indexSeekFlags: + -1 special value: comparison operator not present
-//   + >= 0: actual seek flags corresponding to comparison operator ; may be NOT 
-//     INDEX_SEEK_FLAG__ANY
-// 
-// Ret:
-// - RETURNED: Ok
-// - 1: unexpected problem; anomaly is raised
-int ParseRequestCompOp(struct P_STRING *a_sequence, char b_str, int *an_indexSeekFlags);
-
-// Parse <logical 2op>  
-//
-// Passed:
-// - *a_sequence: before parsing
-//
-// Changed:
-// - *a_sequence: after parsing 
-// - *a_criteriaFlags: corresponding op. flags (ALL_FLAG_OFF0 special value if not found) 
-// 
-// Ret:
-// - RETURNED: Ok
-// - 1: unexpected problem; anomaly is raised
-int ParseLogical2Op(struct P_STRING *a_sequence, int *a_criteriaOpFlags);
-
-
 struct BLOTEX_VALUE {
   char b_strex;
   union {
@@ -372,9 +262,9 @@ int l_BlotexlibExecutorComputeBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
 // 
 // Ret:
 // - RESULT__FOUND:
-// - RESULT__NOT_FOUND: no current blotset
+// - RESULT__NOT_FOUND: current blotset not available
 // - -1: unexpected problem; anomaly is raised
 int UpdateCurrentBlotsetField(struct BLOTTAB_FIELD_REFERENCE blottabFieldReference, int as,
  struct BLOTEX_VALUE blotexValue) ;
 
-#endif // __BLOTEX_C_ANSI_H_INCLUDED__
+#endif // __C_ANSI_BLOTEX_H_INCLUDED__

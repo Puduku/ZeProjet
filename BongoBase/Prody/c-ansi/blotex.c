@@ -114,7 +114,6 @@ int l_BlotcodeExecutorGetBlotexlibExecutorHandle(BLOTCODE_EXECUTOR_HANDLE handle
   m_DIGGY_RETURN(RETURNED)
 } // l_BlotcodeExecutorGetBlotexlibExecutorHandle
 
-// Blotregs: 
 #if 0
 static int DumpBlotregs(G_STRINGS_HANDLE blotregsHandle, const char *p_legend) {
 m_DIGGY_BOLLARD() ////////////////////////// DEBUG TRACES:
@@ -288,19 +287,6 @@ m_DIGGY_VAR_P(handle->h_blottabsHandle)
 
 
 // Blot expressions parsing:
-
-
-// IS_CHAR_FUNCTION:
-int IsEntityNameChar(int c) {
-  return (c == '_' || isalnum(c));
-} // IsEntityNameChar 
-
-
-#define b_STREX b_TRUE
-
-
-#define b_L_VALUE b_TRUE
-#define b_R_VALUE b_FALSE0 
 
 
 // specific blotvar reference (of a register) 
@@ -490,159 +476,6 @@ m_ASSERT(*ant_blotvarStuff == NULL)
   m_DIGGY_RETURN(RETURNED)
 } // FetchBlotvar
 
-#define  AS__R_VALUE__ENTRY__XX "!#" 
-#define  AS__NAME__XX           "!$"
-#define  AS__VALUE_INT__X       "#" 
-#define  AS__ID__X              "!"
-#define  AS__VALUE_STR__X       "$"
-
-
-// Parse "as" specifier (not present : default to '#" value int) 
-//
-// Passed:
-// - *a_sequence: before parsing
-// - b_lValue: TRUE => "as entry" not accepted 
-//
-// Changed:
-// - *a_sequence: after parsing 
-// - *a_as: (>=0) corresponding "as" specifier 
-// 
-// Ret:
-// - RETURNED: Ok
-// - 1: unexpected problem; anomaly is raised
-static int ParseAs(char b_lValue, struct P_STRING *a_sequence, int *a_as) {
-  m_DIGGY_BOLLARD()
-  struct P_STRING lexeme; // UNDEFINED
-  m_PParsePassSpaces(a_sequence,NULL);
-m_DIGGY_VAR_P_STRING(*a_sequence)
-  int n_matchedEntry = UNDEFINED;
-  m_P_PARSE_MATCH_AMONG_C(*a_sequence,NULL,&n_matchedEntry,a_as,&lexeme, 5,
-    AS__R_VALUE__ENTRY__XX,b_lValue? -1:AS__R_VALUE__ENTRY,  AS__NAME__XX,AS__NAME,
-    AS__VALUE_INT__X,AS__VALUE_INT,  AS__ID__X,AS__ID,  AS__VALUE_STR__X,AS__VALUE_STR)
-  if (*a_as == -1) *a_as = AS__VALUE_INT;
-m_DIGGY_VAR_P_STRING(*a_sequence)
-m_DIGGY_VAR_P_STRING(lexeme)
-m_DIGGY_VAR_D(*a_as)
-  m_DIGGY_RETURN(RETURNED)
-} // ParseAs 
-
-// See .h 
-int ParseAsValue(struct P_STRING *a_sequence, int *an_as) {
-  m_DIGGY_BOLLARD()
-  struct P_STRING lexeme; // UNDEFINED
-  m_PParsePassSpaces(a_sequence,NULL);
-m_DIGGY_VAR_P_STRING(*a_sequence)
-  int n_matchedEntry = UNDEFINED;
-  m_P_PARSE_MATCH_AMONG_C(*a_sequence,NULL,&n_matchedEntry,an_as,&lexeme, 2,
-    AS__VALUE_INT__X,AS__VALUE_INT, AS__VALUE_STR__X,AS__VALUE_STR)
-m_DIGGY_VAR_P_STRING(*a_sequence)
-m_DIGGY_VAR_P_STRING(lexeme)
-m_DIGGY_VAR_D(*an_as)
-  m_DIGGY_RETURN(RETURNED)
-} // ParseAsValue 
-
-
-// Enumeration of <comp op> | <str comp op> | <fact op> terminal symbols 
-enum {
-              EQUAL__COMP_OP,
-               LESS__COMP_OP,
-         LESS_EQUAL__COMP_OP,
-            GREATER__COMP_OP,
-      GREATER_EQUAL__COMP_OP,
-          NOT_EQUAL__COMP_OP,
-          LIKE__STR__COMP_OP, // only <str comp op>
-  MULTIPLY__FACT_OP__COMP_OP, // only <fact op>
-    DIVIDE__FACT_OP__COMP_OP, // only <fact op>
-} ;
-
-enum {
-       NO__COMP_OP_EXTENSION,
-      STR__COMP_OP_EXTENSION,
-  FACT_OP__COMP_OP_EXTENSION,
-} ;
-
-// Parse comparison operator, if present...
-//
-// Passed:
-// - compOpExtension: + NO__COMP_OP_EXTENSION: parse <comp op>
-//   + STR__COMP_OP_EXTENSION: parse <str comp op>
-//   + FACT_OP__COMP_OP_EXTENSION: parse <fact op>
-// - *a_sequence: expected (eventually) : <comp op> | <str comp op> | <fact op>  
-//
-// Changed:
-// - *a_sequence: after parsing 
-// - *an_compOp: + -1: special value: comparison operator NOT present
-//   + >=0 : corresponding comparison operator 
-//
-// Ret:
-// - RETURNED: Ok
-// - -1: unexpected problem
-static int ParseCompOp(int compOpExtension, struct P_STRING *a_sequence, int *an_compOp) {
-  m_DIGGY_BOLLARD()
-  struct P_STRING lexeme; // UNDEFINED
-  int n_matchedEntry = UNDEFINED;
-  m_P_PARSE_MATCH_AMONG_C(*a_sequence,NULL,&n_matchedEntry,an_compOp,&lexeme, 9,
-    "===", compOpExtension == STR__COMP_OP_EXTENSION? LIKE__STR__COMP_OP: -1,
-    "!=",NOT_EQUAL__COMP_OP, ">=",GREATER_EQUAL__COMP_OP, "<=",LESS_EQUAL__COMP_OP,
-    "==",EQUAL__COMP_OP, "<",LESS__COMP_OP, ">",GREATER__COMP_OP,
-    "*",compOpExtension == FACT_OP__COMP_OP_EXTENSION? MULTIPLY__FACT_OP__COMP_OP: -1,
-    "/",compOpExtension == FACT_OP__COMP_OP_EXTENSION? DIVIDE__FACT_OP__COMP_OP: -1)
-  m_DIGGY_RETURN(RETURNED)
-} // ParseCompOp
-
-
-// 
-int ParseRequestCompOp(struct P_STRING *a_sequence, char b_str,
-  int *an_indexSeekFlags) {
-  m_DIGGY_BOLLARD()
-  *an_indexSeekFlags = -1; // a priori
-  m_PParsePassSpaces(a_sequence,NULL);
-m_DIGGY_VAR_P_STRING(*a_sequence)
-
-  int n_compOp = UNDEFINED;
-  m_TRACK_IF(ParseCompOp(b_str? STR__COMP_OP_EXTENSION:
-    NO__COMP_OP_EXTENSION, a_sequence, &n_compOp) != RETURNED)
-
-  switch (n_compOp) {
-  case -1: 
-    *an_indexSeekFlags = -1;
-  break; case GREATER__COMP_OP: 
-    *an_indexSeekFlags = INDEX_SEEK_FLAGS__GREATER; 
-  break; case LESS__COMP_OP: 
-    *an_indexSeekFlags = INDEX_SEEK_FLAGS__LESS; 
-  break; case GREATER_EQUAL__COMP_OP: 
-    *an_indexSeekFlags = INDEX_SEEK_FLAGS__GREATER_EQUAL;
-  break; case LESS_EQUAL__COMP_OP: 
-    *an_indexSeekFlags = INDEX_SEEK_FLAGS__LESS_EQUAL;
-  break; case EQUAL__COMP_OP: 
-    *an_indexSeekFlags = INDEX_SEEK_FLAGS__EQUAL;
-  break; case NOT_EQUAL__COMP_OP: 
-    *an_indexSeekFlags = INDEX_SEEK_FLAGS__NOT_EQUAL;
-  break; case LIKE__STR__COMP_OP: 
-    m_ASSERT(b_str)
-    *an_indexSeekFlags = INDEX_SEEK_FLAGS__LIKE;
-  break; default: m_RAISE(ANOMALY__VALUE__D,n_compOp)
-  } // switch
-
-  m_DIGGY_RETURN(RETURNED)
-} // ParseRequestCompOp 
-
-//
-int ParseLogical2Op(struct P_STRING *a_sequence,
-  int *a_criteriaOpFlags) {
-  m_DIGGY_BOLLARD()
-  struct P_STRING lexeme; // UNDEFINED
-  m_PParsePassSpaces(a_sequence,NULL);
-  PParseMatch(a_sequence,m_PString("and"),NULL,&lexeme);
-  if (!b_EMPTY_P_STRING(lexeme)) *a_criteriaOpFlags = CRITERIA_OP_FLAGS__AND;
-  else { 
-    PParseMatch(a_sequence,m_PString("or"),NULL,&lexeme); 
-    if (!b_EMPTY_P_STRING(lexeme)) *a_criteriaOpFlags = CRITERIA_OP_FLAGS__OR;
-    else *a_criteriaOpFlags = ALL_FLAGS_OFF0;
-  } // if
-
-  m_DIGGY_RETURN(RETURNED)
-} // ParseLogical2Op
 
 
 // Parse and compute blotreg request. 
@@ -904,21 +737,6 @@ m_DIGGY_VAR_P_STRING(blotregName)
 } // BlotexlibExecutorComputeBlotregOps
 
 
-
-
-
-// IS_CHAR_FUNCTION:
-static int IsInt1Op(int c) {
-  return (c == '+' || c == '-' || c == '!');
-} // IsInt1Op
-
-// Terminal symbols (of <int 1op> terminal symbol)
-enum {
-  NOT__INT_1OP,
-  PLUS__INT_1OP,
-  MINUS__INT_1OP,
-} ;
-
 // Complete blotvar reference parsing and compute blotex atom value.
 //
 // Passed:
@@ -1117,34 +935,6 @@ m_DIGGY_VAR_P_STRING(lexeme)
 } // BlotexlibExecutorProbeBlotexAtom
 
 
-// Terminal symbols (of <int 2op> terminal symbol)
-enum {
-            ADD__TERM_OP,
-       SUBTRACT__TERM_OP,
-            AND__TERM_OP,
-             OR__TERM_OP,
-} ;
-
-// Parse <term op> if present
-//
-// Passed:
-// - *a_sequence: before parsing
-//
-// Changed:
-// - *a_sequence: after parsing 
-// - *an_termOp:
-//   + -1: special value: <int 2op> NOT present
-//   + >=0 : corresponding int 2op 
-static inline int m_ParseTermOp(struct P_STRING *a_sequence, int *an_termOp) {
-  m_DIGGY_BOLLARD()
-  struct P_STRING lexeme; // UNDEFINED
-  int c_matchedEntry = UNDEFINED;
-  m_P_PARSE_MATCH_AMONG_C(*a_sequence,NULL,&c_matchedEntry,an_termOp,&lexeme, 4,
-    "&&",AND__TERM_OP, "||",OR__TERM_OP, "+",ADD__TERM_OP, "-",SUBTRACT__TERM_OP)
-  // TODO: FOIREUX !!!!???? "++" sera rejeted !!!!!!????
-  m_DIGGY_RETURN(RETURNED)
-} // m_ParseTermOp
-
 // Parse <intex term>  
 //
 // Passed:
@@ -1268,7 +1058,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
     
   struct BLOTEX_VALUE intexTermValue ;
   while (b_TRUE) {
-    m_TRACK_IF(m_ParseTermOp(a_sequence,&n_termOp) != RETURNED)
+    m_TRACK_IF(ParseTermOp(a_sequence,&n_termOp) != RETURNED)
 m_DIGGY_VAR_D(n_termOp)
     if (n_termOp == -1) break;
     switch (BlotexlibExecutorComputeIntexTerm(handle,a_sequence,NULL, &intexTermValue,
@@ -1581,68 +1371,6 @@ m_DIGGY_VAR_GEN(*ac_blotval,ld)
 } // m_BlotexlibExecutorExecuteCFunctionEval
 
 
-// IS_CHAR_FUNCTION:
-static int IsFormatSpecifierChar(int c) {
-  return (c == 'd' || c == 's' || c == 'x' || c == 'X' || c == 'L' || c == 'B' || c == 'E');
-} // IsFormatSpecifierChar
-
-// Terminal symbols (of <format> terminal symbol)
-enum {
-             D__FORMAT,
-             LS__FORMAT,
-             LX__FORMAT,
-            UX__FORMAT,
-            LE__FORMAT,
-            BE__FORMAT,
-} ;
-
-// Parse <format> 
-//
-// Passed:
-// - *a_sequence: before parsing
-//
-// Changed:
-// - *a_sequence: after parsing 
-// - *avn_format:
-//   + -1 special value: when abandonned (invalid format) 
-//   + >=0 : corresponding format 
-// 
-// Ret:
-// - ANSWER__YES: Ok,
-// - ANSWER__NO: 'invalid format' error; abandon processing 
-static inline int m_ParseFormat(struct P_STRING *a_sequence, int *avn_format,
-  G_STRING_STUFF nc_abandonmentInfo) {
-  m_DIGGY_BOLLARD()
-  struct P_STRING lexeme; // UNDEFINED
-
-  *avn_format = -1;
-  m_PREPARE_ABANDON(a_sequence, "<format>") 
-  m_PParsePassSpaces(a_sequence,NULL);
-  PParsePassSingleChar(a_sequence,NULL,'%',&lexeme);
-  if (b_EMPTY_P_STRING(lexeme)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
-  PParsePassChars(a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_WHILE,IsFormatSpecifierChar,(char)UNDEFINED,
-    &lexeme);
-  int length = m_PStringLength(lexeme);
-  switch (lexeme.string[0]) {
-  case 'd': 
-    if (length == 1) *avn_format = D__FORMAT;
-  break; case 's':
-    if (length == 1) *avn_format = LS__FORMAT;
-  break; case 'x':
-    if (length == 1) *avn_format = LX__FORMAT;
-  break; case 'X':
-    if (length == 1) *avn_format = UX__FORMAT;
-  break; case 'L':
-    if (length == 2 && lexeme.string[0] == 'E') *avn_format = LE__FORMAT;
-  break; case 'B':
-    if (length == 2 && lexeme.string[0] == 'E') *avn_format = BE__FORMAT;
-  } // switch
-
-  if (*avn_format < 0) m_ABANDON(INVALID_FORMAT__ABANDONMENT_CAUSE) 
-
-  m_DIGGY_RETURN(ANSWER__YES)
-} // m_ParseFormat
-
 // Execute OutputF() blot function
 //
 // Passed
@@ -1664,7 +1392,7 @@ static inline int m_BlotexlibExecutorExecuteCFunctionOutputF(BLOTEXLIB_EXECUTOR_
   m_DIGGY_BOLLARD()
   m_TRACK_IF(GStringsClear(handle->h_workingGStringsHandle,b_LIGHT_CLEAR) < 0)
   int n_format = -1;
-  switch(m_ParseFormat(&arguments,&n_format,nc_abandonmentInfo)) {
+  switch(ParseFormat(&arguments,&n_format,nc_abandonmentInfo)) {
   case ANSWER__YES:
     break;
   break; case ANSWER__NO:
