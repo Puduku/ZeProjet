@@ -146,6 +146,6 @@
 // catch-all for all sorts of problems. That is, we blithely mix anomalies of execution (which are
 // linked to the conception of the program) with applicative errors (which are caused by some misuse
 // of the application).
-// In any way, anomalies of execution are ORTHOGONAL to applicative errors and CANNOT be gathered 
-// together within negative case of procedures' execution.
+// In any way, anomalies of execution are ORTHOGONAL to applicative errors and SHOULD NEVER be
+// gathered together within negative case of procedures' execution.
 
