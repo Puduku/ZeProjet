@@ -32,7 +32,7 @@
 // Let us consider two particular ‘extremes’:
 // - minimalist naming conventions, based on simple, short names with no hierarchy, make
 //   the code far too obscure and inevitably lead to endless naming conflicts;
-// - the other extreme, based on descriptive names (which are therefore very long) and
+// - the other extreme, based on very descriptive names (which are therefore very long) and
 //   using systematic hierarchy, is no more manageable:
 //   + long names composed of several words are NOT easily identified by humans and
 //     unreasonably increase the weight of the code. 
