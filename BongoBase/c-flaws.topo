@@ -128,7 +128,7 @@
 // 2nd pitfall: Given function declaration f(char p[256]); , what is the value of sizeof(p) in f ?
 // Some compilers give the size of a pointer (ah?) instead of 256...  (P)
 // Worse, among compilers giving the size of a pointer with the declaration f(char t[256]); ,
-// some of them give the size 256 with the declaration typedef char t256[256]; f(t256p); (P)
+// some of them give well the size 256 with the declaration typedef char t256[256]; f(t256p); (P)
 // This is of course in relation with flaw Number 7 : "typedef" thus looks like a very simple
 // aliasing mechanism... with a few (non-portable) subtleties, just there to confuse the "average"
 // programmer... 
@@ -184,7 +184,7 @@
 // forms of data corruption, but the price to pay for this protection is a real risk of causing
 // application crashes, which are "generalized" forms of data corruption... (**)
 // So, in such circumstances, the wisest course is to simply forego the "protection" offered by
-// "const"..
+// 'const'..
 // Morality : 'const' qualifier may be useful, but is FAR to be the Panacea.
 // (*) Ideally, C would propose an "intelligent" casting operator that would just remove the
 // 'constness' constraint (for one time, C++ marks a real point over C :p)...

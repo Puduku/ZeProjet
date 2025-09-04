@@ -239,7 +239,7 @@
 //     perfect program with our rotten lines of code...
 //   + Have good usage of binary statutes in C-programs (see also c-monism.topo, § "Why do guys so
 //     often harass girls ???") to avoid the following crappy behaviours :
-//     . Hanging programms (with massive resource consumption as common "side effect") may be simple
+//     . Hanging programms (with massive resource grabbing as major "side effect") may be simple
 //       consequence of a bad re-interpration of ('yes'/'no way' - girl verity perception) binary
 //       status as a ('success'/'try again' - guy verity perception). 
 //     . Unexpected crashes may a contrario results of a wrong re-interpreation ('success'/'try
@@ -249,4 +249,5 @@
 //       of ('ok'/'ok, but') binary status into unary 'ok' status (like the European Union, with his
 //       habit of proudly presenting a total FAILURE to reach agreement as a SUCCESS of plenary
 //       agreement - "We unanimously all agreed... that we agree on nothing...")
+
 

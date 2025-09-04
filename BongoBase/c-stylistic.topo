@@ -32,7 +32,7 @@
 // Let us consider two particular ‘extremes’:
 // - minimalist naming conventions, based on simple, short names with no hierarchy, make
 //   the code far too obscure and inevitably lead to endless naming conflicts;
-// - the other extreme, based on descriptive names (which are therefore very long) and
+// - the other extreme, based on very descriptive names (which are therefore very long) and
 //   using systematic hierarchy, is no more manageable:
 //   + long names composed of several words are NOT easily identified by humans and
 //     unreasonably increase the weight of the code. 
@@ -57,10 +57,10 @@
 // Let me give you a simple example. A project I worked on for many years consisted of
 // software AND specific hardware. The software part was (quite naturally) named after the
 // project itself. Unfortunately, management quickly ended up confusing the software part of
-// the project with the whole thing. The head of the development team became the de facto
-// manager of the entire project (including the hardware part) without this ever being
+// the project with the whole thing. The head of the software development team became the de
+// facto manager of the entire project (including the hardware part) without this ever being
 // clearly formalised. This explains (from my humble point of view) many of the erratic
-// decisions that ensued.
+// decisions that ensued...
 
 -12345789-12345789-12345789-12345789-12345789-12345789-12345789-12345789-12345789-12345789
 // Examples of useful figures of speech:
