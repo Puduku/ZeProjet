@@ -44,7 +44,7 @@ struct P_STRING { // #REF struct-P_STRING
 // Remark: string == stop == NULL (called "trivial" empty string) is thus a VALID representation of
 // empty string portions...
 
-
+const struct P_STRING *ap_aTrivialEmptyPString ;  
 
 // Assigning string portions
 // -------------------------

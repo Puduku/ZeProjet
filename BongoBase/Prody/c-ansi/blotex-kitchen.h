@@ -76,12 +76,17 @@ int IsEntityNameChar(int c) ;
 #define b_R_VALUE b_FALSE0 
 
 enum {
-  AS__R_VALUE__ENTRY,// '!#' 
-  AS__NAME,          // '!$'
-  AS__VALUE_INT,     // [ '#' ]
-  AS__ID,            // '!'
-  AS__VALUE_STR,     // '$'
+  AS__ENTRY,    // '!#' (ONLY R-value)
+  AS__NAME,     // '!$'
+  AS__VALUE_INT,// [ '#' ]
+  AS__ID,       // '!'
+  AS__VALUE_STR,// '$'
 } ;
+
+static inline int mb_AsValue(int as) {
+  return as == AS__VALUE_INT || as == AS__VALUE_STR;
+} // mb_AsValue
+
 
 // Parse "as" specifier (not present : default to '#" value int) 
 //

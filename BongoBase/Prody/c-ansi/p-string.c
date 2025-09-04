@@ -13,6 +13,8 @@
 #include "c-ansi/diggy.h"
 #include "c-ansi/testy-diggy.h"
 
+const struct P_STRING* ap_aTrivialEmptyPString = { 0 } ;  
+
 // Public function: see .h
 int VerifyCPString(struct P_STRING *a_pString) { 
   m_DIGGY_BOLLARD()

@@ -139,12 +139,53 @@ int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
 // ---------------------------------
 
 struct BLOTEX_VALUE {
+  int c_workingGStringEntry; // TODO : dans l'union... 
   char b_strex;
   union {
     gen_BLOTVAL c_blotval;
-    struct P_STRING c_str;
+    struct P_STRING cv_str;
   } select ;
 } ;
+
+#define b_FUGACIOUS_STR b_TRUE
+
+// Set blotex INITIAL value
+// TODO: manage double initialization ???
+//
+// Passed:
+// - handle:
+// - b_strex: (TRUE/FALSE) 
+// - c_blotval:
+// - cap_str:
+// - cb_fugaciousStr: (TRUE/FALSE) NOTICE: if you intialize TWICE a
+//   fugacious string, the first working string buffer is "lost"  
+// 
+// changed:
+// - a_blotexValue: 
+//
+// Ret: 
+// - RETURNED: Ok
+// - -1: unexpected problem; anomaly is raised
+int BlotexlibExecutorSetBlotexValue(BLOTEXLIB_EXECUTOR_HANDLE handle, char b_strex,
+  gen_BLOTVAL c_blotval, const struct P_STRING* cap_str, char cb_fugaciousStr,
+  struct BLOTEX_VALUE *a_blotexValue) ;
+
+
+// Passed:
+// - handle:
+// - ac_blotexValue: 
+// - a_strexValue1: 
+// - p_str2:
+// 
+// changed:
+// - a_strtexValue1: 
+//
+// Ret: 
+// - RETURNED: Ok
+// - -1: unexpected problem; anomaly is raised
+int BlotexlibExecutorConcatenateStrexValue(BLOTEXLIB_EXECUTOR_HANDLE handle,
+  struct BLOTEX_VALUE *a_strexValue1, struct P_STRING p_str2) ;
+
 
 // Parse <blotex>
 //
@@ -238,7 +279,7 @@ struct BLOTTAB_FIELD_REFERENCE {
 // - *a_sequence: after parsing 
 // - *cac_blotexValue: only significant if "success" (r-value) ; value corresponding to blottab ops
 // - *cac_blottabFieldReference: only significant if "success" (l-value) 
-// - *cac_asValue: only significant if "success" (l-value) 
+// - *cac_asValue: only significant if "success" (l-value) either AS__VALUE_INT or AS__VALUE_STR 
 // - nc_abandonmentInfo: 
 //
 // Ret: Computed successfully ? 
@@ -257,14 +298,14 @@ int l_BlotexlibExecutorComputeBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
 //
 // Passed:
 // - blottabFieldReference: 
-// - as: 
+// - asValue: AS__VALUE_INT / AS__VALUE_STR 
 // - blotexValue:
 // 
 // Ret:
 // - RESULT__FOUND:
 // - RESULT__NOT_FOUND: current blotset not available
 // - -1: unexpected problem; anomaly is raised
-int UpdateCurrentBlotsetField(struct BLOTTAB_FIELD_REFERENCE blottabFieldReference, int as,
+int UpdateCurrentBlotsetField(struct BLOTTAB_FIELD_REFERENCE blottabFieldReference, int asValue,
  struct BLOTEX_VALUE blotexValue) ;
 
 #endif // __C_ANSI_BLOTEX_H_INCLUDED__

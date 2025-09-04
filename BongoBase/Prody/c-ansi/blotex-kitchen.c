@@ -31,7 +31,7 @@ int IsEntityNameChar(int c) {
 
 
 
-#define  AS__R_VALUE__ENTRY__XX "!#" 
+#define  AS__ENTRY__XX "!#" 
 #define  AS__NAME__XX           "!$"
 #define  AS__VALUE_INT__X       "#" 
 #define  AS__ID__X              "!"
@@ -46,7 +46,7 @@ int ParseAs(char b_lValue, struct P_STRING *a_sequence, int *a_as) {
 m_DIGGY_VAR_P_STRING(*a_sequence)
   int n_matchedEntry = UNDEFINED;
   m_P_PARSE_MATCH_AMONG_C(*a_sequence,NULL,&n_matchedEntry,a_as,&lexeme, 5,
-    AS__R_VALUE__ENTRY__XX,b_lValue? -1:AS__R_VALUE__ENTRY,  AS__NAME__XX,AS__NAME,
+    AS__ENTRY__XX,b_lValue? -1:AS__ENTRY,  AS__NAME__XX,AS__NAME,
     AS__VALUE_INT__X,AS__VALUE_INT,  AS__ID__X,AS__ID,  AS__VALUE_STR__X,AS__VALUE_STR)
   if (*a_as == -1) *a_as = AS__VALUE_INT;
 m_DIGGY_VAR_P_STRING(*a_sequence)

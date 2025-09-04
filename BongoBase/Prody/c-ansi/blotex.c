@@ -477,6 +477,45 @@ m_ASSERT(*ant_blotvarStuff == NULL)
 } // FetchBlotvar
 
 
+// Public function: see .h
+int BlotexlibExecutorSetBlotexValue(BLOTEXLIB_EXECUTOR_HANDLE handle, char b_strex,
+  gen_BLOTVAL c_blotval, const struct P_STRING* cap_str, char cb_fugaciousStr,
+  struct BLOTEX_VALUE *a_blotexValue) {
+  m_DIGGY_BOLLARD()
+  if ((a_blotexValue->b_strex = b_strex)) {
+    G_STRING_STUFF t_workingGStringStuff = (G_STRING_STUFF)UNDEFINED;
+    m_TRACK_IF((a_blotexValue->c_workingGStringEntry = GStringsFetch(handle->h_workingGStringsHandle,-1,
+      &t_workingGStringStuff)) < 0)
+    if (cb_fugaciousStr) {
+      m_TRACK_IF(GStringCopy(t_workingGStringStuff,0, *cap_str) < 0)
+    } else {
+      switch(GStringImport(t_workingGStringStuff, *cap_str)) {
+      case COMPLETED__OK:
+      break; case COMPLETED__BUT: 
+      break; default:
+        m_TRACK()
+      } // switch
+    } // if
+    a_blotexValue->select.cv_str = t_workingGStringStuff->cv_pString;
+  } else { // intex
+    a_blotexValue->select.c_blotval = c_blotval;
+  } // if
+  m_DIGGY_RETURN(RETURNED)
+} // BlotexlibExecutorSetBlotexValue
+
+// Public function: see .h
+int BlotexlibExecutorConcatenateStrexValue(BLOTEXLIB_EXECUTOR_HANDLE handle,
+  struct BLOTEX_VALUE *a_strexValue1, struct P_STRING p_str2) {
+  m_DIGGY_BOLLARD()
+  m_ASSERT(a_strexValue1->b_strex)
+  G_STRING_STUFF t_workingGStringStuff = (G_STRING_STUFF)UNDEFINED;
+  m_TRACK_IF(GStringsFetch(handle->h_workingGStringsHandle,a_strexValue1->c_workingGStringEntry,
+    &t_workingGStringStuff) != a_strexValue1->c_workingGStringEntry)
+  m_TRACK_IF(GStringCopy(t_workingGStringStuff,-1, p_str2) < 0)
+  a_strexValue1->select.cv_str = t_workingGStringStuff->cv_pString;
+  m_DIGGY_RETURN(RETURNED)
+} // BlotexlibExecutorConcatenateStrexValue
+
 
 // Parse and compute blotreg request. 
 //
@@ -511,8 +550,8 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
   if (b_EMPTY_P_STRING(*a_sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
   PParseOffset(a_sequence,2,NULL);
   m_PRECISE_ABANDON(&subSequence, "<blotreg request atom>") 
-  struct BLOTEX_VALUE blotexValue; // UNDEFINED
-  struct G_KEY gKey; // UNDEFINED
+  struct BLOTEX_VALUE blotexValue = {UNDEFINED}; 
+  struct G_KEY gKey = {UNDEFINED};
   do {
     int as = UNDEFINED;  
     int blotregIndexLabel = UNDEFINED; 
@@ -522,7 +561,7 @@ m_DIGGY_VAR_D(as)
     switch (as) {
     case AS__VALUE_INT: // [ '#' ]
       blotregIndexLabel = INT_VALUE__BLOTREG_INDEX_LABEL; 
-    break; case AS__R_VALUE__ENTRY: // '!#' 
+    break; case AS__ENTRY: // '!#' (r-value) 
 m_RAISE(ANOMALY__NOT_AVAILABLE)
     break; case AS__ID: // '!' 
       blotregIndexLabel = TOKEN_ID__BLOTREG_INDEX_LABEL; 
@@ -550,19 +589,19 @@ m_DIGGY_VAR_P_STRING(lexeme)
         case AS__VALUE_INT: // [ '#' ]
           if (blotexValue.b_strex) m_ABANDON(EXPECT_INTEX__ABANDONMENT_CAUSE)
           gKey = m_GKey_AcolytValue(blotexValue.select.c_blotval); 
-        break; case AS__R_VALUE__ENTRY: // '!#' 
+        break; case AS__ENTRY: // '!#' (r-value) 
           if (blotexValue.b_strex) m_ABANDON(EXPECT_INTEX__ABANDONMENT_CAUSE)
 m_RAISE(ANOMALY__NOT_AVAILABLE)
         break; case AS__ID: // '!' 
           gKey = m_GKey_AcolytValue(blotexValue.select.c_blotval); 
         break; case AS__VALUE_STR: // '$'
           if (!blotexValue.b_strex) m_ABANDON(EXPECT_STREX__ABANDONMENT_CAUSE)
-m_DIGGY_VAR_P_STRING(blotexValue.select.c_str)
-          gKey = m_GKey_PString(blotexValue.select.c_str);
+m_DIGGY_VAR_P_STRING(blotexValue.select.cv_str)
+          gKey = m_GKey_PString(blotexValue.select.cv_str);
         break; case AS__NAME:  // '!$'
           if (!blotexValue.b_strex) m_ABANDON(EXPECT_STREX__ABANDONMENT_CAUSE)
-m_DIGGY_VAR_P_STRING(blotexValue.select.c_str)
-          gKey = m_GKey_PString(blotexValue.select.c_str);
+m_DIGGY_VAR_P_STRING(blotexValue.select.cv_str)
+          gKey = m_GKey_PString(blotexValue.select.cv_str);
         break; default: m_RAISE(ANOMALY__VALUE__D,as)
         } // switch
       break; case ANSWER__NO:
@@ -644,10 +683,8 @@ m_DIGGY_VAR_P_STRING(blotregName)
     cac_blotvarReference->blotregHandle = blotregHandle; 
     cac_blotvarReference->blotvarReference = CURRENT__BLOTVAR_REFERENCE;
     *cac_as = UNDEFINED; // For the moment 
-  } else {
-    cac_blotexValue->b_strex = b_FALSE0; // a priori 
-    cac_blotexValue->select.c_blotval = TRUE__BLOTVAL0; // a priori
-  } // if
+  } else m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle, b_FALSE0,TRUE__BLOTVAL0,
+    (struct P_STRING*)UNDEFINED,(char)UNDEFINED,cac_blotexValue) != RETURNED) // actually UNDEFINED 
   int n_indexFetchFlags = -1; // a priori
   m_PParsePassSpaces(a_sequence,NULL);
 
@@ -686,8 +723,8 @@ m_DIGGY_VAR_P_STRING(blotregName)
     *cac_as = n_as ;
   } else {
     if (n_indexFetchFlags < 0) {
-      cac_blotexValue->b_strex = b_FALSE0; 
-      cac_blotexValue->select.c_blotval = TRUE__BLOTVAL0; 
+      m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle, b_FALSE0,TRUE__BLOTVAL0,
+        (struct P_STRING*)UNDEFINED,(char)UNDEFINED,cac_blotexValue) != RETURNED)
     } else {
       G_STRING_SET_STUFF ct_blotvarStuff = (G_STRING_SET_STUFF)UNDEFINED;
       int c_entry = UNDEFINED;
@@ -699,35 +736,41 @@ m_DIGGY_VAR_P_STRING(blotregName)
   m_DIGGY_VAR_D(n_as)
         switch (n_as) {
         case -1: 
-          cac_blotexValue->b_strex = b_FALSE0; 
-          cac_blotexValue->select.c_blotval = TRUE__BLOTVAL0; 
+          m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle, b_FALSE0,TRUE__BLOTVAL0,
+            (struct P_STRING*)UNDEFINED,(char)UNDEFINED,cac_blotexValue) != RETURNED)
         break; case AS__VALUE_INT:
-          cac_blotexValue->b_strex = b_FALSE0; 
-          cac_blotexValue->select.c_blotval = ct_blotvarStuff[G_PARAM_VALUE_ELEMENT].acolyt.cen_value;
-        break; case AS__R_VALUE__ENTRY:
-          cac_blotexValue->b_strex = b_FALSE0; 
-          cac_blotexValue->select.c_blotval = c_entry; 
+          m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle, b_FALSE0,
+            ct_blotvarStuff[G_PARAM_VALUE_ELEMENT].acolyt.cen_value,
+            (struct P_STRING*)UNDEFINED,(char)UNDEFINED,cac_blotexValue) != RETURNED)
+        break; case AS__ENTRY: // (r-value)
+          m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle, b_FALSE0,c_entry,
+            (struct P_STRING*)UNDEFINED,(char)UNDEFINED,cac_blotexValue) != RETURNED)
         break; case AS__ID:
-          cac_blotexValue->b_strex = b_FALSE0; 
+          //m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle, b_FALSE0,????,
+          //  (struct P_STRING*)UNDEFINED,(char)UNDEFINED,cac_blotexValue) != RETURNED)
   m_RAISE(ANOMALY__NOT_AVAILABLE)
         break; case AS__VALUE_STR:
   m_DIGGY_VAR_P_STRING(ct_blotvarStuff[G_PARAM_VALUE_ELEMENT].cv_pString)
   m_DIGGY_VAR_D((int)ct_blotvarStuff[G_PARAM_VALUE_ELEMENT].acolyt.cen_value)
   m_DIGGY_VAR_P_STRING(ct_blotvarStuff[G_PARAM_NAME_ELEMENT].cv_pString)
   m_DIGGY_VAR_D((int)ct_blotvarStuff[G_PARAM_NAME_ELEMENT].acolyt.cen_value)
-          cac_blotexValue->b_strex = b_TRUE; 
-          cac_blotexValue->select.c_str = ct_blotvarStuff[G_PARAM_VALUE_ELEMENT].cv_pString ; 
+          m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,b_TRUE,UNDEFINED,
+            &ct_blotvarStuff[G_PARAM_VALUE_ELEMENT].cv_pString,b_FUGACIOUS_STR,cac_blotexValue) !=
+            RETURNED) // TODO: really FUGACIOUS????
         break; case AS__NAME:
-          cac_blotexValue->b_strex = b_TRUE; 
-          cac_blotexValue->select.c_str = ct_blotvarStuff[G_PARAM_NAME_ELEMENT].cv_pString ; 
+          m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,b_TRUE,UNDEFINED,
+            &ct_blotvarStuff[G_PARAM_NAME_ELEMENT].cv_pString,b_FUGACIOUS_STR,cac_blotexValue) !=
+            RETURNED) // TODO: really FUGACIOUS????
         break; default: 
           m_TRACK()
         } // switch
   
       break; case RESULT__NOT_FOUND:
         if ((cac_blotexValue->b_strex = (n_as == AS__VALUE_STR || n_as == AS__NAME)))
-          cac_blotexValue->select.c_str = m_PString(GOOD_OLD_EMPTY_C_STRING) ;
-        else cac_blotexValue->select.c_blotval = FALSE__BLOTVAL; 
+          m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,b_TRUE,UNDEFINED,
+          ap_aTrivialEmptyPString,!b_FUGACIOUS_STR,cac_blotexValue) != RETURNED)
+        else m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle, b_FALSE0,FALSE__BLOTVAL,
+          (struct P_STRING*)UNDEFINED,(char)UNDEFINED,cac_blotexValue) != RETURNED)
       break; default: m_TRACK()
       } // switch
     } // if
@@ -746,7 +789,8 @@ m_DIGGY_VAR_P_STRING(blotregName)
 //
 // Changed:
 // - *a_sequence:   
-// - ac_blotexValue: not significant in case of abandon; value corresponding to blotvar reference
+// - ac_blotexAtomValue: not significant in case of abandon; value corresponding to blotvar
+//   reference
 // - nc_abandonmentInfo: 
 //
 // Ret: Computed successfully ? 
@@ -779,25 +823,27 @@ m_DIGGY_VAR_D(vn_entry)
 
   int as = UNDEFINED;
   m_TRACK_IF(ParseAs(b_R_VALUE,a_sequence,&as) != RETURNED)
-  ac_blotexAtomValue->b_strex = b_FALSE0; // a priori
   switch (as) {
   case AS__VALUE_INT: // <blotvar as int>
-    ac_blotexAtomValue->select.c_blotval =
-      nt_blotvarStuff[G_PARAM_VALUE_ELEMENT].acolyt.cen_value;
+    m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,b_FALSE0,
+      nt_blotvarStuff[G_PARAM_VALUE_ELEMENT].acolyt.cen_value,(const struct P_STRING*) UNDEFINED,
+      (char)UNDEFINED, ac_blotexAtomValue) != RETURNED)
   break; case AS__ID: // <blotvar id>
-    ac_blotexAtomValue->select.c_blotval =
-      nt_blotvarStuff[G_PARAM_NAME_ELEMENT].acolyt.cen_value;
-  break; case AS__R_VALUE__ENTRY: // <blotvar entry> 
+    m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,b_FALSE0,
+      nt_blotvarStuff[G_PARAM_NAME_ELEMENT].acolyt.cen_value,(const struct P_STRING*) UNDEFINED,
+      (char)UNDEFINED, ac_blotexAtomValue) != RETURNED)
+  break; case AS__ENTRY: // <blotvar entry> (r-value) 
     m_ASSERT(vn_entry >= 0)
-    ac_blotexAtomValue->select.c_blotval = vn_entry;
+    m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,b_FALSE0,vn_entry,
+      (const struct P_STRING*) UNDEFINED, (char)UNDEFINED, ac_blotexAtomValue) != RETURNED)
   break; case AS__VALUE_STR: // <blotvar strex> 
-    ac_blotexAtomValue->b_strex = b_TRUE;
-    ac_blotexAtomValue->select.c_str =
-      nt_blotvarStuff[G_PARAM_VALUE_ELEMENT].cv_pString; 
+    m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,b_TRUE,UNDEFINED,
+      &nt_blotvarStuff[G_PARAM_VALUE_ELEMENT].cv_pString,b_FUGACIOUS_STR, ac_blotexAtomValue) !=
+      RETURNED) // TODO: really FUGACIOUS????
   break; case AS__NAME:  // <blotvar name> 
-    ac_blotexAtomValue->b_strex = b_TRUE;
-    ac_blotexAtomValue->select.c_str =
-      nt_blotvarStuff[G_PARAM_NAME_ELEMENT].cv_pString; 
+    m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,b_TRUE,UNDEFINED,
+      &nt_blotvarStuff[G_PARAM_NAME_ELEMENT].cv_pString,b_FUGACIOUS_STR, ac_blotexAtomValue) !=
+      RETURNED) // TODO: really FUGACIOUS????
   break; default:
     m_RAISE(ANOMALY__VALUE__D,as)
   } // switch
@@ -814,7 +860,7 @@ m_DIGGY_VAR_D(vn_entry)
 //
 // Changed:
 // - *a_sequence: after parsing 
-// - ac_blotexValue: only significant if "computed successfully" 
+// - ac_blotexAtomValue: only significant if "computed successfully" 
 // - nc_abandonmentInfo: only significant if "computing abandoned"
 //
 // Ret: Computed successfully ? 
@@ -846,18 +892,20 @@ static int BlotexlibExecutorProbeBlotexAtom(BLOTEXLIB_EXECUTOR_HANDLE handle,
   } // if
 
 m_DIGGY_VAR_P_STRING(*a_sequence)
-  PParseGenericInteger(a_sequence,&(ac_blotexAtomValue->select.c_blotval),&lexeme);
-m_DIGGY_VAR_GEN(ac_blotexAtomValue->select.c_blotval,ld)
+  gen_BLOTVAL c_blotval = UNDEFINED; 
+  PParseGenericInteger(a_sequence,&c_blotval,&lexeme);
+m_DIGGY_VAR_GEN(c_blotval,ld)
 m_DIGGY_VAR_P_STRING(lexeme)
-  if (!b_EMPTY_P_STRING(lexeme)) ac_blotexAtomValue->b_strex = b_FALSE0; // <int constant>
+  if (!b_EMPTY_P_STRING(lexeme)) m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,b_FALSE0,
+    c_blotval, (const struct P_STRING*) UNDEFINED, (char)UNDEFINED, ac_blotexAtomValue) != RETURNED)
   else { 
     PParsePassSingleChar(a_sequence,NULL,'"',&lexeme);
     if (!b_EMPTY_P_STRING(lexeme)) { // <str constant> ... 
-      ac_blotexAtomValue->b_strex = b_TRUE;
-      PParsePassChars(a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_TILL,NULL,'"',
-        &(ac_blotexAtomValue->select.c_str));
+      PParsePassChars(a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_TILL,NULL,'"', &lexeme);
       if (b_EMPTY_P_STRING(*a_sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
       PParseOffset(a_sequence,1,NULL);
+      m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,b_TRUE,UNDEFINED,&lexeme,!b_FUGACIOUS_STR,
+        ac_blotexAtomValue) != RETURNED) // TODO: FUGACIOUS???
     } else { 
       PParsePassSingleChar(a_sequence,NULL,'(',&lexeme);
       if (!b_EMPTY_P_STRING(lexeme)) { 
@@ -940,12 +988,13 @@ m_DIGGY_VAR_P_STRING(lexeme)
 // Passed:
 // - handle:
 // - *a_sequence: before parsing
-// - n_intexAtomValue: + NULL special value : no intex atom 
-//   + != NULL: initial intex atom 
+// - b_initialIntexAtomValue: TRUE => initial intex term value is significant and
+//   corresponds to passed intex atom value
+// - *a_intexTermValue: initial intex term value when significant
 //
 // Changed:
 // - *a_sequence: after parsing 
-// - ac_intexTermValue: only significant if "computed successfully" 
+// - a_intexTermValue: only updated if "computed successfully" 
 // - nc_abandonmentInfo: only significant if "computing abandoned"
 //
 // Ret: Computed successfully ? 
@@ -953,19 +1002,20 @@ m_DIGGY_VAR_P_STRING(lexeme)
 // - ANSWER__NO: 'syntax' 'not found' error; abandon processing 
 // - -1: unexpected problem
 static int BlotexlibExecutorComputeIntexTerm(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING *a_sequence, struct BLOTEX_VALUE *n_intexAtomValue, struct BLOTEX_VALUE
-  *ac_intexTermValue, G_STRING_STUFF nc_abandonmentInfo) {
+  struct P_STRING *a_sequence, char b_initialIntexAtomValue, struct BLOTEX_VALUE *a_intexTermValue,
+  G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD_S()
 
+  m_ASSERT(!a_intexTermValue->b_strex)
   m_PREPARE_ABANDON(a_sequence, "<intex term>") 
   m_PParsePassSpaces(a_sequence,NULL);
   int n_compOp = UNDEFINED;
-  if (n_intexAtomValue != NULL) *ac_intexTermValue = *n_intexAtomValue;
-  else {
-    switch (BlotexlibExecutorProbeBlotexAtom(handle,a_sequence,ac_intexTermValue,
+
+  if (!b_initialIntexAtomValue) {
+    switch (BlotexlibExecutorProbeBlotexAtom(handle,a_sequence,a_intexTermValue,
       nc_abandonmentInfo)) {
     case ANSWER__YES:
-      if (ac_intexTermValue->b_strex) m_ABANDON(EXPECT_INTEX__ABANDONMENT_CAUSE)
+      if (a_intexTermValue->b_strex) m_ABANDON(EXPECT_INTEX__ABANDONMENT_CAUSE)
     break; case ANSWER__NO:
       m_DIGGY_RETURN(ANSWER__NO)
     break; default:
@@ -973,39 +1023,40 @@ static int BlotexlibExecutorComputeIntexTerm(BLOTEXLIB_EXECUTOR_HANDLE handle,
     } // switch
   } // if
 
+  struct BLOTEX_VALUE intexAtomValue ;
   while (b_TRUE) {
     m_TRACK_IF(ParseCompOp(FACT_OP__COMP_OP_EXTENSION,a_sequence,
       &n_compOp) != RETURNED)
     if (n_compOp == -1) break;
-    switch (BlotexlibExecutorProbeBlotexAtom(handle,a_sequence,n_intexAtomValue,
+    switch (BlotexlibExecutorProbeBlotexAtom(handle,a_sequence,&intexAtomValue,
       nc_abandonmentInfo)) {
     case ANSWER__YES:
-      if (n_intexAtomValue->b_strex) m_ABANDON(EXPECT_INTEX__ABANDONMENT_CAUSE)
+      if (intexAtomValue.b_strex) m_ABANDON(EXPECT_INTEX__ABANDONMENT_CAUSE)
       switch (n_compOp) {
       case EQUAL__COMP_OP:
-        ac_intexTermValue->select.c_blotval = BOOLEAN_BLOTVAL(ac_intexTermValue->select.c_blotval ==
-          n_intexAtomValue->select.c_blotval);
+        a_intexTermValue->select.c_blotval = BOOLEAN_BLOTVAL(a_intexTermValue->select.c_blotval ==
+          intexAtomValue.select.c_blotval);
       break; case LESS__COMP_OP:
-        ac_intexTermValue->select.c_blotval = BOOLEAN_BLOTVAL(ac_intexTermValue->select.c_blotval < 
-          n_intexAtomValue->select.c_blotval);
+        a_intexTermValue->select.c_blotval = BOOLEAN_BLOTVAL(a_intexTermValue->select.c_blotval < 
+          intexAtomValue.select.c_blotval);
       break; case LESS_EQUAL__COMP_OP:
-        ac_intexTermValue->select.c_blotval = BOOLEAN_BLOTVAL(ac_intexTermValue->select.c_blotval <=
-          n_intexAtomValue->select.c_blotval);
+        a_intexTermValue->select.c_blotval = BOOLEAN_BLOTVAL(a_intexTermValue->select.c_blotval <=
+          intexAtomValue.select.c_blotval);
       break; case GREATER__COMP_OP:
-        ac_intexTermValue->select.c_blotval = BOOLEAN_BLOTVAL(ac_intexTermValue->select.c_blotval > 
-          n_intexAtomValue->select.c_blotval);
+        a_intexTermValue->select.c_blotval = BOOLEAN_BLOTVAL(a_intexTermValue->select.c_blotval > 
+          intexAtomValue.select.c_blotval);
       break; case GREATER_EQUAL__COMP_OP:
-        ac_intexTermValue->select.c_blotval = BOOLEAN_BLOTVAL(ac_intexTermValue->select.c_blotval >=
-          n_intexAtomValue->select.c_blotval);
+        a_intexTermValue->select.c_blotval = BOOLEAN_BLOTVAL(a_intexTermValue->select.c_blotval >=
+          intexAtomValue.select.c_blotval);
       break; case NOT_EQUAL__COMP_OP:
-        ac_intexTermValue->select.c_blotval = BOOLEAN_BLOTVAL(ac_intexTermValue->select.c_blotval !=
-          n_intexAtomValue->select.c_blotval);
+        a_intexTermValue->select.c_blotval = BOOLEAN_BLOTVAL(a_intexTermValue->select.c_blotval !=
+          intexAtomValue.select.c_blotval);
       break; case MULTIPLY__FACT_OP__COMP_OP:
-        ac_intexTermValue->select.c_blotval = ac_intexTermValue->select.c_blotval *
-          n_intexAtomValue->select.c_blotval;
+        a_intexTermValue->select.c_blotval = a_intexTermValue->select.c_blotval *
+          intexAtomValue.select.c_blotval;
       break; case DIVIDE__FACT_OP__COMP_OP:
-        ac_intexTermValue->select.c_blotval = ac_intexTermValue->select.c_blotval /
-          n_intexAtomValue->select.c_blotval;
+        a_intexTermValue->select.c_blotval = a_intexTermValue->select.c_blotval /
+          intexAtomValue.select.c_blotval;
       break; default:
         m_RAISE(ANOMALY__VALUE__D,n_compOp);
       } // switch
@@ -1028,11 +1079,11 @@ static int BlotexlibExecutorComputeIntexTerm(BLOTEXLIB_EXECUTOR_HANDLE handle,
 // Passed:
 // - handle:
 // - *a_sequence: before parsing
-// - intexAtomValue: 1st intex atom
+// - *a_intexValue: 1st intex atom value
 //
 // Changed:
 // - *a_sequence: after parsing 
-// - ac_intexValue: only significant if "computed successfully" 
+// - a_intexValue: only updated if "computed successfully" 
 // - nc_abandonmentInfo: only significant if "processing abandoned"
 //
 // Ret: Computed successfully ? 
@@ -1040,41 +1091,42 @@ static int BlotexlibExecutorComputeIntexTerm(BLOTEXLIB_EXECUTOR_HANDLE handle,
 // - ANSWER__NO: 'value' error (next <blotex> NOT intex) ; abandon processing 
 // - -1: unexpected problem
 static inline int m_BlotexlibExecutorComputeFullIntex(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING *a_sequence, struct BLOTEX_VALUE intexAtomValue,
-  struct BLOTEX_VALUE *ac_intexValue, G_STRING_STUFF nc_abandonmentInfo) {
+  struct P_STRING *a_sequence, struct BLOTEX_VALUE *a_intexValue,
+  G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD_S()
-  m_ASSERT(!intexAtomValue.b_strex)
+  m_ASSERT(!a_intexValue->b_strex)
 m_DIGGY_VAR_P_STRING(*a_sequence)
   int n_termOp = UNDEFINED;
-  switch (BlotexlibExecutorComputeIntexTerm(handle,a_sequence,&intexAtomValue,
-    ac_intexValue, nc_abandonmentInfo)) {
+
+  switch (BlotexlibExecutorComputeIntexTerm(handle,a_sequence,b_TRUE, a_intexValue,
+    nc_abandonmentInfo)) {
   case ANSWER__YES:
-    m_ASSERT(!ac_intexValue->b_strex)
+    m_ASSERT(!a_intexValue->b_strex)
   break; case ANSWER__NO:
     m_DIGGY_RETURN(ANSWER__NO)
   break; default:
     m_TRACK()
   } // switch
     
-  struct BLOTEX_VALUE intexTermValue ;
+  struct BLOTEX_VALUE intexTermValue = { UNDEFINED } ;
   while (b_TRUE) {
     m_TRACK_IF(ParseTermOp(a_sequence,&n_termOp) != RETURNED)
 m_DIGGY_VAR_D(n_termOp)
     if (n_termOp == -1) break;
-    switch (BlotexlibExecutorComputeIntexTerm(handle,a_sequence,NULL, &intexTermValue,
+    switch (BlotexlibExecutorComputeIntexTerm(handle,a_sequence,b_FALSE0, &intexTermValue,
       nc_abandonmentInfo)) {
     case ANSWER__YES:
       m_ASSERT(!intexTermValue.b_strex)
       switch (n_termOp) {
       case ADD__TERM_OP:
-        ac_intexValue->select.c_blotval += intexTermValue.select.c_blotval;
+        a_intexValue->select.c_blotval += intexTermValue.select.c_blotval;
       break; case SUBTRACT__TERM_OP:
-        ac_intexValue->select.c_blotval -= intexTermValue.select.c_blotval;
+        a_intexValue->select.c_blotval -= intexTermValue.select.c_blotval;
       break; case AND__TERM_OP:
-        ac_intexValue->select.c_blotval = ac_intexValue->select.c_blotval && 
+        a_intexValue->select.c_blotval = a_intexValue->select.c_blotval && 
           intexTermValue.select.c_blotval;
       break; case OR__TERM_OP:
-        ac_intexValue->select.c_blotval = ac_intexValue->select.c_blotval || 
+        a_intexValue->select.c_blotval = a_intexValue->select.c_blotval || 
           intexTermValue.select.c_blotval;
       break; default:
         m_RAISE(ANOMALY__VALUE__D,n_termOp) 
@@ -1089,6 +1141,7 @@ m_DIGGY_VAR_D(n_termOp)
   m_DIGGY_RETURN(ANSWER__YES)
 } // m_BlotexlibExecutorComputeFullIntex 
 
+
 // Compute full strex ; that is
 // Parse rest of <strex> after (already parsed) 1st <strex atom> and if such rest exist compute it.
 // Otherwise, full strex simply corresponds to strex atom.
@@ -1096,26 +1149,26 @@ m_DIGGY_VAR_D(n_termOp)
 // Passed:
 // - handle:
 // - *a_sequence: before parsing
-// - strexAtomValue: 1st intex atom
+// - *a_strexValue: 1st strex atom value parsed so far
 //
 // Changed:
 // - *a_sequence: after parsing 
-// - ac_strexValue: only significant if "computed successfully" 
+// - *a_strexValue: only updated if "computed successfully" 
 // - nc_abandonmentInfo: only significant if "processing abandoned"
 //
 // Ret: Computed successfully ? 
 // - ANSWER__YES: Ok,
-// - ANSWER__NO: 'value' error (next <blotex> NOT intex) ; abandon processing 
+// - ANSWER__NO: 'value' error (next <blotex atom> NOT strex) ; abandon processing 
 // - -1: unexpected problem
 static inline int m_BlotexlibExecutorComputeFullStrex(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING *a_sequence, struct BLOTEX_VALUE strexAtomValue,
-  struct BLOTEX_VALUE *ac_strexValue, G_STRING_STUFF nc_abandonmentInfo) {
+  struct P_STRING *a_sequence, struct BLOTEX_VALUE *a_strexValue,
+  G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD_S()
-  m_ASSERT(strexAtomValue.b_strex)
+  m_ASSERT(a_strexValue->b_strex)
 m_DIGGY_VAR_P_STRING(*a_sequence)
   m_PREPARE_ABANDON(a_sequence, "<strex>") 
 
-  *ac_strexValue = strexAtomValue;
+  struct BLOTEX_VALUE strexAtomValue = { UNDEFINED }; 
   struct P_STRING lexeme; // UNDEFINED
   while (b_TRUE) {
     PParsePassSingleChar(a_sequence,NULL,'+',&lexeme);
@@ -1125,11 +1178,13 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
       nc_abandonmentInfo)) {
     case ANSWER__YES:
       if (!strexAtomValue.b_strex) m_ABANDON(EXPECT_STREX__ABANDONMENT_CAUSE)
-      G_STRING_STUFF t_workingGStringStuff = (G_STRING_STUFF)UNDEFINED;
-      m_TRACK_IF(GStringsFetch(handle->h_workingGStringsHandle,-1, &t_workingGStringStuff) < 0)
-      m_TRACK_IF(GStringCopy(t_workingGStringStuff,0, ac_strexValue->select.c_str) < 0)
-      m_TRACK_IF(GStringCopy(t_workingGStringStuff,-1, strexAtomValue.select.c_str) < 0)
-      ac_strexValue->select.c_str = t_workingGStringStuff->cv_pString;
+      m_TRACK_IF(BlotexlibExecutorConcatenateStrexValue(handle,
+        a_strexValue, strexAtomValue.select.cv_str) != RETURNED)
+//      G_STRING_STUFF t_workingGStringStuff = (G_STRING_STUFF)UNDEFINED;
+//      m_TRACK_IF(GStringsFetch(handle->h_workingGStringsHandle,-1, &t_workingGStringStuff) < 0)
+//      m_TRACK_IF(GStringCopy(t_workingGStringStuff,0, ac_strexValue->select.cv_str) < 0)
+//      m_TRACK_IF(GStringCopy(t_workingGStringStuff,-1, strexAtomValue.select.cv_str) < 0)
+//      ac_strexValue->select.cv_str = t_workingGStringStuff->cv_pString;
     break; case ANSWER__NO:
       m_DIGGY_RETURN(ANSWER__NO)
     break; default:
@@ -1140,16 +1195,14 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
   m_DIGGY_RETURN(ANSWER__YES)
 } // m_BlotexlibExecutorComputeFullStrex
 
-//
+// Public function; see .h
 int BlotexlibExecutorComputeBlotex(BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct P_STRING *a_sequence, struct BLOTEX_VALUE *ac_blotexValue,
   G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD_S()
 m_DIGGY_VAR_P_STRING(*a_sequence)
 
-  struct BLOTEX_VALUE blotexAtomValue; // UNDEFINED
-
-  switch (BlotexlibExecutorProbeBlotexAtom(handle,a_sequence,&blotexAtomValue,
+  switch (BlotexlibExecutorProbeBlotexAtom(handle,a_sequence,ac_blotexValue,
     nc_abandonmentInfo)) {
   case ANSWER__YES:
   break; case ANSWER__NO:
@@ -1159,8 +1212,8 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
   } // switch
 
   m_PParsePassSpaces(a_sequence,NULL);
-  if (blotexAtomValue.b_strex) { // <strex>
-    switch (m_BlotexlibExecutorComputeFullStrex(handle,a_sequence,blotexAtomValue,ac_blotexValue,
+  if (ac_blotexValue->b_strex) { // <strex>
+    switch (m_BlotexlibExecutorComputeFullStrex(handle,a_sequence,ac_blotexValue,
       nc_abandonmentInfo)) {
     case ANSWER__YES:
     break; case ANSWER__NO:
@@ -1170,7 +1223,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
     } // switch
 
   } else { // <intex>
-    switch (m_BlotexlibExecutorComputeFullIntex(handle,a_sequence,blotexAtomValue,ac_blotexValue,
+    switch (m_BlotexlibExecutorComputeFullIntex(handle,a_sequence,ac_blotexValue,
       nc_abandonmentInfo)) {
     case ANSWER__YES:
     break; case ANSWER__NO:
@@ -1316,7 +1369,7 @@ static inline int m_BlotexlibExecutorExecuteCFunctionEval(BLOTEXLIB_EXECUTOR_HAN
     } // if
   } // subSequence
 
-  struct BLOTEX_VALUE c_blotexValue; // UNDEFINED
+  struct BLOTEX_VALUE c_blotexValue = { UNDEFINED }; 
   switch (BlotexlibExecutorComputeBlotex(handle,&arguments,&c_blotexValue,nc_abandonmentInfo)) {
   case ANSWER__YES:
   break; case ANSWER__NO:
@@ -1351,7 +1404,7 @@ static inline int m_BlotexlibExecutorExecuteCFunctionEval(BLOTEXLIB_EXECUTOR_HAN
       break; case AS__VALUE_STR: // '$'
         if (! c_blotexValue.b_strex) m_ABANDON(EXPECT_STREX__ABANDONMENT_CAUSE)
         m_TRACK_IF(GStringCopy(cnt_blotvarStuff+G_PARAM_VALUE_ELEMENT,0,
-          c_blotexValue.select.c_str) < 0)
+          c_blotexValue.select.cv_str) < 0)
       break; case AS__NAME:  // '!$'
   m_RAISE(ANOMALY__NOT_AVAILABLE)
       break; default: m_RAISE(ANOMALY__VALUE__D,c_as)
@@ -1408,7 +1461,7 @@ static inline int m_BlotexlibExecutorExecuteCFunctionOutputF(BLOTEXLIB_EXECUTOR_
   PParsePassSingleChar(&arguments,NULL,',',&lexeme);
   if (b_EMPTY_P_STRING(lexeme)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
   m_PParsePassSpaces(&arguments,NULL);
-  struct BLOTEX_VALUE c_blotexValue; // UNDEFINED
+  struct BLOTEX_VALUE c_blotexValue = {UNDEFINED};
   switch (BlotexlibExecutorComputeBlotex(handle,&arguments,&c_blotexValue,nc_abandonmentInfo)) {
   case ANSWER__YES:
   break; case ANSWER__NO:
@@ -1427,7 +1480,7 @@ static inline int m_BlotexlibExecutorExecuteCFunctionOutputF(BLOTEXLIB_EXECUTOR_
   break; case LS__FORMAT:
     if (!c_blotexValue.b_strex) m_ABANDON(EXPECT_STREX__ABANDONMENT_CAUSE)
     GStringPrintf(c_surrogate,0,FMT_P_STRING,m_P_STRING_2_FMT_ARGS(
-      c_blotexValue.select.c_str));
+      c_blotexValue.select.cv_str));
   break; case LX__FORMAT:
     if (c_blotexValue.b_strex) m_ABANDON(EXPECT_INTEX__ABANDONMENT_CAUSE)
     GStringPrintf(c_surrogate,0,"%x",c_blotexValue.select.c_blotval);

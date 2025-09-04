@@ -112,7 +112,8 @@ int BlottabDestroyInstance(void *xhr_handle) {
 // - *a_sequence: after parsing
 // - *nac_tableIndexLabel: (when seek for created table index) only significant if no abandon
 // - *cac_element: (when not seek for created table index) only significant if no abandon
-// - *ac_asValue: only significant if no abandon; default to "as value int" (must correspond to 
+// - *ac_asValue: only significant if no abandon; either "as value int" or "as value str"; default
+//   to "as value int" (must correspond to 
 //   existing index when seek for created table index)
 // - nc_abandonmentInfo: only significant when parsing abandoned 
 //
@@ -218,7 +219,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
   if (b_EMPTY_P_STRING(*a_sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
   PParseOffset(a_sequence,2,NULL);
   m_PRECISE_ABANDON(&subSequence, "<blottab request atom>") 
-  struct BLOTEX_VALUE blotexValue; // UNDEFINED
+  struct BLOTEX_VALUE blotexValue = { UNDEFINED }; 
   struct G_KEY gKey; // UNDEFINED
   do {
     int asValue = UNDEFINED;  
@@ -253,8 +254,8 @@ m_DIGGY_VAR_P_STRING(lexeme)
           gKey = m_GKey_AcolytValue(blotexValue.select.c_blotval); 
         break; case AS__VALUE_STR: // '$'
           if (!blotexValue.b_strex) m_ABANDON(EXPECT_STREX__ABANDONMENT_CAUSE)
-m_DIGGY_VAR_P_STRING(blotexValue.select.c_str)
-          gKey = m_GKey_PString(blotexValue.select.c_str);
+m_DIGGY_VAR_P_STRING(blotexValue.select.cv_str)
+          gKey = m_GKey_PString(blotexValue.select.cv_str);
         break; default: m_RAISE(ANOMALY__VALUE__D,asValue)
         } // switch
       break; case ANSWER__NO:
@@ -435,7 +436,7 @@ m_DIGGY_VAR_P_STRING(blottabName)
     switch (RetrieveBlottabElement(a_sequence, n_blottabHandle->hp_fieldAttributesHandle, NULL,&c_element,
       &n_asValue, nc_abandonmentInfo)) {
     case ANSWER__YES:
-      m_ASSERT(n_asValue != -1)
+m_ASSERT(n_asValue != -1)
     break; case ANSWER__NO:
       m_DIGGY_RETURN(ANSWER__NO)
     break; default:
@@ -473,14 +474,14 @@ m_DIGGY_VAR_P_STRING(blottabName)
           cac_blotexValue->select.c_blotval = ct_blotsetStuff[c_element].acolyt.cen_value;
         break; case AS__VALUE_STR:
           cac_blotexValue->b_strex = b_TRUE; 
-          cac_blotexValue->select.c_str = ct_blotsetStuff[c_element].cv_pString ; 
+          cac_blotexValue->select.cv_str = ct_blotsetStuff[c_element].cv_pString ; 
         break; default: 
           m_TRACK()
         } // switch
   
       break; case RESULT__NOT_FOUND:
         if ((cac_blotexValue->b_strex = (n_asValue == AS__VALUE_STR)))
-          cac_blotexValue->select.c_str = m_PString(GOOD_OLD_EMPTY_C_STRING) ;
+          cac_blotexValue->select.cv_str = m_PString(GOOD_OLD_EMPTY_C_STRING) ;
         else cac_blotexValue->select.c_blotval = FALSE__BLOTVAL; 
       break; default: m_TRACK()
       } // switch
@@ -492,21 +493,46 @@ m_DIGGY_VAR_P_STRING(blottabName)
 
 
 // See .h
-int UpdateCurrentBlotsetField(struct BLOTTAB_FIELD_REFERENCE blottabFieldReference, int as,
+int UpdateCurrentBlotsetField(struct BLOTTAB_FIELD_REFERENCE blottabFieldReference, int asValue,
   struct BLOTEX_VALUE blotexValue) {
   m_DIGGY_BOLLARD()
+
 #if 0
-  G_STRING_SET_STUFF *vnt_blotsetStuff;
-  switch (GStringsIndexFetch(blottabFieldReference.blottabHandle,NULL,
-    INDEX_FETCH_FLAGS__CURRENT, &vnt_blotvarStuff, navn_entry)){
+struct BLOTTAB {
+  m_DECLARE_MAGIC_FIELD(BLOTTAB_HANDLE)
+  G_STRINGS_HANDLE h_tableHandle;
+  G_STRINGS_HANDLE hp_fieldAttributesHandle;
+} ; 
+
+  G_STRING_SET_STUFF nt_fieldAttributeStuff = (G_STRING_SET_STUFF)UNDEFINED;
+  int fieldsNumber = GStringsGetCount(blottabFieldReference.blottabHandle->hp_fieldAttributesHandle,
+    &nt_fieldAttributeStuff);
+  m_ASSERT(nt_fieldAttributeStuff != NULL)
+  m_ASSERT(blottabFieldReference.element < fieldsNumber)
+
+  G_STRING_SET_STUFF vnt_blotsetStuff;
+  int vn_entry = UNDEFINED;
+  switch (GStringsIndexFetch(blottabFieldReference.blottabHandle->h_tableHandle,NULL,
+    INDEX_FETCH_FLAGS__CURRENT, &vnt_blotsetStuff, vn_entry)) {
   case RESULT__FOUND:
-m_ASSERT(*ant_blotvarStuff != NULL)
+m_ASSERT(vnt_blotsetStuff != NULL)
+m_DIGGY_VAR_D(as)
+    switch (asValue) {
+    break; case AS__VALUE_INT:
+      vnt_blotsetStuff[blottabFieldReference.element].acolyt.cen_value = blotexValue->select.c_blotval
+    break; case AS__VALUE_STR:
+      vnt_blotsetStuff[blottabFieldReference.element].cv_pString ; 
+      cac_blotexValue->select.c_str = ct_blotsetStuff[c_element].cv_pString ; 
+    break; default: 
+      m_TRACK()
+    } // switch
   break; case RESULT__NOT_FOUND:
 m_ASSERT(*ant_blotvarStuff == NULL)
   break; default: m_TRACK()
   } // switch   
+#endif
 
-
+#if 0
 
   //ap_blottabReference->blottabHandle 
   //G_STRINGS_HANDLE h_tableHandle;
