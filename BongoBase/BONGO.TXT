@@ -7,7 +7,7 @@ To check Mama installation, simply type
 $ miss-ross.sh 
 (This command can be executed anywhere) 
 If the command is not found, then Mama framework is not properly installed.
-Otherwise, check Miss Ross's status ; verify in particular the "Flint" environment is properly 
+Check Miss Ross's status ; verify in particular the "Flint" environment is properly 
 detected...
 Find also some "good advices" in the following files :
 - "$MAMA/MAMA.TXT" : see (in particular) "User guide" paragraph...
