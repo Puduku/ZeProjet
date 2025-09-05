@@ -5,33 +5,36 @@
 1. Synopsis
 -----------
 1.a The original story - more or less... 
-Support the katzenjammer kids in their (cunning) plots...
+Follow and support the katzenjammer kids in their (cunning) tours...
 Landscape:
-- garden: place where the katzenjammer kids execute their tours (directory position)
+- garden: place (directory position) where the katzenjammer kids cook up their tours
 - creek: specific path within garden (regarding tour execution) 
 - island: all gardens' place (main directory position)
   The island is not so huge. It is easy to find your way around - especially when moving from one
   garden to another.
-  Hence, all gardens of the island are simply located with RELATIVE paths.
+  Hence, as long as your are also located in the island, all gardens of the island are simply
+  referenced with RELATIVE paths.
   However, out of the island, it's quite "terra incognita"...
-  So, all emplacements outside the island are located with ABSOLUTE paths...
-Characters:
-- Mama: she's a naive lady, but she's nevertheless the real "boss"...
+  So, all emplacements outside the island are referenced with ABSOLUTE paths...
+Main characters:
+- Mama: she's a naive lady, but she's nevertheless the real "boss"... (see 'mama.sh' script)
 - Hans & Fritz: (the katzenjammer kids) are the stars of the series. These two rascals have all
-  sorts of tours for the pranks (done to the whole family) they carry out in the gardens.
+  sorts of tours for the pranks (done to the whole family) they carry out in the gardens. (see
+  'katzenjammer.esh' script extension and 'hans.sh' and 'fritz.sh' exclusive scripts)
 - Lena: she is a nice little girl who often helps Hans and Fritz to get back at der Captain and der
-  Inspector...
+  Inspector... (see 'lena.esh' script extension)
 - Adolf (Rollo) : he is a hypocritical, boastful, and prankster boy who likes to put the blame on
   Hans and Fritz. But the latter have also learned to turn their cousin's malicious initiatives to
-  their own advantage    
+  their own advantage. (see 'adolf.esh' script extension)    
 - Der Captain: likes to nap and play cards while drinking cider. However, he has to shuffle the
-  mats when Mama threatens him with the rolling pin...
-- Der Inspector: is as lazy as the captain. However, he is quite good at collecting coconuts...
+  mats when Mama threatens him with the rolling pin... (see der-captain.sh script)
+- Der Inspector: is as lazy as the captain. However, he is quite good at collecting coconuts... 
+  (see 'der-inspector.sh' exclusive scripts)
 - Miss Ross (Miss Twiddle) : a skinny and surly old maid who tries to give a good education to her
   cherubs, Adolf and Lena. She hates Hans and Fritz (who give it back to her) but she also has
-  her uses to ensure the smooth running of the house.
+  her uses to ensure the smooth running of the house. (see 'miss-ross.sh' script)
 
-1.b Island metaphor in projects.
+1.b Island metaphor in actual projects.
 An island is nothing but a hierarchy of basic directories (the gardens) and files. For instance: 
 ~/Projects/Montreal/
   ISLAND 
@@ -48,54 +51,60 @@ An island is nothing but a hierarchy of basic directories (the gardens) and file
     Japonais/
       fritz.sh 
       der-inspector.sh 
+NB: In real story, the Katzenjammer Kids lived in several places around the world. It seems that they
+finally established their home on Bongo Island. However, I do not believe they ever lived in Montreal...
 
-To extend the metaphor, a creek corresponds to a particular path within a garden ; the idea is to 
-let follow different creeks at the same time while playing a tour... 
+And to extend the metaphor, a creek corresponds to a particular path within a garden ; the idea is to 
+let the katzenjammer kids follow different creeks at the same time while playing a tour... 
+
 
 2. Configuration guide 
 ----------------------
 2.a Creating a new island ("Montreal" in this example) 
-Choose a position directory for the island - e.g ~/Projects/Montreal
-$ export MONTREAL=~/Projects/Montreal 
-(You can add the line above in your profile)
-Create location (directory) :
-$ mkdir $MONTREAL
-Create 'ISLAND' beacon file (the content of the file does not matter) :
-$ echo 'Bongo is the actual name of the island in the real story.' > $MONTREAL/ISLAND
+- Choose a position directory for the island - e.g ~/Projects/Montreal
+  $ export MONTREAL=~/Projects/Montreal 
+  (You can add the line above in your profile - for instance your .flintrc file)
+- Create location (directory) :
+  $ mkdir $MONTREAL
+- Create 'ISLAND' beacon file (the content of the file does not matter) :
+  $ echo 'Yep! Montreal is an island.' > $MONTREAL/ISLAND
 Note: possible (totally equivalent) file names of island's beacon file are:
   'ISLAND', 'Island', 'island', '.ISLAND', '.Island', or '.island'.
 
 2.b Creating a new garden (e.g "MontRoyal" in "Montreal" island)
-Create garden location (directory) within the island:
-$ cd $MONTREAL
-$ mkdir MontRoyal
-$ cd MontRoyal
-You may need to define some "katzenjammer" scripts:
-- If you need to compile some code in the garden, you can create "hans.sh" exclusive script from model :
-  $ cp "$MAMA/hans.sh.mod" hans.sh
-- If you need to run tests in the garden, you can create "fritz.sh" exclusive script from model :
-  $ cp "$MAMA/fritz.sh.mod" fritz.sh
-- If you want to maintain code's documentation comments (so-called "coconuts"), you can create
-  "der-inspector.sh" exclusive script from model (based on "coco" tool) :
-  $ cp "$MAMA/der-inspector.sh.mod" der-inspector.sh
-Then edit and adapt your exclusive script(s). The following command shows the environment (bash
-functions and variables) usable by these exclusive scripts:  
-$ mama.sh -i
-Finally, don't forget to set 'execution permission' of script file, like:
-$ chmod u+x hans.sh
+- Create garden location (directory) within the island:
+  $ cd $MONTREAL
+  $ mkdir MontRoyal
+  $ cd MontRoyal
+- You may need to define some "katzenjammer" scripts:
+  + If you need to compile some code in the garden, you can create "hans.sh" exclusive script from
+    model :
+    $ cp "$MAMA/hans.sh.mod" hans.sh
+  + If you need to run tests in the garden, you can create "fritz.sh" exclusive script from model :
+    $ cp "$MAMA/fritz.sh.mod" fritz.sh
+  + If you want to maintain code's documentation comments (so-called "coconuts"), you can create
+    "der-inspector.sh" exclusive script from model (based on "coco" tool) :
+    $ cp "$MAMA/der-inspector.sh.mod" der-inspector.sh
+  Then edit and adapt your exclusive script(s). The following command shows the environment (bash
+  functions and variables) usable by these exclusive scripts:  
+  $ mama.sh -i
+  Finally, don't forget to set 'execution permission' of script file, like:
+  $ chmod u+x hans.sh
 
 
 3. User guide
 -------------
 To play a "tour", run the corresponding exclusive script of the garden. The script must be referenced
-by its location. For instance, in Montreal island of § 1.b, to execute Fritz's tour in Botanique garden :
+by its location. For instance, in 'Montreal' island of § 1.b, to execute Fritz's tour in 'Botanique'
+garden :
 - From $MONTREAL/Rosemont/Botanique/ directory, type ./fritz.sh
 - From $MONTREAL/Rosemont/ directory, type ./Botanique/fritz.sh
 - From $MONTREAL/ directory, type ./Rosemont/Botanique/fritz.sh
 - etc.
 
 Hints:
-- Any katzenjammer script recognizes the -h (help display) option.
-- At any time, you can issue "miss-ross.sh" command to verify 'Mama's  installation ;
-  if that command is not recognized, then your 'Mama' installation is not correct; please check
-  README-INSTALL.TXT file (present in Mama's base).
+- Any katzenjammer script recognizes the -h (help display resquest) option.
+- At any time, you can issue "miss-ross.sh" command to verify Mama's  installation ;
+  if that command is not recognized, this means thatyour 'Mama' installation is not correct; please
+  check README-INSTALL.TXT file (present in Mama's base).
+
