@@ -1,6 +1,6 @@
-==============================================================================
-GENESEE - (teeny tiny) bits of tips : files and directories naming conventions
-==============================================================================
+======================================================================================
+GENESEE - (teeny tiny) bits of tips : GENERAL files and directories naming conventions
+======================================================================================
 (c) 2023 - Puduku
 
 Notice: the following principles were conceived for "UNIXes" family files systems. In
