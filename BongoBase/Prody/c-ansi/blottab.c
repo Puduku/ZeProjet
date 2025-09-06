@@ -126,7 +126,7 @@ static int RetrieveBlottabElement(struct P_STRING *a_sequence, G_STRINGS_HANDLE 
   m_DIGGY_BOLLARD()
 m_DIGGY_VAR_P_STRING(*a_sequence)
   G_STRING_SET_STUFF fieldAttributeStuff = (G_STRING_SET_STUFF)UNDEFINED;
-  struct P_STRING fieldName; //UNDEFINED
+  struct P_STRING fieldName = UNDEFINED_P_STRING;
   *ac_asValue = UNDEFINED;
  
   m_PREPARE_ABANDON(a_sequence,"<entity> [ <<as value int>> | <<as value str>> ]")
@@ -210,8 +210,8 @@ static inline int ml_BlotexlibExecutorComputeBlottabRequest(BLOTEXLIB_EXECUTOR_H
 
   int criteriaNumber = 0;
   struct G_REQUEST_CRITERIUM criteria5[5] ;  
-  struct P_STRING lexeme;
-  struct P_STRING subSequence; 
+  struct P_STRING lexeme = UNDEFINED_P_STRING;
+  struct P_STRING subSequence = UNDEFINED_P_STRING; 
 
   PParseTillMatch(a_sequence,m_PString(":?"),NULL, &subSequence);
 m_DIGGY_VAR_P_STRING(subSequence)
@@ -219,8 +219,8 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
   if (b_EMPTY_P_STRING(*a_sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
   PParseOffset(a_sequence,2,NULL);
   m_PRECISE_ABANDON(&subSequence, "<blottab request atom>") 
-  struct BLOTEX_VALUE blotexValue = { UNDEFINED }; 
-  struct G_KEY gKey; // UNDEFINED
+  struct BLOTEX_VALUE blotexValue = UNDEFINED_BLOTEX_VALUE; 
+  struct G_KEY gKey = { UNDEFINED };
   do {
     int asValue = UNDEFINED;  
     int tableIndexLabel = UNDEFINED;
@@ -254,8 +254,8 @@ m_DIGGY_VAR_P_STRING(lexeme)
           gKey = m_GKey_AcolytValue(blotexValue.select.c_blotval); 
         break; case AS__VALUE_STR: // '$'
           if (!blotexValue.b_strex) m_ABANDON(EXPECT_STREX__ABANDONMENT_CAUSE)
-m_DIGGY_VAR_P_STRING(blotexValue.select.cv_str)
-          gKey = m_GKey_PString(blotexValue.select.cv_str);
+m_DIGGY_VAR_P_STRING(blotexValue.select.c_strex.v_str)
+          gKey = m_GKey_PString(blotexValue.select.c_strex.v_str);
         break; default: m_RAISE(ANOMALY__VALUE__D,asValue)
         } // switch
       break; case ANSWER__NO:
@@ -309,7 +309,7 @@ static inline int ml_BlotexlibExecutorComputeBlottabCreation(BLOTEXLIB_EXECUTOR_
 
   m_PREPARE_ABANDON(a_sequence, "<blottab creation>") 
 
-  struct P_STRING subSequence; 
+  struct P_STRING subSequence = UNDEFINED_P_STRING; 
 
   PParseTillMatch(a_sequence,m_PString("]?"),NULL, &subSequence);
 m_DIGGY_VAR_P_STRING(subSequence)
@@ -317,8 +317,8 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
   if (b_EMPTY_P_STRING(*a_sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
   PParseOffset(a_sequence,2,NULL);
 
-  struct P_STRING s_names10[10];
-  int s_blottabIndexFlags10[10] ;
+  struct P_STRING s_names10[10]; // UNDEFINED
+  int s_blottabIndexFlags10[10]; // UNDEFINED
   int n_asValue = UNDEFINED, n_asValue2 = UNDEFINED;
   int i = -1;
   do {
@@ -368,7 +368,7 @@ int l_BlotexlibExecutorComputeBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct BLOTEX_VALUE *cac_blotexValue, struct BLOTTAB_FIELD_REFERENCE *cac_blottabFieldReference,
   int *cac_asValue, G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
-  struct P_STRING lexeme;
+  struct P_STRING lexeme = UNDEFINED_P_STRING;
 
   m_PREPARE_ABANDON(a_sequence, b_lValue? "<blottab ref op set int> | <blottab ref op set str>":
     "<int blottab ops> | <str blottab ops>") 
@@ -474,14 +474,14 @@ m_ASSERT(n_asValue != -1)
           cac_blotexValue->select.c_blotval = ct_blotsetStuff[c_element].acolyt.cen_value;
         break; case AS__VALUE_STR:
           cac_blotexValue->b_strex = b_TRUE; 
-          cac_blotexValue->select.cv_str = ct_blotsetStuff[c_element].cv_pString ; 
+          cac_blotexValue->select.c_strex.v_str = ct_blotsetStuff[c_element].cv_pString ; 
         break; default: 
           m_TRACK()
         } // switch
   
       break; case RESULT__NOT_FOUND:
         if ((cac_blotexValue->b_strex = (n_asValue == AS__VALUE_STR)))
-          cac_blotexValue->select.cv_str = m_PString(GOOD_OLD_EMPTY_C_STRING) ;
+          cac_blotexValue->select.c_strex.v_str = m_PString(GOOD_OLD_EMPTY_C_STRING) ;
         else cac_blotexValue->select.c_blotval = FALSE__BLOTVAL; 
       break; default: m_TRACK()
       } // switch

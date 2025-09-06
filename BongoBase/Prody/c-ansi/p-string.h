@@ -49,6 +49,9 @@ const struct P_STRING *ap_aTrivialEmptyPString ;
 // Assigning string portions
 // -------------------------
 
+#define UNDEFINED_P_STRING { (const char*)UNDEFINED } 
+
+
 // Establish (regular) string portion.
 // 
 // Passed:

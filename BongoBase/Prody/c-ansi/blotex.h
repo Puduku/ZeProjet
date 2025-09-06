@@ -138,14 +138,19 @@ int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
 // Parsing blot expressions: helpers
 // ---------------------------------
 
+
 struct BLOTEX_VALUE {
-  int c_workingGStringEntry; // TODO : dans l'union... 
   char b_strex;
   union {
     gen_BLOTVAL c_blotval;
-    struct P_STRING cv_str;
+    struct {
+      int workingGStringEntry; 
+      struct P_STRING v_str;
+    } c_strex ;
   } select ;
 } ;
+
+#define UNDEFINED_BLOTEX_VALUE { (char) UNDEFINED } 
 
 #define b_FUGACIOUS_STR b_TRUE
 
