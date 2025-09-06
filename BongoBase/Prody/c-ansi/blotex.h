@@ -152,6 +152,7 @@ struct BLOTEX_VALUE {
 
 #define UNDEFINED_BLOTEX_VALUE { (char) UNDEFINED } 
 
+#define b_STREX b_TRUE
 #define b_FUGACIOUS_STR b_TRUE
 
 // Set blotex INITIAL value
