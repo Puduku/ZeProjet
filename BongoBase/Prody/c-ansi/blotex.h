@@ -140,7 +140,7 @@ int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
 
 
 struct BLOTEX_VALUE {
-  char b_strex;
+  int asValue;
   union {
     gen_BLOTVAL c_blotval;
     struct {
@@ -150,9 +150,8 @@ struct BLOTEX_VALUE {
   } select ;
 } ;
 
-#define UNDEFINED_BLOTEX_VALUE { (char) UNDEFINED } 
+#define UNDEFINED_BLOTEX_VALUE { (int) UNDEFINED } 
 
-#define b_STREX b_TRUE
 #define b_FUGACIOUS_STR b_TRUE
 
 // Set blotex INITIAL value
@@ -160,7 +159,7 @@ struct BLOTEX_VALUE {
 //
 // Passed:
 // - handle:
-// - b_strex: (TRUE/FALSE) 
+// - asValue: AS__VALUE_INT / AS__VALUE_STR 
 // - c_blotval:
 // - cap_str:
 // - cb_fugaciousStr: (TRUE/FALSE) NOTICE: if you intialize TWICE a
@@ -172,7 +171,7 @@ struct BLOTEX_VALUE {
 // Ret: 
 // - RETURNED: Ok
 // - -1: unexpected problem; anomaly is raised
-int BlotexlibExecutorSetBlotexValue(BLOTEXLIB_EXECUTOR_HANDLE handle, char b_strex,
+int BlotexlibExecutorSetBlotexValue(BLOTEXLIB_EXECUTOR_HANDLE handle, int asValue,
   gen_BLOTVAL c_blotval, const struct P_STRING* cap_str, char cb_fugaciousStr,
   struct BLOTEX_VALUE *a_blotexValue) ;
 

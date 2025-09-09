@@ -19,6 +19,9 @@
 
 // Blottabs: 
 
+// #REF BLOTTAB_INDEX_FLAG
+#define STR__BLOTTAB_INDEX_FLAG 0x01
+#define INT__BLOTTAB_INDEX_FLAG 0x02
 
 // Note: blot tables are based on g-string set collections. 
 //
@@ -31,11 +34,6 @@ int BlottabCreateInstance(BLOTTAB_HANDLE *azh_handle, int fieldsNumber,
 
 // NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION
 int BlottabDestroyInstance(void *xhr_handle) ;
-
-// #REF BLOTTAB_INDEX_FLAG
-#define STR__BLOTTAB_INDEX_FLAG 0x01
-#define INT__BLOTTAB_INDEX_FLAG 0x02
-
 
 // Create NEW blot table and add it in blotex executor's blot tables.
 // 
@@ -65,7 +63,7 @@ int l_BlotexlibExecutorComputeBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
   int *cac_asValue, G_STRING_STUFF nc_abandonmentInfo) ;
 
 // #SEE UpdateCurrentBlotsetField @c-ansi/blotex.h
-int UpdateCurrentBlotsetField(struct BLOTTAB_FIELD_REFERENCE blottabFieldReference, int asValue,
+int UpdateCurrentBlotsetField(struct BLOTTAB_FIELD_REFERENCE blottabFieldReference, int as,
  struct BLOTEX_VALUE blotexValue) ;
 
 
