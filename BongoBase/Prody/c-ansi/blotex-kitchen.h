@@ -110,12 +110,12 @@ int ParseAs(char b_lValue, struct P_STRING *a_sequence, int *a_as) ;
 //
 // Changed:
 // - *a_sequence: after parsing 
-// - *an_as: (>=0) corresponding "as" "value" specifier (-1 if not present) 
+// - *an_asValue: (>=0) corresponding "as" "value" specifier (-1 if not present) 
 // 
 // Ret:
 // - RETURNED: Ok
 // - 1: unexpected problem; anomaly is raised
-int ParseAsValue(struct P_STRING *a_sequence, int *an_as) ;
+int ParseAsValue(struct P_STRING *a_sequence, int *an_asValue) ;
 
 
 // Enumeration of <comp op> | <str comp op> | <fact op> terminal symbols 

@@ -259,8 +259,9 @@ int BlotexlibExecutorGetBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRIN
 
 
 struct BLOTTAB_FIELD_REFERENCE {
+  int asValue; 
   int element; // field identification
-  BLOTTAB_HANDLE blottabHandle; // Current 
+  BLOTTAB_HANDLE blottabHandle; // Current  
 } ;
 
 
@@ -277,14 +278,12 @@ struct BLOTTAB_FIELD_REFERENCE {
 // - *a_sequence: before parsing
 // - blottabName: blot table name
 // - cac_blotexValue: only significant with (r-value) 
-// - cac_blotvarReference: only significant with (l-value)
-// - cac_asValue: only significant with (l-value) 
+// - cac_blottabFieldReference: only significant with (l-value)
 //
 // Changed:
 // - *a_sequence: after parsing 
 // - *cac_blotexValue: only significant if "success" (r-value) ; value corresponding to blottab ops
 // - *cac_blottabFieldReference: only significant if "success" (l-value) 
-// - *cac_asValue: only significant if "success" (l-value) either AS__VALUE_INT or AS__VALUE_STR 
 // - nc_abandonmentInfo: 
 //
 // Ret: Computed successfully ? 
@@ -294,7 +293,7 @@ struct BLOTTAB_FIELD_REFERENCE {
 int l_BlotexlibExecutorComputeBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
   char b_lValue, struct P_STRING *a_sequence, struct P_STRING blottabName,
   struct BLOTEX_VALUE *cac_blotexValue, struct BLOTTAB_FIELD_REFERENCE *cac_blottabFieldReference,
-  int *cac_asValue, G_STRING_STUFF nc_abandonmentInfo) ;
+  G_STRING_STUFF nc_abandonmentInfo) ;
 
 
 // ===> To be implemente by blottab module
@@ -303,14 +302,13 @@ int l_BlotexlibExecutorComputeBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
 //
 // Passed:
 // - blottabFieldReference: 
-// - asValue: AS__VALUE_INT / AS__VALUE_STR 
-// - blotexValue:
+// - blotexValue: accurate (INT / STR) value regarding blottabFieldReference
 // 
 // Ret:
 // - RESULT__FOUND:
 // - RESULT__NOT_FOUND: current blotset not available
 // - -1: unexpected problem; anomaly is raised
-int UpdateCurrentBlotsetField(struct BLOTTAB_FIELD_REFERENCE blottabFieldReference, int asValue,
+int UpdateCurrentBlotsetField(struct BLOTTAB_FIELD_REFERENCE blottabFieldReference,
  struct BLOTEX_VALUE blotexValue) ;
 
 #endif // __C_ANSI_BLOTEX_H_INCLUDED__

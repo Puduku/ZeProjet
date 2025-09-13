@@ -56,17 +56,17 @@ m_DIGGY_VAR_D(*a_as)
 } // ParseAs 
 
 // See .h 
-int ParseAsValue(struct P_STRING *a_sequence, int *an_as) {
+int ParseAsValue(struct P_STRING *a_sequence, int *an_asValue) {
   m_DIGGY_BOLLARD()
   struct P_STRING lexeme; // UNDEFINED
   m_PParsePassSpaces(a_sequence,NULL);
 m_DIGGY_VAR_P_STRING(*a_sequence)
   int n_matchedEntry = UNDEFINED;
-  m_P_PARSE_MATCH_AMONG_C(*a_sequence,NULL,&n_matchedEntry,an_as,&lexeme, 2,
+  m_P_PARSE_MATCH_AMONG_C(*a_sequence,NULL,&n_matchedEntry,an_asValue,&lexeme, 2,
     AS__VALUE_INT__X,AS__VALUE_INT, AS__VALUE_STR__X,AS__VALUE_STR)
 m_DIGGY_VAR_P_STRING(*a_sequence)
 m_DIGGY_VAR_P_STRING(lexeme)
-m_DIGGY_VAR_D(*an_as)
+m_DIGGY_VAR_D(*an_asValue)
   m_DIGGY_RETURN(RETURNED)
 } // ParseAsValue 
 

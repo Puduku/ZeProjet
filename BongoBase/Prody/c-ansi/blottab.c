@@ -362,7 +362,7 @@ m_DIGGY_VAR_D(n_asValue2)
 int l_BlotexlibExecutorComputeBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
   char b_lValue, struct P_STRING *a_sequence, struct P_STRING blottabName,
   struct BLOTEX_VALUE *cac_blotexValue, struct BLOTTAB_FIELD_REFERENCE *cac_blottabFieldReference,
-  int *cac_asValue, G_STRING_STUFF nc_abandonmentInfo) {
+  G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
   struct P_STRING lexeme = UNDEFINED_P_STRING;
 
@@ -446,7 +446,7 @@ m_ASSERT(n_asValue != -1)
     if (n_blottabHandle == NULL) m_ABANDON(UNKNOWN_BLOTTAB__ABANDONMENT_CAUSE) 
     cac_blottabFieldReference->element = c_element;
     cac_blottabFieldReference->blottabHandle = n_blottabHandle; 
-    *cac_asValue = n_asValue ;
+    cac_blottabFieldReference->asValue = n_asValue;
   } else {
     if (n_indexFetchFlags < 0) {
       m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle, AS__VALUE_INT,TRUE__BLOTVAL0,
@@ -489,7 +489,8 @@ m_ASSERT(n_asValue != -1)
 } // l_BlotexlibExecutorComputeBlottabOps
 
 // XXXXXXXXXXXXX
-int BlottabUpdateCurrentBlotsetField(BLOTTAB_HANDLE handle, int element, struct BLOTEX_VALUE blotexValue) {
+static int BlottabUpdateCurrentBlotsetField(BLOTTAB_HANDLE handle, int element,
+  struct BLOTEX_VALUE blotexValue) {
   m_DIGGY_BOLLARD()
   G_STRING_SET_STUFF nt_fieldAttributeStuff = (G_STRING_SET_STUFF)UNDEFINED;
   int fieldsNumber = GStringsGetCount(handle->hp_fieldAttributesHandle,
@@ -534,10 +535,10 @@ struct BLOTTAB_FIELD_REFERENCE {
 #endif
 
 // Public function; see .h
-int UpdateCurrentBlotsetField(struct BLOTTAB_FIELD_REFERENCE blottabFieldReference, int asValue,
+int UpdateCurrentBlotsetField(struct BLOTTAB_FIELD_REFERENCE blottabFieldReference,
   struct BLOTEX_VALUE blotexValue) {
   m_DIGGY_BOLLARD()
-
+  m_ASSERT(blottabFieldReference.asValue == blotexValue.asValue);
   int result = BlottabUpdateCurrentBlotsetField(blottabFieldReference.blottabHandle,
     blottabFieldReference.element, blotexValue); 
   m_TRACK_IF(result < 0) 
