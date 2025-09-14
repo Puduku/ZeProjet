@@ -266,34 +266,53 @@ struct BLOTTAB_FIELD_REFERENCE {
 
 
 // ===> To be implemented by blottab module:
-// #REF l_BlotexlibExecutorComputeBlottabOps
-// Parse and compute blottab operations:
-// - as r-value of blotex atom => expect <int blottab ops> | <str blottab ops>
-// or
-// - as l-value of blotex reference => expect <blottab ref op set int> | <blottab ref op set str> 
+// #REF l_BlotexlibExecutorComputeLValueBlottabOps
+// Parse and compute 'l-value' blottab operations:
+// expect <blottab ref op set int> | <blottab ref op set str> 
 //
 // Passed:
 // - handle: 
-// - b_lValue: true=>l-value ; false=>r-value
 // - *a_sequence: before parsing
 // - blottabName: blot table name
-// - cac_blotexValue: only significant with (r-value) 
-// - cac_blottabFieldReference: only significant with (l-value)
 //
 // Changed:
 // - *a_sequence: after parsing 
-// - *cac_blotexValue: only significant if "success" (r-value) ; value corresponding to blottab ops
-// - *cac_blottabFieldReference: only significant if "success" (l-value) 
+// - *ac_blottabFieldReference: only significant if "success" 
 // - nc_abandonmentInfo: 
 //
 // Ret: Computed successfully ? 
 // - ANSWER__YES: Ok,
 // - ANSWER__NO: 'syntax' 'not found' 'already exist' error; abandon processing 
 // - -1: unexpected problem
-int l_BlotexlibExecutorComputeBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  char b_lValue, struct P_STRING *a_sequence, struct P_STRING blottabName,
-  struct BLOTEX_VALUE *cac_blotexValue, struct BLOTTAB_FIELD_REFERENCE *cac_blottabFieldReference,
+int l_BlotexlibExecutorComputeLValueBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
+  struct P_STRING *a_sequence, struct P_STRING blottabName,
+  struct BLOTTAB_FIELD_REFERENCE *ac_blottabFieldReference, G_STRING_STUFF nc_abandonmentInfo) ;
+
+
+
+// ===> To be implemented by blottab module:
+// #REF l_BlotexlibExecutorComputeRValueBlottabOps
+// Parse and compute 'r-value' blottab operations:
+// expect <int blottab ops> | <str blottab ops>
+//
+// Passed:
+// - handle: 
+// - *a_sequence: before parsing
+// - blottabName: blot table name
+//
+// Changed:
+// - *a_sequence: after parsing 
+// - *ac_blotexValue: only significant if "success" ; value corresponding to blottab ops
+// - nc_abandonmentInfo: 
+//
+// Ret: Computed successfully ? 
+// - ANSWER__YES: Ok,
+// - ANSWER__NO: 'syntax' 'not found' 'already exist' error; abandon processing 
+// - -1: unexpected problem
+int l_BlotexlibExecutorComputeRValueBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
+  struct P_STRING *a_sequence, struct P_STRING blottabName, struct BLOTEX_VALUE *ac_blotexValue,
   G_STRING_STUFF nc_abandonmentInfo) ;
+
 
 
 // ===> To be implemente by blottab module

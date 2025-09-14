@@ -56,13 +56,17 @@ int l_BlotexlibExecutorCreateBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_
   int fieldsNumber, struct P_STRING* s_names, int* s_blottabIndexFlags,
   BLOTTAB_HANDLE *a_blottabHandle) ;
 
-// #SEE l_BlotexlibExecutorComputeBlottabOps@c-ansi/blotex.h
-// Changed: 
-// - *cac_as: only significant if "success" (l-value): either AS__VALUE_INT / AS__VALUE_STR
-int l_BlotexlibExecutorComputeBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  char b_lValue, struct P_STRING *a_sequence, struct P_STRING blottabName, 
-  struct BLOTEX_VALUE *cac_blotexValue, struct BLOTTAB_FIELD_REFERENCE *cac_blottabFieldReference,
+
+// #SEE l_BlotexlibExecutorComputeLValueBlottabOps@c-ansi/blotex.h
+int l_BlotexlibExecutorComputeLValueBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle, 
+  struct P_STRING *a_sequence, struct P_STRING blottabName, 
+  struct BLOTTAB_FIELD_REFERENCE *ac_blottabFieldReference, G_STRING_STUFF nc_abandonmentInfo) ;
+
+// #SEE l_BlotexlibExecutorComputeRValueBlottabOps@c-ansi/blotex.h
+int l_BlotexlibExecutorComputeRValueBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
+  struct P_STRING *a_sequence, struct P_STRING blottabName, struct BLOTEX_VALUE *ac_blotexValue,
   G_STRING_STUFF nc_abandonmentInfo) ;
+
 
 // #SEE UpdateCurrentBlotsetField @c-ansi/blotex.h
 int UpdateCurrentBlotsetField(struct BLOTTAB_FIELD_REFERENCE blottabFieldReference,
