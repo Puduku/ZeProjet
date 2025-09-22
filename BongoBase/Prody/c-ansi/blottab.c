@@ -76,7 +76,7 @@ int BlottabCreateInstance(BLOTTAB_HANDLE *azh_handle, int fieldsNumber,
 } // BlottabCreateInstance
 
 // NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION
-int BlottabDestroyInstance(void *xhr_handle) {
+int BlottabDestroyInstanceGenuine(void *xhr_handle) {
   m_DIGGY_BOLLARD_S()
 
   BLOTTAB_HANDLE xh_handle = (BLOTTAB_HANDLE) xhr_handle;
@@ -87,10 +87,10 @@ int BlottabDestroyInstance(void *xhr_handle) {
   free(xh_handle);
 
   m_DIGGY_RETURN(RETURNED)
-} // BlottabDestroyInstance
+} // BlottabDestroyInstanceGenuine
 
 // Public function; see .h
-int l_BlotexlibExecutorCreateBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING blottabName,
+int l_BlotexlibExecutorCreateBlottabGenuine(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING blottabName,
   int fieldsNumber, struct P_STRING* s_names, int* s_blottabIndexFlags,
   BLOTTAB_HANDLE *a_blottabHandle) {
   m_DIGGY_BOLLARD()
@@ -99,10 +99,11 @@ m_DIGGY_VAR_P_STRING(blottabName)
   m_TRACK_IF(BlottabCreateInstance(a_blottabHandle,fieldsNumber, s_names,s_blottabIndexFlags) !=
     RETURNED)
 
-  m_TRACK_IF(BlotexlibExecutorAddBlottab(handle, blottabName, *a_blottabHandle) != RETURNED)
+  m_TRACK_IF(BlotexlibExecutorAddBlottab(handle,GENUINE_BLOTTAB_LABEL0,blottabName,
+    *a_blottabHandle) != RETURNED)
 
   m_DIGGY_RETURN(RETURNED)
-} // l_BlotexlibExecutorCreateBlottab
+} // l_BlotexlibExecutorCreateBlottabGenuine
 
 // Blottab expressions parsing:
 
@@ -183,7 +184,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
 
 
 // Public function: see .h
-int l_BlotexlibExecutorComputeLValueBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
+int l_BlotexlibExecutorComputeLValueBlottabOpsGenuine(BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct P_STRING *a_sequence, struct P_STRING blottabName,
   struct BLOTTAB_FIELD_REFERENCE *ac_blottabFieldReference, G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
@@ -193,7 +194,8 @@ int l_BlotexlibExecutorComputeLValueBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
 
   BLOTTAB_HANDLE n_blottabHandle = (BLOTTAB_HANDLE)UNDEFINED;
 m_DIGGY_VAR_P_STRING(blottabName)
-  switch (BlotexlibExecutorGetBlottab(handle,blottabName,&n_blottabHandle)) {
+  switch (BlotexlibExecutorGetBlottab(handle,GENUINE_BLOTTAB_LABEL0,blottabName,
+    (void**)&n_blottabHandle)) {
   case RESULT__FOUND:
     m_ASSERT(n_blottabHandle != NULL)
   break; case RESULT__NOT_FOUND:
@@ -224,12 +226,12 @@ m_ASSERT(n_asValue != -1)
   
   if (n_asValue == -1) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
   if (n_blottabHandle == NULL) m_ABANDON(UNKNOWN_BLOTTAB__ABANDONMENT_CAUSE) 
-  ac_blottabFieldReference->element = c_element;
-  ac_blottabFieldReference->blottabHandle = n_blottabHandle; 
+  ac_blottabFieldReference->r_identification = (void*)(GENERIC_INTEGER)c_element;
+  ac_blottabFieldReference->r_blottabHandle = n_blottabHandle; 
   ac_blottabFieldReference->asValue = n_asValue;
 
   m_DIGGY_RETURN(ANSWER__YES)
-} // l_BlotexlibExecutorComputeLValueBlottabOps
+} // l_BlotexlibExecutorComputeLValueBlottabOpsGenuine
 
 
 // Parse and compute blottab request. 
@@ -399,7 +401,7 @@ m_DIGGY_VAR_D(n_asValue2)
     m_PParsePassSpaces(&subSequence,NULL);
   } while (!b_EMPTY_P_STRING(subSequence)) ; 
 
-  switch(l_BlotexlibExecutorCreateBlottab(handle, nonExistingBlottabName, i+1, s_names10,
+  switch(l_BlotexlibExecutorCreateBlottabGenuine(handle, nonExistingBlottabName, i+1, s_names10,
     s_blottabIndexFlags10, ac_blottabHandle)) {
   case COMPLETED__OK:
   break; case COMPLETED__BUT:
@@ -412,7 +414,7 @@ m_DIGGY_VAR_D(n_asValue2)
 
 
 // Public function: see .h
-int l_BlotexlibExecutorComputeRValueBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
+int l_BlotexlibExecutorComputeRValueBlottabOpsGenuine(BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct P_STRING *a_sequence, struct P_STRING blottabName, struct BLOTEX_VALUE *ac_blotexValue,
   G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
@@ -422,7 +424,8 @@ int l_BlotexlibExecutorComputeRValueBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
 
   BLOTTAB_HANDLE n_blottabHandle = (BLOTTAB_HANDLE)UNDEFINED;
 m_DIGGY_VAR_P_STRING(blottabName)
-  switch (BlotexlibExecutorGetBlottab(handle,blottabName,&n_blottabHandle)) {
+  switch (BlotexlibExecutorGetBlottab(handle,GENUINE_BLOTTAB_LABEL0,blottabName,
+    (void**)&n_blottabHandle)) {
   case RESULT__FOUND:
     m_ASSERT(n_blottabHandle != NULL)
   break; case RESULT__NOT_FOUND:
@@ -527,7 +530,7 @@ m_DIGGY_VAR_D(n_asValue)
   } // if
 
   m_DIGGY_RETURN(ANSWER__YES)
-} // l_BlotexlibExecutorComputeRValueBlottabOps
+} // l_BlotexlibExecutorComputeRValueBlottabOpsGenuine
 
 // XXXXXXXXXXXXX
 static int BlottabUpdateCurrentBlotsetField(BLOTTAB_HANDLE handle, int element,
@@ -564,14 +567,14 @@ m_ASSERT(vnt_blotsetStuff == NULL)
 
 
 // Public function; see .h
-int UpdateCurrentBlotsetField(struct BLOTTAB_FIELD_REFERENCE blottabFieldReference,
+int UpdateCurrentBlotsetFieldGenuine(struct BLOTTAB_FIELD_REFERENCE blottabFieldReference,
   struct BLOTEX_VALUE blotexValue) {
   m_DIGGY_BOLLARD()
   m_ASSERT(blottabFieldReference.asValue == blotexValue.asValue);
-  int result = BlottabUpdateCurrentBlotsetField(blottabFieldReference.blottabHandle,
-    blottabFieldReference.element, blotexValue); 
+  int result = BlottabUpdateCurrentBlotsetField(blottabFieldReference.r_blottabHandle,
+    (int)(GENERIC_INTEGER)blottabFieldReference.r_identification, blotexValue); 
   m_TRACK_IF(result < 0) 
 
   m_DIGGY_RETURN(result)
-} // UpdateCurrentBlotsetField
+} // UpdateCurrentBlotsetFieldGenuine
 

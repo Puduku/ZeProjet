@@ -194,7 +194,10 @@ int main (int argc, char** argv) {
   BLOTEXLIB_EXECUTOR_FACTORY_HANDLE h_blotexlibExecutorFactoryHandle =
     (BLOTEXLIB_EXECUTOR_FACTORY_HANDLE)UNDEFINED;
   m_TRACK_IF(BlotexlibExecutorFactoryCreateInstance(&h_blotexlibExecutorFactoryHandle,
-    BlottabDestroyInstance) != RETURNED)
+    l_BlotexlibExecutorComputeLValueBlottabOpsGenuine,
+    l_BlotexlibExecutorComputeRValueBlottabOpsGenuine, UpdateCurrentBlotsetFieldGenuine,
+    BlottabDestroyInstanceGenuine) != RETURNED)
+
 
   int blotlibLabel = UNDEFINED; 
   blotlibLabel = BlotcodeLinkBlotlib(h_blotcodeHandle,  "lib1", 4, s_localBlotfuncsName1,

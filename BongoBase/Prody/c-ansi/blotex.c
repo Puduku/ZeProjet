@@ -18,21 +18,71 @@
 // blotex library executor 
 // =======================
 
+#define MAX_BLOTTAB_IMPLEMENTIONS_NUMBER 3
+
+struct BLOTTAB_IMPLEMENTATION {
+  l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_OPS_FUNCTION
+  l_blotexlibExecutorComputeLValueBlottabOpsFunction;
+  l_BLOTEXLIB_EXECUTOR_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION
+  l_blotexlibExecutorComputeRValueBlottabOpsFunction;
+  UPDATE_CURRENT_BLOTSET_FIELD_FUNCTION updateCurrentBlotsetFieldFunction;
+  NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION blottabDestroyInstanceFunction ;
+}; 
+
 struct BLOTEXLIB_EXECUTOR_FACTORY {
   m_DECLARE_MAGIC_FIELD(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE)
-  NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION blottabDestroyInstanceFunction ;
-} ; 
+  int blottabImplementationsNumber; 
+  struct BLOTTAB_IMPLEMENTATION blottabImplementations[
+    MAX_BLOTTAB_IMPLEMENTIONS_NUMBER]; 
+}; 
+
+// Public function; see .h
+int BlotexlibExecutorFactoryRegisterBlottabHandler(
+  BLOTEXLIB_EXECUTOR_FACTORY_HANDLE handle,
+  l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_OPS_FUNCTION
+  l_blotexlibExecutorComputeLValueBlottabOpsFunction,
+  l_BLOTEXLIB_EXECUTOR_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION
+  l_blotexlibExecutorComputeRValueBlottabOpsFunction,
+  UPDATE_CURRENT_BLOTSET_FIELD_FUNCTION updateCurrentBlotsetFieldFunction,
+  NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION blottabDestroyInstanceFunction) {
+  m_DIGGY_BOLLARD()
+  int i = handle->blottabImplementationsNumber++; 
+  m_ASSERT(i < MAX_BLOTTAB_IMPLEMENTIONS_NUMBER)
+  handle->blottabImplementations[i].l_blotexlibExecutorComputeLValueBlottabOpsFunction =
+    l_blotexlibExecutorComputeLValueBlottabOpsFunction;
+  handle->blottabImplementations[i].l_blotexlibExecutorComputeRValueBlottabOpsFunction =
+    l_blotexlibExecutorComputeRValueBlottabOpsFunction;
+  handle->blottabImplementations[i].updateCurrentBlotsetFieldFunction =
+    updateCurrentBlotsetFieldFunction ;
+  handle->blottabImplementations[i].blottabDestroyInstanceFunction =
+  blottabDestroyInstanceFunction;
+
+  m_DIGGY_RETURN(RETURNED)
+} // BlotexlibExecutorFactoryRegisterBlottabHandler
 
  
 // Public function; see .h
 int BlotexlibExecutorFactoryCreateInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE *azh_handle,
-  NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION blottabDestroyInstanceFunction) {
+  l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_OPS_FUNCTION
+  l_blotexlibExecutorComputeLValueBlottabOpsGenuineFunction,
+  l_BLOTEXLIB_EXECUTOR_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION
+  l_blotexlibExecutorComputeRValueBlottabOpsGenuineFunction,
+  UPDATE_CURRENT_BLOTSET_FIELD_FUNCTION updateCurrentBlotsetFieldGenuineFunction,
+  NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION blottabDestroyInstanceGenuineFunction) {
   m_DIGGY_BOLLARD()
+
   m_MALLOC_INSTANCE(*azh_handle)
   m_ASSIGN_MAGIC_FIELD(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE,*azh_handle)
-  (*azh_handle)->blottabDestroyInstanceFunction = blottabDestroyInstanceFunction;
+  (*azh_handle)->blottabImplementationsNumber = 0; 
+  m_ASSERT(BlotexlibExecutorFactoryRegisterBlottabHandler(*azh_handle,
+    l_blotexlibExecutorComputeLValueBlottabOpsGenuineFunction,
+    l_blotexlibExecutorComputeRValueBlottabOpsGenuineFunction,
+    updateCurrentBlotsetFieldGenuineFunction, blottabDestroyInstanceGenuineFunction) ==
+    GENUINE_BLOTTAB_LABEL0) 
   m_DIGGY_RETURN(RETURNED)
 } // BlotexlibExecutorFactoryCreateInstance
+
+
 
 
 // Public function; see .h
@@ -42,12 +92,22 @@ int BlotexlibExecutorFactoryDestroyInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE xh
   m_DIGGY_RETURN(RETURNED)
 } // BlotexlibExecutorFactoryDestroyInstance
 
+struct BLOTTAB_EXECUTOR_IMPLEMENTATION {
+  l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_OPS_FUNCTION
+  l_blotexlibExecutorComputeLValueBlottabOpsFunction;
+  l_BLOTEXLIB_EXECUTOR_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION
+  l_blotexlibExecutorComputeRValueBlottabOpsFunction;
+  UPDATE_CURRENT_BLOTSET_FIELD_FUNCTION updateCurrentBlotsetFieldFunction;
+  G_STRINGS_HANDLE h_blottabsHandle ; 
+} ;
 
 struct BLOTEXLIB_EXECUTOR {
   m_DECLARE_MAGIC_FIELD(BLOTEXLIB_EXECUTOR_HANDLE)
   G_STRINGS_HANDLE h_blotregsHandle ; 
-  G_STRINGS_HANDLE h_blottabsHandle ; 
   G_STRINGS_HANDLE h_workingGStringsHandle ;
+  int blottabExecutorImplementationsNumber; 
+  struct BLOTTAB_EXECUTOR_IMPLEMENTATION blottabExecutorImplementations[
+    MAX_BLOTTAB_IMPLEMENTIONS_NUMBER]; 
 } ;  
 
 
@@ -82,10 +142,23 @@ static int BlotexlibExecutorFactoryCreateProductInstance(void *pr_handle,
   m_ASSERT(G_STRINGS_ADD_PLAIN_LEXICAL_INDEX(productHandle->h_blotregsHandle, NULL,NULL) ==
     INDEX_LABEL0)
 
-  m_TRACK_IF(NAMED_OBJECTS_CREATE_INSTANCE(&(productHandle->h_blottabsHandle), 10,
-    p_handle->blottabDestroyInstanceFunction) != RETURNED)
-  m_ASSERT(G_STRINGS_ADD_PLAIN_LEXICAL_INDEX(productHandle->h_blottabsHandle, NULL,NULL) ==
-    INDEX_LABEL0)
+  productHandle->blottabExecutorImplementationsNumber = p_handle->blottabImplementationsNumber;
+  int i = 0; for (; i < p_handle->blottabImplementationsNumber; i++) { 
+    m_TRACK_IF(NAMED_OBJECTS_CREATE_INSTANCE(
+      &(productHandle->blottabExecutorImplementations[i].h_blottabsHandle), 10,
+      p_handle->blottabImplementations[i].blottabDestroyInstanceFunction) != RETURNED)
+    m_ASSERT(G_STRINGS_ADD_PLAIN_LEXICAL_INDEX(
+      productHandle->blottabExecutorImplementations[i].h_blottabsHandle, NULL,NULL) ==
+      INDEX_LABEL0)
+    productHandle->blottabExecutorImplementations[i].
+      l_blotexlibExecutorComputeLValueBlottabOpsFunction =
+      p_handle->blottabImplementations[i].l_blotexlibExecutorComputeLValueBlottabOpsFunction;
+    productHandle->blottabExecutorImplementations[i].
+      l_blotexlibExecutorComputeRValueBlottabOpsFunction =
+      p_handle->blottabImplementations[i].l_blotexlibExecutorComputeRValueBlottabOpsFunction;
+    productHandle->blottabExecutorImplementations[i].updateCurrentBlotsetFieldFunction =
+      p_handle->blottabImplementations[i].updateCurrentBlotsetFieldFunction;
+  } // for
 
   m_TRACK_IF(G_STRINGS_CREATE_INSTANCE(&productHandle->h_workingGStringsHandle,5) != RETURNED) 
 
@@ -102,8 +175,7 @@ int l_BlotcodeExecutorGetBlotexlibExecutorHandle(BLOTCODE_EXECUTOR_HANDLE handle
     &r_blotexlibExecutorHandle);
   switch (result) {
   case RESULT__FOUND:
-    *a_blotexlibExecutorHandle =
-      (BLOTEXLIB_EXECUTOR_HANDLE)r_blotexlibExecutorHandle;
+    *a_blotexlibExecutorHandle = (BLOTEXLIB_EXECUTOR_HANDLE)r_blotexlibExecutorHandle;
     m_CHECK_MAGIC_FIELD(BLOTEXLIB_EXECUTOR_HANDLE,*a_blotexlibExecutorHandle)
   break; case RESULT__NOT_FOUND:
     m_RAISE(ANOMALY__VALUE__D,result)
@@ -242,18 +314,20 @@ m_DIGGY_VAR_P_STRING(blotregName)
 
 
 // Public function; see .h
-int BlotexlibExecutorGetBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING blottabName,
-  BLOTTAB_HANDLE *ac_blottabHandle) {
+int BlotexlibExecutorGetBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, int blottabLabel,
+  struct P_STRING blottabName, void* *acr_blottabHandle) {
   m_DIGGY_BOLLARD()
+  m_ASSERT(blottabLabel < handle->blottabExecutorImplementationsNumber)
 
   G_STRING_STUFF ct_namedBlottabStuff = (G_STRING_STUFF)UNDEFINED;
   struct G_KEY gKey = m_GKey_PString(blottabName);
 
-  int result = m_GStringsIndexSingleFetch(handle->h_blottabsHandle,NULL,INDEX_LABEL0,
+  int result = m_GStringsIndexSingleFetch(
+    handle->blottabExecutorImplementations[blottabLabel].h_blottabsHandle,NULL,INDEX_LABEL0,
     INDEX_SEEK_FLAGS__EQUAL,&gKey, INDEX_FETCH_FLAGS__SEEK_ONLY,&ct_namedBlottabStuff, NULL);
   switch (result) {
   case RESULT__FOUND:
-    m_ASSERT((*ac_blottabHandle = (BLOTTAB_HANDLE)ct_namedBlottabStuff->acolyt.cnhr_handle) != NULL);
+    m_ASSERT((*acr_blottabHandle = ct_namedBlottabStuff->acolyt.cnhr_handle) != NULL);
   break; case RESULT__NOT_FOUND:
   break; default:
     m_TRACK()
@@ -263,21 +337,25 @@ int BlotexlibExecutorGetBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRIN
 } // BlotexlibExecutorGetBlottab
 
 // Public function; see .h
-int BlotexlibExecutorAddBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING blottabName,
-  BLOTTAB_HANDLE h_blottabHandle) {
+int BlotexlibExecutorAddBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, int blottabLabel,
+  struct P_STRING blottabName, void* hr_blottabHandle) {
   m_DIGGY_BOLLARD()
+  m_ASSERT(blottabLabel < handle->blottabExecutorImplementationsNumber)
 m_DIGGY_VAR_P_STRING(blottabName)
-m_DIGGY_VAR_P(handle->h_blottabsHandle)
+  
+  G_STRINGS_HANDLE blottabsHandle = 
+    handle->blottabExecutorImplementations[blottabLabel].h_blottabsHandle;
+m_DIGGY_VAR_P(blottabsHandle)
   G_STRING_STUFF t_namedBlottabStuff = (G_STRING_STUFF)UNDEFINED;
   struct G_KEY gKey = m_GKey_PString(blottabName);
-  switch (m_GStringsIndexSingleFetch(handle->h_blottabsHandle,NULL,INDEX_LABEL0,
-    INDEX_SEEK_FLAGS__EQUAL,&gKey, INDEX_FETCH_FLAGS__FETCH,&t_namedBlottabStuff,NULL)) {
+  switch (m_GStringsIndexSingleFetch(blottabsHandle,NULL,INDEX_LABEL0,INDEX_SEEK_FLAGS__EQUAL,&gKey,
+    INDEX_FETCH_FLAGS__FETCH,&t_namedBlottabStuff,NULL)) {
   case RESULT__FOUND:
     m_RAISE(ANOMALY__UNEXPECTED_CASE)
   break; case RESULT__NOT_FOUND:
     m_TRACK_IF(GStringCopy(t_namedBlottabStuff,0,blottabName) < 0)
-    m_TRACK_IF(m_GStringAsNamedObject(t_namedBlottabStuff,h_blottabHandle,
-      handle->h_blottabsHandle) != RETURNED)
+    m_TRACK_IF(m_GStringAsNamedObject(t_namedBlottabStuff,hr_blottabHandle,
+      blottabsHandle) != RETURNED)
   break; default:
     m_TRACK()
   } // switch
@@ -958,8 +1036,9 @@ m_DIGGY_VAR_P_STRING(lexeme)
           (char)UNDEFINED,&name); // <entity>
         PParsePassSingleChar(a_sequence,NULL,'?',&lexeme);
         if (!b_EMPTY_P_STRING(lexeme)) { 
-          if (b_blottab) { // <int blottab> | <str blottab> ...
-            switch (l_BlotexlibExecutorComputeRValueBlottabOps(handle,a_sequence,name,
+          if (b_blottab) { // <int blottab> | <str blottab> ... TODO: use good blottab label
+            switch (handle->blottabExecutorImplementations[0].
+              l_blotexlibExecutorComputeRValueBlottabOpsFunction(handle,a_sequence,name,
               ac_blotexAtomValue,nc_abandonmentInfo)) {
             case ANSWER__YES:
             break; case ANSWER__NO:
@@ -1304,7 +1383,9 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
   PParsePassSingleChar(a_sequence,NULL,'?',&lexeme);
   if (!b_EMPTY_P_STRING(lexeme)) { 
     if (*acb_blottabFieldReference) { // Parsing <int blottab ref> or <str blottab ref> ...
-      switch (l_BlotexlibExecutorComputeLValueBlottabOps(handle,a_sequence,name,
+// TODO: which blottab label ?
+      switch (handle->blottabExecutorImplementations[0].
+        l_blotexlibExecutorComputeLValueBlottabOpsFunction(handle,a_sequence,name,
         acc_blottabFieldReference, nc_abandonmentInfo)) {
       case ANSWER__YES:
       break; case ANSWER__NO:
@@ -1417,8 +1498,9 @@ static inline int m_BlotexlibExecutorExecuteCFunctionEval(BLOTEXLIB_EXECUTOR_HAN
       break; case AS__VALUE_STR: // '$'
         if (c_blotexValue.asValue != AS__VALUE_STR) m_ABANDON(EXPECT_STREX__ABANDONMENT_CAUSE)
       break; default: m_RAISE(ANOMALY__VALUE__D,cc_lValueBlottabFieldReference.asValue)
-      } // switch
-      switch (UpdateCurrentBlotsetField(cc_lValueBlottabFieldReference, c_blotexValue)) {
+      } // switch TODO: use correct blottab label:
+      switch (handle->blottabExecutorImplementations[0].updateCurrentBlotsetFieldFunction(
+        cc_lValueBlottabFieldReference, c_blotexValue)) {
       case RESULT__FOUND:
       break; case RESULT__NOT_FOUND:
         m_ABANDON(NOT_EXISTING_L_VALUE__ABANDONMENT_CAUSE)
@@ -1594,7 +1676,10 @@ static int BlotexlibExecutorDestroyInstance(void *xhr_handle) {
 
   m_TRACK_IF(GStringsDestroyInstance(xh_handle->h_blotregsHandle) != RETURNED)
 
-  m_TRACK_IF(GStringsDestroyInstance(xh_handle->h_blottabsHandle) != RETURNED)
+  int i =0; for (; i < xh_handle->blottabExecutorImplementationsNumber; i++) { 
+    m_TRACK_IF(GStringsDestroyInstance(
+      xh_handle->blottabExecutorImplementations[i].h_blottabsHandle) != RETURNED)
+  } // for
 
   m_TRACK_IF(GStringsDestroyInstance(xh_handle->h_workingGStringsHandle) != RETURNED)
 

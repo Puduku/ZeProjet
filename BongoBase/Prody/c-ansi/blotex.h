@@ -20,6 +20,92 @@
 struct BLOTEXLIB_EXECUTOR_FACTORY ; // Private
 typedef struct BLOTEXLIB_EXECUTOR_FACTORY *BLOTEXLIB_EXECUTOR_FACTORY_HANDLE; // Public
  
+
+#define GENUINE_BLOTTAB_LABEL0 0
+
+//struct BLOTTAB ;
+//typedef struct BLOTTAB* BLOTTAB_HANDLE;
+
+struct BLOTTAB_FIELD_REFERENCE {
+  int asValue; 
+  void *r_identification; // "field" identification
+  void *r_blottabHandle; // Current blottab   
+} ;
+
+struct BLOTEXLIB_EXECUTOR; // Private structure 
+typedef struct BLOTEXLIB_EXECUTOR *BLOTEXLIB_EXECUTOR_HANDLE; // Public handle
+
+// #REF l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_OPS_FUNCTION
+// Parse and compute 'l-value' blottab operations:
+// expect <blottab ref op set int> | <blottab ref op set str> 
+//
+// Passed:
+// - handle: 
+// - *a_sequence: before parsing
+// - blottabName: blot table name
+//
+// Changed:
+// - *a_sequence: after parsing 
+// - *ac_blottabFieldReference: only significant if "success" 
+// - nc_abandonmentInfo: 
+//
+// Ret: Computed successfully ? 
+// - ANSWER__YES: Ok,
+// - ANSWER__NO: 'syntax' 'not found' 'already exist' error; abandon processing 
+// - -1: unexpected problem
+typedef int (*l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_OPS_FUNCTION)(BLOTEXLIB_EXECUTOR_HANDLE handle,
+  struct P_STRING *a_sequence, struct P_STRING blottabName,
+  struct BLOTTAB_FIELD_REFERENCE *ac_blottabFieldReference, G_STRING_STUFF nc_abandonmentInfo) ;
+
+
+struct BLOTEX_VALUE {
+  int asValue;
+  union {
+    gen_BLOTVAL c_blotval;
+    struct {
+      int workingGStringEntry; 
+      struct P_STRING v_str;
+    } c_strex ;
+  } select ;
+} ;
+
+// #REF l_BLOTEXLIB_EXECUTOR_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION
+// Parse and compute 'r-value' blottab operations:
+// expect <int blottab ops> | <str blottab ops>
+//
+// Passed:
+// - handle: 
+// - *a_sequence: before parsing
+// - blottabName: blot table name
+//
+// Changed:
+// - *a_sequence: after parsing 
+// - *ac_blotexValue: only significant if "success" ; value corresponding to blottab ops
+// - nc_abandonmentInfo: 
+//
+// Ret: Computed successfully ? 
+// - ANSWER__YES: Ok,
+// - ANSWER__NO: 'syntax' 'not found' 'already exist' error; abandon processing 
+// - -1: unexpected problem
+typedef int (*l_BLOTEXLIB_EXECUTOR_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION)(BLOTEXLIB_EXECUTOR_HANDLE handle,
+  struct P_STRING *a_sequence, struct P_STRING blottabName, struct BLOTEX_VALUE *ac_blotexValue,
+  G_STRING_STUFF nc_abandonmentInfo) ;
+
+
+// #REF UPDATE_CURRENT_BLOTSET_FIELD_FUNCTION 
+// Update some field of current blotset of a blottab.
+//
+// Passed:
+// - blottabFieldReference: 
+// - blotexValue: accurate (INT / STR) value regarding blottabFieldReference
+// 
+// Ret:
+// - RESULT__FOUND:
+// - RESULT__NOT_FOUND: current blotset not available
+// - -1: unexpected problem; anomaly is raised
+typedef int (*UPDATE_CURRENT_BLOTSET_FIELD_FUNCTION)(
+  struct BLOTTAB_FIELD_REFERENCE blottabFieldReference, struct BLOTEX_VALUE blotexValue);
+
 // Create blotex library executor factory
 //
 // Passed:
@@ -33,18 +119,32 @@ typedef struct BLOTEXLIB_EXECUTOR_FACTORY *BLOTEXLIB_EXECUTOR_FACTORY_HANDLE; //
 // - RETURNED: OK, created and initialized
 // - -1: unexpected problem
 int BlotexlibExecutorFactoryCreateInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE *azh_handle,
-  NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION blottabDestroyInstanceFunction) ;
+  l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_OPS_FUNCTION
+  l_blotexlibExecutorComputeLValueBlottabOpsGenuineFunction,
+  l_BLOTEXLIB_EXECUTOR_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION
+  l_blotexlibExecutorComputeRValueBlottabOpsGenuineFunction,
+  UPDATE_CURRENT_BLOTSET_FIELD_FUNCTION updateCurrentBlotsetFieldGenuineFunction,
+  NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION blottabDestroyInstanceGenuineFunction) ;
 
-
-// Destroy blotex library executor factory
+// Register actual blottab handler
+// => Register ALL blotab handlers before linking blotex library
 //
 // Passed:
-// - xh_handle: 
+// - l_blotexlibExecutorComputeLValueBlottabOpsFunction:
+// - l_blotexlibExecutorComputeRValueBlottabOpsFunction:
+// - updateCurrentBlotsetFieldFunction:
 //
 // Returned:
-// - RETURNED: OK, destroyed 
-// - -1: unexpected problem ; anomaly is raised
-int BlotexlibExecutorFactoryDestroyInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE xh_handle) ;
+// - >= 1: new EXTRA (not GENUINE) registration
+int BlotexlibExecutorFactoryRegisterBlottabHandler(
+  BLOTEXLIB_EXECUTOR_FACTORY_HANDLE handle,
+  l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_OPS_FUNCTION
+  l_blotexlibExecutorComputeLValueBlottabOpsFunction,
+  l_BLOTEXLIB_EXECUTOR_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION
+  l_blotexlibExecutorComputeRValueBlottabOpsFunction,
+  UPDATE_CURRENT_BLOTSET_FIELD_FUNCTION updateCurrentBlotsetFieldFunction,
+  NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION blottabDestroyInstanceFunction) ;
+
 
 
 // Link blotex library
@@ -62,12 +162,23 @@ int l_BlotcodeLinkBlotexlib(BLOTCODE_HANDLE ep_handle, const char* nfp_blotlibPr
   BLOTEXLIB_EXECUTOR_FACTORY_HANDLE fp_blotexlibExecutorFactoryHandle) ;
 
 
+// Destroy blotex library executor factory
+//
+// Passed:
+// - xh_handle: 
+//
+// Returned:
+// - RETURNED: OK, destroyed 
+// - -1: unexpected problem ; anomaly is raised
+int BlotexlibExecutorFactoryDestroyInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE xh_handle) ;
+
+
 
 // Interface with other blotlibs
 // =============================
 
-struct BLOTEXLIB_EXECUTOR; // Private structure 
-typedef struct BLOTEXLIB_EXECUTOR *BLOTEXLIB_EXECUTOR_HANDLE; // Public handle
+//struct BLOTEXLIB_EXECUTOR; // Private structure 
+//typedef struct BLOTEXLIB_EXECUTOR *BLOTEXLIB_EXECUTOR_HANDLE; // Public handle
 
 // This function, which wraps BlotcodeExecutorGetBlotlibExecutorHandle(), retrieves the executor
 // handle of =>blotex<= library.
@@ -139,16 +250,16 @@ int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
 // ---------------------------------
 
 
-struct BLOTEX_VALUE {
-  int asValue;
-  union {
-    gen_BLOTVAL c_blotval;
-    struct {
-      int workingGStringEntry; 
-      struct P_STRING v_str;
-    } c_strex ;
-  } select ;
-} ;
+//struct BLOTEX_VALUE {
+//  int asValue;
+//  union {
+//    gen_BLOTVAL c_blotval;
+//    struct {
+//      int workingGStringEntry; 
+//      struct P_STRING v_str;
+//    } c_strex ;
+//  } select ;
+//} ;
 
 #define UNDEFINED_BLOTEX_VALUE { (int) UNDEFINED } 
 
@@ -219,17 +330,19 @@ int BlotexlibExecutorComputeBlotex(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_ST
 // The blotex module simply manages the blottab identification within blot expressions (seen as
 // some <entity> prefixed with '^' token). 
 
-
+#if 0
 // ===> To be implemented by blottab module:
 struct BLOTTAB ;
 typedef struct BLOTTAB* BLOTTAB_HANDLE;
+#endif
 
 // Add new blottab in blotex executor's blot tables.
 // 
 // Passed:
 // - handle:
+// - blottabLabel: GENUINE_BLOTTAB_LABEL0,... 
 // - blottabName:
-// - h_blottabHandle: new blotab handle 
+// - hr_blottabHandle: new blotab handle 
 //
 // Changed:
 // - *a_blottabHandle: created blottab's handle 
@@ -237,33 +350,33 @@ typedef struct BLOTTAB* BLOTTAB_HANDLE;
 // Ret:
 // - RETURNED: Ok
 // - -1: unexpected problem; anomaly is raised
-int BlotexlibExecutorAddBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING blottabName,
-  BLOTTAB_HANDLE h_blottabHandle) ;
+int BlotexlibExecutorAddBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, int blottabLabel,
+  struct P_STRING blottabName, void* hr_blottabHandle) ;
 
 
 // Retrieve some blot table of blotex executor...
 // 
 // Passed:
 // - handle:
+// - blottabLabel: GENUINE_BLOTTAB_LABEL0,... 
 // - blottabName: blot table's name 
 //
 // Changed:
-// - *ac_blottabHandle: (only significant when retrieved : RESULT__FOUND) 
+// - *acr_blottabHandle: (only significant when retrieved : RESULT__FOUND) 
 //
 // Ret:
 // - RESULT__FOUND: OK
 // - RESULT__NOT_FOUND: 
 // - -1: unexpected problem; anomaly is raised
-int BlotexlibExecutorGetBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING blottabName,
-  BLOTTAB_HANDLE *ac_blottabHandle) ;
+int BlotexlibExecutorGetBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, int blottabLabel,
+  struct P_STRING blottabName, void* *acr_blottabHandle) ;
 
-
+#if 0
 struct BLOTTAB_FIELD_REFERENCE {
   int asValue; 
-  int element; // field identification
-  BLOTTAB_HANDLE blottabHandle; // Current  
+  void *r_identification; // field identification
+  BLOTTAB_HANDLE blottabHandle; // Current blottab   
 } ;
-
 
 // ===> To be implemented by blottab module:
 // #REF l_BlotexlibExecutorComputeLValueBlottabOps
@@ -329,5 +442,6 @@ int l_BlotexlibExecutorComputeRValueBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
 // - -1: unexpected problem; anomaly is raised
 int UpdateCurrentBlotsetField(struct BLOTTAB_FIELD_REFERENCE blottabFieldReference,
  struct BLOTEX_VALUE blotexValue) ;
+#endif
 
 #endif // __C_ANSI_BLOTEX_H_INCLUDED__
