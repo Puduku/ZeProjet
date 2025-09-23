@@ -49,7 +49,6 @@
 // - 0 : represents "true" boolean value
 // - !=0 : represents "false" boolean value
 //
-// NOTICE: see blottab extensions in c-ansi/blottab.topo 
 // "int" blotex references are (usable as 'l-value') :
 // <int blotex ref> ::= <blotvar as int> | <blotvar id> | <int blotreg ref> | <int blottab ref>
 // "str" blotex references are usable as 'l-value' :
@@ -58,9 +57,9 @@
 // Integer and string atoms are made of constants, blot expressions between brackets, variables
 // references, strings comparisons, "register" and "table" operations:
 // <intex atom> ::= [ <int 1op> ] ( ( '(' <intex> ')' ) | <int constant> | <blotvar as int> |
-//   <blotvar entry> | <blotvar id> | <int blotreg> | <int blottab> | <strex comp> ) 
+//   <blotvar entry> | <blotvar id> | <int blotreg> | <int some blottab> | <strex comp> ) 
 // <strex atom> ::= ( '(' <strex> ')' ) | <str constant> | <blotvar as str> | <blotvar name> |
-//   <str blotreg> | <str blottab>
+//   <str blotreg> | <str some blottab>
 //
 // Unary operators modify integer atoms. Pseudo-logical operator '!' "negates" the integer
 // expression "seen" as boolean:
@@ -174,12 +173,29 @@
 //
 //
 // Blot table 'r-value' operations :
+// <int some blottab> ::= <int blottab> | <int blottab2> | <int blottab3> 
+// <str some blottab> ::= <str blottab> | <str blottab2> | <str blottab3> 
+//
+// Blot table 'l-value' operations :
+// <int any blottab ref> ::= <int blottab ref> | <int blottab2 ref> | <int blottab3 ref> 
+// <str any blottab ref> ::= <str blottab ref> | <str blottab2 ref> | <str blottab3 ref> 
+
+// NOTICE: see "GENUINE" blottab extensions in c-ansi/blottab.topo 
+// "GENUINE" Blot table 'r-value' operations :
 // <int blottab> ::= '^' <entity> '?' <int blottab ops>  
 // <str blottab> ::= '^' <entity> '?' <str blottab ops>  
 //
-// Blot table 'l-value' operations :
+// "GENUINE" Blot table 'l-value' operations :
 // <int blottab ref> ::= '^' <entity> '?' <blottab ref op set int>
 // <str blottab ref> ::= '^' <entity> '?' <blottab ref op set str>
+//
+// "SUPER" Blot table 'r-value' operations :
+// <int blottab2> ::= '^^' <entity> '?' <int blottab2 ops>  
+// <str blottab2> ::= '^^' <entity> '?' <str blottab2 ops>  
+//
+// "SUPER" Blot table 'l-value' operations :
+// <int blottab2 ref> ::= '^^' <entity> '?' <blottab2 ref op set int>
+// <str blottab2 ref> ::= '^^' <entity> '?' <blottab2 ref op set str>
 //
 //
 // Examples of <blotex> :
@@ -281,4 +297,5 @@
 //    order. 
 //   OutputF (%s, var$) 
 //   OutputF (%.10s, var$) 
+
 
