@@ -38,7 +38,7 @@ int BlottabCreateInstance(BLOTTAB_HANDLE *azh_handle, int fieldsNumber,
 
 
 // NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION
-int BlottabDestroyInstanceGenuine(void *xhr_handle) ;
+int BlottabDestroyInstance(void *xhr_handle) ;
 
 // Create NEW GENUINE blot table and add it in blotex executor's blot tables.
 // 
@@ -57,24 +57,24 @@ int BlottabDestroyInstanceGenuine(void *xhr_handle) ;
 // Ret:
 // - RETURNED: Ok
 // - -1: unexpected problem; anomaly is raised
-int l_BlotexlibExecutorCreateBlottabGenuine(BLOTEXLIB_EXECUTOR_HANDLE handle,
+int l_BlotexlibExecutorCreateBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct P_STRING blottabName, int fieldsNumber, struct P_STRING* s_names, int* s_blottabIndexFlags,
   BLOTTAB_HANDLE *a_blottabHandle) ;
 
 
 // #SEE l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_OPS_FUNCTION@c-ansi/blotex.h
-int l_BlotexlibExecutorComputeLValueBlottabOpsGenuine(BLOTEXLIB_EXECUTOR_HANDLE handle, 
+int l_BlotexlibExecutorComputeLValueBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle, 
   struct P_STRING *a_sequence, struct P_STRING blottabName, 
   struct BLOTTAB_FIELD_REFERENCE *ac_blottabFieldReference, G_STRING_STUFF nc_abandonmentInfo) ;
 
 // #SEE l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_OPS_FUNCTION@c-ansi/blotex.h
-int l_BlotexlibExecutorComputeRValueBlottabOpsGenuine(BLOTEXLIB_EXECUTOR_HANDLE handle,
+int l_BlotexlibExecutorComputeRValueBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct P_STRING *a_sequence, struct P_STRING blottabName, struct BLOTEX_VALUE *ac_blotexValue,
   G_STRING_STUFF nc_abandonmentInfo) ;
 
 
 // #SEE  l_BLOTEXLIB_EXECUTOR_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION@c-ansi/blotex.h
-int UpdateCurrentBlotsetFieldGenuine(struct BLOTTAB_FIELD_REFERENCE blottabFieldReference,
+int UpdateCurrentBlotsetField(struct BLOTTAB_FIELD_REFERENCE blottabFieldReference,
  struct BLOTEX_VALUE blotexValue) ;
 
 

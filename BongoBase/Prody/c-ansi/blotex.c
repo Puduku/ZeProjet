@@ -37,7 +37,7 @@ struct BLOTEXLIB_EXECUTOR_FACTORY {
 }; 
 
 // Public function; see .h
-int BlotexlibExecutorFactoryRegisterBlottabHandler(
+int BlotexlibExecutorFactoryRegisterBlottabImplementation(
   BLOTEXLIB_EXECUTOR_FACTORY_HANDLE handle,
   l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_OPS_FUNCTION
   l_blotexlibExecutorComputeLValueBlottabOpsFunction,
@@ -58,26 +58,26 @@ int BlotexlibExecutorFactoryRegisterBlottabHandler(
   blottabDestroyInstanceFunction;
 
   m_DIGGY_RETURN(RETURNED)
-} // BlotexlibExecutorFactoryRegisterBlottabHandler
+} // BlotexlibExecutorFactoryRegisterBlottabImplementation
 
  
 // Public function; see .h
 int BlotexlibExecutorFactoryCreateInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE *azh_handle,
   l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_OPS_FUNCTION
-  l_blotexlibExecutorComputeLValueBlottabOpsGenuineFunction,
+  l_blotexlibExecutorComputeLValueGenuineBlottabOpsFunction,
   l_BLOTEXLIB_EXECUTOR_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION
-  l_blotexlibExecutorComputeRValueBlottabOpsGenuineFunction,
-  UPDATE_CURRENT_BLOTSET_FIELD_FUNCTION updateCurrentBlotsetFieldGenuineFunction,
-  NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION blottabDestroyInstanceGenuineFunction) {
+  l_blotexlibExecutorComputeRValueGenuineBlottabOpsFunction,
+  UPDATE_CURRENT_BLOTSET_FIELD_FUNCTION updateCurrentGenuineBlotsetFieldFunction,
+  NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION genuineBlottabDestroyInstanceFunction) {
   m_DIGGY_BOLLARD()
 
   m_MALLOC_INSTANCE(*azh_handle)
   m_ASSIGN_MAGIC_FIELD(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE,*azh_handle)
   (*azh_handle)->blottabImplementationsNumber = 0; 
-  m_ASSERT(BlotexlibExecutorFactoryRegisterBlottabHandler(*azh_handle,
-    l_blotexlibExecutorComputeLValueBlottabOpsGenuineFunction,
-    l_blotexlibExecutorComputeRValueBlottabOpsGenuineFunction,
-    updateCurrentBlotsetFieldGenuineFunction, blottabDestroyInstanceGenuineFunction) ==
+  m_ASSERT(BlotexlibExecutorFactoryRegisterBlottabImplementation(*azh_handle,
+    l_blotexlibExecutorComputeLValueGenuineBlottabOpsFunction,
+    l_blotexlibExecutorComputeRValueGenuineBlottabOpsFunction,
+    updateCurrentGenuineBlotsetFieldFunction, genuineBlottabDestroyInstanceFunction) ==
     GENUINE_BLOTTAB_LABEL0) 
   m_DIGGY_RETURN(RETURNED)
 } // BlotexlibExecutorFactoryCreateInstance
