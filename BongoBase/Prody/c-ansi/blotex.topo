@@ -50,9 +50,9 @@
 // - !=0 : represents "false" boolean value
 //
 // "int" blotex references are (usable as 'l-value') :
-// <int blotex ref> ::= <blotvar as int> | <blotvar id> | <int blotreg ref> | <int blottab ref>
+// <int blotex ref> ::= <blotvar as int> | <blotvar id> | <int blotreg ref> | <int some blottab ref>
 // "str" blotex references are usable as 'l-value' :
-// <str blotex ref> ::= <blotvar as str> | <blotvar name> | <str blotreg ref> | <str blottab ref>
+// <str blotex ref> ::= <blotvar as str> | <blotvar name> | <str blotreg ref> | <str some blottab ref>
 //
 // Integer and string atoms are made of constants, blot expressions between brackets, variables
 // references, strings comparisons, "register" and "table" operations:
@@ -177,8 +177,8 @@
 // <str some blottab> ::= <str blottab> | <str blottab2> | <str blottab3> 
 //
 // Blot table 'l-value' operations :
-// <int any blottab ref> ::= <int blottab ref> | <int blottab2 ref> | <int blottab3 ref> 
-// <str any blottab ref> ::= <str blottab ref> | <str blottab2 ref> | <str blottab3 ref> 
+// <int some blottab ref> ::= <int blottab ref> | <int blottab2 ref> | <int blottab3 ref> 
+// <str some blottab ref> ::= <str blottab ref> | <str blottab2 ref> | <str blottab3 ref> 
 
 // NOTICE: see "GENUINE" blottab extensions in c-ansi/blottab.topo 
 // "GENUINE" Blot table 'r-value' operations :
@@ -297,5 +297,6 @@
 //    order. 
 //   OutputF (%s, var$) 
 //   OutputF (%.10s, var$) 
+
 
 
