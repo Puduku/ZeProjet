@@ -8,7 +8,7 @@
 // Using karl in blot code
 // =========================
 //
-// structure : verset / alinea / paragraph / section / article
+// structure : verset / alinea / paragraph / section / article / topic
 // Blot pamplets operations
 //
 // See engels.topo for the description of pamphlets structure (point / group / aggregate...) 
@@ -117,5 +117,6 @@
 //         widest representation does not applies; =w is equivalent to =V
 //        +binary integer: as is (strict binary content); =w is equivalent to =V 
 //   =I : point's raw binary value displayable image
+
 
 
