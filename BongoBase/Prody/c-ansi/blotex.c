@@ -217,26 +217,7 @@ m_DIGGY_VAR_P_STRING(blotregName)
     INDEX_SEEK_FLAGS__EQUAL,&gKey, INDEX_FETCH_FLAGS__SEEK_ONLY,&ct_namedBlotregStuff, NULL);
   switch (result) {
   case RESULT__FOUND:
-m_DIGGY_VAR_P_STRING(blotregName)
     m_ASSERT((*ac_blotregHandle = ct_namedBlotregStuff->acolyt.cnhr_handle) != NULL)
-m_DIGGY_INFO("... was FOUND : *ac_blotregHandle=%p",*ac_blotregHandle)
-#if 0
-struct G_STRING *na_gStrings = (struct G_STRING *)UNDEFINED;
-m_TRACK_IF(GStringsFetch(*ac_blotregHandle,0, &na_gStrings) < 0)
-int count = GStringsGetCount(*ac_blotregHandle,NULL);
-m_TRACK_IF(count < 0)
-m_DIGGY_VAR_D(count)
-int i=0; for (; i < count ; i++){
- m_DIGGY_VAR_D(i)
- m_DIGGY_VAR_P_STRING(na_gStrings[(i*2)+G_PARAM_NAME_ELEMENT].cv_pString)
- m_DIGGY_VAR_D(na_gStrings[(i*2)+G_PARAM_NAME_ELEMENT].acolyt.c_tokenId)
- m_DIGGY_VAR_P_STRING(na_gStrings[(i*2)+G_PARAM_VALUE_ELEMENT].cv_pString)
- m_DIGGY_VAR_D(na_gStrings[(i*2)+G_PARAM_VALUE_ELEMENT].acolyt.c_tokenId)
- m_DIGGY_VAR_P(&(na_gStrings[(i*2)+G_PARAM_NAME_ELEMENT].cv_pString))
- m_DIGGY_VAR_P(&(na_gStrings[(i*2)+G_PARAM_VALUE_ELEMENT].cv_pString))
-}
-m_DIGGY_VAR_P_STRING(blotregName)
-#endif
 switch(GStringsVerifyIndexes(*ac_blotregHandle)) {
 case COMPLETED__OK:
 break; case COMPLETED__BUT:
@@ -244,10 +225,7 @@ break; case COMPLETED__BUT:
 break; default:
   m_TRACK()
 } // switch
-//////////////////////////
   break; case RESULT__NOT_FOUND:
-m_DIGGY_VAR_P_STRING(blotregName)
-m_DIGGY_INFO("... was NOT FOUND => on abandonne... ")
   break; default:
     m_TRACK()
   } // switch
@@ -633,7 +611,6 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
     int blotregIndexLabel = UNDEFINED; 
     // <blotreg request atom int> | <blotreg request atom str> ...
     m_TRACK_IF(ParseAs(b_R_VALUE,&subSequence,&as) != RETURNED)
-m_DIGGY_VAR_D(as)
     switch (as) {
     case AS__VALUE_INT: // [ '#' ]
       blotregIndexLabel = INT_VALUE__BLOTREG_INDEX_LABEL; 
@@ -647,14 +624,11 @@ m_RAISE(ANOMALY__NOT_AVAILABLE)
       blotregIndexLabel = NAME__BLOTREG_INDEX_LABEL;
     break; default: m_RAISE(ANOMALY__VALUE__D,as)
     } // switch
-m_DIGGY_VAR_P_STRING(subSequence)
     
     int n_indexSeekFlags = UNDEFINED;
     PParsePassSingleChar(&subSequence,NULL,'*',&lexeme);
-m_DIGGY_VAR_P_STRING(lexeme)
     if (!b_EMPTY_P_STRING(lexeme)) n_indexSeekFlags = INDEX_SEEK_FLAGS__ANY;
     else {  // select with actual criterium
-m_DIGGY_VAR_P_STRING(lexeme)
       m_TRACK_IF(ParseRequestCompOp(&subSequence,as != AS__VALUE_INT,
         &n_indexSeekFlags) != RETURNED)
       if (n_indexSeekFlags < 0) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
@@ -672,11 +646,9 @@ m_RAISE(ANOMALY__NOT_AVAILABLE)
           gKey = m_GKey_AcolytValue(blotexValue.select.c_blotval); 
         break; case AS__VALUE_STR: // '$'
           if (blotexValue.asValue == AS__VALUE_INT) m_ABANDON(EXPECT_STREX__ABANDONMENT_CAUSE)
-m_DIGGY_VAR_P_STRING(blotexValue.select.c_strex.v_str)
           gKey = m_GKey_PString(blotexValue.select.c_strex.v_str);
         break; case AS__NAME:  // '!$'
           if (blotexValue.asValue == AS__VALUE_INT) m_ABANDON(EXPECT_STREX__ABANDONMENT_CAUSE)
-m_DIGGY_VAR_P_STRING(blotexValue.select.c_strex.v_str)
           gKey = m_GKey_PString(blotexValue.select.c_strex.v_str);
         break; default: m_RAISE(ANOMALY__VALUE__D,as)
         } // switch
@@ -689,7 +661,6 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(n_indexSeekFlags)
     
     int criteriaOpFlags = UNDEFINED;
     m_TRACK_IF(ParseLogical2Op(&subSequence, &criteriaOpFlags) != RETURNED)
-m_DIGGY_VAR_P_STRING(subSequence)
 
     m_ASSERT(criteriaNumber < 5)
     criteria5[criteriaNumber++] = m_GRequestCriterium_GKeys(blotregIndexLabel,
@@ -697,7 +668,6 @@ m_DIGGY_VAR_P_STRING(subSequence)
     m_PParsePassSpaces(&subSequence,NULL);
   } while (!b_EMPTY_P_STRING(subSequence)) ; 
 
-m_DIGGY_INFO("Before GStringsIndexRequestR(blotregHandle=%p)...",blotregHandle)
   switch (GStringsIndexRequestR(blotregHandle,NULL,criteriaNumber,criteria5)) {
   case COMPLETED__OK:
   break ; case COMPLETED__BUT: // Request rectified
@@ -736,7 +706,6 @@ static int BlotexlibExecutorComputeLValueBlotregOps(BLOTEXLIB_EXECUTOR_HANDLE ha
   m_PREPARE_ABANDON(a_sequence, "<blotreg ref op set int> | <blotreg ref op set str>")
 
   G_STRINGS_HANDLE blotregHandle = (G_STRINGS_HANDLE)UNDEFINED; 
-m_DIGGY_VAR_P_STRING(blotregName)
   switch (BlotexlibExecutorGetBlotreg(handle,blotregName,&blotregHandle)) {
   case RESULT__FOUND:
   break; case RESULT__NOT_FOUND:
@@ -791,7 +760,6 @@ static int BlotexlibExecutorComputeRValueBlotregOps(BLOTEXLIB_EXECUTOR_HANDLE ha
   m_PREPARE_ABANDON(a_sequence, "<int blotreg ops> | <str blotreg ops>") 
 
   G_STRINGS_HANDLE blotregHandle = (G_STRINGS_HANDLE)UNDEFINED; 
-m_DIGGY_VAR_P_STRING(blotregName)
   switch (BlotexlibExecutorGetBlotreg(handle,blotregName,&blotregHandle)) {
   case RESULT__FOUND:
   break; case RESULT__NOT_FOUND:
@@ -845,7 +813,6 @@ m_DIGGY_VAR_INDEX_FETCH_FLAGS(n_indexFetchFlags)
     switch (GStringsIndexFetch(blotregHandle,NULL,n_indexFetchFlags,
       &ct_blotvarStuff, &c_entry)) {
     case RESULT__FOUND:
-m_DIGGY_VAR_D(n_as)
       switch (n_as) {
       case -1: 
         m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle, AS__VALUE_INT,TRUE__BLOTVAL0,
@@ -860,10 +827,6 @@ m_DIGGY_VAR_D(n_as)
       break; case AS__ID:
 m_RAISE(ANOMALY__NOT_AVAILABLE)
       break; case AS__VALUE_STR:
-m_DIGGY_VAR_P_STRING(ct_blotvarStuff[G_PARAM_VALUE_ELEMENT].cv_pString)
-m_DIGGY_VAR_D((int)ct_blotvarStuff[G_PARAM_VALUE_ELEMENT].acolyt.cen_value)
-m_DIGGY_VAR_P_STRING(ct_blotvarStuff[G_PARAM_NAME_ELEMENT].cv_pString)
-m_DIGGY_VAR_D((int)ct_blotvarStuff[G_PARAM_NAME_ELEMENT].acolyt.cen_value)
         m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,AS__VALUE_STR,UNDEFINED,
           &ct_blotvarStuff[G_PARAM_VALUE_ELEMENT].cv_pString,b_FUGACIOUS_STR,ac_blotexValue) !=
           RETURNED) // TODO: really FUGACIOUS????
@@ -920,7 +883,6 @@ static inline int m_BlotexlibExecutorComputeBlotexAtomBlotvar(BLOTEXLIB_EXECUTOR
     &c_blotvarReference, nc_abandonmentInfo)) {
   case ANSWER__YES: 
     m_TRACK_IF(FetchBlotvar(&c_blotvarReference, b_R_VALUE,&nt_blotvarStuff, &vn_entry) != RETURNED)
-m_DIGGY_VAR_D(vn_entry)
     if (nt_blotvarStuff == NULL) m_ABANDON(UNKNOWN_BLOTVAR__ABANDONMENT_CAUSE) 
   break; case ANSWER__NO:
     m_DIGGY_RETURN(ANSWER__NO)
@@ -1002,8 +964,6 @@ static int BlotexlibExecutorProbeBlotexAtom(BLOTEXLIB_EXECUTOR_HANDLE handle,
 m_DIGGY_VAR_P_STRING(*a_sequence)
   gen_BLOTVAL c_blotval = UNDEFINED; 
   PParseGenericInteger(a_sequence,&c_blotval,&lexeme);
-m_DIGGY_VAR_GEN(c_blotval,ld)
-m_DIGGY_VAR_P_STRING(lexeme)
   if (!b_EMPTY_P_STRING(lexeme)) m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,AS__VALUE_INT,
     c_blotval, (const struct P_STRING*) UNDEFINED, (char)UNDEFINED, ac_blotexAtomValue) != RETURNED)
   else { 
@@ -1030,14 +990,14 @@ m_DIGGY_VAR_P_STRING(lexeme)
         } // switch
       } else { // 
         struct P_STRING name = UNDEFINED_P_STRING;
-        PParsePassSingleChar(a_sequence,NULL,'^',&lexeme);
-        char b_blottab = (!b_EMPTY_P_STRING(lexeme)); 
+        int n_blottabLabel = UNDEFINED;
+        ParseBlottabLabel(a_sequence, &n_blottabLabel);
         PParsePassChars(a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_WHILE,IsEntityNameChar,
           (char)UNDEFINED,&name); // <entity>
         PParsePassSingleChar(a_sequence,NULL,'?',&lexeme);
         if (!b_EMPTY_P_STRING(lexeme)) { 
-          if (b_blottab) { // <int blottab> | <str blottab> ... TODO: use good blottab label
-            switch (handle->blottabExecutorImplementations[0].
+          if (n_blottabLabel >= 0) { // <int blottab> | <str blottab> ...
+            switch (handle->blottabExecutorImplementations[n_blottabLabel].
               l_blotexlibExecutorComputeRValueBlottabOpsFunction(handle,a_sequence,name,
               ac_blotexAtomValue,nc_abandonmentInfo)) {
             case ANSWER__YES:
@@ -1057,7 +1017,7 @@ m_DIGGY_VAR_P_STRING(lexeme)
             } // switch
           } // if
         } else {
-          if (b_blottab) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
+          if (n_blottabLabel >= 0) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
           switch (m_BlotexlibExecutorComputeBlotexAtomBlotvar(handle,a_sequence,name,
             ac_blotexAtomValue, nc_abandonmentInfo)) {
           case ANSWER__YES: // ( <blotvar as int> | <blotvar as str> | <blotvar name> ) 
@@ -1218,7 +1178,6 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
   struct BLOTEX_VALUE intexTermValue = UNDEFINED_BLOTEX_VALUE ;
   while (b_TRUE) {
     m_TRACK_IF(ParseTermOp(a_sequence,&n_termOp) != RETURNED)
-m_DIGGY_VAR_D(n_termOp)
     if (n_termOp == -1) break;
     switch (BlotexlibExecutorComputeIntexTerm(handle,a_sequence,b_FALSE0, &intexTermValue,
       nc_abandonmentInfo)) {
@@ -1287,11 +1246,6 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
       if (strexAtomValue.asValue != AS__VALUE_STR) m_ABANDON(EXPECT_STREX__ABANDONMENT_CAUSE)
       m_TRACK_IF(BlotexlibExecutorConcatenateStrexValue(handle,
         a_strexValue, strexAtomValue.select.c_strex.v_str) != RETURNED)
-//      G_STRING_STUFF t_workingGStringStuff = (G_STRING_STUFF)UNDEFINED;
-//      m_TRACK_IF(GStringsFetch(handle->h_workingGStringsHandle,-1, &t_workingGStringStuff) < 0)
-//      m_TRACK_IF(GStringCopy(t_workingGStringStuff,0, ac_strexValue->select.cv_str) < 0)
-//      m_TRACK_IF(GStringCopy(t_workingGStringStuff,-1, strexAtomValue.select.cv_str) < 0)
-//      ac_strexValue->select.cv_str = t_workingGStringStuff->cv_pString;
     break; case ANSWER__NO:
       m_DIGGY_RETURN(ANSWER__NO)
     break; default:
@@ -1353,7 +1307,8 @@ m_DIGGY_VAR_D(ac_blotexValue->asValue)
 //
 // Changed:
 // - *a_sequence: after parsing 
-// - *acb_blottabFieldReference: only significant if success blottab (field) ref  ?
+//// - *acb_blottabFieldReference: only significant if success blottab (field) ref  ?
+// - *an_fieldReferenceBlottabLabel: only significant if success / blottab (field) ref
 // - *acc_blotvarReference: only significant if success, NOT blottab (field) ref case
 // - nc_abandonmentInfo: only significant if abandon 
 //
@@ -1362,7 +1317,7 @@ m_DIGGY_VAR_D(ac_blotexValue->asValue)
 // - ANSWER__NO: abandon 
 // - -1: unexpected problem
 static inline int m_BlotexlibExecutorProbeBlotexRef(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING *a_sequence, char *acb_blottabFieldReference,
+  struct P_STRING *a_sequence, int* an_fieldReferenceBlottabLabel,
   struct BLOTVAR_REFERENCE *acc_blotvarReference,
   struct BLOTTAB_FIELD_REFERENCE *acc_blottabFieldReference, int *acc_as,
   G_STRING_STUFF nc_abandonmentInfo) {
@@ -1375,16 +1330,15 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
   *acc_as = UNDEFINED;
 
   struct P_STRING name; UNDEFINED;
-  PParsePassSingleChar(a_sequence,NULL,'^',&lexeme);
-  *acb_blottabFieldReference = (!b_EMPTY_P_STRING(lexeme)); 
+  ParseBlottabLabel(a_sequence, an_fieldReferenceBlottabLabel); 
   // Parse <entity> corresponding to blotreg or blottab name:
   PParsePassChars(a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_WHILE,IsEntityNameChar,
     (char)UNDEFINED,&name); 
   PParsePassSingleChar(a_sequence,NULL,'?',&lexeme);
   if (!b_EMPTY_P_STRING(lexeme)) { 
-    if (*acb_blottabFieldReference) { // Parsing <int blottab ref> or <str blottab ref> ...
+    if (*an_fieldReferenceBlottabLabel >= 0) { // Parsing <int blottab ref> or <str blottab ref> ...
 // TODO: which blottab label ?
-      switch (handle->blottabExecutorImplementations[0].
+      switch (handle->blottabExecutorImplementations[*an_fieldReferenceBlottabLabel].
         l_blotexlibExecutorComputeLValueBlottabOpsFunction(handle,a_sequence,name,
         acc_blottabFieldReference, nc_abandonmentInfo)) {
       case ANSWER__YES:
@@ -1405,7 +1359,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
     } // if
 
   } else {
-    if (*acb_blottabFieldReference) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
+    if (*an_fieldReferenceBlottabLabel >= 0) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
     // Parse <blotvar>:
     switch (BlotexlibExecutorParseSimpleBlotvarReference(handle,b_L_VALUE,a_sequence,name,
       acc_blotvarReference, nc_abandonmentInfo)) {
@@ -1451,7 +1405,7 @@ static inline int m_BlotexlibExecutorExecuteCFunctionEval(BLOTEXLIB_EXECUTOR_HAN
   m_DIGGY_BOLLARD()
   m_TRACK_IF(GStringsClear(handle->h_workingGStringsHandle,b_LIGHT_CLEAR) < 0)
   char b_lValueReference = b_FALSE0; // NO 'L-value' reference a priori
-  char cb_lValueBlottabFieldReference = (char)UNDEFINED;
+  int n_fieldReferenceBlottabLabel = UNDEFINED;
   struct BLOTVAR_REFERENCE cc_lValueBlotvarReference = UNDEFINED_BLOTVAR_REFERENCE ; 
   struct BLOTTAB_FIELD_REFERENCE cc_lValueBlottabFieldReference;
   int cc_as = UNDEFINED; // only significant with assignation of single blotvar/blotreg
@@ -1463,7 +1417,7 @@ static inline int m_BlotexlibExecutorExecuteCFunctionEval(BLOTEXLIB_EXECUTOR_HAN
     if (b_EMPTY_P_STRING(arguments)) arguments = subSequence; // No assignation
     else { // Assignation 
       b_lValueReference = b_TRUE;
-      switch (m_BlotexlibExecutorProbeBlotexRef(handle,&subSequence, &cb_lValueBlottabFieldReference,
+      switch (m_BlotexlibExecutorProbeBlotexRef(handle,&subSequence, &n_fieldReferenceBlottabLabel,
         &cc_lValueBlotvarReference, &cc_lValueBlottabFieldReference, &cc_as, nc_abandonmentInfo)) {
       case ANSWER__YES: // <blotvar>
       break; case ANSWER__NO:
@@ -1491,7 +1445,7 @@ static inline int m_BlotexlibExecutorExecuteCFunctionEval(BLOTEXLIB_EXECUTOR_HAN
   if (!b_EMPTY_P_STRING(arguments)) m_ABANDON(NOT_PARSABLE__ABANDONMENT_CAUSE)
 
   if (b_lValueReference) { // Assignation
-    if (cb_lValueBlottabFieldReference) { // blottab assignation
+    if (/*cb_lValueBlottabFieldReference*/ n_fieldReferenceBlottabLabel >= 0) { // blottab assignation
       switch (cc_lValueBlottabFieldReference.asValue) {
       case AS__VALUE_INT: // [ '#' ] 
         if (c_blotexValue.asValue != AS__VALUE_INT) m_ABANDON(EXPECT_INTEX__ABANDONMENT_CAUSE)
@@ -1499,8 +1453,8 @@ static inline int m_BlotexlibExecutorExecuteCFunctionEval(BLOTEXLIB_EXECUTOR_HAN
         if (c_blotexValue.asValue != AS__VALUE_STR) m_ABANDON(EXPECT_STREX__ABANDONMENT_CAUSE)
       break; default: m_RAISE(ANOMALY__VALUE__D,cc_lValueBlottabFieldReference.asValue)
       } // switch TODO: use correct blottab label:
-      switch (handle->blottabExecutorImplementations[0].updateCurrentBlotsetFieldFunction(
-        cc_lValueBlottabFieldReference, c_blotexValue)) {
+      switch (handle->blottabExecutorImplementations[n_fieldReferenceBlottabLabel].
+        updateCurrentBlotsetFieldFunction(cc_lValueBlottabFieldReference, c_blotexValue)) {
       case RESULT__FOUND:
       break; case RESULT__NOT_FOUND:
         m_ABANDON(NOT_EXISTING_L_VALUE__ABANDONMENT_CAUSE)
