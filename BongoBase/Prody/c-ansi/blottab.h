@@ -10,9 +10,6 @@
 /////////////////////////////
 
 #include "c-ansi/blotcode.h"
-
-//#undef __C_ANSI_BLOTEX_H_INCLUDED__
-
 #include "c-ansi/blotex.h"
 #include "c-ansi/g-string.h"
 
@@ -21,8 +18,6 @@
 struct BLOTTAB ; // the GENUINE blottab...
 typedef struct BLOTTAB* BLOTTAB_HANDLE;
 
-
-// Blottabs: 
 
 // #REF BLOTTAB_INDEX_FLAG
 #define STR__BLOTTAB_INDEX_FLAG 0x01
@@ -81,3 +76,4 @@ int UpdateCurrentBlotsetField(struct BLOTTAB_FIELD_REFERENCE blottabFieldReferen
 
 
 #endif // __BLOTTAB_C_ANSI_H_INCLUDED__
+
