@@ -14,8 +14,8 @@
 #include "c-ansi/g-string.h"
 
 
-// blotex library executor 
-// =======================
+// I. blotex library executor factory 
+// ==================================
 
 struct BLOTEXLIB_EXECUTOR_FACTORY ; // Private
 typedef struct BLOTEXLIB_EXECUTOR_FACTORY *BLOTEXLIB_EXECUTOR_FACTORY_HANDLE; // Public
@@ -172,9 +172,8 @@ int l_BlotcodeLinkBlotexlib(BLOTCODE_HANDLE ep_handle, const char* nfp_blotlibPr
 int BlotexlibExecutorFactoryDestroyInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE xh_handle) ;
 
 
-
-// Interface with other blotlibs
-// =============================
+// II. Interface with other blotlib executors
+// ==========================================
 
 // This function, which wraps BlotcodeExecutorGetBlotlibExecutorHandle(), retrieves the executor
 // handle of =>blotex<= library.
@@ -243,7 +242,7 @@ int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
 
 
 // Parsing blot expressions: helpers
-// ================================= 
+// ---------------------------------
 
 #define UNDEFINED_BLOTEX_VALUE { (int) UNDEFINED } 
 
@@ -349,3 +348,4 @@ int BlotexlibExecutorGetBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, int blottabLab
 
 
 #endif // __C_ANSI_BLOTEX_H_INCLUDED__
+
