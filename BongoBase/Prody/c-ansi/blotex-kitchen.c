@@ -202,7 +202,6 @@ int ParseFormat(struct P_STRING *a_sequence, int *avn_format,
 
 int ParseBlottabLabel(struct P_STRING *a_sequence, int *an_blottabLabel) {
   m_DIGGY_BOLLARD()
-m_DIGGY_VAR_P_STRING(*a_sequence)
   *an_blottabLabel = -1; // a priori
   struct P_STRING lexeme; // UNDEFINED
   while (b_TRUE) { 
@@ -210,7 +209,5 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
     if (b_EMPTY_P_STRING(lexeme)) break;
     (*an_blottabLabel)++; 
   } // while 
-m_DIGGY_VAR_P_STRING(*a_sequence)
-m_DIGGY_VAR_D(*an_blottabLabel)
   m_DIGGY_RETURN(RETURNED)
 } // ParseBlottabLabel
