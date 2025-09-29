@@ -46,6 +46,7 @@
 #define UNKNOWN_BLOTREG__ABANDONMENT_CAUSE "Unknown blotreg"
 #define INVALID_FORMAT__ABANDONMENT_CAUSE "Invalid format"
 #define NOT_EXISTING_L_VALUE__ABANDONMENT_CAUSE "Not existing l-value"
+#define NOT_SUPPORTED__ABANDONMENT_CAUSE "Not supported"
 
 // Make function abandon parsing (return ANSWER__NO)
 //

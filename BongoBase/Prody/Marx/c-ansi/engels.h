@@ -9,13 +9,7 @@
 #include "c-ansi/engels.topo"
 /////////////////////////////
 
-#include "c-ansi/blotcode.h"
 #include "c-ansi/g-string.h"
-
-
-// Public function: see .h
-int EngelsCreateInstance() ;
-
 
 
 // PamphletExamplars: 
@@ -23,16 +17,24 @@ int EngelsCreateInstance() ;
 struct PAMPHLET_EXAMPLAR ; // Private!
 typedef struct PAMPHLET_EXAMPLAR* PAMPHLET_EXAMPLAR_HANDLE;
 
-
-
+// Create new pamphlet examplar
+//
+// Passed:
+// - *azh_handle: "un-initialized" handle
+//
+// Changed:
+// - *azh_handle: initilized instance handle
+//
 // Ret:
 // - RETURNED: Ok
 // - -1 special value: anomaly raised
 int PamphletExamplarCreateInstance(PAMPHLET_EXAMPLAR_HANDLE *azh_handle, int dummy) ;
 
 
-// NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION
-int PamphletExamplarDestroyInstance(void *xhr_handle) ;
+// Ret:
+// - RETURNED: Ok
+// - -1 special value: anomaly raised
+int PamphletExamplarDestroyInstance(PAMPHLET_EXAMPLAR_HANDLE xh_handle) ;
 
 
 #endif // __C_ANSI_ENGELS_H_INCLUDED__

@@ -195,7 +195,7 @@ int main (int argc, char** argv) {
     (BLOTEXLIB_EXECUTOR_FACTORY_HANDLE)UNDEFINED;
   m_TRACK_IF(BlotexlibExecutorFactoryCreateInstance(&h_blotexlibExecutorFactoryHandle,
     l_BlotexlibExecutorComputeLValueGenuineBlottabOps,
-    l_BlotexlibExecutorComputeRValueGenuineBlottabOps, UpdateCurrentBlotsetField,
+    l_BlotexlibExecutorComputeRValueGenuineBlottabOps, UpdateBlottabCurrentBlotsetField,
     BlottabDestroyInstance) != RETURNED)
 
 

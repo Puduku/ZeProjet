@@ -226,7 +226,7 @@ m_ASSERT(n_asValue != -1)
   
   if (n_asValue == -1) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
   if (n_blottabHandle == NULL) m_ABANDON(UNKNOWN_BLOTTAB__ABANDONMENT_CAUSE) 
-  ac_blottabFieldReference->r_identification = (void*)(GENERIC_INTEGER)c_element;
+  ac_blottabFieldReference->r_field = (void*)(GENERIC_INTEGER)c_element;
   ac_blottabFieldReference->r_blottabHandle = n_blottabHandle; 
   ac_blottabFieldReference->asValue = n_asValue;
 
@@ -533,7 +533,7 @@ m_DIGGY_VAR_D(n_asValue)
 } // l_BlotexlibExecutorComputeRValueGenuineBlottabOps
 
 // Passed:
-// - handle:
+// - handle: supposed to be positoned on the "current" blotset
 // - element:
 // blotexValue 
 static int BlottabUpdateCurrentBlotsetField(BLOTTAB_HANDLE handle, int element,
@@ -570,14 +570,14 @@ m_ASSERT(vnt_blotsetStuff == NULL)
 
 
 // Public function; see .h
-int UpdateCurrentBlotsetField(struct BLOTTAB_FIELD_REFERENCE blottabFieldReference,
+int UpdateBlottabCurrentBlotsetField(struct BLOTTAB_FIELD_REFERENCE blottabFieldReference,
   struct BLOTEX_VALUE blotexValue) {
   m_DIGGY_BOLLARD()
   m_ASSERT(blottabFieldReference.asValue == blotexValue.asValue);
   int result = BlottabUpdateCurrentBlotsetField(blottabFieldReference.r_blottabHandle,
-    (int)(GENERIC_INTEGER)blottabFieldReference.r_identification, blotexValue); 
+    (int)(GENERIC_INTEGER)blottabFieldReference.r_field, blotexValue); 
   m_TRACK_IF(result < 0) 
 
   m_DIGGY_RETURN(result)
-} // UpdateCurrentBlotsetField
+} // UpdateBlottabCurrentBlotsetField
 

@@ -23,8 +23,8 @@ typedef struct BLOTEXLIB_EXECUTOR_FACTORY *BLOTEXLIB_EXECUTOR_FACTORY_HANDLE; //
 
 struct BLOTTAB_FIELD_REFERENCE {
   int asValue; 
-  void *r_identification; // "field" identification
-  void *r_blottabHandle; // Current blottab   
+  void *r_blottabHandle;
+  void *r_field; // "field" identification
 } ;
 
 struct BLOTEXLIB_EXECUTOR; // Private structure 
@@ -87,18 +87,18 @@ typedef int (*l_BLOTEXLIB_EXECUTOR_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION)(BLOTEXL
   G_STRING_STUFF nc_abandonmentInfo) ;
 
 
-// #REF UPDATE_CURRENT_BLOTSET_FIELD_FUNCTION 
+// #REF UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION 
 // Update some field of current blotset of a blottab.
 //
 // Passed:
-// - blottabFieldReference: 
+// - blottabFieldReference: referenced blottab, supposed to be positoned on the "current" blotset 
 // - blotexValue: accurate (INT / STR) value regarding blottabFieldReference
 // 
 // Ret:
 // - RESULT__FOUND:
 // - RESULT__NOT_FOUND: current blotset not available
 // - -1: unexpected problem; anomaly is raised
-typedef int (*UPDATE_CURRENT_BLOTSET_FIELD_FUNCTION)(
+typedef int (*UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION)(
   struct BLOTTAB_FIELD_REFERENCE blottabFieldReference, struct BLOTEX_VALUE blotexValue);
 
 #define GENUINE_BLOTTAB_LABEL0 0
@@ -124,7 +124,7 @@ int BlotexlibExecutorFactoryCreateInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE *az
   l_blotexlibExecutorComputeLValueGenuineBlottabOpsFunction,
   l_BLOTEXLIB_EXECUTOR_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION
   l_blotexlibExecutorComputeRValueGenuineBlottabOpsFunction,
-  UPDATE_CURRENT_BLOTSET_FIELD_FUNCTION updateCurrentGenuineBlotsetFieldFunction,
+  UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION updateGenuineBlottabCurrentBlotsetFieldFunction,
   NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION genuineBlottabDestroyInstanceFunction) ;
 
 // Register another blottab implementation. 
@@ -143,7 +143,7 @@ int BlotexlibExecutorFactoryRegisterBlottabImplementation(
   l_blotexlibExecutorComputeLValueBlottabOpsFunction,
   l_BLOTEXLIB_EXECUTOR_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION
   l_blotexlibExecutorComputeRValueBlottabOpsFunction,
-  UPDATE_CURRENT_BLOTSET_FIELD_FUNCTION updateCurrentBlotsetFieldFunction,
+  UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION updateCurrentBlotsetFieldFunction,
   NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION blottabDestroyInstanceFunction) ;
 
 // Link blotex library

@@ -12,12 +12,12 @@
 
 
 
-struct PAMPHLET_POINT_DESCRIPTION {
+struct PAMPHLET_SPOT_DESCRIPTION {
   int size;
 } ;
 
 struct PAMPHLET_DESCRIPTION {
-  G_STRINGS_HANDLE h_pointDescriptionsHandle ; 
+  G_STRINGS_HANDLE h_spotDescriptionsHandle ; 
 } ;
 
 // Public function: see .h
@@ -29,53 +29,55 @@ int EngelsCreateInstance() {
 
 // PamphletExamplars: 
 
-struct PAMPHLET_EXAMPLAR_POINT_OCCURENCE {
-  // Localization 
-  int offset ; // >= 0 (vis-a-vis point) 
-} ;
-typedef struct PAMPHLET_EXAMPLAR_POINT_OCCURENCE *PAMPHLET_EXAMPLAR_POINT_OCCURENCE_STUFF;
+// === SPOTs =====
 
-struct PAMPHLET_EXAMPLAR_POINT {
+struct SPOT_OCCURENCE {
   // Localization 
-  int offset ; // >= 0 (vis-a-vis parent point) 
+  int offset ; // >= 0 (vis-a-vis spot) 
+} ;
+typedef struct SPOT_OCCURENCE *SPOT_OCCURENCE_STUFF;
+
+struct SPOT {
+  // Localization 
+  int offset ; // >= 0 (vis-a-vis parent spot) 
   int depth ; // >= 0 
   int totalLength ; // >= 0 (all occurences)
 
-  // Entry in "pamphlet point descriptions"
-  int descriptionEntry ;
+  // Entry in "spot descriptions"
+  int spotDescriptionEntry ;
 
-  GREEN_COLLECTION_HANDLE h_occurencesHandle; 
+  GREEN_COLLECTION_HANDLE h_spotOccurencesHandle; 
 
-  G_STRINGS_HANDLE h_subPointsHandle ; // PAMPHLET_EXAMPLAR_POINT as NAMED_OBJECT
-  m_DECLARE_MAGIC_FIELD(PAMPHLET_EXAMPLAR_POINT_HANDLE)
+  G_STRINGS_HANDLE h_subSpotsHandle ; // SPOT as NAMED_OBJECT
+  m_DECLARE_MAGIC_FIELD(SPOT_HANDLE)
 } ;
-typedef struct PAMPHLET_EXAMPLAR_POINT *PAMPHLET_EXAMPLAR_POINT_HANDLE;
+typedef struct SPOT *SPOT_HANDLE;
 
 // NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION
-static int PamphletExamplarPointDestroyInstance(void *xhr_handle) {
+static int SpotDestroyInstance(void *xhr_handle) {
   m_DIGGY_BOLLARD_S()
 
-  PAMPHLET_EXAMPLAR_POINT_HANDLE xh_handle = (PAMPHLET_EXAMPLAR_POINT_HANDLE) xhr_handle;
-  m_CHECK_MAGIC_FIELD(PAMPHLET_EXAMPLAR_POINT_HANDLE,xh_handle)
+  SPOT_HANDLE xh_handle = (SPOT_HANDLE) xhr_handle;
+  m_CHECK_MAGIC_FIELD(SPOT_HANDLE,xh_handle)
   m_TRACK_IF(GreenCollectionDestroyInstance(xh_handle->h_occurencesHandle) != RETURNED)
-  m_TRACK_IF(GStringsDestroyInstance(xh_handle->h_subPointsHandle) != RETURNED)
+  m_TRACK_IF(GStringsDestroyInstance(xh_handle->h_subSpotsHandle) != RETURNED)
   
   free(xh_handle);
 
   m_DIGGY_RETURN(RETURNED)
-} // PamphletExamplarPointDestroyInstance
+} // SpotDestroyInstance
 
 // Public function: see .h
 // Ret:
 // - RETURNED: Ok
 // - -1: unexpected problem
-static int PamphletExamplarPointCreateInstance(PAMPHLET_EXAMPLAR_POINT_HANDLE *azh_handle,
+static int SpotCreateInstance(SPOT_HANDLE *azh_handle,
    int fieldsNumber) {
   m_DIGGY_BOLLARD_S()
 
   m_MALLOC_INSTANCE(*azh_handle)
-  PAMPHLET_EXAMPLAR_POINT_HANDLE handle = *azh_handle;
-  m_ASSIGN_MAGIC_FIELD(PAMPHLET_EXAMPLAR_POINT_HANDLE,handle)
+  SPOT_HANDLE handle = *azh_handle;
+  m_ASSIGN_MAGIC_FIELD(SPOT_HANDLE,handle)
 
   handle->offset = 0;
   handle->depth = 0;
@@ -83,42 +85,28 @@ static int PamphletExamplarPointCreateInstance(PAMPHLET_EXAMPLAR_POINT_HANDLE *a
   handle->descriptionEntry = 0;
  
   m_TRACK_IF(GreenCollectionCreateInstance(&handle->h_occurencesHandle, BATEAU__EXPECTED_ITEMS_NUMBER,
-    sizeof(struct PAMPHLET_EXAMPLAR_POINT_OCCURENCE), (GREEN_HANDLER__DISENGAGE_FUNCTION)NULL,
+    sizeof(struct SPOT_OCCURENCE), (GREEN_HANDLER__DISENGAGE_FUNCTION)NULL,
     (GREEN_HANDLER__COMPARE_FUNCTION)NULL,(GREEN_HANDLER__EQUATE_FUNCTION)NULL,
     (void*)UNDEFINED) != RETURNED) 
 
-  m_TRACK_IF(NAMED_OBJECTS_CREATE_INSTANCE(&handle->h_subPointsHandle, BATEAU__EXPECTED_ITEMS_NUMBER,
-    PamphletExamplarPointDestroyInstance) != RETURNED)
-  //GStringsAddIndex(handle->h_pointsHandle);
+  m_TRACK_IF(NAMED_OBJECTS_CREATE_INSTANCE(&handle->h_subSpotsHandle, BATEAU__EXPECTED_ITEMS_NUMBER,
+    SpotDestroyInstance) != RETURNED)
+  //GStringsAddIndex(handle->h_spotsHandle);
 
   //m_TRACK_IF(GStringsFreeze(handle->hp_fieldsHandle,NULL) < 0)
   m_DIGGY_RETURN(RETURNED)
-} // PamphletExamplarPointCreateInstance
+} // SpotCreateInstance
 
 
-//struct PAMPHLET_EXAMPLAR {
-//  struct P_STRING examplar ;
-//  // description entry in "pamphlets" descriptions
-//  int pamphletDescriptionEntry ;
-//  G_STRINGS_HANDLE *h_pointsHandle ; // PAMPHLET_EXAMPLAR_POINT as NAMED_OBJECT
-//} ;
+// ======== PAMPHLET_EXAMPLARs ======
 
-
-////////////////////////////////
-// blotpam <=> pamphlet examplar
-////////////////////////////////
 struct PAMPHLET_EXAMPLAR {
   m_DECLARE_MAGIC_FIELD(PAMPHLET_EXAMPLAR_HANDLE)
-  //G_STRINGS_HANDLE h_tableHandle;
-  //G_STRINGS_HANDLE hp_fieldsHandle;
   struct P_STRING examplar ;
   // description entry in "pamphlets" descriptions
   int pamphletDescriptionEntry ;
-  G_STRINGS_HANDLE h_pointsHandle ; // PAMPHLET_EXAMPLAR_POINT as NAMED_OBJECT
+  G_STRINGS_HANDLE h_spotsHandle ; // SPOT as NAMED_OBJECT
 } ; 
-typedef struct PAMPHLET_EXAMPLAR* PAMPHLET_EXAMPLAR_HANDLE;
-
-
 
 // Ret:
 // - RETURNED: Ok
@@ -130,9 +118,9 @@ int PamphletExamplarCreateInstance(PAMPHLET_EXAMPLAR_HANDLE *azh_handle, int dum
   PAMPHLET_EXAMPLAR_HANDLE handle = *azh_handle;
   m_ASSIGN_MAGIC_FIELD(PAMPHLET_EXAMPLAR_HANDLE,handle)
 
-  m_TRACK_IF(NAMED_OBJECTS_CREATE_INSTANCE(&handle->h_pointsHandle, BATEAU__EXPECTED_ITEMS_NUMBER,
-    PamphletExamplarPointDestroyInstance) != RETURNED)
-  //GStringsAddIndex(handle->h_pointsHandle);
+  m_TRACK_IF(NAMED_OBJECTS_CREATE_INSTANCE(&handle->h_spotsHandle, BATEAU__EXPECTED_ITEMS_NUMBER,
+    SpotDestroyInstance) != RETURNED)
+  //GStringsAddIndex(handle->h_spotsHandle);
 
   //m_TRACK_IF(GStringsFreeze(handle->hp_fieldsHandle,NULL) < 0)
 
@@ -147,7 +135,7 @@ int PamphletExamplarDestroyInstance(void *xhr_handle) {
 
   PAMPHLET_EXAMPLAR_HANDLE xh_handle = (PAMPHLET_EXAMPLAR_HANDLE) xhr_handle;
   m_CHECK_MAGIC_FIELD(PAMPHLET_EXAMPLAR_HANDLE,xh_handle)
-  m_TRACK_IF(GStringsDestroyInstance(xh_handle->h_pointsHandle) != RETURNED)
+  m_TRACK_IF(GStringsDestroyInstance(xh_handle->h_spotsHandle) != RETURNED)
 
   free(xh_handle);
 

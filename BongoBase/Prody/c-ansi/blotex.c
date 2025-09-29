@@ -25,7 +25,7 @@ struct BLOTTAB_IMPLEMENTATION {
   l_blotexlibExecutorComputeLValueBlottabOpsFunction;
   l_BLOTEXLIB_EXECUTOR_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION
   l_blotexlibExecutorComputeRValueBlottabOpsFunction;
-  UPDATE_CURRENT_BLOTSET_FIELD_FUNCTION updateCurrentBlotsetFieldFunction;
+  UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION updateBlottabCurrentBlotsetFieldFunction;
   NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION blottabDestroyInstanceFunction ;
 }; 
 
@@ -43,7 +43,7 @@ int BlotexlibExecutorFactoryRegisterBlottabImplementation(
   l_blotexlibExecutorComputeLValueBlottabOpsFunction,
   l_BLOTEXLIB_EXECUTOR_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION
   l_blotexlibExecutorComputeRValueBlottabOpsFunction,
-  UPDATE_CURRENT_BLOTSET_FIELD_FUNCTION updateCurrentBlotsetFieldFunction,
+  UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION updateBlottabCurrentBlotsetFieldFunction,
   NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION blottabDestroyInstanceFunction) {
   m_DIGGY_BOLLARD()
   int i = handle->blottabImplementationsNumber++; 
@@ -52,8 +52,8 @@ int BlotexlibExecutorFactoryRegisterBlottabImplementation(
     l_blotexlibExecutorComputeLValueBlottabOpsFunction;
   handle->blottabImplementations[i].l_blotexlibExecutorComputeRValueBlottabOpsFunction =
     l_blotexlibExecutorComputeRValueBlottabOpsFunction;
-  handle->blottabImplementations[i].updateCurrentBlotsetFieldFunction =
-    updateCurrentBlotsetFieldFunction ;
+  handle->blottabImplementations[i].updateBlottabCurrentBlotsetFieldFunction =
+    updateBlottabCurrentBlotsetFieldFunction ;
   handle->blottabImplementations[i].blottabDestroyInstanceFunction =
   blottabDestroyInstanceFunction;
 
@@ -67,7 +67,7 @@ int BlotexlibExecutorFactoryCreateInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE *az
   l_blotexlibExecutorComputeLValueGenuineBlottabOpsFunction,
   l_BLOTEXLIB_EXECUTOR_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION
   l_blotexlibExecutorComputeRValueGenuineBlottabOpsFunction,
-  UPDATE_CURRENT_BLOTSET_FIELD_FUNCTION updateCurrentGenuineBlotsetFieldFunction,
+  UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION updateGenuineBlottabCurrentBlotsetFieldFunction,
   NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION genuineBlottabDestroyInstanceFunction) {
   m_DIGGY_BOLLARD()
 
@@ -77,7 +77,7 @@ int BlotexlibExecutorFactoryCreateInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE *az
   m_ASSERT(BlotexlibExecutorFactoryRegisterBlottabImplementation(*azh_handle,
     l_blotexlibExecutorComputeLValueGenuineBlottabOpsFunction,
     l_blotexlibExecutorComputeRValueGenuineBlottabOpsFunction,
-    updateCurrentGenuineBlotsetFieldFunction, genuineBlottabDestroyInstanceFunction) ==
+    updateGenuineBlottabCurrentBlotsetFieldFunction, genuineBlottabDestroyInstanceFunction) ==
     GENUINE_BLOTTAB_LABEL0) 
   m_DIGGY_RETURN(RETURNED)
 } // BlotexlibExecutorFactoryCreateInstance
@@ -97,7 +97,7 @@ struct BLOTTAB_EXECUTOR_IMPLEMENTATION {
   l_blotexlibExecutorComputeLValueBlottabOpsFunction;
   l_BLOTEXLIB_EXECUTOR_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION
   l_blotexlibExecutorComputeRValueBlottabOpsFunction;
-  UPDATE_CURRENT_BLOTSET_FIELD_FUNCTION updateCurrentBlotsetFieldFunction;
+  UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION updateBlottabCurrentBlotsetFieldFunction;
   G_STRINGS_HANDLE h_blottabsHandle ; 
 } ;
 
@@ -156,8 +156,8 @@ static int BlotexlibExecutorFactoryCreateProductInstance(void *pr_handle,
     productHandle->blottabExecutorImplementations[i].
       l_blotexlibExecutorComputeRValueBlottabOpsFunction =
       p_handle->blottabImplementations[i].l_blotexlibExecutorComputeRValueBlottabOpsFunction;
-    productHandle->blottabExecutorImplementations[i].updateCurrentBlotsetFieldFunction =
-      p_handle->blottabImplementations[i].updateCurrentBlotsetFieldFunction;
+    productHandle->blottabExecutorImplementations[i].updateBlottabCurrentBlotsetFieldFunction =
+      p_handle->blottabImplementations[i].updateBlottabCurrentBlotsetFieldFunction;
   } // for
 
   m_TRACK_IF(G_STRINGS_CREATE_INSTANCE(&productHandle->h_workingGStringsHandle,5) != RETURNED) 
@@ -1454,7 +1454,7 @@ static inline int m_BlotexlibExecutorExecuteCFunctionEval(BLOTEXLIB_EXECUTOR_HAN
       break; default: m_RAISE(ANOMALY__VALUE__D,cc_lValueBlottabFieldReference.asValue)
       } // switch TODO: use correct blottab label:
       switch (handle->blottabExecutorImplementations[n_fieldReferenceBlottabLabel].
-        updateCurrentBlotsetFieldFunction(cc_lValueBlottabFieldReference, c_blotexValue)) {
+        updateBlottabCurrentBlotsetFieldFunction(cc_lValueBlottabFieldReference, c_blotexValue)) {
       case RESULT__FOUND:
       break; case RESULT__NOT_FOUND:
         m_ABANDON(NOT_EXISTING_L_VALUE__ABANDONMENT_CAUSE)

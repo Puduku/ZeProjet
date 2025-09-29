@@ -25,6 +25,12 @@ typedef struct BLOTTAB* BLOTTAB_HANDLE;
 
 // Note: blot tables are based on g-string set collections. 
 //
+// Passed:
+// - *azh_handle: "un-initialized" handle
+//
+// Changed
+// - *azh_handle: initialized instance handle
+//
 // Ret:
 // - RETURNED: Ok
 // - -1 special value: anomaly raised
@@ -43,8 +49,6 @@ int BlottabDestroyInstance(void *xhr_handle) ;
 // - fieldsNumber:
 // - s_names:
 // - s_blottabIndexFlags: #SEE BLOTTAB_INDEX_FLAG
-// - na_tableHandle: NULL special pointer: not used
-// - nap_fieldsHandle: NULL special pointer: not used
 //
 // Changed:
 // - *a_blottabHandle: created blottab's handle 
@@ -70,8 +74,8 @@ int l_BlotexlibExecutorComputeRValueGenuineBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE 
   G_STRING_STUFF nc_abandonmentInfo) ;
 
 
-// #SEE  l_BLOTEXLIB_EXECUTOR_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION@c-ansi/blotex.h
-int UpdateCurrentBlotsetField(struct BLOTTAB_FIELD_REFERENCE blottabFieldReference,
+// #SEE UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION@c-ansi/blotex.h
+int UpdateBlottabCurrentBlotsetField(struct BLOTTAB_FIELD_REFERENCE blottabFieldReference,
  struct BLOTEX_VALUE blotexValue) ;
 
 
