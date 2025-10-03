@@ -182,20 +182,20 @@
 
 // NOTICE: see "GENUINE" blottab extensions in c-ansi/blottab.topo 
 // "GENUINE" Blot table 'r-value' operations :
-// <int blottab> ::= '^' <entity> '?' <int blottab ops>  
-// <str blottab> ::= '^' <entity> '?' <str blottab ops>  
+// <int blottab> ::= '^' <entity> ( ( '?' <int blottab ops> ) | <int blottab spot> ) 
+// <str blottab> ::= '^' <entity> ( ( '?' <str blottab ops> ) | <str blottab spot> )  
 //
 // "GENUINE" Blot table 'l-value' operations :
-// <int blottab ref> ::= '^' <entity> '?' <blottab ref op set int>
-// <str blottab ref> ::= '^' <entity> '?' <blottab ref op set str>
+// <int blottab ref> ::= '^' <entity> ( ( '?' <blottab ref op set int> ) |<int blottab spot> )
+// <str blottab ref> ::= '^' <entity> ( ( '?' <blottab ref op set str> ) |<str blottab spot> )
 //
 // "SUPER" Blot table 'r-value' operations :
-// <int blottab2> ::= '^^' <entity> '?' <int blottab2 ops>  
-// <str blottab2> ::= '^^' <entity> '?' <str blottab2 ops>  
+// <int blottab2> ::= '^^' <entity> ( ( '?' <int blottab2 ops> ) | <int blottab2 spot> )
+// <str blottab2> ::= '^^' <entity> ( ( '?' <str blottab2 ops> ) | <str blottab2 spot> ) 
 //
 // "SUPER" Blot table 'l-value' operations :
-// <int blottab2 ref> ::= '^^' <entity> '?' <blottab2 ref op set int>
-// <str blottab2 ref> ::= '^^' <entity> '?' <blottab2 ref op set str>
+// <int blottab2 ref> ::= '^^' <entity> ( ( '?' <blottab2 ref op set int> ) | <int blottab2 spot> )
+// <str blottab2 ref> ::= '^^' <entity> ( ( '?' <blottab2 ref op set str> ) | <str blottab2 spot> )
 //
 //
 // Examples of <blotex> :

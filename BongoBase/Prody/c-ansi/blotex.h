@@ -30,7 +30,7 @@ struct BLOTTAB_FIELD_REFERENCE {
 struct BLOTEXLIB_EXECUTOR; // Private structure 
 typedef struct BLOTEXLIB_EXECUTOR *BLOTEXLIB_EXECUTOR_HANDLE; // Public handle
 
-// #REF l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_OPS_FUNCTION
+// #REF l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_SET_OP_FUNCTION
 // Parse and compute 'l-value' blottab operations:
 // expect <blottab ref op set int> | <blottab ref op set str> 
 //
@@ -48,8 +48,30 @@ typedef struct BLOTEXLIB_EXECUTOR *BLOTEXLIB_EXECUTOR_HANDLE; // Public handle
 // - ANSWER__YES: Ok,
 // - ANSWER__NO: 'syntax' 'not found' 'already exist' error; abandon processing 
 // - -1: unexpected problem
-typedef int (*l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_OPS_FUNCTION)(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING *a_sequence, struct P_STRING blottabName,
+typedef int (*l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_SET_OP_FUNCTION)(
+  BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING *a_sequence, struct P_STRING blottabName,
+  struct BLOTTAB_FIELD_REFERENCE *ac_blottabFieldReference, G_STRING_STUFF nc_abandonmentInfo) ;
+
+// #REF l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_SPOT_FUNCTION
+// Parse and compute 'l-value' blottab spot:
+// expect <int blottab spot> | <str blottab spot> 
+//
+// Passed:
+// - handle: 
+// - *a_sequence: before parsing
+// - blottabName: blot table name
+//
+// Changed:
+// - *a_sequence: after parsing 
+// - *ac_blottabFieldReference: only significant if "success" 
+// - nc_abandonmentInfo: 
+//
+// Ret: Computed successfully ? 
+// - ANSWER__YES: Ok,
+// - ANSWER__NO: 'syntax' (or other) error; abandon processing 
+// - -1: unexpected problem
+typedef int (*l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_SPOT_FUNCTION)(
+  BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING *a_sequence, struct P_STRING blottabName,
   struct BLOTTAB_FIELD_REFERENCE *ac_blottabFieldReference, G_STRING_STUFF nc_abandonmentInfo) ;
 
 
@@ -86,6 +108,28 @@ typedef int (*l_BLOTEXLIB_EXECUTOR_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION)(BLOTEXL
   struct P_STRING *a_sequence, struct P_STRING blottabName, struct BLOTEX_VALUE *ac_blotexValue,
   G_STRING_STUFF nc_abandonmentInfo) ;
 
+// #REF l_BLOTEXLIB_EXECUTOR_COMPUTE_R_VALUE_BLOTTAB_SPOT_FUNCTION
+// Parse and compute 'r-value' blottab operations:
+// expect <int blottab spot> | <str blottab spot>
+//
+// Passed:
+// - handle: 
+// - *a_sequence: before parsing
+// - blottabName: blot table name
+//
+// Changed:
+// - *a_sequence: after parsing 
+// - *ac_blotexValue: only significant if "success" ; value corresponding to blottab ops
+// - nc_abandonmentInfo: 
+//
+// Ret: Computed successfully ? 
+// - ANSWER__YES: Ok,
+// - ANSWER__NO: 'syntax' (or other) error; abandon processing 
+// - -1: unexpected problem
+typedef int (*l_BLOTEXLIB_EXECUTOR_COMPUTE_R_VALUE_BLOTTAB_SPOT_FUNCTION)(BLOTEXLIB_EXECUTOR_HANDLE handle,
+  struct P_STRING *a_sequence, struct P_STRING blottabName, struct BLOTEX_VALUE *ac_blotexValue,
+  G_STRING_STUFF nc_abandonmentInfo) ;
+
 
 // #REF UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION 
 // Update some field of current blotset of a blottab.
@@ -108,8 +152,10 @@ typedef int (*UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION)(
 //
 // Passed:
 // - *azh_handle: "un-initialized" handle
-// - l_blotexlibExecutorComputeLValueGenuineBlottabOpsFunction:
+// - l_blotexlibExecutorComputeLValueGenuineBlottabSetOpFunction:
+// - l_blotexlibExecutorComputeLValueGenuineBlottabSpotFunction,
 // - l_blotexlibExecutorComputeRValueGenuineBlottabOpsFunction:
+// - l_blotexlibExecutorComputeRValueGenuineBlottabSpotFunction,
 // - updateCurrentGenuineBlotsetFieldFunction:
 // - genuineBlottabDestroyInstanceFunction:
 //
@@ -120,10 +166,14 @@ typedef int (*UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION)(
 // - RETURNED: OK, created and initialized
 // - -1: unexpected problem
 int BlotexlibExecutorFactoryCreateInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE *azh_handle,
-  l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_OPS_FUNCTION
-  l_blotexlibExecutorComputeLValueGenuineBlottabOpsFunction,
+  l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_SET_OP_FUNCTION
+  l_blotexlibExecutorComputeLValueGenuineBlottabSetOpFunction,
+  l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_SPOT_FUNCTION
+  l_blotexlibExecutorComputeLValueGenuineBlottabSpotFunction,
   l_BLOTEXLIB_EXECUTOR_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION
   l_blotexlibExecutorComputeRValueGenuineBlottabOpsFunction,
+  l_BLOTEXLIB_EXECUTOR_COMPUTE_R_VALUE_BLOTTAB_SPOT_FUNCTION
+  l_blotexlibExecutorComputeRValueGenuineBlottabSpotFunction,
   UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION updateGenuineBlottabCurrentBlotsetFieldFunction,
   NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION genuineBlottabDestroyInstanceFunction) ;
 
@@ -131,18 +181,24 @@ int BlotexlibExecutorFactoryCreateInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE *az
 // => Your are supposed to register ALL blotab implementations before linking blotex library...
 //
 // Passed:
-// - l_blotexlibExecutorComputeLValueBlottabOpsFunction:
+// - l_blotexlibExecutorComputeLValueBlottabSetOpFunction:
+// - l_blotexlibExecutorComputeLValueBlottabSpotFunction,
 // - l_blotexlibExecutorComputeRValueBlottabOpsFunction:
+// - l_blotexlibExecutorComputeRValueBlottabSpotFunction:
 // - updateCurrentBlotsetFieldFunction:
 //
 // Returned:
 // - >= 1: new EXTRA (not GENUINE)  
 int BlotexlibExecutorFactoryRegisterBlottabImplementation(
   BLOTEXLIB_EXECUTOR_FACTORY_HANDLE handle,
-  l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_OPS_FUNCTION
-  l_blotexlibExecutorComputeLValueBlottabOpsFunction,
+  l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_SET_OP_FUNCTION
+  l_blotexlibExecutorComputeLValueBlottabSetOpFunction,
+  l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_SPOT_FUNCTION
+  l_blotexlibExecutorComputeLValueBlottabSpotFunction,
   l_BLOTEXLIB_EXECUTOR_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION
   l_blotexlibExecutorComputeRValueBlottabOpsFunction,
+  l_BLOTEXLIB_EXECUTOR_COMPUTE_R_VALUE_BLOTTAB_SPOT_FUNCTION
+  l_blotexlibExecutorComputeRValueBlottabSpotFunction,
   UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION updateCurrentBlotsetFieldFunction,
   NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION blottabDestroyInstanceFunction) ;
 

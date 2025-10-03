@@ -54,13 +54,23 @@ int l_BlotexlibExecutorCreateBlottab2(BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct P_STRING blottab2Name, int dummy, BLOTTAB2_HANDLE *a_blottab2Handle) ;
 
 
-// #SEE l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB2_OPS_FUNCTION@c-ansi/blotex.h
-int l_BlotexlibExecutorComputeLValueBlottab2Ops(BLOTEXLIB_EXECUTOR_HANDLE handle, 
+// #SEE l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_SET_OP_FUNCTION@c-ansi/blotex.h
+int l_BlotexlibExecutorComputeLValueBlottab2SetOp(BLOTEXLIB_EXECUTOR_HANDLE handle, 
   struct P_STRING *a_sequence, struct P_STRING blottab2Name, 
   struct BLOTTAB_FIELD_REFERENCE *ac_blottab2FieldReference, G_STRING_STUFF nc_abandonmentInfo) ;
 
-// #SEE l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB2_OPS_FUNCTION@c-ansi/blotex.h
+// #SEE l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_SPOT_FUNCTION@c-ansi/blotex.h
+int l_BlotexlibExecutorComputeLValueBlottab2Spot(BLOTEXLIB_EXECUTOR_HANDLE handle, 
+  struct P_STRING *a_sequence, struct P_STRING blottab2Name, 
+  struct BLOTTAB_FIELD_REFERENCE *ac_blottab2FieldReference, G_STRING_STUFF nc_abandonmentInfo) ;
+
+// #SEE l_BLOTEXLIB_EXECUTOR_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION@c-ansi/blotex.h
 int l_BlotexlibExecutorComputeRValueBlottab2Ops(BLOTEXLIB_EXECUTOR_HANDLE handle,
+  struct P_STRING *a_sequence, struct P_STRING blottab2Name, struct BLOTEX_VALUE *ac_blotexValue,
+  G_STRING_STUFF nc_abandonmentInfo) ;
+
+// #SEE l_BLOTEXLIB_EXECUTOR_COMPUTE_R_VALUE_BLOTTAB_SPOT_FUNCTION@c-ansi/blotex.h
+int l_BlotexlibExecutorComputeRValueBlottab2Spot(BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct P_STRING *a_sequence, struct P_STRING blottab2Name, struct BLOTEX_VALUE *ac_blotexValue,
   G_STRING_STUFF nc_abandonmentInfo) ;
 

@@ -21,10 +21,14 @@
 #define MAX_BLOTTAB_IMPLEMENTIONS_NUMBER 3
 
 struct BLOTTAB_IMPLEMENTATION {
-  l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_OPS_FUNCTION
-  l_blotexlibExecutorComputeLValueBlottabOpsFunction;
+  l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_SET_OP_FUNCTION
+  l_blotexlibExecutorComputeLValueBlottabSetOpFunction;
+  l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_SPOT_FUNCTION
+  l_blotexlibExecutorComputeLValueBlottabSpotFunction;
   l_BLOTEXLIB_EXECUTOR_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION
   l_blotexlibExecutorComputeRValueBlottabOpsFunction;
+  l_BLOTEXLIB_EXECUTOR_COMPUTE_R_VALUE_BLOTTAB_SPOT_FUNCTION
+  l_blotexlibExecutorComputeRValueBlottabSpotFunction;
   UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION updateBlottabCurrentBlotsetFieldFunction;
   NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION blottabDestroyInstanceFunction ;
 }; 
@@ -39,19 +43,27 @@ struct BLOTEXLIB_EXECUTOR_FACTORY {
 // Public function; see .h
 int BlotexlibExecutorFactoryRegisterBlottabImplementation(
   BLOTEXLIB_EXECUTOR_FACTORY_HANDLE handle,
-  l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_OPS_FUNCTION
-  l_blotexlibExecutorComputeLValueBlottabOpsFunction,
+  l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_SET_OP_FUNCTION
+  l_blotexlibExecutorComputeLValueBlottabSetOpFunction,
+  l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_SPOT_FUNCTION
+  l_blotexlibExecutorComputeLValueBlottabSpotFunction,
   l_BLOTEXLIB_EXECUTOR_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION
   l_blotexlibExecutorComputeRValueBlottabOpsFunction,
+  l_BLOTEXLIB_EXECUTOR_COMPUTE_R_VALUE_BLOTTAB_SPOT_FUNCTION
+  l_blotexlibExecutorComputeRValueBlottabSpotFunction,
   UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION updateBlottabCurrentBlotsetFieldFunction,
   NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION blottabDestroyInstanceFunction) {
   m_DIGGY_BOLLARD()
   int i = handle->blottabImplementationsNumber++; 
   m_ASSERT(i < MAX_BLOTTAB_IMPLEMENTIONS_NUMBER)
-  handle->blottabImplementations[i].l_blotexlibExecutorComputeLValueBlottabOpsFunction =
-    l_blotexlibExecutorComputeLValueBlottabOpsFunction;
+  handle->blottabImplementations[i].l_blotexlibExecutorComputeLValueBlottabSetOpFunction =
+    l_blotexlibExecutorComputeLValueBlottabSetOpFunction;
+  handle->blottabImplementations[i].l_blotexlibExecutorComputeLValueBlottabSpotFunction =
+    l_blotexlibExecutorComputeLValueBlottabSpotFunction;
   handle->blottabImplementations[i].l_blotexlibExecutorComputeRValueBlottabOpsFunction =
     l_blotexlibExecutorComputeRValueBlottabOpsFunction;
+  handle->blottabImplementations[i].l_blotexlibExecutorComputeRValueBlottabSpotFunction =
+    l_blotexlibExecutorComputeRValueBlottabSpotFunction;
   handle->blottabImplementations[i].updateBlottabCurrentBlotsetFieldFunction =
     updateBlottabCurrentBlotsetFieldFunction ;
   handle->blottabImplementations[i].blottabDestroyInstanceFunction =
@@ -63,10 +75,14 @@ int BlotexlibExecutorFactoryRegisterBlottabImplementation(
  
 // Public function; see .h
 int BlotexlibExecutorFactoryCreateInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE *azh_handle,
-  l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_OPS_FUNCTION
-  l_blotexlibExecutorComputeLValueGenuineBlottabOpsFunction,
+  l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_SET_OP_FUNCTION
+  l_blotexlibExecutorComputeLValueGenuineBlottabSetOpFunction,
+  l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_SPOT_FUNCTION
+  l_blotexlibExecutorComputeLValueGenuineBlottabSpotFunction,
   l_BLOTEXLIB_EXECUTOR_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION
   l_blotexlibExecutorComputeRValueGenuineBlottabOpsFunction,
+  l_BLOTEXLIB_EXECUTOR_COMPUTE_R_VALUE_BLOTTAB_SPOT_FUNCTION
+  l_blotexlibExecutorComputeRValueGenuineBlottabSpotFunction,
   UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION updateGenuineBlottabCurrentBlotsetFieldFunction,
   NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION genuineBlottabDestroyInstanceFunction) {
   m_DIGGY_BOLLARD()
@@ -75,8 +91,10 @@ int BlotexlibExecutorFactoryCreateInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE *az
   m_ASSIGN_MAGIC_FIELD(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE,*azh_handle)
   (*azh_handle)->blottabImplementationsNumber = 0; 
   m_ASSERT(BlotexlibExecutorFactoryRegisterBlottabImplementation(*azh_handle,
-    l_blotexlibExecutorComputeLValueGenuineBlottabOpsFunction,
+    l_blotexlibExecutorComputeLValueGenuineBlottabSetOpFunction,
+    l_blotexlibExecutorComputeLValueGenuineBlottabSpotFunction,
     l_blotexlibExecutorComputeRValueGenuineBlottabOpsFunction,
+    l_blotexlibExecutorComputeRValueGenuineBlottabSpotFunction,
     updateGenuineBlottabCurrentBlotsetFieldFunction, genuineBlottabDestroyInstanceFunction) ==
     GENUINE_BLOTTAB_LABEL0) 
   m_DIGGY_RETURN(RETURNED)
@@ -93,10 +111,14 @@ int BlotexlibExecutorFactoryDestroyInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE xh
 } // BlotexlibExecutorFactoryDestroyInstance
 
 struct BLOTTAB_EXECUTOR_IMPLEMENTATION {
-  l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_OPS_FUNCTION
-  l_blotexlibExecutorComputeLValueBlottabOpsFunction;
+  l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_SET_OP_FUNCTION
+  l_blotexlibExecutorComputeLValueBlottabSetOpFunction;
+  l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_SPOT_FUNCTION
+  l_blotexlibExecutorComputeLValueBlottabSpotFunction;
   l_BLOTEXLIB_EXECUTOR_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION
   l_blotexlibExecutorComputeRValueBlottabOpsFunction;
+  l_BLOTEXLIB_EXECUTOR_COMPUTE_R_VALUE_BLOTTAB_SPOT_FUNCTION
+  l_blotexlibExecutorComputeRValueBlottabSpotFunction;
   UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION updateBlottabCurrentBlotsetFieldFunction;
   G_STRINGS_HANDLE h_blottabsHandle ; 
 } ;
@@ -151,11 +173,17 @@ static int BlotexlibExecutorFactoryCreateProductInstance(void *pr_handle,
       productHandle->blottabExecutorImplementations[i].h_blottabsHandle, NULL,NULL) ==
       INDEX_LABEL0)
     productHandle->blottabExecutorImplementations[i].
-      l_blotexlibExecutorComputeLValueBlottabOpsFunction =
-      p_handle->blottabImplementations[i].l_blotexlibExecutorComputeLValueBlottabOpsFunction;
+      l_blotexlibExecutorComputeLValueBlottabSetOpFunction =
+      p_handle->blottabImplementations[i].l_blotexlibExecutorComputeLValueBlottabSetOpFunction;
+    productHandle->blottabExecutorImplementations[i].
+      l_blotexlibExecutorComputeLValueBlottabSpotFunction =
+      p_handle->blottabImplementations[i].l_blotexlibExecutorComputeLValueBlottabSpotFunction;
     productHandle->blottabExecutorImplementations[i].
       l_blotexlibExecutorComputeRValueBlottabOpsFunction =
       p_handle->blottabImplementations[i].l_blotexlibExecutorComputeRValueBlottabOpsFunction;
+    productHandle->blottabExecutorImplementations[i].
+      l_blotexlibExecutorComputeRValueBlottabSpotFunction =
+      p_handle->blottabImplementations[i].l_blotexlibExecutorComputeRValueBlottabSpotFunction;
     productHandle->blottabExecutorImplementations[i].updateBlottabCurrentBlotsetFieldFunction =
       p_handle->blottabImplementations[i].updateBlottabCurrentBlotsetFieldFunction;
   } // for
@@ -1337,9 +1365,8 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
   PParsePassSingleChar(a_sequence,NULL,'?',&lexeme);
   if (!b_EMPTY_P_STRING(lexeme)) { 
     if (*an_fieldReferenceBlottabLabel >= 0) { // Parsing <int blottab ref> or <str blottab ref> ...
-// TODO: which blottab label ?
       switch (handle->blottabExecutorImplementations[*an_fieldReferenceBlottabLabel].
-        l_blotexlibExecutorComputeLValueBlottabOpsFunction(handle,a_sequence,name,
+        l_blotexlibExecutorComputeLValueBlottabSetOpFunction(handle,a_sequence,name,
         acc_blottabFieldReference, nc_abandonmentInfo)) {
       case ANSWER__YES:
       break; case ANSWER__NO:

@@ -3,7 +3,7 @@
 // (c) Puduku - 2023
 
 // KARL: Kit for Analysis and Rendering Layer
-// "Extend" blotex (blot hook) to parse blotpam - based on pamphlets (see c-ansi/engels.topo) 
+// "Extend" blotex (blot hook) to parse blottab2 - based on pamphlets (see c-ansi/engels.topo) 
 //
 // Using karl in blot code
 // =========================
@@ -11,112 +11,116 @@
 // structure : verset / alinea / paragraph / section / article / topic
 // Blot pamplets operations
 //
-// See engels.topo for the description of pamphlets structure (point / group / aggregate...) 
-// NOTICE: contrary to blotregs and blottabs, there is NO "global" blotpam. Hence a blotpam with
-// empty entity name is simply a notation to refer the "current" blotpam (cursor) 
+// See engels.topo for the description of pamphlets structure (spot / group / aggregate...) 
+// NOTICE: contrary to blotregs and blottabs, there is NO "global" blottab2. Hence a blottab2 with
+// empty entity name is simply a notation to refer the "current" blottab2 (cursor) 
 //
-// Blot pamphlet point  :
+// Blot pamphlet spot  :
 // <prot intex> ::= <int constant> | ( '(' <intex> ')' )  
-// <blotpam portion> ::= '{' <prot intex> [ ( ':' | '-' ) <prot intex> ] '}'  
-// <blotpam point ref> ::= ( '.' <entity>  | '@' <prot intex> ']' [ '[' <prot intex> ']' ] [
-//   <blotpam portion> ] )* 
+// <blottab2 portion> ::= '{' <prot intex> [ ( ':' | '-' ) <prot intex> ] '}'  
+// <blottab2 spot ref> ::= ( '.' <entity>  | '@' <prot intex> ']' [ '[' <prot intex> ']' ] [
+//   <blottab2 portion> ] )* 
 //
-// <int blotpam point> ::= [ <blotpam point ref> ] '=' <int blotpam spec> 
-// <int blotpam spec> ::= 'L' | 't' | 'z' | 'O' | 'i' | 'j' | 'p' | 'e' | 'l' | 'o' | 's'
+// <int blottab2 spot> ::= [ <blottab2 spot ref> ] '=' <int blottab2 spec> 
+// <int blottab2 spec> ::= 'L' | 't' | 'z' | 'O' | 'i' | 'j' | 'p' | 'e' | 'l' | 'o' | 's'
 //
-// <str blotpam point> ::= [ <blotpam point ref> ] '=' <str blotpam spec> 
-// <str blotpam spec> ::= 'P' | 'T' | 'N' | 'd' | 'n' | 'r' | 'D' | 'I' | 'v' | 'V' | 'w'
+// <str blottab2 spot> ::= [ <blottab2 spot ref> ] '=' <str blottab2 spec> 
+// <str blottab2 spec> ::= 'P' | 'T' | 'N' | 'd' | 'n' | 'r' | 'D' | 'I' | 'v' | 'V' | 'w'
 //
 //
-// Blot pamphlet ('r-value') point references and operations :
-// <int blotpam> ::= '^^' <entity> ( ( '?' <int blotpam ops> ) | <int blotpam point> )
-// <int blotpam ops> ::= [ <blotpam op select> ] [ <blotpam op reset> ] [ <blotpam op next> ]
-//   [ <blotpam op read int> ] 
-// <blotpam op select> ::= ':' <blotpam request>
-// <blotpam op reset> ::= '^'
-// <blotpam op next> ::= '+'
-// <blotpam op read int> ::= '=' <entity> [ <<as value int>> ] 
+// NOTICE:  <int blottab2 ref> and  <str blottab2 ref> 'l-value' operations are NOT supported.
 //
-// <str blotpam> ::= '^^' <entity> ( ( '?' <str blotpam ops> ) | <str blotpam point> )
-// <str blotpam ops> ::= [ <blotpam op select> ] [ <blotpam op reset> ] [ <blotpam op next> ]
-//   [ <blotpam op insert> ] <blotpam op read str>
-// <blotpam op read str> ::= '=' <entity> <<as value str>> 
+// Blot pamphlet ('r-value') spot references and operations :
+// REMINDER (see c-ansi/blotex.topo) :
+// <int blottab2> ::= '^^' <entity> ( ( '?' <int blottab2 ops> ) | <int blottab2 spot> )
+// <str blottab2> ::= '^^' <entity> ( ( '?' <str blottab2 ops> ) | <str blottab2 spot> )
+//
+// <int blottab2 ops> ::= [ <blottab2 op select> ] [ <blottab2 op reset> ] [ <blottab2 op next> ]
+//   [ <blottab2 op read int> ] 
+// <blottab2 op select> ::= ':' <blottab2 request>
+// <blottab2 op reset> ::= '^'
+// <blottab2 op next> ::= '+'
+// <blottab2 op read int> ::= '=' <<as value int>>
+//
+// <str blottab2 ops> ::= [ <blottab2 op select> ] [ <blottab2 op reset> ] [ <blottab2 op next> ]
+//   [ <blottab2 op insert> ] <blottab2 op read str>
+// <blottab2 op read str> ::= '=' <entity> <<as value str>> 
 //
 // Selections based on physical filel types ('#' => INT(LE/BE) '$' => chars)
-// pamphlet physical point type : byte sequence ($) or int (BE / LE) (#)
+// pamphlet physical spot type : byte sequence ($) or int (BE / LE) (#)
 // TODO: logical selections (based on logical data type) ?)
-// Like blotreg and blottabs requests, blotpam requests are made of "atoms" : 
-// <blotpam request> ::= <blotpam request atom> ( <logical 2op> <blotpam request atom> )* ':?'
+// Like blotreg and blottabs requests, blottab2 requests are made of "atoms" : 
+// <blottab2 request> ::= <blottab2 request atom> ( <logical 2op> <blottab2 request atom> )* ':?'
 // <depth specifier> ::= '>' <prot intex>
-// <blotpam request atom> ::= '*' | <depth specifier> | <blotpam request atom int> | <blotpam request atom str>
-// <blotpam request atom int> ::= [ <<as value int>> ] <comp op> <prot intex> )
-// <blotpam request atom str> ::= ( <<as value str>> | <<as name>> ) <str comp op> <strex>
+// <blottab2 request atom> ::= '*' | <depth specifier> | <blottab2 request atom int> | <blottab2 request atom str>
+// <blottab2 request atom int> ::= [ <<as value int>> ] <comp op> <prot intex> )
+// <blottab2 request atom str> ::= ( <<as value str>> | <<as name>> ) <str comp op> <strex>
 
 // TODO: date logical type (ag dedfinir dans blotex ?)
 
 // EXAMPLES:
 //   ^^RLCM1K?: * :?       => dumping pamphlet RLCM1K
-//   ^^RLCM1K?: >2 :?    => dumping pamphlet RLCM1K, limited to pamphlet points having 2 depth
-//   ^^RLCM1K?: $ === "*bolo*" :?  => dumping pamphlet RLCM1K, limited to pamphlet points containing "bolo"
-//   ^^RLCM1K?: # === 69 :?        => dumping pamphlet RLCM1K, limited to integer pamphlet points equal to 69 
-//   ^^RLCM1K?: !$ == "CIdAdfEmetOm" :?  => dumping pamphlet RLCM1K, limited to points "CIdAdfEmetOm"
+//   ^^RLCM1K?: >2 :?    => dumping pamphlet RLCM1K, limited to pamphlet spots having 2 depth
+//   ^^RLCM1K?: $ === "*bolo*" :?  => dumping pamphlet RLCM1K, limited to pamphlet spots containing "bolo"
+//   ^^RLCM1K?: # === 69 :?        => dumping pamphlet RLCM1K, limited to integer pamphlet spots equal to 69 
+//   ^^RLCM1K?: !$ == "CIdAdfEmetOm" :?  => dumping pamphlet RLCM1K, limited to spots "CIdAdfEmetOm"
 //   ^^RLCM1K?: !$ == "CIdAdfEmetOm" and >2 :? 
 //   ^^RLCM1K?^          => reset 
 //   ^^RLCM1K?+          =>  fetch 
 //   ^^?+                => fetch (implicit RLCM1K) 
-//   ^^?=n               => read point name (implicit RLCM1K) 
-//   ^^RLC04K.AMeLim=l      => the length of 6 occurences of the AMeLim point
+//   ^^?=n               => read spot name (implicit RLCM1K) 
+//   ^^RLC04K.AMeLim=l      => the length of 6 occurences of the AMeLim spot
 //   ^^RLC04K.AMeLim[1]=V   => the value of the 1st occurence of AMeLim
 //   ^^RLC04K=V        => the complete RLC04K pamphlet
-//   ^^RLCM1K@232=V                        => the CIdAdfEmetOm point of the ACarOmDenAcKL aggregate
-//   ^^RLCM1K.ACarOmDenAcKL.CIdAdfEmetOm=V => also the CIdAdfEmetOm point of the ACarOmDenAcKL aggreg
+//   ^^RLCM1K@232=V                        => the CIdAdfEmetOm spot of the ACarOmDenAcKL aggregate
+//   ^^RLCM1K.ACarOmDenAcKL.CIdAdfEmetOm=V => also the CIdAdfEmetOm spot of the ACarOmDenAcKL aggreg
 //   ^^RLCM1K.ACarOmDenAcKL=V              => the ACarOmDenAcKL as aggregate 
 //   ^^RLC01K.DHTran{9-14}=V 
 //   ^^RLC01K.DHTran{9:6}=V
 ////   ^^RLC04K?:.AMeLim[1] :?+=V   => the value of the 1st occurence of AMeLim 
 ////   ^^RLCM1K@232>1=V          => designates the ACarOmDenAcKL aggregate.
-////   ^^RLCM1K@427&.CIdAdfEmetOm=V => (indicates both name and position of a point)
-////   ^^RLCM1K.CIdAdfEmetOm=V => also designates the CIdAdfEmetOm point of the ACarOmDenAcKL aggreg
+////   ^^RLCM1K@427&.CIdAdfEmetOm=V => (indicates both name and position of a spot)
+////   ^^RLCM1K.CIdAdfEmetOm=V => also designates the CIdAdfEmetOm spot of the ACarOmDenAcKL aggreg
 
 // Notice: blot pamphlet operations are NOT supported as 'l-value' operations.
 
-// List of convertors utilizable in point read op 
+// List of convertors utilizable in spot read op 
 //   =r : raw reference
 //   =D : pamphlet description
 //   =L : pamphlet length
 //   =N : pamphlet name
-//   =d : point description
-//   =n : point name
-//   =t : point type 
-//   =z : point depth in pamphlet
-//   =T : point expansion (tree representation) in pamphlet (with pamphlet points iterator)
-//   =P : point path in pamphlet
-//   =O : point occurences specifier in pamphlet or aggregate 
-//   =i : point's occurence specifier in pamphlet or aggregate 
-//   =j : point's portion specifier 
-//   =p : point position in pamphlet (first char, taking into account the
+//   =d : spot description
+//   =n : spot name
+//   =t : spot type 
+//   =z : spot depth in pamphlet
+//   =T : spot expansion (tree representation) in pamphlet (with pamphlet spots iterator)
+//   =P : spot path in pamphlet
+//   =O : spot occurences specifier in pamphlet or aggregate 
+//   =i : spot's occurence specifier in pamphlet or aggregate 
+//   =j : spot's portion specifier 
+//   =p : spot position in pamphlet (first char, taking into account the
 //        portion specifier)
-//   =e : point's last char position in pamphlet (taking into account the
+//   =e : spot's last char position in pamphlet (taking into account the
 //        portion specifier) 
-//   =l : point length (taking into account the portion specifier) 
-//   =o : point offset position in pamphlet (first char, taking into account the
+//   =l : spot length (taking into account the portion specifier) 
+//   =o : spot offset position in pamphlet (first char, taking into account the
 //        portion specifier) 
-//   =s : point's last char offset position in pamphlet (taking into account the
+//   =s : spot's last char offset position in pamphlet (taking into account the
 //        portion specifier) 
-//   =v : point's value, narrowest representation, taking into account the intrinsic representation rules
+//   =v : spot's value, narrowest representation, taking into account the intrinsic representation rules
 //        +bytes string: trimmed to min length 
-//         Note: in case you work on point portion ({<portion>} specifier in point reference), the 
+//         Note: in case you work on spot portion ({<portion>} specifier in spot reference), the 
 //         narrowest representation does not applies; =v is equivalent to =V
 //        +binary integer: as is (strict binary content); =v is equivalent to =V 
-//   =V : point's verbatim value
+//   =V : spot's verbatim value
 //        +bytes string: as is
 //        +binary integer: as is (strict binary content) 
-//   =w : point's value, widest representation, taking into account the intrinsic representation rules 
-//        +bytes string: padded to max point length 
-//         Note: in case you work on point portion ({<portion>} specifier in point reference), the 
+//   =w : spot's value, widest representation, taking into account the intrinsic representation rules 
+//        +bytes string: padded to max spot length 
+//         Note: in case you work on spot portion ({<portion>} specifier in spot reference), the 
 //         widest representation does not applies; =w is equivalent to =V
 //        +binary integer: as is (strict binary content); =w is equivalent to =V 
-//   =I : point's raw binary value displayable image
+//   =I : spot's raw binary value displayable image
 
 
 

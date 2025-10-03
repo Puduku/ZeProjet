@@ -184,7 +184,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
 
 
 // Public function: see .h
-int l_BlotexlibExecutorComputeLValueGenuineBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
+int l_BlotexlibExecutorComputeLValueGenuineBlottabSetOp(BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct P_STRING *a_sequence, struct P_STRING blottabName,
   struct BLOTTAB_FIELD_REFERENCE *ac_blottabFieldReference, G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
@@ -231,8 +231,15 @@ m_ASSERT(n_asValue != -1)
   ac_blottabFieldReference->asValue = n_asValue;
 
   m_DIGGY_RETURN(ANSWER__YES)
-} // l_BlotexlibExecutorComputeLValueGenuineBlottabOps
+} // l_BlotexlibExecutorComputeLValueGenuineBlottabSetOp
 
+// Public function: see .h
+int l_BlotexlibExecutorComputeLValueGenuineBlottabSpot(BLOTEXLIB_EXECUTOR_HANDLE handle,
+  struct P_STRING *a_sequence, struct P_STRING blottabName,
+  struct BLOTTAB_FIELD_REFERENCE *ac_blottabFieldReference, G_STRING_STUFF nc_abandonmentInfo) {
+  m_DIGGY_BOLLARD()
+m_RAISE(ANOMALY__NOT_AVAILABLE)
+} // l_BlotexlibExecutorComputeLValueGenuineBlottabSpot
 
 // Parse and compute blottab request. 
 //
@@ -531,6 +538,14 @@ m_DIGGY_VAR_D(n_asValue)
 
   m_DIGGY_RETURN(ANSWER__YES)
 } // l_BlotexlibExecutorComputeRValueGenuineBlottabOps
+
+// Public function: see .h
+int l_BlotexlibExecutorComputeRValueGenuineBlottabSpot(BLOTEXLIB_EXECUTOR_HANDLE handle,
+  struct P_STRING *a_sequence, struct P_STRING blottabName, struct BLOTEX_VALUE *ac_blotexValue,
+  G_STRING_STUFF nc_abandonmentInfo) {
+  m_DIGGY_BOLLARD()
+m_RAISE(ANOMALY__NOT_AVAILABLE)
+} // l_BlotexlibExecutorComputeRValueGenuineBlottabSpot
 
 // Passed:
 // - handle: supposed to be positoned on the "current" blotset
