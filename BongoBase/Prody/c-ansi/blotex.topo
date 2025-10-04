@@ -181,19 +181,19 @@
 // <str some blottab ref> ::= <str blottab ref> | <str blottab2 ref> | <str blottab3 ref> 
 
 // NOTICE: see "GENUINE" blottab extensions in c-ansi/blottab.topo 
-// "GENUINE" Blot table 'r-value' operations :
+// "GENUINE" Blot table 'r-value' operations and spots :
 // <int blottab> ::= '^' <entity> ( ( '?' <int blottab ops> ) | <int blottab spot> ) 
 // <str blottab> ::= '^' <entity> ( ( '?' <str blottab ops> ) | <str blottab spot> )  
 //
-// "GENUINE" Blot table 'l-value' operations :
+// "GENUINE" Blot table 'l-value' operations and spots :
 // <int blottab ref> ::= '^' <entity> ( ( '?' <blottab ref op set int> ) |<int blottab spot> )
 // <str blottab ref> ::= '^' <entity> ( ( '?' <blottab ref op set str> ) |<str blottab spot> )
 //
-// "SUPER" Blot table 'r-value' operations :
+// "SUPER" Blot table 'r-value' operations and spots:
 // <int blottab2> ::= '^^' <entity> ( ( '?' <int blottab2 ops> ) | <int blottab2 spot> )
 // <str blottab2> ::= '^^' <entity> ( ( '?' <str blottab2 ops> ) | <str blottab2 spot> ) 
 //
-// "SUPER" Blot table 'l-value' operations :
+// "SUPER" Blot table 'l-value' operations and spots:
 // <int blottab2 ref> ::= '^^' <entity> ( ( '?' <blottab2 ref op set int> ) | <int blottab2 spot> )
 // <str blottab2 ref> ::= '^^' <entity> ( ( '?' <blottab2 ref op set str> ) | <str blottab2 spot> )
 //

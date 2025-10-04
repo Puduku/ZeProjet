@@ -3,88 +3,25 @@
 // (c) Puduku - 2023
 
 // KARL: Kit for Analysis and Rendering Layer
-// "Extend" blotex (blot hook) to parse blottab2 - based on pamphlets (see c-ansi/engels.topo) 
+// "Extend" blotex to parse blottab2 - based on pamphlets (see c-ansi/engels.topo) 
 //
 // Using karl in blot code
 // =========================
 //
-// structure : verset / alinea / paragraph / section / article / topic
+// structure : verset / alinea / paragraph / section / article / topic ( = spots)
 // Blot pamplets operations
 //
 // See engels.topo for the description of pamphlets structure (spot / group / aggregate...) 
 // NOTICE: contrary to blotregs and blottabs, there is NO "global" blottab2. Hence a blottab2 with
 // empty entity name is simply a notation to refer the "current" blottab2 (cursor) 
 //
-// Blot pamphlet spot  :
-// <prot intex> ::= <int constant> | ( '(' <intex> ')' )  
-// <blottab2 portion> ::= '{' <prot intex> [ ( ':' | '-' ) <prot intex> ] '}'  
-// <blottab2 spot ref> ::= ( '.' <entity>  | '@' <prot intex> ']' [ '[' <prot intex> ']' ] [
-//   <blottab2 portion> ] )* 
+// Specifiers:
+// -----------
 //
-// <int blottab2 spot> ::= [ <blottab2 spot ref> ] '=' <int blottab2 spec> 
 // <int blottab2 spec> ::= 'L' | 't' | 'z' | 'O' | 'i' | 'j' | 'p' | 'e' | 'l' | 'o' | 's'
-//
-// <str blottab2 spot> ::= [ <blottab2 spot ref> ] '=' <str blottab2 spec> 
 // <str blottab2 spec> ::= 'P' | 'T' | 'N' | 'd' | 'n' | 'r' | 'D' | 'I' | 'v' | 'V' | 'w'
 //
-//
-// NOTICE:  <int blottab2 ref> and  <str blottab2 ref> 'l-value' operations are NOT supported.
-//
-// Blot pamphlet ('r-value') spot references and operations :
-// REMINDER (see c-ansi/blotex.topo) :
-// <int blottab2> ::= '^^' <entity> ( ( '?' <int blottab2 ops> ) | <int blottab2 spot> )
-// <str blottab2> ::= '^^' <entity> ( ( '?' <str blottab2 ops> ) | <str blottab2 spot> )
-//
-// <int blottab2 ops> ::= [ <blottab2 op select> ] [ <blottab2 op reset> ] [ <blottab2 op next> ]
-//   [ <blottab2 op read int> ] 
-// <blottab2 op select> ::= ':' <blottab2 request>
-// <blottab2 op reset> ::= '^'
-// <blottab2 op next> ::= '+'
-// <blottab2 op read int> ::= '=' <<as value int>>
-//
-// <str blottab2 ops> ::= [ <blottab2 op select> ] [ <blottab2 op reset> ] [ <blottab2 op next> ]
-//   [ <blottab2 op insert> ] <blottab2 op read str>
-// <blottab2 op read str> ::= '=' <entity> <<as value str>> 
-//
-// Selections based on physical filel types ('#' => INT(LE/BE) '$' => chars)
-// pamphlet physical spot type : byte sequence ($) or int (BE / LE) (#)
-// TODO: logical selections (based on logical data type) ?)
-// Like blotreg and blottabs requests, blottab2 requests are made of "atoms" : 
-// <blottab2 request> ::= <blottab2 request atom> ( <logical 2op> <blottab2 request atom> )* ':?'
-// <depth specifier> ::= '>' <prot intex>
-// <blottab2 request atom> ::= '*' | <depth specifier> | <blottab2 request atom int> | <blottab2 request atom str>
-// <blottab2 request atom int> ::= [ <<as value int>> ] <comp op> <prot intex> )
-// <blottab2 request atom str> ::= ( <<as value str>> | <<as name>> ) <str comp op> <strex>
-
-// TODO: date logical type (ag dedfinir dans blotex ?)
-
-// EXAMPLES:
-//   ^^RLCM1K?: * :?       => dumping pamphlet RLCM1K
-//   ^^RLCM1K?: >2 :?    => dumping pamphlet RLCM1K, limited to pamphlet spots having 2 depth
-//   ^^RLCM1K?: $ === "*bolo*" :?  => dumping pamphlet RLCM1K, limited to pamphlet spots containing "bolo"
-//   ^^RLCM1K?: # === 69 :?        => dumping pamphlet RLCM1K, limited to integer pamphlet spots equal to 69 
-//   ^^RLCM1K?: !$ == "CIdAdfEmetOm" :?  => dumping pamphlet RLCM1K, limited to spots "CIdAdfEmetOm"
-//   ^^RLCM1K?: !$ == "CIdAdfEmetOm" and >2 :? 
-//   ^^RLCM1K?^          => reset 
-//   ^^RLCM1K?+          =>  fetch 
-//   ^^?+                => fetch (implicit RLCM1K) 
-//   ^^?=n               => read spot name (implicit RLCM1K) 
-//   ^^RLC04K.AMeLim=l      => the length of 6 occurences of the AMeLim spot
-//   ^^RLC04K.AMeLim[1]=V   => the value of the 1st occurence of AMeLim
-//   ^^RLC04K=V        => the complete RLC04K pamphlet
-//   ^^RLCM1K@232=V                        => the CIdAdfEmetOm spot of the ACarOmDenAcKL aggregate
-//   ^^RLCM1K.ACarOmDenAcKL.CIdAdfEmetOm=V => also the CIdAdfEmetOm spot of the ACarOmDenAcKL aggreg
-//   ^^RLCM1K.ACarOmDenAcKL=V              => the ACarOmDenAcKL as aggregate 
-//   ^^RLC01K.DHTran{9-14}=V 
-//   ^^RLC01K.DHTran{9:6}=V
-////   ^^RLC04K?:.AMeLim[1] :?+=V   => the value of the 1st occurence of AMeLim 
-////   ^^RLCM1K@232>1=V          => designates the ACarOmDenAcKL aggregate.
-////   ^^RLCM1K@427&.CIdAdfEmetOm=V => (indicates both name and position of a spot)
-////   ^^RLCM1K.CIdAdfEmetOm=V => also designates the CIdAdfEmetOm spot of the ACarOmDenAcKL aggreg
-
-// Notice: blot pamphlet operations are NOT supported as 'l-value' operations.
-
-// List of convertors utilizable in spot read op 
+// Description of specifiers 
 //   =r : raw reference
 //   =D : pamphlet description
 //   =L : pamphlet length
@@ -121,6 +58,100 @@
 //         widest representation does not applies; =w is equivalent to =V
 //        +binary integer: as is (strict binary content); =w is equivalent to =V 
 //   =I : spot's raw binary value displayable image
+//
+//
+// 
+// Blot pamphlet ('r-value') spot references and operations:
+// ---------------------------------------------------------
+// NOTICE:  <int blottab2 ref> and  <str blottab2 ref> 'l-value' spots and operations are NOT
+//   supported.
+//
+// REMINDER (see c-ansi/blotex.topo) :
+// <int blottab2> ::= '^^' <entity> ( ( '?' <int blottab2 ops> ) | <int blottab2 spot> )
+// <str blottab2> ::= '^^' <entity> ( ( '?' <str blottab2 ops> ) | <str blottab2 spot> )
+//
+//
+// Spots:
+// ------
+//
+// <protected intex> ::= <int constant> | ( '(' <intex> ')' )  
+// <blottab2 portion> ::= '{' <protected intex> [ ( ':' | '-' ) <protected intex> ] '}'  
+// <blottab2 spot ref> ::= ( '.' <entity>  | '@' <protected intex> ']' [ '[' <protected intex> ']' ] [
+//   <blottab2 portion> ] )* 
+//
+// <int blottab2 spot> ::= [ <blottab2 spot ref> ] '=' <int blottab2 spec> 
+//
+// <str blottab2 spot> ::= [ <blottab2 spot ref> ] '=' <str blottab2 spec> 
+//
 
+// Operations:
+// -----------
+// <int blottab2 ops> ::= [ <blottab2 op select> ] [ <blottab2 op reset> ] [ <blottab2 op next> ]
+//   [ <blottab2 op read int> ] 
+// <blottab2 op select> ::= ':' <blottab2 request>
+// <blottab2 op reset> ::= '^'
+// <blottab2 op next> ::= '+'
+// <blottab2 op read int> ::= '=' <int blottab2 spec> 
+//
+// <str blottab2 ops> ::= [ <blottab2 op select> ] [ <blottab2 op reset> ] [ <blottab2 op next> ]
+//   [ <blottab2 op insert> ] <blottab2 op read str>
+// <blottab2 op read str> ::= '=' <str blottab2 spec>
+//
+// Selections based on physical filel types ('#' => INT(LE/BE) '$' => chars)
+// pamphlet physical spot type : byte sequence ($) or int (BE / LE) (#)
+// TODO: logical selections (based on logical data type) ?)
+// Like blotreg and blottabs requests, blottab2 requests are made of "atoms" : 
+// <blottab2 request> ::= <blottab2 request atom> ( <logical 2op> <blottab2 request atom> )* ':?'
+// <depth specifier> ::= '>' <protected intex>
+// <blottab2 request atom> ::= '*' | <depth specifier> | <blottab2 request atom int> | <blottab2 request atom str>
+// <blottab2 request atom int> ::= [ <<as value int>> ] <comp op> <protected intex> )
+// <blottab2 request atom str> ::= ( <<as value str>> | <<as name>> ) <str comp op> <strex>
 
+// TODO: date logical type (ag dedfinir dans blotex ?)
+
+// EXAMPLES:
+// ---------
+// Operation examples : '^^' <entity> '?' ( <int blottab2 ops>  | <str blottab2 ops> )
+// => dumping pamphlet RLCM1K:
+//   ^^RLCM1K?: * :?  
+// => dumping pamphlet RLCM1K, limited to spots having 2 depth:
+//   ^^RLCM1K?: >2 :?
+// => dumping pamphlet RLCM1K, limited to pamphlet spots containing "bolo":
+//   ^^RLCM1K?: $ === "*bolo*" :? 
+// => dumping pamphlet RLCM1K, limited to integer spots equal to 69:
+//   ^^RLCM1K?: # === 69 :? 
+// => dumping pamphlet RLCM1K, limited to spots "CIdAdfEmetOm":
+//   ^^RLCM1K?: !$ == "CIdAdfEmetOm" :?
+// => dumping pamphlet RLCM1K, limited to spots "CIdAdfEmetOm" with depth > 2
+//   ^^RLCM1K?: !$ == "CIdAdfEmetOm" and >2 :?
+// => Reset: 
+//   ^^RLCM1K?^
+// => Fetch next in RLCM1K: 
+//   ^^RLCM1K?+
+// => Fetch next in implicit pamphlet: 
+//   ^^?+
+// => Read current spot name in implicit pamphlet: 
+//   ^^?=n 
+//
+// Spot examples : '^^' <entity> ( <int blottab2 spot> | <str blottab2 spot> )
+// => the length of 6 occurences of the AMeLim spot:
+//   ^^RLC04K.AMeLim=l 
+// => the value of the 1st occurence of AMeLim:
+//   ^^RLC04K.AMeLim[1]=V
+// => the complete RLC04K pamphlet:
+//   ^^RLC04K=V
+// => the CIdAdfEmetOm spot of the ACarOmDenAcKL aggregate:
+//   ^^RLCM1K@232=V
+// => also the CIdAdfEmetOm spot of the ACarOmDenAcKL aggregate:
+//   ^^RLCM1K.ACarOmDenAcKL.CIdAdfEmetOm=V
+// => the ACarOmDenAcKL as aggregate: 
+//   ^^RLCM1K.ACarOmDenAcKL=V
+// => Spot portion example:
+//   ^^RLC01K.DHTran{9-14}=V 
+// => Spot portion example 2:
+//   ^^RLC01K.DHTran{9:6}=V
+////   ^^RLC04K?:.AMeLim[1] :?+=V   => the value of the 1st occurence of AMeLim 
+////   ^^RLCM1K@232>1=V          => designates the ACarOmDenAcKL aggregate.
+////   ^^RLCM1K@427&.CIdAdfEmetOm=V => (indicates both name and position of a spot)
+////   ^^RLCM1K.CIdAdfEmetOm=V => also designates the CIdAdfEmetOm spot of the ACarOmDenAcKL aggreg
 

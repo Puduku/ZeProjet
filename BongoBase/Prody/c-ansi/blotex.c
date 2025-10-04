@@ -1024,7 +1024,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
           (char)UNDEFINED,&name); // <entity>
         PParsePassSingleChar(a_sequence,NULL,'?',&lexeme);
         if (!b_EMPTY_P_STRING(lexeme)) { 
-          if (n_blottabLabel >= 0) { // <int blottab> | <str blottab> ...
+          if (n_blottabLabel >= 0) { // <int blottabX ops> | <str blottabX ops> ...
             switch (handle->blottabExecutorImplementations[n_blottabLabel].
               l_blotexlibExecutorComputeRValueBlottabOpsFunction(handle,a_sequence,name,
               ac_blotexAtomValue,nc_abandonmentInfo)) {
@@ -1045,15 +1045,27 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
             } // switch
           } // if
         } else {
-          if (n_blottabLabel >= 0) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
-          switch (m_BlotexlibExecutorComputeBlotexAtomBlotvar(handle,a_sequence,name,
-            ac_blotexAtomValue, nc_abandonmentInfo)) {
-          case ANSWER__YES: // ( <blotvar as int> | <blotvar as str> | <blotvar name> ) 
-          break; case ANSWER__NO:
-            m_DIGGY_RETURN(ANSWER__NO)
-          break; default: 
-            m_TRACK()
-          } // switch
+          if (n_blottabLabel >= 0) { 
+            // <int blottabX spot> | <str blottabX spot> ... 
+            switch (handle->blottabExecutorImplementations[n_blottabLabel].
+              l_blotexlibExecutorComputeRValueBlottabSpotFunction(handle,a_sequence,name,
+              ac_blotexAtomValue,nc_abandonmentInfo)) {
+            case ANSWER__YES:
+            break; case ANSWER__NO:
+              m_DIGGY_RETURN(ANSWER__NO)
+            break; default: 
+              m_TRACK()
+            } // switch
+          } else { 
+            switch (m_BlotexlibExecutorComputeBlotexAtomBlotvar(handle,a_sequence,name,
+              ac_blotexAtomValue, nc_abandonmentInfo)) {
+            case ANSWER__YES: // ( <blotvar as int> | <blotvar as str> | <blotvar name> ) 
+            break; case ANSWER__NO:
+              m_DIGGY_RETURN(ANSWER__NO)
+            break; default: 
+              m_TRACK()
+            } // switch
+          } // if
         } // if
       } // if 
     } // if 
@@ -1354,7 +1366,6 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
   acc_blotvarReference->blotregHandle = (G_STRINGS_HANDLE)UNDEFINED; 
   struct P_STRING lexeme = UNDEFINED_P_STRING;
 
-  m_PREPARE_ABANDON(a_sequence,"<int blotex ref> | <str blotex ref>")
   *acc_as = UNDEFINED;
 
   struct P_STRING name; UNDEFINED;
@@ -1386,25 +1397,36 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
     } // if
 
   } else {
-    if (*an_fieldReferenceBlottabLabel >= 0) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
-    // Parse <blotvar>:
-    switch (BlotexlibExecutorParseSimpleBlotvarReference(handle,b_L_VALUE,a_sequence,name,
-      acc_blotvarReference, nc_abandonmentInfo)) {
-    case ANSWER__YES: 
-      m_PParsePassSpaces(a_sequence,NULL);
-      // Expect <blotvar as int> | <blotvar id> | <blotvar as str> | <blotvar name>  
-      switch (ParseAs(b_L_VALUE,a_sequence, acc_as)) {
+    if (*an_fieldReferenceBlottabLabel >= 0) {
+      switch (handle->blottabExecutorImplementations[*an_fieldReferenceBlottabLabel].
+        l_blotexlibExecutorComputeLValueBlottabSpotFunction(handle,a_sequence,name,
+        acc_blottabFieldReference, nc_abandonmentInfo)) {
       case ANSWER__YES:
       break; case ANSWER__NO:
         m_DIGGY_RETURN(ANSWER__NO)
       break; default:
         m_TRACK()
       } // switch
-    break; case ANSWER__NO:
-      m_DIGGY_RETURN(ANSWER__NO)
-    break; default:
-      m_TRACK()
-    } // switch
+    } else {
+      // Parse <blotvar>:
+      switch (BlotexlibExecutorParseSimpleBlotvarReference(handle,b_L_VALUE,a_sequence,name,
+        acc_blotvarReference, nc_abandonmentInfo)) {
+      case ANSWER__YES: 
+        m_PParsePassSpaces(a_sequence,NULL);
+        // Expect <blotvar as int> | <blotvar id> | <blotvar as str> | <blotvar name>  
+        switch (ParseAs(b_L_VALUE,a_sequence, acc_as)) {
+        case ANSWER__YES:
+        break; case ANSWER__NO:
+          m_DIGGY_RETURN(ANSWER__NO)
+        break; default:
+          m_TRACK()
+        } // switch
+      break; case ANSWER__NO:
+        m_DIGGY_RETURN(ANSWER__NO)
+      break; default:
+        m_TRACK()
+      } // switch
+    } // if
   } // if
 
   m_DIGGY_RETURN(ANSWER__YES)
