@@ -4,28 +4,38 @@
 
 // Description: Blot expressions extension: blot tables 
 //
-// Using blottabs in blot code
-// ===========================
+// Using Genuine blottabs in blot code
+// ===================================
+
+// Integration of blot tables in blot expressions (blotex): 
+// --------------------------------------------------------
 //
-// I. Integration of blot tables in blot expressions (blotex) 
-// ----------------------------------------------------------
 // Legend: see c-ansi/blotex.topo
-//
 //
 // Entities. The new entities:
 // - blottab (blot table)
 // - blottab field 
 // are also identified by their name (may be empty):
-//
 // 
 // Blot tables and blot table operations
+
+// REMINDER (see c-ansi/blotex.topo) :
+// "GENUINE" Blot table 'r-value' operations and spots :
+// <int blottab> ::= '^' <entity> ( ( '?' <int blottab ops> ) | <int blottab spot> )
+// <str blottab> ::= '^' <entity> ( ( '?' <str blottab ops> ) | <str blottab spot> )
+//
+// "GENUINE" Blot table 'l-value' operations and spots :
+// <int blottab ref> ::= '^' <entity> ( ( '?' <blottab ref op set int> ) |<int blottab spot> )
+// <str blottab ref> ::= '^' <entity> ( ( '?' <blottab ref op set str> ) |<str blottab spot> )
+//
 //
 // A blot set (blotset) is a fixed set of blot values. Each element of the set is identified by
 // its name. 
 // A blot table (blottab) is a collection of blotsets 
 // (the table with empty entity name is called the global table)
-//
-// Blot table 'r-value' operations :
+
+// Blot table 'r-value' operations:
+// --------------------------------
 // <int blottab ops> ::= <blottab op create> | ( [ <blottab op select> ] [ <blottab op reset> ]
 //   [ <blottab op insert> ] [ <blottab op next> ] [ <blottab op read int> ] ) 
 // <blottab op create> ::=  '[' <blottab creation> 
@@ -47,16 +57,32 @@
 // <blottab request atom> ::= <blottab request atom int> | <blottab request atom str>
 // <blottab request atom int> ::= <entity> [ <<as value int>> ] ( '*' | ( <comp op> <intex> ) )
 // <blottab request atom str> ::= <entity> <<as value str>> ( '*' | ( <str comp op> <strex> ) )
-//
-//
-// Blot table 'l-value' operations :
+
+// Blotab 'r-value' spots:
+// -----------------------
+
+// <blottab spot> ::= '[' <intex> ']' '.' <entity> 
+// <int blottab spot> ::= <blottab spot> [ <<as value int>> ] 
+// <str blottab spot> ::= <blottab spot> <<as value str>>
+
+
+// Blot table 'l-value' operations:
+// --------------------------------
 // Set current int value operation (l-value): 
 // <blottab ref op set int> ::= '=' <entity> [ <<as value int>> ] 
 // Set current str value operation (l-value): 
 // <blottab ref op set str> ::= '=' <entity> <<as value str>> 
-//
-//
-// Blottab operations examples: 
+
+// Blotab 'l-value' spots:
+// -----------------------
+
+// <blottab spot ref> ::= '[' <intex> ']' '.' <entity> 
+// <int blottab spot ref> ::= <blottab spot ref> [ <<as value int>> ] 
+// <str blottab spot ref> ::= <blottab spot ref> <<as value str>>
+
+
+// Blottab operations / spots examples: 
+// ------------------------------------
 // ^recettes2?[ name$ price# ]?                     => Create table of elements 'name' and 'price'
 //                                                     with lexical 'name' index and numeric 'price'
 //                                                     index
@@ -65,18 +91,18 @@
 // ^recettes2?^                                     => single reset, ascending 
 // ^recettes2?+                                     => fetch next one 
 // ^recettes2?@                                     => insert new table record  
+// ^recettes2[1].prix#                              => price of 2nd blotset of recettes2  
 // ^recettes3?[ name-and-price$# ]?                 => Create table of single element 'name-and-price'
 //                                                     with lexical AND numeric indexes
 // ^recettes3?: name-and-price$ * :?                => select all items ordered by lexical index 
 // ^recettes3?: name-and-price$ === "*bolo*" or name-and-price < 10 :?
 //                                                  => new table selection 
 // (See below for assignation examples)
-//
-// II. "blotex" examples 
-// ---------------------
+
+// "blotex" examples: 
+// ------------------
 //
 //   Eval (.var$ := ^recettes2?=name$)         => assign 'var' global variable with current 'name'
 //                                                field of 'recettes2' table 
 //   Eval (^recettes2?=name$ := "craboutchas") => assign "craboutchas" to current 'name' field of 
 //                                                'recettes2' table 
-//
