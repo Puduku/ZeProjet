@@ -76,9 +76,8 @@
 // Blotab 'l-value' spots:
 // -----------------------
 
-// <blottab spot ref> ::= '[' <intex> ']' '.' <entity> 
-// <int blottab spot ref> ::= <blottab spot ref> [ <<as value int>> ] 
-// <str blottab spot ref> ::= <blottab spot ref> <<as value str>>
+// <int blottab spot ref> ::= <int blottab spot> 
+// <str blottab spot ref> ::= <str blottab spot>
 
 
 // Blottab operations / spots examples: 
