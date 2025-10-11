@@ -61,30 +61,17 @@ int l_BlotexlibExecutorCreateGenuineBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle,
   BLOTTAB_HANDLE *a_blottabHandle) ;
 
 
-// #SEE l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_SET_OP_FUNCTION@c-ansi/blotex.h
+// #SEE l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_L_VALUE_BLOTTAB_SET_OP_FUNCTION@c-ansi/blotex.h
 // => See also: BlotexlibExecutorFactoryCreateInstance() 
-int l_BlotexlibExecutorComputeLValueGenuineBlottabSetOp(BLOTEXLIB_EXECUTOR_HANDLE handle, 
-  struct P_STRING *a_sequence, struct P_STRING blottabName, 
+int l_BlotexlibExecutorParseAndComputeLValueGenuineBlottabSetOp(BLOTEXLIB_EXECUTOR_HANDLE handle, 
+  char b_spot, struct P_STRING *a_sequence, struct P_STRING blottabName, 
   struct BLOTTAB_FIELD_REFERENCE *ac_blottabFieldReference, G_STRING_STUFF nc_abandonmentInfo) ;
 
-// #SEE l_BLOTEXLIB_EXECUTOR_COMPUTE_L_VALUE_BLOTTAB_SPOT_FUNCTION@c-ansi/blotex.h
+// #SEE l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION@c-ansi/blotex.h
 // => See also: BlotexlibExecutorFactoryCreateInstance() 
-int l_BlotexlibExecutorComputeLValueGenuineBlottabSpot(BLOTEXLIB_EXECUTOR_HANDLE handle, 
-  struct P_STRING *a_sequence, struct P_STRING blottabName, 
-  struct BLOTTAB_FIELD_REFERENCE *ac_blottabFieldReference, G_STRING_STUFF nc_abandonmentInfo) ;
-
-// #SEE l_BLOTEXLIB_EXECUTOR_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION@c-ansi/blotex.h
-// => See also: BlotexlibExecutorFactoryCreateInstance() 
-int l_BlotexlibExecutorComputeRValueGenuineBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING *a_sequence, struct P_STRING blottabName, struct BLOTEX_VALUE *ac_blotexValue,
+int l_BlotexlibExecutorParseAndComputeRValueGenuineBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
+  char b_spot, struct P_STRING *a_sequence, struct P_STRING blottabName, struct BLOTEX_VALUE *ac_blotexValue,
   G_STRING_STUFF nc_abandonmentInfo) ;
-
-// #SEE l_BLOTEXLIB_EXECUTOR_COMPUTE_R_VALUE_BLOTTAB_SPOT_FUNCTION@c-ansi/blotex.h
-// => See also: BlotexlibExecutorFactoryCreateInstance() 
-int l_BlotexlibExecutorComputeRValueGenuineBlottabSpot(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING *a_sequence, struct P_STRING blottabName, struct BLOTEX_VALUE *ac_blotexValue,
-  G_STRING_STUFF nc_abandonmentInfo) ;
-
 
 // #SEE UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION@c-ansi/blotex.h
 int UpdateBlottabCurrentBlotsetField(struct BLOTTAB_FIELD_REFERENCE blottabFieldReference,
