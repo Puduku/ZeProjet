@@ -3,7 +3,8 @@
 // ================== DRAFT ==========================
 
 // Using stylistic devices in C (and other programmming languages)
-
+// Idede: si on (humains)  veut s'en sortir il faut absolument trouver les mots qui "parlent" et qui "frappent" => on ne peut
+// PAS "globalement" s'en sortir avec des noms longs... 
 // In Programming/software development, we (very roughly) distinct the two following phases:
 // - preliminary conception/design 
 // - writing and compiling the code (including testing and debugging)
