@@ -25,8 +25,8 @@
 // <str blottab> ::= '^' <entity> ( ( '?' <str blottab ops> ) | <str blottab spot> )
 //
 // "GENUINE" Blot table 'l-value' operations and spots :
-// <int blottab ref> ::= '^' <entity> ( ( '?' <blottab ref op set int> ) |<int blottab spot> )
-// <str blottab ref> ::= '^' <entity> ( ( '?' <blottab ref op set str> ) |<str blottab spot> )
+// <int blottab ref> ::= '^' <entity> ( ( '?' <blottab ref op set int> ) | <int blottab spot ref> )
+// <str blottab ref> ::= '^' <entity> ( ( '?' <blottab ref op set str> ) | <str blottab spot ref> )
 //
 //
 // A blot set (blotset) is a fixed set of blot values. Each element of the set is identified by
@@ -34,8 +34,8 @@
 // A blot table (blottab) is a collection of blotsets 
 // (the table with empty entity name is called the global table)
 
-// Blot table 'r-value' operations:
-// --------------------------------
+// Blottab 'r-value' operations:
+// -----------------------------
 // <int blottab ops> ::= <blottab op create> | ( [ <blottab op select> ] [ <blottab op reset> ]
 //   [ <blottab op insert> ] [ <blottab op next> ] [ <blottab op read int> ] ) 
 // <blottab op create> ::=  '[' <blottab creation> 
@@ -60,7 +60,6 @@
 
 // Blotab 'r-value' spots:
 // -----------------------
-
 // <blottab spot> ::= '[' <intex> ']' '.' <entity> 
 // <int blottab spot> ::= <blottab spot> [ <<as value int>> ] 
 // <str blottab spot> ::= <blottab spot> <<as value str>>
@@ -75,13 +74,13 @@
 
 // Blotab 'l-value' spots:
 // -----------------------
-
+// (See 'r-value' spots) 
 // <int blottab spot ref> ::= <int blottab spot> 
-// <str blottab spot ref> ::= <str blottab spot>
+// <str blottab spot ref> ::= <str blottab spot> 
 
 
-// Blottab operations / spots examples: 
-// ------------------------------------
+// Blottab 'r-value' operations examples: 
+// --------------------------------------
 // ^recettes2?[ name$ price# ]?                     => Create table of elements 'name' and 'price'
 //                                                     with lexical 'name' index and numeric 'price'
 //                                                     index
@@ -96,7 +95,13 @@
 // ^recettes3?: name-and-price$ * :?                => select all items ordered by lexical index 
 // ^recettes3?: name-and-price$ === "*bolo*" or name-and-price < 10 :?
 //                                                  => new table selection 
-// (See below for assignation examples)
+// (See below for 'l-value' operations examples)
+
+// Blottab spots examples: 
+// -----------------------
+// ^recettes2[1].prix#                              => price of 2nd blotset of recettes2  
+//                                                  => new table selection 
+// (See below for 'l-value' spot examples)
 
 // "blotex" examples: 
 // ------------------

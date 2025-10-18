@@ -290,7 +290,9 @@ static int l_BlotexlibExecutorParseAndRetrieveBlottabSpot(BLOTEXLIB_EXECUTOR_HAN
 } // l_BlotexlibExecutorParseAndRetrieveBlottabSpot
 
 // Parse and compute 'l-value' blottab spot:
-// expect <int blottab spot> | <str blottab spot> 
+// expect <int blottab spot ref> | <str blottab spot ref> 
+// Reminder: <int blottab spot ref> ::= <int blottab spot>
+// and <str blottab spot ref> ::= <str blottab spot>
 static inline int ml_BlotexlibExecutorParseAndComputeLValueGenuineBlottabSpot(
   BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING *a_sequence, struct P_STRING blottabName,
   struct BLOTTAB_FIELD_REFERENCE *ac_blottabFieldReference, G_STRING_STUFF nc_abandonmentInfo) {

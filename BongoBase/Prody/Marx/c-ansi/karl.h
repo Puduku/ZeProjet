@@ -56,23 +56,13 @@ int l_BlotexlibExecutorCreateBlottab2(BLOTEXLIB_EXECUTOR_HANDLE handle,
 
 // #SEE l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_L_VALUE_BLOTTAB_SET_OP_FUNCTION@c-ansi/blotex.h
 int l_BlotexlibExecutorParseAndComputeLValueBlottab2SetOp(BLOTEXLIB_EXECUTOR_HANDLE handle, 
-  struct P_STRING *a_sequence, struct P_STRING blottab2Name, 
-  struct BLOTTAB_FIELD_REFERENCE *ac_blottab2FieldReference, G_STRING_STUFF nc_abandonmentInfo) ;
-
-// #SEE l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_L_VALUE_BLOTTAB_SPOT_FUNCTION@c-ansi/blotex.h
-int l_BlotexlibExecutorParseAndComputeLValueBlottab2Spot(BLOTEXLIB_EXECUTOR_HANDLE handle, 
-  struct P_STRING *a_sequence, struct P_STRING blottab2Name, 
+  char b_spot, struct P_STRING *a_sequence, struct P_STRING blottab2Name, 
   struct BLOTTAB_FIELD_REFERENCE *ac_blottab2FieldReference, G_STRING_STUFF nc_abandonmentInfo) ;
 
 // #SEE l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION@c-ansi/blotex.h
 int l_BlotexlibExecutorParseAndComputeRValueBlottab2Ops(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING *a_sequence, struct P_STRING blottab2Name, struct BLOTEX_VALUE *ac_blotexValue,
-  G_STRING_STUFF nc_abandonmentInfo) ;
-
-// #SEE l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_R_VALUE_BLOTTAB_SPOT_FUNCTION@c-ansi/blotex.h
-int l_BlotexlibExecutorParseAndComputeRValueBlottab2Spot(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING *a_sequence, struct P_STRING blottab2Name, struct BLOTEX_VALUE *ac_blotexValue,
-  G_STRING_STUFF nc_abandonmentInfo) ;
+  char b_spot, struct P_STRING *a_sequence, struct P_STRING blottab2Name,
+  struct BLOTEX_VALUE *ac_blotexValue, G_STRING_STUFF nc_abandonmentInfo) ;
 
 
 // #SEE UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION@c-ansi/blotex.h

@@ -104,6 +104,8 @@
 // <<as value str>> ::= '$'
 // <<as name>> ::= '!$'
 // 
+// <str portion> ::= '{' [ <intex> ] [ ( ':' | '-' ) [ <intex> ] ] '}'
+//
 // Blotvar implicit and explicit integer value:
 // A blotvar value is implicitly an integer value.
 // However, reference to integer value of a blotvar may be explicit:

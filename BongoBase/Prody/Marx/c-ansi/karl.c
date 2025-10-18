@@ -33,39 +33,61 @@ m_RAISE(ANOMALY__NOT_AVAILABLE)
 } // l_BlotexlibExecutorCreateBlottab2
 
 
-// Public function; see .h
-int l_BlotexlibExecutorParseAndComputeLValueBlottab2Ops(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING *a_sequence, struct P_STRING blottab2Name,
-  struct BLOTTAB_FIELD_REFERENCE *ac_blottab2FieldReference, G_STRING_STUFF nc_abandonmentInfo) {
-  m_DIGGY_BOLLARD()
+// Public function: see .h
+int l_BlotexlibExecutorParseAndComputeLValueBlottab2Ops(
+  BLOTEXLIB_EXECUTOR_HANDLE handle, char b_spot, struct P_STRING *a_sequence,
+  struct P_STRING blottab2Name, struct BLOTTAB_FIELD_REFERENCE *ac_blottab2FieldReference,
+  G_STRING_STUFF nc_abandonmentInfo) {
+  m_DIGGY_BOLLARD_S()
   m_PREPARE_ABANDON(a_sequence,"<blottab2 ref op set int> | <blottab2 ref op set str>") \
   m_ABANDON(NOT_SUPPORTED__ABANDONMENT_CAUSE)
 } // l_BlotexlibExecutorParseAndComputeLValueBlottab2Ops
 
-// Public function; see .h
-int l_BlotexlibExecutorParseAndComputeLValueBlottab2Spot(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING *a_sequence, struct P_STRING blottab2Name,
-  struct BLOTTAB_FIELD_REFERENCE *ac_blottab2FieldReference, G_STRING_STUFF nc_abandonmentInfo) {
-  m_DIGGY_BOLLARD()
-  m_PREPARE_ABANDON(a_sequence,"<int blottab2 spot> | <str blottab2 spot>") \
-  m_ABANDON(NOT_SUPPORTED__ABANDONMENT_CAUSE)
-} // l_BlotexlibExecutorParseAndComputeLValueBlottab2Spot
 
-// Public function; see .h
+// Parse and compute 'r-value' blottab2 OPERATIONS:
+// expect <int blottab2 ops> | <str blottab2 ops>
+int ml_BlotexlibExecutorParseAndComputeRValueBlottab2Ops(BLOTEXLIB_EXECUTOR_HANDLE handle,
+  char b_spot, struct P_STRING *a_sequence, struct P_STRING blottab2Name,
+  struct BLOTEX_VALUE *ac_blotexValue, G_STRING_STUFF nc_abandonmentInfo) {
+  m_DIGGY_BOLLARD()
+m_RAISE(ANOMALY__NOT_AVAILABLE)
+} // ml_BlotexlibExecutorParseAndComputeRValueBlottab2Ops
+
+
+// Parse and compute 'r-value' blottab2 SPOT:
+// expect <int blottab2 spot> | <str blottab2 spot>
+int ml_BlotexlibExecutorParseAndComputeRValueBlottab2Spot(BLOTEXLIB_EXECUTOR_HANDLE handle,
+  char b_spot, struct P_STRING *a_sequence, struct P_STRING blottab2Name,
+  struct BLOTEX_VALUE *ac_blotexValue, G_STRING_STUFF nc_abandonmentInfo) {
+  m_DIGGY_BOLLARD()
+m_RAISE(ANOMALY__NOT_AVAILABLE)
+} // ml_BlotexlibExecutorParseAndComputeRValueBlottab2Spot
+
+// Public function: see .h
 int l_BlotexlibExecutorParseAndComputeRValueBlottab2Ops(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING *a_sequence, struct P_STRING blottab2Name, struct BLOTEX_VALUE *ac_blotexValue,
-  G_STRING_STUFF nc_abandonmentInfo) {
+  char b_spot, struct P_STRING *a_sequence, struct P_STRING blottabName,
+  struct BLOTEX_VALUE *ac_blotexValue, G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
-m_RAISE(ANOMALY__NOT_AVAILABLE)
-} // l_BlotexlibExecutorParseAndComputeRValueBlottabOps2
+  int answer = UNDEFINED;
+  if (b_spot) {
+    switch (answer = ml_BlotexlibExecutorParseAndComputeRValueGenuineBlottab2Spot(handle,a_sequence,
+      blottabName,ac_blotexValue,nc_abandonmentInfo)) {   
+    case ANSWER__YES:
+    break; case ANSWER__NO:
+    break; default: m_TRACK() } // switch 
+  } else {
+    switch (answer = ml_BlotexlibExecutorParseAndComputeRValueGenuineBlottab2Ops(handle,a_sequence,
+      blottabName,ac_blotexValue,nc_abandonmentInfo)) {   
+    case ANSWER__YES:
+    break; case ANSWER__NO:
+    break; default: m_TRACK() } // switch 
+  } // if
 
-// Public function; see .h
-int l_BlotexlibExecutorParseAndComputeRValueBlottabSpot(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING *a_sequence, struct P_STRING blottab2Name, struct BLOTEX_VALUE *ac_blotexValue,
-  G_STRING_STUFF nc_abandonmentInfo) {
-  m_DIGGY_BOLLARD()
-m_RAISE(ANOMALY__NOT_AVAILABLE)
-} // l_BlotexlibExecutorParseAndComputeRValueBlottabSpot
+  m_DIGGY_RETURN(answer)
+} // l_BlotexlibExecutorParseAndComputeRValueGenuineBlottabOps
+
+
+
 
 
 // Public function; see .h

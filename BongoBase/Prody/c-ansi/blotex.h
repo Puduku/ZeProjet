@@ -37,7 +37,7 @@ typedef struct BLOTEXLIB_EXECUTOR *BLOTEXLIB_EXECUTOR_HANDLE; // Public handle
 // #REF l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_L_VALUE_BLOTTAB_SET_OP_FUNCTION
 // Parse and compute 'l-value' blottab operations or spot:
 // expect <blottab ref op set int> | <blottab ref op set str> (OPS) 
-// expect <int blottab spot> | <str blottab spot> (SPOT) 
+// expect <int blottab spot ref> | <str blottab spot ref> (SPOT) 
 //
 // Passed:
 // - handle: 
@@ -302,8 +302,8 @@ int BlotexlibExecutorConcatenateStrexValue(BLOTEXLIB_EXECUTOR_HANDLE handle,
 //
 // Changed:
 // - *a_sequence: after parsing 
-// - ac_blotexValue: only significant if "computed successfully" 
-// - nc_abandonmentInfo: only significant if "computing abandoned"
+// - ac_blotexValue: only significant if "parsed/computed successfully" 
+// - nc_abandonmentInfo: only significant if "parsing/computing abandoned"
 //
 // Ret: Computed successfully ? 
 // - ANSWER__YES: Ok,
@@ -312,6 +312,26 @@ int BlotexlibExecutorConcatenateStrexValue(BLOTEXLIB_EXECUTOR_HANDLE handle,
 int BlotexlibExecutorParseAndComputeBlotex(BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct P_STRING *a_sequence, struct BLOTEX_VALUE *ac_blotexValue,
   G_STRING_STUFF nc_abandonmentInfo) ;
+
+// TODO: dans kitchen???
+// Parse <str portion>
+//
+// Passed:
+// - handle:
+// - *a_sequence: before parsing; expect '{' [ <intex> ] [ ( ':' | '-' ) [ <intex> ] ] '}'
+//
+// Changed:
+// - *a_sequence: after parsing 
+// - *ac_offset: >= 0; only significant if parsed successfully
+// - *acn_length: (-1 special value for all rest of string) only significant if parsed successfully
+// - nc_abandonmentInfo: only significant if "parsing abandoned"
+//
+// Ret: Computed successfully ? 
+// - ANSWER__YES: Ok,
+// - ANSWER__NO: 'syntax' 'not found' error; abandon processing 
+// - -1: unexpected problem
+int BlotexlibExecutorParseAndComputeStrPortion(BLOTEXLIB_EXECUTOR_HANDLE handle,
+  struct P_STRING *a_sequence, int *ac_offset, int *acn_length, G_STRING_STUFF nc_abandonmentInfo);
 
 
 // blottabs:
