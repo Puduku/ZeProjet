@@ -113,7 +113,8 @@
 // fact is that the language "refuses" to tell which representation is the good one!    
 // Ex2: the nature of entities declared with [] notations. Basically, one (naively) say : "When I
 // want to declare a pointer p, I can use *p or p[] notations, which are equivalent - I just have
-// not to confuse p[<some size>] with p[] which are indeed totally different declarations..."
+// not to confuse p[] with p[<some size>] which are indeed totally different declarations (the 
+// latter declaring an array)."
 // Actually, both parts of the proposition are not true (i.e *p and p[] are not always equivalent
 // in declarations AND p[] and p[<some size>] are sometimes equivalent (to *p) in declarations).
 // And as usual, the real complications are caused by absence of portability. (P)
