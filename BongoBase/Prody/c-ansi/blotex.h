@@ -294,6 +294,7 @@ int BlotexlibExecutorConcatenateStrexValue(BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct BLOTEX_VALUE *a_strexValue1, struct P_STRING p_str2) ;
 
 
+// TODO: ParseBlotex() dans kitchen???
 // Parse <blotex>
 //
 // Passed:
@@ -313,7 +314,7 @@ int BlotexlibExecutorParseAndComputeBlotex(BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct P_STRING *a_sequence, struct BLOTEX_VALUE *ac_blotexValue,
   G_STRING_STUFF nc_abandonmentInfo) ;
 
-// TODO: dans kitchen???
+// TODO: ParseStrPortion dans kitchen???
 // Parse <str portion>
 //
 // Passed:

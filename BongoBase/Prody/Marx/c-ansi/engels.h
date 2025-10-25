@@ -12,12 +12,14 @@
 #include "c-ansi/g-string.h"
 
 
-// PamphletExamplars: 
 
-struct PAMPHLET_EXAMPLAR ; // Private!
-typedef struct PAMPHLET_EXAMPLAR* PAMPHLET_EXAMPLAR_HANDLE;
+// 1. Engels (manage pamphlet models)
+// ----------------------------------
 
-// Create new pamphlet examplar
+struct ENGELS;
+typedef struct ENGELS *ENGELS_HANDLE;
+
+// Create Engels instance
 //
 // Passed:
 // - *azh_handle: "un-initialized" handle
@@ -28,13 +30,40 @@ typedef struct PAMPHLET_EXAMPLAR* PAMPHLET_EXAMPLAR_HANDLE;
 // Ret:
 // - RETURNED: Ok
 // - -1 special value: anomaly raised
-int PamphletExamplarCreateInstance(PAMPHLET_EXAMPLAR_HANDLE *azh_handle, int dummy) ;
+int EngelsCreateInstance(ENGELS_HANDLE *azh_handle);
+
+// Ret:
+// - RETURNED: Ok
+// - -1 special value: anomaly raised
+int EngelsDestroyInstance(ENGELS_HANDLE xh_handle) ;
+
+// Pamphlets (aka "super blot tables"...)
+// --------------------------------------
+
+struct PAMPHLET ; // Private!
+typedef struct PAMPHLET* PAMPHLET_HANDLE;
+
+// Create new pamphlet examplar
+//
+// Passed:
+// - *azh_handle: "un-initialized" handle
+// - f_engelsHandle: pamphlet models handler  
+//
+// Changed:
+// - *azh_handle: initilized instance handle
+//
+// Ret:
+// - RETURNED: Ok
+// - -1 special value: anomaly raised
+int PamphletCreateInstance(PAMPHLET_HANDLE *azh_handle, ENGELS_HANDLE f_engelsHandle) ;
 
 
 // Ret:
 // - RETURNED: Ok
 // - -1 special value: anomaly raised
-int PamphletExamplarDestroyInstance(PAMPHLET_EXAMPLAR_HANDLE xh_handle) ;
+// NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION
+int PamphletDestroyInstance(void *xhr_handle) ;
+// int PamphletDestroyInstance(PAMPHLET_HANDLE xh_handle) ;
 
 
 #endif // __C_ANSI_ENGELS_H_INCLUDED__

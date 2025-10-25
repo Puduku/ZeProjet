@@ -16,13 +16,14 @@
 
 // ===> "super" blottabs (aka pamphlets) <===
 
-typedef PAMPHLET_EXAMPLAR_HANDLE g_BLOTTAB2_HANDLE;
+typedef PAMPHLET_HANDLE g_BLOTTAB2_HANDLE;
 
 
-// Reminder: "super" blottabs are nothing but PAMPHLET EXAMPLARS. 
+// Reminder: "super" blottabs are nothing but PAMPHLETS. 
 //
 // Passed:
 // - *azh_handle: "un-initialized" handle
+// - f_engelsHandle: pamphlet models handler...
 //
 // Changed:
 // - *azh_handle: initilized instance handle
@@ -30,9 +31,11 @@ typedef PAMPHLET_EXAMPLAR_HANDLE g_BLOTTAB2_HANDLE;
 // Ret:
 // - RETURNED: Ok
 // - -1 special value: anomaly raised
-#define BLOTTAB2_CREATE_INSTANCE(/*BLOTTAB2_HANDLE* */azh_handle,/*int*/dummy)\
-  PamphletExamplarCreateInstance(azh_handle,dummy);
-
+static inline int m_Blottab2CreateInstance(g_BLOTTAB2_HANDLE* azh_handle, ENGELS_HANDLE f_engelsHandle) {
+  m_DIGGY_BOLLARD_S()
+  m_TRACK_IF(PamphletCreateInstance(azh_handle,f_engelsHandle) != RETURNED)
+  m_DIGGY_RETURN(RETURNED)
+} // m_Blottab2CreateInstance
 
 // NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION
 int Blottab2DestroyInstance(void *xhr_handle) ;
@@ -51,7 +54,7 @@ int Blottab2DestroyInstance(void *xhr_handle) ;
 // - RETURNED: Ok
 // - -1: unexpected problem; anomaly is raised
 int l_BlotexlibExecutorCreateBlottab2(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING blottab2Name, int dummy, BLOTTAB2_HANDLE *a_blottab2Handle) ;
+  struct P_STRING blottab2Name, int dummy, g_BLOTTAB2_HANDLE *a_blottab2Handle) ;
 
 
 // #SEE l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_L_VALUE_BLOTTAB_SET_OP_FUNCTION@c-ansi/blotex.h
