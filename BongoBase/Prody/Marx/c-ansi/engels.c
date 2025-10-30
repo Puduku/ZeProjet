@@ -33,8 +33,9 @@ enum {
   DATE__REFINED_MATTER,
 } ;
 
-// PIVOT_MODEL:
+// I.1 PIVOT_MODEL:
 
+// NAMED OBJECT: 
 struct PIVOT_MODEL {
   m_DECLARE_MAGIC_FIELD(PIVOT_MODEL_HANDLE)
   struct P_STRING v_name; // that of as "named object"
@@ -67,12 +68,12 @@ static int PivotModelDestroyInstance (void *xhr_handle) {
   m_DIGGY_RETURN(RETURNED)
 } // PivotModelDestroyInstance
  
-// TRACT_OR_PIVOT_MODEL:
+// I.2 TRACT_OR_PIVOT_MODEL:
 
 #define b_PIVOT b_TRUE
 #define b_TRACT !b_PIVOT 
 
-// ULTRA green type:
+// ULTRA GREEN ITEM:
 struct TRACT_OR_PIVOT_MODEL {
   m_DECLARE_MAGIC_FIELD(TRACT_OR_PIVOT_MODEL_HANDLE)
   int minOccurencesNumber;
@@ -98,8 +99,9 @@ static int TractOrPivotModelInitialize(TRACT_OR_PIVOT_MODEL_STUFF stuff, int min
 } // TractOrPivotModelInitialize
 
 
-// TRACT_MODEL:
+// I.3 TRACT_MODEL:
 
+// NAMED OBJECT: 
 struct TRACT_MODEL {
   m_DECLARE_MAGIC_FIELD(TRACT_MODEL_HANDLE)
   struct P_STRING v_name; // that of as "named object"
@@ -134,8 +136,9 @@ static int TractModelDestroyInstance (void *xhr_handle) {
   m_DIGGY_RETURN(RETURNED)
 } // TractModelDestroyInstance
 
-// PAMPHLET_MODEL:
+// I.4 PAMPHLET_MODEL:
 
+// NAMED OBJECT: 
 struct PAMPHLET_MODEL {
   m_DECLARE_MAGIC_FIELD(PAMPHLET_MODEL_HANDLE)
   struct P_STRING v_name; // that of as "named object"
@@ -170,8 +173,7 @@ static int PamphletModelDestroyInstance (void *xhr_handle) {
   m_DIGGY_RETURN(RETURNED)
 } // PamphletModelDestroyInstance
 
-
-// ===== ENGELS ===
+// I.5 ENGELS:
 
 struct ENGELS {
   G_STRINGS_HANDLE h_pivotModelsHandle ; // managed as NAMED OBJECTs 
@@ -195,11 +197,21 @@ int EngelsCreateInstance(ENGELS_HANDLE *azh_handle) {
   m_DIGGY_RETURN(RETURNED)
 } // EngelsCreateInstance
 
+// Public function: see .h
+int EngelsDestroyInstance(ENGELS_HANDLE xh_handle) {
+  m_DIGGY_BOLLARD()
+  
+  m_TRACK_IF(GStringsDestroyInstance(xh_handle->h_pivotModelsHandle) != RETURNED)
+  m_TRACK_IF(GStringsDestroyInstance(xh_handle->h_tractModelsHandle) != RETURNED)
+  m_TRACK_IF(GStringsDestroyInstance(xh_handle->h_pamphletModelsHandle) != RETURNED)
+  free(xh_handle);
+  m_DIGGY_RETURN(RETURNED)
+} // EngelsDestroyInstance
 
 // === II. examplars: === 
 // ======================
 
-// === TRACT_OR_PIVOT =====
+// II.1 TRACT_OR_PIVOT: 
 
 // ULTRA GREEN ITEM:
 struct TRACT_OR_PIVOT {
@@ -220,8 +232,9 @@ struct TRACT_OR_PIVOT {
 } ;
 typedef struct TRACT_OR_PIVOT *TRACT_OR_PIVOT_STUFF;
 
-// === TRACTs =====
-// See GREEN_ITEM @ c-ansi/green.h
+// II.2 TRACT:
+
+// GREEN ITEM:
 struct TRACT {
   int tractModelEntry;
   GREEN_COLLECTION_HANDLE nh_tractOrPivotsHandle ; 
@@ -261,15 +274,19 @@ static int DisengageTract(void *r_handle, char *r_greenItemStuff) {
 } // DisengageTract
 
 
-// ======== PAMPHLETs ======
+// II.3 PAMPHLET:
 
+// NAMED OBJECT: 
 struct PAMPHLET {
   m_DECLARE_MAGIC_FIELD(PAMPHLET_HANDLE)
+  struct P_STRING v_name; // that of as "named object"
   ENGELS_HANDLE engelsHandle;
   int n_pamphletModelEntry ; // -1 special value => pamphlet is NOT defined 
   struct P_STRING ci_examplar ; // Only significant if pamphlet is defined
-  GREEN_COLLECTION_HANDLE hcv_tractOrPivotsHandle ; // Only significant if pamphlet is defined ; 
+  GREEN_COLLECTION_HANDLE hcv_tractOrPivotsHandle ; // When pamphlet is defined: 
     // tracts or pivots then correspond to the "examplar" 
+  GREEN_COLLECTION_HANDLE hcv_tractsHandle ; // When pamphlet is defined:
+    // all tracts used in the "examplar" 
 } ; 
 
 // Public function; see .h
@@ -285,10 +302,13 @@ int PamphletCreateInstance(PAMPHLET_HANDLE *azh_handle, ENGELS_HANDLE f_engelsHa
     BATEAU__EXPECTED_ITEMS_NUMBER, sizeof(struct TRACT_OR_PIVOT),
     (GREEN_HANDLER__DISENGAGE_FUNCTION)NULL, (GREEN_HANDLER__COMPARE_FUNCTION)NULL,
     (GREEN_HANDLER__EQUATE_FUNCTION)NULL,(void*)UNDEFINED) != RETURNED)
+  m_TRACK_IF(GreenCollectionCreateInstance(&handle->hcv_tractsHandle,
+    BATEAU__EXPECTED_ITEMS_NUMBER, sizeof(struct TRACT),
+    DisengageTract, (GREEN_HANDLER__COMPARE_FUNCTION)NULL,
+    (GREEN_HANDLER__EQUATE_FUNCTION)NULL,(void*)UNDEFINED) != RETURNED)
 
   m_DIGGY_RETURN(RETURNED)
 } // PamphletCreateInstance
-
 
 // Public function; see .h
 // NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION
@@ -298,9 +318,11 @@ int PamphletDestroyInstance(void *xhr_handle) {
   PAMPHLET_HANDLE xh_handle = (PAMPHLET_HANDLE) xhr_handle;
   m_CHECK_MAGIC_FIELD(PAMPHLET_HANDLE,xh_handle)
   m_TRACK_IF(GreenCollectionDestroyInstance(xh_handle->hcv_tractOrPivotsHandle) != RETURNED)
+  m_TRACK_IF(GreenCollectionDestroyInstance(xh_handle->hcv_tractsHandle) != RETURNED)
 
   free(xh_handle);
 
   m_DIGGY_RETURN(RETURNED)
-} // PamphletExamplarDestroyInstance
+} // PamphletDestroyInstance
+
 
