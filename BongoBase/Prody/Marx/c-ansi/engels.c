@@ -258,11 +258,11 @@ int EngelsCreateInstance(ENGELS_HANDLE *azh_handle) {
     BATEAU__EXPECTED_ITEMS_NUMBER, PivotModelDestroyInstance) != RETURNED)
   m_TRACK_IF(l_NamedObjectsCreateInstance(&(handle->h_tractModelsHandle),
     BATEAU__EXPECTED_ITEMS_NUMBER, TractModelDestroyInstance) != RETURNED)
-  m_ASSERT(G_STRINGS_ADD_PLAIN_LEXICAL_INDEX(handle->h_tractModelsHandle, NULL,NULL) ==
+  m_ASSERT(m_GStringsAddPlainLexicalIndex(handle->h_tractModelsHandle, NULL,NULL) ==
     INDEX_LABEL0)
   m_TRACK_IF(l_NamedObjectsCreateInstance(&(handle->h_pamphletModelsHandle),
     BATEAU__EXPECTED_ITEMS_NUMBER, PamphletModelDestroyInstance) != RETURNED)
-  m_ASSERT(G_STRINGS_ADD_PLAIN_LEXICAL_INDEX(handle->h_pamphletModelsHandle, NULL,NULL) ==
+  m_ASSERT(m_GStringsAddPlainLexicalIndex(handle->h_pamphletModelsHandle, NULL,NULL) ==
     INDEX_LABEL0)
   m_DIGGY_RETURN(RETURNED)
 } // EngelsCreateInstance

@@ -73,9 +73,9 @@ static int GStringsTest (const char *p_vers3) {
   
   m_TRACK_IF(G_STRINGS_CREATE_INSTANCE(&h_gStrings,100) != RETURNED)
 
-  m_ASSERT(G_STRINGS_ADD_PLAIN_LEXICAL_INDEX(h_gStrings, NULL, NULL) == NON_CASE__INDEX_LABEL)
+  m_ASSERT(m_GStringsAddPlainLexicalIndex(h_gStrings, NULL, NULL) == NON_CASE__INDEX_LABEL)
 
-  m_ASSERT(G_STRINGS_ADD_PLAIN_LEXICAL_INDEX(h_gStrings, NULL, toupper) == CASE__INDEX_LABEL)
+  m_ASSERT(m_GStringsAddPlainLexicalIndex(h_gStrings, NULL, toupper) == CASE__INDEX_LABEL)
 
   G_STRING_STUFF gStringStuff = (G_STRING_STUFF)UNDEFINED;
 

@@ -315,10 +315,13 @@ int GStringsAddIndex(G_STRINGS_HANDLE handle,  int keysNumber, int key1GStringSe
 // #SEE GStringsAddIndex <g-string> <key>
 // Add an index for single (aka cardinality 1) g-strings collection for LEXICAL comparison
 // Nb: Plain index => one single key
-#define /*int*/ G_STRINGS_ADD_PLAIN_LEXICAL_INDEX(/*G_STRINGS_HANDLE*/handle,\
-  /*IS_CHAR_FUNCTION*/ n_keyIsNeutralCharFunction, /*TO_CHAR_FUNCTION*/n_keyToCharFunction) \
-  GStringsAddIndex(handle, 1, 0, P_STRING__G_KEYS_COMPARISON, n_keyIsNeutralCharFunction,\
-  n_keyToCharFunction, (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) 
+static inline int m_GStringsAddPlainLexicalIndex(G_STRINGS_HANDLE handle,
+  IS_CHAR_FUNCTION n_keyIsNeutralCharFunction, TO_CHAR_FUNCTION n_keyToCharFunction) {
+  m_DIGGY_BOLLARD_S()
+  m_DIGGY_RETURN(GStringsAddIndex(handle, 1, 0, P_STRING__G_KEYS_COMPARISON,
+     n_keyIsNeutralCharFunction, n_keyToCharFunction, (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,
+     (void*)UNDEFINED))
+} // m_GStringsAddPlainLexicalIndex
 
 
 // (Internal use)
