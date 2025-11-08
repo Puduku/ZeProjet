@@ -32,6 +32,19 @@ typedef struct ENGELS *ENGELS_HANDLE;
 // - -1 special value: anomaly raised
 int EngelsCreateInstance(ENGELS_HANDLE *azh_handle);
 
+// Add pivot models
+// 
+// Passed:
+// - handle:
+// - p_configHandle: INI file config of pivot models
+//
+// Ret:
+// - COMPLETED__OK:  
+// - COMPLETED__BUT: some pivot models were updated 
+// - -1 special value: anomaly raised
+int EngelsAddPivotModels(ENGELS_HANDLE handle, G_STRINGS_HANDLE p_configHandle) ;
+
+
 // Ret:
 // - RETURNED: Ok
 // - -1 special value: anomaly raised

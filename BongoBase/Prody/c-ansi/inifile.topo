@@ -1,0 +1,12 @@
+// c-ansi/inifile.topo
+
+// (c) Puduku 2025 
+
+// Purpose: handling miscellaneous configuration files, following MS-DOS/Windoze .ini files
+// "philosophy".
+
+// This module supports native .ini format (text lines with one key–value pair per line, organized
+// into sections), but other configuration file format (json, etc.) can be supported. 
+// Regardless of the file format used, configuration data is presented as unique collections of
+// g-params.
+
