@@ -8,15 +8,22 @@
 #include "c-ansi/g-string.h" 
 #include "c-ansi/testy-diggy.h"
 
+typedef G_STRINGS_HANDLE g_NAMED_OBJECTS_HANDLE ;
 
-// #REF NAMED_OBJECTS_CREATE_INSTANCE <named-object>
-// #SEE GStringsCreateInstance@c-ansi/g-string.h  <g-string>
-// Note: NAMED_OBJECT__G_STRING_CONVEYANCE => object handle acolyt 
-#define /*int*/ NAMED_OBJECTS_CREATE_INSTANCE(/*G_STRINGS_HANDLE*/ azh_handle,\
-  /*int*/ expectedItemsNumber,\
-  /*NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION*/namedObjectDestroyInstanceFunction)\
-  GStringsCreateInstance(azh_handle, expectedItemsNumber,1, NAMED_OBJECT__G_STRING_CONVEYANCE,\
-  (const int *)UNDEFINED,namedObjectDestroyInstanceFunction)
+
+// => The function also adds plain lexical index (INDEX_LABEL0) 
+// #SEE GStringsCreateInstance@c-ansi/g-string.h  <named-object>
+// Reminder: NAMED_OBJECT__G_STRING_CONVEYANCE => object handle acolyt 
+int l_NamedObjectsCreateInstance(g_NAMED_OBJECTS_HANDLE *azh_handle,int expectedItemsNumber,
+  NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION namedObjectDestroyInstanceFunction);
+
+
+// #SEE GStringsDestroyInstance @ c-ansi/g-string.h <named-object>
+static inline int m_NamedObjectsDestroyInstance(g_NAMED_OBJECTS_HANDLE xh_handle) {
+  m_DIGGY_BOLLARD_S()
+  m_TRACK_IF(GStringsDestroyInstance(xh_handle) != RETURNED)
+  m_DIGGY_RETURN(RETURNED)
+} // m_NamedObjectsDestroyInstance  
 
 
 // Manipulate g-string as 'named object'

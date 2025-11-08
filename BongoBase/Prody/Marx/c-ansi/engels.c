@@ -242,9 +242,9 @@ static int PamphletModelDestroyInstance (void *xhr_handle) {
 // I.5 ENGELS:
 
 struct ENGELS {
-  G_STRINGS_HANDLE h_pivotModelsHandle ; // managed as NAMED OBJECTs 
-  G_STRINGS_HANDLE h_tractModelsHandle ; // managed as NAMED OBJECTs 
-  G_STRINGS_HANDLE h_pamphletModelsHandle ; // managed as NAMED OBJECTs 
+  g_NAMED_OBJECTS_HANDLE h_pivotModelsHandle ;
+  g_NAMED_OBJECTS_HANDLE h_tractModelsHandle ;
+  g_NAMED_OBJECTS_HANDLE h_pamphletModelsHandle ;
 } ;
 
 // Public function: see .h
@@ -254,15 +254,13 @@ int EngelsCreateInstance(ENGELS_HANDLE *azh_handle) {
   m_MALLOC_INSTANCE(*azh_handle)
   ENGELS_HANDLE handle = *azh_handle;
 
-  m_TRACK_IF(NAMED_OBJECTS_CREATE_INSTANCE(&(handle->h_pivotModelsHandle),
+  m_TRACK_IF(l_NamedObjectsCreateInstance(&(handle->h_pivotModelsHandle),
     BATEAU__EXPECTED_ITEMS_NUMBER, PivotModelDestroyInstance) != RETURNED)
-  m_ASSERT(G_STRINGS_ADD_PLAIN_LEXICAL_INDEX(handle->h_pivotModelsHandle, NULL,NULL) ==
-    INDEX_LABEL0)
-  m_TRACK_IF(NAMED_OBJECTS_CREATE_INSTANCE(&(handle->h_tractModelsHandle),
+  m_TRACK_IF(l_NamedObjectsCreateInstance(&(handle->h_tractModelsHandle),
     BATEAU__EXPECTED_ITEMS_NUMBER, TractModelDestroyInstance) != RETURNED)
   m_ASSERT(G_STRINGS_ADD_PLAIN_LEXICAL_INDEX(handle->h_tractModelsHandle, NULL,NULL) ==
     INDEX_LABEL0)
-  m_TRACK_IF(NAMED_OBJECTS_CREATE_INSTANCE(&(handle->h_pamphletModelsHandle),
+  m_TRACK_IF(l_NamedObjectsCreateInstance(&(handle->h_pamphletModelsHandle),
     BATEAU__EXPECTED_ITEMS_NUMBER, PamphletModelDestroyInstance) != RETURNED)
   m_ASSERT(G_STRINGS_ADD_PLAIN_LEXICAL_INDEX(handle->h_pamphletModelsHandle, NULL,NULL) ==
     INDEX_LABEL0)
@@ -319,9 +317,9 @@ static int EngelsGetTrackModelsNumber(ENGELS_HANDLE handle, int trackModelEntry)
 int EngelsDestroyInstance(ENGELS_HANDLE xh_handle) {
   m_DIGGY_BOLLARD()
   
-  m_TRACK_IF(GStringsDestroyInstance(xh_handle->h_pivotModelsHandle) != RETURNED)
-  m_TRACK_IF(GStringsDestroyInstance(xh_handle->h_tractModelsHandle) != RETURNED)
-  m_TRACK_IF(GStringsDestroyInstance(xh_handle->h_pamphletModelsHandle) != RETURNED)
+  m_TRACK_IF(m_NamedObjectsDestroyInstance(xh_handle->h_pivotModelsHandle) != RETURNED)
+  m_TRACK_IF(m_NamedObjectsDestroyInstance(xh_handle->h_tractModelsHandle) != RETURNED)
+  m_TRACK_IF(m_NamedObjectsDestroyInstance(xh_handle->h_pamphletModelsHandle) != RETURNED)
   free(xh_handle);
   m_DIGGY_RETURN(RETURNED)
 } // EngelsDestroyInstance

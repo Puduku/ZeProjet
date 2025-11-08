@@ -98,12 +98,12 @@ struct BLOTTAB_EXECUTOR_IMPLEMENTATION {
   l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION
   l_blotexlibExecutorParseAndComputeRValueBlottabOpsFunction;
   UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION updateBlottabCurrentBlotsetFieldFunction;
-  G_STRINGS_HANDLE h_blottabsHandle ; 
+  g_NAMED_OBJECTS_HANDLE h_blottabsHandle ; 
 } ;
 
 struct BLOTEXLIB_EXECUTOR {
   m_DECLARE_MAGIC_FIELD(BLOTEXLIB_EXECUTOR_HANDLE)
-  G_STRINGS_HANDLE h_blotregsHandle ; 
+  g_NAMED_OBJECTS_HANDLE h_blotregsHandle ; 
   G_STRINGS_HANDLE h_workingGStringsHandle ;
   int blottabExecutorImplementationsNumber; 
   struct BLOTTAB_EXECUTOR_IMPLEMENTATION blottabExecutorImplementations[
@@ -137,19 +137,14 @@ static int BlotexlibExecutorFactoryCreateProductInstance(void *pr_handle,
 
   m_ASSIGN_MAGIC_FIELD(BLOTEXLIB_EXECUTOR_HANDLE,productHandle)
 
-  m_TRACK_IF(NAMED_OBJECTS_CREATE_INSTANCE(&(productHandle->h_blotregsHandle), 10,
+  m_TRACK_IF(l_NamedObjectsCreateInstance(&(productHandle->h_blotregsHandle), 10,
     BlotregDestroyInstance) != RETURNED)
-  m_ASSERT(G_STRINGS_ADD_PLAIN_LEXICAL_INDEX(productHandle->h_blotregsHandle, NULL,NULL) ==
-    INDEX_LABEL0)
 
   productHandle->blottabExecutorImplementationsNumber = p_handle->blottabImplementationsNumber;
   int i = 0; for (; i < p_handle->blottabImplementationsNumber; i++) { 
-    m_TRACK_IF(NAMED_OBJECTS_CREATE_INSTANCE(
+    m_TRACK_IF(l_NamedObjectsCreateInstance(
       &(productHandle->blottabExecutorImplementations[i].h_blottabsHandle), 10,
       p_handle->blottabImplementations[i].blottabDestroyInstanceFunction) != RETURNED)
-    m_ASSERT(G_STRINGS_ADD_PLAIN_LEXICAL_INDEX(
-      productHandle->blottabExecutorImplementations[i].h_blottabsHandle, NULL,NULL) ==
-      INDEX_LABEL0)
     productHandle->blottabExecutorImplementations[i].
       l_blotexlibExecutorParseAndComputeLValueBlottabSetOpFunction =
       p_handle->blottabImplementations[i].l_blotexlibExecutorParseAndComputeLValueBlottabSetOpFunction;
@@ -1649,10 +1644,10 @@ static int BlotexlibExecutorDestroyInstance(void *xhr_handle) {
   BLOTEXLIB_EXECUTOR_HANDLE xh_handle = (BLOTEXLIB_EXECUTOR_HANDLE)xhr_handle;
   m_CHECK_MAGIC_FIELD(BLOTEXLIB_EXECUTOR_HANDLE,xh_handle)
 
-  m_TRACK_IF(GStringsDestroyInstance(xh_handle->h_blotregsHandle) != RETURNED)
+  m_TRACK_IF(m_NamedObjectsDestroyInstance(xh_handle->h_blotregsHandle) != RETURNED)
 
   int i =0; for (; i < xh_handle->blottabExecutorImplementationsNumber; i++) { 
-    m_TRACK_IF(GStringsDestroyInstance(
+    m_TRACK_IF(m_NamedObjectsDestroyInstance(
       xh_handle->blottabExecutorImplementations[i].h_blottabsHandle) != RETURNED)
   } // for
 
