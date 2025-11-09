@@ -269,14 +269,14 @@ int EngelsCreateInstance(ENGELS_HANDLE *azh_handle) {
 
 
 // Public function: see .h
-int EngelsAddPivotModels(ENGELS_HANDLE handle, G_STRINGS_HANDLE p_configHandle) {
+int EngelsAddPivotModels(ENGELS_HANDLE handle, g_G_PARAMS_HANDLE p_configHandle) {
   m_DIGGY_BOLLARD()
   int completed = COMPLETED__OK;  // a priori
   int count = GStringsGetCount(p_configHandle,NULL);
   m_TRACK_IF(count < 0)
 
-  G_STRING_SET_STUFF t_pivotModelConfigStuff = (G_STRING_SET_STUFF)UNDEFINED;
-  G_STRING_STUFF t_namedPivotModelStuff = (G_STRING_STUFF)UNDEFINED;
+  g_G_PARAM_STUFF t_pivotModelConfigStuff = (g_G_PARAM_STUFF)UNDEFINED;
+  g_NAMED_OBJECT_STUFF t_namedPivotModelStuff = (g_NAMED_OBJECT_STUFF)UNDEFINED;
   int entry = UNDEFINED;
   int n_minSize = UNDEFINED;
   int n_maxSize = UNDEFINED;

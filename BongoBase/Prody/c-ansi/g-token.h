@@ -18,13 +18,19 @@ struct TOKEN_DEFINITION {
   int tokenId;
 } ; 
 
+typedef G_STRINGS_HANDLE g_G_TOKENS_HANDLE ;
 
-// #REF G_TOKENS_CREATE_INSTANCE <named-object>
+
+
 // #SEE G_STRINGS_CREATE_INSTANCE <named-object>
 // Note: TOKEN__G_STRING_CONVEYANCE => token id acolyt 
-#define /*int*/ G_TOKENS_CREATE_INSTANCE(/*G_STRINGS_HANDLE*/ azh_handle,\
-  /*int*/ expectedItemsNumber)  GStringsCreateInstance(azh_handle, expectedItemsNumber, 1,\
-  VALUED_STRING__G_STRING_CONVEYANCE,(const int *)UNDEFINED,(NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION)UNDEFINED)
+static inline int ml_GTokensCreateInstance(g_G_TOKENS_HANDLE *azh_handle, int expectedItemsNumber) {
+  m_DIGGY_BOLLARD_S()
+  m_TRACK_IF(GStringsCreateInstance(azh_handle,expectedItemsNumber,1,
+    VALUED_STRING__G_STRING_CONVEYANCE,(const int *)UNDEFINED,
+    (NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION)UNDEFINED) != RETURNED)
+  m_DIGGY_RETURN(RETURNED)
+} // ml_GTokensCreateInstance
 
 
 // Manipulate g-string as 'token'

@@ -161,7 +161,7 @@ int GStringConvert(G_STRING_STUFF stuff,  IS_CHAR_FUNCTION n_isNeutralCharFuncti
 // "g-string set" == array of g-strings (fixed number of elements)
 // Hence, a g-string set stuff is exacltly the g-string stuff of the first element of the set.
 // To retrieve a specific g-string element of a set, just apply the "good old" pointer arithmetic. 
-typedef struct G_STRING *G_STRING_SET_STUFF;
+typedef G_STRING_STUFF g_G_STRING_SET_STUFF;
 
 #define FIRST_ELEMENT0 0
 
@@ -178,7 +178,7 @@ typedef struct G_STRING *G_STRING_SET_STUFF;
 // Ret:
 // - RETURNED
 // - -1: unexpected problem ; anomaly is raised
-int GStringSetCreateInstance(G_STRING_SET_STUFF *azh_stuff,  int cardinality);
+int GStringSetCreateInstance(g_G_STRING_SET_STUFF *azh_stuff,  int cardinality);
 
 // #SEE GStringSetCreateInstance <g-string>
 #define /*int*/ G_STRING_CREATE_INSTANCE(/*G_STRING_STUFF* */ azh_stuff) \
@@ -199,7 +199,7 @@ GStringSetCreateInstance(azh_stuff,1)
 // Returned
 // - RETURNED
 // - -1: unexpected problem ; anomaly is raised
-int GStringSetDestroyInstance(G_STRING_SET_STUFF xh_notNamedObjectStuff,  int cardinality);
+int GStringSetDestroyInstance(g_G_STRING_SET_STUFF xh_notNamedObjectStuff,  int cardinality);
 
 // #SEE GStringSetDestroyInstance <g-string>
 #define /*int*/ G_STRING_DESTROY_INSTANCE(/*G_STRING_STUFF*/ xh_notNamedObjectStuff) \
@@ -259,12 +259,12 @@ int GStringsCreateInstance(G_STRINGS_HANDLE* azh_handle, int expectedItemsNumber
 
 // #REF GStringsFetch <gStringSet> 
 // #SEE GreenCollectionFetch @ c-ansi/green.h <<gStringSet>>
-int GStringsFetch(G_STRINGS_HANDLE cp_handle, int n_entry, G_STRING_SET_STUFF* acnt_gStringSetStuff);
+int GStringsFetch(G_STRINGS_HANDLE cp_handle, int n_entry, g_G_STRING_SET_STUFF* acnt_gStringSetStuff);
 
 
 // #REF GStringsGetCount <gStringSet> 
 // #SEE GreenCollectionGetCount@c-ansi/green.h <<gStringSet>>
-int GStringsGetCount (G_STRINGS_HANDLE cp_handle,  G_STRING_SET_STUFF *navnt_gStringSetStuff);
+int GStringsGetCount (G_STRINGS_HANDLE cp_handle,  g_G_STRING_SET_STUFF *navnt_gStringSetStuff);
 
 
 enum { // #REF enum-G_KEYS_COMPARISON 
@@ -421,7 +421,7 @@ int GStringsIndexRequestR(G_STRINGS_HANDLE cp_handle,
 // #SEE GreenCollectionIndexRequest@c-ansi/green.h  <<gStringSet>> 
 int GStringsIndexFetch(G_STRINGS_HANDLE cp_handle,
   INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, unsigned int indexFetchFlags,
-  G_STRING_SET_STUFF *acvnt_gStringSetStuff, int *nacvn_entry);
+  g_G_STRING_SET_STUFF *acvnt_gStringSetStuff, int *nacvn_entry);
 
 // Simple fetch (one single criterium)
 // #SEE GStringsIndexRequest <gStringSet>
@@ -429,7 +429,7 @@ int GStringsIndexFetch(G_STRINGS_HANDLE cp_handle,
 static inline int m_GStringsIndexSingleFetch(G_STRINGS_HANDLE cp_handle, 
   INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, 
   int indexLabel, unsigned int indexSeekFlags, const struct G_KEY *cfps_keys,
-  unsigned int indexFetchFlags, G_STRING_SET_STUFF *acvnt_gStringSetStuff, int *nacvn_entry) {
+  unsigned int indexFetchFlags, g_G_STRING_SET_STUFF *acvnt_gStringSetStuff, int *nacvn_entry) {
   m_DIGGY_BOLLARD_S() 
   m_TRACK_IF(GStringsIndexRequest(cp_handle,nf_indexRequestAutomaticBuffer,1,indexLabel,
     indexSeekFlags, cfps_keys) != RETURNED) 
@@ -467,9 +467,9 @@ int GStringsFreeze(G_STRINGS_HANDLE handle, G_STRINGS_ARRAY **nap_gStringsArray)
 // - u_gStringSetCardinality: that passed to GStringsCreateInstance()...
 //
 // Ret: <g-string-set> stuff 
-#define /*G_STRING_SET_STUFF*/ GET_G_STRING_SET_STUFF(/*char* */ u_greenArray,  /*int*/ u_entry,\
+#define /*g_G_STRING_SET_STUFF*/ GET_G_STRING_SET_STUFF(/*char* */ u_greenArray,  /*int*/ u_entry,\
   /*int*/ u_gStringSetCardinality) \
-( (G_STRING_SET_STUFF) r_GET_GREEN_ITEM_STUFF(u_greenArray,u_entry,\
+( (g_G_STRING_SET_STUFF) r_GET_GREEN_ITEM_STUFF(u_greenArray,u_entry,\
   sizeof(struct G_STRING)*u_gStringSetCardinality) )
 
 

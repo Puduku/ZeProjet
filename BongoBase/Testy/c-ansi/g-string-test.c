@@ -41,7 +41,7 @@ static int GStringTest (const char *p_vers3) {
 static int GParamTest (const char *p_vers3) {
   m_DIGGY_BOLLARD()
 
-  G_STRING_SET_STUFF h_gParam = (G_STRING_SET_STUFF) UNDEFINED;
+  g_G_STRING_SET_STUFF h_gParam = (g_G_STRING_SET_STUFF) UNDEFINED;
   m_TRACK_IF(GStringSetCreateInstance(&h_gParam,G_PARAM_CARDINALITY) != RETURNED)
 
   int ret = GStringCopy(h_gParam + G_PARAM_NAME_ELEMENT, 0, m_PString("VERS1")); 

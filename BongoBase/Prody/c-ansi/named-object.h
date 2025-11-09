@@ -10,6 +10,7 @@
 
 typedef G_STRINGS_HANDLE g_NAMED_OBJECTS_HANDLE ;
 
+typedef G_STRING_STUFF g_NAMED_OBJECT_STUFF ;
 
 // => The function also adds plain lexical index (INDEX_LABEL0) 
 // #SEE GStringsCreateInstance@c-ansi/g-string.h  <named-object>

@@ -14,23 +14,16 @@
 
 // name AND value conveyance : VALUED_STRING__G_STRING_CONVEYANCE
 
-// #REF G_PARAMS_CREATE_INSTANCE <named-object>
-// #SEE GStringsCreateInstance@c-ansi/g-string.h  <g-string>
-//#define /*int*/ G_PARAMS_CREATE_INSTANCE(/*G_STRINGS_HANDLE*/azh_handle,/*int*/expectedItemsNumber)\
-//  GStringsCreateInstance(azh_handle, expectedItemsNumber,G_PARAM_CARDINALITY,-1,\
-//  ps_gParamGStringConveyances,(NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION)UNDEFINED)
+typedef G_STRINGS_HANDLE g_G_PARAMS_HANDLE;
 
-// #REF m_GParamsCreateInstance <named-object>
-// #SEE GStringsCreateInstance@c-ansi/g-string.h  <g-string>
-static inline int m_GParamsCreateInstance(G_STRINGS_HANDLE *azh_handle,int expectedItemsNumber) {
-  static const int ps_gParamGStringConveyances[G_PARAM_CARDINALITY] = { 
-     VALUED_STRING__G_STRING_CONVEYANCE, // "Token id." 
-     VALUED_STRING__G_STRING_CONVEYANCE, 
-  } ; 
+typedef g_G_STRING_SET_STUFF g_G_PARAM_STUFF;
 
-  return GStringsCreateInstance(azh_handle, expectedItemsNumber,G_PARAM_CARDINALITY,-1,
-    ps_gParamGStringConveyances,(NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION)UNDEFINED);
-} // m_GParamsCreateInstance
+#define G_PARAM_NAME_STUFF(u_gParamStuff) ((u_gParamStuff)+G_PARAM_NAME_ELEMENT)
+#define G_PARAM_VALUE_STUFF(u_gParamStuff) ((u_gParamStuff)+G_PARAM_VALUE_ELEMENT)
+
+
+// #SEE GStringsCreateInstance@c-ansi/g-string.h  <named-object>
+int l_GParamsCreateInstance(g_G_PARAMS_HANDLE *azh_handle,int expectedItemsNumber);
 
 // Manipulate g-string as 'g-param's value'
 // 
@@ -45,7 +38,7 @@ static inline int m_GParamsCreateInstance(G_STRINGS_HANDLE *azh_handle,int expec
 static inline int m_GStringAsGParamValue(G_STRING_STUFF stuff, GENERIC_INTEGER en_value, 
   G_STRINGS_HANDLE n_gStringsHandle) {
   m_CHECK_G_STRINGS_COLLECTION_CONVEYANCE(n_gStringsHandle,G_PARAM_VALUE_ELEMENT,
-   VALUED_STRING__G_STRING_CONVEYANCE)
+    VALUED_STRING__G_STRING_CONVEYANCE)
   stuff->acolyt.cen_value = en_value;
   return RETURNED;
 } // m_GStringAsGParamValue
@@ -64,7 +57,7 @@ static inline int m_GStringAsGParamValue(G_STRING_STUFF stuff, GENERIC_INTEGER e
 static inline int m_GStringAsGParamName(G_STRING_STUFF stuff, int tokenId, 
   G_STRINGS_HANDLE n_gStringsHandle) {
   m_CHECK_G_STRINGS_COLLECTION_CONVEYANCE(n_gStringsHandle,G_PARAM_NAME_ELEMENT,
-   VALUED_STRING__G_STRING_CONVEYANCE)
+    VALUED_STRING__G_STRING_CONVEYANCE)
   stuff->acolyt.cen_value = tokenId;
   return RETURNED;
 } // m_GStringAsGParamValue

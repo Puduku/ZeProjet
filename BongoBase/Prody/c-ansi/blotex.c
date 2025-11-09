@@ -202,11 +202,11 @@ m_DIGGY_RETURN(RETURNED)
 #endif
 // Public function; see .h
 int BlotexlibExecutorGetBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING blotregName, G_STRINGS_HANDLE *ac_blotregHandle) {
+  struct P_STRING blotregName, g_G_PARAMS_HANDLE *ac_blotregHandle) {
   m_DIGGY_BOLLARD()
 m_DIGGY_VAR_P_STRING(blotregName)
 //DumpBlotregs(handle->h_blotregsHandle,"GET blotreg BEFORE SEARCH");
-  G_STRING_STUFF ct_namedBlotregStuff = (G_STRING_STUFF)UNDEFINED; 
+  g_NAMED_OBJECT_STUFF ct_namedBlotregStuff = (g_NAMED_OBJECT_STUFF)UNDEFINED; 
   struct G_KEY gKey = m_GKey_PString(blotregName);
   int result = m_GStringsIndexSingleFetch(handle->h_blotregsHandle,NULL,INDEX_LABEL0,
     INDEX_SEEK_FLAGS__EQUAL,&gKey, INDEX_FETCH_FLAGS__SEEK_ONLY,&ct_namedBlotregStuff, NULL);
@@ -236,11 +236,11 @@ break; default:
 
 // Public function; see .h
 int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING blotregName, G_STRINGS_HANDLE *na_blotregHandle) {
+  struct P_STRING blotregName, g_G_PARAMS_HANDLE *na_blotregHandle) {
   m_DIGGY_BOLLARD()
 m_DIGGY_VAR_P_STRING(blotregName)
   int completed = COMPLETED__OK; // a priori
-  G_STRING_STUFF t_namedBlotregStuff = (G_STRING_STUFF)UNDEFINED; 
+  g_NAMED_OBJECT_STUFF t_namedBlotregStuff = (g_NAMED_OBJECT_STUFF)UNDEFINED; 
   struct G_KEY gKey = m_GKey_PString(blotregName);
   int result = m_GStringsIndexSingleFetch(handle->h_blotregsHandle,NULL,INDEX_LABEL0,
     INDEX_SEEK_FLAGS__EQUAL,&gKey, INDEX_FETCH_FLAGS__FETCH,&t_namedBlotregStuff,NULL);
@@ -249,8 +249,8 @@ m_DIGGY_VAR_P_STRING(blotregName)
     m_ASSERT(t_namedBlotregStuff->acolyt.cnhr_handle != NULL)
     completed = COMPLETED__BUT;
   break; case RESULT__NOT_FOUND:
-    { G_STRINGS_HANDLE h_blotregHandle = (G_STRINGS_HANDLE)UNDEFINED ;
-      m_TRACK_IF(m_GParamsCreateInstance(&h_blotregHandle,BATEAU__EXPECTED_ITEMS_NUMBER) !=
+    { g_G_PARAMS_HANDLE h_blotregHandle = (G_STRINGS_HANDLE)UNDEFINED ;
+      m_TRACK_IF(l_GParamsCreateInstance(&h_blotregHandle,BATEAU__EXPECTED_ITEMS_NUMBER) !=
         RETURNED) 
       m_ASSERT(GStringsAddIndex(h_blotregHandle,1,G_PARAM_NAME_ELEMENT,
         P_STRING__G_KEYS_COMPARISON,NULL,NULL,
@@ -292,7 +292,7 @@ int BlotexlibExecutorGetBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, int blottabLab
   m_DIGGY_BOLLARD()
   m_ASSERT(blottabLabel < handle->blottabExecutorImplementationsNumber)
 
-  G_STRING_STUFF ct_namedBlottabStuff = (G_STRING_STUFF)UNDEFINED;
+  g_NAMED_OBJECT_STUFF ct_namedBlottabStuff = (g_NAMED_OBJECT_STUFF)UNDEFINED;
   struct G_KEY gKey = m_GKey_PString(blottabName);
 
   int result = m_GStringsIndexSingleFetch(
@@ -319,7 +319,7 @@ m_DIGGY_VAR_P_STRING(blottabName)
   G_STRINGS_HANDLE blottabsHandle = 
     handle->blottabExecutorImplementations[blottabLabel].h_blottabsHandle;
 m_DIGGY_VAR_P(blottabsHandle)
-  G_STRING_STUFF t_namedBlottabStuff = (G_STRING_STUFF)UNDEFINED;
+  g_NAMED_OBJECT_STUFF t_namedBlottabStuff = (g_NAMED_OBJECT_STUFF)UNDEFINED;
   struct G_KEY gKey = m_GKey_PString(blottabName);
   switch (m_GStringsIndexSingleFetch(blottabsHandle,NULL,INDEX_LABEL0,INDEX_SEEK_FLAGS__EQUAL,&gKey,
     INDEX_FETCH_FLAGS__FETCH,&t_namedBlottabStuff,NULL)) {
@@ -349,7 +349,7 @@ enum {
 };
 
 struct BLOTVAR_REFERENCE {
-  G_STRINGS_HANDLE blotregHandle;
+  g_G_PARAMS_HANDLE blotregHandle;
   int blotvarReference; 
   union {
     struct P_STRING c_name; // Only significant with NAME__BLOTVAR_REFERENCE
@@ -462,11 +462,11 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
 // - RETURNED: Ok
 // - -1: unexpected problem
 static int FetchBlotvar(const struct BLOTVAR_REFERENCE *ap_blotvarReference, char cb_lValue,
-  G_STRING_SET_STUFF *ant_blotvarStuff, int *navn_entry) {
+  g_G_PARAM_STUFF *ant_blotvarStuff, int *navn_entry) {
   m_DIGGY_BOLLARD_S()
 
   int ret = UNDEFINED;
-  *ant_blotvarStuff = (G_STRING_SET_STUFF)UNDEFINED;
+  *ant_blotvarStuff = (g_G_PARAM_STUFF)UNDEFINED;
   switch (ap_blotvarReference->blotvarReference) {
   case NAME__BLOTVAR_REFERENCE:
   case TOKEN_ID__BLOTVAR_REFERENCE:
@@ -583,7 +583,7 @@ int BlotexlibExecutorConcatenateStrexValue(BLOTEXLIB_EXECUTOR_HANDLE handle,
 // - ANSWER__NO: 'syntax' error; abandon processing 
 // - -1: unexpected problem
 static inline int m_BlotexlibExecutorParseAndComputeBlotregRequest(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING *a_sequence, G_STRINGS_HANDLE blotregHandle, G_STRING_STUFF nc_abandonmentInfo) {
+  struct P_STRING *a_sequence, g_G_PARAMS_HANDLE blotregHandle, G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
 
   m_PREPARE_ABANDON(a_sequence, "<blotreg request>") 
@@ -700,7 +700,7 @@ static int BlotexlibExecutorParseAndComputeLValueBlotregOps(BLOTEXLIB_EXECUTOR_H
 
   m_PREPARE_ABANDON(a_sequence, "<blotreg ref op set int> | <blotreg ref op set str>")
 
-  G_STRINGS_HANDLE blotregHandle = (G_STRINGS_HANDLE)UNDEFINED; 
+  g_G_PARAMS_HANDLE blotregHandle = (G_STRINGS_HANDLE)UNDEFINED; 
   switch (BlotexlibExecutorGetBlotreg(handle,blotregName,&blotregHandle)) {
   case RESULT__FOUND:
   break; case RESULT__NOT_FOUND:
@@ -754,7 +754,7 @@ static int BlotexlibExecutorParseAndComputeRValueBlotregOps(BLOTEXLIB_EXECUTOR_H
 
   m_PREPARE_ABANDON(a_sequence, "<int blotreg ops> | <str blotreg ops>") 
 
-  G_STRINGS_HANDLE blotregHandle = (G_STRINGS_HANDLE)UNDEFINED; 
+  g_G_PARAMS_HANDLE blotregHandle = (G_STRINGS_HANDLE)UNDEFINED; 
   switch (BlotexlibExecutorGetBlotreg(handle,blotregName,&blotregHandle)) {
   case RESULT__FOUND:
   break; case RESULT__NOT_FOUND:
@@ -801,7 +801,7 @@ static int BlotexlibExecutorParseAndComputeRValueBlotregOps(BLOTEXLIB_EXECUTOR_H
     m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle, AS__VALUE_INT,TRUE__BLOTVAL0,
       (struct P_STRING*)UNDEFINED,(char)UNDEFINED,ac_blotexValue) != RETURNED)
   } else {
-    G_STRING_SET_STUFF ct_blotvarStuff = (G_STRING_SET_STUFF)UNDEFINED;
+    g_G_PARAM_STUFF ct_blotvarStuff = (g_G_PARAM_STUFF)UNDEFINED;
     int c_entry = UNDEFINED;
 
 m_DIGGY_VAR_INDEX_FETCH_FLAGS(n_indexFetchFlags) 
@@ -869,7 +869,7 @@ static inline int m_BlotexlibExecutorParseAndComputeBlotexAtomBlotvar(BLOTEXLIB_
   m_DIGGY_BOLLARD()
 
   struct BLOTVAR_REFERENCE c_blotvarReference = UNDEFINED_BLOTVAR_REFERENCE ; 
-  G_STRING_SET_STUFF nt_blotvarStuff = (G_STRING_SET_STUFF)UNDEFINED;
+  g_G_PARAM_STUFF nt_blotvarStuff = (g_G_PARAM_STUFF)UNDEFINED;
   int vn_entry = UNDEFINED; 
   m_PREPARE_ABANDON(a_sequence,
     "<blotvar as int> | <blotvar entry> | <blotvar id> | <blotvar as str> | <blotvar name>") 
@@ -1478,7 +1478,7 @@ static inline int m_BlotexlibExecutorExecuteCFunctionEval(BLOTEXLIB_EXECUTOR_HAN
         m_TRACK() 
       } // switch
     } else {
-      G_STRING_SET_STUFF cnt_blotvarStuff = (G_STRING_SET_STUFF)UNDEFINED;
+      g_G_PARAM_STUFF cnt_blotvarStuff = (g_G_PARAM_STUFF)UNDEFINED;
       m_TRACK_IF(FetchBlotvar(&cc_lValueBlotvarReference, b_L_VALUE,&cnt_blotvarStuff,NULL) !=
         RETURNED)
       if (cnt_blotvarStuff == NULL) m_ABANDON(NOT_EXISTING_L_VALUE__ABANDONMENT_CAUSE)

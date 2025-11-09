@@ -12,6 +12,7 @@
 #include "c-ansi/blotex-kitchen.h"
 #include "c-ansi/blotcode.h"
 #include "c-ansi/g-string.h"
+#include "c-ansi/g-param.h"
 
 
 // I. blotex library executor factory 
@@ -229,7 +230,7 @@ int l_BlotcodeExecutorGetBlotexlibExecutorHandle(BLOTCODE_EXECUTOR_HANDLE handle
 // - RESULT__NOT_FOUND: 
 // - -1: unexpected problem; anomaly is raised
 int BlotexlibExecutorGetBlotreg (BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING blotregName, G_STRINGS_HANDLE *ac_blotregHandle) ;
+  struct P_STRING blotregName, g_G_PARAMS_HANDLE *ac_blotregHandle) ;
 
 // Create blot register.
 // 
@@ -246,7 +247,7 @@ int BlotexlibExecutorGetBlotreg (BLOTEXLIB_EXECUTOR_HANDLE handle,
 // - COMPLETED__BUT: the register already exists 
 // - -1: unexpected problem; anomaly is raised
 int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING blotregName, G_STRINGS_HANDLE *na_blotregHandle);
+  struct P_STRING blotregName, g_G_PARAMS_HANDLE *na_blotregHandle);
 
 
 // Parsing blot expressions: helpers

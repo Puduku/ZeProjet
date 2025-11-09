@@ -124,7 +124,7 @@ int GStringConvert(G_STRING_STUFF stuff,  IS_CHAR_FUNCTION n_isNeutralCharFuncti
 // ============
 
 // Public function : see .h
-int GStringSetCreateInstance(G_STRING_SET_STUFF *azh_stuff,  int cardinality) {
+int GStringSetCreateInstance(g_G_STRING_SET_STUFF *azh_stuff,  int cardinality) {
   m_DIGGY_BOLLARD()
   m_CALLOC( *azh_stuff, cardinality,sizeof(struct G_STRING) )
 
@@ -135,7 +135,7 @@ int GStringSetCreateInstance(G_STRING_SET_STUFF *azh_stuff,  int cardinality) {
 // Passed:
 // - notNamedObjectStuff:
 // - cardinality: 
-static int GStringSetDisengage(G_STRING_SET_STUFF notNamedObjectStuff,  int cardinality) {
+static int GStringSetDisengage(g_G_STRING_SET_STUFF notNamedObjectStuff,  int cardinality) {
   m_DIGGY_BOLLARD()
   int i = 0;
 
@@ -151,7 +151,7 @@ static int GStringSetDisengage(G_STRING_SET_STUFF notNamedObjectStuff,  int card
 
 
 // Public function : see .h
-int GStringSetDestroyInstance(G_STRING_SET_STUFF xh_notNamedObjectStuff,  int cardinality) {
+int GStringSetDestroyInstance(g_G_STRING_SET_STUFF xh_notNamedObjectStuff,  int cardinality) {
   m_DIGGY_BOLLARD()
 
   m_TRACK_IF(GStringSetDisengage(xh_notNamedObjectStuff,cardinality) != RETURNED)
@@ -205,7 +205,7 @@ struct G_STRINGS {
 static int GStringsDisengage(void *r_handle,  char *r_greenItemStuff) {
   G_STRINGS_HANDLE handle = (G_STRINGS_HANDLE) r_handle;
   m_CHECK_MAGIC_FIELD(G_STRINGS_HANDLE,handle)
-  G_STRING_SET_STUFF gStringSetStuff = (G_STRING_SET_STUFF) r_greenItemStuff;
+  g_G_STRING_SET_STUFF gStringSetStuff = (g_G_STRING_SET_STUFF) r_greenItemStuff;
   
   int i = 0;
   for (; i < handle->gStringSetCardinality ; i++) {
@@ -349,7 +349,7 @@ int GStringsCreateInstance(G_STRINGS_HANDLE* azh_handle,  int expectedItemsNumbe
 
 // Public function : see .h
 int GStringsFetch(G_STRINGS_HANDLE cp_handle,  int n_entry,
-      G_STRING_SET_STUFF* acnt_gStringSetStuff) {
+      g_G_STRING_SET_STUFF* acnt_gStringSetStuff) {
   m_DIGGY_BOLLARD()
   int entry = GreenCollectionFetch(cp_handle->h_greenCollectionHandle,n_entry,
     (char **)acnt_gStringSetStuff) ;
@@ -360,7 +360,7 @@ int GStringsFetch(G_STRINGS_HANDLE cp_handle,  int n_entry,
 
 // Public function : see .h
 int GStringsGetCount(G_STRINGS_HANDLE cp_handle,
-      G_STRING_SET_STUFF *navnt_gStringSetStuff) {
+      g_G_STRING_SET_STUFF *navnt_gStringSetStuff) {
   m_DIGGY_BOLLARD()
   int count = GreenCollectionGetCount(cp_handle->h_greenCollectionHandle,
     (char **)navnt_gStringSetStuff) ;
@@ -465,7 +465,7 @@ int GStringsIndexRequest(G_STRINGS_HANDLE cp_handle,
 // Public function : see .h
 int GStringsIndexFetch(G_STRINGS_HANDLE cp_handle,
   INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, unsigned int indexFetchFlags,
-  G_STRING_SET_STUFF *acvnt_gStringSetStuff, int *nacvn_entry) {
+  g_G_STRING_SET_STUFF *acvnt_gStringSetStuff, int *nacvn_entry) {
   m_DIGGY_BOLLARD()
 
   int result = GreenCollectionIndexFetch(cp_handle->h_greenCollectionHandle,

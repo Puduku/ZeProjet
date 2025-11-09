@@ -55,7 +55,7 @@ int BlottabCreateInstance(BLOTTAB_HANDLE *azh_handle, int fieldsNumber,
     0,P_STRING__G_KEYS_COMPARISON,(IS_CHAR_FUNCTION)NULL,(TO_CHAR_FUNCTION)NULL,
     (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) == INDEX_LABEL0)
 
-  G_STRING_SET_STUFF fieldAttributeStuff = (G_STRING_SET_STUFF)UNDEFINED; 
+  g_G_STRING_SET_STUFF fieldAttributeStuff = (g_G_STRING_SET_STUFF)UNDEFINED; 
   int c_indexLabel = UNDEFINED;
   int i = 0; for (; i < fieldsNumber; i++) {
     m_TRACK_IF(GStringsFetch(handle->hp_fieldAttributesHandle, -1, &fieldAttributeStuff) != i)
@@ -137,7 +137,7 @@ static int ParseAndRetrieveBlottabElement(struct P_STRING *a_sequence, G_STRINGS
   int *nac_tableIndexLabel, int *cac_element, int *ac_asValue, G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
 m_DIGGY_VAR_P_STRING(*a_sequence)
-  G_STRING_SET_STUFF fieldAttributeStuff = (G_STRING_SET_STUFF)UNDEFINED;
+  g_G_STRING_SET_STUFF fieldAttributeStuff = (g_G_STRING_SET_STUFF)UNDEFINED;
   struct P_STRING fieldName = UNDEFINED_P_STRING;
   *ac_asValue = UNDEFINED;
  
@@ -248,7 +248,7 @@ m_ASSERT(n_asValue != -1)
 // - ANSWER__NO: 'syntax' error; abandon processing 
 // - -1: unexpected problem
 static int l_BlotexlibExecutorParseAndRetrieveBlottabSpot(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING *a_sequence, BLOTTAB_HANDLE blottabHandle, G_STRING_SET_STUFF* act_blotsetStuff,
+  struct P_STRING *a_sequence, BLOTTAB_HANDLE blottabHandle, g_G_STRING_SET_STUFF* act_blotsetStuff,
   int *ac_element, int *ac_asValue, G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD_S()
   m_PParsePassSpaces(a_sequence,NULL);
@@ -268,7 +268,7 @@ static int l_BlotexlibExecutorParseAndRetrieveBlottabSpot(BLOTEXLIB_EXECUTOR_HAN
 
   int entry = entryBlotexValue.select.c_blotval;
   if (entry < 0) m_ABANDON(VALUE_ERROR__ABANDONMENT_CAUSE)
-  *act_blotsetStuff = (G_STRING_SET_STUFF)UNDEFINED;
+  *act_blotsetStuff = (g_G_STRING_SET_STUFF)UNDEFINED;
   m_TRACK_IF(GStringsFetch(blottabHandle->h_tableHandle, entry, act_blotsetStuff) < 0)
   if (*act_blotsetStuff == NULL) m_ABANDON(NOT_EXISTING_BLOTSET__ABANDONMENT_CAUSE)
 
@@ -314,7 +314,7 @@ m_DIGGY_VAR_P_STRING(blottabName)
 
   int asValue = UNDEFINED; 
   int element = UNDEFINED;
-  G_STRING_SET_STUFF t_blotsetStuff = (G_STRING_SET_STUFF)UNDEFINED;
+  g_G_STRING_SET_STUFF t_blotsetStuff = (g_G_STRING_SET_STUFF)UNDEFINED;
   switch (l_BlotexlibExecutorParseAndRetrieveBlottabSpot(handle,a_sequence,blottabHandle,
     &t_blotsetStuff,&element, &asValue,nc_abandonmentInfo)) {
   case ANSWER__YES:
@@ -616,7 +616,7 @@ m_ASSERT(n_asValue != -1)
     m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle, AS__VALUE_INT,TRUE__BLOTVAL0,
       (struct P_STRING*)UNDEFINED,(char)UNDEFINED,ac_blotexValue) != RETURNED)
   } else {
-    G_STRING_SET_STUFF ct_blotsetStuff = (G_STRING_SET_STUFF)UNDEFINED;
+    g_G_STRING_SET_STUFF ct_blotsetStuff = (g_G_STRING_SET_STUFF)UNDEFINED;
     int c_entry = UNDEFINED;
 
 m_DIGGY_VAR_INDEX_FETCH_FLAGS(n_indexFetchFlags)
@@ -674,7 +674,7 @@ m_DIGGY_VAR_P_STRING(blottabName)
 
   int asValue = UNDEFINED; 
   int element = UNDEFINED;
-  G_STRING_SET_STUFF t_blotsetStuff = (G_STRING_SET_STUFF)UNDEFINED;
+  g_G_STRING_SET_STUFF t_blotsetStuff = (g_G_STRING_SET_STUFF)UNDEFINED;
   switch (l_BlotexlibExecutorParseAndRetrieveBlottabSpot(handle,a_sequence,blottabHandle,
     &t_blotsetStuff,&element, &asValue,nc_abandonmentInfo)) {
   case ANSWER__YES:
@@ -728,7 +728,7 @@ int l_BlotexlibExecutorParseAndComputeRValueGenuineBlottabOps(BLOTEXLIB_EXECUTOR
 static int BlottabUpdateCurrentBlotsetField(BLOTTAB_HANDLE handle, int element,
   struct BLOTEX_VALUE blotexValue) {
   m_DIGGY_BOLLARD()
-  G_STRING_SET_STUFF nt_fieldAttributeStuff = (G_STRING_SET_STUFF)UNDEFINED;
+  g_G_STRING_SET_STUFF nt_fieldAttributeStuff = (g_G_STRING_SET_STUFF)UNDEFINED;
   int fieldsNumber = GStringsGetCount(handle->hp_fieldAttributesHandle,
     &nt_fieldAttributeStuff);
   m_TRACK_IF(fieldsNumber < 0)
@@ -737,7 +737,7 @@ static int BlottabUpdateCurrentBlotsetField(BLOTTAB_HANDLE handle, int element,
   m_TRACK_IF(fieldsNumber < 0)
   m_ASSERT(element < fieldsNumber)
 
-  G_STRING_SET_STUFF vnt_blotsetStuff;
+  g_G_STRING_SET_STUFF vnt_blotsetStuff;
   int vn_entry = UNDEFINED;
   int result = GStringsIndexFetch(handle->h_tableHandle,NULL, INDEX_FETCH_FLAGS__CURRENT,
     &vnt_blotsetStuff, &vn_entry); 

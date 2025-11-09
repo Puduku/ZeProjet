@@ -185,7 +185,7 @@ static int BlotfuncsHandlerCompare (void *cpr_handle,  char b_frozen, int indexL
 // --------------------
 
 struct BLOTCODE {
-  G_STRINGS_HANDLE h_blotkeywsHandle; // Directly frozen
+  g_G_TOKENS_HANDLE h_blotkeywsHandle; // Directly frozen
   GREEN_COLLECTION_HANDLE h_blotlibsHandle; // blotlibs collection
   char b_frozen ; // TRUE => blotlibs collection is frozen
   // two fields below are only significant when blotlibs collection is frozen
@@ -200,7 +200,7 @@ int BlotcodeCreateInstance (BLOTCODE_HANDLE *azh_handle) {
   m_MALLOC_INSTANCE(*azh_handle) 
   BLOTCODE_HANDLE handle = *azh_handle;
 
-  m_TRACK_IF(G_TOKENS_CREATE_INSTANCE(&handle->h_blotkeywsHandle, BLOTKEYW_IDS_NUMBER) != RETURNED)
+  m_TRACK_IF(ml_GTokensCreateInstance(&handle->h_blotkeywsHandle, BLOTKEYW_IDS_NUMBER) != RETURNED)
   m_ASSERT(m_GStringsAddPlainLexicalIndex(handle->h_blotkeywsHandle, NULL, NULL) == INDEX_LABEL0)
   m_G_TOKENS_IMPORT(handle->h_blotkeywsHandle, p_blotkeywsTokenDefinitions,
     BLOTKEYW_IDS_NUMBER)

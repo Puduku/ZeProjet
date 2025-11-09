@@ -42,7 +42,7 @@ int EngelsCreateInstance(ENGELS_HANDLE *azh_handle);
 // - COMPLETED__OK:  
 // - COMPLETED__BUT: some pivot models were updated 
 // - -1 special value: anomaly raised
-int EngelsAddPivotModels(ENGELS_HANDLE handle, G_STRINGS_HANDLE p_configHandle) ;
+int EngelsAddPivotModels(ENGELS_HANDLE handle, G_PARAMS_HANDLE p_configHandle) ;
 
 
 // Ret:
