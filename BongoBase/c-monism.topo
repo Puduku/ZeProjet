@@ -125,8 +125,8 @@
 // debated (in a nutshell: the DBAs love it and the programmers hate it.)
 //
 // III.2. Unary logic: a (particularly) arduous acceptation...
-// The main incarnation of monism in classic structured programming is undoubtedly the "pure"
-// procedure, which executes without any "return status". The idea of absence of return status makes
+// The main manifestations of monism in classic structured programming are presumably the "pure"
+// procedures, which execute without any "return status". The idea of absence of return status makes
 // programmers that we are uncomfortable.
 // For instance, we have great difficulty conceiving parsing (which is a fundamental activity in
 // computing) with a monist vision. That is, we tend to consider the "syntax error" negative case as
