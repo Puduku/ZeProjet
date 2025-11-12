@@ -268,7 +268,7 @@ int EngelsCreateInstance(ENGELS_HANDLE *azh_handle) {
 int EngelsAddPivotModels(ENGELS_HANDLE handle, g_G_PARAMS_HANDLE p_configHandle) {
   m_DIGGY_BOLLARD()
   int completed = COMPLETED__OK;  // a priori
-  int count = GStringsGetCount(p_configHandle,NULL);
+  int count = g_GParamsGetCount(p_configHandle,NULL);
   m_TRACK_IF(count < 0)
 
   g_G_PARAM_STUFF t_pivotModelConfigStuff = (g_G_PARAM_STUFF)UNDEFINED;
@@ -280,7 +280,7 @@ int EngelsAddPivotModels(ENGELS_HANDLE handle, g_G_PARAMS_HANDLE p_configHandle)
   int refinedMatter = UNDEFINED;
   PIVOT_MODEL_HANDLE h_pivotModelHandle = (PIVOT_MODEL_HANDLE)UNDEFINED;
   int i = 0; for (; i < count; i++) {
-    m_TRACK_IF(GStringsFetch(p_configHandle, i, &t_pivotModelConfigStuff) != i)
+    m_TRACK_IF(g_GParamsFetch(p_configHandle, i, &t_pivotModelConfigStuff) != i)
     struct G_KEY gKey = m_GKey_PString(t_pivotModelConfigStuff[G_PARAM_NAME_ELEMENT].cv_pString);
     switch (m_GStringsIndexSingleFetch(handle->h_pivotModelsHandle,NULL,INDEX_LABEL0,
       INDEX_SEEK_FLAGS__EQUAL,&gKey,INDEX_FETCH_FLAGS__FETCH, &t_namedPivotModelStuff, &entry)) {
@@ -306,7 +306,7 @@ int EngelsAddTractModel(ENGELS_HANDLE handle, struct P_STRING name,
   g_G_PARAMS_HANDLE p_configHandle) {
   m_DIGGY_BOLLARD()
   int completed = COMPLETED__OK;  // a priori
-  int count = GStringsGetCount(p_configHandle,NULL);
+  int count = g_GParamsGetCount(p_configHandle,NULL);
   m_TRACK_IF(count < 0)
 
   int entry = UNDEFINED;
@@ -330,7 +330,7 @@ int EngelsAddTractModel(ENGELS_HANDLE handle, struct P_STRING name,
     handle->h_tractModelsHandle) != RETURNED)
 
   int i = 0; for (; i < count; i++) {
-    m_TRACK_IF(GStringsFetch(p_configHandle, i, &t_tractModelConfigStuff) != i)
+    m_TRACK_IF(g_GParamsFetch(p_configHandle, i, &t_tractModelConfigStuff) != i)
   } // for
   
   m_DIGGY_RETURN(completed)

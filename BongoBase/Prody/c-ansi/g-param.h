@@ -17,13 +17,9 @@
 typedef G_STRINGS_HANDLE g_G_PARAMS_HANDLE;
 
 typedef g_G_STRING_SET_STUFF g_G_PARAM_STUFF;
-//typedef G_STRING_STUFF g_G_PARAM_NAME_STUFF;
-//typedef G_STRING_STUFF g_G_PARAM_VALUE_STUFF;
 
-#define GET_G_PARAM_NAME_STUFF(u_gParamStuff) ((u_gParamStuff)+G_PARAM_NAME_ELEMENT)
-#define GET_G_PARAM_VALUE_STUFF(u_gParamStuff) ((u_gParamStuff)+G_PARAM_VALUE_ELEMENT)
 
-// Assign actual token id to 'g-param's name'
+// Assign actual acolyt token id to 'g-param's name'
 // 
 // Passed
 // - stuff: 
@@ -41,7 +37,7 @@ static inline int m_GParamAssignName(g_G_PARAM_STUFF stuff, int tokenId,
   return RETURNED;
 } // m_GParamAssignName
 
-// Assign actual integer value to 'g-param's value'
+// Assign actual acolyt integer value to 'g-param's value'
 // 
 // Passed
 // - stuff:
@@ -63,6 +59,27 @@ static inline int m_GParamAssignValue(g_G_PARAM_STUFF stuff, GENERIC_INTEGER en_
 // #SEE GStringsCreateInstance@c-ansi/g-string.h  <named-object>
 int l_GParamsCreateInstance(g_G_PARAMS_HANDLE *azh_handle,int expectedItemsNumber);
 
+// #SEE GStringsAddIndex @ c-ansi/g-string.h <g-param>
+#define g_GParamsAddIndex GStringsAddIndex
+
+// #SEE GStringsFetch @ c-ansi/g-string.h <g-param>
+#define g_GParamsFetch GStringsFetch
+
+// #SEE GStringsGetCount @ c-ansi/g-string.h <g-param>
+#define g_GParamsGetCount GStringsGetCount  
+
+// #SEE GStringsIndexFetch @ c-ansi/g-string.h <g-param>
+#define g_GParamsIndexFetch GStringsIndexFetch
+
+
+// #SEE GStringsIndexRequestR @ c-ansi/g-string.h <g-param>
+#define g_GParamsIndexRequestR GStringsIndexRequestR
+
+// #SEE m_GStringsIndexSingleFetch @ c-ansi/g-string.h <g-param> 
+#define gm_GParamsIndexSingleFetch m_GStringsIndexSingleFetch 
+
+// #SEE GStringsDestroyInstance @ c-ansi/g-string.h <g-param>
+#define g_GParamsDestroyInstance GStringsDestroyInstance
 
 
 #endif // __C_ANSI_G_PARAM_H_INCLUDED

@@ -116,9 +116,9 @@ struct BLOTEXLIB_EXECUTOR {
 // NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION
 static int BlotregDestroyInstance(void *xhr_handle) {
   m_DIGGY_BOLLARD_S()
-  G_STRINGS_HANDLE xh_handle = (G_STRINGS_HANDLE) xhr_handle;
+  g_G_PARAMS_HANDLE xh_handle = (g_G_PARAMS_HANDLE) xhr_handle;
 
-  m_TRACK_IF(GStringsDestroyInstance(xh_handle) < 0)  
+  m_TRACK_IF(g_GParamsDestroyInstance(xh_handle) < 0)  
 
   m_DIGGY_RETURN(RETURNED) 
 } // BlotregDestroyInstance 
@@ -247,19 +247,19 @@ m_DIGGY_VAR_P_STRING(blotregName)
     { g_G_PARAMS_HANDLE h_blotregHandle = (g_G_PARAMS_HANDLE)UNDEFINED ;
       m_TRACK_IF(l_GParamsCreateInstance(&h_blotregHandle,BATEAU__EXPECTED_ITEMS_NUMBER) !=
         RETURNED) 
-      m_ASSERT(GStringsAddIndex(h_blotregHandle,1,G_PARAM_NAME_ELEMENT,
+      m_ASSERT(g_GParamsAddIndex(h_blotregHandle,1,G_PARAM_NAME_ELEMENT,
         P_STRING__G_KEYS_COMPARISON,NULL,NULL,
         (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) ==
         NAME__BLOTREG_INDEX_LABEL)
-      m_ASSERT(GStringsAddIndex(h_blotregHandle,1,G_PARAM_NAME_ELEMENT,
+      m_ASSERT(g_GParamsAddIndex(h_blotregHandle,1,G_PARAM_NAME_ELEMENT,
         ACOLYT_VALUE__G_KEYS_COMPARISON,(IS_CHAR_FUNCTION)UNDEFINED,(TO_CHAR_FUNCTION)UNDEFINED,
         (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) ==
         TOKEN_ID__BLOTREG_INDEX_LABEL)
-      m_ASSERT(GStringsAddIndex(h_blotregHandle,1,G_PARAM_VALUE_ELEMENT,
+      m_ASSERT(g_GParamsAddIndex(h_blotregHandle,1,G_PARAM_VALUE_ELEMENT,
         ACOLYT_VALUE__G_KEYS_COMPARISON,(IS_CHAR_FUNCTION)UNDEFINED,(TO_CHAR_FUNCTION)UNDEFINED,
         (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) ==
         INT_VALUE__BLOTREG_INDEX_LABEL)
-      m_ASSERT(GStringsAddIndex(h_blotregHandle,1,G_PARAM_VALUE_ELEMENT,
+      m_ASSERT(g_GParamsAddIndex(h_blotregHandle,1,G_PARAM_VALUE_ELEMENT,
         P_STRING__G_KEYS_COMPARISON,NULL,NULL,
         (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) ==
         STR_VALUE__BLOTREG_INDEX_LABEL)
@@ -466,7 +466,7 @@ m_DIGGY_VAR_P_STRING(ap_blotvarReference->c_select.c_name)
         indexLabel = TOKEN_ID__BLOTREG_INDEX_LABEL;
         gKey = m_GKey_AcolytValue(ap_blotvarReference->c_select.c_tokenId);
       } // if
-      switch (m_GStringsIndexSingleFetch(ap_blotvarReference->blotregHandle,NULL,indexLabel,
+      switch (gm_GParamsIndexSingleFetch(ap_blotvarReference->blotregHandle,NULL,indexLabel,
         INDEX_SEEK_FLAGS__EQUAL,&gKey,cb_lValue?  INDEX_FETCH_FLAGS__FETCH:
         INDEX_FETCH_FLAGS__SEEK_ONLY, ant_blotvarStuff, navn_entry)) {
       case RESULT__FOUND:
@@ -487,12 +487,12 @@ m_DIGGY_VAR_P_STRING(ap_blotvarReference->c_select.c_name)
       } // switch
     } // gKey 
   break; case ENTRY__BLOTVAR_REFERENCE:
-    ret = GStringsFetch(ap_blotvarReference->blotregHandle,
+    ret = g_GParamsFetch(ap_blotvarReference->blotregHandle,
       ap_blotvarReference->c_select.c_entry, ant_blotvarStuff);
     m_TRACK_IF(ret < 0)
 m_ASSERT(ret == ap_blotvarReference->c_select.c_entry)
   break; case CURRENT__BLOTVAR_REFERENCE:
-    switch (GStringsIndexFetch(ap_blotvarReference->blotregHandle,NULL,
+    switch (g_GParamsIndexFetch(ap_blotvarReference->blotregHandle,NULL,
       INDEX_FETCH_FLAGS__CURRENT, ant_blotvarStuff, navn_entry)){
     case RESULT__FOUND:
 m_ASSERT(*ant_blotvarStuff != NULL)
@@ -649,7 +649,7 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(n_indexSeekFlags)
     m_PParsePassSpaces(&subSequence,NULL);
   } while (!b_EMPTY_P_STRING(subSequence)) ; 
 
-  switch (GStringsIndexRequestR(blotregHandle,NULL,criteriaNumber,criteria5)) {
+  switch (g_GParamsIndexRequestR(blotregHandle,NULL,criteriaNumber,criteria5)) {
   case COMPLETED__OK:
   break ; case COMPLETED__BUT: // Request rectified
     m_RAISE(ANOMALY__UNEXPECTED_CASE)
@@ -791,7 +791,7 @@ static int BlotexlibExecutorParseAndComputeRValueBlotregOps(BLOTEXLIB_EXECUTOR_H
     int c_entry = UNDEFINED;
 
 m_DIGGY_VAR_INDEX_FETCH_FLAGS(n_indexFetchFlags) 
-    switch (GStringsIndexFetch(blotregHandle,NULL,n_indexFetchFlags,
+    switch (g_GParamsIndexFetch(blotregHandle,NULL,n_indexFetchFlags,
       &ct_blotvarStuff, &c_entry)) {
     case RESULT__FOUND:
       switch (n_as) {

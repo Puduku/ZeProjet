@@ -12,7 +12,7 @@ typedef G_STRINGS_HANDLE g_NAMED_OBJECTS_HANDLE ;
 
 typedef G_STRING_STUFF g_NAMED_OBJECT_STUFF ;
 
-// Assign actual handle to 'named object'
+// Assign actual acolyt handle to 'named object'
 // 
 // Passed
 // - stuff: 
