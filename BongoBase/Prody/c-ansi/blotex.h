@@ -350,7 +350,7 @@ int BlotexlibExecutorParseAndComputeStrPortion(BLOTEXLIB_EXECUTOR_HANDLE handle,
 // Passed:
 // - handle:
 // - blottabLabel: GENUINE_BLOTTAB_LABEL0; 1 => "Super" blottabs' label, etc.
-// - blottabName:
+// - blottabName: must correspond to NON-existing blottab 
 // - hr_blottabHandle: new blottab's handle to be added
 //
 // Ret:

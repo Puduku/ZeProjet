@@ -36,14 +36,27 @@ int EngelsCreateInstance(ENGELS_HANDLE *azh_handle);
 // 
 // Passed:
 // - handle:
+// - p_configHandle: INI file config of tract models
+//
+// Ret:
+// - COMPLETED__OK:  
+// - COMPLETED__BUT: some tract models were updated 
+// - -1 special value: anomaly raised
+int EngelsAddPivotModels(ENGELS_HANDLE handle, g_G_PARAMS_HANDLE p_configHandle) ;
+
+// Add tract model
+// 
+// Passed:
+// - handle:
+// - name:
 // - p_configHandle: INI file config of pivot models
 //
 // Ret:
 // - COMPLETED__OK:  
 // - COMPLETED__BUT: some pivot models were updated 
 // - -1 special value: anomaly raised
-int EngelsAddPivotModels(ENGELS_HANDLE handle, G_PARAMS_HANDLE p_configHandle) ;
-
+int EngelsAddTractModel(ENGELS_HANDLE handle, struct P_STRING name,
+  g_G_PARAMS_HANDLE p_configHandle) ;
 
 // Ret:
 // - RETURNED: Ok

@@ -17,50 +17,52 @@
 typedef G_STRINGS_HANDLE g_G_PARAMS_HANDLE;
 
 typedef g_G_STRING_SET_STUFF g_G_PARAM_STUFF;
+//typedef G_STRING_STUFF g_G_PARAM_NAME_STUFF;
+//typedef G_STRING_STUFF g_G_PARAM_VALUE_STUFF;
 
-#define G_PARAM_NAME_STUFF(u_gParamStuff) ((u_gParamStuff)+G_PARAM_NAME_ELEMENT)
-#define G_PARAM_VALUE_STUFF(u_gParamStuff) ((u_gParamStuff)+G_PARAM_VALUE_ELEMENT)
+#define GET_G_PARAM_NAME_STUFF(u_gParamStuff) ((u_gParamStuff)+G_PARAM_NAME_ELEMENT)
+#define GET_G_PARAM_VALUE_STUFF(u_gParamStuff) ((u_gParamStuff)+G_PARAM_VALUE_ELEMENT)
+
+// Assign actual token id to 'g-param's name'
+// 
+// Passed
+// - stuff: 
+// - tokenId: id to assign
+// - n_gParamsHandle: (when non NULL) "reference" g-params collection
+// 
+// Ret:
+// - RETURNED: OK
+// - -1: unexpected problem; anomaly is raised...
+static inline int m_GParamAssignName(g_G_PARAM_STUFF stuff, int tokenId, 
+  g_G_PARAMS_HANDLE n_gParamsHandle) {
+  m_CHECK_G_STRINGS_COLLECTION_CONVEYANCE(n_gParamsHandle,G_PARAM_NAME_ELEMENT,
+    VALUED_STRING__G_STRING_CONVEYANCE)
+  stuff[G_PARAM_NAME_ELEMENT].acolyt.cen_value = tokenId;
+  return RETURNED;
+} // m_GParamAssignName
+
+// Assign actual integer value to 'g-param's value'
+// 
+// Passed
+// - stuff:
+// - en_value: integer value to assign
+// - n_gParamsHandle: (when non NULL) "reference" g-params collection
+// 
+// Ret:
+// - RETURNED: OK
+// - -1: unexpected problem; anomaly is raised...
+static inline int m_GParamAssignValue(g_G_PARAM_STUFF stuff, GENERIC_INTEGER en_value, 
+  g_G_PARAMS_HANDLE n_gParamsHandle) {
+  m_CHECK_G_STRINGS_COLLECTION_CONVEYANCE(n_gParamsHandle,G_PARAM_VALUE_ELEMENT,
+    VALUED_STRING__G_STRING_CONVEYANCE)
+  stuff[G_PARAM_VALUE_ELEMENT].acolyt.cen_value = en_value;
+  return RETURNED;
+} // m_GParamAssignValue
 
 
 // #SEE GStringsCreateInstance@c-ansi/g-string.h  <named-object>
 int l_GParamsCreateInstance(g_G_PARAMS_HANDLE *azh_handle,int expectedItemsNumber);
 
-// Manipulate g-string as 'g-param's value'
-// 
-// Passed
-// - stuff: g-string as g-param's value
-// - en_value: integer value to assign
-// - n_gStringsHandle: (when non NULL) "reference" g-params collection
-// 
-// Ret:
-// - RETURNED: OK
-// - -1: unexpected problem; anomaly is raised...
-static inline int m_GStringAsGParamValue(G_STRING_STUFF stuff, GENERIC_INTEGER en_value, 
-  G_STRINGS_HANDLE n_gStringsHandle) {
-  m_CHECK_G_STRINGS_COLLECTION_CONVEYANCE(n_gStringsHandle,G_PARAM_VALUE_ELEMENT,
-    VALUED_STRING__G_STRING_CONVEYANCE)
-  stuff->acolyt.cen_value = en_value;
-  return RETURNED;
-} // m_GStringAsGParamValue
-
-
-// Manipulate g-string as 'g-param's name'
-// 
-// Passed
-// - stuff: g-string as g-param's name 
-// - tokenId: id to assign
-// - n_gStringsHandle: (when non NULL) "reference" g-params collection
-// 
-// Ret:
-// - RETURNED: OK
-// - -1: unexpected problem; anomaly is raised...
-static inline int m_GStringAsGParamName(G_STRING_STUFF stuff, int tokenId, 
-  G_STRINGS_HANDLE n_gStringsHandle) {
-  m_CHECK_G_STRINGS_COLLECTION_CONVEYANCE(n_gStringsHandle,G_PARAM_NAME_ELEMENT,
-    VALUED_STRING__G_STRING_CONVEYANCE)
-  stuff->acolyt.cen_value = tokenId;
-  return RETURNED;
-} // m_GStringAsGParamValue
 
 
 #endif // __C_ANSI_G_PARAM_H_INCLUDED

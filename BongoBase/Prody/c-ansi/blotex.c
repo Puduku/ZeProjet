@@ -206,13 +206,12 @@ int BlotexlibExecutorGetBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
   m_DIGGY_BOLLARD()
 m_DIGGY_VAR_P_STRING(blotregName)
 //DumpBlotregs(handle->h_blotregsHandle,"GET blotreg BEFORE SEARCH");
-  g_NAMED_OBJECT_STUFF ct_namedBlotregStuff = (g_NAMED_OBJECT_STUFF)UNDEFINED; 
-  struct G_KEY gKey = m_GKey_PString(blotregName);
-  int result = m_GStringsIndexSingleFetch(handle->h_blotregsHandle,NULL,INDEX_LABEL0,
-    INDEX_SEEK_FLAGS__EQUAL,&gKey, INDEX_FETCH_FLAGS__SEEK_ONLY,&ct_namedBlotregStuff, NULL);
+
+  int result = l_NamedObjectsGetNamedObject(handle->h_blotregsHandle, blotregName,
+    (void **)ac_blotregHandle); 
   switch (result) {
   case RESULT__FOUND:
-    m_ASSERT((*ac_blotregHandle = ct_namedBlotregStuff->acolyt.cnhr_handle) != NULL)
+    m_ASSERT(*ac_blotregHandle != NULL)
 switch(GStringsVerifyIndexes(*ac_blotregHandle)) {
 case COMPLETED__OK:
 break; case COMPLETED__BUT:
@@ -239,17 +238,13 @@ int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct P_STRING blotregName, g_G_PARAMS_HANDLE *na_blotregHandle) {
   m_DIGGY_BOLLARD()
 m_DIGGY_VAR_P_STRING(blotregName)
-  int completed = COMPLETED__OK; // a priori
+  int completed = UNDEFINED;
   g_NAMED_OBJECT_STUFF t_namedBlotregStuff = (g_NAMED_OBJECT_STUFF)UNDEFINED; 
-  struct G_KEY gKey = m_GKey_PString(blotregName);
-  int result = m_GStringsIndexSingleFetch(handle->h_blotregsHandle,NULL,INDEX_LABEL0,
-    INDEX_SEEK_FLAGS__EQUAL,&gKey, INDEX_FETCH_FLAGS__FETCH,&t_namedBlotregStuff,NULL);
-  switch (result) {
-  case RESULT__FOUND:
-    m_ASSERT(t_namedBlotregStuff->acolyt.cnhr_handle != NULL)
-    completed = COMPLETED__BUT;
-  break; case RESULT__NOT_FOUND:
-    { g_G_PARAMS_HANDLE h_blotregHandle = (G_STRINGS_HANDLE)UNDEFINED ;
+
+  switch (completed = l_NamedObjectsAddNamedObject(handle->h_blotregsHandle,blotregName,
+    &t_namedBlotregStuff)) {
+  case COMPLETED__OK:
+    { g_G_PARAMS_HANDLE h_blotregHandle = (g_G_PARAMS_HANDLE)UNDEFINED ;
       m_TRACK_IF(l_GParamsCreateInstance(&h_blotregHandle,BATEAU__EXPECTED_ITEMS_NUMBER) !=
         RETURNED) 
       m_ASSERT(GStringsAddIndex(h_blotregHandle,1,G_PARAM_NAME_ELEMENT,
@@ -268,16 +263,13 @@ m_DIGGY_VAR_P_STRING(blotregName)
         P_STRING__G_KEYS_COMPARISON,NULL,NULL,
         (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) ==
         STR_VALUE__BLOTREG_INDEX_LABEL)
+      m_TRACK_IF(m_NamedObjectAssign(t_namedBlotregStuff,h_blotregHandle,handle->h_blotregsHandle)
+        != RETURNED)
+    } // h_blotregHandle
+  break; case COMPLETED__BUT:
+  break; default: m_TRACK() } // switch 
 
-      m_TRACK_IF(GStringCopy(t_namedBlotregStuff,0,blotregName) < 0)
-      m_TRACK_IF(m_GStringAsNamedObject(t_namedBlotregStuff,h_blotregHandle,
-        handle->h_blotregsHandle) != RETURNED)
-    } // h_blotregHandle 
-  break; default:
-    m_TRACK()
-  } // switch
   if (na_blotregHandle != NULL) *na_blotregHandle = t_namedBlotregStuff->acolyt.cnhr_handle;
-
   m_DIGGY_RETURN(completed)
 } // BlotexlibExecutorCreateBlotreg
 
@@ -292,15 +284,12 @@ int BlotexlibExecutorGetBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, int blottabLab
   m_DIGGY_BOLLARD()
   m_ASSERT(blottabLabel < handle->blottabExecutorImplementationsNumber)
 
-  g_NAMED_OBJECT_STUFF ct_namedBlottabStuff = (g_NAMED_OBJECT_STUFF)UNDEFINED;
-  struct G_KEY gKey = m_GKey_PString(blottabName);
-
-  int result = m_GStringsIndexSingleFetch(
-    handle->blottabExecutorImplementations[blottabLabel].h_blottabsHandle,NULL,INDEX_LABEL0,
-    INDEX_SEEK_FLAGS__EQUAL,&gKey, INDEX_FETCH_FLAGS__SEEK_ONLY,&ct_namedBlottabStuff, NULL);
+  int result = l_NamedObjectsGetNamedObject(
+    handle->blottabExecutorImplementations[blottabLabel].h_blottabsHandle,blottabName,
+    acr_blottabHandle);
   switch (result) {
   case RESULT__FOUND:
-    m_ASSERT((*acr_blottabHandle = ct_namedBlottabStuff->acolyt.cnhr_handle) != NULL);
+    m_ASSERT(*acr_blottabHandle != NULL);
   break; case RESULT__NOT_FOUND:
   break; default:
     m_TRACK()
@@ -316,19 +305,16 @@ int BlotexlibExecutorAddBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, int blottabLab
   m_ASSERT(blottabLabel < handle->blottabExecutorImplementationsNumber)
 m_DIGGY_VAR_P_STRING(blottabName)
   
-  G_STRINGS_HANDLE blottabsHandle = 
+  g_NAMED_OBJECTS_HANDLE blottabsHandle = 
     handle->blottabExecutorImplementations[blottabLabel].h_blottabsHandle;
 m_DIGGY_VAR_P(blottabsHandle)
   g_NAMED_OBJECT_STUFF t_namedBlottabStuff = (g_NAMED_OBJECT_STUFF)UNDEFINED;
-  struct G_KEY gKey = m_GKey_PString(blottabName);
-  switch (m_GStringsIndexSingleFetch(blottabsHandle,NULL,INDEX_LABEL0,INDEX_SEEK_FLAGS__EQUAL,&gKey,
-    INDEX_FETCH_FLAGS__FETCH,&t_namedBlottabStuff,NULL)) {
-  case RESULT__FOUND:
-    m_RAISE(ANOMALY__UNEXPECTED_CASE)
-  break; case RESULT__NOT_FOUND:
-    m_TRACK_IF(GStringCopy(t_namedBlottabStuff,0,blottabName) < 0)
-    m_TRACK_IF(m_GStringAsNamedObject(t_namedBlottabStuff,hr_blottabHandle,
+  switch (l_NamedObjectsAddNamedObject(blottabsHandle,blottabName,&t_namedBlottabStuff)) {
+  case COMPLETED__OK:
+    m_TRACK_IF(m_NamedObjectAssign(t_namedBlottabStuff,hr_blottabHandle,
       blottabsHandle) != RETURNED)
+  break; case COMPLETED__BUT:
+    m_RAISE(ANOMALY__UNEXPECTED_CASE)
   break; default:
     m_TRACK()
   } // switch
@@ -491,7 +477,7 @@ m_DIGGY_VAR_P_STRING(ap_blotvarReference->c_select.c_name)
             m_TRACK_IF(GStringCopy((*ant_blotvarStuff)+G_PARAM_NAME_ELEMENT,0,
               ap_blotvarReference->c_select.c_name) < 0)
           else { // TOKEN_ID__BLOTVAR_REFERENCE 
-            m_TRACK_IF(m_GStringAsGParamName((*ant_blotvarStuff)+G_PARAM_NAME_ELEMENT,
+            m_TRACK_IF(m_GParamAssignName(*ant_blotvarStuff,
               ap_blotvarReference->c_select.c_tokenId, ap_blotvarReference->blotregHandle)
               < 0)
           } // if
@@ -1644,10 +1630,10 @@ static int BlotexlibExecutorDestroyInstance(void *xhr_handle) {
   BLOTEXLIB_EXECUTOR_HANDLE xh_handle = (BLOTEXLIB_EXECUTOR_HANDLE)xhr_handle;
   m_CHECK_MAGIC_FIELD(BLOTEXLIB_EXECUTOR_HANDLE,xh_handle)
 
-  m_TRACK_IF(m_NamedObjectsDestroyInstance(xh_handle->h_blotregsHandle) != RETURNED)
+  m_TRACK_IF(g_NamedObjectsDestroyInstance(xh_handle->h_blotregsHandle) != RETURNED)
 
   int i =0; for (; i < xh_handle->blottabExecutorImplementationsNumber; i++) { 
-    m_TRACK_IF(m_NamedObjectsDestroyInstance(
+    m_TRACK_IF(g_NamedObjectsDestroyInstance(
       xh_handle->blottabExecutorImplementations[i].h_blottabsHandle) != RETURNED)
   } // for
 
