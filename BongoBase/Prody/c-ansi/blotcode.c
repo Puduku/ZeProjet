@@ -201,10 +201,10 @@ int BlotcodeCreateInstance (BLOTCODE_HANDLE *azh_handle) {
   BLOTCODE_HANDLE handle = *azh_handle;
 
   m_TRACK_IF(ml_GTokensCreateInstance(&handle->h_blotkeywsHandle, BLOTKEYW_IDS_NUMBER) != RETURNED)
-  m_ASSERT(m_GStringsAddPlainLexicalIndex(handle->h_blotkeywsHandle, NULL, NULL) == INDEX_LABEL0)
+  m_ASSERT(gm_GTokensAddPlainLexicalIndex(handle->h_blotkeywsHandle, NULL, NULL) == INDEX_LABEL0)
   m_G_TOKENS_IMPORT(handle->h_blotkeywsHandle, p_blotkeywsTokenDefinitions,
     BLOTKEYW_IDS_NUMBER)
-  m_ASSERT(GStringsFreeze(handle->h_blotkeywsHandle, NULL) >= BLOTKEYW_IDS_NUMBER)
+  m_ASSERT(g_GTokensFreeze(handle->h_blotkeywsHandle, NULL) >= BLOTKEYW_IDS_NUMBER)
 
   m_TRACK_IF(GreenCollectionCreateInstance(&(handle->h_blotlibsHandle),  10,
     sizeof(struct BLOTLIB),  NULL, NULL,NULL, (void *)UNDEFINED) != RETURNED)
@@ -236,7 +236,7 @@ static int BlotcodeFindBlotkeyw (BLOTCODE_HANDLE p_handle,
 
   struct G_KEY gKey = m_GKey_PString(*ap_litteralKeyw); 
 
-  int result = m_GStringsIndexSingleFetch(p_handle->h_blotkeywsHandle, indexRequestAutomaticBuffer,
+  int result = gm_GTokensIndexSingleFetch(p_handle->h_blotkeywsHandle, indexRequestAutomaticBuffer,
     INDEX_LABEL0,INDEX_SEEK_FLAGS__EQUAL,&gKey,INDEX_FETCH_FLAGS__READ_ONLY,&t_blotkeywStuff,
     NULL); 
   switch(result) { 
@@ -390,7 +390,7 @@ m_DIGGY_VAR_P_STRING(blotfuncKeyName.name)
 int BlotcodeDestroyInstance (BLOTCODE_HANDLE xh_handle) {
   m_DIGGY_BOLLARD()
 
-  m_TRACK_IF(GStringsDestroyInstance(xh_handle->h_blotkeywsHandle) != RETURNED)
+  m_TRACK_IF(g_GTokensDestroyInstance(xh_handle->h_blotkeywsHandle) != RETURNED)
   m_TRACK_IF(GreenCollectionDestroyInstance(xh_handle->h_blotlibsHandle) != RETURNED)
   m_TRACK_IF(GreenCollectionDestroyInstance(xh_handle->ch_blotfuncsHandle) != RETURNED)
 

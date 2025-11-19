@@ -29,7 +29,7 @@ extern const struct TOKEN_DEFINITION p_commonMimeTypes[] ;
 static inline int m_MarcelCreateInstance(g_G_TOKENS_HANDLE *azh_handle) {
   m_TRACK_IF(ml_GTokensCreateInstance(azh_handle,COMMON_MIME_TYPES_NUMBER) != RETURNED)
   m_G_TOKENS_IMPORT((*azh_handle),p_commonMimeTypes,  COMMON_MIME_TYPES_NUMBER)
-  m_TRACK_IF(GStringsFreeze(*azh_handle,NULL) != RETURNED)
+  m_TRACK_IF(g_GTokensFreeze(*azh_handle,NULL) != RETURNED)
   return RETURNED;
 } // m_MarcelCreateInstance
 
