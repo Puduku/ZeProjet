@@ -202,8 +202,8 @@ int BlotcodeCreateInstance (BLOTCODE_HANDLE *azh_handle) {
 
   m_TRACK_IF(ml_GTokensCreateInstance(&handle->h_blotkeywsHandle, BLOTKEYW_IDS_NUMBER) != RETURNED)
   m_ASSERT(gm_GTokensAddPlainLexicalIndex(handle->h_blotkeywsHandle, NULL, NULL) == INDEX_LABEL0)
-  m_G_TOKENS_IMPORT(handle->h_blotkeywsHandle, p_blotkeywsTokenDefinitions,
-    BLOTKEYW_IDS_NUMBER)
+  m_TRACK_IF(l_GTokensImport(handle->h_blotkeywsHandle, p_blotkeywsTokenDefinitions,
+    BLOTKEYW_IDS_NUMBER) != RETURNED)
   m_ASSERT(g_GTokensFreeze(handle->h_blotkeywsHandle, NULL) >= BLOTKEYW_IDS_NUMBER)
 
   m_TRACK_IF(GreenCollectionCreateInstance(&(handle->h_blotlibsHandle),  10,

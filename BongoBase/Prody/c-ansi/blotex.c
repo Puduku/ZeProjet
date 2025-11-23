@@ -98,12 +98,12 @@ struct BLOTTAB_EXECUTOR_IMPLEMENTATION {
   l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION
   l_blotexlibExecutorParseAndComputeRValueBlottabOpsFunction;
   UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION updateBlottabCurrentBlotsetFieldFunction;
-  g_NAMED_OBJECTS_HANDLE h_blottabsHandle ; 
+  NAMED_OBJECTS_HANDLE h_blottabsHandle ; 
 } ;
 
 struct BLOTEXLIB_EXECUTOR {
   m_DECLARE_MAGIC_FIELD(BLOTEXLIB_EXECUTOR_HANDLE)
-  g_NAMED_OBJECTS_HANDLE h_blotregsHandle ; 
+  NAMED_OBJECTS_HANDLE h_blotregsHandle ; 
   G_STRINGS_HANDLE h_workingGStringsHandle ;
   int blottabExecutorImplementationsNumber; 
   struct BLOTTAB_EXECUTOR_IMPLEMENTATION blottabExecutorImplementations[
@@ -112,6 +112,36 @@ struct BLOTEXLIB_EXECUTOR {
 
 
 // Blotregs: 
+
+
+#define NAME__BLOTREG_INDEX_LABEL      0
+#define TOKEN_ID__BLOTREG_INDEX_LABEL  1
+#define INT_VALUE__BLOTREG_INDEX_LABEL 2
+#define STR_VALUE__BLOTREG_INDEX_LABEL 3
+
+// NAMED_OBJECT_CREATE_INSTANCE_FUNCTION
+static int BlotregCreateInstance(void **azhr_handle, struct P_STRING name, void *r_arguments){
+  m_DIGGY_BOLLARD_S()
+  g_G_PARAMS_HANDLE* azh_handle = (g_G_PARAMS_HANDLE*) azhr_handle;
+  m_TRACK_IF(l_GParamsCreateInstance(azh_handle,BATEAU__EXPECTED_ITEMS_NUMBER) !=
+    RETURNED) 
+  g_G_PARAMS_HANDLE handle = *azh_handle;
+  m_ASSERT(g_GParamsAddIndex(handle,1,G_PARAM_NAME_ELEMENT,P_STRING__G_KEYS_COMPARISON,NULL,NULL,
+    (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) == NAME__BLOTREG_INDEX_LABEL)
+  m_ASSERT(g_GParamsAddIndex(handle,1,G_PARAM_NAME_ELEMENT,ACOLYT_VALUE__G_KEYS_COMPARISON,
+    (IS_CHAR_FUNCTION)UNDEFINED,(TO_CHAR_FUNCTION)UNDEFINED,
+    (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) == TOKEN_ID__BLOTREG_INDEX_LABEL)
+  m_ASSERT(g_GParamsAddIndex(handle,1,G_PARAM_VALUE_ELEMENT,ACOLYT_VALUE__G_KEYS_COMPARISON,
+    (IS_CHAR_FUNCTION)UNDEFINED,(TO_CHAR_FUNCTION)UNDEFINED,
+    (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) ==
+    INT_VALUE__BLOTREG_INDEX_LABEL)
+  m_ASSERT(g_GParamsAddIndex(handle,1,G_PARAM_VALUE_ELEMENT, P_STRING__G_KEYS_COMPARISON,NULL,NULL,
+        (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) ==
+        STR_VALUE__BLOTREG_INDEX_LABEL)
+  m_DIGGY_RETURN(RETURNED)
+} // BlotregCreateInstance 
+
+
 
 // NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION
 static int BlotregDestroyInstance(void *xhr_handle) {
@@ -137,14 +167,15 @@ static int BlotexlibExecutorFactoryCreateProductInstance(void *pr_handle,
 
   m_ASSIGN_MAGIC_FIELD(BLOTEXLIB_EXECUTOR_HANDLE,productHandle)
 
-  m_TRACK_IF(l_NamedObjectsCreateInstance(&(productHandle->h_blotregsHandle), 10,
-    BlotregDestroyInstance) != RETURNED)
+  m_TRACK_IF(NamedObjectsCreateInstance(&(productHandle->h_blotregsHandle), 10,
+    BlotregCreateInstance,BlotregDestroyInstance) != RETURNED)
 
   productHandle->blottabExecutorImplementationsNumber = p_handle->blottabImplementationsNumber;
   int i = 0; for (; i < p_handle->blottabImplementationsNumber; i++) { 
-    m_TRACK_IF(l_NamedObjectsCreateInstance(
+    m_TRACK_IF(NamedObjectsCreateInstance(
       &(productHandle->blottabExecutorImplementations[i].h_blottabsHandle), 10,
-      p_handle->blottabImplementations[i].blottabDestroyInstanceFunction) != RETURNED)
+     (NAMED_OBJECT_CREATE_INSTANCE_FUNCTION)NULL,
+     p_handle->blottabImplementations[i].blottabDestroyInstanceFunction) != RETURNED)
     productHandle->blottabExecutorImplementations[i].
       l_blotexlibExecutorParseAndComputeLValueBlottabSetOpFunction =
       p_handle->blottabImplementations[i].l_blotexlibExecutorParseAndComputeLValueBlottabSetOpFunction;
@@ -207,12 +238,12 @@ int BlotexlibExecutorGetBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
 m_DIGGY_VAR_P_STRING(blotregName)
 //DumpBlotregs(handle->h_blotregsHandle,"GET blotreg BEFORE SEARCH");
 
-  int result = l_NamedObjectsGetNamedObject(handle->h_blotregsHandle, blotregName,
+  int result = NamedObjectsGetNamedObject(handle->h_blotregsHandle, blotregName,
     (void **)ac_blotregHandle); 
   switch (result) {
   case RESULT__FOUND:
     m_ASSERT(*ac_blotregHandle != NULL)
-switch(GStringsVerifyIndexes(*ac_blotregHandle)) {
+switch(g_GParamsVerifyIndexes(*ac_blotregHandle)) {
 case COMPLETED__OK:
 break; case COMPLETED__BUT:
   m_RAISE(ANOMALY__CORRUPTED_INDEXES)
@@ -228,11 +259,6 @@ break; default:
   m_DIGGY_RETURN(result)
 } // BlotexlibExecutorGetBlotreg
 
-#define NAME__BLOTREG_INDEX_LABEL      0
-#define TOKEN_ID__BLOTREG_INDEX_LABEL  1
-#define INT_VALUE__BLOTREG_INDEX_LABEL 2
-#define STR_VALUE__BLOTREG_INDEX_LABEL 3
-
 // Public function; see .h
 int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct P_STRING blotregName, g_G_PARAMS_HANDLE *na_blotregHandle) {
@@ -241,31 +267,9 @@ m_DIGGY_VAR_P_STRING(blotregName)
   int completed = UNDEFINED;
   g_NAMED_OBJECT_STUFF t_namedBlotregStuff = (g_NAMED_OBJECT_STUFF)UNDEFINED; 
 
-  switch (completed = l_NamedObjectsAddNamedObject(handle->h_blotregsHandle,blotregName,
-    &t_namedBlotregStuff)) {
+  switch (completed = NamedObjectsAddNamedObject(handle->h_blotregsHandle,blotregName,
+    (void*)UNDEFINED,&t_namedBlotregStuff)) {
   case COMPLETED__OK:
-    { g_G_PARAMS_HANDLE h_blotregHandle = (g_G_PARAMS_HANDLE)UNDEFINED ;
-      m_TRACK_IF(l_GParamsCreateInstance(&h_blotregHandle,BATEAU__EXPECTED_ITEMS_NUMBER) !=
-        RETURNED) 
-      m_ASSERT(g_GParamsAddIndex(h_blotregHandle,1,G_PARAM_NAME_ELEMENT,
-        P_STRING__G_KEYS_COMPARISON,NULL,NULL,
-        (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) ==
-        NAME__BLOTREG_INDEX_LABEL)
-      m_ASSERT(g_GParamsAddIndex(h_blotregHandle,1,G_PARAM_NAME_ELEMENT,
-        ACOLYT_VALUE__G_KEYS_COMPARISON,(IS_CHAR_FUNCTION)UNDEFINED,(TO_CHAR_FUNCTION)UNDEFINED,
-        (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) ==
-        TOKEN_ID__BLOTREG_INDEX_LABEL)
-      m_ASSERT(g_GParamsAddIndex(h_blotregHandle,1,G_PARAM_VALUE_ELEMENT,
-        ACOLYT_VALUE__G_KEYS_COMPARISON,(IS_CHAR_FUNCTION)UNDEFINED,(TO_CHAR_FUNCTION)UNDEFINED,
-        (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) ==
-        INT_VALUE__BLOTREG_INDEX_LABEL)
-      m_ASSERT(g_GParamsAddIndex(h_blotregHandle,1,G_PARAM_VALUE_ELEMENT,
-        P_STRING__G_KEYS_COMPARISON,NULL,NULL,
-        (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) ==
-        STR_VALUE__BLOTREG_INDEX_LABEL)
-      m_TRACK_IF(m_NamedObjectAssign(t_namedBlotregStuff,h_blotregHandle,handle->h_blotregsHandle)
-        != RETURNED)
-    } // h_blotregHandle
   break; case COMPLETED__BUT:
   break; default: m_TRACK() } // switch 
 
@@ -284,7 +288,7 @@ int BlotexlibExecutorGetBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, int blottabLab
   m_DIGGY_BOLLARD()
   m_ASSERT(blottabLabel < handle->blottabExecutorImplementationsNumber)
 
-  int result = l_NamedObjectsGetNamedObject(
+  int result = NamedObjectsGetNamedObject(
     handle->blottabExecutorImplementations[blottabLabel].h_blottabsHandle,blottabName,
     acr_blottabHandle);
   switch (result) {
@@ -305,14 +309,15 @@ int BlotexlibExecutorAddBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, int blottabLab
   m_ASSERT(blottabLabel < handle->blottabExecutorImplementationsNumber)
 m_DIGGY_VAR_P_STRING(blottabName)
   
-  g_NAMED_OBJECTS_HANDLE blottabsHandle = 
+  NAMED_OBJECTS_HANDLE blottabsHandle = 
     handle->blottabExecutorImplementations[blottabLabel].h_blottabsHandle;
 m_DIGGY_VAR_P(blottabsHandle)
   g_NAMED_OBJECT_STUFF t_namedBlottabStuff = (g_NAMED_OBJECT_STUFF)UNDEFINED;
-  switch (l_NamedObjectsAddNamedObject(blottabsHandle,blottabName,&t_namedBlottabStuff)) {
+  switch (NamedObjectsAddNamedObject(blottabsHandle,blottabName,(void*)UNDEFINED,
+    &t_namedBlottabStuff)) {
   case COMPLETED__OK:
     m_TRACK_IF(m_NamedObjectAssign(t_namedBlottabStuff,hr_blottabHandle,
-      blottabsHandle) != RETURNED)
+      /*blottabsHandle*/NULL) != RETURNED)
   break; case COMPLETED__BUT:
     m_RAISE(ANOMALY__UNEXPECTED_CASE)
   break; default:
@@ -1630,10 +1635,10 @@ static int BlotexlibExecutorDestroyInstance(void *xhr_handle) {
   BLOTEXLIB_EXECUTOR_HANDLE xh_handle = (BLOTEXLIB_EXECUTOR_HANDLE)xhr_handle;
   m_CHECK_MAGIC_FIELD(BLOTEXLIB_EXECUTOR_HANDLE,xh_handle)
 
-  m_TRACK_IF(g_NamedObjectsDestroyInstance(xh_handle->h_blotregsHandle) != RETURNED)
+  m_TRACK_IF(NamedObjectsDestroyInstance(xh_handle->h_blotregsHandle) != RETURNED)
 
   int i =0; for (; i < xh_handle->blottabExecutorImplementationsNumber; i++) { 
-    m_TRACK_IF(g_NamedObjectsDestroyInstance(
+    m_TRACK_IF(NamedObjectsDestroyInstance(
       xh_handle->blottabExecutorImplementations[i].h_blottabsHandle) != RETURNED)
   } // for
 

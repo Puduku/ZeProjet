@@ -47,20 +47,14 @@ struct PIVOT_MODEL {
 } ;
 typedef struct PIVOT_MODEL *PIVOT_MODEL_HANDLE;
 
-// Passed:
-// - *azh_handle:
-// - name:
-// - n_minSize:
-// - n_maxSize:
-// - rawMatterFlags:
-// - refinedMatter:
-// 
-// Ret:
-// - RETURNED: Ok
-// - -1: unexpected problem; 
-static int PivotModelCreateInstance(PIVOT_MODEL_HANDLE *azh_handle, struct P_STRING name,
-  int n_minSize, int n_maxSize, int rawMatterFlags, int refinedMatter) {
+// NAMED_OBJECT_CREATE_INSTANCE_FUNCTION
+static int PivotModelCreateInstance(void **azhr_handle, struct P_STRING name, void *r_arguments){
   m_DIGGY_BOLLARD_S()
+  PIVOT_MODEL_HANDLE *azh_handle = (PIVOT_MODEL_HANDLE*) azhr_handle;
+  int n_minSize = (int)(GENERIC_INTEGER)r_arguments;
+  int n_maxSize = UNDEFINED;
+  int rawMatterFlags = UNDEFINED;
+  int refinedMatter = UNDEFINED;
   m_MALLOC_INSTANCE(*azh_handle)
   PIVOT_MODEL_HANDLE handle = *azh_handle;
   m_ASSIGN_MAGIC_FIELD(PIVOT_MODEL_HANDLE,handle)
@@ -135,17 +129,11 @@ struct TRACT_MODEL {
 } ;
 typedef struct TRACT_MODEL *TRACT_MODEL_HANDLE;
 
-// Passed:
-// - *azh_handle:
-// - name:
-// - expectedTractOrPivotModelsNumber:
-// 
-// Ret:
-// - RETURNED: Ok
-// - -1: unexpected problem; 
-static int TractModelCreateInstance(TRACT_MODEL_HANDLE *azh_handle, struct P_STRING name,
-  int expectedTractOrPivotModelsNumber) {
+// NAMED_OBJECT_CREATE_INSTANCE_FUNCTION
+static int TractModelCreateInstance(void **azhr_handle, struct P_STRING name, void *r_arguments){
   m_DIGGY_BOLLARD_S()
+  TRACT_MODEL_HANDLE *azh_handle = (TRACT_MODEL_HANDLE*) azhr_handle;
+  int expectedTractOrPivotModelsNumber = (int)(GENERIC_INTEGER)r_arguments;
   m_MALLOC_INSTANCE(*azh_handle)
   TRACT_MODEL_HANDLE handle = *azh_handle;
   m_ASSIGN_MAGIC_FIELD(TRACT_MODEL_HANDLE,handle)
@@ -202,29 +190,21 @@ struct PAMPHLET_MODEL {
 } ;
 typedef struct PAMPHLET_MODEL *PAMPHLET_MODEL_HANDLE;
 
-// Passed:
-// - *azh_handle:
-// - name:
-// - expectedTractOrPivotModelsNumber:
-// 
-// Changed:
-// - azh_handle: 
-// 
-// Ret:
-// - RETURNED: Ok
-// - -1: unexpected problem; 
-static int PamphletModelCreateInstance(PAMPHLET_MODEL_HANDLE *azh_handle,
-  int expectedTractOrPivotModelsNumber) {
+// NAMED_OBJECT_CREATE_INSTANCE_FUNCTION
+static int PamphletModelCreateInstance(void **azhr_handle, struct P_STRING name, void *r_arguments){
   m_DIGGY_BOLLARD_S()
+  PAMPHLET_MODEL_HANDLE *azh_handle = (PAMPHLET_MODEL_HANDLE*) azhr_handle;
+  int expectedTractOrPivotModelsNumber = (int)(GENERIC_INTEGER)r_arguments;
   m_MALLOC_INSTANCE(*azh_handle)
   PAMPHLET_MODEL_HANDLE handle = *azh_handle;
   m_ASSIGN_MAGIC_FIELD(PAMPHLET_MODEL_HANDLE,handle)
+  handle->name = name;
   m_TRACK_IF(GreenCollectionCreateInstance(&handle->h_tractOrPivotModelsHandle,
     expectedTractOrPivotModelsNumber, sizeof(struct TRACT_OR_PIVOT_MODEL),
       (GREEN_HANDLER__DISENGAGE_FUNCTION)NULL, (GREEN_HANDLER__COMPARE_FUNCTION)NULL,
       (GREEN_HANDLER__EQUATE_FUNCTION)NULL, (void*)UNDEFINED) != RETURNED) 
   m_DIGGY_RETURN(RETURNED)
-} // PamphletModelCreateInstance
+} // PamphletModelCreateInstance 
 
 // NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION
 static int PamphletModelDestroyInstance (void *xhr_handle) {
@@ -242,10 +222,12 @@ static int PamphletModelDestroyInstance (void *xhr_handle) {
 // I.5 ENGELS:
 
 struct ENGELS {
-  g_NAMED_OBJECTS_HANDLE h_pivotModelsHandle ;
-  g_NAMED_OBJECTS_HANDLE h_tractModelsHandle ;
-  g_NAMED_OBJECTS_HANDLE h_pamphletModelsHandle ;
+  NAMED_OBJECTS_HANDLE h_pivotModelsHandle ;
+  NAMED_OBJECTS_HANDLE h_tractModelsHandle ;
+  NAMED_OBJECTS_HANDLE h_pamphletModelsHandle ;
 } ;
+
+
 
 // Public function: see .h
 int EngelsCreateInstance(ENGELS_HANDLE *azh_handle) {
@@ -254,12 +236,12 @@ int EngelsCreateInstance(ENGELS_HANDLE *azh_handle) {
   m_MALLOC_INSTANCE(*azh_handle)
   ENGELS_HANDLE handle = *azh_handle;
 
-  m_TRACK_IF(l_NamedObjectsCreateInstance(&(handle->h_pivotModelsHandle),
-    BATEAU__EXPECTED_ITEMS_NUMBER, PivotModelDestroyInstance) != RETURNED)
-  m_TRACK_IF(l_NamedObjectsCreateInstance(&(handle->h_tractModelsHandle),
-    BATEAU__EXPECTED_ITEMS_NUMBER, TractModelDestroyInstance) != RETURNED)
-  m_TRACK_IF(l_NamedObjectsCreateInstance(&(handle->h_pamphletModelsHandle),
-    BATEAU__EXPECTED_ITEMS_NUMBER, PamphletModelDestroyInstance) != RETURNED)
+  m_TRACK_IF(NamedObjectsCreateInstance(&(handle->h_pivotModelsHandle),
+    BATEAU__EXPECTED_ITEMS_NUMBER,PivotModelCreateInstance, PivotModelDestroyInstance) != RETURNED)
+  m_TRACK_IF(NamedObjectsCreateInstance(&(handle->h_tractModelsHandle),
+    BATEAU__EXPECTED_ITEMS_NUMBER,TractModelCreateInstance, TractModelDestroyInstance) != RETURNED)
+  m_TRACK_IF(NamedObjectsCreateInstance(&(handle->h_pamphletModelsHandle),
+    BATEAU__EXPECTED_ITEMS_NUMBER,PamphletModelCreateInstance, PamphletModelDestroyInstance) != RETURNED)
   m_DIGGY_RETURN(RETURNED)
 } // EngelsCreateInstance
 
@@ -273,29 +255,20 @@ int EngelsAddPivotModels(ENGELS_HANDLE handle, g_G_PARAMS_HANDLE p_configHandle)
 
   g_G_PARAM_STUFF t_pivotModelConfigStuff = (g_G_PARAM_STUFF)UNDEFINED;
   g_NAMED_OBJECT_STUFF t_namedPivotModelStuff = (g_NAMED_OBJECT_STUFF)UNDEFINED;
-  int entry = UNDEFINED;
   int n_minSize = UNDEFINED;
   int n_maxSize = UNDEFINED;
   int rawMatterFlags = UNDEFINED;
   int refinedMatter = UNDEFINED;
-  PIVOT_MODEL_HANDLE h_pivotModelHandle = (PIVOT_MODEL_HANDLE)UNDEFINED;
   int i = 0; for (; i < count; i++) {
     m_TRACK_IF(g_GParamsFetch(p_configHandle, i, &t_pivotModelConfigStuff) != i)
-    struct G_KEY gKey = m_GKey_PString(t_pivotModelConfigStuff[G_PARAM_NAME_ELEMENT].cv_pString);
-    switch (m_GStringsIndexSingleFetch(handle->h_pivotModelsHandle,NULL,INDEX_LABEL0,
-      INDEX_SEEK_FLAGS__EQUAL,&gKey,INDEX_FETCH_FLAGS__FETCH, &t_namedPivotModelStuff, &entry)) {
-    case RESULT__FOUND: 
-      completed = COMPLETED__BUT; 
-    break; case RESULT__NOT_FOUND:
+    switch (completed = NamedObjectsAddNamedObject(handle->h_pivotModelsHandle,
+      t_pivotModelConfigStuff[G_PARAM_NAME_ELEMENT].cv_pString,(void *)(GENERIC_INTEGER)-1,
+      &t_namedPivotModelStuff)) {
+    case COMPLETED__OK:
+    break; case COMPLETED__BUT:
     break; default: m_TRACK() } // switch 
-    
-    m_TRACK_IF(PivotModelCreateInstance(&h_pivotModelHandle,
-      t_pivotModelConfigStuff[G_PARAM_NAME_ELEMENT].cv_pString,n_minSize,n_maxSize,rawMatterFlags,
-      refinedMatter) != RETURNED) 
-    m_TRACK_IF(GStringCopy(t_namedPivotModelStuff,0,
-      t_pivotModelConfigStuff[G_PARAM_NAME_ELEMENT].cv_pString) < 0)
-    m_TRACK_IF(m_NamedObjectAssign(t_namedPivotModelStuff,h_pivotModelHandle,
-      handle->h_pivotModelsHandle) != RETURNED)
+
+ m_ASSERT(t_namedPivotModelStuff->acolyt.cnhr_handle != NULL)
   } // for
   
   m_DIGGY_RETURN(completed)
@@ -309,28 +282,21 @@ int EngelsAddTractModel(ENGELS_HANDLE handle, struct P_STRING name,
   int count = g_GParamsGetCount(p_configHandle,NULL);
   m_TRACK_IF(count < 0)
 
-  int entry = UNDEFINED;
   g_G_PARAM_STUFF t_tractModelConfigStuff = (g_G_PARAM_STUFF)UNDEFINED;
   g_NAMED_OBJECT_STUFF t_namedTractModelStuff = (g_NAMED_OBJECT_STUFF)UNDEFINED;
   int expectedTractOrPivotModelsNumber = UNDEFINED;
-  TRACT_MODEL_HANDLE h_tractModelHandle = (TRACT_MODEL_HANDLE)UNDEFINED;
 
-  struct G_KEY gKey = m_GKey_PString(name);
-  switch (m_GStringsIndexSingleFetch(handle->h_tractModelsHandle,NULL,INDEX_LABEL0,
-    INDEX_SEEK_FLAGS__EQUAL,&gKey,INDEX_FETCH_FLAGS__FETCH, &t_namedTractModelStuff, &entry)) {
-  case RESULT__FOUND: 
-    completed = COMPLETED__BUT; 
-  break; case RESULT__NOT_FOUND:
+  switch (NamedObjectsAddNamedObject(handle->h_tractModelsHandle,name,(void*)(GENERIC_INTEGER)10,
+    &t_namedTractModelStuff)) {
+  case COMPLETED__OK:
+  break; case COMPLETED__BUT:
   break; default: m_TRACK() } // switch 
     
-  m_TRACK_IF(TractModelCreateInstance(&h_tractModelHandle,name,expectedTractOrPivotModelsNumber) !=
-    RETURNED) 
-  m_TRACK_IF(GStringCopy(t_namedTractModelStuff,0,name) < 0)
-  m_TRACK_IF(m_NamedObjectAssign(t_namedTractModelStuff,h_tractModelHandle,
-    handle->h_tractModelsHandle) != RETURNED)
+ m_ASSERT(t_namedTractModelStuff->acolyt.cnhr_handle != NULL)
 
   int i = 0; for (; i < count; i++) {
     m_TRACK_IF(g_GParamsFetch(p_configHandle, i, &t_tractModelConfigStuff) != i)
+// TODO: init tract model item
   } // for
   
   m_DIGGY_RETURN(completed)
@@ -340,7 +306,7 @@ int EngelsAddTractModel(ENGELS_HANDLE handle, struct P_STRING name,
 //
 static int EngelsGetTrackModelsNumber(ENGELS_HANDLE handle, int trackModelEntry) {
   m_DIGGY_BOLLARD_S()
-  int itemsNumber = GStringsGetCount(handle->h_tractModelsHandle,NULL);
+  int itemsNumber = NamedObjectsGetCount(handle->h_tractModelsHandle,NULL);
   m_TRACK_IF(itemsNumber < 0)
   m_DIGGY_RETURN(itemsNumber)
 } // EngelsGetTrackModelsNumber
@@ -350,9 +316,9 @@ static int EngelsGetTrackModelsNumber(ENGELS_HANDLE handle, int trackModelEntry)
 int EngelsDestroyInstance(ENGELS_HANDLE xh_handle) {
   m_DIGGY_BOLLARD()
   
-  m_TRACK_IF(g_NamedObjectsDestroyInstance(xh_handle->h_pivotModelsHandle) != RETURNED)
-  m_TRACK_IF(g_NamedObjectsDestroyInstance(xh_handle->h_tractModelsHandle) != RETURNED)
-  m_TRACK_IF(g_NamedObjectsDestroyInstance(xh_handle->h_pamphletModelsHandle) != RETURNED)
+  m_TRACK_IF(NamedObjectsDestroyInstance(xh_handle->h_pivotModelsHandle) != RETURNED)
+  m_TRACK_IF(NamedObjectsDestroyInstance(xh_handle->h_tractModelsHandle) != RETURNED)
+  m_TRACK_IF(NamedObjectsDestroyInstance(xh_handle->h_pamphletModelsHandle) != RETURNED)
   free(xh_handle);
   m_DIGGY_RETURN(RETURNED)
 } // EngelsDestroyInstance

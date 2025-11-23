@@ -35,12 +35,12 @@ static inline int m_GTokenAssign(g_G_TOKEN_STUFF stuff, int tokenId,
   stuff->acolyt.cen_value = tokenId;
   return RETURNED;
 } // m_GTokenAssign
+
+
 struct TOKEN_DEFINITION {
   const char *p_litteral;
   int tokenId;
 } ; 
-
-
 
 
 // #SEE G_STRINGS_CREATE_INSTANCE <named-object>
@@ -62,34 +62,18 @@ static inline int ml_GTokensCreateInstance(g_G_TOKENS_HANDLE *azh_handle, int ex
 #define g_GTokenImport GStringImport
 
 
+//#define m_G_TOKENS_IMPORT(/*g_G_TOKENS_HANDLE*/ handle,\
 // Import g-tokens in one shot...
 //
 // Passed:
 // - handle:
 // - mp_tokenDefinitionsArray:
 // - expectedTokensNumber:
-#define m_G_TOKENS_IMPORT(/*g_G_TOKENS_HANDLE*/ handle,\
-  /*const struct TOKEN_DEFINITION*/ mp_tokenDefinitions /*[]*/,  /*int*/ tokensNumber) {\
-  int i = 0;\
-  g_G_TOKEN_STUFF gTokenStuff = (g_G_TOKEN_STUFF)UNDEFINED; \
-  int entry = UNDEFINED;\
-  for (; i < tokensNumber; i++) {\
-    m_TRACK_IF((entry = g_GTokensFetch(handle,-1,&gTokenStuff)) < 0);\
-    switch (g_GTokenImport(gTokenStuff, m_PString(mp_tokenDefinitions[i].p_litteral))) {\
-    case COMPLETED__OK: \
-      m_TRACK_IF(m_GTokenAssign(gTokenStuff, mp_tokenDefinitions[i].tokenId, handle) !=\
-        RETURNED)\
-    break; case COMPLETED__BUT: \
-      m_RAISE(ANOMALY__NON_PURE_LOGICAL_G_STRING)\
-    break; default: \
-      m_TRACK()\
-    }\
-  } \
-} 
+int l_GTokensImport(g_G_TOKENS_HANDLE handle, const struct TOKEN_DEFINITION* sp_tokenDefinitions,
+  int tokensNumber) ;
 
 // #SEE GStringsAddIndex @ c-ansi/g-string.h <g-token> <key>
 #define gm_GTokensAddPlainLexicalIndex m_GStringsAddPlainLexicalIndex
-
 
 // #SEE m_GStringsIndexSingleFetch @ c-ansi/g-string.h <g-token>
 #define gm_GTokensIndexSingleFetch m_GStringsIndexSingleFetch

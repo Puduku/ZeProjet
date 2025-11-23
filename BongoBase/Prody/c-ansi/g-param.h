@@ -71,12 +71,14 @@ int l_GParamsCreateInstance(g_G_PARAMS_HANDLE *azh_handle,int expectedItemsNumbe
 // #SEE GStringsIndexFetch @ c-ansi/g-string.h <g-param>
 #define g_GParamsIndexFetch GStringsIndexFetch
 
-
 // #SEE GStringsIndexRequestR @ c-ansi/g-string.h <g-param>
 #define g_GParamsIndexRequestR GStringsIndexRequestR
 
 // #SEE m_GStringsIndexSingleFetch @ c-ansi/g-string.h <g-param> 
 #define gm_GParamsIndexSingleFetch m_GStringsIndexSingleFetch 
+
+// #SEE GStringsVerifyIndexes @ c-ansi/g-string.h 
+#define g_GParamsVerifyIndexes GStringsVerifyIndexes
 
 // #SEE GStringsDestroyInstance @ c-ansi/g-string.h <g-param>
 #define g_GParamsDestroyInstance GStringsDestroyInstance

@@ -8,7 +8,8 @@
 #include "c-ansi/g-string.h" 
 #include "c-ansi/testy-diggy.h"
 
-typedef G_STRINGS_HANDLE g_NAMED_OBJECTS_HANDLE ;
+struct NAMED_OBJECTS ;
+typedef struct NAMED_OBJECTS* NAMED_OBJECTS_HANDLE ;
 
 typedef G_STRING_STUFF g_NAMED_OBJECT_STUFF ;
 
@@ -17,15 +18,15 @@ typedef G_STRING_STUFF g_NAMED_OBJECT_STUFF ;
 // Passed
 // - stuff: 
 // - nhr_handle: named object's head handle
-// - n_namedObjectsHandle: (when not NULL) named objects collection which the named object belongs to
+// - n_gStringsHandle: (when not NULL) g-strings collection which the named object belongs to
 // 
 // Ret:
 // - RETURNED: OK
 // - -1: unexpected problem; anomaly is raised...
 static inline int m_NamedObjectAssign(g_NAMED_OBJECT_STUFF stuff, void *nhr_handle,
-  g_NAMED_OBJECTS_HANDLE n_namedObjectsHandle) {
+  G_STRINGS_HANDLE n_gStringsHandle) {
   m_DIGGY_BOLLARD_S()
-  m_CHECK_G_STRINGS_COLLECTION_CONVEYANCE(n_namedObjectsHandle,FIRST_ELEMENT0,
+  m_CHECK_G_STRINGS_COLLECTION_CONVEYANCE(n_gStringsHandle,FIRST_ELEMENT0,
     NAMED_OBJECT__G_STRING_CONVEYANCE)
   stuff->acolyt.cnhr_handle = NULL;
   stuff->acolyt.cnhr_handle = nhr_handle;
@@ -33,11 +34,32 @@ static inline int m_NamedObjectAssign(g_NAMED_OBJECT_STUFF stuff, void *nhr_hand
 } // m_NamedObjectAssign 
 
 
+// Passed:
+// - *azhr_handle: UNDEFINED handle 
+// - name:
+// - r_arguments
+//
+// Modified:
+// - *azhr_handle: instance's handle
+//
+// Returned:
+// - RETURNED: done
+// - -1: unexpected problem ; anomaly is raised
+typedef int (*NAMED_OBJECT_CREATE_INSTANCE_FUNCTION)(void **azhr_handle, struct P_STRING name, void *r_arguments);
+
+
 // => Create collection of NAMED_OBJECT__G_STRING_CONVEYANCE g-strings 
 // => The function also adds plain lexical index (INDEX_LABEL0) 
+// Also passed:
+// - n_namedObjectCreateInstanceFunction: != NULL => automatic creation of named objects
+// - namedObjectDestroyInstanceFunction:
 // #SEE GStringsCreateInstance@c-ansi/g-string.h  <named-object>
-int l_NamedObjectsCreateInstance(g_NAMED_OBJECTS_HANDLE *azh_handle,int expectedItemsNumber,
+int NamedObjectsCreateInstance(NAMED_OBJECTS_HANDLE *azh_handle,int expectedItemsNumber,
+  NAMED_OBJECT_CREATE_INSTANCE_FUNCTION n_namedObjectCreateInstanceFunction,
   NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION namedObjectDestroyInstanceFunction);
+
+// #SEE GStringsGetCount @ c-ansi/g-string.h <named-object>
+int NamedObjectsGetCount(NAMED_OBJECTS_HANDLE cp_handle, g_NAMED_OBJECT_STUFF *navnt_namedObjectStuff);
 
 // Add new named object to colllection...
 //
@@ -55,8 +77,8 @@ int l_NamedObjectsCreateInstance(g_NAMED_OBJECTS_HANDLE *azh_handle,int expected
 // - COMPLETED__OK: new (empty) named object added in the collection 
 // - COMPLETED__BUT: named object with same name already exists in collection
 // - -1: unexpected problem; anomaly is raised...
-int l_NamedObjectsAddNamedObject(g_NAMED_OBJECTS_HANDLE handle, struct P_STRING namedObjectName,
-  g_NAMED_OBJECT_STUFF *at_namedObjectStuff); 
+int NamedObjectsAddNamedObject(NAMED_OBJECTS_HANDLE handle, struct P_STRING namedObjectName,
+  void *cr_arguments, g_NAMED_OBJECT_STUFF *at_namedObjectStuff); 
   
 // Get named object of colllection...
 //
@@ -71,11 +93,12 @@ int l_NamedObjectsAddNamedObject(g_NAMED_OBJECTS_HANDLE handle, struct P_STRING 
 // - RESULT__FOUND: 
 // - RESULT__NOT_FOUND: 
 // - -1: unexpected problem; anomaly is raised...
-int l_NamedObjectsGetNamedObject(g_NAMED_OBJECTS_HANDLE handle, struct P_STRING namedObjectName,
+int NamedObjectsGetNamedObject(NAMED_OBJECTS_HANDLE handle, struct P_STRING namedObjectName,
   void **acvnr_namedObjectHandle); 
 
+
 // #SEE GStringsDestroyInstance @ c-ansi/g-string.h <named-object>
-#define g_NamedObjectsDestroyInstance GStringsDestroyInstance
+int NamedObjectsDestroyInstance(NAMED_OBJECTS_HANDLE xh_handle) ; 
 
 
 #endif // __C_ANSI_NAMED_OBJECT_H_INCLUDED
