@@ -268,7 +268,7 @@ m_DIGGY_VAR_P_STRING(blotregName)
   g_NAMED_OBJECT_STUFF t_namedBlotregStuff = (g_NAMED_OBJECT_STUFF)UNDEFINED; 
 
   switch (completed = NamedObjectsAddNamedObject(handle->h_blotregsHandle,blotregName,
-    (void*)UNDEFINED,&t_namedBlotregStuff)) {
+    (void*)NULL, (void*)UNDEFINED,&t_namedBlotregStuff)) {
   case COMPLETED__OK:
   break; case COMPLETED__BUT:
   break; default: m_TRACK() } // switch 
@@ -313,11 +313,9 @@ m_DIGGY_VAR_P_STRING(blottabName)
     handle->blottabExecutorImplementations[blottabLabel].h_blottabsHandle;
 m_DIGGY_VAR_P(blottabsHandle)
   g_NAMED_OBJECT_STUFF t_namedBlottabStuff = (g_NAMED_OBJECT_STUFF)UNDEFINED;
-  switch (NamedObjectsAddNamedObject(blottabsHandle,blottabName,(void*)UNDEFINED,
+  switch (NamedObjectsAddNamedObject(blottabsHandle,blottabName,hr_blottabHandle,(void*)UNDEFINED,
     &t_namedBlottabStuff)) {
   case COMPLETED__OK:
-    m_TRACK_IF(m_NamedObjectAssign(t_namedBlottabStuff,hr_blottabHandle,
-      /*blottabsHandle*/NULL) != RETURNED)
   break; case COMPLETED__BUT:
     m_RAISE(ANOMALY__UNEXPECTED_CASE)
   break; default:

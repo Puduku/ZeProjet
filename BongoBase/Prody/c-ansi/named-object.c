@@ -37,9 +37,30 @@ int NamedObjectsGetCount(NAMED_OBJECTS_HANDLE cp_handle, g_NAMED_OBJECT_STUFF *n
 } // NamedObjectsGetCount
 
 
+// Assign actual acolyt handle to 'named object'
+// 
+// Passed
+// - stuff: 
+// - nhr_handle: named object's head handle
+// - n_gStringsHandle: (when not NULL) g-strings collection which the named object belongs to
+// 
+// Ret:
+// - RETURNED: OK
+// - -1: unexpected problem; anomaly is raised...
+static inline int m_NamedObjectAssign(g_NAMED_OBJECT_STUFF stuff, void *nhr_handle,
+  G_STRINGS_HANDLE n_gStringsHandle) {
+  m_DIGGY_BOLLARD_S()
+  m_CHECK_G_STRINGS_COLLECTION_CONVEYANCE(n_gStringsHandle,FIRST_ELEMENT0,
+    NAMED_OBJECT__G_STRING_CONVEYANCE)
+  stuff->acolyt.cnhr_handle = NULL;
+  stuff->acolyt.cnhr_handle = nhr_handle;
+  m_DIGGY_RETURN(RETURNED)
+} // m_NamedObjectAssign 
+
+
 // Public function: see .h
 int NamedObjectsAddNamedObject(NAMED_OBJECTS_HANDLE handle, struct P_STRING namedObjectName, 
-  void *cr_arguments, g_NAMED_OBJECT_STUFF *at_namedObjectStuff){ 
+  void *nhr_namedObjectHandle, void *ccr_arguments, g_NAMED_OBJECT_STUFF *at_namedObjectStuff){ 
   m_DIGGY_BOLLARD()
   int completed = COMPLETED__OK; // a priori
   struct G_KEY gKey = m_GKey_PString(namedObjectName);
@@ -49,13 +70,14 @@ int NamedObjectsAddNamedObject(NAMED_OBJECTS_HANDLE handle, struct P_STRING name
     completed = COMPLETED__BUT;
   break; case RESULT__NOT_FOUND:
     m_TRACK_IF(GStringCopy(*at_namedObjectStuff,0,namedObjectName) < 0) 
-    if (handle->n_namedObjectCreateInstanceFunction != NULL) {
-      void *hr_namedObjectHandle = (void*)UNDEFINED;
-      m_TRACK_IF(handle->n_namedObjectCreateInstanceFunction(&hr_namedObjectHandle,namedObjectName,
-        cr_arguments) != RETURNED)
-      m_TRACK_IF(m_NamedObjectAssign(*at_namedObjectStuff,hr_namedObjectHandle,
-        handle->h_gStringsHandle) != RETURNED)
+    if (nhr_namedObjectHandle == NULL) {
+      if (handle->n_namedObjectCreateInstanceFunction != NULL) {
+        m_TRACK_IF(handle->n_namedObjectCreateInstanceFunction(&nhr_namedObjectHandle,namedObjectName,
+          ccr_arguments) != RETURNED)
+      } // if
     } // if
+    m_TRACK_IF(m_NamedObjectAssign(*at_namedObjectStuff,nhr_namedObjectHandle,
+      handle->h_gStringsHandle) != RETURNED)
   break; default: m_TRACK() } // switch
   m_DIGGY_RETURN(completed)
 } // NamedObjectsAddNamedObject
@@ -75,7 +97,7 @@ int NamedObjectsGetNamedObject(NAMED_OBJECTS_HANDLE handle, struct P_STRING name
     *acvnr_namedObjectHandle = NULL;
   break; default: m_TRACK() } // switch
   m_DIGGY_RETURN(result)
-} // NamedObjectsAddNamedObject
+} // NamedObjectsGetNamedObject
 
 // Public function: see .h
 int NamedObjectsDestroyInstance(NAMED_OBJECTS_HANDLE xh_handle) {

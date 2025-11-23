@@ -13,26 +13,6 @@ typedef struct NAMED_OBJECTS* NAMED_OBJECTS_HANDLE ;
 
 typedef G_STRING_STUFF g_NAMED_OBJECT_STUFF ;
 
-// Assign actual acolyt handle to 'named object'
-// 
-// Passed
-// - stuff: 
-// - nhr_handle: named object's head handle
-// - n_gStringsHandle: (when not NULL) g-strings collection which the named object belongs to
-// 
-// Ret:
-// - RETURNED: OK
-// - -1: unexpected problem; anomaly is raised...
-static inline int m_NamedObjectAssign(g_NAMED_OBJECT_STUFF stuff, void *nhr_handle,
-  G_STRINGS_HANDLE n_gStringsHandle) {
-  m_DIGGY_BOLLARD_S()
-  m_CHECK_G_STRINGS_COLLECTION_CONVEYANCE(n_gStringsHandle,FIRST_ELEMENT0,
-    NAMED_OBJECT__G_STRING_CONVEYANCE)
-  stuff->acolyt.cnhr_handle = NULL;
-  stuff->acolyt.cnhr_handle = nhr_handle;
-  m_DIGGY_RETURN(RETURNED)
-} // m_NamedObjectAssign 
-
 
 // Passed:
 // - *azhr_handle: UNDEFINED handle 
@@ -59,15 +39,18 @@ int NamedObjectsCreateInstance(NAMED_OBJECTS_HANDLE *azh_handle,int expectedItem
   NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION namedObjectDestroyInstanceFunction);
 
 // #SEE GStringsGetCount @ c-ansi/g-string.h <named-object>
-int NamedObjectsGetCount(NAMED_OBJECTS_HANDLE cp_handle, g_NAMED_OBJECT_STUFF *navnt_namedObjectStuff);
+int NamedObjectsGetCount(NAMED_OBJECTS_HANDLE cp_handle,
+  g_NAMED_OBJECT_STUFF *navnt_namedObjectStuff);
 
 // Add new named object to colllection...
 //
 // Passed:
 // - handle: named objects collection
 // - namedObjectName:
-// - hr_namedObjectHandle: new named object instance to add in the collection; its handle
-// - nar_namedObjectHandle: NULL special pointer if not used
+// - nhr_namedObjectHandle: (when != NULL) new named object instance to add in the collection; its
+//   handle
+// - *ccr_arguments: (only significant if new named object instnce is not provided) arguments for
+//   named object instance creation function  (when significant)
 // 
 // Changed:
 // - handle: new named object added if not already exists in collection...
@@ -78,8 +61,9 @@ int NamedObjectsGetCount(NAMED_OBJECTS_HANDLE cp_handle, g_NAMED_OBJECT_STUFF *n
 // - COMPLETED__BUT: named object with same name already exists in collection
 // - -1: unexpected problem; anomaly is raised...
 int NamedObjectsAddNamedObject(NAMED_OBJECTS_HANDLE handle, struct P_STRING namedObjectName,
-  void *cr_arguments, g_NAMED_OBJECT_STUFF *at_namedObjectStuff); 
+  void *nhr_namedObjectHandle, void *ccr_arguments, g_NAMED_OBJECT_STUFF *at_namedObjectStuff); 
   
+
 // Get named object of colllection...
 //
 // Passed:
