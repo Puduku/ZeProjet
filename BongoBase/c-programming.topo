@@ -111,9 +111,9 @@
 //   Initially, the motivation was practical: such split eases recuperation of modules usable to
 //   write stand-alone C-Ansi programs (reminder: pure C-Ansi programs have limitations but offer
 //   the great advantage to run almost "anywhere")
-//   And even if now C-Ansi programs are less in our "focus", we've realized that such a split
-//   "inducts" a good separation between pure business logic (code that can be written in Ansi-C)
-//   with "technical", low level code (that is "by essence" Posix-C) 
+//   And even if now C-Ansi programs are less in our "focus", realized that such a split "inducts"
+//   a good separation between pure business logic (code that can be written in Ansi-C) with
+//   "technical", low level code (that is "by essence" Posix-C). 
 //   NB: final extra, empiric, but real, advantage : this separation lets us directly identifying 
 //   our own headers (#include "c-ansi/xxx" and "c-posix/xxx")
 //
@@ -249,6 +249,7 @@
 //       of ('ok'/'ok, but') binary status into unary 'ok' status (like the European Union, with his
 //       habit of proudly presenting a total FAILURE to reach agreement as a SUCCESS of plenary
 //       agreement - "We unanimously all agreed... that we agree on nothing...")
+
 
 
 
