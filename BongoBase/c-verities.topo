@@ -1,0 +1,150 @@
+// c-verities.topo
+// (c) Puduku - 2024
+
+// Verities in C programs (and other programming languages)...
+
+// First, a few simple (and arbitrary) definitions...
+// Dualism: reduction of a reality to two aspects (or principles)
+// Falsity: any 'false' proposition
+// Holism: any doctrine of the Greater Whole
+// Monism: reduction of a reality to a single aspect (or principle)
+// Ternary: which can take on three possible values (or states)
+// Unary: which can have only one value (or one state)
+// Excluded middle: principle of "either one or the other".
+// Verity: 1. which can take either the value "true" or "false" (at least, in the logic of the
+//            excluded middle)
+//         2. any "true" proposition
+// Truth: Verity (sorry, this subtlety of the English language completely escapes me)
+
+// I. Dual verities
+// The verity values 'true'/'false' are generally perceived as the fundamental duality of logic,
+// from which the other dualities conceived by our mind - such as 'positive'/'negative', 'yes'/'no',
+// 'good'/'bad', 'all'/'nothing', 'on'/'off', ... not forgetting the digital 0/1 bit avatar - seem
+/  to derive. Even more practical dualities such as 'day'/'night', 'win'/'lose', 'rich'/'poor',
+// 'white'/'black' or 'attractive'/'repulsive' can be trivially reduced to a 'true'/'false' opposition (
+// e.g., the duality 'day'/'night' can be simply restated with "it's day" is 'true' / "it's day" is
+// 'false').
+// Yet, those logical dualities will be genuinely equivalent once we have determined a rule that
+// uniquely associates each single verity value between two given dualities.
+// So, for example, when comparing the two dualities 'yes'/'no' and 'day'/'night', why assimilate
+// 'yes' with 'day' (and 'no' with 'night')? and not the opposite ('yes' with 'night'...)?
+// The answer is: in order to establish such rule of univocal association, it is sufficient that the
+// association between any duality with a "fundamental" duality to be univocal. So here's the point:
+// the associations between dualities with the 'true'/'false' duality are, all in all, arbitrary.
+// For instance, the association of 'attractive' with 'true' is arbitrary.
+// On the other hand, any association of logical duality with the 'positive'/'negative' (or 'good'/
+// 'bad') pair of values is self-evident. So, 'attractive', 'yes', 'true', 'win', etc. are
+// spontaneously associated with 'positive' (or 'good') value - whereas 'repulsive', 'no', 'false',
+// 'lose' counterparts are assimilated to 'negative' (or 'bad') value.
+// Let's simply admit this bias typical of our Manichean brains: our mental capacity to operate
+// binary separations is deeply found on our so-called AFFECT, which can only measure moral values.
+// In short, our different dual values of verity are merely interchangeable. However, there are no
+// "neutral" verity values as 'true'/'false'. To the contrary, our "fundamental" values of truth are
+// oriented according to a MORAL partition between the 'Good' and the 'Evil'.
+// 
+// Are dual verities PRACTICALLY interchangeable ? Answer with counterexample...
+// Let's try a comparison between 'yes'/'no' and 'win'/'lose' dualities...
+// Why do guys so often harass girls?
+// A guy who's kind of a pain in the neck is hit on a girl. The girl blows him off. Guy insists.
+// The girl refuses again. But the guy doesn't give up. On the contrary, the angrier the girl gets,
+// the more he comes back for more...
+// What's remarkable about this banal story is the perfect symmetry:
+// - the girl really doesn't understand why this guy insists (and doesn't end up leaving her alone)
+// - the guy really doesn't understand why the girl gets upset (and doesn't end up accepting his
+// advances).
+// By simply stating that:
+// - the girl thinks 'yes'/'no (way)' values as a duality of truth.
+// - the guy thinks 'win'/'lose (try again)' values as a duality of truth.
+// We have a much better insight into the origin of the misunderstanding...
+// And, speaking of symmetry, the mirror case of that situation can correspond to the (equally
+// common) case of shy or faded people (girls but also guys) who, after just one rejection, have
+// convinced themselves that they'll never, ever appeal to anyone. (*)
+// 
+// (*) Julie's case, who developed some complexes about her appearance, was a bit more subtle.
+// When I told her that, in my opinion, SHE embodied Absolute Beauty, she corrected me, saying,
+// "No NORMAL guy would ever find [her] attractive!!!"
+
+// II. "Non-dual" verities.
+// Is the "absolute" dual Verity behind (non-dual) ternary verities ?
+// Our aforementioned 'Western' civilisations appreciate 'Eastern' philosophies and their strange
+// holistic thinking, but not without a degree of circumspection.
+// The dogma of the duality of absolute verity (everything is either 'true' or 'false') is so
+// deeply rooted in our our "rational" minds, that the idea that Verity might not be dual seems to
+// us particularly preposterous.
+// Yet, we must consider, albeit reluctantly, the idea that the principle of the "excluded middle"
+// may, at times, be questioned. This is the case each time we ignore a truth, we mention some
+// 'unknown' state or declare the information 'not applicable' - the famous 'N/A' in the boxes on
+// forms.
+// Even so, such 'unknown' characterization is seen as a mere artifice, behind which lies the
+// fundamental truth ('true' or 'false') that simply escapes us because, precisely, we don't know
+// it. Thus, the proposition "Nicolas Sarkozy was sodomised by his German shepherd." (*), like any
+// other proposition, is either 'true' or 'false', according to the principle of the "excluded
+// middle".
+// However, we are not keen to attribute a 'true' or 'false' value to such proposition. Instead, we
+// will rather declare that "we don't know" - and even that we don't care! Such "technical" response
+// obviously do not comply with the "excluded middle" principle...
+// Will this mean that we actually give up our dual vision of the Truth?
+// "We don't know", because materially, we can't know (if the event happened, we weren't there to
+// hold the candle). But even if we pulled out all the stops (hiring detectives, bribing the servants,
+// etc.), our chances of finding out the truth would remain infinitesimal.
+// And even if we were to obtain the 'proof' we're looking for (a video, for example), would we
+// know for sure that it would be the truth (lookalike actor, editing, etc.) ?
+// As for establishing the falsity of the proposition, that would appear to be even more arduous...
+// And yet, however inaccessible and pointless the "truth" or "falsity" of the proposition appear
+// to us, we never question its "existence" : we remain convinced that in the "absolute", the
+// proposition must be either "true" or "false". In other words, we are just not capable of
+// constructing our thoughts outside the (totally arbitrary) "evidence" of the absolute existence of
+// a dual Truth which is, moreover, independent of moral values.
+
+// (*) Dedsoled pour cette image un peu crue, mais c'est vraiment l'exemple, bien susr juste
+// grotesque et "sans fondement", que j'avais imagined ag l'edpoque, tant pour forger mes 
+// redflexions que tenter d'expliquer ag Julie...
+// Evidemment, on pourra m'objecter, qu'au moins j'aurais pu actualiser mon exemple - en remplaccant
+// Sarko par Macron -, mais c'est juste que je trouve l'exemple plus parlant avec Sarko...
+
+// III. Verities in computing.
+// The questioning of dualism (as in Eastern thought), therefore, when it is not considered as
+// madness or an insult to "(good) rational Cartesian sense", arouses, at best, vague curiosity,
+// amusement or commiseration towards beliefs that are quite primitive, naive and exotic.
+// In computing (i.e. in our universe of BINARY DIGITS), our attachment to dual verity is
+// obviously reinforced.
+//
+// III.1. Incessant debates around ternary logic:
+// It should be noted, however, that ternary logic made, with varying degrees of success, notable 
+// inroads into the world of the BIT.
+// For example, in the Wikipedia article on the SQL language:
+//   The NULL keyword was introduced into SQL to express missing information in the relational
+//   model. The introduction of NULL, along with TRUE and FALSE, is the foundation of ternary logic.
+//   NULL has no value in SQL (and is not a member of any data type), it is a reserved keyword,
+//   indicating that information is missing. As a result, a comparison with NULL, even with NULL
+//   itself, can be neither TRUE nor FALSE; it is necessarily unknown and has no Boolean value. In
+//   fact, NULL cannot be considered equal to NULL, since the two pieces of missing information,
+//   which these two distinct NULLs represent, may turn out to be different. NULL is generally
+//   referred to as a "marker".
+// Note: Fifty years on, the question of the RELEVANCE of this ternary logic in SQL is still being
+// debated (in a nutshell: the DBAs love it and the programmers hate it.)
+//
+// III.2. Unary logic: a (particularly) arduous acceptation...
+// The main manifestations of monism in classic structured programming are presumably the "pure"
+// procedures, which execute without any "return status". The idea of absence of return status makes
+// programmers that we are uncomfortable.
+// For instance, we have great difficulty conceiving parsing (which is a fundamental activity in
+// computing) with a monist vision. That is, we tend to consider the "syntax error" negative case as
+// intrinsic to any - even elementary - parsing tasks. This vision, which forbids us from conceiving
+// fundamental parsing processing as pure procedures, also hampers the design of easily reusable
+// code...
+//
+// III.3. Ubiquitous binary verities
+// No doubt we are too oriented or biased by our belief in absolute and dual truth. Anyway, we
+// cannot help attributing to any procedural execution a status of return corresponding to its dual
+// truth. The "de facto" scheme is applied:
+// - the positive "OK" case (true): the procedure was successful 
+// - the negative "error" case (false): the procedure was not successful
+// The problem is that universal, but oversimplified, vision is source of much confusion and major
+// setbacks.
+// The most serious - and most common! - of confusion is to use the negative error case as a
+// catch-all for all sorts of problems. That is, we blithely mix anomalies of execution (which are
+// linked to the conception of the program) with applicative errors (which are caused by some misuse
+// of the application).
+// In any way, anomalies of execution are ORTHOGONAL to applicative errors and SHOULD NEVER be
+// gathered together within negative case of procedures' execution.
