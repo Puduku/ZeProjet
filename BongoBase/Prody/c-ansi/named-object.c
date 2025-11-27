@@ -47,11 +47,12 @@ int NamedObjectsGetCount(NAMED_OBJECTS_HANDLE cp_handle, g_NAMED_OBJECT_STUFF *n
 // Ret:
 // - RETURNED: OK
 // - -1: unexpected problem; anomaly is raised...
-static inline int m_NamedObjectAssign(g_NAMED_OBJECT_STUFF stuff, void *nhr_handle,
+static inline int m_NamedObjectAssign(g_NAMED_OBJECT_STUFF stuff, struct P_STRING name, void *nhr_handle,
   G_STRINGS_HANDLE n_gStringsHandle) {
   m_DIGGY_BOLLARD_S()
   m_CHECK_G_STRINGS_COLLECTION_CONVEYANCE(n_gStringsHandle,FIRST_ELEMENT0,
     NAMED_OBJECT__G_STRING_CONVEYANCE)
+  m_TRACK_IF(GStringCopy(stuff,0,name) < 0) 
   stuff->acolyt.cnhr_handle = NULL;
   stuff->acolyt.cnhr_handle = nhr_handle;
   m_DIGGY_RETURN(RETURNED)
@@ -69,14 +70,10 @@ int NamedObjectsAddNamedObject(NAMED_OBJECTS_HANDLE handle, struct P_STRING name
   case RESULT__FOUND:
     completed = COMPLETED__BUT;
   break; case RESULT__NOT_FOUND:
-    m_TRACK_IF(GStringCopy(*at_namedObjectStuff,0,namedObjectName) < 0) 
-    if (nhr_namedObjectHandle == NULL) {
-      if (handle->n_namedObjectCreateInstanceFunction != NULL) {
-        m_TRACK_IF(handle->n_namedObjectCreateInstanceFunction(&nhr_namedObjectHandle,namedObjectName,
-          ccr_arguments) != RETURNED)
-      } // if
-    } // if
-    m_TRACK_IF(m_NamedObjectAssign(*at_namedObjectStuff,nhr_namedObjectHandle,
+    if (nhr_namedObjectHandle == NULL && handle->n_namedObjectCreateInstanceFunction != NULL)
+      m_TRACK_IF(handle->n_namedObjectCreateInstanceFunction(&nhr_namedObjectHandle,namedObjectName,
+      ccr_arguments) != RETURNED)
+    m_TRACK_IF(m_NamedObjectAssign(*at_namedObjectStuff,namedObjectName,nhr_namedObjectHandle,
       handle->h_gStringsHandle) != RETURNED)
   break; default: m_TRACK() } // switch
   m_DIGGY_RETURN(completed)

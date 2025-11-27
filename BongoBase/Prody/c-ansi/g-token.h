@@ -15,6 +15,9 @@
 typedef G_STRING_STUFF g_G_TOKEN_STUFF;
 typedef G_STRINGS_HANDLE g_G_TOKENS_HANDLE;
 
+// #SEE GStringImport @ c-ansi/g-string.h <g-token>
+#define g_GTokenImport GStringImport
+
 
 #define ANONYMOUS_TOKEN_ID0 0
 
@@ -26,12 +29,19 @@ typedef G_STRINGS_HANDLE g_G_TOKENS_HANDLE;
 // - n_gTokensHandle: (when non NULL) "reference" tokens collection
 // 
 // Ret:
-// - RETURNED: OK
+// - COMPLETED__OK: 
+// - COMPLETED__BUT: copy instead of simple import 
 // - -1: unexpected problem; anomaly is raised...
-static inline int m_GTokenAssign(g_G_TOKEN_STUFF stuff, int tokenId, 
+static inline int m_GTokenAssign(g_G_TOKEN_STUFF stuff, const char*p_litteral, int tokenId, 
   g_G_TOKENS_HANDLE n_gTokensHandle) {
   m_CHECK_G_STRINGS_COLLECTION_CONVEYANCE(n_gTokensHandle,FIRST_ELEMENT0,
     VALUED_STRING__G_STRING_CONVEYANCE)
+  int completed = g_GTokenImport(stuff, m_PString(p_litteral));
+  switch (completed) {
+  case COMPLETED__OK:
+  break; case COMPLETED__BUT:
+  break; default: m_TRACK() } // switch
+  
   stuff->acolyt.cen_value = tokenId;
   return RETURNED;
 } // m_GTokenAssign
@@ -57,9 +67,6 @@ static inline int ml_GTokensCreateInstance(g_G_TOKENS_HANDLE *azh_handle, int ex
 // #SEE GStringsFetch @ c-ansi/g-string.h <g-token>
 #define g_GTokensFetch GStringsFetch
 
-
-// #SEE GStringImport @ c-ansi/g-string.h <g-token>
-#define g_GTokenImport GStringImport
 
 
 //#define m_G_TOKENS_IMPORT(/*g_G_TOKENS_HANDLE*/ handle,\

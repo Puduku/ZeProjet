@@ -12,10 +12,8 @@ int l_GTokensImport(g_G_TOKENS_HANDLE handle, const struct TOKEN_DEFINITION* sp_
   int entry = UNDEFINED;
   for (; i < tokensNumber; i++) {
     m_TRACK_IF((entry = g_GTokensFetch(handle,-1,&gTokenStuff)) < 0);
-    switch (g_GTokenImport(gTokenStuff, m_PString(sp_tokenDefinitions[i].p_litteral))) {
+    switch (m_GTokenAssign(gTokenStuff,  sp_tokenDefinitions[i].p_litteral, sp_tokenDefinitions[i].tokenId, handle)) {
     case COMPLETED__OK: 
-      m_TRACK_IF(m_GTokenAssign(gTokenStuff, sp_tokenDefinitions[i].tokenId, handle) !=
-        RETURNED)
     break; case COMPLETED__BUT: 
       m_RAISE(ANOMALY__NON_PURE_LOGICAL_G_STRING)
     break; default: 
