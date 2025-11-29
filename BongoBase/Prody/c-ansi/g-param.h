@@ -19,6 +19,12 @@ typedef G_STRINGS_HANDLE g_G_PARAMS_HANDLE;
 typedef g_G_STRING_SET_STUFF g_G_PARAM_STUFF;
 
 
+// #SEE GStringCopy # c-ansi/g-string.h <g-param-name>
+static inline int m_GParamNameCopy(g_G_PARAM_STUFF stuff, int n_offset, struct P_STRING pString) {
+  return GStringCopy((stuff)+G_PARAM_NAME_ELEMENT,n_offset, pString);
+} // m_GParamNameCopy
+
+
 // Assign actual acolyt token id to 'g-param's name'
 // 
 // Passed
@@ -30,14 +36,8 @@ typedef g_G_STRING_SET_STUFF g_G_PARAM_STUFF;
 // Ret:
 // - RETURNED: OK
 // - -1: unexpected problem; anomaly is raised...
-static inline int m_GParamAssignName(g_G_PARAM_STUFF stuff, struct P_STRING *nap_name, int tokenId, 
-  g_G_PARAMS_HANDLE n_gParamsHandle) {
-  m_CHECK_G_STRINGS_COLLECTION_CONVEYANCE(n_gParamsHandle,G_PARAM_NAME_ELEMENT,
-    VALUED_STRING__G_STRING_CONVEYANCE)
-  if (nap_name != NULL) m_TRACK_IF(GStringCopy((stuff)+G_PARAM_NAME_ELEMENT,0, *nap_name) < 0)
-  stuff[G_PARAM_NAME_ELEMENT].acolyt.cen_value = tokenId;
-  return RETURNED;
-} // m_GParamAssignName
+int GParamNameAssign(g_G_PARAM_STUFF stuff, struct P_STRING *nap_pString, int tokenId,
+  g_G_PARAMS_HANDLE n_gParamsHandle) ;
 
 // Assign actual acolyt integer value to 'g-param's value'
 // 

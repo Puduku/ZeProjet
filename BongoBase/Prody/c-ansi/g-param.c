@@ -5,6 +5,16 @@
 
 #include "c-ansi/g-param.h" 
 
+// Public function: see .h
+int GParamNameAssign(g_G_PARAM_STUFF stuff, struct P_STRING *nap_pString, int tokenId, 
+  g_G_PARAMS_HANDLE n_gParamsHandle) {
+  m_DIGGY_BOLLARD()
+  m_CHECK_G_STRINGS_COLLECTION_CONVEYANCE(n_gParamsHandle,G_PARAM_NAME_ELEMENT,
+    VALUED_STRING__G_STRING_CONVEYANCE)
+  if (nap_pString != NULL) m_TRACK_IF(GStringCopy((stuff)+G_PARAM_NAME_ELEMENT,0, *nap_pString) < 0)
+  stuff[G_PARAM_NAME_ELEMENT].acolyt.cen_value = tokenId;
+  m_DIGGY_RETURN(RETURNED);
+} // GParamNameAssign
 
 // Public function: see .h
 int l_GParamsCreateInstance(g_G_PARAMS_HANDLE *azh_handle,int expectedItemsNumber) {

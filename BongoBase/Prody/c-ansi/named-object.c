@@ -49,13 +49,12 @@ int NamedObjectsGetCount(NAMED_OBJECTS_HANDLE cp_handle, g_NAMED_OBJECT_STUFF *n
 // - -1: unexpected problem; anomaly is raised...
 static inline int m_NamedObjectAssign(g_NAMED_OBJECT_STUFF stuff, struct P_STRING name, void *nhr_handle,
   G_STRINGS_HANDLE n_gStringsHandle) {
-  m_DIGGY_BOLLARD_S()
   m_CHECK_G_STRINGS_COLLECTION_CONVEYANCE(n_gStringsHandle,FIRST_ELEMENT0,
     NAMED_OBJECT__G_STRING_CONVEYANCE)
   m_TRACK_IF(GStringCopy(stuff,0,name) < 0) 
   stuff->acolyt.cnhr_handle = NULL;
   stuff->acolyt.cnhr_handle = nhr_handle;
-  m_DIGGY_RETURN(RETURNED)
+  return RETURNED;
 } // m_NamedObjectAssign 
 
 

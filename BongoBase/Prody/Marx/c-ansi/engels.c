@@ -262,7 +262,7 @@ int EngelsAddPivotModels(ENGELS_HANDLE handle, g_G_PARAMS_HANDLE p_configHandle)
   int i = 0; for (; i < count; i++) {
     m_TRACK_IF(g_GParamsFetch(p_configHandle, i, &t_pivotModelConfigStuff) != i)
     switch (completed = NamedObjectsAddNamedObject(handle->h_pivotModelsHandle,
-      t_pivotModelConfigStuff[G_PARAM_NAME_ELEMENT].cv_pString,(void *)(GENERIC_INTEGER)-1,
+      t_pivotModelConfigStuff[G_PARAM_NAME_ELEMENT].cv_pString,NULL,(void *)(GENERIC_INTEGER)-1,
       &t_namedPivotModelStuff)) {
     case COMPLETED__OK:
     break; case COMPLETED__BUT:
@@ -286,7 +286,7 @@ int EngelsAddTractModel(ENGELS_HANDLE handle, struct P_STRING name,
   g_NAMED_OBJECT_STUFF t_namedTractModelStuff = (g_NAMED_OBJECT_STUFF)UNDEFINED;
   int expectedTractOrPivotModelsNumber = UNDEFINED;
 
-  switch (NamedObjectsAddNamedObject(handle->h_tractModelsHandle,name,(void*)(GENERIC_INTEGER)10,
+  switch (NamedObjectsAddNamedObject(handle->h_tractModelsHandle,name,NULL,(void*)(GENERIC_INTEGER)10,
     &t_namedTractModelStuff)) {
   case COMPLETED__OK:
   break; case COMPLETED__BUT:

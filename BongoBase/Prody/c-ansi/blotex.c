@@ -477,10 +477,10 @@ m_DIGGY_VAR_P_STRING(ap_blotvarReference->c_select.c_name)
         if (cb_lValue) { 
           m_ASSERT(*ant_blotvarStuff != NULL)
           if (ap_blotvarReference->blotvarReference == NAME__BLOTVAR_REFERENCE)
-            m_TRACK_IF(GStringCopy((*ant_blotvarStuff)+G_PARAM_NAME_ELEMENT,0,
-              ap_blotvarReference->c_select.c_name) < 0)
+            m_TRACK_IF(m_GParamNameCopy(*ant_blotvarStuff,0,ap_blotvarReference->c_select.c_name)
+              < 0)
           else { // TOKEN_ID__BLOTVAR_REFERENCE 
-            m_TRACK_IF(m_GParamAssignName(*ant_blotvarStuff,(struct P_STRING*)NULL,
+            m_TRACK_IF(GParamNameAssign(*ant_blotvarStuff,(struct P_STRING*)NULL,
               ap_blotvarReference->c_select.c_tokenId, ap_blotvarReference->blotregHandle)
               < 0)
           } // if

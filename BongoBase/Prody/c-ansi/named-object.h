@@ -49,7 +49,7 @@ int NamedObjectsGetCount(NAMED_OBJECTS_HANDLE cp_handle,
 // - namedObjectName:
 // - nhr_namedObjectHandle: (when != NULL) new named object instance to add in the collection; its
 //   handle
-// - *ccr_arguments: (only significant if new named object instnce is not provided) arguments for
+// - *ccr_arguments: (only significant if new named object instance is not provided) arguments for
 //   named object instance creation function  (when significant)
 // 
 // Changed:
