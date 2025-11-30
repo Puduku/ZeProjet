@@ -396,15 +396,15 @@ int GreenCollectionIndexRequestV(GREEN_COLLECTION_HANDLE cp_handle,
 
 
 // May or may be NOT index-based selection:
-struct G_REQUEST_CRITERIUM {
+struct G_REQUEST_CRITERION {
   int indexLabel;
   unsigned int indexSeekFlags;
   const void *cfpr_keys; // Only significant with Key-based seek flag(s)
   unsigned int criteriaOpFlags;
 } ;
 
-// #REF m_GRequestCriterium <keys>
-// Establish request criterium
+// #REF m_GRequestCriterion <keys>
+// Establish request criterion
 //
 // Passed:
 // - indexLabel:
@@ -413,21 +413,21 @@ struct G_REQUEST_CRITERIUM {
 // - criteriaOpFlags:
 //
 // Returned:
-// - request criterium
+// - request criterion
 // TODO: is the function really USEFUL????
-static inline struct G_REQUEST_CRITERIUM m_GRequestCriterium(int indexLabel,
+static inline struct G_REQUEST_CRITERION m_GRequestCriterion(int indexLabel,
    unsigned int indexSeekFlags, const void* cfpr_keys, unsigned int criteriaOpFlags) {
-  struct G_REQUEST_CRITERIUM requestCriterium = { .indexLabel = indexLabel,
+  struct G_REQUEST_CRITERION requestCriterion = { .indexLabel = indexLabel,
     .indexSeekFlags = indexSeekFlags, .cfpr_keys = cfpr_keys, .criteriaOpFlags = criteriaOpFlags };
-  return requestCriterium;
- } // m_GRequestCriterium
+  return requestCriterion;
+ } // m_GRequestCriterion
 
 
 
 //  #SEE GreenCollectionIndexRequest <greenItem> <keys>
 int GreenCollectionIndexRequestR(GREEN_COLLECTION_HANDLE cp_handle,
   INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaNumber,
-  const struct G_REQUEST_CRITERIUM *sp_criteria) ;
+  const struct G_REQUEST_CRITERION *sp_criteria) ;
 
 
 

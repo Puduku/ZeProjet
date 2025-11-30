@@ -405,16 +405,16 @@ int GStringsIndexRequest(G_STRINGS_HANDLE cp_handle,
   int indexLabel1, unsigned int indexSeekFlags1, const struct G_KEY *cfps_keys1, ...);
 
 
-// #SEE m_GRequestCriterium  
-static inline struct G_REQUEST_CRITERIUM m_GRequestCriterium_GKeys(int indexLabel,
+// #SEE m_GRequestCriterion  
+static inline struct G_REQUEST_CRITERION m_GRequestCriterion_GKeys(int indexLabel,
   unsigned int indexSeekFlags, const struct G_KEY* cfps_keys, unsigned int u_criteriaOpFlags) {
-  return m_GRequestCriterium(indexLabel,indexSeekFlags, cfps_keys, u_criteriaOpFlags);
-} // m_GRequestCriterium_GKeys
+  return m_GRequestCriterion(indexLabel,indexSeekFlags, cfps_keys, u_criteriaOpFlags);
+} // m_GRequestCriterion_GKeys
 
 // #SEE GStringsIndexRequest <gStringSet>
 int GStringsIndexRequestR(G_STRINGS_HANDLE cp_handle,
   INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaNumber,
-  const struct G_REQUEST_CRITERIUM *sp_criteria) ;
+  const struct G_REQUEST_CRITERION *sp_criteria) ;
 
 
 // #REF GStringsIndexFetch <gStringSet>
@@ -423,7 +423,7 @@ int GStringsIndexFetch(G_STRINGS_HANDLE cp_handle,
   INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, unsigned int indexFetchFlags,
   g_G_STRING_SET_STUFF *acvnt_gStringSetStuff, int *nacvn_entry);
 
-// Simple fetch (one single criterium)
+// Simple fetch (one single criterion)
 // #SEE GStringsIndexRequest <gStringSet>
 // #SEE GStringsIndexFetch <gStringSet>
 static inline int m_GStringsIndexSingleFetch(G_STRINGS_HANDLE cp_handle, 

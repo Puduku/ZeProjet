@@ -375,7 +375,7 @@ static inline int ml_BlotexlibExecutorParseAndComputeBlottabRequest(BLOTEXLIB_EX
   m_PREPARE_ABANDON(a_sequence, "<blottab request>") 
 
   int criteriaNumber = 0;
-  struct G_REQUEST_CRITERIUM criteria5[5] ;  
+  struct G_REQUEST_CRITERION criteria5[5] ;  
   struct P_STRING lexeme = UNDEFINED_P_STRING;
   struct P_STRING subSequence = UNDEFINED_P_STRING; 
 
@@ -406,7 +406,7 @@ m_DIGGY_VAR_P_STRING(subSequence)
     PParsePassSingleChar(&subSequence,NULL,'*',&lexeme);
 m_DIGGY_VAR_P_STRING(lexeme)
     if (!b_EMPTY_P_STRING(lexeme)) n_indexSeekFlags = INDEX_SEEK_FLAGS__ANY;
-    else {  // select with actual criterium
+    else {  // select with actual criterion
 m_DIGGY_VAR_P_STRING(lexeme)
       m_TRACK_IF(ParseRequestCompOp(&subSequence,asValue != AS__VALUE_INT,
         &n_indexSeekFlags) != RETURNED)
@@ -437,7 +437,7 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(n_indexSeekFlags)
 m_DIGGY_VAR_P_STRING(subSequence)
 
     m_ASSERT(criteriaNumber < 5)
-    criteria5[criteriaNumber++] = m_GRequestCriterium_GKeys(tableIndexLabel,
+    criteria5[criteriaNumber++] = m_GRequestCriterion_GKeys(tableIndexLabel,
       n_indexSeekFlags,&gKey, criteriaOpFlags);
     m_PParsePassSpaces(&subSequence,NULL);
   } while (!b_EMPTY_P_STRING(subSequence)) ; 

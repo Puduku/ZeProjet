@@ -578,7 +578,7 @@ static inline int m_BlotexlibExecutorParseAndComputeBlotregRequest(BLOTEXLIB_EXE
   m_PREPARE_ABANDON(a_sequence, "<blotreg request>") 
 
   int criteriaNumber = 0;
-  struct G_REQUEST_CRITERIUM criteria5[5] ;  
+  struct G_REQUEST_CRITERION criteria5[5] ;  
   struct P_STRING lexeme;
   struct P_STRING subSequence; 
 
@@ -612,7 +612,7 @@ m_RAISE(ANOMALY__NOT_AVAILABLE)
     int n_indexSeekFlags = UNDEFINED;
     PParsePassSingleChar(&subSequence,NULL,'*',&lexeme);
     if (!b_EMPTY_P_STRING(lexeme)) n_indexSeekFlags = INDEX_SEEK_FLAGS__ANY;
-    else {  // select with actual criterium
+    else {  // select with actual criterion
       m_TRACK_IF(ParseRequestCompOp(&subSequence,as != AS__VALUE_INT,
         &n_indexSeekFlags) != RETURNED)
       if (n_indexSeekFlags < 0) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
@@ -647,7 +647,7 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(n_indexSeekFlags)
     m_TRACK_IF(ParseLogical2Op(&subSequence, &criteriaOpFlags) != RETURNED)
 
     m_ASSERT(criteriaNumber < 5)
-    criteria5[criteriaNumber++] = m_GRequestCriterium_GKeys(blotregIndexLabel,
+    criteria5[criteriaNumber++] = m_GRequestCriterion_GKeys(blotregIndexLabel,
       n_indexSeekFlags,&gKey, criteriaOpFlags);
     m_PParsePassSpaces(&subSequence,NULL);
   } while (!b_EMPTY_P_STRING(subSequence)) ; 

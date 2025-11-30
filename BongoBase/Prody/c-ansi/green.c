@@ -666,7 +666,7 @@ static int GreenIndexesResize (struct GREEN_INDEXES *a_indexes, int newItemsPhys
 
 struct INDEX_ITERATOR {
   int criteriaNumber5 ;
-  struct G_REQUEST_CRITERIUM criteria[5] ;
+  struct G_REQUEST_CRITERION criteria[5] ;
   char b_descending; 
   struct INDEX_SEQUENCE indexSequence;
 };
@@ -676,22 +676,22 @@ struct INDEX_ITERATOR {
 
 // Passed:
 // - m_indexIterator:
-// - m_criterium1:
-#define m_INIT_INDEX_ITERATOR(/*struct INDEX_ITERATOR*/m_indexIterator, /*struct G_REQUEST_CRITERIUM */m_criterium1) {\
+// - m_criterion1:
+#define m_INIT_INDEX_ITERATOR(/*struct INDEX_ITERATOR*/m_indexIterator, /*struct G_REQUEST_CRITERION */m_criterion1) {\
   (m_indexIterator).criteriaNumber5 = 1;\
-  (m_indexIterator).criteria[0] = m_criterium1;\
+  (m_indexIterator).criteria[0] = m_criterion1;\
   (m_indexIterator).b_descending = b_ASCENDING;\
   m_DISABLE_INDEX_SEQUENCE((m_indexIterator).indexSequence)\
 }
 
 // Passed:
 // - m_indexIterator:
-// - m_criterium:
+// - m_criterion:
 #define m_INIT_INDEX_ITERATOR__EXTRAS(/*struct INDEX_ITERATOR*/m_indexIterator,\
-  /*struct G_REQUEST_CRITERIUM */m_criterium) {\
+  /*struct G_REQUEST_CRITERION */m_criterion) {\
   m_ASSERT((m_indexIterator).criteriaNumber5 < 5)\
   int em_i = (m_indexIterator).criteriaNumber5;\
-  (m_indexIterator).criteria[em_i] = m_criterium;\
+  (m_indexIterator).criteria[em_i] = m_criterion;\
   (m_indexIterator).criteriaNumber5 ++;\
 }
 
@@ -758,7 +758,7 @@ static int GreenIndexesSeekEntryEquate(struct GREEN_INDEXES* a_indexes, int inde
   char statuses[CRITERIA_STACK_SIZE]; 
   
 // Re-init criteria handler.
-// 1st criterium op. flags are rectified if needed:
+// 1st criterion op. flags are rectified if needed:
 // - AND op. is set
 // - OR op. is removed
 //
@@ -773,8 +773,8 @@ static int GreenIndexesSeekEntryEquate(struct GREEN_INDEXES* a_indexes, int inde
   m_SET_FLAG_ON(knownCriteriaOpFlags[0], CRITERIA_OP_FLAG__AND)\
   m_SET_FLAG_OFF(knownCriteriaOpFlags[0], CRITERIA_OP_FLAG__OR)\
 
-// Handle equation and then closing brackets for current criterium
-// criterium op. flags are rectified if needed:
+// Handle equation and then closing brackets for current criterion
+// criterion op. flags are rectified if needed:
 // - closing bracket added to ensure AND op. precedence (over OR op.)
 // - missing closing brackets (at the end of the expression) are added 
 // - superfluous closing brackets are ignored
@@ -782,7 +782,7 @@ static int GreenIndexesSeekEntryEquate(struct GREEN_INDEXES* a_indexes, int inde
 // Passed:
 // - a_indexes: indexes global handler
 // - a_indexIterator: contains criteria criteria
-// - m_i: criterium entry 
+// - m_i: criterion entry 
 #define m_CRITERIA_HANDLER_EQUATION_AND_CLOSE_BRACKETS(/*struct GREEN_INDEXES* */a_indexes,\
   /*struct INDEX_ITERATOR* */a_indexIterator, /*int*/m_i) \
 if (m_i == 0) {\
@@ -838,15 +838,15 @@ if (m_i == 0) {\
     a_indexIterator->criteria[m_i].criteriaOpFlags;\
 } 
 
-// Handle open brackets for current criterium
+// Handle open brackets for current criterion
 // Note: in this implementation, opening brackets are indeed handled AFTER handling of closing
 // brackets...
-// criterium op. flags are rectified if needed:
+// criterion op. flags are rectified if needed:
 // - open bracket added to ensure AND op. precedence (over OR op.)
 //
 // Passed:
 // - a_indexIterator: contains criteria criteria
-// - m_i: criterium entry 
+// - m_i: criterion entry 
 #define m_CRITERIA_HANDLER_OPEN_BRACKETS(/*struct INDEX_ITERATOR* */a_indexIterator, /*int*/m_i) {\
   int em_on = m_OpenBracketsNumber(a_indexIterator->criteria[m_i].criteriaOpFlags);\
   if (em_on == 0 && (m_i)+1 < a_indexIterator->criteriaNumber5 && b_FLAG_SET_ON(\
@@ -1189,17 +1189,17 @@ struct INDEX_REQUEST {
  
 // Passed:
 // - m_indexRequest:
-// - m_criterium1:
-#define m_INIT_INDEX_REQUEST(/*struct INDEX_REQUEST*/m_indexRequest,  /*struct G_REQUEST_CRITERIUM */m_criterium1) {\
-  m_INIT_INDEX_ITERATOR((m_indexRequest).iterator, m_criterium1) \
+// - m_criterion1:
+#define m_INIT_INDEX_REQUEST(/*struct INDEX_REQUEST*/m_indexRequest,  /*struct G_REQUEST_CRITERION */m_criterion1) {\
+  m_INIT_INDEX_ITERATOR((m_indexRequest).iterator, m_criterion1) \
   (m_indexRequest).fetch4 = FETCH_4__CHANGE;\
 }
 
 // Passed:
 // - m_indexRequest:
-// - m_criterium:
-#define m_INIT_INDEX_REQUEST__EXTRAS(/*struct INDEX_REQUEST*/m_indexRequest,  /*struct G_REQUEST_CRITERIUM */m_criterium) {\
-  m_INIT_INDEX_ITERATOR__EXTRAS((m_indexRequest).iterator, m_criterium) \
+// - m_criterion:
+#define m_INIT_INDEX_REQUEST__EXTRAS(/*struct INDEX_REQUEST*/m_indexRequest,  /*struct G_REQUEST_CRITERION */m_criterion) {\
+  m_INIT_INDEX_ITERATOR__EXTRAS((m_indexRequest).iterator, m_criterion) \
 }
 
 #define m_HARD_RESET_INDEX_REQUEST(/*struct INDEX_REQUEST*/m_indexRequest, mb_descending,\
@@ -1363,9 +1363,9 @@ int GreenCollectionCreateInstance(GREEN_COLLECTION_HANDLE *azh_handle,  int expe
   m_GREEN_INDEXES_INIT(handle->indexes,GreenCollectionEntryRawCompare,
     GreenCollectionEntryRawEquate, (void *) handle)
   m_GAPS_STACK_INIT(handle->h_gaps,handle->itemsPhysicalNumber)
-  struct G_REQUEST_CRITERIUM defaultCriterium = m_GRequestCriterium(INDEX_LABEL0,ALL_FLAGS_OFF0,
+  struct G_REQUEST_CRITERION defaultCriterion = m_GRequestCriterion(INDEX_LABEL0,ALL_FLAGS_OFF0,
     (void*)UNDEFINED, ALL_FLAGS_OFF0) ;
-  m_INIT_INDEX_REQUEST(handle->internalIndexRequest,defaultCriterium)
+  m_INIT_INDEX_REQUEST(handle->internalIndexRequest,defaultCriterion)
 
   m_MALLOC_ARRAY(handle->h_fetched4ChangeEntries,handle->fetched4ChangeEntriesPhysicalNumber =
     expectedItemsNumber)
@@ -1668,7 +1668,7 @@ int GreenCollectionAddIndex (GREEN_COLLECTION_HANDLE handle, int keysNumber) {
 // Public function; see description in .h
 int GreenCollectionIndexRequestR(GREEN_COLLECTION_HANDLE cp_handle,
   INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaNumber,
-  const struct G_REQUEST_CRITERIUM *sp_criteria) {
+  const struct G_REQUEST_CRITERION *sp_criteria) {
   m_DIGGY_BOLLARD()
   m_ASSERT(criteriaNumber > 0)
   m_ASSERT(sp_criteria->indexSeekFlags != ALL_FLAGS_OFF0) 
@@ -1700,14 +1700,14 @@ int GreenCollectionIndexRequestV(GREEN_COLLECTION_HANDLE cp_handle,
   m_DIGGY_BOLLARD()
 
   m_ASSERT(criteriaNumber > 0)
-  struct G_REQUEST_CRITERIUM s_criteria[criteriaNumber] ;
-  struct G_REQUEST_CRITERIUM *criteriumPtr = s_criteria;
+  struct G_REQUEST_CRITERION s_criteria[criteriaNumber] ;
+  struct G_REQUEST_CRITERION *criterionPtr = s_criteria;
 
   unsigned int criteriaOpFlags = ALL_FLAGS_OFF0;
   if (criteriaNumber > 1) criteriaOpFlags = va_arg(extraCriteria,unsigned int);
-  *criteriumPtr = m_GRequestCriterium(indexLabel1,indexSeekFlags1,cfpr_keys1,criteriaOpFlags);
+  *criterionPtr = m_GRequestCriterion(indexLabel1,indexSeekFlags1,cfpr_keys1,criteriaOpFlags);
 
-  int i = 1; for (; i < criteriaNumber;  i++) *(++criteriumPtr) = m_GRequestCriterium(va_arg(
+  int i = 1; for (; i < criteriaNumber;  i++) *(++criterionPtr) = m_GRequestCriterion(va_arg(
     extraCriteria,int), va_arg(extraCriteria,unsigned int),va_arg(extraCriteria,void *),
     va_arg(extraCriteria,unsigned int));
 
