@@ -52,11 +52,8 @@ static inline int ml_GTokensCreateInstance(g_G_TOKENS_HANDLE *azh_handle, int ex
   m_DIGGY_RETURN(RETURNED)
 } // ml_GTokensCreateInstance
 
-
 // #SEE GStringsFetch @ c-ansi/g-string.h <g-token>
 #define g_GTokensFetch GStringsFetch
-
-
 
 //#define m_G_TOKENS_IMPORT(/*g_G_TOKENS_HANDLE*/ handle,\
 // Import g-tokens in one shot...

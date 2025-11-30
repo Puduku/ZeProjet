@@ -7,6 +7,7 @@
 
 #include "c-ansi/g-string.h" 
 #include "c-ansi/testy-diggy.h"
+#include <stdarg.h>
 
 struct NAMED_OBJECTS ;
 typedef struct NAMED_OBJECTS* NAMED_OBJECTS_HANDLE ;
@@ -25,8 +26,8 @@ typedef G_STRING_STUFF g_NAMED_OBJECT_STUFF ;
 // Returned:
 // - RETURNED: done
 // - -1: unexpected problem ; anomaly is raised
-typedef int (*NAMED_OBJECT_CREATE_INSTANCE_FUNCTION)(void **azhr_handle, struct P_STRING name, void *r_arguments);
-
+//typedef int (*NAMED_OBJECT_CREATE_INSTANCE_FUNCTION)(void **azhr_handle, struct P_STRING name, void *r_arguments);
+typedef int (*NAMED_OBJECT_CREATE_INSTANCE_FUNCTION)(void **azhr_handle, struct P_STRING name, va_list arguments);
 
 // => Create collection of NAMED_OBJECT__G_STRING_CONVEYANCE g-strings 
 // => The function also adds plain lexical index (INDEX_LABEL0) 
@@ -61,7 +62,8 @@ int NamedObjectsGetCount(NAMED_OBJECTS_HANDLE cp_handle,
 // - COMPLETED__BUT: named object with same name already exists in collection
 // - -1: unexpected problem; anomaly is raised...
 int NamedObjectsAddNamedObject(NAMED_OBJECTS_HANDLE handle, struct P_STRING namedObjectName,
-  void *nhr_namedObjectHandle, void *ccr_arguments, g_NAMED_OBJECT_STUFF *at_namedObjectStuff); 
+//  void *nhr_namedObjectHandle, void *ccr_arguments, g_NAMED_OBJECT_STUFF *at_namedObjectStuff); 
+  void *nhr_namedObjectHandle, g_NAMED_OBJECT_STUFF *at_namedObjectStuff, ...); 
   
 
 // Get named object of colllection...

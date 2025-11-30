@@ -48,13 +48,13 @@ struct PIVOT_MODEL {
 typedef struct PIVOT_MODEL *PIVOT_MODEL_HANDLE;
 
 // NAMED_OBJECT_CREATE_INSTANCE_FUNCTION
-static int PivotModelCreateInstance(void **azhr_handle, struct P_STRING name, void *r_arguments){
+static int PivotModelCreateInstance(void **azhr_handle, struct P_STRING name, va_list arguments){
   m_DIGGY_BOLLARD_S()
   PIVOT_MODEL_HANDLE *azh_handle = (PIVOT_MODEL_HANDLE*) azhr_handle;
-  int n_minSize = (int)(GENERIC_INTEGER)r_arguments;
-  int n_maxSize = UNDEFINED;
-  int rawMatterFlags = UNDEFINED;
-  int refinedMatter = UNDEFINED;
+  int n_minSize = va_arg(arguments,int);
+  int n_maxSize = va_arg(arguments,int);
+  int rawMatterFlags = va_arg(arguments,int);
+  int refinedMatter = va_arg(arguments,int);
   m_MALLOC_INSTANCE(*azh_handle)
   PIVOT_MODEL_HANDLE handle = *azh_handle;
   m_ASSIGN_MAGIC_FIELD(PIVOT_MODEL_HANDLE,handle)
@@ -130,10 +130,10 @@ struct TRACT_MODEL {
 typedef struct TRACT_MODEL *TRACT_MODEL_HANDLE;
 
 // NAMED_OBJECT_CREATE_INSTANCE_FUNCTION
-static int TractModelCreateInstance(void **azhr_handle, struct P_STRING name, void *r_arguments){
+static int TractModelCreateInstance(void **azhr_handle, struct P_STRING name, va_list arguments){
   m_DIGGY_BOLLARD_S()
   TRACT_MODEL_HANDLE *azh_handle = (TRACT_MODEL_HANDLE*) azhr_handle;
-  int expectedTractOrPivotModelsNumber = (int)(GENERIC_INTEGER)r_arguments;
+  int expectedTractOrPivotModelsNumber = va_arg(arguments,int);
   m_MALLOC_INSTANCE(*azh_handle)
   TRACT_MODEL_HANDLE handle = *azh_handle;
   m_ASSIGN_MAGIC_FIELD(TRACT_MODEL_HANDLE,handle)
@@ -191,10 +191,10 @@ struct PAMPHLET_MODEL {
 typedef struct PAMPHLET_MODEL *PAMPHLET_MODEL_HANDLE;
 
 // NAMED_OBJECT_CREATE_INSTANCE_FUNCTION
-static int PamphletModelCreateInstance(void **azhr_handle, struct P_STRING name, void *r_arguments){
+static int PamphletModelCreateInstance(void **azhr_handle, struct P_STRING name, va_list arguments){
   m_DIGGY_BOLLARD_S()
   PAMPHLET_MODEL_HANDLE *azh_handle = (PAMPHLET_MODEL_HANDLE*) azhr_handle;
-  int expectedTractOrPivotModelsNumber = (int)(GENERIC_INTEGER)r_arguments;
+  int expectedTractOrPivotModelsNumber = va_arg(arguments,int);
   m_MALLOC_INSTANCE(*azh_handle)
   PAMPHLET_MODEL_HANDLE handle = *azh_handle;
   m_ASSIGN_MAGIC_FIELD(PAMPHLET_MODEL_HANDLE,handle)
@@ -255,15 +255,15 @@ int EngelsAddPivotModels(ENGELS_HANDLE handle, g_G_PARAMS_HANDLE p_configHandle)
 
   g_G_PARAM_STUFF t_pivotModelConfigStuff = (g_G_PARAM_STUFF)UNDEFINED;
   g_NAMED_OBJECT_STUFF t_namedPivotModelStuff = (g_NAMED_OBJECT_STUFF)UNDEFINED;
-  int n_minSize = UNDEFINED;
-  int n_maxSize = UNDEFINED;
-  int rawMatterFlags = UNDEFINED;
-  int refinedMatter = UNDEFINED;
   int i = 0; for (; i < count; i++) {
+    int n_minSize = 0;
+    int n_maxSize = -1;
+    int rawMatterFlags = 0;
+    int refinedMatter = 0;
     m_TRACK_IF(g_GParamsFetch(p_configHandle, i, &t_pivotModelConfigStuff) != i)
     switch (completed = NamedObjectsAddNamedObject(handle->h_pivotModelsHandle,
-      t_pivotModelConfigStuff[G_PARAM_NAME_ELEMENT].cv_pString,NULL,(void *)(GENERIC_INTEGER)-1,
-      &t_namedPivotModelStuff)) {
+      t_pivotModelConfigStuff[G_PARAM_NAME_ELEMENT].cv_pString,NULL,&t_namedPivotModelStuff,
+      n_minSize,n_maxSize,rawMatterFlags,refinedMatter)) {
     case COMPLETED__OK:
     break; case COMPLETED__BUT:
     break; default: m_TRACK() } // switch 
@@ -284,10 +284,10 @@ int EngelsAddTractModel(ENGELS_HANDLE handle, struct P_STRING name,
 
   g_G_PARAM_STUFF t_tractModelConfigStuff = (g_G_PARAM_STUFF)UNDEFINED;
   g_NAMED_OBJECT_STUFF t_namedTractModelStuff = (g_NAMED_OBJECT_STUFF)UNDEFINED;
-  int expectedTractOrPivotModelsNumber = UNDEFINED;
 
-  switch (NamedObjectsAddNamedObject(handle->h_tractModelsHandle,name,NULL,(void*)(GENERIC_INTEGER)10,
-    &t_namedTractModelStuff)) {
+  int expectedTractOrPivotModelsNumber = 10;
+  switch (NamedObjectsAddNamedObject(handle->h_tractModelsHandle,name,NULL,
+    &t_namedTractModelStuff,expectedTractOrPivotModelsNumber)) {
   case COMPLETED__OK:
   break; case COMPLETED__BUT:
   break; default: m_TRACK() } // switch 

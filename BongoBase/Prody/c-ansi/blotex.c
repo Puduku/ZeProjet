@@ -120,7 +120,7 @@ struct BLOTEXLIB_EXECUTOR {
 #define STR_VALUE__BLOTREG_INDEX_LABEL 3
 
 // NAMED_OBJECT_CREATE_INSTANCE_FUNCTION
-static int BlotregCreateInstance(void **azhr_handle, struct P_STRING name, void *r_arguments){
+static int BlotregCreateInstance(void **azhr_handle, struct P_STRING name, va_list arguments){
   m_DIGGY_BOLLARD_S()
   g_G_PARAMS_HANDLE* azh_handle = (g_G_PARAMS_HANDLE*) azhr_handle;
   m_TRACK_IF(l_GParamsCreateInstance(azh_handle,BATEAU__EXPECTED_ITEMS_NUMBER) !=
@@ -268,7 +268,7 @@ m_DIGGY_VAR_P_STRING(blotregName)
   g_NAMED_OBJECT_STUFF t_namedBlotregStuff = (g_NAMED_OBJECT_STUFF)UNDEFINED; 
 
   switch (completed = NamedObjectsAddNamedObject(handle->h_blotregsHandle,blotregName,
-    (void*)NULL, (void*)UNDEFINED,&t_namedBlotregStuff)) {
+    (void*)NULL, &t_namedBlotregStuff,UNDEFINED/*TODO: ag virer ?*/)) {
   case COMPLETED__OK:
   break; case COMPLETED__BUT:
   break; default: m_TRACK() } // switch 
@@ -313,8 +313,8 @@ m_DIGGY_VAR_P_STRING(blottabName)
     handle->blottabExecutorImplementations[blottabLabel].h_blottabsHandle;
 m_DIGGY_VAR_P(blottabsHandle)
   g_NAMED_OBJECT_STUFF t_namedBlottabStuff = (g_NAMED_OBJECT_STUFF)UNDEFINED;
-  switch (NamedObjectsAddNamedObject(blottabsHandle,blottabName,hr_blottabHandle,(void*)UNDEFINED,
-    &t_namedBlottabStuff)) {
+  switch (NamedObjectsAddNamedObject(blottabsHandle,blottabName,hr_blottabHandle,
+    &t_namedBlottabStuff,UNDEFINED/*TODO: ag virer???*/)) {
   case COMPLETED__OK:
   break; case COMPLETED__BUT:
     m_RAISE(ANOMALY__UNEXPECTED_CASE)

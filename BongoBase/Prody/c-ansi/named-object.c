@@ -60,7 +60,7 @@ static inline int m_NamedObjectAssign(g_NAMED_OBJECT_STUFF stuff, struct P_STRIN
 
 // Public function: see .h
 int NamedObjectsAddNamedObject(NAMED_OBJECTS_HANDLE handle, struct P_STRING namedObjectName, 
-  void *nhr_namedObjectHandle, void *ccr_arguments, g_NAMED_OBJECT_STUFF *at_namedObjectStuff){ 
+  void *nhr_namedObjectHandle, /*void* ccr_arguments,*/ g_NAMED_OBJECT_STUFF *at_namedObjectStuff, ...){ 
   m_DIGGY_BOLLARD()
   int completed = COMPLETED__OK; // a priori
   struct G_KEY gKey = m_GKey_PString(namedObjectName);
@@ -69,9 +69,13 @@ int NamedObjectsAddNamedObject(NAMED_OBJECTS_HANDLE handle, struct P_STRING name
   case RESULT__FOUND:
     completed = COMPLETED__BUT;
   break; case RESULT__NOT_FOUND:
-    if (nhr_namedObjectHandle == NULL && handle->n_namedObjectCreateInstanceFunction != NULL)
-      m_TRACK_IF(handle->n_namedObjectCreateInstanceFunction(&nhr_namedObjectHandle,namedObjectName,
-      ccr_arguments) != RETURNED)
+    { va_list arguments;
+      va_start(arguments,at_namedObjectStuff);
+      if (nhr_namedObjectHandle == NULL && handle->n_namedObjectCreateInstanceFunction != NULL)
+        m_TRACK_IF(handle->n_namedObjectCreateInstanceFunction(&nhr_namedObjectHandle,namedObjectName,
+        arguments) != RETURNED)
+      va_end(arguments);
+    } // arguments
     m_TRACK_IF(m_NamedObjectAssign(*at_namedObjectStuff,namedObjectName,nhr_namedObjectHandle,
       handle->h_gStringsHandle) != RETURNED)
   break; default: m_TRACK() } // switch
