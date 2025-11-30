@@ -48,21 +48,17 @@ struct PIVOT_MODEL {
 typedef struct PIVOT_MODEL *PIVOT_MODEL_HANDLE;
 
 // NAMED_OBJECT_CREATE_INSTANCE_FUNCTION
-static int PivotModelCreateInstance(void **azhr_handle, struct P_STRING name, va_list arguments){
+static int PivotModelCreateInstance(void **azhr_handle, struct P_STRING f_name, va_list arguments){
   m_DIGGY_BOLLARD_S()
   PIVOT_MODEL_HANDLE *azh_handle = (PIVOT_MODEL_HANDLE*) azhr_handle;
-  int n_minSize = va_arg(arguments,int);
-  int n_maxSize = va_arg(arguments,int);
-  int rawMatterFlags = va_arg(arguments,int);
-  int refinedMatter = va_arg(arguments,int);
   m_MALLOC_INSTANCE(*azh_handle)
   PIVOT_MODEL_HANDLE handle = *azh_handle;
   m_ASSIGN_MAGIC_FIELD(PIVOT_MODEL_HANDLE,handle)
-  handle->name = name;
-  handle->n_minSize = n_minSize;
-  handle->n_maxSize = n_maxSize;
-  handle->rawMatterFlags = rawMatterFlags;
-  handle->refinedMatter = refinedMatter;
+  handle->name = f_name;
+  handle->n_minSize = va_arg(arguments,int);
+  handle->n_maxSize = va_arg(arguments,int);
+  handle->rawMatterFlags = va_arg(arguments,int);
+  handle->refinedMatter = va_arg(arguments,int);
   m_DIGGY_RETURN(RETURNED)
 } // PivotModelCreateInstance
 
@@ -130,14 +126,14 @@ struct TRACT_MODEL {
 typedef struct TRACT_MODEL *TRACT_MODEL_HANDLE;
 
 // NAMED_OBJECT_CREATE_INSTANCE_FUNCTION
-static int TractModelCreateInstance(void **azhr_handle, struct P_STRING name, va_list arguments){
+static int TractModelCreateInstance(void **azhr_handle, struct P_STRING f_name, va_list arguments){
   m_DIGGY_BOLLARD_S()
   TRACT_MODEL_HANDLE *azh_handle = (TRACT_MODEL_HANDLE*) azhr_handle;
   int expectedTractOrPivotModelsNumber = va_arg(arguments,int);
   m_MALLOC_INSTANCE(*azh_handle)
   TRACT_MODEL_HANDLE handle = *azh_handle;
   m_ASSIGN_MAGIC_FIELD(TRACT_MODEL_HANDLE,handle)
-  handle->name = name;
+  handle->name = f_name;
   m_TRACK_IF(GreenCollectionCreateInstance(&handle->h_tractOrPivotModelsHandle,
     expectedTractOrPivotModelsNumber, sizeof(struct TRACT_OR_PIVOT_MODEL),
       (GREEN_HANDLER__DISENGAGE_FUNCTION)NULL, (GREEN_HANDLER__COMPARE_FUNCTION)NULL,
@@ -191,14 +187,14 @@ struct PAMPHLET_MODEL {
 typedef struct PAMPHLET_MODEL *PAMPHLET_MODEL_HANDLE;
 
 // NAMED_OBJECT_CREATE_INSTANCE_FUNCTION
-static int PamphletModelCreateInstance(void **azhr_handle, struct P_STRING name, va_list arguments){
+static int PamphletModelCreateInstance(void **azhr_handle, struct P_STRING f_name, va_list arguments){
   m_DIGGY_BOLLARD_S()
   PAMPHLET_MODEL_HANDLE *azh_handle = (PAMPHLET_MODEL_HANDLE*) azhr_handle;
   int expectedTractOrPivotModelsNumber = va_arg(arguments,int);
   m_MALLOC_INSTANCE(*azh_handle)
   PAMPHLET_MODEL_HANDLE handle = *azh_handle;
   m_ASSIGN_MAGIC_FIELD(PAMPHLET_MODEL_HANDLE,handle)
-  handle->name = name;
+  handle->name = f_name;
   m_TRACK_IF(GreenCollectionCreateInstance(&handle->h_tractOrPivotModelsHandle,
     expectedTractOrPivotModelsNumber, sizeof(struct TRACT_OR_PIVOT_MODEL),
       (GREEN_HANDLER__DISENGAGE_FUNCTION)NULL, (GREEN_HANDLER__COMPARE_FUNCTION)NULL,

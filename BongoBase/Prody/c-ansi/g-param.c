@@ -16,6 +16,14 @@ int GParamNameAssign(g_G_PARAM_STUFF stuff, struct P_STRING *nap_pString, int to
   m_DIGGY_RETURN(RETURNED);
 } // GParamNameAssign
 
+int GParamValueAssign(g_G_PARAM_STUFF stuff, GENERIC_INTEGER en_value,                
+  g_G_PARAMS_HANDLE n_gParamsHandle) {
+  m_CHECK_G_STRINGS_COLLECTION_CONVEYANCE(n_gParamsHandle,G_PARAM_VALUE_ELEMENT,
+    VALUED_STRING__G_STRING_CONVEYANCE)
+  stuff[G_PARAM_VALUE_ELEMENT].acolyt.cen_value = en_value;
+  return RETURNED;
+} // GParamValueAssign
+
 // Public function: see .h
 int l_GParamsCreateInstance(g_G_PARAMS_HANDLE *azh_handle,int expectedItemsNumber) {
   m_DIGGY_BOLLARD()

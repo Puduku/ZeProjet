@@ -63,14 +63,14 @@ int GStringCopy(G_STRING_STUFF stuff, int n_offset, struct P_STRING pString) {
 } // GStringCopy
 
 // Public function : see .h
-int GStringImport(G_STRING_STUFF stuff, struct P_STRING f_pString) {
+int GStringImport(G_STRING_STUFF stuff, struct P_STRING cf_pString) {
   m_DIGGY_BOLLARD()
   
   if (stuff->nhi_string == NULL) {
-    stuff->cv_pString = f_pString;
+    stuff->cv_pString = cf_pString;
     m_DIGGY_RETURN(COMPLETED__OK)
   } // if
-  int ret = GStringCopy(stuff,0,f_pString);
+  int ret = GStringCopy(stuff,0,cf_pString);
   m_TRACK_IF(ret < 0) 
   m_DIGGY_RETURN(COMPLETED__BUT)
 } // GStringImport

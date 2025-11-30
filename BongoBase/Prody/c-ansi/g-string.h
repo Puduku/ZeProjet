@@ -81,11 +81,10 @@ static inline int m_GStringGCopy(G_STRING_STUFF stuff, int n_offset, G_STRING_ST
 // Import "logically" a string portion in a g-string ; the string portion is not physically
 // copied if g-string is purely "logical". 
 // copy.
-// TODO: edviter appel ag vraie fonction si la g-string est "purement logique"...
 // 
 // Passed:
 // - stuff:
-// - f_pString:
+// - cf_pString:
 // 
 // Changed:
 // - stuff: remains pure "logical" if possible
@@ -95,7 +94,7 @@ static inline int m_GStringGCopy(G_STRING_STUFF stuff, int n_offset, G_STRING_ST
 // - COMPLETED__BUT: imported, but "physical" copy was needed ; if it's not normal, don't
 //   hesitate to raise ANOMALY__NON_PURE_LOGICAL_G_STRING ...
 // - -1: unexpected problem
-int GStringImport(G_STRING_STUFF stuff, struct P_STRING f_pString);
+int GStringImport(G_STRING_STUFF stuff, struct P_STRING cf_pString);
 
 
 // See GStringImport() above...

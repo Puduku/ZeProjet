@@ -14,7 +14,7 @@ const struct TOKEN_DEFINITION p_commonMimeTypes[] = {
 
 // Public function: see .h 
 int l_MarcelCreateInstance(g_G_TOKENS_HANDLE *azh_handle) {
-  m_TRACK_IF(ml_GTokensCreateInstance(azh_handle,COMMON_MIME_TYPES_NUMBER) != RETURNED)
+  m_TRACK_IF(l_GTokensCreateInstance(azh_handle,COMMON_MIME_TYPES_NUMBER) != RETURNED)
   m_TRACK_IF(l_GTokensImport((*azh_handle),p_commonMimeTypes,  COMMON_MIME_TYPES_NUMBER) != RETURNED)
   m_TRACK_IF(g_GTokensFreeze(*azh_handle,NULL) != RETURNED)
   return RETURNED;

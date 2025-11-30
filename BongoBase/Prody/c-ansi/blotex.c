@@ -120,7 +120,7 @@ struct BLOTEXLIB_EXECUTOR {
 #define STR_VALUE__BLOTREG_INDEX_LABEL 3
 
 // NAMED_OBJECT_CREATE_INSTANCE_FUNCTION
-static int BlotregCreateInstance(void **azhr_handle, struct P_STRING name, va_list arguments){
+static int BlotregCreateInstance(void **azhr_handle, struct P_STRING f_name, va_list arguments){
   m_DIGGY_BOLLARD_S()
   g_G_PARAMS_HANDLE* azh_handle = (g_G_PARAMS_HANDLE*) azhr_handle;
   m_TRACK_IF(l_GParamsCreateInstance(azh_handle,BATEAU__EXPECTED_ITEMS_NUMBER) !=

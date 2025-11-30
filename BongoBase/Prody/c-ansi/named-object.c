@@ -59,11 +59,11 @@ static inline int m_NamedObjectAssign(g_NAMED_OBJECT_STUFF stuff, struct P_STRIN
 
 
 // Public function: see .h
-int NamedObjectsAddNamedObject(NAMED_OBJECTS_HANDLE handle, struct P_STRING namedObjectName, 
-  void *nhr_namedObjectHandle, /*void* ccr_arguments,*/ g_NAMED_OBJECT_STUFF *at_namedObjectStuff, ...){ 
+int NamedObjectsAddNamedObject(NAMED_OBJECTS_HANDLE handle, struct P_STRING name, 
+  void *nhr_namedObjectHandle, g_NAMED_OBJECT_STUFF *at_namedObjectStuff, ...){ 
   m_DIGGY_BOLLARD()
   int completed = COMPLETED__OK; // a priori
-  struct G_KEY gKey = m_GKey_PString(namedObjectName);
+  struct G_KEY gKey = m_GKey_PString(name);
   switch (m_GStringsIndexSingleFetch(handle->h_gStringsHandle,NULL,INDEX_LABEL0,
     INDEX_SEEK_FLAGS__EQUAL,&gKey, INDEX_FETCH_FLAGS__FETCH,at_namedObjectStuff,NULL)) {
   case RESULT__FOUND:
@@ -72,22 +72,22 @@ int NamedObjectsAddNamedObject(NAMED_OBJECTS_HANDLE handle, struct P_STRING name
     { va_list arguments;
       va_start(arguments,at_namedObjectStuff);
       if (nhr_namedObjectHandle == NULL && handle->n_namedObjectCreateInstanceFunction != NULL)
-        m_TRACK_IF(handle->n_namedObjectCreateInstanceFunction(&nhr_namedObjectHandle,namedObjectName,
+        m_TRACK_IF(handle->n_namedObjectCreateInstanceFunction(&nhr_namedObjectHandle,name,
         arguments) != RETURNED)
       va_end(arguments);
     } // arguments
-    m_TRACK_IF(m_NamedObjectAssign(*at_namedObjectStuff,namedObjectName,nhr_namedObjectHandle,
+    m_TRACK_IF(m_NamedObjectAssign(*at_namedObjectStuff,name,nhr_namedObjectHandle,
       handle->h_gStringsHandle) != RETURNED)
   break; default: m_TRACK() } // switch
   m_DIGGY_RETURN(completed)
 } // NamedObjectsAddNamedObject
 
 // Public function: see .h
-int NamedObjectsGetNamedObject(NAMED_OBJECTS_HANDLE handle, struct P_STRING namedObjectName,
+int NamedObjectsGetNamedObject(NAMED_OBJECTS_HANDLE handle, struct P_STRING name,
   void **acvnr_namedObjectHandle){ 
   m_DIGGY_BOLLARD()
   g_NAMED_OBJECT_STUFF ct_namedObjectStuff = (g_NAMED_OBJECT_STUFF)UNDEFINED;
-  struct G_KEY gKey = m_GKey_PString(namedObjectName);
+  struct G_KEY gKey = m_GKey_PString(name);
   int result = m_GStringsIndexSingleFetch(handle->h_gStringsHandle,NULL,INDEX_LABEL0,
     INDEX_SEEK_FLAGS__EQUAL,&gKey, INDEX_FETCH_FLAGS__SEEK_ONLY,&ct_namedObjectStuff,NULL);
   switch (result) {

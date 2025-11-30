@@ -14,11 +14,13 @@ typedef struct NAMED_OBJECTS* NAMED_OBJECTS_HANDLE ;
 
 typedef G_STRING_STUFF g_NAMED_OBJECT_STUFF ;
 
-
+// #REF NAMED_OBJECT_CREATE_INSTANCE_FUNCTION <named-object>
+// <named-object> creation function.
+//
 // Passed:
 // - *azhr_handle: UNDEFINED handle 
-// - name:
-// - r_arguments
+// - f_name:
+// - arguments: arguments for named object creation function
 //
 // Modified:
 // - *azhr_handle: instance's handle
@@ -26,8 +28,7 @@ typedef G_STRING_STUFF g_NAMED_OBJECT_STUFF ;
 // Returned:
 // - RETURNED: done
 // - -1: unexpected problem ; anomaly is raised
-//typedef int (*NAMED_OBJECT_CREATE_INSTANCE_FUNCTION)(void **azhr_handle, struct P_STRING name, void *r_arguments);
-typedef int (*NAMED_OBJECT_CREATE_INSTANCE_FUNCTION)(void **azhr_handle, struct P_STRING name, va_list arguments);
+typedef int (*NAMED_OBJECT_CREATE_INSTANCE_FUNCTION)(void **azhr_handle, struct P_STRING f_name, va_list arguments);
 
 // => Create collection of NAMED_OBJECT__G_STRING_CONVEYANCE g-strings 
 // => The function also adds plain lexical index (INDEX_LABEL0) 
@@ -47,10 +48,10 @@ int NamedObjectsGetCount(NAMED_OBJECTS_HANDLE cp_handle,
 //
 // Passed:
 // - handle: named objects collection
-// - namedObjectName:
+// - name:
 // - nhr_namedObjectHandle: (when != NULL) new named object instance to add in the collection; its
 //   handle
-// - *ccr_arguments: (only significant if new named object instance is not provided) arguments for
+// - ...: (only significant if new named object instance is not provided) arguments for
 //   named object instance creation function  (when significant)
 // 
 // Changed:
@@ -61,8 +62,7 @@ int NamedObjectsGetCount(NAMED_OBJECTS_HANDLE cp_handle,
 // - COMPLETED__OK: new (empty) named object added in the collection 
 // - COMPLETED__BUT: named object with same name already exists in collection
 // - -1: unexpected problem; anomaly is raised...
-int NamedObjectsAddNamedObject(NAMED_OBJECTS_HANDLE handle, struct P_STRING namedObjectName,
-//  void *nhr_namedObjectHandle, void *ccr_arguments, g_NAMED_OBJECT_STUFF *at_namedObjectStuff); 
+int NamedObjectsAddNamedObject(NAMED_OBJECTS_HANDLE handle, struct P_STRING name,
   void *nhr_namedObjectHandle, g_NAMED_OBJECT_STUFF *at_namedObjectStuff, ...); 
   
 
@@ -70,7 +70,7 @@ int NamedObjectsAddNamedObject(NAMED_OBJECTS_HANDLE handle, struct P_STRING name
 //
 // Passed:
 // - handle: named objects collection
-// - namedObjectName:
+// - name:
 // 
 // Changed:
 // - *acvnr_namedObjectHandle: (set to NULL if not found) named object of the collection
@@ -79,7 +79,7 @@ int NamedObjectsAddNamedObject(NAMED_OBJECTS_HANDLE handle, struct P_STRING name
 // - RESULT__FOUND: 
 // - RESULT__NOT_FOUND: 
 // - -1: unexpected problem; anomaly is raised...
-int NamedObjectsGetNamedObject(NAMED_OBJECTS_HANDLE handle, struct P_STRING namedObjectName,
+int NamedObjectsGetNamedObject(NAMED_OBJECTS_HANDLE handle, struct P_STRING name,
   void **acvnr_namedObjectHandle); 
 
 

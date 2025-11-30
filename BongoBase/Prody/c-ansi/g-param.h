@@ -49,14 +49,8 @@ int GParamNameAssign(g_G_PARAM_STUFF stuff, struct P_STRING *nap_pString, int to
 // Ret:
 // - RETURNED: OK
 // - -1: unexpected problem; anomaly is raised...
-static inline int m_GParamAssignValue(g_G_PARAM_STUFF stuff, GENERIC_INTEGER en_value, 
-  g_G_PARAMS_HANDLE n_gParamsHandle) {
-  m_CHECK_G_STRINGS_COLLECTION_CONVEYANCE(n_gParamsHandle,G_PARAM_VALUE_ELEMENT,
-    VALUED_STRING__G_STRING_CONVEYANCE)
-  stuff[G_PARAM_VALUE_ELEMENT].acolyt.cen_value = en_value;
-  return RETURNED;
-} // m_GParamAssignValue
-
+int GParamAssignValue(g_G_PARAM_STUFF stuff, GENERIC_INTEGER en_value, 
+  g_G_PARAMS_HANDLE n_gParamsHandle) ;
 
 // #SEE GStringsCreateInstance@c-ansi/g-string.h  <named-object>
 int l_GParamsCreateInstance(g_G_PARAMS_HANDLE *azh_handle,int expectedItemsNumber);
