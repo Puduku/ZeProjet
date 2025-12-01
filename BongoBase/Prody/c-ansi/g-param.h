@@ -49,7 +49,7 @@ int GParamNameAssign(g_G_PARAM_STUFF stuff, struct P_STRING *nap_pString, int to
 // Ret:
 // - RETURNED: OK
 // - -1: unexpected problem; anomaly is raised...
-int GParamAssignValue(g_G_PARAM_STUFF stuff, GENERIC_INTEGER en_value, 
+int GParamValueAssign(g_G_PARAM_STUFF stuff, GENERIC_INTEGER en_value, 
   g_G_PARAMS_HANDLE n_gParamsHandle) ;
 
 // #SEE GStringsCreateInstance@c-ansi/g-string.h  <named-object>

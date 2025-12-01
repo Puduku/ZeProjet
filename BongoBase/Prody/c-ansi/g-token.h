@@ -38,6 +38,7 @@ int l_GTokensCreateInstance(g_G_TOKENS_HANDLE *azh_handle, int expectedItemsNumb
 #define gm_GTokensAddPlainLexicalIndex m_GStringsAddPlainLexicalIndex
 
 // Import g-tokens in one shot...
+// Once you finished importing g-tokens, call g_GTokensFreeze()  
 //
 // Passed:
 // - handle:

@@ -104,13 +104,12 @@ typedef struct TRACT_OR_PIVOT_MODEL *TRACT_OR_PIVOT_MODEL_STUFF;
 // - RETURNED: Ok
 // - -1: unexpected problem; 
 static int TractOrPivotModelInitialize(TRACT_OR_PIVOT_MODEL_STUFF stuff, int minOccurencesNumber,
-  int maxOccurencesNumber, char b_pivot, int c_pivotModelEntry, int c_tractModelEntry) {
+  int maxOccurencesNumber, char b_pivot, int modelEntry) {
   m_DIGGY_BOLLARD_S()
   stuff->minOccurencesNumber = minOccurencesNumber;
   stuff->maxOccurencesNumber = maxOccurencesNumber;
-  stuff->b_pivot = b_pivot; 
-  stuff->select.c_pivotModelEntry = c_pivotModelEntry; 
-  stuff->select.c_tractModelEntry = c_tractModelEntry;
+  if ((stuff->b_pivot = b_pivot)) stuff->select.c_pivotModelEntry = modelEntry; 
+  else stuff->select.c_tractModelEntry = modelEntry;
   m_DIGGY_RETURN(RETURNED)
 } // TractOrPivotModelInitialize
 
@@ -153,13 +152,13 @@ static int TractModelCreateInstance(void **azhr_handle, struct P_STRING f_name, 
 // - RETURNED: Ok
 // - -1: unexpected problem; 
 static int TractModelAddTractOrPivotModel(TRACT_MODEL_HANDLE handle, int minOccurencesNumber,
-  int maxOccurencesNumber, char b_pivot, int c_pivotModelEntry, int c_tractModelEntry) {
+  int maxOccurencesNumber, char b_pivot, int modelEntry) {
   int entry = UNDEFINED;
   TRACT_OR_PIVOT_MODEL_STUFF tractOrPivotModelStuff = (TRACT_OR_PIVOT_MODEL_STUFF) UNDEFINED;
   m_TRACK_IF((entry = GreenCollectionFetch(handle->h_tractOrPivotModelsHandle,-1,
     (char**)&tractOrPivotModelStuff)) < 0) 
   m_TRACK_IF(TractOrPivotModelInitialize(tractOrPivotModelStuff,minOccurencesNumber,
-    maxOccurencesNumber,b_pivot,c_pivotModelEntry,c_tractModelEntry) != RETURNED) 
+    maxOccurencesNumber,b_pivot,modelEntry) != RETURNED) 
   m_DIGGY_RETURN(RETURNED)
 } // TractModelAddTractOrPivotModel
 
@@ -292,20 +291,66 @@ int EngelsAddTractModel(ENGELS_HANDLE handle, struct P_STRING name,
 
   int i = 0; for (; i < count; i++) {
     m_TRACK_IF(g_GParamsFetch(p_configHandle, i, &t_tractModelConfigStuff) != i)
-// TODO: init tract model item
+    int minOccurencesNumber = UNDEFINED;
+    int maxOccurencesNumber = UNDEFINED; 
+    char b_pivot = (char)UNDEFINED; 
+    int modelEntry = UNDEFINED; 
+    m_TRACK_IF(TractModelAddTractOrPivotModel(t_namedTractModelStuff->acolyt.cnhr_handle,
+      minOccurencesNumber,maxOccurencesNumber,b_pivot,modelEntry) != RETURNED)
   } // for
   
   m_DIGGY_RETURN(completed)
 } // EngelsAddTractModel
 
-
 //
-static int EngelsGetTrackModelsNumber(ENGELS_HANDLE handle, int trackModelEntry) {
+static int EngelsGetTractModelsNumber(ENGELS_HANDLE handle, int trackModelEntry) {
   m_DIGGY_BOLLARD_S()
   int itemsNumber = NamedObjectsGetCount(handle->h_tractModelsHandle,NULL);
   m_TRACK_IF(itemsNumber < 0)
   m_DIGGY_RETURN(itemsNumber)
-} // EngelsGetTrackModelsNumber
+} // EngelsGetTractModelsNumber
+
+
+// Public function: see .h
+int EngelsAddPamphletModel(ENGELS_HANDLE handle, struct P_STRING name,
+  g_G_PARAMS_HANDLE p_configHandle) {
+  m_DIGGY_BOLLARD()
+  int completed = COMPLETED__OK;  // a priori
+  int count = g_GParamsGetCount(p_configHandle,NULL);
+  m_TRACK_IF(count < 0)
+
+  g_G_PARAM_STUFF t_pamphletModelConfigStuff = (g_G_PARAM_STUFF)UNDEFINED;
+  g_NAMED_OBJECT_STUFF t_namedPamphletModelStuff = (g_NAMED_OBJECT_STUFF)UNDEFINED;
+
+  int expectedPamphletOrPivotModelsNumber = 10;
+  switch (NamedObjectsAddNamedObject(handle->h_pamphletModelsHandle,name,NULL,
+    &t_namedPamphletModelStuff,expectedPamphletOrPivotModelsNumber)) {
+  case COMPLETED__OK:
+  break; case COMPLETED__BUT:
+  break; default: m_TRACK() } // switch 
+    
+ m_ASSERT(t_namedPamphletModelStuff->acolyt.cnhr_handle != NULL)
+
+  int i = 0; for (; i < count; i++) {
+    m_TRACK_IF(g_GParamsFetch(p_configHandle, i, &t_pamphletModelConfigStuff) != i)
+    int minOccurencesNumber = UNDEFINED;
+    int maxOccurencesNumber = UNDEFINED; 
+    char b_pivot = (char)UNDEFINED; 
+    int modelEntry = UNDEFINED; 
+    m_TRACK_IF(TractModelAddTractOrPivotModel(t_namedPamphletModelStuff->acolyt.cnhr_handle,
+      minOccurencesNumber,maxOccurencesNumber,b_pivot,modelEntry) != RETURNED)
+  } // for
+  
+  m_DIGGY_RETURN(completed)
+} // EngelsAddPamphletModel
+
+//
+static int EngelsGetPamphletModelsNumber(ENGELS_HANDLE handle, int trackModelEntry) {
+  m_DIGGY_BOLLARD_S()
+  int itemsNumber = NamedObjectsGetCount(handle->h_pamphletModelsHandle,NULL);
+  m_TRACK_IF(itemsNumber < 0)
+  m_DIGGY_RETURN(itemsNumber)
+} // EngelsGetPamphletModelsNumber
 
 
 // Public function: see .h
@@ -361,7 +406,7 @@ typedef struct TRACT *TRACT_STUFF;
 static int TractAssign(TRACT_STUFF stuff, ENGELS_HANDLE engelsHandle, int tractModelEntry) {
   m_DIGGY_BOLLARD_S()
 
-  int itemsNumber = EngelsGetTrackModelsNumber(engelsHandle, tractModelEntry);
+  int itemsNumber = EngelsGetTractModelsNumber(engelsHandle, tractModelEntry);
   m_TRACK_IF(itemsNumber < 0) 
   m_ASSERT(itemsNumber > 0)
   stuff->tractModelEntry = tractModelEntry;
