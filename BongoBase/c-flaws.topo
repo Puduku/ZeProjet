@@ -116,7 +116,7 @@
 // not to confuse p[] with p[<some size>] which are indeed totally different declarations (the 
 // latter declaring an array)."
 // Actually, both parts of the proposition are not true (i.e *p and p[] are not always equivalent
-// in declarations AND p[] and p[<some size>] are sometimes equivalent (to *p) in declarations).
+// in declarations AND p[] and p[<some size>] are sometimes equivalent (to *p) in declarations.
 // And as usual, the real complications are caused by absence of portability. (P)
 // Some concrete pitfalls : we define char p[] = "blabla"; in the .c (private) source. We report
 // the extern char p[]; declaration in the .h header. Some time later, some "zealous" guy decides
