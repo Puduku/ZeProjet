@@ -16,12 +16,6 @@
 
 #include <limits.h>
 
-// NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION
-int Blottab2DestroyInstance(void *xhr_handle) {
-  m_DIGGY_BOLLARD()
-  m_TRACK_IF(PamphletDestroyInstance(xhr_handle) != RETURNED)
-  m_DIGGY_RETURN(RETURNED)
-} // Blottab2DestroyInstance
 
 // Public function; see .h
 int l_BlotexlibExecutorCreateBlottab2(BLOTEXLIB_EXECUTOR_HANDLE handle,

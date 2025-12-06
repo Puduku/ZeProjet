@@ -67,7 +67,7 @@ int EngelsAddTractModel(ENGELS_HANDLE handle, struct P_STRING name,
 //
 // Ret:
 // - COMPLETED__OK:  
-// - COMPLETED__BUT: some pamphlet models were updated 
+// - COMPLETED__BUT: pamphlet model already exists and is updated with new tract/pivot items. 
 // - -1 special value: anomaly raised
 int EngelsAddPamphletModel(ENGELS_HANDLE handle, struct P_STRING name,
   g_G_PARAMS_HANDLE p_configHandle) ;
@@ -98,10 +98,8 @@ typedef struct PAMPHLET* PAMPHLET_HANDLE;
 // - -1 special value: anomaly raised
 int PamphletCreateInstance(PAMPHLET_HANDLE *azh_handle, ENGELS_HANDLE f_engelsHandle) ;
 
+//int PamphletCreateInstance(PAMPHLET_HANDLE handle) {
 
-// Ret:
-// - RETURNED: Ok
-// - -1 special value: anomaly raised
 // NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION
 int PamphletDestroyInstance(void *xhr_handle) ;
 // int PamphletDestroyInstance(PAMPHLET_HANDLE xh_handle) ;

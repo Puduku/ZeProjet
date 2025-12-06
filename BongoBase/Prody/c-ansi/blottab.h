@@ -38,8 +38,28 @@ int BlottabCreateInstance(BLOTTAB_HANDLE *azh_handle, int fieldsNumber,
   struct P_STRING* s_names, int* s_blottabIndexFlags);
 
 
-// NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION
+// #SEE NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION@c-ansi/named-object.h
 int BlottabDestroyInstance(void *xhr_handle) ;
+
+
+// #SEE l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_L_VALUE_BLOTTAB_SET_OP_FUNCTION@c-ansi/blotex.h
+// => See also: BlotexlibExecutorFactoryCreateInstance() 
+int l_BlotexlibExecutorParseAndComputeLValueBlottabSetOp(BLOTEXLIB_EXECUTOR_HANDLE handle, 
+  char b_spot, struct P_STRING *a_sequence, struct P_STRING blottabName, void* nr_blottabHandle, 
+  struct BLOTTAB_FIELD_REFERENCE *ac_blottabFieldReference, G_STRING_STUFF nc_abandonmentInfo);
+
+// #SEE l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION@c-ansi/blotex.h
+// => See also: BlotexlibExecutorFactoryCreateInstance() 
+int l_BlotexlibExecutorParseAndComputeRValueBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
+  char b_spot, struct P_STRING *a_sequence, int blottabsLabel, struct P_STRING blottabName,
+  void* nr_blottabHandle, struct BLOTEX_VALUE *ac_blotexValue, G_STRING_STUFF nc_abandonmentInfo);
+
+// #SEE UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION@c-ansi/blotex.h
+int UpdateBlottabCurrentBlotsetField(struct BLOTTAB_FIELD_REFERENCE blottabFieldReference,
+ struct BLOTEX_VALUE blotexValue) ;
+
+
+// "Extra" functions/...
 
 // Create NEW GENUINE blot table and add it in blotex executor's blot tables.
 // 
@@ -56,26 +76,11 @@ int BlottabDestroyInstance(void *xhr_handle) ;
 // Ret:
 // - RETURNED: Ok
 // - -1: unexpected problem; anomaly is raised
-int l_BlotexlibExecutorCreateGenuineBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle,
+#if 0
+int l_BlotexlibExecutorCreateBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct P_STRING blottabName, int fieldsNumber, struct P_STRING* s_names, int* s_blottabIndexFlags,
   BLOTTAB_HANDLE *a_blottabHandle) ;
-
-
-// #SEE l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_L_VALUE_BLOTTAB_SET_OP_FUNCTION@c-ansi/blotex.h
-// => See also: BlotexlibExecutorFactoryCreateInstance() 
-int l_BlotexlibExecutorParseAndComputeLValueGenuineBlottabSetOp(BLOTEXLIB_EXECUTOR_HANDLE handle, 
-  char b_spot, struct P_STRING *a_sequence, struct P_STRING blottabName, 
-  struct BLOTTAB_FIELD_REFERENCE *ac_blottabFieldReference, G_STRING_STUFF nc_abandonmentInfo) ;
-
-// #SEE l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION@c-ansi/blotex.h
-// => See also: BlotexlibExecutorFactoryCreateInstance() 
-int l_BlotexlibExecutorParseAndComputeRValueGenuineBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  char b_spot, struct P_STRING *a_sequence, struct P_STRING blottabName, struct BLOTEX_VALUE *ac_blotexValue,
-  G_STRING_STUFF nc_abandonmentInfo) ;
-
-// #SEE UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION@c-ansi/blotex.h
-int UpdateBlottabCurrentBlotsetField(struct BLOTTAB_FIELD_REFERENCE blottabFieldReference,
- struct BLOTEX_VALUE blotexValue) ;
+#endif
 
 
 #endif // __BLOTTAB_C_ANSI_H_INCLUDED__

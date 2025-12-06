@@ -251,18 +251,17 @@ int EngelsAddPivotModels(ENGELS_HANDLE handle, g_G_PARAMS_HANDLE p_configHandle)
   g_G_PARAM_STUFF t_pivotModelConfigStuff = (g_G_PARAM_STUFF)UNDEFINED;
   g_NAMED_OBJECT_STUFF t_namedPivotModelStuff = (g_NAMED_OBJECT_STUFF)UNDEFINED;
   int i = 0; for (; i < count; i++) {
-    int n_minSize = 0;
-    int n_maxSize = -1;
-    int rawMatterFlags = 0;
-    int refinedMatter = 0;
     m_TRACK_IF(g_GParamsFetch(p_configHandle, i, &t_pivotModelConfigStuff) != i)
+    int n_minSize = UNDEFINED;
+    int n_maxSize = UNDEFINED;
+    int rawMatterFlags = UNDEFINED;
+    int refinedMatter = UNDEFINED;
     switch (completed = NamedObjectsAddNamedObject(handle->h_pivotModelsHandle,
       t_pivotModelConfigStuff[G_PARAM_NAME_ELEMENT].cv_pString,NULL,&t_namedPivotModelStuff,
       n_minSize,n_maxSize,rawMatterFlags,refinedMatter)) {
     case COMPLETED__OK:
     break; case COMPLETED__BUT:
     break; default: m_TRACK() } // switch 
-
  m_ASSERT(t_namedPivotModelStuff->acolyt.cnhr_handle != NULL)
   } // for
   
@@ -273,15 +272,15 @@ int EngelsAddPivotModels(ENGELS_HANDLE handle, g_G_PARAMS_HANDLE p_configHandle)
 int EngelsAddTractModel(ENGELS_HANDLE handle, struct P_STRING name,
   g_G_PARAMS_HANDLE p_configHandle) {
   m_DIGGY_BOLLARD()
-  int completed = COMPLETED__OK;  // a priori
   int count = g_GParamsGetCount(p_configHandle,NULL);
   m_TRACK_IF(count < 0)
 
   g_G_PARAM_STUFF t_tractModelConfigStuff = (g_G_PARAM_STUFF)UNDEFINED;
   g_NAMED_OBJECT_STUFF t_namedTractModelStuff = (g_NAMED_OBJECT_STUFF)UNDEFINED;
 
+  int completed = UNDEFINED; 
   int expectedTractOrPivotModelsNumber = 10;
-  switch (NamedObjectsAddNamedObject(handle->h_tractModelsHandle,name,NULL,
+  switch (completed = NamedObjectsAddNamedObject(handle->h_tractModelsHandle,name,NULL,
     &t_namedTractModelStuff,expectedTractOrPivotModelsNumber)) {
   case COMPLETED__OK:
   break; case COMPLETED__BUT:
@@ -315,15 +314,15 @@ static int EngelsGetTractModelsNumber(ENGELS_HANDLE handle, int trackModelEntry)
 int EngelsAddPamphletModel(ENGELS_HANDLE handle, struct P_STRING name,
   g_G_PARAMS_HANDLE p_configHandle) {
   m_DIGGY_BOLLARD()
-  int completed = COMPLETED__OK;  // a priori
   int count = g_GParamsGetCount(p_configHandle,NULL);
   m_TRACK_IF(count < 0)
 
   g_G_PARAM_STUFF t_pamphletModelConfigStuff = (g_G_PARAM_STUFF)UNDEFINED;
   g_NAMED_OBJECT_STUFF t_namedPamphletModelStuff = (g_NAMED_OBJECT_STUFF)UNDEFINED;
 
+  int completed = UNDEFINED; 
   int expectedPamphletOrPivotModelsNumber = 10;
-  switch (NamedObjectsAddNamedObject(handle->h_pamphletModelsHandle,name,NULL,
+  switch (completed = NamedObjectsAddNamedObject(handle->h_pamphletModelsHandle,name,NULL,
     &t_namedPamphletModelStuff,expectedPamphletOrPivotModelsNumber)) {
   case COMPLETED__OK:
   break; case COMPLETED__BUT:

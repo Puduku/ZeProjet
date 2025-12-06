@@ -45,6 +45,7 @@ typedef struct BLOTEXLIB_EXECUTOR *BLOTEXLIB_EXECUTOR_HANDLE; // Public handle
 // - b_spot: b_SPOT(TRUE) / b_OPS(FALSE) 
 // - *a_sequence: before parsing
 // - blottabName: blot table name
+// - nr_blottabHandle: NULL when not existing
 //
 // Changed:
 // - *a_sequence: after parsing 
@@ -57,8 +58,8 @@ typedef struct BLOTEXLIB_EXECUTOR *BLOTEXLIB_EXECUTOR_HANDLE; // Public handle
 // - -1: unexpected problem
 typedef int (*l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_L_VALUE_BLOTTAB_SET_OP_FUNCTION)(
   BLOTEXLIB_EXECUTOR_HANDLE handle, char b_spot, struct P_STRING *a_sequence,
-  struct P_STRING blottabName, struct BLOTTAB_FIELD_REFERENCE *ac_blottabFieldReference,
-  G_STRING_STUFF nc_abandonmentInfo) ;
+  struct P_STRING blottabName, void* nr_blottabHandle,
+  struct BLOTTAB_FIELD_REFERENCE *ac_blottabFieldReference, G_STRING_STUFF nc_abandonmentInfo) ;
 
 struct BLOTEX_VALUE {
   int asValue;
@@ -80,7 +81,9 @@ struct BLOTEX_VALUE {
 // - handle: 
 // - b_spot: b_SPOT(TRUE) / b_OPS(FALSE) 
 // - *a_sequence: before parsing
+// - blottabsLabel:
 // - blottabName: blot table name
+// - nr_blottabHandle: NULL when not existing
 //
 // Changed:
 // - *a_sequence: after parsing 
@@ -92,9 +95,9 @@ struct BLOTEX_VALUE {
 // - ANSWER__NO: 'syntax' 'not found' 'already exist' error; abandon processing 
 // - -1: unexpected problem
 typedef int (*l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION)(
-  BLOTEXLIB_EXECUTOR_HANDLE handle, char b_spot, struct P_STRING *a_sequence,
-  struct P_STRING blottabName, struct BLOTEX_VALUE *ac_blotexValue, G_STRING_STUFF
-  nc_abandonmentInfo) ;
+  BLOTEXLIB_EXECUTOR_HANDLE handle, char b_spot, struct P_STRING *a_sequence, int blottabslabel,
+  struct P_STRING blottabName, void* nr_blottabHandle, struct BLOTEX_VALUE *ac_blotexValue,
+  G_STRING_STUFF nc_abandonmentInfo) ;
 
 // #REF UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION 
 // Update some field of current blotset of a blottab.
@@ -110,10 +113,10 @@ typedef int (*l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTIO
 typedef int (*UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION)(
   struct BLOTTAB_FIELD_REFERENCE blottabFieldReference, struct BLOTEX_VALUE blotexValue);
 
-#define GENUINE_BLOTTAB_LABEL0 0
+#define GENUINE_BLOTTABS_LABEL0 0
 
 // Create blotex library executor factory; also register "Genuine" blottab implementation
-// (GENUINE_BLOTTAB_LABEL0)
+// (GENUINE_BLOTTABS_LABEL0)
 //
 // Passed:
 // - *azh_handle: "un-initialized" handle
@@ -198,7 +201,7 @@ int BlotexlibExecutorFactoryDestroyInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE xh
 // Returned: 
 // - RETURNED: Ok
 // - -1: unexpected problem ; anomaly is raised
-int l_BlotcodeExecutorGetBlotexlibExecutorHandle(BLOTCODE_EXECUTOR_HANDLE handle, int blotexlibEntry,
+int l_BlotcodeExecutorGetBlotexlibExecutorHandle(BLOTCODE_EXECUTOR_HANDLE handle,int blotexlibEntry,
   BLOTEXLIB_EXECUTOR_HANDLE *a_blotexlibExecutorHandle) ;
 												  
 
@@ -229,8 +232,8 @@ int l_BlotcodeExecutorGetBlotexlibExecutorHandle(BLOTCODE_EXECUTOR_HANDLE handle
 // - RESULT__FOUND: OK
 // - RESULT__NOT_FOUND: 
 // - -1: unexpected problem; anomaly is raised
-int BlotexlibExecutorGetBlotreg (BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING blotregName, g_G_PARAMS_HANDLE *ac_blotregHandle) ;
+int BlotexlibExecutorGetBlotreg (BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING blotregName,
+  g_G_PARAMS_HANDLE *ac_blotregHandle) ;
 
 // Create blot register.
 // 
@@ -349,14 +352,14 @@ int BlotexlibExecutorParseAndComputeStrPortion(BLOTEXLIB_EXECUTOR_HANDLE handle,
 // 
 // Passed:
 // - handle:
-// - blottabLabel: GENUINE_BLOTTAB_LABEL0; 1 => "Super" blottabs' label, etc.
+// - blottabsLabel: GENUINE_BLOTTABS_LABEL0; 1 => "Super" blottabs' label, etc.
 // - blottabName: must correspond to NON-existing blottab 
 // - hr_blottabHandle: new blottab's handle to be added
 //
 // Ret:
 // - RETURNED: Ok
 // - -1: unexpected problem; anomaly is raised
-int BlotexlibExecutorAddBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, int blottabLabel,
+int BlotexlibExecutorAddBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, int blottabsLabel,
   struct P_STRING blottabName, void* hr_blottabHandle) ;
 
 
@@ -364,7 +367,7 @@ int BlotexlibExecutorAddBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, int blottabLab
 // 
 // Passed:
 // - handle:
-// - blottabLabel: GENUINE_BLOTTAB_LABEL0; 1 => "Super" blottabs' label, etc.
+// - blottabsLabel: GENUINE_BLOTTABS_LABEL0; 1 => "Super" blottabs' label, etc.
 // - blottabName: blot table's name 
 //
 // Changed:
@@ -374,7 +377,7 @@ int BlotexlibExecutorAddBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, int blottabLab
 // - RESULT__FOUND: OK
 // - RESULT__NOT_FOUND: 
 // - -1: unexpected problem; anomaly is raised
-int BlotexlibExecutorGetBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, int blottabLabel,
+int BlotexlibExecutorGetBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, int blottabsLabel,
   struct P_STRING blottabName, void* *acr_blottabHandle) ;
 
 

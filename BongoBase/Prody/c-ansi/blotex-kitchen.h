@@ -252,19 +252,19 @@ int ParseFormat(struct P_STRING *a_sequence, int *avn_format,
 // blottabs:
 // ---------
 
-// Parse blottab label  
+// Parse blottabs label  
 //
 // Passed:
 // - *a_sequence: before parsing
 //
 // Changed:
 // - *a_sequence: after parsing 
-// - *an_blottablabel: -1 special value => NO blottab label
-//   + 0 (GENUINE_BLOTTAB_LABEL0) : parsed "^"
-//   + 1 ("super" blottab label) : parsed "^^" 
-//   + 2 ("hyper" blottab label) : parsed "^^^" 
+// - *an_blottabsLabel: -1 special value => NO blottabs label
+//   + 0 (GENUINE_BLOTTABS_LABEL0) : parsed "^"
+//   + 1 ("super" blottabs label) : parsed "^^" 
+//   + 2 ("hyper" blottabs label) : parsed "^^^" 
 //
 // Ret: RETURNED (Ok)
-int ParseBlottabLabel(struct P_STRING *a_sequence, int *an_blottablabel);
+int ParseBlottabsLabel(struct P_STRING *a_sequence, int *an_blottabsLabel);
 
 #endif // __C_ANSI_BLOTEX_KITCHEN_H_INCLUDED__

@@ -31,14 +31,10 @@ typedef PAMPHLET_HANDLE g_BLOTTAB2_HANDLE;
 // Ret:
 // - RETURNED: Ok
 // - -1 special value: anomaly raised
-static inline int m_Blottab2CreateInstance(g_BLOTTAB2_HANDLE* azh_handle, ENGELS_HANDLE f_engelsHandle) {
-  m_DIGGY_BOLLARD_S()
-  m_TRACK_IF(PamphletCreateInstance(azh_handle,f_engelsHandle) != RETURNED)
-  m_DIGGY_RETURN(RETURNED)
-} // m_Blottab2CreateInstance
+#define g_Blottab2CreateInstance PamphletCreateInstance
 
 // NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION
-int Blottab2DestroyInstance(void *xhr_handle) ;
+#define g_Blottab2DestroyInstance PamphletDestroyInstance
 
 // Create NEW "super" blot table and add it in blotex executor's "super" blot tables.
 // 

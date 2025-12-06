@@ -200,14 +200,14 @@ int ParseFormat(struct P_STRING *a_sequence, int *avn_format,
   m_DIGGY_RETURN(ANSWER__YES)
 } // ParseFormat
 
-int ParseBlottabLabel(struct P_STRING *a_sequence, int *an_blottabLabel) {
+int ParseBlottabsLabel(struct P_STRING *a_sequence, int *an_blottabsLabel) {
   m_DIGGY_BOLLARD()
-  *an_blottabLabel = -1; // a priori
+  *an_blottabsLabel = -1; // a priori
   struct P_STRING lexeme; // UNDEFINED
   while (b_TRUE) { 
     PParsePassSingleChar(a_sequence,NULL,'^',&lexeme);
     if (b_EMPTY_P_STRING(lexeme)) break;
-    (*an_blottabLabel)++; 
+    (*an_blottabsLabel)++; 
   } // while 
   m_DIGGY_RETURN(RETURNED)
-} // ParseBlottabLabel
+} // ParseBlottabsLabel

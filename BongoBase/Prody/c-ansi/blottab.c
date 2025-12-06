@@ -89,21 +89,6 @@ int BlottabDestroyInstance(void *xhr_handle) {
   m_DIGGY_RETURN(RETURNED)
 } // BlottabDestroyInstance
 
-// Public function; see .h
-int l_BlotexlibExecutorCreateGenuineBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING blottabName,
-  int fieldsNumber, struct P_STRING* s_names, int* s_blottabIndexFlags,
-  BLOTTAB_HANDLE *a_blottabHandle) {
-  m_DIGGY_BOLLARD()
-m_DIGGY_VAR_P_STRING(blottabName)
-
-  m_TRACK_IF(BlottabCreateInstance(a_blottabHandle,fieldsNumber, s_names,s_blottabIndexFlags) !=
-    RETURNED)
-
-  m_TRACK_IF(BlotexlibExecutorAddBlottab(handle,GENUINE_BLOTTAB_LABEL0,blottabName,
-    *a_blottabHandle) != RETURNED)
-
-  m_DIGGY_RETURN(RETURNED)
-} // l_BlotexlibExecutorCreateGenuineBlottab
 
 // Blottab expressions parsing:
 
@@ -133,8 +118,9 @@ m_DIGGY_VAR_P_STRING(blottabName)
 // Ret:
 // - ANSWER__YES: Ok
 // - ANSWER__NO: parsing abandoned
-static int ParseAndRetrieveBlottabElement(struct P_STRING *a_sequence, G_STRINGS_HANDLE fieldAttributesHandle,
-  int *nac_tableIndexLabel, int *cac_element, int *ac_asValue, G_STRING_STUFF nc_abandonmentInfo) {
+static int ParseAndRetrieveBlottabElement(struct P_STRING *a_sequence,
+  G_STRINGS_HANDLE fieldAttributesHandle, int *nac_tableIndexLabel, int *cac_element, int *ac_asValue,
+  G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
 m_DIGGY_VAR_P_STRING(*a_sequence)
   g_G_STRING_SET_STUFF fieldAttributeStuff = (g_G_STRING_SET_STUFF)UNDEFINED;
@@ -184,26 +170,15 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
 
 // Parse and compute 'l-value' blottab operations:
 // expect <blottab ref op set int> | <blottab ref op set str> 
-static inline int ml_BlotexlibExecutorParseAndComputeLValueGenuineBlottabSetOp(
+static inline int ml_BlotexlibExecutorParseAndComputeLValueBlottabSetOp(
   BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING *a_sequence, struct P_STRING blottabName,
-  struct BLOTTAB_FIELD_REFERENCE *ac_blottabFieldReference, G_STRING_STUFF nc_abandonmentInfo) {
+  BLOTTAB_HANDLE n_blottabHandle, struct BLOTTAB_FIELD_REFERENCE *ac_blottabFieldReference,
+  G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
   struct P_STRING lexeme = UNDEFINED_P_STRING;
 
   m_PREPARE_ABANDON(a_sequence, "<blottab ref op set int> | <blottab ref op set str>") 
-
-  BLOTTAB_HANDLE blottabHandle = (BLOTTAB_HANDLE)UNDEFINED;
-m_DIGGY_VAR_P_STRING(blottabName)
-  switch (BlotexlibExecutorGetBlottab(handle,GENUINE_BLOTTAB_LABEL0,blottabName,
-    (void**)&blottabHandle)) {
-  case RESULT__FOUND:
-    m_ASSERT(blottabHandle != NULL)
-  break; case RESULT__NOT_FOUND:
-    m_ABANDON(UNKNOWN_BLOTTAB__ABANDONMENT_CAUSE)
-  break; default:
-    m_TRACK()
-  } // switch
-
+  if (n_blottabHandle == NULL) m_ABANDON(UNKNOWN_BLOTTAB__ABANDONMENT_CAUSE)
   int n_indexFetchFlags = -1; // a priori 
   m_PParsePassSpaces(a_sequence,NULL);
 
@@ -212,8 +187,8 @@ m_DIGGY_VAR_P_STRING(blottabName)
   int c_element = UNDEFINED; // Only significant with blottab read/set op
   if (!b_EMPTY_P_STRING(lexeme)) { // <blottab op read int> | <blottab op read str> (R-value)
     // <blottab ref op set int> | <blottab ref op set str> (L-value)... 
-    switch (ParseAndRetrieveBlottabElement(a_sequence, blottabHandle->hp_fieldAttributesHandle, NULL,&c_element,
-      &n_asValue, nc_abandonmentInfo)) {
+    switch (ParseAndRetrieveBlottabElement(a_sequence, n_blottabHandle->hp_fieldAttributesHandle,
+      NULL,&c_element, &n_asValue, nc_abandonmentInfo)) {
     case ANSWER__YES:
 m_ASSERT(n_asValue != -1)
     break; case ANSWER__NO:
@@ -226,11 +201,11 @@ m_ASSERT(n_asValue != -1)
   
   if (n_asValue == -1) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
   ac_blottabFieldReference->r_field = (void*)(GENERIC_INTEGER)c_element;
-  ac_blottabFieldReference->r_blottabHandle = blottabHandle; 
+  ac_blottabFieldReference->r_blottabHandle = n_blottabHandle; 
   ac_blottabFieldReference->asValue = n_asValue;
 
   m_DIGGY_RETURN(ANSWER__YES)
-} // ml_BlotexlibExecutorParseAndComputeLValueGenuineBlottabSetOp
+} // ml_BlotexlibExecutorParseAndComputeLValueBlottabSetOp
 
 // Passed:
 // - handle:
@@ -279,8 +254,8 @@ static int l_BlotexlibExecutorParseAndRetrieveBlottabSpot(BLOTEXLIB_EXECUTOR_HAN
 
   *ac_asValue = UNDEFINED; 
   *ac_element = UNDEFINED;
-  switch (ParseAndRetrieveBlottabElement(a_sequence,blottabHandle->hp_fieldAttributesHandle,NULL,ac_element,
-    ac_asValue, nc_abandonmentInfo)) { 
+  switch (ParseAndRetrieveBlottabElement(a_sequence,blottabHandle->hp_fieldAttributesHandle,NULL,
+    ac_element, ac_asValue, nc_abandonmentInfo)) { 
   case ANSWER__YES:
   break; case ANSWER__NO:
     m_DIGGY_RETURN(ANSWER__NO)
@@ -293,29 +268,18 @@ static int l_BlotexlibExecutorParseAndRetrieveBlottabSpot(BLOTEXLIB_EXECUTOR_HAN
 // expect <int blottab spot ref> | <str blottab spot ref> 
 // Reminder: <int blottab spot ref> ::= <int blottab spot>
 // and <str blottab spot ref> ::= <str blottab spot>
-static inline int ml_BlotexlibExecutorParseAndComputeLValueGenuineBlottabSpot(
+static inline int ml_BlotexlibExecutorParseAndComputeLValueBlottabSpot(
   BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING *a_sequence, struct P_STRING blottabName,
-  struct BLOTTAB_FIELD_REFERENCE *ac_blottabFieldReference, G_STRING_STUFF nc_abandonmentInfo) {
+  BLOTTAB_HANDLE n_blottabHandle, struct BLOTTAB_FIELD_REFERENCE *ac_blottabFieldReference,
+  G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
 
   m_PREPARE_ABANDON(a_sequence, "<int blottab spot> | <str blottab spot>") 
-
-  BLOTTAB_HANDLE blottabHandle = (BLOTTAB_HANDLE)UNDEFINED;
-m_DIGGY_VAR_P_STRING(blottabName)
-  switch (BlotexlibExecutorGetBlottab(handle,GENUINE_BLOTTAB_LABEL0,blottabName,
-    (void**)&blottabHandle)) {
-  case RESULT__FOUND:
-    m_ASSERT(blottabHandle != NULL)
-  break; case RESULT__NOT_FOUND:
-    m_ABANDON(UNKNOWN_BLOTTAB__ABANDONMENT_CAUSE) 
-  break; default:
-    m_TRACK()
-  } // switch
-
+  if (n_blottabHandle == NULL) m_ABANDON(UNKNOWN_BLOTTAB__ABANDONMENT_CAUSE)
   int asValue = UNDEFINED; 
   int element = UNDEFINED;
   g_G_STRING_SET_STUFF t_blotsetStuff = (g_G_STRING_SET_STUFF)UNDEFINED;
-  switch (l_BlotexlibExecutorParseAndRetrieveBlottabSpot(handle,a_sequence,blottabHandle,
+  switch (l_BlotexlibExecutorParseAndRetrieveBlottabSpot(handle,a_sequence,n_blottabHandle,
     &t_blotsetStuff,&element, &asValue,nc_abandonmentInfo)) {
   case ANSWER__YES:
   break;  case ANSWER__NO:
@@ -323,33 +287,33 @@ m_DIGGY_VAR_P_STRING(blottabName)
   break; default: m_TRACK() } // switch
 
   ac_blottabFieldReference->r_field = (void*)(GENERIC_INTEGER)element;
-  ac_blottabFieldReference->r_blottabHandle = blottabHandle; 
+  ac_blottabFieldReference->r_blottabHandle = n_blottabHandle; 
   ac_blottabFieldReference->asValue = asValue;
   m_DIGGY_RETURN(ANSWER__YES)
-} // ml_BlotexlibExecutorParseAndComputeLValueGenuineBlottabSpot
+} // ml_BlotexlibExecutorParseAndComputeLValueBlottabSpot
 
 // Public function: see .h
-int l_BlotexlibExecutorParseAndComputeLValueGenuineBlottabSetOp(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  char b_spot, struct P_STRING *a_sequence, struct P_STRING blottabName,
+int l_BlotexlibExecutorParseAndComputeLValueBlottabSetOp(BLOTEXLIB_EXECUTOR_HANDLE handle,
+  char b_spot, struct P_STRING *a_sequence, struct P_STRING blottabName, void *nr_blottabHandle,
   struct BLOTTAB_FIELD_REFERENCE *ac_blottabFieldReference, G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
   int answer = UNDEFINED ;
   if (b_spot) {
-    switch (answer = ml_BlotexlibExecutorParseAndComputeLValueGenuineBlottabSpot(handle,a_sequence,
-      blottabName,ac_blottabFieldReference,nc_abandonmentInfo)) {
+    switch (answer = ml_BlotexlibExecutorParseAndComputeLValueBlottabSpot(handle,a_sequence,
+      blottabName,(BLOTTAB_HANDLE)nr_blottabHandle,ac_blottabFieldReference,nc_abandonmentInfo)) {
     case ANSWER__YES:
     break; case ANSWER__NO:
     break; default: m_TRACK() } // switch
   } else {
-    switch (answer = ml_BlotexlibExecutorParseAndComputeLValueGenuineBlottabSetOp(handle,a_sequence,
-      blottabName,ac_blottabFieldReference,nc_abandonmentInfo)) {
+    switch (answer = ml_BlotexlibExecutorParseAndComputeLValueBlottabSetOp(handle,a_sequence,
+      blottabName,(BLOTTAB_HANDLE)nr_blottabHandle,ac_blottabFieldReference,nc_abandonmentInfo)) {
     case ANSWER__YES:
     break; case ANSWER__NO:
     break; default: m_TRACK() } // switch
   } // if
      
   m_DIGGY_RETURN(answer)
-} // l_BlotexlibExecutorParseAndComputeLValueGenuineBlottabSetOp
+} // l_BlotexlibExecutorParseAndComputeLValueBlottabSetOp
 
 // Parse and compute blottab request. 
 //
@@ -368,8 +332,9 @@ int l_BlotexlibExecutorParseAndComputeLValueGenuineBlottabSetOp(BLOTEXLIB_EXECUT
 // - ANSWER__YES: success
 // - ANSWER__NO: 'syntax' error; abandon processing 
 // - -1: unexpected problem
-static inline int ml_BlotexlibExecutorParseAndComputeBlottabRequest(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING *a_sequence, BLOTTAB_HANDLE blottabHandle, G_STRING_STUFF nc_abandonmentInfo) {
+static inline int ml_BlotexlibExecutorParseAndComputeBlottabRequest(
+  BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING *a_sequence, BLOTTAB_HANDLE blottabHandle,
+  G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
 
   m_PREPARE_ABANDON(a_sequence, "<blottab request>") 
@@ -453,12 +418,43 @@ m_DIGGY_VAR_P_STRING(subSequence)
   m_DIGGY_RETURN(ANSWER__YES)
 } // ml_BlotexlibExecutorParseAndComputeBlottabRequest
 
+// Create NEW GENUINE blot table and add it in blotex executor's blot tables.
+// 
+// Passed:
+// - handle:
+// - blottabsLabel:
+// - blottabName: NON EXISTING blot table's name 
+// - fieldsNumber:
+// - s_names:
+// - s_blottabIndexFlags: #SEE BLOTTAB_INDEX_FLAG
+//
+// Changed:
+// - *a_blottabHandle: created blottab's handle 
+//
+// Ret:
+// - RETURNED: Ok
+// - -1: unexpected problem; anomaly is raised
+static inline int ml_BlotexlibExecutorCreateBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle,
+  int blottabsLabel, struct P_STRING blottabName, int fieldsNumber, struct P_STRING* s_names,
+  int* s_blottabIndexFlags, BLOTTAB_HANDLE *a_blottabHandle) {
+  m_DIGGY_BOLLARD()
+m_DIGGY_VAR_P_STRING(blottabName)
+
+  m_TRACK_IF(BlottabCreateInstance(a_blottabHandle,fieldsNumber, s_names,s_blottabIndexFlags) !=
+    RETURNED)
+
+  m_TRACK_IF(BlotexlibExecutorAddBlottab(handle,blottabsLabel,blottabName,
+    *a_blottabHandle) != RETURNED)
+
+  m_DIGGY_RETURN(RETURNED)
+} // ml_BlotexlibExecutorCreateBlottab
 
 // Parse and compute blottab creation. 
 //
 // Passed:
 // - handle:
 // - *a_sequence: expect <blottab creation>  
+// - blottabsLabel:
 // - blottabName: name of NON EXISTING blottab
 //
 // Changed:
@@ -470,9 +466,10 @@ m_DIGGY_VAR_P_STRING(subSequence)
 // - ANSWER__YES: success
 // - ANSWER__NO: 'syntax' error; abandon processing 
 // - -1: unexpected problem
-static inline int ml_BlotexlibExecutorParseAndComputeBlottabCreation(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING *a_sequence, struct P_STRING nonExistingBlottabName,
-  BLOTTAB_HANDLE *ac_blottabHandle, G_STRING_STUFF nc_abandonmentInfo) {
+static inline int ml_BlotexlibExecutorParseAndComputeBlottabCreation(
+  BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING *a_sequence, int blottabsLabel,
+  struct P_STRING nonExistingBlottabName, BLOTTAB_HANDLE *ac_blottabHandle,
+  G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
 
   m_PREPARE_ABANDON(a_sequence, "<blottab creation>") 
@@ -519,7 +516,7 @@ m_DIGGY_VAR_D(n_asValue2)
     m_PParsePassSpaces(&subSequence,NULL);
   } while (!b_EMPTY_P_STRING(subSequence)) ; 
 
-  switch(l_BlotexlibExecutorCreateGenuineBlottab(handle, nonExistingBlottabName, i+1, s_names10,
+  switch(ml_BlotexlibExecutorCreateBlottab(handle, blottabsLabel,nonExistingBlottabName, i+1, s_names10,
     s_blottabIndexFlags10, ac_blottabHandle)) {
   case COMPLETED__OK:
   break; case COMPLETED__BUT:
@@ -533,26 +530,14 @@ m_DIGGY_VAR_D(n_asValue2)
 
 // Parse and compute 'r-value' blottab OPERATIONS:
 // expect <int blottab ops> | <str blottab ops>
-static inline int ml_BlotexlibExecutorParseAndComputeRValueGenuineBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING *a_sequence, struct P_STRING blottabName, struct BLOTEX_VALUE *ac_blotexValue,
+static inline int ml_BlotexlibExecutorParseAndComputeRValueBlottabOps(
+  BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING *a_sequence, int blottabsLabel,
+  struct P_STRING blottabName,BLOTTAB_HANDLE n_blottabHandle, struct BLOTEX_VALUE *ac_blotexValue,
   G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
   struct P_STRING lexeme = UNDEFINED_P_STRING;
 
   m_PREPARE_ABANDON(a_sequence, "<int blottab ops> | <str blottab ops>") 
-
-  BLOTTAB_HANDLE n_blottabHandle = (BLOTTAB_HANDLE)UNDEFINED;
-m_DIGGY_VAR_P_STRING(blottabName)
-  switch (BlotexlibExecutorGetBlottab(handle,GENUINE_BLOTTAB_LABEL0,blottabName,
-    (void**)&n_blottabHandle)) {
-  case RESULT__FOUND:
-    m_ASSERT(n_blottabHandle != NULL)
-  break; case RESULT__NOT_FOUND:
-    n_blottabHandle = NULL;
-  break; default:
-    m_TRACK()
-  } // switch
-
   m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle, AS__VALUE_INT,TRUE__BLOTVAL0,
     (struct P_STRING*)UNDEFINED,(char)UNDEFINED,ac_blotexValue) != RETURNED) // a priori
 
@@ -562,8 +547,8 @@ m_DIGGY_VAR_P_STRING(blottabName)
   PParsePassSingleChar(a_sequence,NULL,'[',&lexeme); 
   if (!b_EMPTY_P_STRING(lexeme)) { // <blottab op create> ...
     if (n_blottabHandle != NULL) m_ABANDON(ALREADY_EXISTS_BLOTTAB__ABANDONMENT_CAUSE)
-    switch (ml_BlotexlibExecutorParseAndComputeBlottabCreation(handle,a_sequence,blottabName,
-      &n_blottabHandle, nc_abandonmentInfo)) {
+    switch (ml_BlotexlibExecutorParseAndComputeBlottabCreation(handle,a_sequence,blottabsLabel,
+      blottabName, &n_blottabHandle, nc_abandonmentInfo)) {
     case ANSWER__YES:
     break; case ANSWER__NO:
       m_DIGGY_RETURN(ANSWER__NO)
@@ -600,8 +585,8 @@ m_DIGGY_VAR_P_STRING(blottabName)
   int c_element = UNDEFINED; // Only significant with blottab read/set op
   if (!b_EMPTY_P_STRING(lexeme)) { // <blottab op read int> | <blottab op read str> (R-value)
     // <blottab ref op set int> | <blottab ref op set str> (L-value)... 
-    switch (ParseAndRetrieveBlottabElement(a_sequence, n_blottabHandle->hp_fieldAttributesHandle, NULL,&c_element,
-      &n_asValue, nc_abandonmentInfo)) {
+    switch (ParseAndRetrieveBlottabElement(a_sequence, n_blottabHandle->hp_fieldAttributesHandle,
+      NULL,&c_element, &n_asValue, nc_abandonmentInfo)) {
     case ANSWER__YES:
 m_ASSERT(n_asValue != -1)
     break; case ANSWER__NO:
@@ -649,33 +634,22 @@ m_DIGGY_VAR_D(n_asValue)
   } // if
 
   m_DIGGY_RETURN(ANSWER__YES)
-} // ml_BlotexlibExecutorParseAndComputeRValueGenuineBlottabOps
+} // ml_BlotexlibExecutorParseAndComputeRValueBlottabOps
 
 // Parse and compute 'r-value' blottab spot:
 // expect <int blottab spot> | <str blottab spot>
-static inline int ml_BlotexlibExecutorParseAndComputeRValueGenuineBlottabSpot(
+static inline int ml_BlotexlibExecutorParseAndComputeRValueBlottabSpot(
   BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING *a_sequence, struct P_STRING blottabName,
-  struct BLOTEX_VALUE *ac_blotexValue, G_STRING_STUFF nc_abandonmentInfo) {
+  BLOTTAB_HANDLE n_blottabHandle, struct BLOTEX_VALUE *ac_blotexValue,
+  G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
 
   m_PREPARE_ABANDON(a_sequence, "<int blottab spot> | <str blottab spot>") 
-
-  BLOTTAB_HANDLE blottabHandle = (BLOTTAB_HANDLE)UNDEFINED;
-m_DIGGY_VAR_P_STRING(blottabName)
-  switch (BlotexlibExecutorGetBlottab(handle,GENUINE_BLOTTAB_LABEL0,blottabName,
-    (void**)&blottabHandle)) {
-  case RESULT__FOUND:
-    m_ASSERT(blottabHandle != NULL)
-  break; case RESULT__NOT_FOUND:
-    m_ABANDON(UNKNOWN_BLOTTAB__ABANDONMENT_CAUSE) 
-  break; default:
-    m_TRACK()
-  } // switch
-
+  if (n_blottabHandle == NULL) m_ABANDON(UNKNOWN_BLOTTAB__ABANDONMENT_CAUSE)
   int asValue = UNDEFINED; 
   int element = UNDEFINED;
   g_G_STRING_SET_STUFF t_blotsetStuff = (g_G_STRING_SET_STUFF)UNDEFINED;
-  switch (l_BlotexlibExecutorParseAndRetrieveBlottabSpot(handle,a_sequence,blottabHandle,
+  switch (l_BlotexlibExecutorParseAndRetrieveBlottabSpot(handle,a_sequence,n_blottabHandle,
     &t_blotsetStuff,&element, &asValue,nc_abandonmentInfo)) {
   case ANSWER__YES:
   break;  case ANSWER__NO:
@@ -695,30 +669,31 @@ m_DIGGY_VAR_P_STRING(blottabName)
   break; default: m_TRACK() } // switch
 
   m_DIGGY_RETURN(ANSWER__YES) 
-} // l_BlotexlibExecutorParseAndComputeRValueGenuineBlottabSpot
+} // ml_BlotexlibExecutorParseAndComputeRValueBlottabSpot
 
 // Public function: see .h
-int l_BlotexlibExecutorParseAndComputeRValueGenuineBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  char b_spot, struct P_STRING *a_sequence, struct P_STRING blottabName,
-  struct BLOTEX_VALUE *ac_blotexValue, G_STRING_STUFF nc_abandonmentInfo) {
+int l_BlotexlibExecutorParseAndComputeRValueBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
+  char b_spot, struct P_STRING *a_sequence, int blottabsLabel, struct P_STRING blottabName,
+  void *nr_blottabHandle, struct BLOTEX_VALUE *ac_blotexValue, G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
   int answer = UNDEFINED;
   if (b_spot) {
-    switch (answer = ml_BlotexlibExecutorParseAndComputeRValueGenuineBlottabSpot(handle,a_sequence,
-      blottabName,ac_blotexValue,nc_abandonmentInfo)) {  
+    switch (answer = ml_BlotexlibExecutorParseAndComputeRValueBlottabSpot(handle,a_sequence,
+      blottabName,(BLOTTAB_HANDLE)nr_blottabHandle,ac_blotexValue,nc_abandonmentInfo)) {  
     case ANSWER__YES:
     break; case ANSWER__NO:
     break; default: m_TRACK() } // switch 
   } else {
-    switch (answer = ml_BlotexlibExecutorParseAndComputeRValueGenuineBlottabOps(handle,a_sequence,
-      blottabName,ac_blotexValue,nc_abandonmentInfo)) {  
+    switch (answer = ml_BlotexlibExecutorParseAndComputeRValueBlottabOps(handle,a_sequence,
+      blottabsLabel,blottabName,(BLOTTAB_HANDLE)nr_blottabHandle,ac_blotexValue,
+      nc_abandonmentInfo)) {
     case ANSWER__YES:
     break; case ANSWER__NO:
     break; default: m_TRACK() } // switch 
   } // if
 
   m_DIGGY_RETURN(answer)
-} // l_BlotexlibExecutorParseAndComputeRValueGenuineBlottabOps
+} // l_BlotexlibExecutorParseAndComputeRValueBlottabOps
 
 
 // Passed:
