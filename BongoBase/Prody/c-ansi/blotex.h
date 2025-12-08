@@ -113,6 +113,11 @@ typedef int (*l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTIO
 typedef int (*UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION)(
   struct BLOTTAB_FIELD_REFERENCE blottabFieldReference, struct BLOTEX_VALUE blotexValue);
 
+#define MAX_BLOTTAB_IMPLEMENTIONS_NUMBER 3
+// 1st implementation: "genuine" blottabs
+// 2nd implementation: "super" blottabs
+// 3rd implementation: "hyper" blottabs
+
 #define GENUINE_BLOTTABS_LABEL0 0
 
 // Create blotex library executor factory; also register "Genuine" blottab implementation

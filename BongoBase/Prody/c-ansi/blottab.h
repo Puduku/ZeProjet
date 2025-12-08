@@ -59,28 +59,6 @@ int UpdateBlottabCurrentBlotsetField(struct BLOTTAB_FIELD_REFERENCE blottabField
  struct BLOTEX_VALUE blotexValue) ;
 
 
-// "Extra" functions/...
-
-// Create NEW GENUINE blot table and add it in blotex executor's blot tables.
-// 
-// Passed:
-// - handle:
-// - blottabName: NON EXISTING blot table's name 
-// - fieldsNumber:
-// - s_names:
-// - s_blottabIndexFlags: #SEE BLOTTAB_INDEX_FLAG
-//
-// Changed:
-// - *a_blottabHandle: created blottab's handle 
-//
-// Ret:
-// - RETURNED: Ok
-// - -1: unexpected problem; anomaly is raised
-#if 0
-int l_BlotexlibExecutorCreateBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING blottabName, int fieldsNumber, struct P_STRING* s_names, int* s_blottabIndexFlags,
-  BLOTTAB_HANDLE *a_blottabHandle) ;
-#endif
 
 
 #endif // __BLOTTAB_C_ANSI_H_INCLUDED__

@@ -15,10 +15,61 @@
 
 #include <limits.h>
 
+// Blotregs: 
+// ---------
+
+#define NAME__BLOTREG_INDEX_LABEL      0
+#define TOKEN_ID__BLOTREG_INDEX_LABEL  1
+#define INT_VALUE__BLOTREG_INDEX_LABEL 2
+#define STR_VALUE__BLOTREG_INDEX_LABEL 3
+
+#define g_BLOTREG_HANDLE g_G_PARAMS_HANDLE
+
+// #SEE NAMED_OBJECT_CREATE_INSTANCE_FUNCTION @ c-ansi/named-object.h <blotreg>
+static int BlotregCreateInstance(void **azhr_handle, struct P_STRING f_name, va_list arguments){
+  m_DIGGY_BOLLARD_S()
+  g_BLOTREG_HANDLE* azh_handle = (g_BLOTREG_HANDLE*) azhr_handle;
+  m_TRACK_IF(l_GParamsCreateInstance(azh_handle,BATEAU__EXPECTED_ITEMS_NUMBER) !=
+    RETURNED) 
+  g_BLOTREG_HANDLE handle = *azh_handle;
+  m_ASSERT(g_GParamsAddIndex(handle,1,G_PARAM_NAME_ELEMENT,P_STRING__G_KEYS_COMPARISON,NULL,NULL,
+    (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) == NAME__BLOTREG_INDEX_LABEL)
+  m_ASSERT(g_GParamsAddIndex(handle,1,G_PARAM_NAME_ELEMENT,ACOLYT_VALUE__G_KEYS_COMPARISON,
+    (IS_CHAR_FUNCTION)UNDEFINED,(TO_CHAR_FUNCTION)UNDEFINED,
+    (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) == TOKEN_ID__BLOTREG_INDEX_LABEL)
+  m_ASSERT(g_GParamsAddIndex(handle,1,G_PARAM_VALUE_ELEMENT,ACOLYT_VALUE__G_KEYS_COMPARISON,
+    (IS_CHAR_FUNCTION)UNDEFINED,(TO_CHAR_FUNCTION)UNDEFINED,
+    (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) ==
+    INT_VALUE__BLOTREG_INDEX_LABEL)
+  m_ASSERT(g_GParamsAddIndex(handle,1,G_PARAM_VALUE_ELEMENT, P_STRING__G_KEYS_COMPARISON,NULL,NULL,
+        (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) ==
+        STR_VALUE__BLOTREG_INDEX_LABEL)
+  m_DIGGY_RETURN(RETURNED)
+} // BlotregCreateInstance 
+
+#define g_BlotregVerifyIndexes g_GParamsVerifyIndexes
+
+#define g_BlotregFetch g_GParamsFetch
+
+#define gm_BlotregIndexSingleFetch gm_GParamsIndexSingleFetch
+
+#define g_BlotregIndexFetch g_GParamsIndexFetch
+
+#define g_BlotregIndexRequestR g_GParamsIndexRequestR
+
+// #SEE NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION @ c-ansi/g-string.h <blotreg>
+static int BlotregDestroyInstance(void *xhr_handle) {
+  m_DIGGY_BOLLARD_S()
+  g_BLOTREG_HANDLE xh_handle = (g_BLOTREG_HANDLE) xhr_handle;
+
+  m_TRACK_IF(g_GParamsDestroyInstance(xh_handle) < 0)  
+
+  m_DIGGY_RETURN(RETURNED) 
+} // BlotregDestroyInstance 
+
+
 // blotex library executor 
 // =======================
-
-#define MAX_BLOTTAB_IMPLEMENTIONS_NUMBER 3
 
 struct BLOTTAB_IMPLEMENTATION {
   l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_L_VALUE_BLOTTAB_SET_OP_FUNCTION
@@ -106,50 +157,6 @@ struct BLOTEXLIB_EXECUTOR {
     MAX_BLOTTAB_IMPLEMENTIONS_NUMBER]; 
 } ;  
 
-
-// Blotregs: 
-
-
-#define NAME__BLOTREG_INDEX_LABEL      0
-#define TOKEN_ID__BLOTREG_INDEX_LABEL  1
-#define INT_VALUE__BLOTREG_INDEX_LABEL 2
-#define STR_VALUE__BLOTREG_INDEX_LABEL 3
-
-// NAMED_OBJECT_CREATE_INSTANCE_FUNCTION
-static int BlotregCreateInstance(void **azhr_handle, struct P_STRING f_name, va_list arguments){
-  m_DIGGY_BOLLARD_S()
-  g_G_PARAMS_HANDLE* azh_handle = (g_G_PARAMS_HANDLE*) azhr_handle;
-  m_TRACK_IF(l_GParamsCreateInstance(azh_handle,BATEAU__EXPECTED_ITEMS_NUMBER) !=
-    RETURNED) 
-  g_G_PARAMS_HANDLE handle = *azh_handle;
-  m_ASSERT(g_GParamsAddIndex(handle,1,G_PARAM_NAME_ELEMENT,P_STRING__G_KEYS_COMPARISON,NULL,NULL,
-    (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) == NAME__BLOTREG_INDEX_LABEL)
-  m_ASSERT(g_GParamsAddIndex(handle,1,G_PARAM_NAME_ELEMENT,ACOLYT_VALUE__G_KEYS_COMPARISON,
-    (IS_CHAR_FUNCTION)UNDEFINED,(TO_CHAR_FUNCTION)UNDEFINED,
-    (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) == TOKEN_ID__BLOTREG_INDEX_LABEL)
-  m_ASSERT(g_GParamsAddIndex(handle,1,G_PARAM_VALUE_ELEMENT,ACOLYT_VALUE__G_KEYS_COMPARISON,
-    (IS_CHAR_FUNCTION)UNDEFINED,(TO_CHAR_FUNCTION)UNDEFINED,
-    (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) ==
-    INT_VALUE__BLOTREG_INDEX_LABEL)
-  m_ASSERT(g_GParamsAddIndex(handle,1,G_PARAM_VALUE_ELEMENT, P_STRING__G_KEYS_COMPARISON,NULL,NULL,
-        (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) ==
-        STR_VALUE__BLOTREG_INDEX_LABEL)
-  m_DIGGY_RETURN(RETURNED)
-} // BlotregCreateInstance 
-
-
-
-// NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION
-static int BlotregDestroyInstance(void *xhr_handle) {
-  m_DIGGY_BOLLARD_S()
-  g_G_PARAMS_HANDLE xh_handle = (g_G_PARAMS_HANDLE) xhr_handle;
-
-  m_TRACK_IF(g_GParamsDestroyInstance(xh_handle) < 0)  
-
-  m_DIGGY_RETURN(RETURNED) 
-} // BlotregDestroyInstance 
-
-
 // #SEE BLOTLIB_EXECUTOR_FACTORY__CREATE_PRODUCT_INSTANCE_FUNCTION@c-ansi/blotcode.h <blotex>
 static int BlotexlibExecutorFactoryCreateProductInstance(void *pr_handle,
   void **azhr_blotlibExecutorHandle) {
@@ -229,7 +236,7 @@ m_DIGGY_RETURN(RETURNED)
 #endif
 // Public function; see .h
 int BlotexlibExecutorGetBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING blotregName, g_G_PARAMS_HANDLE *ac_blotregHandle) {
+  struct P_STRING blotregName, g_BLOTREG_HANDLE *ac_blotregHandle) {
   m_DIGGY_BOLLARD()
 m_DIGGY_VAR_P_STRING(blotregName)
 //DumpBlotregs(handle->h_blotregsHandle,"GET blotreg BEFORE SEARCH");
@@ -239,7 +246,7 @@ m_DIGGY_VAR_P_STRING(blotregName)
   switch (result) {
   case RESULT__FOUND:
     m_ASSERT(*ac_blotregHandle != NULL)
-switch(g_GParamsVerifyIndexes(*ac_blotregHandle)) {
+switch(g_BlotregVerifyIndexes(*ac_blotregHandle)) {
 case COMPLETED__OK:
 break; case COMPLETED__BUT:
   m_RAISE(ANOMALY__CORRUPTED_INDEXES)
@@ -257,7 +264,7 @@ break; default:
 
 // Public function; see .h
 int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING blotregName, g_G_PARAMS_HANDLE *na_blotregHandle) {
+  struct P_STRING blotregName, g_BLOTREG_HANDLE *na_blotregHandle) {
   m_DIGGY_BOLLARD()
 m_DIGGY_VAR_P_STRING(blotregName)
   int completed = UNDEFINED;
@@ -331,7 +338,7 @@ enum {
 };
 
 struct BLOTVAR_REFERENCE {
-  g_G_PARAMS_HANDLE blotregHandle;
+  g_BLOTREG_HANDLE blotregHandle;
   int blotvarReference; 
   union {
     struct P_STRING c_name; // Only significant with NAME__BLOTVAR_REFERENCE
@@ -340,7 +347,7 @@ struct BLOTVAR_REFERENCE {
   } c_select; // NOT significant with CURRENT__BLOTVAR_REFERENCE
 } ;
 
-#define UNDEFINED_BLOTVAR_REFERENCE { (G_STRINGS_HANDLE) UNDEFINED }
+#define UNDEFINED_BLOTVAR_REFERENCE { (g_BLOTREG_HANDLE) UNDEFINED }
 
 // Complete parsing of "simple" blotvar reference.
 //
@@ -361,12 +368,12 @@ struct BLOTVAR_REFERENCE {
 // - -1: unexpected problem
 static int BlotexlibExecutorParseAndComputeSimpleBlotvarReference(BLOTEXLIB_EXECUTOR_HANDLE handle,
   char b_lValue, struct P_STRING *a_sequence, const struct P_STRING blotregName,
-  g_G_PARAMS_HANDLE n_blotregHandle, struct BLOTVAR_REFERENCE *ac_blotvarReference,
+  g_BLOTREG_HANDLE n_blotregHandle, struct BLOTVAR_REFERENCE *ac_blotvarReference,
   G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD_S()
 m_DIGGY_VAR_P_STRING(*a_sequence) 
 m_DIGGY_VAR_P(n_blotregHandle)
-  ac_blotvarReference->blotregHandle = (G_STRINGS_HANDLE)UNDEFINED; 
+  ac_blotvarReference->blotregHandle = (g_BLOTREG_HANDLE)UNDEFINED; 
   struct P_STRING lexeme = UNDEFINED_P_STRING;
 
   m_PREPARE_ABANDON(a_sequence,"<blotvar>") 
@@ -462,7 +469,7 @@ m_DIGGY_VAR_P_STRING(ap_blotvarReference->c_select.c_name)
         gKey = m_GKey_AcolytValue(ap_blotvarReference->c_select.c_tokenId);
       } // if
 m_DIGGY_VAR_P(ap_blotvarReference->blotregHandle)
-      switch (gm_GParamsIndexSingleFetch(ap_blotvarReference->blotregHandle,NULL,indexLabel,
+      switch (gm_BlotregIndexSingleFetch(ap_blotvarReference->blotregHandle,NULL,indexLabel,
         INDEX_SEEK_FLAGS__EQUAL,&gKey,cb_lValue?  INDEX_FETCH_FLAGS__FETCH:
         INDEX_FETCH_FLAGS__SEEK_ONLY, ant_blotvarStuff, navn_entry)) {
       case RESULT__FOUND:
@@ -483,12 +490,12 @@ m_DIGGY_VAR_P(ap_blotvarReference->blotregHandle)
       } // switch
     } // gKey 
   break; case ENTRY__BLOTVAR_REFERENCE:
-    ret = g_GParamsFetch(ap_blotvarReference->blotregHandle,
+    ret = g_BlotregFetch(ap_blotvarReference->blotregHandle,
       ap_blotvarReference->c_select.c_entry, ant_blotvarStuff);
     m_TRACK_IF(ret < 0)
 m_ASSERT(ret == ap_blotvarReference->c_select.c_entry)
   break; case CURRENT__BLOTVAR_REFERENCE:
-    switch (g_GParamsIndexFetch(ap_blotvarReference->blotregHandle,NULL,
+    switch (g_BlotregIndexFetch(ap_blotvarReference->blotregHandle,NULL,
       INDEX_FETCH_FLAGS__CURRENT, ant_blotvarStuff, navn_entry)){
     case RESULT__FOUND:
 m_ASSERT(*ant_blotvarStuff != NULL)
@@ -564,7 +571,7 @@ int BlotexlibExecutorConcatenateStrexValue(BLOTEXLIB_EXECUTOR_HANDLE handle,
 // - ANSWER__NO: 'syntax' error; abandon processing 
 // - -1: unexpected problem
 static inline int m_BlotexlibExecutorParseAndComputeBlotregRequest(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING *a_sequence, g_G_PARAMS_HANDLE blotregHandle, G_STRING_STUFF nc_abandonmentInfo) {
+  struct P_STRING *a_sequence, g_BLOTREG_HANDLE blotregHandle, G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
 
   m_PREPARE_ABANDON(a_sequence, "<blotreg request>") 
@@ -644,7 +651,7 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(n_indexSeekFlags)
     m_PParsePassSpaces(&subSequence,NULL);
   } while (!b_EMPTY_P_STRING(subSequence)) ; 
 
-  switch (g_GParamsIndexRequestR(blotregHandle,NULL,criteriaNumber,criteria5)) {
+  switch (g_BlotregIndexRequestR(blotregHandle,NULL,criteriaNumber,criteria5)) {
   case COMPLETED__OK:
   break ; case COMPLETED__BUT: // Request rectified
     m_RAISE(ANOMALY__UNEXPECTED_CASE)
@@ -674,7 +681,7 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(n_indexSeekFlags)
 // - ANSWER__NO: 'syntax' 'not found' error; abandon processing 
 // - -1: unexpected problem
 static int BlotexlibExecutorParseAndComputeLValueBlotregOps(BLOTEXLIB_EXECUTOR_HANDLE handle, 
-  struct P_STRING *a_sequence, struct P_STRING blotregName, g_G_PARAMS_HANDLE n_blotregHandle, 
+  struct P_STRING *a_sequence, struct P_STRING blotregName, g_BLOTREG_HANDLE n_blotregHandle, 
   struct BLOTVAR_REFERENCE *ac_blotvarReference, int *ac_as, G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
   struct P_STRING lexeme;
@@ -720,7 +727,7 @@ static int BlotexlibExecutorParseAndComputeLValueBlotregOps(BLOTEXLIB_EXECUTOR_H
 // - ANSWER__NO: 'syntax' 'not found' error; abandon processing 
 // - -1: unexpected problem
 static int BlotexlibExecutorParseAndComputeRValueBlotregOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING *a_sequence, struct P_STRING blotregName, g_G_PARAMS_HANDLE n_blotregHandle,
+  struct P_STRING *a_sequence, struct P_STRING blotregName, g_BLOTREG_HANDLE n_blotregHandle,
   struct BLOTEX_VALUE *ac_blotexValue, G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
   struct P_STRING lexeme;
@@ -771,7 +778,7 @@ static int BlotexlibExecutorParseAndComputeRValueBlotregOps(BLOTEXLIB_EXECUTOR_H
     int c_entry = UNDEFINED;
 
 m_DIGGY_VAR_INDEX_FETCH_FLAGS(n_indexFetchFlags) 
-    switch (g_GParamsIndexFetch(n_blotregHandle,NULL,n_indexFetchFlags,
+    switch (g_BlotregIndexFetch(n_blotregHandle,NULL,n_indexFetchFlags,
       &ct_blotvarStuff, &c_entry)) {
     case RESULT__FOUND:
       switch (n_as) {
@@ -830,7 +837,7 @@ m_RAISE(ANOMALY__NOT_AVAILABLE)
 // - ANSWER__NO: 'syntax' 'not found' error; abandon processing 
 // - -1: unexpected problem
 static inline int m_BlotexlibExecutorParseAndComputeBlotexAtomBlotvar(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING *a_sequence, struct P_STRING blotregName, g_G_PARAMS_HANDLE n_blotregHandle,
+  struct P_STRING *a_sequence, struct P_STRING blotregName, g_BLOTREG_HANDLE n_blotregHandle,
   struct BLOTEX_VALUE *ac_blotexAtomValue, G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
 
@@ -902,7 +909,7 @@ static inline int m_BlotexlibExecutorParseAndComputeBlotexAtomBlotvar(BLOTEXLIB_
 // - -1: unexpected problem
 static int BlotexLibParseAndComputeBlotregOrBlottabXName(BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct P_STRING *a_sequence, int *an_blottabsLabel, struct P_STRING *a_name,
-  void ** acnr_blottabHandle, g_G_PARAMS_HANDLE *acn_blotregHandle) {
+  void ** acnr_blottabHandle, g_BLOTREG_HANDLE *acn_blotregHandle) {
   m_DIGGY_BOLLARD()
 m_DIGGY_VAR_P(a_name)
 
@@ -1007,7 +1014,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
         struct P_STRING name = UNDEFINED_P_STRING;
         int n_blottabsLabel = UNDEFINED;
         void* cnr_blottabHandle = (void*)UNDEFINED;
-        g_G_PARAMS_HANDLE cn_blotregHandle = (void*)UNDEFINED;
+        g_BLOTREG_HANDLE cn_blotregHandle = (void*)UNDEFINED;
         m_TRACK_IF(BlotexLibParseAndComputeBlotregOrBlottabXName(handle,a_sequence, &n_blottabsLabel,
           &name, &cnr_blottabHandle,&cn_blotregHandle) != RETURNED) 
 m_DIGGY_VAR_P(cn_blotregHandle)
@@ -1349,14 +1356,14 @@ static inline int m_BlotexlibExecutorProbeBlotexRef(BLOTEXLIB_EXECUTOR_HANDLE ha
   G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD_S()
 m_DIGGY_VAR_P_STRING(*a_sequence) 
-  acc_blotvarReference->blotregHandle = (G_STRINGS_HANDLE)UNDEFINED; 
+  acc_blotvarReference->blotregHandle = (g_BLOTREG_HANDLE)UNDEFINED; 
   struct P_STRING lexeme = UNDEFINED_P_STRING;
 
   *acc_as = UNDEFINED;
 
   struct P_STRING name; UNDEFINED;
   void* cnr_blottabHandle = (void*)UNDEFINED;
-  g_G_PARAMS_HANDLE cn_blotregHandle = (void*)UNDEFINED;
+  g_BLOTREG_HANDLE cn_blotregHandle = (g_BLOTREG_HANDLE)UNDEFINED;
   m_TRACK_IF(BlotexLibParseAndComputeBlotregOrBlottabXName(handle,a_sequence,
     an_fieldReferenceBlottabsLabel,&name, &cnr_blottabHandle,&cn_blotregHandle) != RETURNED)
   PParsePassSingleChar(a_sequence,NULL,'?',&lexeme);
@@ -1486,7 +1493,7 @@ static inline int m_BlotexlibExecutorExecuteCFunctionEval(BLOTEXLIB_EXECUTOR_HAN
       break; case AS__VALUE_STR: // '$'
         if (c_blotexValue.asValue != AS__VALUE_STR) m_ABANDON(EXPECT_STREX__ABANDONMENT_CAUSE)
       break; default: m_RAISE(ANOMALY__VALUE__D,cc_lValueBlottabFieldReference.asValue)
-      } // switch TODO: use correct blottab label:
+      } // switch 
       switch (handle->blottabExecutorImplementations[n_fieldReferenceBlottabsLabel].
         updateBlottabCurrentBlotsetFieldFunction(cc_lValueBlottabFieldReference, c_blotexValue)) {
       case RESULT__FOUND:
