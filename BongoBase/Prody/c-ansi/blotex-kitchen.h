@@ -219,8 +219,6 @@ enum {
 //   + >=0 : corresponding int 2op 
 int ParseTermOp(struct P_STRING *a_sequence, int *an_termOp);
 
-
-
 // Terminal symbols (of <format> terminal symbol)
 enum {
              D__FORMAT,
@@ -249,10 +247,6 @@ int ParseFormat(struct P_STRING *a_sequence, int *avn_format,
   G_STRING_STUFF nc_abandonmentInfo) ;
 
 
-
-// blottabs:
-// ---------
-
 // Parse blottabs label  
 //
 // Passed:
@@ -269,8 +263,8 @@ int ParseFormat(struct P_STRING *a_sequence, int *avn_format,
 int ParseBlottabsLabel(struct P_STRING *a_sequence, int *an_blottabsLabel);
 
 
-// Blotregs: 
-// ---------
+// BLOTREG: 
+// --------
 
 #define NAME__BLOTREG_INDEX_LABEL      0
 #define TOKEN_ID__BLOTREG_INDEX_LABEL  1
@@ -296,7 +290,8 @@ int BlotregCreateInstance(void **azhr_handle, struct P_STRING f_name, va_list ar
 int BlotregDestroyInstance(void *xhr_handle) ;
 
 
-// BLOTVAR support
+// BLOTVAR: 
+// --------
 
 // specific blotvar reference (of a register) 
 enum {
@@ -317,6 +312,48 @@ struct BLOTVAR_REFERENCE {
 } ;
 
 #define UNDEFINED_BLOTVAR_REFERENCE { (g_BLOTREG_HANDLE) UNDEFINED }
+
+// Complete parsing of "simple" blotvar reference.
+//
+// Passed:
+// - *a_sequence: expected: [ last part of ] <blotvar> 
+// - blotregHandle: 
+//
+// Changed:
+// - *a_sequence: after parsing 
+// - ac_blotvarReference: only significant if success
+// - nc_abandonmentInfo: only significant if abandon 
+//
+// Ret: "simple" blotvar successfully parsed ? 
+// - ANSWER__YES: success
+// - ANSWER__NO: abandon 
+// - -1: unexpected problem
+int ParseAndComputeSimpleBlotvarReference(struct P_STRING *a_sequence, 
+  g_BLOTREG_HANDLE blotregHandle, struct BLOTVAR_REFERENCE *ac_blotvarReference,
+  G_STRING_STUFF nc_abandonmentInfo) ;
+
+// Parse and compute blotreg operations (l-values) :
+// Expect <blotreg ref op set int> | <blotreg ref op set str> 
+//
+// Passed:
+// - handle: 
+// - *a_sequence: before parsing
+// - blotregName: register name
+//
+// Changed:
+// - *a_sequence: after parsing 
+// - *ac_blotvarReference: only significant if "success" ; corresponding blotvar reference
+// - *ac_as: only significant if "success" 
+// - nc_abandonmentInfo: 
+//
+// Ret: Computed successfully ? 
+// - ANSWER__YES: Ok,
+// - ANSWER__NO: 'syntax' 'not found' error; abandon processing 
+// - -1: unexpected problem
+int ParseAndComputeLValueBlotregOps(       
+  struct P_STRING *a_sequence, struct P_STRING blotregName, g_BLOTREG_HANDLE n_blotregHandle,
+  struct BLOTVAR_REFERENCE *ac_blotvarReference, int *ac_as, G_STRING_STUFF nc_abandonmentInfo) ;
+
 
 // Fetch actual blotvar corresponding to blotvar reference 
 //

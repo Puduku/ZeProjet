@@ -13,16 +13,7 @@
 
 #include <limits.h>
 
-// blotex library executor 
-// =======================
-
-
-// Blotregs: 
-
-
-
 // Blot expressions parsing:
-
 
 // IS_CHAR_FUNCTION:
 int IsEntityNameChar(int c) {
@@ -30,13 +21,11 @@ int IsEntityNameChar(int c) {
 } // IsEntityNameChar 
 
 
-
 #define  AS__ENTRY__XX "!#" 
 #define  AS__NAME__XX           "!$"
 #define  AS__VALUE_INT__X       "#" 
 #define  AS__ID__X              "!"
 #define  AS__VALUE_STR__X       "$"
-
 
 // See .h 
 int ParseAs(char b_lValue, struct P_STRING *a_sequence, int *a_as) {
@@ -121,7 +110,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
   m_DIGGY_RETURN(RETURNED)
 } // ParseRequestCompOp 
 
-//
+// See .h
 int ParseLogical2Op(struct P_STRING *a_sequence,
   int *a_criteriaOpFlags) {
   m_DIGGY_BOLLARD()
@@ -146,7 +135,6 @@ int IsInt1Op(int c) {
 } // IsInt1Op
 
 
-
 // See .h
 int ParseTermOp(struct P_STRING *a_sequence, int *an_termOp) {
   m_DIGGY_BOLLARD()
@@ -157,7 +145,6 @@ int ParseTermOp(struct P_STRING *a_sequence, int *an_termOp) {
   // TODO: FOIREUX !!!!???? "++" sera rejeted !!!!!!????
   m_DIGGY_RETURN(RETURNED)
 } // ParseTermOp
-
 
 
 // IS_CHAR_FUNCTION:
@@ -213,6 +200,7 @@ int ParseBlottabsLabel(struct P_STRING *a_sequence, int *an_blottabsLabel) {
 } // ParseBlottabsLabel
 
 // BLOTREG:
+// --------
 
 // See .h
 int BlotregCreateInstance(void **azhr_handle, struct P_STRING f_name, va_list arguments){
@@ -248,6 +236,89 @@ int BlotregDestroyInstance(void *xhr_handle) {
 
 
 // BLOTVAR:
+// --------
+
+// See .h
+int ParseAndComputeSimpleBlotvarReference(struct P_STRING *a_sequence, 
+  g_BLOTREG_HANDLE blotregHandle, struct BLOTVAR_REFERENCE *ac_blotvarReference,
+  G_STRING_STUFF nc_abandonmentInfo) {
+  m_DIGGY_BOLLARD_S()
+m_DIGGY_VAR_P_STRING(*a_sequence)
+m_DIGGY_VAR_P(blotregHandle)
+  ac_blotvarReference->blotregHandle = blotregHandle;
+  struct P_STRING lexeme = UNDEFINED_P_STRING;
+
+  m_PREPARE_ABANDON(a_sequence,"<blotvar>")
+
+  m_PParsePassSpaces(a_sequence,NULL);
+
+  // Retrieve blotvar reference:
+  PParseOffset(a_sequence,1,&lexeme);
+  if (b_EMPTY_P_STRING(lexeme)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE) 
+  GENERIC_INTEGER genericInteger = UNDEFINED;
+  switch (lexeme.string[0]) {
+  case '.' : // '.' <entity> : 
+    ac_blotvarReference->blotvarReference = NAME__BLOTVAR_REFERENCE;
+    PParsePassChars(a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_WHILE,IsEntityNameChar,
+      (char)UNDEFINED,&lexeme);
+    ac_blotvarReference->c_select.c_name = lexeme;
+  break; case '[' : // '[' <intex> ']' :
+    ac_blotvarReference->blotvarReference = ENTRY__BLOTVAR_REFERENCE;
+    PParseGenericInteger(a_sequence,&genericInteger,&lexeme);
+    if (b_EMPTY_P_STRING(lexeme)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
+    // TODO: support empty or -1 entry when l-value (for smart fetch) 
+    else if (genericInteger > INT_MAX || genericInteger < 0) m_ABANDON(
+      VALUE_ERROR__ABANDONMENT_CAUSE)
+    else ac_blotvarReference->c_select.c_entry = genericInteger;
+    PParsePassSingleChar(a_sequence,NULL,']',&lexeme);
+    if (b_EMPTY_P_STRING(lexeme)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
+  break; case '{' : // '{' <intex> '}' : 
+    ac_blotvarReference->blotvarReference = TOKEN_ID__BLOTVAR_REFERENCE;
+    PParseGenericInteger(a_sequence,&genericInteger,&lexeme);
+    if (b_EMPTY_P_STRING(lexeme)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
+    else if (genericInteger > INT_MAX || genericInteger < 0) m_ABANDON(
+      VALUE_ERROR__ABANDONMENT_CAUSE)
+    else ac_blotvarReference->c_select.c_tokenId = genericInteger;
+    PParsePassSingleChar(a_sequence,NULL,'}',&lexeme);
+    if (b_EMPTY_P_STRING(lexeme)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
+  break; default:
+    m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE) 
+  } // switch
+
+  m_DIGGY_RETURN(ANSWER__YES) ;
+} // ParseAndComputeSimpleBlotvarReference 
+
+
+// See .h
+int ParseAndComputeLValueBlotregOps( 
+  struct P_STRING *a_sequence, struct P_STRING blotregName, g_BLOTREG_HANDLE n_blotregHandle, 
+  struct BLOTVAR_REFERENCE *ac_blotvarReference, int *ac_as, G_STRING_STUFF nc_abandonmentInfo) {
+  m_DIGGY_BOLLARD()
+  struct P_STRING lexeme;
+
+  m_PREPARE_ABANDON(a_sequence, "<blotreg ref op set int> | <blotreg ref op set str>")
+
+  if (n_blotregHandle == NULL) m_ABANDON(UNKNOWN_BLOTREG__ABANDONMENT_CAUSE)
+  ac_blotvarReference->blotregHandle = n_blotregHandle; 
+  ac_blotvarReference->blotvarReference = CURRENT__BLOTVAR_REFERENCE;
+  *ac_as = UNDEFINED; // For the moment 
+
+  int n_indexFetchFlags = -1; // a priori
+  m_PParsePassSpaces(a_sequence,NULL);
+
+  int n_as = -1; // No blotreg read/set op a priori 
+  PParsePassSingleChar(a_sequence,NULL,'=',&lexeme); 
+  if (!b_EMPTY_P_STRING(lexeme)) { // <blotreg ref op set int> | <blotreg ref op set str>... 
+    m_TRACK_IF(ParseAs(b_L_VALUE,a_sequence,&n_as) != RETURNED)
+    if (n_indexFetchFlags < 0) n_indexFetchFlags = ALL_FLAGS_OFF0; 
+  } // if
+  
+    if (n_as == -1) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
+    *ac_as = n_as ;
+
+  m_DIGGY_RETURN(ANSWER__YES)
+} // ParseAndComputeLValueBlotregOps
+
 
 // See .h
 int FetchBlotvar(const struct BLOTVAR_REFERENCE *ap_blotvarReference, char cb_lValue,
