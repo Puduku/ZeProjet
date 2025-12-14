@@ -15,8 +15,8 @@
 
 #include <limits.h>
 
-// blotex library executor 
-// =======================
+// blotex library executor factory: 
+// ================================
 
 struct BLOTTAB_IMPLEMENTATION {
   l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_L_VALUE_BLOTTAB_SET_OP_FUNCTION
@@ -140,7 +140,10 @@ static int BlotexlibExecutorFactoryCreateProductInstance(void *pr_handle,
 
   m_DIGGY_RETURN(RETURNED)
 } // BlotexlibExecutorFactoryCreateProductInstance
-  
+
+
+// Interface for other blotlib executors:
+// ======================================
 
 // Public function; see .h
 int l_BlotcodeExecutorGetBlotexlibExecutorHandle(BLOTCODE_EXECUTOR_HANDLE handle, int blotexlibEntry,
@@ -181,6 +184,7 @@ m_DIGGY_RETURN(RETURNED)
 
 } // DumpBlotregs
 #endif
+
 // Public function; see .h
 int BlotexlibExecutorGetBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct P_STRING blotregName, g_BLOTREG_HANDLE *ac_blotregHandle) {
@@ -227,6 +231,9 @@ m_DIGGY_VAR_P_STRING(blotregName)
   m_DIGGY_RETURN(completed)
 } // BlotexlibExecutorCreateBlotreg
 
+
+// Interface for blottab implementations:
+// ======================================
 
 // Blottabs:
 

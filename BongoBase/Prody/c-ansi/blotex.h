@@ -25,6 +25,14 @@ typedef struct BLOTEXLIB_EXECUTOR_FACTORY *BLOTEXLIB_EXECUTOR_FACTORY_HANDLE; //
 struct BLOTEXLIB_EXECUTOR; // Private structure 
 typedef struct BLOTEXLIB_EXECUTOR *BLOTEXLIB_EXECUTOR_HANDLE; // Public handle
 
+// Blottabs:
+// ---------
+
+// Actual blottabs are handled by external (so-called "blottab") module(s).
+// The blotex module simply manages the blottab identification within blot expressions:
+// - "Genuine" blottabs are seen as some <entity> prefixed with '^' token) 
+// - "Super" blottabs are seen as some <entity> prefixed with '^^' token) 
+// - "Hyper" blottabs are seen as some <entity> prefixed with '^^^' token) 
 
 #define b_SPOT b_TRUE
 #define b_OPS !b_SPOT
@@ -160,7 +168,7 @@ int l_BlotcodeLinkBlotexlib(BLOTCODE_HANDLE ep_handle, const char* nfp_blotlibPr
 int BlotexlibExecutorFactoryDestroyInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE xh_handle) ;
 
 
-// Interface with other blotlib executors
+// Interface for other blotlib executors:
 // ======================================
 
 // This function, which wraps BlotcodeExecutorGetBlotlibExecutorHandle(), retrieves the executor
@@ -179,12 +187,11 @@ int BlotexlibExecutorFactoryDestroyInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE xh
 // - -1: unexpected problem ; anomaly is raised
 int l_BlotcodeExecutorGetBlotexlibExecutorHandle(BLOTCODE_EXECUTOR_HANDLE handle,int blotexlibEntry,
   BLOTEXLIB_EXECUTOR_HANDLE *a_blotexlibExecutorHandle) ;
-												  
-
-#define GLOBAL_BLOTREG_NAME GOOD_OLD_EMPTY_C_STRING
 
 // blotregs:
 // ---------
+
+#define GLOBAL_BLOTREG_NAME GOOD_OLD_EMPTY_C_STRING
 
 // Notice: blot registers are based on g-params 
 // blotvar <=> g-param 
@@ -225,11 +232,13 @@ int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct P_STRING blotregName, g_BLOTREG_HANDLE *na_blotregHandle);
 
 
-// Parsing blot expressions: helpers
-// ---------------------------------
+// Interface for blottab implementations:
+// ======================================
+
+// Blotex values:
+// --------------
 
 // Set blotex INITIAL value
-// TODO: manage double initialization ???
 //
 // Passed:
 // - handle:
@@ -264,6 +273,9 @@ int BlotexlibExecutorSetBlotexValue(BLOTEXLIB_EXECUTOR_HANDLE handle, int asValu
 // - -1: unexpected problem; anomaly is raised
 int BlotexlibExecutorConcatenateStrexValue(BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct BLOTEX_VALUE *a_strexValue1, struct P_STRING p_str2) ;
+
+// Parsing blot expressions:
+// -------------------------
 
 // TODO: ParseBlotex() dans kitchen???
 // Parse <blotex>
@@ -308,12 +320,6 @@ int BlotexlibExecutorParseAndComputeStrPortion(BLOTEXLIB_EXECUTOR_HANDLE handle,
 
 // blottabs:
 // ---------
-
-// Notice: blot tables "details" are actually handled by external (so-called "blottab") module(s).
-// The blotex module simply manages the blottab identification within blot expressions:
-// - "Genuine" blottabs are seen as some <entity> prefixed with '^' token) 
-// - "Super" blottabs are seen as some <entity> prefixed with '^^' token) 
-// - "Hyper" blottabs are seen as some <entity> prefixed with '^^^' token) 
 
 // Add new blottab in blotex executor's blot tables.
 // 
