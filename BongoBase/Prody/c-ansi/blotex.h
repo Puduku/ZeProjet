@@ -15,18 +15,12 @@
 #include "c-ansi/g-param.h"
 
 
-// I. blotex library executor factory 
-// ==================================
+// blotex library executor factory 
+// ===============================
 
 struct BLOTEXLIB_EXECUTOR_FACTORY ; // Private
 typedef struct BLOTEXLIB_EXECUTOR_FACTORY *BLOTEXLIB_EXECUTOR_FACTORY_HANDLE; // Public
  
-
-struct BLOTTAB_FIELD_REFERENCE {
-  int asValue; 
-  void *r_blottabHandle;
-  void *r_field; // "field" identification
-} ;
 
 struct BLOTEXLIB_EXECUTOR; // Private structure 
 typedef struct BLOTEXLIB_EXECUTOR *BLOTEXLIB_EXECUTOR_HANDLE; // Public handle
@@ -61,16 +55,6 @@ typedef int (*l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_L_VALUE_BLOTTAB_SET_OP_FUNC
   struct P_STRING blottabName, void* nr_blottabHandle,
   struct BLOTTAB_FIELD_REFERENCE *ac_blottabFieldReference, G_STRING_STUFF nc_abandonmentInfo) ;
 
-struct BLOTEX_VALUE {
-  int asValue;
-  union {
-    gen_BLOTVAL c_blotval;
-    struct {
-      int workingGStringEntry; 
-      struct P_STRING v_str;
-    } c_strex ;
-  } select ;
-} ;
 
 // #REF l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION
 // Parse and compute 'r-value' blottab operations:
@@ -98,20 +82,6 @@ typedef int (*l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTIO
   BLOTEXLIB_EXECUTOR_HANDLE handle, char b_spot, struct P_STRING *a_sequence, int blottabslabel,
   struct P_STRING blottabName, void* nr_blottabHandle, struct BLOTEX_VALUE *ac_blotexValue,
   G_STRING_STUFF nc_abandonmentInfo) ;
-
-// #REF UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION 
-// Update some field of current blotset of a blottab.
-//
-// Passed:
-// - blottabFieldReference: referenced blottab, supposed to be positoned on the "current" blotset 
-// - blotexValue: accurate (INT / STR) value regarding blottabFieldReference
-// 
-// Ret:
-// - RESULT__FOUND:
-// - RESULT__NOT_FOUND: current blotset not available
-// - -1: unexpected problem; anomaly is raised
-typedef int (*UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION)(
-  struct BLOTTAB_FIELD_REFERENCE blottabFieldReference, struct BLOTEX_VALUE blotexValue);
 
 #define MAX_BLOTTAB_IMPLEMENTIONS_NUMBER 3
 // 1st implementation: "genuine" blottabs
@@ -154,6 +124,7 @@ int BlotexlibExecutorFactoryCreateInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE *az
 //
 // Returned:
 // - >= 1: new EXTRA (not GENUINE)  
+// - -1: unexpected problem
 int BlotexlibExecutorFactoryRegisterBlottabImplementation(
   BLOTEXLIB_EXECUTOR_FACTORY_HANDLE handle,
   l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_L_VALUE_BLOTTAB_SET_OP_FUNCTION
@@ -189,8 +160,8 @@ int l_BlotcodeLinkBlotexlib(BLOTCODE_HANDLE ep_handle, const char* nfp_blotlibPr
 int BlotexlibExecutorFactoryDestroyInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE xh_handle) ;
 
 
-// II. Interface with other blotlib executors
-// ==========================================
+// Interface with other blotlib executors
+// ======================================
 
 // This function, which wraps BlotcodeExecutorGetBlotlibExecutorHandle(), retrieves the executor
 // handle of =>blotex<= library.
@@ -211,10 +182,6 @@ int l_BlotcodeExecutorGetBlotexlibExecutorHandle(BLOTCODE_EXECUTOR_HANDLE handle
 												  
 
 #define GLOBAL_BLOTREG_NAME GOOD_OLD_EMPTY_C_STRING
-
-#define BLOTVAR_NAME_ELEMENT G_PARAM_NAME_ELEMENT
-#define BLOTVAR_VALUE_ELEMENT G_PARAM_VALUE_ELEMENT 
-
 
 // blotregs:
 // ---------
@@ -238,7 +205,7 @@ int l_BlotcodeExecutorGetBlotexlibExecutorHandle(BLOTCODE_EXECUTOR_HANDLE handle
 // - RESULT__NOT_FOUND: 
 // - -1: unexpected problem; anomaly is raised
 int BlotexlibExecutorGetBlotreg (BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING blotregName,
-  g_G_PARAMS_HANDLE *ac_blotregHandle) ;
+  g_BLOTREG_HANDLE *ac_blotregHandle) ;
 
 // Create blot register.
 // 
@@ -255,15 +222,11 @@ int BlotexlibExecutorGetBlotreg (BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRI
 // - COMPLETED__BUT: the register already exists 
 // - -1: unexpected problem; anomaly is raised
 int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING blotregName, g_G_PARAMS_HANDLE *na_blotregHandle);
+  struct P_STRING blotregName, g_BLOTREG_HANDLE *na_blotregHandle);
 
 
 // Parsing blot expressions: helpers
 // ---------------------------------
-
-#define UNDEFINED_BLOTEX_VALUE { (int) UNDEFINED } 
-
-#define b_FUGACIOUS_STR b_TRUE
 
 // Set blotex INITIAL value
 // TODO: manage double initialization ???
@@ -301,7 +264,6 @@ int BlotexlibExecutorSetBlotexValue(BLOTEXLIB_EXECUTOR_HANDLE handle, int asValu
 // - -1: unexpected problem; anomaly is raised
 int BlotexlibExecutorConcatenateStrexValue(BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct BLOTEX_VALUE *a_strexValue1, struct P_STRING p_str2) ;
-
 
 // TODO: ParseBlotex() dans kitchen???
 // Parse <blotex>

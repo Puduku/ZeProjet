@@ -13,9 +13,162 @@
 #include "c-ansi/g-string.h"
 #include "c-ansi/g-param.h"
 
+// BLOTREG: 
+// --------
 
-// Parsing blot expressions: helpers
-// ---------------------------------
+// blotreg indexes :
+#define NAME__BLOTREG_INDEX_LABEL      0
+#define TOKEN_ID__BLOTREG_INDEX_LABEL  1
+#define INT_VALUE__BLOTREG_INDEX_LABEL 2
+#define STR_VALUE__BLOTREG_INDEX_LABEL 3
+
+// A blotreg is nothing but a g-param colllection...
+#define g_BLOTREG_HANDLE g_G_PARAMS_HANDLE
+
+// The four indexes are added to the register.
+// #SEE NAMED_OBJECT_CREATE_INSTANCE_FUNCTION @ c-ansi/named-object.h <blotreg>
+int BlotregCreateInstance(void **azhr_handle, struct P_STRING f_name, va_list arguments);
+
+#define g_BlotregVerifyIndexes g_GParamsVerifyIndexes
+
+#define g_BlotregFetch g_GParamsFetch
+
+#define gm_BlotregIndexSingleFetch gm_GParamsIndexSingleFetch
+
+#define g_BlotregIndexFetch g_GParamsIndexFetch
+
+#define g_BlotregIndexRequestR g_GParamsIndexRequestR
+
+// #SEE NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION @ c-ansi/g-string.h <blotreg>
+int BlotregDestroyInstance(void *xhr_handle) ;
+
+// BLOTVAR: 
+// --------
+
+#define g_BLOTVAR_NAME_ELEMENT G_PARAM_NAME_ELEMENT
+#define g_BLOTVAR_VALUE_ELEMENT G_PARAM_VALUE_ELEMENT 
+
+#define g_BLOTVAR_STUFF g_G_PARAM_STUFF
+
+// specific blotvar reference (of a register) 
+enum {
+  NAME__BLOTVAR_REFERENCE, // blotvar identified as '.' <entity> 
+  ENTRY__BLOTVAR_REFERENCE, // blotvar identified as '[' <intex> ']'
+  TOKEN_ID__BLOTVAR_REFERENCE, // blotvar identified as {' <intex> '}'
+  CURRENT__BLOTVAR_REFERENCE // Current blotvar '?=' 
+};
+
+struct BLOTVAR_REFERENCE {
+  g_BLOTREG_HANDLE blotregHandle;
+  int blotvarReference;
+  union {
+    struct P_STRING c_name; // Only significant with NAME__BLOTVAR_REFERENCE
+    int c_entry; // Only significant with ENTRY__BLOTVAR_REFERENCE
+    int c_tokenId; // Only significant with TOKEN_ID__BLOTVAR_REFERENCE
+  } c_select; // NOT significant with CURRENT__BLOTVAR_REFERENCE
+} ;
+
+#define UNDEFINED_BLOTVAR_REFERENCE { (g_BLOTREG_HANDLE) UNDEFINED }
+
+// Fetch actual blotvar corresponding to blotvar reference 
+//
+// Passed:
+// - ap_blotvarReference: blotvar reference 
+// - cb_lValue: ONLY significant with NAME__BLOTVAR_REFERENCE / TOKEN_ID__BLOTVAR_REFERENCE; 
+//   r-value=>do not create if not found ; l-value=>do create if not found
+// - navn_entry: NULL address if not used
+// 
+// Changed:
+// - *ant_blotvarStuff: if not found and seek only, set to NULL
+// - *navn_entry: if not found  and seek only, set to -1  
+//
+// Ret: 
+// - RETURNED: Ok
+// - -1: unexpected problem
+int FetchBlotvar(const struct BLOTVAR_REFERENCE *ap_blotvarReference, char cb_lValue,
+  g_BLOTVAR_STUFF *ant_blotvarStuff, int *navn_entry) ;
+
+
+// BLOTEX_VALUE:
+// -------------
+
+struct BLOTEX_VALUE {
+  int asValue;
+  union {
+    gen_BLOTVAL c_blotval;
+    struct {
+      int workingGStringEntry; 
+      struct P_STRING v_str;
+    } c_strex;
+  } select;
+};
+
+#define UNDEFINED_BLOTEX_VALUE { (int) UNDEFINED } 
+
+#define b_FUGACIOUS_STR b_TRUE
+
+// Set blotex INITIAL value
+// TODO: manage double initialization ???
+//
+// Passed:
+// - workingGStringsHandle:
+// - asValue: AS__VALUE_INT / AS__VALUE_STR 
+// - c_blotval:
+// - cap_str:
+// - cb_fugaciousStr: (TRUE/FALSE) NOTICE: if you intialize TWICE a
+//   fugacious string, the first working string buffer is "lost"  
+// 
+// changed:
+// - a_blotexValue: 
+//
+// Ret: 
+// - RETURNED: Ok
+// - -1: unexpected problem; anomaly is raised
+int SetBlotexValue(G_STRINGS_HANDLE workingGStringHandle, int asValue, gen_BLOTVAL c_blotval,
+  const struct P_STRING* cap_str, char cb_fugaciousStr, struct BLOTEX_VALUE *a_blotexValue) ;
+
+
+// Passed:
+// - workingGStringsHandle:
+// - ac_blotexValue: 
+// - a_strexValue1: 
+// - p_str2:
+// 
+// changed:
+// - a_strtexValue1: 
+//
+// Ret: 
+// - RETURNED: Ok
+// - -1: unexpected problem; anomaly is raised
+int ConcatenateStrexValue(G_STRINGS_HANDLE workingGStringHandle,
+  struct BLOTEX_VALUE *a_strexValue1, struct P_STRING p_str2) ;
+
+
+// BLOTTAB:
+// --------
+struct BLOTTAB_FIELD_REFERENCE {
+  int asValue; 
+  void *r_blottabHandle;
+  void *r_field; // "field" identification
+} ;
+
+// #REF UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION 
+// Update some field of current blotset of a blottab.
+//
+// Passed:
+// - blottabFieldReference: referenced blottab, supposed to be positoned on the "current" blotset 
+// - blotexValue: accurate (INT / STR) value regarding blottabFieldReference
+// 
+// Ret:
+// - RESULT__FOUND:
+// - RESULT__NOT_FOUND: current blotset not available
+// - -1: unexpected problem; anomaly is raised
+typedef int (*UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION)(
+  struct BLOTTAB_FIELD_REFERENCE blottabFieldReference, struct BLOTEX_VALUE blotexValue);
+
+
+// Parsing blot expressions: framework 
+// -----------------------------------
 
 // Prepare parsing function for potential abandonment.   
 //
@@ -70,6 +223,10 @@
   m_DIGGY_RETURN(ANSWER__NO)\
 }
  
+
+// Parsing blot expressions: helpers 
+// ---------------------------------
+
 // IS_CHAR_FUNCTION:
 // Recognize any character corresponding to <entity>
 int IsEntityNameChar(int c) ;
@@ -262,57 +419,6 @@ int ParseFormat(struct P_STRING *a_sequence, int *avn_format,
 // Ret: RETURNED (Ok)
 int ParseBlottabsLabel(struct P_STRING *a_sequence, int *an_blottabsLabel);
 
-
-// BLOTREG: 
-// --------
-
-#define NAME__BLOTREG_INDEX_LABEL      0
-#define TOKEN_ID__BLOTREG_INDEX_LABEL  1
-#define INT_VALUE__BLOTREG_INDEX_LABEL 2
-#define STR_VALUE__BLOTREG_INDEX_LABEL 3
-
-#define g_BLOTREG_HANDLE g_G_PARAMS_HANDLE
-
-// #SEE NAMED_OBJECT_CREATE_INSTANCE_FUNCTION @ c-ansi/named-object.h <blotreg>
-int BlotregCreateInstance(void **azhr_handle, struct P_STRING f_name, va_list arguments);
-
-#define g_BlotregVerifyIndexes g_GParamsVerifyIndexes
-
-#define g_BlotregFetch g_GParamsFetch
-
-#define gm_BlotregIndexSingleFetch gm_GParamsIndexSingleFetch
-
-#define g_BlotregIndexFetch g_GParamsIndexFetch
-
-#define g_BlotregIndexRequestR g_GParamsIndexRequestR
-
-// #SEE NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION @ c-ansi/g-string.h <blotreg>
-int BlotregDestroyInstance(void *xhr_handle) ;
-
-
-// BLOTVAR: 
-// --------
-
-// specific blotvar reference (of a register) 
-enum {
-  NAME__BLOTVAR_REFERENCE, // blotvar identified as '.' <entity> 
-  ENTRY__BLOTVAR_REFERENCE, // blotvar identified as '[' <intex> ']'
-  TOKEN_ID__BLOTVAR_REFERENCE, // blotvar identified as {' <intex> '}'
-  CURRENT__BLOTVAR_REFERENCE // Current blotvar '?=' 
-};
-
-struct BLOTVAR_REFERENCE {
-  g_BLOTREG_HANDLE blotregHandle;
-  int blotvarReference;
-  union {
-    struct P_STRING c_name; // Only significant with NAME__BLOTVAR_REFERENCE
-    int c_entry; // Only significant with ENTRY__BLOTVAR_REFERENCE
-    int c_tokenId; // Only significant with TOKEN_ID__BLOTVAR_REFERENCE
-  } c_select; // NOT significant with CURRENT__BLOTVAR_REFERENCE
-} ;
-
-#define UNDEFINED_BLOTVAR_REFERENCE { (g_BLOTREG_HANDLE) UNDEFINED }
-
 // Complete parsing of "simple" blotvar reference.
 //
 // Passed:
@@ -354,24 +460,6 @@ int ParseAndComputeLValueBlotregOps(
   struct P_STRING *a_sequence, struct P_STRING blotregName, g_BLOTREG_HANDLE n_blotregHandle,
   struct BLOTVAR_REFERENCE *ac_blotvarReference, int *ac_as, G_STRING_STUFF nc_abandonmentInfo) ;
 
-
-// Fetch actual blotvar corresponding to blotvar reference 
-//
-// Passed:
-// - ap_blotvarReference: blotvar reference 
-// - cb_lValue: ONLY significant with NAME__BLOTVAR_REFERENCE / TOKEN_ID__BLOTVAR_REFERENCE; 
-//   r-value=>do not create if not found ; l-value=>do create if not found
-// - navn_entry: NULL address if not used
-// 
-// Changed:
-// - *ant_blotvarStuff: if not found and seek only, set to NULL
-// - *navn_entry: if not found  and seek only, set to -1  
-//
-// Ret: 
-// - RETURNED: Ok
-// - -1: unexpected problem
-int FetchBlotvar(const struct BLOTVAR_REFERENCE *ap_blotvarReference, char cb_lValue,
-  g_G_PARAM_STUFF *ant_blotvarStuff, int *navn_entry) ;
 
 
 #endif // __C_ANSI_BLOTEX_KITCHEN_H_INCLUDED__

@@ -281,26 +281,9 @@ int BlotexlibExecutorSetBlotexValue(BLOTEXLIB_EXECUTOR_HANDLE handle, int asValu
   gen_BLOTVAL c_blotval, const struct P_STRING* cap_str, char cb_fugaciousStr,
   struct BLOTEX_VALUE *a_blotexValue) {
   m_DIGGY_BOLLARD()
-  switch ((a_blotexValue->asValue = asValue)) {
-  case AS__VALUE_STR:
-    { G_STRING_STUFF t_workingGStringStuff = (G_STRING_STUFF)UNDEFINED;
-      m_TRACK_IF((a_blotexValue->select.c_strex.workingGStringEntry =
-        GStringsFetch(handle->h_workingGStringsHandle,-1, &t_workingGStringStuff)) < 0)
-      if (cb_fugaciousStr) {
-        m_TRACK_IF(GStringCopy(t_workingGStringStuff,0, *cap_str) < 0)
-      } else {
-        switch(GStringImport(t_workingGStringStuff, *cap_str)) {
-        case COMPLETED__OK:
-        break; case COMPLETED__BUT: 
-        break; default:
-          m_TRACK()
-        } // switch
-      } // if
-      a_blotexValue->select.c_strex.v_str = t_workingGStringStuff->cv_pString;
-    } // t_workingGStringStuff
-  break; case AS__VALUE_INT:
-    a_blotexValue->select.c_blotval = c_blotval;
-  break; default: m_RAISE(ANOMALY__VALUE__D,asValue) } // switch  
+
+  m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle,asValue, c_blotval, cap_str,
+    cb_fugaciousStr, a_blotexValue) != RETURNED)
   m_DIGGY_RETURN(RETURNED)
 } // BlotexlibExecutorSetBlotexValue
 
@@ -308,13 +291,9 @@ int BlotexlibExecutorSetBlotexValue(BLOTEXLIB_EXECUTOR_HANDLE handle, int asValu
 int BlotexlibExecutorConcatenateStrexValue(BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct BLOTEX_VALUE *a_strexValue1, struct P_STRING p_str2) {
   m_DIGGY_BOLLARD()
-  m_ASSERT(a_strexValue1->asValue == AS__VALUE_STR)
-  G_STRING_STUFF t_workingGStringStuff = (G_STRING_STUFF)UNDEFINED;
-  m_TRACK_IF(GStringsFetch(handle->h_workingGStringsHandle,
-    a_strexValue1->select.c_strex.workingGStringEntry, &t_workingGStringStuff) !=
-    a_strexValue1->select.c_strex.workingGStringEntry)
-  m_TRACK_IF(GStringCopy(t_workingGStringStuff,-1, p_str2) < 0)
-  a_strexValue1->select.c_strex.v_str = t_workingGStringStuff->cv_pString;
+
+  m_TRACK_IF(ConcatenateStrexValue(handle->h_workingGStringsHandle,a_strexValue1,p_str2) !=
+    RETURNED)
   m_DIGGY_RETURN(RETURNED)
 } // BlotexlibExecutorConcatenateStrexValue
 
@@ -454,7 +433,7 @@ static int BlotexlibExecutorParseAndComputeRValueBlotregOps(BLOTEXLIB_EXECUTOR_H
 
   if (n_blotregHandle == NULL) m_ABANDON(UNKNOWN_BLOTREG__ABANDONMENT_CAUSE) 
 
-  m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle, AS__VALUE_INT,TRUE__BLOTVAL0,
+  m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle, AS__VALUE_INT,TRUE__BLOTVAL0,
     (struct P_STRING*)UNDEFINED,(char)UNDEFINED,ac_blotexValue) != RETURNED) // actually UNDEFINED 
   int n_indexFetchFlags = -1; // a priori
   m_PParsePassSpaces(a_sequence,NULL);
@@ -489,10 +468,10 @@ static int BlotexlibExecutorParseAndComputeRValueBlotregOps(BLOTEXLIB_EXECUTOR_H
   } // if
   
   if (n_indexFetchFlags < 0) {
-    m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle, AS__VALUE_INT,TRUE__BLOTVAL0,
+    m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle, AS__VALUE_INT,TRUE__BLOTVAL0,
       (struct P_STRING*)UNDEFINED,(char)UNDEFINED,ac_blotexValue) != RETURNED)
   } else {
-    g_G_PARAM_STUFF ct_blotvarStuff = (g_G_PARAM_STUFF)UNDEFINED;
+    g_BLOTVAR_STUFF ct_blotvarStuff = (g_BLOTVAR_STUFF)UNDEFINED;
     int c_entry = UNDEFINED;
 
 m_DIGGY_VAR_INDEX_FETCH_FLAGS(n_indexFetchFlags) 
@@ -501,34 +480,34 @@ m_DIGGY_VAR_INDEX_FETCH_FLAGS(n_indexFetchFlags)
     case RESULT__FOUND:
       switch (n_as) {
       case -1: 
-        m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle, AS__VALUE_INT,TRUE__BLOTVAL0,
+        m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle, AS__VALUE_INT,TRUE__BLOTVAL0,
           (struct P_STRING*)UNDEFINED,(char)UNDEFINED,ac_blotexValue) != RETURNED)
       break; case AS__VALUE_INT:
-        m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle, AS__VALUE_INT,
-          ct_blotvarStuff[G_PARAM_VALUE_ELEMENT].acolyt.cen_value,
+        m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle, AS__VALUE_INT,
+          ct_blotvarStuff[g_BLOTVAR_VALUE_ELEMENT].acolyt.cen_value,
           (struct P_STRING*)UNDEFINED,(char)UNDEFINED,ac_blotexValue) != RETURNED)
       break; case AS__ENTRY: // (r-value)
-        m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle, AS__VALUE_INT,c_entry,
+        m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle, AS__VALUE_INT,c_entry,
           (struct P_STRING*)UNDEFINED,(char)UNDEFINED,ac_blotexValue) != RETURNED)
       break; case AS__ID:
 m_RAISE(ANOMALY__NOT_AVAILABLE)
       break; case AS__VALUE_STR:
-        m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,AS__VALUE_STR,UNDEFINED,
-          &ct_blotvarStuff[G_PARAM_VALUE_ELEMENT].cv_pString,b_FUGACIOUS_STR,ac_blotexValue) !=
+        m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle,AS__VALUE_STR,UNDEFINED,
+          &ct_blotvarStuff[g_BLOTVAR_VALUE_ELEMENT].cv_pString,b_FUGACIOUS_STR,ac_blotexValue) !=
           RETURNED) // TODO: really FUGACIOUS????
       break; case AS__NAME:
-        m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,AS__VALUE_STR,UNDEFINED,
-          &ct_blotvarStuff[G_PARAM_NAME_ELEMENT].cv_pString,b_FUGACIOUS_STR,ac_blotexValue) !=
+        m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle,AS__VALUE_STR,UNDEFINED,
+          &ct_blotvarStuff[g_BLOTVAR_NAME_ELEMENT].cv_pString,b_FUGACIOUS_STR,ac_blotexValue) !=
           RETURNED) // TODO: really FUGACIOUS????
       break; default: 
         m_TRACK()
       } // switch
 
     break; case RESULT__NOT_FOUND:
-      if (n_as == AS__VALUE_STR || n_as == AS__NAME) m_TRACK_IF(BlotexlibExecutorSetBlotexValue(
-        handle,AS__VALUE_STR,UNDEFINED, ap_aTrivialEmptyPString,!b_FUGACIOUS_STR,
-        ac_blotexValue) != RETURNED)
-      else m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle, AS__VALUE_INT,FALSE__BLOTVAL,
+      if (n_as == AS__VALUE_STR || n_as == AS__NAME) m_TRACK_IF(SetBlotexValue(
+        handle->h_workingGStringsHandle,AS__VALUE_STR,UNDEFINED, ap_aTrivialEmptyPString,
+        !b_FUGACIOUS_STR, ac_blotexValue) != RETURNED)
+      else m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle, AS__VALUE_INT,FALSE__BLOTVAL,
         (struct P_STRING*)UNDEFINED,(char)UNDEFINED,ac_blotexValue) != RETURNED)
     break; default: m_TRACK()
     } // switch
@@ -560,7 +539,7 @@ static inline int m_BlotexlibExecutorParseAndComputeBlotexAtomBlotvar(BLOTEXLIB_
   m_DIGGY_BOLLARD()
 
   struct BLOTVAR_REFERENCE c_blotvarReference = UNDEFINED_BLOTVAR_REFERENCE ; 
-  g_G_PARAM_STUFF nt_blotvarStuff = (g_G_PARAM_STUFF)UNDEFINED;
+  g_BLOTVAR_STUFF nt_blotvarStuff = (g_BLOTVAR_STUFF)UNDEFINED;
   int vn_entry = UNDEFINED; 
   m_PREPARE_ABANDON(a_sequence,
     "<blotvar as int> | <blotvar entry> | <blotvar id> | <blotvar as str> | <blotvar name>") 
@@ -582,24 +561,24 @@ static inline int m_BlotexlibExecutorParseAndComputeBlotexAtomBlotvar(BLOTEXLIB_
   m_TRACK_IF(ParseAs(b_R_VALUE,a_sequence,&as) != RETURNED)
   switch (as) {
   case AS__VALUE_INT: // <blotvar as int>
-    m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,AS__VALUE_INT,
-      nt_blotvarStuff[G_PARAM_VALUE_ELEMENT].acolyt.cen_value,(const struct P_STRING*) UNDEFINED,
+    m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle,AS__VALUE_INT,
+      nt_blotvarStuff[g_BLOTVAR_VALUE_ELEMENT].acolyt.cen_value,(const struct P_STRING*) UNDEFINED,
       (char)UNDEFINED, ac_blotexAtomValue) != RETURNED)
   break; case AS__ID: // <blotvar id>
-    m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,AS__VALUE_INT,
-      nt_blotvarStuff[G_PARAM_NAME_ELEMENT].acolyt.cen_value,(const struct P_STRING*) UNDEFINED,
+    m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle,AS__VALUE_INT,
+      nt_blotvarStuff[g_BLOTVAR_NAME_ELEMENT].acolyt.cen_value,(const struct P_STRING*) UNDEFINED,
       (char)UNDEFINED, ac_blotexAtomValue) != RETURNED)
   break; case AS__ENTRY: // <blotvar entry> (r-value) 
     m_ASSERT(vn_entry >= 0)
-    m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,AS__VALUE_INT,vn_entry,
+    m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle,AS__VALUE_INT,vn_entry,
       (const struct P_STRING*) UNDEFINED, (char)UNDEFINED, ac_blotexAtomValue) != RETURNED)
   break; case AS__VALUE_STR: // <blotvar strex> 
-    m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,AS__VALUE_STR,UNDEFINED,
-      &nt_blotvarStuff[G_PARAM_VALUE_ELEMENT].cv_pString,b_FUGACIOUS_STR, ac_blotexAtomValue) !=
+    m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle,AS__VALUE_STR,UNDEFINED,
+      &nt_blotvarStuff[g_BLOTVAR_VALUE_ELEMENT].cv_pString,b_FUGACIOUS_STR, ac_blotexAtomValue) !=
       RETURNED) // TODO: really FUGACIOUS????
   break; case AS__NAME:  // <blotvar name> 
-    m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,AS__VALUE_STR,UNDEFINED,
-      &nt_blotvarStuff[G_PARAM_NAME_ELEMENT].cv_pString,b_FUGACIOUS_STR, ac_blotexAtomValue) !=
+    m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle,AS__VALUE_STR,UNDEFINED,
+      &nt_blotvarStuff[g_BLOTVAR_NAME_ELEMENT].cv_pString,b_FUGACIOUS_STR, ac_blotexAtomValue) !=
       RETURNED) // TODO: really FUGACIOUS????
   break; default:
     m_RAISE(ANOMALY__VALUE__D,as)
@@ -705,7 +684,7 @@ static int BlotexlibExecutorProbeBlotexAtom(BLOTEXLIB_EXECUTOR_HANDLE handle,
 m_DIGGY_VAR_P_STRING(*a_sequence)
   gen_BLOTVAL c_blotval = UNDEFINED; 
   PParseGenericInteger(a_sequence,&c_blotval,&lexeme);
-  if (!b_EMPTY_P_STRING(lexeme)) m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,AS__VALUE_INT,
+  if (!b_EMPTY_P_STRING(lexeme)) m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle,AS__VALUE_INT,
     c_blotval, (const struct P_STRING*) UNDEFINED, (char)UNDEFINED, ac_blotexAtomValue) != RETURNED)
   else { 
     PParsePassSingleChar(a_sequence,NULL,'"',&lexeme);
@@ -713,7 +692,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
       PParsePassChars(a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_TILL,NULL,'"', &lexeme);
       if (b_EMPTY_P_STRING(*a_sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
       PParseOffset(a_sequence,1,NULL);
-      m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,AS__VALUE_STR,UNDEFINED,&lexeme,
+      m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle,AS__VALUE_STR,UNDEFINED,&lexeme,
         !b_FUGACIOUS_STR, ac_blotexAtomValue) != RETURNED) // TODO: FUGACIOUS???
     } else { 
       PParsePassSingleChar(a_sequence,NULL,'(',&lexeme);
@@ -997,7 +976,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
       nc_abandonmentInfo)) {
     case ANSWER__YES:
       if (strexAtomValue.asValue != AS__VALUE_STR) m_ABANDON(EXPECT_STREX__ABANDONMENT_CAUSE)
-      m_TRACK_IF(BlotexlibExecutorConcatenateStrexValue(handle,
+      m_TRACK_IF(ConcatenateStrexValue(handle->h_workingGStringsHandle,
         a_strexValue, strexAtomValue.select.c_strex.v_str) != RETURNED)
     break; case ANSWER__NO:
       m_DIGGY_RETURN(ANSWER__NO)
@@ -1230,19 +1209,19 @@ static inline int m_BlotexlibExecutorExecuteCFunctionEval(BLOTEXLIB_EXECUTOR_HAN
         m_TRACK() 
       } // switch
     } else {
-      g_G_PARAM_STUFF cnt_blotvarStuff = (g_G_PARAM_STUFF)UNDEFINED;
+      g_BLOTVAR_STUFF cnt_blotvarStuff = (g_BLOTVAR_STUFF)UNDEFINED;
       m_TRACK_IF(FetchBlotvar(&cc_lValueBlotvarReference, b_L_VALUE,&cnt_blotvarStuff,NULL) !=
         RETURNED)
       if (cnt_blotvarStuff == NULL) m_ABANDON(NOT_EXISTING_L_VALUE__ABANDONMENT_CAUSE)
       switch (cc_as) {
       case AS__VALUE_INT: // [ '#' ]
         if (c_blotexValue.asValue != AS__VALUE_INT) m_ABANDON(EXPECT_INTEX__ABANDONMENT_CAUSE)
-        cnt_blotvarStuff[G_PARAM_VALUE_ELEMENT].acolyt.cen_value = c_blotexValue.select.c_blotval;
+        cnt_blotvarStuff[g_BLOTVAR_VALUE_ELEMENT].acolyt.cen_value = c_blotexValue.select.c_blotval;
       break; case AS__ID: // '!' 
   m_RAISE(ANOMALY__NOT_AVAILABLE)
       break; case AS__VALUE_STR: // '$'
         if (c_blotexValue.asValue != AS__VALUE_STR) m_ABANDON(EXPECT_STREX__ABANDONMENT_CAUSE)
-        m_TRACK_IF(GStringCopy(cnt_blotvarStuff+G_PARAM_VALUE_ELEMENT,0,
+        m_TRACK_IF(GStringCopy(cnt_blotvarStuff+g_BLOTVAR_VALUE_ELEMENT,0,
           c_blotexValue.select.c_strex.v_str) < 0)
       break; case AS__NAME:  // '!$'
   m_RAISE(ANOMALY__NOT_AVAILABLE)
