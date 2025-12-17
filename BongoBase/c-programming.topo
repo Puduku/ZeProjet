@@ -237,8 +237,8 @@
 //     "empty" program - without a single line of code. Obviously its practical usefulness is very
 //     limited... To give it a use, we common programmers know no other way than to spoil this
 //     perfect program with our rotten lines of code...
-//   + Have good usage of binary statutes in C-programs (see also c-monism.topo, § "Why do guys so
-//     often harass girls ???") to avoid the following crappy behaviours :
+//   + Have good usage of binary statutes in C-programs (see also c-verities.topo, section "Why do
+//     guys so often harass girls ???") to avoid the following crappy behaviours :
 //     . Hanging programms (with massive resource grabbing as major "side effect") may be simple
 //       consequence of a bad re-interpration of ('yes'/'no way' - girl verity perception) binary
 //       status as a ('success'/'try again' - guy verity perception). 
@@ -249,6 +249,7 @@
 //       of ('ok'/'ok, but') binary status into unary 'ok' status (like the European Union, with his
 //       habit of proudly presenting a total FAILURE to reach agreement as a SUCCESS of plenary
 //       agreement - "We unanimously all agreed... that we agree on nothing...")
+
 
 
 
