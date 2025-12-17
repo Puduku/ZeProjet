@@ -131,7 +131,7 @@
 // programmers that we are uncomfortable.
 // For instance, we have great difficulty conceiving parsing (which is a fundamental activity in
 // computing) with a monist vision. That is, we tend to consider the "syntax error" negative case as
-// intrinsic to any - even elementary - parsing tasks. This vision, which forbids us from conceiving
+// intrinsic to any - even elementary - parsing tasks. This bias, which forbids us from conceiving
 // fundamental parsing processing as pure procedures, also hampers the design of easily reusable
 // code...
 //
