@@ -23,7 +23,7 @@ struct BLOTTAB_IMPLEMENTATION {
   l_blotexlibExecutorParseAndComputeLValueBlottabSetOpFunction;
   l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION
   l_blotexlibExecutorParseAndComputeRValueBlottabOpsFunction;
-  UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION updateBlottabCurrentBlotsetFieldFunction;
+  UPDATE_BLOTTAB_SPOT_FUNCTION updateBlottabSpotFunction;
   NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION blottabDestroyInstanceFunction ;
 }; 
 
@@ -41,7 +41,7 @@ int BlotexlibExecutorFactoryRegisterBlottabImplementation(
   l_blotexlibExecutorParseAndComputeLValueBlottabSetOpFunction,
   l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION
   l_blotexlibExecutorParseAndComputeRValueBlottabOpsFunction,
-  UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION updateBlottabCurrentBlotsetFieldFunction,
+  UPDATE_BLOTTAB_SPOT_FUNCTION updateBlottabSpotFunction,
   NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION blottabDestroyInstanceFunction) {
   m_DIGGY_BOLLARD()
   int i = handle->blottabImplementationsNumber++; 
@@ -50,8 +50,8 @@ int BlotexlibExecutorFactoryRegisterBlottabImplementation(
     l_blotexlibExecutorParseAndComputeLValueBlottabSetOpFunction;
   handle->blottabImplementations[i].l_blotexlibExecutorParseAndComputeRValueBlottabOpsFunction =
     l_blotexlibExecutorParseAndComputeRValueBlottabOpsFunction;
-  handle->blottabImplementations[i].updateBlottabCurrentBlotsetFieldFunction =
-    updateBlottabCurrentBlotsetFieldFunction ;
+  handle->blottabImplementations[i].updateBlottabSpotFunction =
+    updateBlottabSpotFunction ;
   handle->blottabImplementations[i].blottabDestroyInstanceFunction =
   blottabDestroyInstanceFunction;
 
@@ -64,7 +64,7 @@ int BlotexlibExecutorFactoryCreateInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE *az
   l_blotexlibExecutorParseAndComputeLValueGenuineBlottabSetOpFunction,
   l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION
   l_blotexlibExecutorParseAndComputeRValueGenuineBlottabOpsFunction,
-  UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION updateGenuineBlottabCurrentBlotsetFieldFunction,
+  UPDATE_BLOTTAB_SPOT_FUNCTION updateGenuineBlottabSpotFunction,
   NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION genuineBlottabDestroyInstanceFunction) {
   m_DIGGY_BOLLARD()
 
@@ -74,7 +74,7 @@ int BlotexlibExecutorFactoryCreateInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE *az
   m_ASSERT(BlotexlibExecutorFactoryRegisterBlottabImplementation(*azh_handle,
     l_blotexlibExecutorParseAndComputeLValueGenuineBlottabSetOpFunction,
     l_blotexlibExecutorParseAndComputeRValueGenuineBlottabOpsFunction,
-    updateGenuineBlottabCurrentBlotsetFieldFunction, genuineBlottabDestroyInstanceFunction) ==
+    updateGenuineBlottabSpotFunction, genuineBlottabDestroyInstanceFunction) ==
     GENUINE_BLOTTABS_LABEL0) 
   m_DIGGY_RETURN(RETURNED)
 } // BlotexlibExecutorFactoryCreateInstance
@@ -91,7 +91,7 @@ struct BLOTTAB_EXECUTOR_IMPLEMENTATION {
   l_blotexlibExecutorParseAndComputeLValueBlottabSetOpFunction;
   l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION
   l_blotexlibExecutorParseAndComputeRValueBlottabOpsFunction;
-  UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION updateBlottabCurrentBlotsetFieldFunction;
+  UPDATE_BLOTTAB_SPOT_FUNCTION updateBlottabSpotFunction;
   NAMED_OBJECTS_HANDLE h_blottabsHandle ; 
 } ;
 
@@ -132,8 +132,8 @@ static int BlotexlibExecutorFactoryCreateProductInstance(void *pr_handle,
     productHandle->blottabExecutorImplementations[i].
       l_blotexlibExecutorParseAndComputeRValueBlottabOpsFunction =
       p_handle->blottabImplementations[i].l_blotexlibExecutorParseAndComputeRValueBlottabOpsFunction;
-    productHandle->blottabExecutorImplementations[i].updateBlottabCurrentBlotsetFieldFunction =
-      p_handle->blottabImplementations[i].updateBlottabCurrentBlotsetFieldFunction;
+    productHandle->blottabExecutorImplementations[i].updateBlottabSpotFunction =
+      p_handle->blottabImplementations[i].updateBlottabSpotFunction;
   } // for
 
   m_TRACK_IF(G_STRINGS_CREATE_INSTANCE(&productHandle->h_workingGStringsHandle,5) != RETURNED) 
@@ -1045,9 +1045,12 @@ m_DIGGY_VAR_D(ac_blotexValue->asValue)
 //
 // Changed:
 // - *a_sequence: after parsing 
-//// - *acb_blottabFieldReference: only significant if success blottab (field) ref  ?
 // - *an_fieldReferenceBlottabsLabel: only significant if success / blottab (field) ref
+//   + -1 special value: blotvar reference 
+//   + >= 0: blottab reference; corresponding blottabs label
 // - *acc_blotvarReference: only significant if success, NOT blottab (field) ref case
+// - *acc_blottabSpotReference: only significant if success blottab (field) ref
+// - *acc_as:
 // - nc_abandonmentInfo: only significant if abandon 
 //
 // Ret: <blotvar> succesfully parsed ? 
@@ -1057,7 +1060,7 @@ m_DIGGY_VAR_D(ac_blotexValue->asValue)
 static inline int m_BlotexlibExecutorProbeBlotexRef(BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct P_STRING *a_sequence, int* an_fieldReferenceBlottabsLabel,
   struct BLOTVAR_REFERENCE *acc_blotvarReference,
-  struct BLOTTAB_FIELD_REFERENCE *acc_blottabFieldReference, int *acc_as,
+  struct BLOTTAB_SPOT_REFERENCE *acc_blottabSpotReference, int *acc_as,
   G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD_S()
 m_DIGGY_VAR_P_STRING(*a_sequence) 
@@ -1075,7 +1078,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
     if (*an_fieldReferenceBlottabsLabel >= 0) { // Parsing <int blottab ref> or <str blottab ref> ...
       switch (handle->blottabExecutorImplementations[*an_fieldReferenceBlottabsLabel].
         l_blotexlibExecutorParseAndComputeLValueBlottabSetOpFunction(handle,b_OPS,a_sequence,name,
-        cnr_blottabHandle,acc_blottabFieldReference, nc_abandonmentInfo)) {
+        cnr_blottabHandle,acc_blottabSpotReference, nc_abandonmentInfo)) {
       case ANSWER__YES:
       break; case ANSWER__NO:
         m_DIGGY_RETURN(ANSWER__NO)
@@ -1097,7 +1100,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
     if (*an_fieldReferenceBlottabsLabel >= 0) {
       switch (handle->blottabExecutorImplementations[*an_fieldReferenceBlottabsLabel].
         l_blotexlibExecutorParseAndComputeLValueBlottabSetOpFunction(handle,b_SPOT,a_sequence,name,
-        cnr_blottabHandle,acc_blottabFieldReference, nc_abandonmentInfo)) {
+        cnr_blottabHandle,acc_blottabSpotReference, nc_abandonmentInfo)) {
       case ANSWER__YES:
       break; case ANSWER__NO:
         m_DIGGY_RETURN(ANSWER__NO)
@@ -1161,7 +1164,7 @@ static inline int m_BlotexlibExecutorExecuteCFunctionEval(BLOTEXLIB_EXECUTOR_HAN
   char b_lValueReference = b_FALSE0; // NO 'L-value' reference a priori
   int n_fieldReferenceBlottabsLabel = UNDEFINED;
   struct BLOTVAR_REFERENCE cc_lValueBlotvarReference = UNDEFINED_BLOTVAR_REFERENCE ; 
-  struct BLOTTAB_FIELD_REFERENCE cc_lValueBlottabFieldReference;
+  struct BLOTTAB_SPOT_REFERENCE cc_lValueBlottabSpotReference;
   int cc_as = UNDEFINED; // only significant with assignation of single blotvar/blotreg
 
   m_PREPARE_ABANDON(&arguments, "Eval") 
@@ -1172,7 +1175,7 @@ static inline int m_BlotexlibExecutorExecuteCFunctionEval(BLOTEXLIB_EXECUTOR_HAN
     else { // Assignation 
       b_lValueReference = b_TRUE;
       switch (m_BlotexlibExecutorProbeBlotexRef(handle,&subSequence, &n_fieldReferenceBlottabsLabel,
-        &cc_lValueBlotvarReference, &cc_lValueBlottabFieldReference, &cc_as, nc_abandonmentInfo)) {
+        &cc_lValueBlotvarReference, &cc_lValueBlottabSpotReference, &cc_as, nc_abandonmentInfo)) {
       case ANSWER__YES: // <blotvar>
       break; case ANSWER__NO:
         m_DIGGY_RETURN(ANSWER__NO)
@@ -1199,16 +1202,16 @@ static inline int m_BlotexlibExecutorExecuteCFunctionEval(BLOTEXLIB_EXECUTOR_HAN
   if (!b_EMPTY_P_STRING(arguments)) m_ABANDON(NOT_PARSABLE__ABANDONMENT_CAUSE)
 
   if (b_lValueReference) { // Assignation
-    if (/*cb_lValueBlottabFieldReference*/ n_fieldReferenceBlottabsLabel >= 0) { // blottab assignation
-      switch (cc_lValueBlottabFieldReference.asValue) {
+    if (/*cb_lValueBlottabSpotReference*/ n_fieldReferenceBlottabsLabel >= 0) { // blottab assignation
+      switch (cc_lValueBlottabSpotReference.asValue) {
       case AS__VALUE_INT: // [ '#' ] 
         if (c_blotexValue.asValue != AS__VALUE_INT) m_ABANDON(EXPECT_INTEX__ABANDONMENT_CAUSE)
       break; case AS__VALUE_STR: // '$'
         if (c_blotexValue.asValue != AS__VALUE_STR) m_ABANDON(EXPECT_STREX__ABANDONMENT_CAUSE)
-      break; default: m_RAISE(ANOMALY__VALUE__D,cc_lValueBlottabFieldReference.asValue)
+      break; default: m_RAISE(ANOMALY__VALUE__D,cc_lValueBlottabSpotReference.asValue)
       } // switch 
       switch (handle->blottabExecutorImplementations[n_fieldReferenceBlottabsLabel].
-        updateBlottabCurrentBlotsetFieldFunction(cc_lValueBlottabFieldReference, c_blotexValue)) {
+        updateBlottabSpotFunction(cc_lValueBlottabSpotReference, c_blotexValue)) {
       case RESULT__FOUND:
       break; case RESULT__NOT_FOUND:
         m_ABANDON(NOT_EXISTING_L_VALUE__ABANDONMENT_CAUSE)

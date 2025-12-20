@@ -56,7 +56,7 @@ int l_BlotexlibExecutorCreateBlottab2(BLOTEXLIB_EXECUTOR_HANDLE handle,
 // #SEE l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_L_VALUE_BLOTTAB_SET_OP_FUNCTION@c-ansi/blotex.h
 int l_BlotexlibExecutorParseAndComputeLValueBlottab2SetOp(BLOTEXLIB_EXECUTOR_HANDLE handle, 
   char b_spot, struct P_STRING *a_sequence, struct P_STRING blottab2Name, 
-  struct BLOTTAB_FIELD_REFERENCE *ac_blottab2FieldReference, G_STRING_STUFF nc_abandonmentInfo) ;
+  struct BLOTTAB_SPOT_REFERENCE *ac_blottab2FieldReference, G_STRING_STUFF nc_abandonmentInfo) ;
 
 // #SEE l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION@c-ansi/blotex.h
 int l_BlotexlibExecutorParseAndComputeRValueBlottab2Ops(BLOTEXLIB_EXECUTOR_HANDLE handle,
@@ -64,8 +64,8 @@ int l_BlotexlibExecutorParseAndComputeRValueBlottab2Ops(BLOTEXLIB_EXECUTOR_HANDL
   struct BLOTEX_VALUE *ac_blotexValue, G_STRING_STUFF nc_abandonmentInfo) ;
 
 
-// #SEE UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION@c-ansi/blotex.h
-int UpdateBlottab2CurrentBlotsetField(struct BLOTTAB_FIELD_REFERENCE blottab2FieldReference,
+// #SEE UPDATE_BLOTTAB_SPOT_FUNCTION@c-ansi/blotex.h
+int UpdateBlottab2Spot(struct BLOTTAB_SPOT_REFERENCE blottab2FieldReference,
  struct BLOTEX_VALUE blotexValue) ;
 
 

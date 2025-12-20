@@ -46,7 +46,7 @@ int BlottabDestroyInstance(void *xhr_handle) ;
 // => See also: BlotexlibExecutorFactoryCreateInstance() 
 int l_BlotexlibExecutorParseAndComputeLValueBlottabSetOp(BLOTEXLIB_EXECUTOR_HANDLE handle, 
   char b_spot, struct P_STRING *a_sequence, struct P_STRING blottabName, void* nr_blottabHandle, 
-  struct BLOTTAB_FIELD_REFERENCE *ac_blottabFieldReference, G_STRING_STUFF nc_abandonmentInfo);
+  struct BLOTTAB_SPOT_REFERENCE *ac_blottabSpotReference, G_STRING_STUFF nc_abandonmentInfo);
 
 // #SEE l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION@c-ansi/blotex.h
 // => See also: BlotexlibExecutorFactoryCreateInstance() 
@@ -54,8 +54,8 @@ int l_BlotexlibExecutorParseAndComputeRValueBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE
   char b_spot, struct P_STRING *a_sequence, int blottabsLabel, struct P_STRING blottabName,
   void* nr_blottabHandle, struct BLOTEX_VALUE *ac_blotexValue, G_STRING_STUFF nc_abandonmentInfo);
 
-// #SEE UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION@c-ansi/blotex.h
-int UpdateBlottabCurrentBlotsetField(struct BLOTTAB_FIELD_REFERENCE blottabFieldReference,
+// #SEE UPDATE_BLOTTAB_SPOT_FUNCTION@c-ansi/blotex.h
+int UpdateBlottabSpot(struct BLOTTAB_SPOT_REFERENCE blottabSpotReference,
  struct BLOTEX_VALUE blotexValue) ;
 
 

@@ -416,18 +416,16 @@ int ParseAndComputeLValueBlotregOps(
   ac_blotvarReference->blotvarReference = CURRENT__BLOTVAR_REFERENCE;
   *ac_as = UNDEFINED; // For the moment 
 
-  int n_indexFetchFlags = -1; // a priori
   m_PParsePassSpaces(a_sequence,NULL);
 
   int n_as = -1; // No blotreg read/set op a priori 
   PParsePassSingleChar(a_sequence,NULL,'=',&lexeme); 
   if (!b_EMPTY_P_STRING(lexeme)) { // <blotreg ref op set int> | <blotreg ref op set str>... 
     m_TRACK_IF(ParseAs(b_L_VALUE,a_sequence,&n_as) != RETURNED)
-    if (n_indexFetchFlags < 0) n_indexFetchFlags = ALL_FLAGS_OFF0; 
   } // if
   
-    if (n_as == -1) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
-    *ac_as = n_as ;
+  if (n_as == -1) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
+  *ac_as = n_as ;
 
   m_DIGGY_RETURN(ANSWER__YES)
 } // ParseAndComputeLValueBlotregOps

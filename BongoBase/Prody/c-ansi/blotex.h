@@ -51,7 +51,7 @@ typedef struct BLOTEXLIB_EXECUTOR *BLOTEXLIB_EXECUTOR_HANDLE; // Public handle
 //
 // Changed:
 // - *a_sequence: after parsing 
-// - *ac_blottabFieldReference: only significant if "success" 
+// - *ac_blottabSpotReference: only significant if "success" 
 // - nc_abandonmentInfo: 
 //
 // Ret: Computed successfully ? 
@@ -61,7 +61,7 @@ typedef struct BLOTEXLIB_EXECUTOR *BLOTEXLIB_EXECUTOR_HANDLE; // Public handle
 typedef int (*l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_L_VALUE_BLOTTAB_SET_OP_FUNCTION)(
   BLOTEXLIB_EXECUTOR_HANDLE handle, char b_spot, struct P_STRING *a_sequence,
   struct P_STRING blottabName, void* nr_blottabHandle,
-  struct BLOTTAB_FIELD_REFERENCE *ac_blottabFieldReference, G_STRING_STUFF nc_abandonmentInfo) ;
+  struct BLOTTAB_SPOT_REFERENCE *ac_blottabSpotReference, G_STRING_STUFF nc_abandonmentInfo) ;
 
 
 // #REF l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION
@@ -119,7 +119,7 @@ int BlotexlibExecutorFactoryCreateInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE *az
   l_blotexlibExecutorParseAndComputeLValueGenuineBlottabSetOpFunction,
   l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION
   l_blotexlibExecutorParseAndComputeRValueGenuineBlottabOpsFunction,
-  UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION updateGenuineBlottabCurrentBlotsetFieldFunction,
+  UPDATE_BLOTTAB_SPOT_FUNCTION updateGenuineBlottabSpotFunction,
   NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION genuineBlottabDestroyInstanceFunction) ;
 
 // Register another blottab implementation. 
@@ -128,7 +128,7 @@ int BlotexlibExecutorFactoryCreateInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE *az
 // Passed:
 // - l_blotexlibExecutorParseAndComputeLValueBlottabSetOpFunction:
 // - l_blotexlibExecutorParseAndComputeRValueBlottabOpsFunction:
-// - updateCurrentBlotsetFieldFunction:
+// - updateBlottabSpotFunction:
 //
 // Returned:
 // - >= 1: new EXTRA (not GENUINE)  
@@ -139,7 +139,7 @@ int BlotexlibExecutorFactoryRegisterBlottabImplementation(
   l_blotexlibExecutorParseAndComputeLValueBlottabSetOpFunction,
   l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION
   l_blotexlibExecutorParseAndComputeRValueBlottabOpsFunction,
-  UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION updateCurrentBlotsetFieldFunction,
+  UPDATE_BLOTTAB_SPOT_FUNCTION updateBlottabSpotFunction,
   NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION blottabDestroyInstanceFunction) ;
 
 // Link blotex library

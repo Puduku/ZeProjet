@@ -146,25 +146,25 @@ int ConcatenateStrexValue(G_STRINGS_HANDLE workingGStringHandle,
 
 // BLOTTAB:
 // --------
-struct BLOTTAB_FIELD_REFERENCE {
+struct BLOTTAB_SPOT_REFERENCE {
   int asValue; 
-  void *r_blottabHandle;
-  void *r_field; // "field" identification
+  void *r_blottabHandle; // at some "current" position 
+  void *r_spot; // "field" identification (complete spot reference) 
 } ;
 
-// #REF UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION 
+// #REF UPDATE_BLOTTAB_SPOT_FUNCTION 
 // Update some field of current blotset of a blottab.
 //
 // Passed:
-// - blottabFieldReference: referenced blottab, supposed to be positoned on the "current" blotset 
-// - blotexValue: accurate (INT / STR) value regarding blottabFieldReference
+// - blottabSpotReference: referenced blottab, supposed to be positoned on the "current" blotset 
+// - blotexValue: accurate (INT / STR) value regarding blottabSpotReference
 // 
 // Ret:
 // - RESULT__FOUND:
 // - RESULT__NOT_FOUND: current blotset not available
 // - -1: unexpected problem; anomaly is raised
-typedef int (*UPDATE_BLOTTAB_CURRENT_BLOTSET_FIELD_FUNCTION)(
-  struct BLOTTAB_FIELD_REFERENCE blottabFieldReference, struct BLOTEX_VALUE blotexValue);
+typedef int (*UPDATE_BLOTTAB_SPOT_FUNCTION)(
+  struct BLOTTAB_SPOT_REFERENCE blottabSpotReference, struct BLOTEX_VALUE blotexValue);
 
 
 // Parsing blot expressions: framework 

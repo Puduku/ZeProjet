@@ -28,7 +28,7 @@ m_RAISE(ANOMALY__NOT_AVAILABLE)
 // Public function: see .h
 int l_BlotexlibExecutorParseAndComputeLValueBlottab2Ops(
   BLOTEXLIB_EXECUTOR_HANDLE handle, char b_spot, struct P_STRING *a_sequence,
-  struct P_STRING blottab2Name, struct BLOTTAB_FIELD_REFERENCE *ac_blottab2FieldReference,
+  struct P_STRING blottab2Name, struct BLOTTAB_SPOT_REFERENCE *ac_blottab2SpotReference,
   G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD_S()
   m_PREPARE_ABANDON(a_sequence,"<blottab2 ref op set int> | <blottab2 ref op set str>") \
@@ -80,13 +80,11 @@ int l_BlotexlibExecutorParseAndComputeRValueBlottab2Ops(BLOTEXLIB_EXECUTOR_HANDL
 
 
 
-
-
 // Public function; see .h
-int UpdateBlottab2CurrentBlotsetField(struct BLOTTAB_FIELD_REFERENCE blottab2FieldReference,
+int UpdateBlottab2Spot(struct BLOTTAB_SPOT_REFERENCE blottab2SpotReference,
   struct BLOTEX_VALUE blotexValue) {
   m_DIGGY_BOLLARD()
   m_RAISE(ANOMALY__SHOULD_NOT_BE_HERE)
-} // UpdateBlottab2CurrentBlotsetField
+} // UpdateBlottab2Spot
 
 
