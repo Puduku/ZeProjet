@@ -54,8 +54,8 @@
 
 // Another simple technique is to use metonymies and synecdoches.
 // In fact, we often use metonymies unconsciously. In particular, when, in a (laudable)
-// effort to be concise, we name the master module of our project after the project itself, we
-// are using metonymy.
+// effort to be concise, we name the principal module of our project after the project
+// itself, we are using metonymy.
 // However, it is important to bear in mind that this stylistic device can also create
 // unfortunate confusion.
 // Let me give you a simple example. A project I worked on for many years consisted of
