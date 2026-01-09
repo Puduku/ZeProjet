@@ -218,7 +218,7 @@
 // Number -1: '\0'-terminated strings convention (legacy of assembly languages ?) 
 // Practical problem in brief: crappy representation of strings => crappy code and functions
 // manipulating strings => presence of a lot of crappy code in C programs "in general"...
-// The convention of strings terminated with '\0' is never questionned by programmers because it
+// The convention of strings terminated with '\0' is rarely questionned by programmers because it
 // seems so simple and efficient. In specific cases - "early" programs developped in the 70s (as
 // with my videopac toy "computer" from the year 1978), "low level" drivers, etc. - this
 // representation is indeed, by far, the most effective one can imagine...
