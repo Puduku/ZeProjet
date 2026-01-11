@@ -13,6 +13,10 @@
 #include "c-ansi/g-string.h"
 #include "c-ansi/g-param.h"
 
+
+// Main blotex "concepts":
+// =======================
+
 // BLOTREG: 
 // --------
 
@@ -168,7 +172,7 @@ typedef int (*UPDATE_BLOTTAB_SPOT_FUNCTION)(
 
 
 // Parsing blot expressions: framework 
-// -----------------------------------
+// =================================== 
 
 // Prepare parsing function for potential abandonment.   
 //
@@ -225,7 +229,7 @@ typedef int (*UPDATE_BLOTTAB_SPOT_FUNCTION)(
  
 
 // Parsing blot expressions: helpers 
-// ---------------------------------
+// ================================= 
 
 // IS_CHAR_FUNCTION:
 // Recognize any character corresponding to <entity>
@@ -346,8 +350,36 @@ int ParseRequestCompOp(struct P_STRING *a_sequence, char b_str, int *an_indexSee
 int ParseLogical2Op(struct P_STRING *a_sequence, int *a_criteriaOpFlags);
 
 
-// IS_CHAR_FUNCTION:
-int IsInt1Op(int c) ;
+// Passed:
+// - *a_sequence: expect <str comp op> | <comp op> 
+//
+// Changed:
+// - *a_sequence: after parsing 
+// - *an_int1Op: -1 special value if not parsed 
+// 
+// Ret:
+// - RETURNED: Ok
+// - 1: unexpected problem; anomaly is raised
+int ParseInt1Op(struct P_STRING *a_sequence, int *an_int1Op);
+
+#define b_STR_CONSTANT b_TRUE
+
+// Passed:
+// - *a_sequence: expect <str constant>
+//
+// Changed:
+// - *a_sequence: after parsing 
+// - *acb_strConstant:
+// - *acc_blotexValue:
+// - nc_abandonmentInfo: only significant if abandon 
+//
+// Ret: Parsedsuccessfully ? 
+// - ANSWER__YES: Ok,
+// - ANSWER__NO: 'syntax' error; abandon processing 
+// - -1: unexpected problem
+int ParseStrConstant(struct P_STRING *a_sequence, G_STRINGS_HANDLE workingGStringsHandle,
+  char *acb_strConstant, struct BLOTEX_VALUE *acc_blotexValue, G_STRING_STUFF nc_abandonmentInfo) ;
+
 
 // Terminal symbols (of <int 1op> terminal symbol)
 enum {
@@ -393,15 +425,13 @@ enum {
 //
 // Changed:
 // - *a_sequence: after parsing 
-// - *avn_format:
-//   + -1 special value: when abandonned (invalid format) 
-//   + >=0 : corresponding format 
+// - *ac_format: ony significant when no parsing error; (>=0) corresponding format
+// - nc_abandonmentInfo: only significant if abandon 
 // 
 // Ret:
 // - ANSWER__YES: Ok,
 // - ANSWER__NO: 'invalid format' error; abandon processing 
-int ParseFormat(struct P_STRING *a_sequence, int *avn_format,
-  G_STRING_STUFF nc_abandonmentInfo) ;
+int ParseFormat(struct P_STRING *a_sequence, int *ac_format, G_STRING_STUFF nc_abandonmentInfo);
 
 
 // Parse blottabs label  

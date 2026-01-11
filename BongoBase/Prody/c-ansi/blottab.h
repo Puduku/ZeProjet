@@ -54,7 +54,7 @@ int l_BlotexlibExecutorParseAndComputeRValueBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE
   char b_spot, struct P_STRING *a_sequence, int blottabsLabel, struct P_STRING blottabName,
   void* nr_blottabHandle, struct BLOTEX_VALUE *ac_blotexValue, G_STRING_STUFF nc_abandonmentInfo);
 
-// #SEE UPDATE_BLOTTAB_SPOT_FUNCTION@c-ansi/blotex.h
+// #SEE UPDATE_BLOTTAB_SPOT_FUNCTION@c-ansi/blotex-kitchen.h
 int UpdateBlottabSpot(struct BLOTTAB_SPOT_REFERENCE blottabSpotReference,
  struct BLOTEX_VALUE blotexValue) ;
 

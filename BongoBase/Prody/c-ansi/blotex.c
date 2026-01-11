@@ -676,17 +676,7 @@ static int BlotexlibExecutorProbeBlotexAtom(BLOTEXLIB_EXECUTOR_HANDLE handle,
   if (b_EMPTY_P_STRING(*a_sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE) 
 
   int n_int1Op = -1; // a priori
-  PParsePassSingleChar(a_sequence,IsInt1Op,(char)UNDEFINED,&lexeme);
-  if (!b_EMPTY_P_STRING(lexeme)) { // <int 1op>
-    switch (lexeme.string[0]) {
-    case '!' : n_int1Op = NOT__INT_1OP;
-    break; case '+' : n_int1Op = PLUS__INT_1OP;
-    break; case '-' : n_int1Op = MINUS__INT_1OP;
-    break; default:
-      m_RAISE(ANOMALY__VALUE__D,lexeme.string[0])
-    } // switch
-    m_PParsePassSpaces(a_sequence,NULL);
-  } // if
+  m_TRACK_IF(ParseInt1Op(a_sequence, &n_int1Op) != RETURNED) 
 
 m_DIGGY_VAR_P_STRING(*a_sequence)
   gen_BLOTVAL c_blotval = UNDEFINED; 
@@ -694,14 +684,14 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
   if (!b_EMPTY_P_STRING(lexeme)) m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle,AS__VALUE_INT,
     c_blotval, (const struct P_STRING*) UNDEFINED, (char)UNDEFINED, ac_blotexAtomValue) != RETURNED)
   else { 
-    PParsePassSingleChar(a_sequence,NULL,'"',&lexeme);
-    if (!b_EMPTY_P_STRING(lexeme)) { // <str constant> ... 
-      PParsePassChars(a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_TILL,NULL,'"', &lexeme);
-      if (b_EMPTY_P_STRING(*a_sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
-      PParseOffset(a_sequence,1,NULL);
-      m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle,AS__VALUE_STR,UNDEFINED,&lexeme,
-        !b_FUGACIOUS_STR, ac_blotexAtomValue) != RETURNED) // TODO: FUGACIOUS???
-    } else { 
+    char cb_strConstant = (char)UNDEFINED;
+    switch (ParseStrConstant(a_sequence,handle->h_workingGStringsHandle, &cb_strConstant,
+      ac_blotexAtomValue,nc_abandonmentInfo)) {
+    case ANSWER__YES:
+    break; case ANSWER__NO: 
+      m_DIGGY_RETURN(ANSWER__NO)
+    break; default: m_TRACK() } // switch
+    if (!cb_strConstant) {
       PParsePassSingleChar(a_sequence,NULL,'(',&lexeme);
       if (!b_EMPTY_P_STRING(lexeme)) { 
         switch(BlotexlibExecutorParseAndComputeBlotex(handle,a_sequence,ac_blotexAtomValue,
@@ -745,7 +735,7 @@ m_DIGGY_VAR_P(cn_blotregHandle)
               m_TRACK()
             } // switch
           } // if
-        } else {
+        } else {  
           if (n_blottabsLabel >= 0) { 
             // <int blottabX spot> | <str blottabX spot> ... 
             switch (handle->blottabExecutorImplementations[n_blottabsLabel].
@@ -1280,7 +1270,6 @@ static inline int m_BlotexlibExecutorExecuteCFunctionOutputF(BLOTEXLIB_EXECUTOR_
   break; default:
     m_TRACK()
   } // switch
-  m_ASSERT(n_format >= 0)
      
   m_PREPARE_ABANDON(&arguments, "OutputF") 
   m_PParsePassSpaces(&arguments,NULL);

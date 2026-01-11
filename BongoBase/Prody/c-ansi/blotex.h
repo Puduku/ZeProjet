@@ -15,8 +15,8 @@
 #include "c-ansi/g-param.h"
 
 
-// blotex library executor factory 
-// ===============================
+// blotex library executor factory: 
+// ================================
 
 struct BLOTEXLIB_EXECUTOR_FACTORY ; // Private
 typedef struct BLOTEXLIB_EXECUTOR_FACTORY *BLOTEXLIB_EXECUTOR_FACTORY_HANDLE; // Public
@@ -28,7 +28,7 @@ typedef struct BLOTEXLIB_EXECUTOR *BLOTEXLIB_EXECUTOR_HANDLE; // Public handle
 // Blottabs:
 // ---------
 
-// Actual blottabs are handled by external (so-called "blottab") module(s).
+// Actual blottabs are handled by external module(s).
 // The blotex module simply manages the blottab identification within blot expressions:
 // - "Genuine" blottabs are seen as some <entity> prefixed with '^' token) 
 // - "Super" blottabs are seen as some <entity> prefixed with '^^' token) 
@@ -44,7 +44,7 @@ typedef struct BLOTEXLIB_EXECUTOR *BLOTEXLIB_EXECUTOR_HANDLE; // Public handle
 //
 // Passed:
 // - handle: 
-// - b_spot: b_SPOT(TRUE) / b_OPS(FALSE) 
+// - b_spot: b_SPOT(TRUE) parse spot ; b_OPS(FALSE) parse operation 
 // - *a_sequence: before parsing
 // - blottabName: blot table name
 // - nr_blottabHandle: NULL when not existing
@@ -71,7 +71,7 @@ typedef int (*l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_L_VALUE_BLOTTAB_SET_OP_FUNC
 //
 // Passed:
 // - handle: 
-// - b_spot: b_SPOT(TRUE) / b_OPS(FALSE) 
+// - b_spot: b_SPOT(TRUE) parse spot ; b_OPS(FALSE) parse operation 
 // - *a_sequence: before parsing
 // - blottabsLabel:
 // - blottabName: blot table name
@@ -176,7 +176,7 @@ int BlotexlibExecutorFactoryDestroyInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE xh
 // This function is useful to access to all blotex variables... 
 //
 // Passed:
-// - handle: see BlotcodeExecutorCreateInstance() 
+// - handle:
 // - blotexLibEntry: entry (label) of blotex library (see BlotcodeLinkBlotexlib() above) 
 //
 // Modified:
@@ -200,7 +200,7 @@ int l_BlotcodeExecutorGetBlotexlibExecutorHandle(BLOTCODE_EXECUTOR_HANDLE handle
 // Retrieve some blot register.
 // 
 // Passed:
-// - handle:
+// - handle: see l_BlotcodeExecutorGetBlotexlibExecutorHandle()
 // - blotregName: blot register's name 
 //
 // Changed:
@@ -217,7 +217,7 @@ int BlotexlibExecutorGetBlotreg (BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRI
 // Create blot register.
 // 
 // Passed:
-// - handle:
+// - handle: see l_BlotcodeExecutorGetBlotexlibExecutorHandle()
 // - blotregName: blot register's name 
 // - na_blotregHandle: NULL special pointer: not used
 //
@@ -234,6 +234,8 @@ int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
 
 // Interface for blottab implementations:
 // ======================================
+
+// These functions allow implementation of actual blottabs ("Genuine", "Super", "Hyper") 
 
 // Blotex values:
 // --------------

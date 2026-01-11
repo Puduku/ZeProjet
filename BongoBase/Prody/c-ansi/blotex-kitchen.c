@@ -276,11 +276,49 @@ int ParseLogical2Op(struct P_STRING *a_sequence,
 } // ParseLogical2Op
 
 
-// See .h
 // IS_CHAR_FUNCTION:
-int IsInt1Op(int c) {
+static int IsInt1Op(int c) {
   return (c == '+' || c == '-' || c == '!');
 } // IsInt1Op
+
+// See .h
+int ParseInt1Op(struct P_STRING *a_sequence, int *an_int1Op) { 
+  m_DIGGY_BOLLARD()
+  struct P_STRING lexeme = UNDEFINED_P_STRING;
+  *an_int1Op = -1; // a priori
+  PParsePassSingleChar(a_sequence,IsInt1Op,(char)UNDEFINED,&lexeme);
+  if (!b_EMPTY_P_STRING(lexeme)) { // <int 1op>
+    switch (lexeme.string[0]) {
+    case '!' : *an_int1Op = NOT__INT_1OP;
+    break; case '+' : *an_int1Op = PLUS__INT_1OP;
+    break; case '-' : *an_int1Op = MINUS__INT_1OP;
+    break; default:
+      m_RAISE(ANOMALY__VALUE__D,lexeme.string[0])
+    } // switch
+    m_PParsePassSpaces(a_sequence,NULL);
+  } // if
+
+  m_DIGGY_RETURN(RETURNED)
+} // ParseInt1Op
+
+#define b_STR_CONSTANT b_TRUE
+
+// See .h
+int ParseStrConstant(struct P_STRING *a_sequence, G_STRINGS_HANDLE workingGStringsHandle,
+  char *acb_strConstant, struct BLOTEX_VALUE *acc_blotexValue, G_STRING_STUFF nc_abandonmentInfo) {
+  m_DIGGY_BOLLARD()
+  struct P_STRING lexeme = UNDEFINED_P_STRING;
+  m_PREPARE_ABANDON(a_sequence, "<str constant>")
+  PParsePassSingleChar(a_sequence,NULL,'"',&lexeme);
+  if ((*acb_strConstant = !b_EMPTY_P_STRING(lexeme))) { // <str constant> ... 
+    PParsePassChars(a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_TILL,NULL,'"', &lexeme);
+    if (b_EMPTY_P_STRING(*a_sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
+    PParseOffset(a_sequence,1,NULL);
+    m_TRACK_IF(SetBlotexValue(workingGStringsHandle,AS__VALUE_STR,UNDEFINED,&lexeme,
+      !b_FUGACIOUS_STR, acc_blotexValue) != RETURNED) // TODO: FUGACIOUS???
+  } // if 
+  m_DIGGY_RETURN(ANSWER__YES)
+} // ParseStrConstant
 
 
 // See .h
@@ -302,12 +340,11 @@ static int IsFormatSpecifierChar(int c) {
 
 
 // See .h
-int ParseFormat(struct P_STRING *a_sequence, int *avn_format,
-  G_STRING_STUFF nc_abandonmentInfo) {
+int ParseFormat(struct P_STRING *a_sequence, int *ac_format, G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
   struct P_STRING lexeme; // UNDEFINED
 
-  *avn_format = -1;
+  int n_format = -1; // a priori
   m_PREPARE_ABANDON(a_sequence, "<format>") 
   m_PParsePassSpaces(a_sequence,NULL);
   PParsePassSingleChar(a_sequence,NULL,'%',&lexeme);
@@ -315,22 +352,25 @@ int ParseFormat(struct P_STRING *a_sequence, int *avn_format,
   PParsePassChars(a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_WHILE,IsFormatSpecifierChar,(char)UNDEFINED,
     &lexeme);
   int length = m_PStringLength(lexeme);
-  switch (lexeme.string[0]) {
-  case 'd': 
-    if (length == 1) *avn_format = D__FORMAT;
-  break; case 's':
-    if (length == 1) *avn_format = LS__FORMAT;
-  break; case 'x':
-    if (length == 1) *avn_format = LX__FORMAT;
-  break; case 'X':
-    if (length == 1) *avn_format = UX__FORMAT;
-  break; case 'L':
-    if (length == 2 && lexeme.string[0] == 'E') *avn_format = LE__FORMAT;
-  break; case 'B':
-    if (length == 2 && lexeme.string[0] == 'E') *avn_format = BE__FORMAT;
-  } // switch
+  if (length > 0) {
+    switch (lexeme.string[0]) {
+    case 'd': 
+      if (length == 1) n_format = D__FORMAT;
+    break; case 's':
+      if (length == 1) n_format = LS__FORMAT;
+    break; case 'x':
+      if (length == 1) n_format = LX__FORMAT;
+    break; case 'X':
+      if (length == 1) n_format = UX__FORMAT;
+    break; case 'L':
+      if (length == 2 && lexeme.string[0] == 'E') n_format = LE__FORMAT;
+    break; case 'B':
+      if (length == 2 && lexeme.string[0] == 'E') n_format = BE__FORMAT;
+    } // switch
+  } // if
 
-  if (*avn_format < 0) m_ABANDON(INVALID_FORMAT__ABANDONMENT_CAUSE) 
+  if (n_format < 0) m_ABANDON(INVALID_FORMAT__ABANDONMENT_CAUSE) 
+  *ac_format = n_format;
 
   m_DIGGY_RETURN(ANSWER__YES)
 } // ParseFormat
