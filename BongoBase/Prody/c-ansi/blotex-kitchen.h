@@ -226,7 +226,15 @@ typedef int (*UPDATE_BLOTTAB_SPOT_FUNCTION)(
   } \
   m_DIGGY_RETURN(ANSWER__NO)\
 }
- 
+
+//
+// Passed:
+// - parseBlotexCallAnswer:
+#define m_CHECK_ABANDON(/*int*/parseBlotexCallAnswer) switch (parseBlotexCallAnswer) {\
+  case ANSWER__YES:\
+  break; case ANSWER__NO:\
+    m_DIGGY_RETURN(ANSWER__NO) \
+  break; default: m_TRACK() } 
 
 // Parsing blot expressions: helpers 
 // ================================= 
@@ -362,6 +370,23 @@ int ParseLogical2Op(struct P_STRING *a_sequence, int *a_criteriaOpFlags);
 // - 1: unexpected problem; anomaly is raised
 int ParseInt1Op(struct P_STRING *a_sequence, int *an_int1Op);
 
+#define b_INT_CONSTANT b_TRUE
+
+// Passed:
+// - *a_sequence: expect <int constant>
+//
+// Changed:
+// - *a_sequence: after parsing 
+// - *ab_intConstant:
+// - *acc_blotexValue:
+//
+// Ret: 
+// - RETURNED: Ok,
+// - -1: unexpected problem
+int ParseIntConstant(struct P_STRING *a_sequence, G_STRINGS_HANDLE workingGStringsHandle,
+  char *ab_intConstant, struct BLOTEX_VALUE *ac_blotexValue) ;
+
+
 #define b_STR_CONSTANT b_TRUE
 
 // Passed:
@@ -373,7 +398,7 @@ int ParseInt1Op(struct P_STRING *a_sequence, int *an_int1Op);
 // - *acc_blotexValue:
 // - nc_abandonmentInfo: only significant if abandon 
 //
-// Ret: Parsedsuccessfully ? 
+// Ret: parsed successfully ? 
 // - ANSWER__YES: Ok,
 // - ANSWER__NO: 'syntax' error; abandon processing 
 // - -1: unexpected problem

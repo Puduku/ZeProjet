@@ -301,7 +301,20 @@ int ParseInt1Op(struct P_STRING *a_sequence, int *an_int1Op) {
   m_DIGGY_RETURN(RETURNED)
 } // ParseInt1Op
 
-#define b_STR_CONSTANT b_TRUE
+
+// See .h
+int ParseIntConstant(struct P_STRING *a_sequence, G_STRINGS_HANDLE workingGStringsHandle,
+  char *ab_intConstant, struct BLOTEX_VALUE *ac_blotexValue) {
+  m_DIGGY_BOLLARD()
+  struct P_STRING lexeme = UNDEFINED_P_STRING;
+  gen_BLOTVAL c_blotval = UNDEFINED;
+  PParseGenericInteger(a_sequence,&c_blotval,&lexeme);
+  if ((*ab_intConstant = !b_EMPTY_P_STRING(lexeme))) m_TRACK_IF(SetBlotexValue(
+    workingGStringsHandle,AS__VALUE_INT, c_blotval, (const struct P_STRING*) UNDEFINED,
+    (char)UNDEFINED, ac_blotexValue) != RETURNED)
+
+  m_DIGGY_RETURN(RETURNED)
+} // ParseIntConstant
 
 // See .h
 int ParseStrConstant(struct P_STRING *a_sequence, G_STRINGS_HANDLE workingGStringsHandle,
