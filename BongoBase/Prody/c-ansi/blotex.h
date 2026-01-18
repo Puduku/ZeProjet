@@ -256,9 +256,9 @@ int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
 // Ret: 
 // - RETURNED: Ok
 // - -1: unexpected problem; anomaly is raised
-int BlotexlibExecutorSetBlotexValue(BLOTEXLIB_EXECUTOR_HANDLE handle, int asValue,
-  gen_BLOTVAL c_blotval, const struct P_STRING* cap_str, char cb_fugaciousStr,
-  struct BLOTEX_VALUE *a_blotexValue) ;
+int BlotexlibExecutorSetBlotexValue(BLOTEXLIB_EXECUTOR_HANDLE handle,
+  struct BLOTEX_VALUE *a_blotexValue, int asValue,
+  gen_BLOTVAL c_blotval, const struct P_STRING* cap_str, char cb_fugaciousStr) ;
 
 
 // Passed:

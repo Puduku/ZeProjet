@@ -509,8 +509,8 @@ static inline int ml_BlotexlibExecutorParseAndComputeRValueBlottabOps(
   struct P_STRING lexeme = UNDEFINED_P_STRING;
 
   m_PREPARE_ABANDON(a_sequence, "<int blottab ops> | <str blottab ops>") 
-  m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle, AS__VALUE_INT,TRUE__BLOTVAL0,
-    (struct P_STRING*)UNDEFINED,(char)UNDEFINED,ac_blotexValue) != RETURNED) // a priori
+  m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,ac_blotexValue, AS__VALUE_INT,TRUE__BLOTVAL0,
+    (struct P_STRING*)UNDEFINED,(char)UNDEFINED) != RETURNED) // a priori
 
   int n_indexFetchFlags = -1; // a priori 
   m_PParsePassSpaces(a_sequence,NULL);
@@ -551,8 +551,8 @@ m_ASSERT(n_asValue != -1)
   } // if
   
   if (n_indexFetchFlags < 0) {
-    m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle, AS__VALUE_INT,TRUE__BLOTVAL0,
-      (struct P_STRING*)UNDEFINED,(char)UNDEFINED,ac_blotexValue) != RETURNED)
+    m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,ac_blotexValue, AS__VALUE_INT,TRUE__BLOTVAL0,
+      (struct P_STRING*)UNDEFINED,(char)UNDEFINED) != RETURNED)
   } else {
     g_G_STRING_SET_STUFF ct_blotsetStuff = (g_G_STRING_SET_STUFF)UNDEFINED;
     int c_entry = UNDEFINED;
@@ -565,23 +565,23 @@ m_DIGGY_VAR_INDEX_FETCH_FLAGS(n_indexFetchFlags)
 m_DIGGY_VAR_D(n_asValue)
       switch (n_asValue) {
       case -1: 
-        m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle, AS__VALUE_INT,TRUE__BLOTVAL0,
-          (struct P_STRING*)UNDEFINED,(char)UNDEFINED,ac_blotexValue) != RETURNED)
+        m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,ac_blotexValue, AS__VALUE_INT,TRUE__BLOTVAL0,
+          (struct P_STRING*)UNDEFINED,(char)UNDEFINED) != RETURNED)
       break; case AS__VALUE_INT:
-        m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle, AS__VALUE_INT,
+        m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,ac_blotexValue, AS__VALUE_INT,
           ct_blotsetStuff[c_element].acolyt.cen_value,(struct P_STRING*)UNDEFINED,
-          (char)UNDEFINED,ac_blotexValue) != RETURNED)
+          (char)UNDEFINED) != RETURNED)
       break; case AS__VALUE_STR:
-        m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,AS__VALUE_STR,UNDEFINED,
-          &ct_blotsetStuff[c_element].cv_pString,b_FUGACIOUS_STR,ac_blotexValue) !=
+        m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,ac_blotexValue,AS__VALUE_STR,UNDEFINED,
+          &ct_blotsetStuff[c_element].cv_pString,b_FUGACIOUS_STR) !=
           RETURNED) // TODO: really FUGACIOUS????
       break; default: 
         m_TRACK()
       } // switch
 
     break; case RESULT__NOT_FOUND:
-      m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,n_asValue == AS__VALUE_STR,FALSE__BLOTVAL,
-        ap_aTrivialEmptyPString,!b_FUGACIOUS_STR,ac_blotexValue) != RETURNED)
+      m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,ac_blotexValue,n_asValue == AS__VALUE_STR,FALSE__BLOTVAL,
+        ap_aTrivialEmptyPString,!b_FUGACIOUS_STR) != RETURNED)
     break; default: m_TRACK()
     } // switch
   } // if
@@ -608,12 +608,12 @@ static inline int ml_BlotexlibExecutorParseAndComputeRValueBlottabSpot(
 
   switch (asValue) {
   case AS__VALUE_INT:
-    m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle, AS__VALUE_INT,
+    m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,ac_blotexValue, AS__VALUE_INT,
       t_blotsetStuff[element].acolyt.cen_value,(struct P_STRING*)UNDEFINED,
-      (char)UNDEFINED,ac_blotexValue) != RETURNED)
+      (char)UNDEFINED) != RETURNED)
   break; case AS__VALUE_STR:
-    m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,AS__VALUE_STR,UNDEFINED,
-      &t_blotsetStuff[element].cv_pString,b_FUGACIOUS_STR,ac_blotexValue) !=
+    m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,ac_blotexValue,AS__VALUE_STR,UNDEFINED,
+      &t_blotsetStuff[element].cv_pString,b_FUGACIOUS_STR) !=
       RETURNED) // TODO: really FUGACIOUS????
   break; default: m_TRACK() } // switch
 

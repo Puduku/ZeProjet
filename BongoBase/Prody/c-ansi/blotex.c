@@ -284,13 +284,13 @@ m_DIGGY_VAR_P(blottabsHandle)
 // Blot expressions parsing:
 
 // Public function: see .h
-int BlotexlibExecutorSetBlotexValue(BLOTEXLIB_EXECUTOR_HANDLE handle, int asValue,
-  gen_BLOTVAL c_blotval, const struct P_STRING* cap_str, char cb_fugaciousStr,
-  struct BLOTEX_VALUE *a_blotexValue) {
+int BlotexlibExecutorSetBlotexValue(BLOTEXLIB_EXECUTOR_HANDLE handle,
+  struct BLOTEX_VALUE *a_blotexValue,  int asValue, gen_BLOTVAL c_blotval,
+  const struct P_STRING* cap_str, char cb_fugaciousStr) {
   m_DIGGY_BOLLARD()
 
-  m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle,asValue, c_blotval, cap_str,
-    cb_fugaciousStr, a_blotexValue) != RETURNED)
+  m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle,a_blotexValue,asValue, c_blotval, cap_str,
+    cb_fugaciousStr) != RETURNED)
   m_DIGGY_RETURN(RETURNED)
 } // BlotexlibExecutorSetBlotexValue
 
@@ -344,19 +344,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
     int blotregIndexLabel = UNDEFINED; 
     // <blotreg request atom int> | <blotreg request atom str> ...
     m_TRACK_IF(ParseAs(b_R_VALUE,&subSequence,&as) != RETURNED)
-    switch (as) {
-    case AS__VALUE_INT: // [ '#' ]
-      blotregIndexLabel = INT_VALUE__BLOTREG_INDEX_LABEL; 
-    break; case AS__ENTRY: // '!#' (r-value) 
-m_RAISE(ANOMALY__NOT_AVAILABLE)
-    break; case AS__ID: // '!' 
-      blotregIndexLabel = TOKEN_ID__BLOTREG_INDEX_LABEL; 
-    break; case AS__VALUE_STR: // '$'
-      blotregIndexLabel = STR_VALUE__BLOTREG_INDEX_LABEL; 
-    break; case AS__NAME:  // '!$'
-      blotregIndexLabel = NAME__BLOTREG_INDEX_LABEL;
-    break; default: m_RAISE(ANOMALY__VALUE__D,as)
-    } // switch
+    m_TRACK_IF(AsBlotregIndexLabel(as,&blotregIndexLabel) != RETURNED)
     
     int n_indexSeekFlags = UNDEFINED;
     PParsePassSingleChar(&subSequence,NULL,'*',&lexeme);
@@ -435,8 +423,8 @@ static int BlotexlibExecutorParseAndComputeRValueBlotregOps(BLOTEXLIB_EXECUTOR_H
 
   if (n_blotregHandle == NULL) m_ABANDON(UNKNOWN_BLOTREG__ABANDONMENT_CAUSE) 
 
-  m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle, AS__VALUE_INT,TRUE__BLOTVAL0,
-    (struct P_STRING*)UNDEFINED,(char)UNDEFINED,ac_blotexValue) != RETURNED) // actually UNDEFINED 
+  m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle,ac_blotexValue, AS__VALUE_INT,TRUE__BLOTVAL0,
+    (struct P_STRING*)UNDEFINED,(char)UNDEFINED) != RETURNED) // actually UNDEFINED 
   int n_indexFetchFlags = -1; // a priori
   m_PParsePassSpaces(a_sequence,NULL);
 
@@ -464,47 +452,20 @@ static int BlotexlibExecutorParseAndComputeRValueBlotregOps(BLOTEXLIB_EXECUTOR_H
   } // if
   
   if (n_indexFetchFlags < 0) {
-    m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle, AS__VALUE_INT,TRUE__BLOTVAL0,
-      (struct P_STRING*)UNDEFINED,(char)UNDEFINED,ac_blotexValue) != RETURNED)
+    m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle,ac_blotexValue, AS__VALUE_INT,TRUE__BLOTVAL0,
+      (struct P_STRING*)UNDEFINED,(char)UNDEFINED) != RETURNED)
   } else {
-    g_BLOTVAR_STUFF ct_blotvarStuff = (g_BLOTVAR_STUFF)UNDEFINED;
+    g_BLOTVAR_STUFF nt_blotvarStuff = (g_BLOTVAR_STUFF)UNDEFINED;
     int c_entry = UNDEFINED;
 
 m_DIGGY_VAR_INDEX_FETCH_FLAGS(n_indexFetchFlags) 
     switch (g_BlotregIndexFetch(n_blotregHandle,NULL,n_indexFetchFlags,
-      &ct_blotvarStuff, &c_entry)) {
+      &nt_blotvarStuff, &c_entry)) {
+    case RESULT__NOT_FOUND:
+m_ASSERT(nt_blotvarStuff == NULL)
     case RESULT__FOUND:
-      switch (n_as) {
-      case -1: 
-        m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle, AS__VALUE_INT,TRUE__BLOTVAL0,
-          (struct P_STRING*)UNDEFINED,(char)UNDEFINED,ac_blotexValue) != RETURNED)
-      break; case AS__VALUE_INT:
-        m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle, AS__VALUE_INT,
-          ct_blotvarStuff[g_BLOTVAR_VALUE_ELEMENT].acolyt.cen_value,
-          (struct P_STRING*)UNDEFINED,(char)UNDEFINED,ac_blotexValue) != RETURNED)
-      break; case AS__ENTRY: // (r-value)
-        m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle, AS__VALUE_INT,c_entry,
-          (struct P_STRING*)UNDEFINED,(char)UNDEFINED,ac_blotexValue) != RETURNED)
-      break; case AS__ID:
-m_RAISE(ANOMALY__NOT_AVAILABLE)
-      break; case AS__VALUE_STR:
-        m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle,AS__VALUE_STR,UNDEFINED,
-          &ct_blotvarStuff[g_BLOTVAR_VALUE_ELEMENT].cv_pString,b_FUGACIOUS_STR,ac_blotexValue) !=
-          RETURNED) // TODO: really FUGACIOUS????
-      break; case AS__NAME:
-        m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle,AS__VALUE_STR,UNDEFINED,
-          &ct_blotvarStuff[g_BLOTVAR_NAME_ELEMENT].cv_pString,b_FUGACIOUS_STR,ac_blotexValue) !=
-          RETURNED) // TODO: really FUGACIOUS????
-      break; default: 
-        m_TRACK()
-      } // switch
-
-    break; case RESULT__NOT_FOUND:
-      if (n_as == AS__VALUE_STR || n_as == AS__NAME) m_TRACK_IF(SetBlotexValue(
-        handle->h_workingGStringsHandle,AS__VALUE_STR,UNDEFINED, ap_aTrivialEmptyPString,
-        !b_FUGACIOUS_STR, ac_blotexValue) != RETURNED)
-      else m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle, AS__VALUE_INT,FALSE__BLOTVAL,
-        (struct P_STRING*)UNDEFINED,(char)UNDEFINED,ac_blotexValue) != RETURNED)
+      m_TRACK_IF(BlotvarReadOpAsBlotexValue(nt_blotvarStuff,n_as,c_entry,
+        handle->h_workingGStringsHandle, ac_blotexValue) != RETURNED)
     break; default: m_TRACK()
     } // switch
   } // if
@@ -551,24 +512,24 @@ static inline int m_BlotexlibExecutorParseAndComputeBlotexAtomBlotvar(BLOTEXLIB_
   m_TRACK_IF(ParseAs(b_R_VALUE,a_sequence,&as) != RETURNED)
   switch (as) {
   case AS__VALUE_INT: // <blotvar as int>
-    m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle,AS__VALUE_INT,
+    m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle,ac_blotexAtomValue,AS__VALUE_INT,
       nt_blotvarStuff[g_BLOTVAR_VALUE_ELEMENT].acolyt.cen_value,(const struct P_STRING*) UNDEFINED,
-      (char)UNDEFINED, ac_blotexAtomValue) != RETURNED)
+      (char)UNDEFINED) != RETURNED)
   break; case AS__ID: // <blotvar id>
-    m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle,AS__VALUE_INT,
+    m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle,ac_blotexAtomValue,AS__VALUE_INT,
       nt_blotvarStuff[g_BLOTVAR_NAME_ELEMENT].acolyt.cen_value,(const struct P_STRING*) UNDEFINED,
-      (char)UNDEFINED, ac_blotexAtomValue) != RETURNED)
+      (char)UNDEFINED) != RETURNED)
   break; case AS__ENTRY: // <blotvar entry> (r-value) 
     m_ASSERT(vn_entry >= 0)
-    m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle,AS__VALUE_INT,vn_entry,
-      (const struct P_STRING*) UNDEFINED, (char)UNDEFINED, ac_blotexAtomValue) != RETURNED)
+    m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle,ac_blotexAtomValue,AS__VALUE_INT,vn_entry,
+      (const struct P_STRING*) UNDEFINED, (char)UNDEFINED) != RETURNED)
   break; case AS__VALUE_STR: // <blotvar strex> 
-    m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle,AS__VALUE_STR,UNDEFINED,
-      &nt_blotvarStuff[g_BLOTVAR_VALUE_ELEMENT].cv_pString,b_FUGACIOUS_STR, ac_blotexAtomValue) !=
+    m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle,ac_blotexAtomValue,AS__VALUE_STR,UNDEFINED,
+      &nt_blotvarStuff[g_BLOTVAR_VALUE_ELEMENT].cv_pString,b_FUGACIOUS_STR) !=
       RETURNED) // TODO: really FUGACIOUS????
   break; case AS__NAME:  // <blotvar name> 
-    m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle,AS__VALUE_STR,UNDEFINED,
-      &nt_blotvarStuff[g_BLOTVAR_NAME_ELEMENT].cv_pString,b_FUGACIOUS_STR, ac_blotexAtomValue) !=
+    m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle,ac_blotexAtomValue,AS__VALUE_STR,UNDEFINED,
+      &nt_blotvarStuff[g_BLOTVAR_NAME_ELEMENT].cv_pString,b_FUGACIOUS_STR) !=
       RETURNED) // TODO: really FUGACIOUS????
   break; default:
     m_RAISE(ANOMALY__VALUE__D,as)

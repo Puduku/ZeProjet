@@ -115,21 +115,22 @@ struct BLOTEX_VALUE {
 // TODO: manage double initialization ???
 //
 // Passed:
-// - workingGStringsHandle:
+// - c_workingGStringsHandle: only significant with AS__VALUE_STR
 // - asValue: AS__VALUE_INT / AS__VALUE_STR 
-// - c_blotval:
-// - cap_str:
-// - cb_fugaciousStr: (TRUE/FALSE) NOTICE: if you intialize TWICE a
-//   fugacious string, the first working string buffer is "lost"  
+// - c_blotval: only significant with AS__VALUE_INT
+// - cap_str: only significant with AS__VALUE_STR
+// - cb_fugaciousStr: only significant with AS__VALUE_STR; (TRUE/FALSE) NOTICE: if you intialize
+//   TWICE a fugacious string, the first working string buffer is "lost"  
 // 
 // changed:
+// - c_workingGStringsHandle: when AS__VALUE_STR
 // - a_blotexValue: 
 //
 // Ret: 
 // - RETURNED: Ok
 // - -1: unexpected problem; anomaly is raised
-int SetBlotexValue(G_STRINGS_HANDLE workingGStringHandle, int asValue, gen_BLOTVAL c_blotval,
-  const struct P_STRING* cap_str, char cb_fugaciousStr, struct BLOTEX_VALUE *a_blotexValue) ;
+int SetBlotexValue(G_STRINGS_HANDLE c_workingGStringsHandle, struct BLOTEX_VALUE *a_blotexValue,
+  int asValue, gen_BLOTVAL c_blotval, const struct P_STRING* cap_str, char cb_fugaciousStr) ;
 
 
 // Passed:
@@ -139,12 +140,13 @@ int SetBlotexValue(G_STRINGS_HANDLE workingGStringHandle, int asValue, gen_BLOTV
 // - p_str2:
 // 
 // changed:
+// - workingGStringsHandle:
 // - a_strtexValue1: 
 //
 // Ret: 
 // - RETURNED: Ok
 // - -1: unexpected problem; anomaly is raised
-int ConcatenateStrexValue(G_STRINGS_HANDLE workingGStringHandle,
+int ConcatenateStrexValue(G_STRINGS_HANDLE workingGStringsHandle,
   struct BLOTEX_VALUE *a_strexValue1, struct P_STRING p_str2) ;
 
 
@@ -287,6 +289,38 @@ int ParseAs(char b_lValue, struct P_STRING *a_sequence, int *a_as) ;
 // - RETURNED: Ok
 // - 1: unexpected problem; anomaly is raised
 int ParseAsValue(struct P_STRING *a_sequence, int *an_asValue) ;
+
+// Interpret as ...  blotreg index label
+//
+// Passed:
+// - as:
+// 
+// Changed:
+// - *a_blotregIndexLabel
+// 
+// Ret:
+// - RETURNED: Ok
+// - 1: unexpected problem; anomaly is raised
+int AsBlotregIndexLabel(int as, int *a_blotregIndexLabel) ;
+
+
+// Interpret blotvar read op as ...  blotex value
+//
+// Passed:
+// - n_blotvarStuff: NULL special pointer => not existing
+// - n_readOpAs: -1 special value => read op not specified
+// - c_entry: only significant if blotvar exists
+// - workingGStringsHandle:
+// 
+// Changed:
+// - workingGStringsHandle:
+// - *a_blotexValue:
+// 
+// Ret:
+// - RETURNED: Ok
+// - 1: unexpected problem; anomaly is raised
+int BlotvarReadOpAsBlotexValue(g_BLOTVAR_STUFF n_blotvarStuff, int n_readOpAs, int c_entry,
+   G_STRINGS_HANDLE workingGStringsHandle, struct BLOTEX_VALUE *a_blotexValue);
 
 
 // Enumeration of <comp op> | <str comp op> | <fact op> terminal symbols 
