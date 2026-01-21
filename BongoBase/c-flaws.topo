@@ -133,6 +133,11 @@
 // This is of course in relation with flaw Number 7 : "typedef" thus looks like a very simple
 // aliasing mechanism... with a few (non-portable) subtleties, just there to confuse the "average"
 // programmer... 
+// Update (21 Jan. 2026) Again, the situation is somewhat clarified since C99. In a nutshell, all
+// compilers should now agree on pointer size in any case - so, it's not very intuitive, but at
+// least the situation is now consistent.
+// Otherwise, the declaration-definition mismatch: char p[] vs char *p remains an enduring
+// weakness in C...
 
 // Number 5: (P) 'printf' format specifiers (%d %lu %s, etc.) are linked to bare data types (%d for
 // int, etc.) 
