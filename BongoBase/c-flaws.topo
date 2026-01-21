@@ -105,9 +105,9 @@
 // "Pointers" are showing everywhere in C ; however, WHAT is EXACTLY a pointer in C ? Actually, a
 // lot of different answers are possible... 'Pointer' is a "phantom" concept in C. 
 // Examples of pitfalls caused by that ambivalence:
-// Ex1: pf() vs. *pf() 
+// Ex1: pf() vs. (*pf)() 
 // Suppose 'pf' is a (valid!) "function pointer"... To call the function pointed by pf, should we
-// type '*pf();' or simply 'pf();' ?
+// type '(*pf)();' or simply 'pf();' ?
 // Modern compilers accept both notations (which are totally equivalent). However, your favour for
 // one of the forms is actually linked with your own "instinctive" conception of C pointer. The
 // fact is that the language "refuses" to tell which representation is the good one!    
