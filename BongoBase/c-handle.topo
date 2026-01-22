@@ -1,1 +1,19 @@
 // c-handle.topo - A note about THE handle concept in C
+
+// As far as I can figure out, "handle" appeared in programs in the late '80s ; this coincided with
+// the emergence of what I would describe as pre-object programming style (I mean no pejorative
+// connotation by this description) in ‘general’ languages such as C. As that time, as a non-native
+// English speaker, I did not even understood that word "handle" that I simply confused with
+// "handler".
+// Many years later, I had a revelation when I saw Julie grab her enormous suitcase as it rolled
+// by on the baggage carousel at the airport. She grabbed it easily because, being very pragmatical,
+// her suitcase had auxiliary handles on EACH of its sides. I then finally understood the metaphor of
+// the '80s programmers. The "handle" is just a small device allowing to grip the real object,
+// and the  FUNDAMENTAL property of the the relation handle-object is that a given object may have
+// multiple handles in general.  According to me this concept of handle as such is one the most
+// fundamental concept in programming theory. I mean I think it's ever more fundamental than that of
+// "pointer" for instance (for which guys got the "Turing prize" if I remember well). And it is
+// certainly much more relevant than the (still for instance) pretentious and clumsy (in my humble
+// opinion) class-object models used in so-called advanced languages (C++, etc.).
+// In short, I'm somewhat puzzled that apparently nobody catched the importance of that programming
+// concept ; why this concept isn't better highlighted ?
