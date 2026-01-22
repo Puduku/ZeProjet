@@ -46,8 +46,7 @@
 
 // Therefore, legible code must be both concise and unambiguous (with names that ‘speak’ to
 // us). How can we achieve two seemingly contradictory goals at the same time?
-// Fortunately, figures of speech come to our rescue, allowing us to ‘reconcile the
-// irreconcilable’...
+// Fortunately, figures of speech come to our rescue...
 
 // The basic rule is: when referring to (and therefore naming) an entity, avoid 
 // circumlocutions and compound names. Use simple metaphors as much as possible.
@@ -66,8 +65,214 @@
 // clearly formalised. This explains (from my humble point of view) many of the erratic
 // decisions that ensued...
 
--12345789-12345789-12345789-12345789-12345789-12345789-12345789-12345789-12345789-12345789
-// Examples of useful figures of speech:
+// Examples of useful figures of speech and other rhetorical technics:
 // - Personification: using a knowm character to name your application
-// - Private joke: given the stato quo that we program in English, non English-native programmers use that opportunity to hide (dirty) slan words (in their mother tongue)  within obscure acronyms to
-//   programmmers from the "rest of the world"....
+// - humoristic references
+// -  ....
+
+
+
+# Stylistic Devices in Programming: Naming Conventions and Rhetoric
+
+## Introduction
+
+Writing quality software requires more than technical skill—it demands an 
+understanding of language and rhetoric. Like literature, programming faces a 
+fundamental challenge: balancing rigor with creativity. This note explores how 
+figures of speech and rhetorical techniques can elevate code quality, 
+particularly in naming conventions.
+
+The central thesis is counterintuitive: both the absence of naming conventions 
+and the imposition of overly rigid rules are equally harmful to code quality. 
+The solution lies not in stricter rules, but in mastering stylistic devices 
+drawn from rhetoric and literature.
+
+---
+
+## Part 1: Concept Formation and Design
+
+### The Role of Metaphor in Conception
+
+New programming concepts rarely emerge from nothing. Instead, they arise through 
+**adaptation, generalization, or specialization** of existing concepts and 
+phenomena. The primary mechanisms for deriving new concepts are **metaphor** and 
+**metonymy**.
+
+A well-chosen metaphor can imprint a concept on the human mind with remarkable 
+efficiency. Striking simplicity matters more than perfect accuracy. The first 
+person to compare computing to a tangible object (such as fruit) creates a 
+lasting impression. Subsequent attempts using similar analogies, however apt, 
+fade into insignificance.
+
+This principle applies directly to naming:
+- **Original metaphors** create memorable, intuitive concepts
+- **Derivative metaphors** confuse rather than clarify
+- **Forced metaphors** burden rather than enlighten
+
+### Naming from History and Mythology
+
+A common and effective practice is to derive names from history and mythology. 
+These familiar references ground abstract concepts in human experience. However, 
+originality matters: the first innovative naming choice succeeds; copies do not.
+
+---
+
+## Part 2: Code and the Naming Crisis
+
+### The Central Problem
+
+An undeniable truth: naming conventions are fundamental to code quality. Yet 
+the software industry has never resolved how to define "good" naming conventions. 
+The difficulty is paradoxical:
+
+1. Programmers **must** be rigorous and systematic in naming
+2. Naming conventions that are **too rigid** become counterproductive
+
+This tension mirrors the classic literary problem: how do you create meaningful 
+expression within formal constraints?
+
+### Two Extremes, Both Destructive
+
+**Extreme 1: Minimalist Names**
+- Simple, short names without hierarchy
+- Consequence: Code becomes obscure and unmaintainable
+- Problem: Inevitable naming conflicts across large codebases
+
+**Extreme 2: Descriptive Names with Rigid Hierarchy**
+- Long, compound names following systematic rules
+- Consequences:
+  - Humans poorly recognize long names (cognitive limitation)
+  - Code weight increases unreasonably
+  - Line lengths exceed 200 characters
+  - Side-by-side comparison of code versions becomes tedious
+  - Visual parsing requires excessive cognitive effort
+
+Both extremes fail: one through obscurity, the other through verbosity.
+
+### The Resolution: Concise and Unambiguous
+
+The solution requires achieving two apparently contradictory goals simultaneously:
+- **Conciseness**: Names must be brief
+- **Clarity**: Names must be self-explanatory and unambiguous
+
+This seeming paradox resolves through **rhetorical technique**—specifically, 
+figures of speech.
+
+---
+
+## Part 3: Rhetorical Solutions
+
+### The Fundamental Principle
+
+**When naming an entity, avoid circumlocution and compound constructions. 
+Employ simple, apt metaphors instead.**
+
+This principle works because:
+- A well-chosen metaphor communicates instantly
+- Metaphorical names compress multiple concepts into single terms
+- The brain processes metaphor more efficiently than literal description
+
+### Metonymy and Synecdoche in Practice
+
+Metonymy (substituting the name of one thing for another) is often used 
+unconsciously in programming:
+
+**Example: Project Names**
+When a software project takes the name of the larger enterprise, this is 
+metonymy—the part (software) represents the whole (project). While concise, 
+this technique carries hidden risks.
+
+**A Real Case Study:**
+
+A multi-year project involved both custom software and specialized hardware. 
+The software naturally adopted the project's name (metonymy). Over time, 
+management conflated the software component with the entire project. The head 
+of software development became, *de facto*, manager of the entire enterprise—
+including hardware—without formal definition. This naming ambiguity contributed 
+to organizational confusion and erratic decisions.
+
+**Lesson:** Metonymy is powerful but dangerous. When using it, ensure context 
+prevents misunderstanding. Explicit documentation may be necessary.
+
+### Effective Figures of Speech
+
+The following rhetorical devices serve naming well:
+
+**Personification**
+Name applications or modules after memorable characters (mythological, 
+historical, literary). This creates instant recognition and semantic richness.
+- Example: "Zeus" for a master controller (association with authority)
+- Example: "Hermes" for message passing (association with communication)
+
+**Humorous References**
+A touch of humor makes names memorable without sacrificing clarity. However, 
+ensure humor serves clarity—never obscures intent.
+
+**Allusion**
+Reference well-known concepts, tools, or phenomena from mathematics, physics, 
+or culture. Educated readers immediately grasp the connection.
+- Example: "entropy" for a randomization module
+- Example: "quantum" for an indeterministic process
+
+**Synecdoche**
+Use a distinctive part to represent the whole, or vice versa.
+- Example: "socket" instead of "network_socket_descriptor"
+
+**Metaphor (Precise Use)**
+Choose metaphors that genuinely illuminate the concept:
+- "handle" ← grasping a resource (genuinely clarifies the abstraction)
+- "queue" ← waiting in line (genuinely conveys FIFO semantics)
+- "fork" ← splitting a path (genuinely conveys process creation)
+
+---
+
+## Part 4: Principles and Guidelines
+
+### When Rhetoric Helps
+
+Rhetorical devices excel when:
+- A concept is complex or abstract
+- Direct description would be verbose
+- A vivid metaphor captures essential meaning
+- Clarity and brevity must coexist
+
+### When Rhetoric Harms
+
+Avoid figures of speech when:
+- The reference is obscure or context-dependent
+- The metaphor misleads rather than illuminates
+- Clarity requires explicitness (security, safety-critical code)
+- Technical precision matters more than brevity
+
+### The Balance
+
+**Good naming achieves:**
+- Sufficient specificity to prevent conflicts
+- Sufficient generality to avoid verbosity
+- Sufficient evocativeness to be memorable
+- Sufficient clarity to be unambiguous
+
+This balance is achieved through **selective, thoughtful use of rhetoric**—
+not through rigid rules, and certainly not through avoidance of stylistic 
+consideration.
+
+---
+
+## Conclusion
+
+Programming is, fundamentally, an act of communication. Code communicates intent 
+to machines *and* to humans. The humans reading code—whether reviewers, 
+maintainers, or future versions of yourself—benefit from the same rhetorical 
+craft that makes literature effective.
+
+The false choice between "rigid rules" and "anything goes" is resolved by 
+learning the craft of naming: understanding when to apply rules, when to break 
+them, and how to use figures of speech to achieve clarity without compromise.
+
+Invest in learning rhetoric. Your code will be better for it.
+
+
+
+
+
+
