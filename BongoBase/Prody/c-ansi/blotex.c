@@ -323,64 +323,35 @@ int BlotexlibExecutorConcatenateStrexValue(BLOTEXLIB_EXECUTOR_HANDLE handle,
 static inline int m_BlotexlibExecutorParseAndComputeBlotregRequest(BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct P_STRING *a_sequence, g_BLOTREG_HANDLE blotregHandle, G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
-
-  m_PREPARE_ABANDON(a_sequence, "<blotreg request>") 
+m_DIGGY_VAR_P_STRING(*a_sequence)
 
   int criteriaNumber = 0;
   struct G_REQUEST_CRITERION criteria5[5] ;  
-  struct P_STRING lexeme;
   struct P_STRING subSequence; 
 
-  PParseTillMatch(a_sequence,m_PString(":?"),NULL, &subSequence);
-m_DIGGY_VAR_P_STRING(subSequence)
-m_DIGGY_VAR_P_STRING(*a_sequence)
-  if (b_EMPTY_P_STRING(*a_sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
-  PParseOffset(a_sequence,2,NULL);
-  m_PRECISE_ABANDON(&subSequence, "<blotreg request atom>") 
+  m_CHECK_ABANDON(DelimitBlotregRequest(a_sequence,&subSequence,nc_abandonmentInfo))
   struct BLOTEX_VALUE blotexValue = UNDEFINED_BLOTEX_VALUE ; 
   struct G_KEY gKey = {UNDEFINED};
   do {
     int as = UNDEFINED;  
     int blotregIndexLabel = UNDEFINED; 
-    // <blotreg request atom int> | <blotreg request atom str> ...
-    m_TRACK_IF(ParseAs(b_R_VALUE,&subSequence,&as) != RETURNED)
-    m_TRACK_IF(AsBlotregIndexLabel(as,&blotregIndexLabel) != RETURNED)
+    int indexSeekFlags = UNDEFINED;
     
-    int n_indexSeekFlags = UNDEFINED;
-    PParsePassSingleChar(&subSequence,NULL,'*',&lexeme);
-    if (!b_EMPTY_P_STRING(lexeme)) n_indexSeekFlags = INDEX_SEEK_FLAGS__ANY;
-    else {  // select with actual criterion
-      m_TRACK_IF(ParseRequestCompOp(&subSequence,as != AS__VALUE_INT,
-        &n_indexSeekFlags) != RETURNED)
-      if (n_indexSeekFlags < 0) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
+    m_CHECK_ABANDON(ParseBlotregRequestAtom(&subSequence,&as,&indexSeekFlags,nc_abandonmentInfo))
 
-      m_CHECK_ABANDON(BlotexlibExecutorParseAndComputeBlotex(handle,&subSequence,&blotexValue,nc_abandonmentInfo))
-      switch (as) {
-      case AS__VALUE_INT: // [ '#' ]
-        if (blotexValue.asValue == AS__VALUE_STR) m_ABANDON(EXPECT_INTEX__ABANDONMENT_CAUSE)
-        gKey = m_GKey_AcolytValue(blotexValue.select.c_blotval); 
-      break; case AS__ENTRY: // '!#' (r-value) 
-        if (blotexValue.asValue == AS__VALUE_STR) m_ABANDON(EXPECT_INTEX__ABANDONMENT_CAUSE)
-m_RAISE(ANOMALY__NOT_AVAILABLE)
-      break; case AS__ID: // '!' 
-        gKey = m_GKey_AcolytValue(blotexValue.select.c_blotval); 
-      break; case AS__VALUE_STR: // '$'
-        if (blotexValue.asValue == AS__VALUE_INT) m_ABANDON(EXPECT_STREX__ABANDONMENT_CAUSE)
-        gKey = m_GKey_PString(blotexValue.select.c_strex.v_str);
-      break; case AS__NAME:  // '!$'
-        if (blotexValue.asValue == AS__VALUE_INT) m_ABANDON(EXPECT_STREX__ABANDONMENT_CAUSE)
-        gKey = m_GKey_PString(blotexValue.select.c_strex.v_str);
-      break; default: m_RAISE(ANOMALY__VALUE__D,as)
-      } // switch
-    } // if
-m_DIGGY_VAR_INDEX_SEEK_FLAGS(n_indexSeekFlags)
+    if (indexSeekFlags != INDEX_SEEK_FLAGS__ANY) m_CHECK_ABANDON(
+      BlotexlibExecutorParseAndComputeBlotex(handle,&subSequence,&blotexValue,nc_abandonmentInfo))
+
+m_DIGGY_VAR_INDEX_SEEK_FLAGS(indexSeekFlags)
+    m_CHECK_ABANDON(AsBlotregIndex(&subSequence,as,indexSeekFlags != INDEX_SEEK_FLAGS__ANY?
+      &blotexValue: NULL,&blotregIndexLabel,&gKey, nc_abandonmentInfo))
     
     int criteriaOpFlags = UNDEFINED;
     m_TRACK_IF(ParseLogical2Op(&subSequence, &criteriaOpFlags) != RETURNED)
 
     m_ASSERT(criteriaNumber < 5)
     criteria5[criteriaNumber++] = m_GRequestCriterion_GKeys(blotregIndexLabel,
-      n_indexSeekFlags,&gKey, criteriaOpFlags);
+      indexSeekFlags,&gKey, criteriaOpFlags);
     m_PParsePassSpaces(&subSequence,NULL);
   } while (!b_EMPTY_P_STRING(subSequence)) ; 
 

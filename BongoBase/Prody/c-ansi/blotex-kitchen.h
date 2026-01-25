@@ -290,18 +290,62 @@ int ParseAs(char b_lValue, struct P_STRING *a_sequence, int *a_as) ;
 // - 1: unexpected problem; anomaly is raised
 int ParseAsValue(struct P_STRING *a_sequence, int *an_asValue) ;
 
-// Interpret as ...  blotreg index label
+// Delimit <bloteg request> 
 //
 // Passed:
+// - *a_sequence: before parsing
+//
+// Changed:
+// - *a_sequence: after parsing 
+// - *ac_blotregRequestSequence: delimited blotreg request 
+// - nc_abandonmentInfo: only significant if abandon
+// 
+// Ret: parsed successfully ? 
+// - ANSWER__YES: Ok,
+// - ANSWER__NO: not localized; abandon processing 
+// - 1: unexpected problem; anomaly is raised
+int DelimitBlotregRequest(struct P_STRING *a_sequence, struct P_STRING *ac_blotregRequestSequence,
+  G_STRING_STUFF nc_abandonmentInfo);
+
+//
+// Passed:
+// - *a_sequence: before parsing
+//
+// Changed:
+// - *a_sequence: after parsing 
+// - *ac_as: only significant if not abandoned
+// - *ac_indexSeekFlags: only significant if not abandoned
+// - nc_abandonmentInfo: only significant if abandon
+// 
+// Ret: parsed successfully ? 
+// - ANSWER__YES: Ok,
+// - ANSWER__NO: syntax error; abandon processing 
+// - 1: unexpected problem; anomaly is raised
+int ParseBlotregRequestAtom(struct P_STRING *a_sequence, int *ac_as, int *ac_indexSeekFlags,
+  G_STRING_STUFF nc_abandonmentInfo) ;
+
+
+
+
+// Interpret as ...  blotreg index
+//
+// Passed:
+// - a_sequence:
 // - as:
+// - n_blotexValue: NULL special pointer => NO actual criterion
 // 
 // Changed:
-// - *a_blotregIndexLabel
+// - *ac_blotregIndexLabel: only significant if no abandon
+// - *acc_gKey: only significant if no abandon AND actual criterion
+// - nc_abandonmentInfo: only significant if abandon
 // 
-// Ret:
-// - RETURNED: Ok
+// Ret: parsed successfully ? 
+// - ANSWER__YES: Ok,
+// - ANSWER__NO: 'str/int mismatch' error; abandon processing 
 // - 1: unexpected problem; anomaly is raised
-int AsBlotregIndexLabel(int as, int *a_blotregIndexLabel) ;
+int AsBlotregIndex(struct P_STRING *a_sequence, int as, struct BLOTEX_VALUE* na_blotexValue,
+  int *ac_blotregIndexLabel, struct G_KEY* acc_gKey, G_STRING_STUFF nc_abandonmentInfo) ; 
+
 
 
 // Interpret blotvar read op as ...  blotex value
