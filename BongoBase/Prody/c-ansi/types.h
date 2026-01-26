@@ -36,11 +36,11 @@ m_DEFINE_BINARY_ENUM(AttemptImage,
   ATTEMPT__TRY_AGAIN,) // this try is just not lucky
 
 // Dual verity values allowing the "glass half full" case to be expressed. (and easily transformed
-// into unary verity by European Institutions)
+// into unary "successful" verity by European Institutions)
 m_DEFINE_BINARY_ENUM(CompletedImage,
   COMPLETED__OK,, // procedure completed,
-  COMPLETED__BUT,)// procedure completed, but we want to point something (like "we all agree..." 
-    // but, "we all agree that we agreed on nothing.")
+  COMPLETED__BUT,)// procedure completed, but we want to point something (like "we all unanimously agree..." 
+    // but, "we all unanimously agree that we agreed on nothing.")
 
 // Preferred dual verity values of the "constructivists"
 m_DEFINE_BINARY_ENUM(ResultImage,
@@ -125,6 +125,7 @@ break; default:\
 
 
 #endif // __C_ANSI_TYPES_H_INCLUDED__
+
 
 
 
