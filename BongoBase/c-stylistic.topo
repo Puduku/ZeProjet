@@ -72,8 +72,8 @@
 
 
 
-# Stylistic Devices in Programming: Naming Conventions and Rhetoric
-
+# Stylistic Devices in C and Other Programming Languages: Naming Conventions and Rhetoric
+NOTICE: This note was completely rewritten with the assistance of AI
 ## Introduction
 
 Writing quality software requires more than technical skill—it demands an 
@@ -100,9 +100,9 @@ phenomena. The primary mechanisms for deriving new concepts are **metaphor** and
 
 A well-chosen metaphor can imprint a concept on the human mind with remarkable 
 efficiency. Striking simplicity matters more than perfect accuracy. The first 
-person to compare computing to a tangible object (such as fruit) creates a 
-lasting impression. Subsequent attempts using similar analogies, however apt, 
-fade into insignificance.
+person to compare computing to a tangible fruit (such as an apple) created a 
+lasting impression. Subsequent attempts using similar analogies (such as an apricot),
+however apt, fade into insignificance.
 
 This principle applies directly to naming:
 - **Original metaphors** create memorable, intuitive concepts
