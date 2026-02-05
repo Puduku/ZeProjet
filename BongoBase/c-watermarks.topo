@@ -98,7 +98,9 @@
 //   => Example:
 //     char *n_user; // NULL special address - user name not provided: anonymous connection
 //     char *c_password; // NOT significant in anonymous connection 
-// o_ indicator (?) : indicates that validity of parameter is explicitly checked
+// o_ indicator (?) :
+//   - as function parameter: indicates that validity of parameter is explicitly checked
+//   - as function: certifies function is "pure" function (never raises anomalies..)
 // p_ indicator - "protected": in basic cases, warrants protection against modification ; 
 //   in such case, that indicator is often added in coordination with "const" type qualifier... 
 //   In specific cases (POSIX code) "protected" just means "thread safe" (either the instance data
