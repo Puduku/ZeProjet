@@ -100,7 +100,7 @@ struct FETEPE {
     struct {
       FETEPE_LOG_COMMAND_STATUS_FUNCTION n_logFunction ;
       void *cr_logFunctionHandle ;
-      GREEN_COLLECTION_HANDLE h_linesPartitionHandle;
+      GREEN_COLLECTION_HANDLE h_lineDelimitersHandle;
       G_STRING_STUFF h_line ;
     } status ;
     struct {
@@ -154,24 +154,24 @@ struct FETEPE {
 static int CheckReadFtpCommandStatus (void * r_virtualHandle, const char *p_readBuffer,
   int readLength, int attemptsCount, int *ac_messageLength) {
   m_DIGGY_BOLLARD_S() ;
-  GREEN_COLLECTION_HANDLE linesPartitionHandle = (GREEN_COLLECTION_HANDLE) r_virtualHandle ;
+  GREEN_COLLECTION_HANDLE lineDelimitersHandle = (GREEN_COLLECTION_HANDLE) r_virtualHandle ;
   int answer = ANSWER__NO; // a priori 
 
   m_ASSERT(readLength > 0)
   struct P_STRING readPortion = m_PString2(p_readBuffer,readLength);
-  int count = ParseAsciiLines(readPortion,0,ac_messageLength,linesPartitionHandle);
+  int count = ParseAsciiLines(readPortion,0,ac_messageLength,lineDelimitersHandle);
   m_TRACK_IF(count < 0)
 
-  LINE_DELIMITOR_STUFF n_lastLineDelimitorStuff = (LINE_DELIMITOR_STUFF) UNDEFINED;
-  m_TRACK_IF(LINES_PARTITION_GET_COUNT(linesPartitionHandle,&n_lastLineDelimitorStuff) < 0)
+  LINE_DELIMITER_STUFF n_lastLineDelimiterStuff = (LINE_DELIMITER_STUFF) UNDEFINED;
+  m_TRACK_IF(LINE_DELIMITERS_GET_COUNT(lineDelimitersHandle,&n_lastLineDelimiterStuff) < 0)
 
-  if (n_lastLineDelimitorStuff != NULL) {
+  if (n_lastLineDelimiterStuff != NULL) {
     int practicalLength = UNDEFINED;
-    practicalLength = m_PStringLength(n_lastLineDelimitorStuff->practicalLine);
-    if (practicalLength >= 4 && isdigit(n_lastLineDelimitorStuff->practicalLine.string[0]) && 
-      isdigit(n_lastLineDelimitorStuff->practicalLine.string[1]) && 
-      isdigit(n_lastLineDelimitorStuff->practicalLine.string[2]) &&
-      n_lastLineDelimitorStuff->practicalLine.string[3] == ' ')  answer = ANSWER__YES;
+    practicalLength = m_PStringLength(n_lastLineDelimiterStuff->practicalLine);
+    if (practicalLength >= 4 && isdigit(n_lastLineDelimiterStuff->practicalLine.string[0]) && 
+      isdigit(n_lastLineDelimiterStuff->practicalLine.string[1]) && 
+      isdigit(n_lastLineDelimiterStuff->practicalLine.string[2]) &&
+      n_lastLineDelimiterStuff->practicalLine.string[3] == ' ')  answer = ANSWER__YES;
   } // if
 
   m_DIGGY_RETURN(answer)
@@ -196,12 +196,12 @@ int FetepeCreateInstance (FETEPE_HANDLE *azh_handle, ALARM_SYSTEM_HANDLE nf_alar
     handle->command.status.cr_logFunctionHandle = cfr_logCommandStatusFunctionHandle ;
   } // if
   m_TRACK_IF(G_STRING_CREATE_INSTANCE(&handle->command.status.h_line) != RETURNED)
-  m_TRACK_IF(LINES_PARTITION_CREATE_INSTANCE(&handle->command.status.h_linesPartitionHandle,10,
+  m_TRACK_IF(LINE_DELIMITERS_CREATE_INSTANCE(&handle->command.status.h_lineDelimitersHandle,10,
     NULL,(void *)UNDEFINED) != RETURNED)
   handle->command.socket.nh_connectedDescriptor = -1;
   m_TRACK_IF(ErwCreateInstance(&handle->command.socket.h_erwHandle, f_brokenPipeFixHandle,
     nf_alarmSystemHandle, 256,NULL, CheckReadFtpCommandStatus,
-    (void *) handle->command.status.h_linesPartitionHandle, m_WaitingPlan(
+    (void *) handle->command.status.h_lineDelimitersHandle, m_WaitingPlan(
     DEEPLY_BLOCKING__WAITING_PLAN,30)) != RETURNED)
 
   // data:
@@ -215,7 +215,7 @@ int FetepeCreateInstance (FETEPE_HANDLE *azh_handle, ALARM_SYSTEM_HANDLE nf_alar
   handle->data.nonPosixOpenFlags = 0;
   m_TRACK_IF(PdCreateInstance(&handle->data.h_listeningSocketPdHandle,nf_alarmSystemHandle) != RETURNED)
   m_TRACK_IF(SuckerCreateInstance(&handle->data.h_suckerHandle, transferSizeLimit) != RETURNED)
-  m_TRACK_IF(LINES_PARTITION_CREATE_INSTANCE(&handle->data.h_lsLines,100, NULL,(void *)UNDEFINED)
+  m_TRACK_IF(LINE_DELIMITERS_CREATE_INSTANCE(&handle->data.h_lsLines,100, NULL,(void *)UNDEFINED)
     != RETURNED)
   m_TRACK_IF(G_STRING_CREATE_INSTANCE(&handle->data.h_lsOutput) != RETURNED)
   m_TRACK_IF(GStringButtAdeptCreateInstance(&handle->data.h_lsOutputButtAdeptHandle,
@@ -388,17 +388,17 @@ static int FetepeCloseCommandChannel (FETEPE_HANDLE handle) {
 // Retrieve last (i.e actual) status line command response sent by FTP server.
 // 
 // Passed:
-// - m_action: action to execute (with lastLineDelimitorStuff)
+// - m_action: action to execute (with lastLineDelimiterStuff)
 //
 // Created (local):
 // - commandStatusLinesCount: actual number of lines of the ftp command response 
 #define m_ACTION_ON_LAST_COMMAND_STATUS_LINE(m_action) int commandStatusLinesCount = UNDEFINED;\
 {\
-  LINE_DELIMITOR_STUFF lastLineDelimitorStuff;\
-  commandStatusLinesCount = LINES_PARTITION_GET_COUNT((handle)->command.status.h_linesPartitionHandle,\
-    &lastLineDelimitorStuff) ;\
+  LINE_DELIMITER_STUFF lastLineDelimiterStuff;\
+  commandStatusLinesCount = LINE_DELIMITERS_GET_COUNT((handle)->command.status.h_lineDelimitersHandle,\
+    &lastLineDelimiterStuff) ;\
   m_TRACK_IF(commandStatusLinesCount < 0)\
-  m_ASSERT(lastLineDelimitorStuff != NULL)\
+  m_ASSERT(lastLineDelimiterStuff != NULL)\
   m_action \
 }
 
@@ -439,7 +439,7 @@ static int FetepeReadCommandStatus (FETEPE_HANDLE handle, int *a_fetepeStatus,
     m_DIGGY_RETURN(RETURNED)
   } // if
 
-  GreenCollectionClear(handle->command.status.h_linesPartitionHandle);
+  GreenCollectionClear(handle->command.status.h_lineDelimitersHandle);
   int commandStatusLength = UNDEFINED;
   char *commandStatusBufferPtr = (char *)UNDEFINED;
 
@@ -448,12 +448,12 @@ static int FetepeReadCommandStatus (FETEPE_HANDLE handle, int *a_fetepeStatus,
   case RW_STATUS__OK : 
     { // Scan command status lines 
 
-      LINE_DELIMITOR_STUFF t_lineDelimitorStuff;
-      int commandStatusLinesCount = LINES_PARTITION_GET_COUNT(
-        handle->command.status.h_linesPartitionHandle, &t_lineDelimitorStuff); 
+      LINE_DELIMITER_STUFF t_lineDelimiterStuff;
+      int commandStatusLinesCount = LINE_DELIMITERS_GET_COUNT(
+        handle->command.status.h_lineDelimitersHandle, &t_lineDelimiterStuff); 
       m_TRACK_IF(commandStatusLinesCount < 0)\
-      m_ASSERT(t_lineDelimitorStuff != NULL)
-      switch (SScanfPString(t_lineDelimitorStuff->practicalLine,"%3d",
+      m_ASSERT(t_lineDelimiterStuff != NULL)
+      switch (SScanfPString(t_lineDelimiterStuff->practicalLine,"%3d",
         &handle->command.outline.ftpCommandStatus))  {
       case 1:
       break; case 0:
@@ -465,11 +465,11 @@ static int FetepeReadCommandStatus (FETEPE_HANDLE handle, int *a_fetepeStatus,
       if (handle->command.status.n_logFunction != NULL) {
         int i = 0;
         for (; i < commandStatusLinesCount ; i++) {
-          m_TRACK_IF(LINES_PARTITION_FETCH(handle->command.status.h_linesPartitionHandle,i,
-            &t_lineDelimitorStuff) < 0)
+          m_TRACK_IF(LINE_DELIMITERS_FETCH(handle->command.status.h_lineDelimitersHandle,i,
+            &t_lineDelimiterStuff) < 0)
 
           m_TRACK_IF(handle->command.status.n_logFunction(
-            handle->command.status.cr_logFunctionHandle, t_lineDelimitorStuff->practicalLine,
+            handle->command.status.cr_logFunctionHandle, t_lineDelimiterStuff->practicalLine,
             i == commandStatusLinesCount - 1) != RETURNED)
         } // for 
       } // if 
@@ -796,12 +796,12 @@ static int FetepeOpenDataStream (FETEPE_HANDLE handle, int *a_fetepeStatus,
       unsigned p1, p2 = UNDEFINED;
       unsigned h1, h2, h3, h4 = UNDEFINED;
 
-      LINE_DELIMITOR_STUFF lastLineDelimitorStuff;
-      int commandStatusLinesCount = LINES_PARTITION_GET_COUNT(
-        handle->command.status.h_linesPartitionHandle, &lastLineDelimitorStuff);
+      LINE_DELIMITER_STUFF lastLineDelimiterStuff;
+      int commandStatusLinesCount = LINE_DELIMITERS_GET_COUNT(
+        handle->command.status.h_lineDelimitersHandle, &lastLineDelimiterStuff);
       m_TRACK_IF(commandStatusLinesCount < 0)
-      m_ASSERT(lastLineDelimitorStuff != NULL)
-      ret = SScanfPString(lastLineDelimitorStuff->practicalLine, 
+      m_ASSERT(lastLineDelimiterStuff != NULL)
+      ret = SScanfPString(lastLineDelimiterStuff->practicalLine, 
         ENTERING_PASSIVE_MODE_STATUS__6U, &h1,&h2,&h3,&h4, &p1,&p2); 
       m_TRACK_IF(ret < 0)
       m_ASSERT(ret == 6)
@@ -1105,16 +1105,16 @@ static int FetepeNListDir (FETEPE_HANDLE handle, const char *p_cmd, const char *
     m_TRACK_IF(GreenCollectionClear(handle->data.h_lsLines) != RETURNED)
     m_TRACK_IF(ParseAsciiLines(m_GStringGetLogicalPString(handle->data.h_lsOutput), -1,NULL,
       handle->data.h_lsLines) < 0)
-    int count = LINES_PARTITION_GET_COUNT(handle->data.h_lsLines,NULL);
+    int count = LINE_DELIMITERS_GET_COUNT(handle->data.h_lsLines,NULL);
     m_TRACK_IF(count < 0)
     GStringsClear(list, b_TRUE) ;
     int i ;
 
     for (i = 0 ; i < count ; i++) {
-      LINE_DELIMITOR_STUFF t_lsLine ;
+      LINE_DELIMITER_STUFF t_lsLine ;
       G_STRING_STUFF t_item = (G_STRING_STUFF) UNDEFINED;
 
-      m_TRACK_IF(LINES_PARTITION_FETCH(handle->data.h_lsLines,i,&t_lsLine) != i)
+      m_TRACK_IF(LINE_DELIMITERS_FETCH(handle->data.h_lsLines,i,&t_lsLine) != i)
       m_TRACK_IF(GStringsFetch(list,-1,&t_item) != i)
       m_ASSERT(t_item != NULL)
       m_TRACK_IF(GStringCopy(t_item, 0, t_lsLine->practicalLine) < 0)
@@ -1243,7 +1243,7 @@ int FetepeDisconnect (FETEPE_HANDLE handle) {
 int FetepeDestroyInstance (FETEPE_HANDLE xh_handle) { 
   m_DIGGY_BOLLARD()
   m_TRACK_IF(G_STRING_DESTROY_INSTANCE(xh_handle->command.status.h_line) != RETURNED)
-  m_TRACK_IF(GreenCollectionDestroyInstance(xh_handle->command.status.h_linesPartitionHandle) !=
+  m_TRACK_IF(GreenCollectionDestroyInstance(xh_handle->command.status.h_lineDelimitersHandle) !=
     RETURNED)
 
   m_TRACK_IF(ErwDestroyInstance(xh_handle->command.socket.h_erwHandle) != RETURNED)

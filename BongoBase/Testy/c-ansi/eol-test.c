@@ -13,45 +13,45 @@ int main (int argc, char **argv) {
 
   int ret = UNDEFINED;
   int ret2 = UNDEFINED ;
-  GREEN_COLLECTION_HANDLE linesPartition ;
+  GREEN_COLLECTION_HANDLE lineDelimiters ;
   int parsedLength = UNDEFINED;
   const char *p_s = "PIPI\nCACA\nPOUET\n" ;
   const char *p_s2 = "PIM  \n PAM \r\n POUM" ;
   
   
-  m_TRACK_IF(LINES_PARTITION_CREATE_INSTANCE(&linesPartition,10, NULL, (void *) UNDEFINED) !=
+  m_TRACK_IF(LINE_DELIMITERS_CREATE_INSTANCE(&lineDelimiters,10, NULL, (void *) UNDEFINED) !=
     RETURNED)
 
-  LINE_DELIMITOR_STUFF lineDelimitor;
-  m_TRACK_IF((ret = LINES_PARTITION_GET_COUNT(linesPartition,&lineDelimitor)) < 0)
+  LINE_DELIMITER_STUFF lineDelimitor;
+  m_TRACK_IF((ret = LINE_DELIMITERS_GET_COUNT(lineDelimiters,&lineDelimitor)) < 0)
   m_ASSERT(ret == 0)
   
   struct P_STRING pString ;
   pString = m_PString(p_s); 
-  m_TRACK_IF((ret2 = ParseAsciiLines(pString,-1, &parsedLength, linesPartition)) < 0)
+  m_TRACK_IF((ret2 = ParseAsciiLines(pString,-1, &parsedLength, lineDelimiters)) < 0)
   m_ASSERT(ret2 == 3)
 
-  m_TRACK_IF((ret = LINES_PARTITION_GET_COUNT(linesPartition,&lineDelimitor)) < 0)
+  m_TRACK_IF((ret = LINE_DELIMITERS_GET_COUNT(lineDelimiters,&lineDelimitor)) < 0)
   m_ASSERT(ret == 3)
   
   int i = 0;
   for (; i < 4; i++) {
-    m_ASSERT(LINES_PARTITION_FETCH(linesPartition,i,&lineDelimitor) == i)
+    m_ASSERT(LINE_DELIMITERS_FETCH(lineDelimiters,i,&lineDelimitor) == i)
   } // for
 
 
-  m_TRACK_IF(GreenCollectionClear(linesPartition) != RETURNED)
+  m_TRACK_IF(GreenCollectionClear(lineDelimiters) != RETURNED)
   
   pString = m_PString(p_s2); 
-  ret2 = ParseAsciiLines(pString, 0,&parsedLength, linesPartition) ;
-  m_TRACK_IF((ret = LINES_PARTITION_GET_COUNT(linesPartition,&lineDelimitor)) < 0)
+  ret2 = ParseAsciiLines(pString, 0,&parsedLength, lineDelimiters) ;
+  m_TRACK_IF((ret = LINE_DELIMITERS_GET_COUNT(lineDelimiters,&lineDelimitor)) < 0)
   m_ASSERT(ret == 2)
 
   for (i = 0; i < 3; i++) {
-    m_TRACK_IF(LINES_PARTITION_FETCH(linesPartition,i,&lineDelimitor) != i)
+    m_TRACK_IF(LINE_DELIMITERS_FETCH(lineDelimiters,i,&lineDelimitor) != i)
   } // for
 
-  m_TRACK_IF(GreenCollectionDestroyInstance(linesPartition) != RETURNED)
+  m_TRACK_IF(GreenCollectionDestroyInstance(lineDelimiters) != RETURNED)
   
   m_DIGGY_RETURN(0)
 } // main

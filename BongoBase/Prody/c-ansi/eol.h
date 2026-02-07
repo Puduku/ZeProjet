@@ -42,64 +42,64 @@ int RemoveAsciiEol (char *line) ;
 // 2 - Parsing EOLs in ASCII lines
 
 // Main pieces :
-// - "LINE DELIMITOR":  Delimit ONE ascii line within a string buffer
-// - "LINES PARTITION" (aka green collection of line delimitors)
+// - "LINE DELIMITER":  Delimit ONE ascii line within a string buffer
+// - "LINE DELIMITERS" (aka green collection of line delimiters)
 //   delimit ALL ascii lines of a string buffer
 // - "LINES COMPARATOR": that piece is optional ; allows sorting lines of a PARTITION
 // - ParseAsciiLines() : the function for parsing multiple lines in a buffer
 
 
-// "LINE DELIMITOR" :
+// "LINE DELIMITER" :
 //  ---- ---------
 
 // GREEN ITEM:
-struct LINE_DELIMITOR {
+struct LINE_DELIMITER {
   struct P_STRING practicalLine; 
   int eolLength ;
 } ;
-typedef struct LINE_DELIMITOR* LINE_DELIMITOR_STUFF;
+typedef struct LINE_DELIMITER* LINE_DELIMITER_STUFF;
 
 
 
 //
 // Passed:
-// - m_lineDelimitor:
+// - m_lineDelimiter:
 // 
 // Changed:
 // - m_physicalLength:
-#define m_GET_LINE_DELIMITOR_PHYSICAL_LENGTH(/*struct LINE_DELIMITOR*/m_lineDelimitor,\
+#define m_GET_LINE_DELIMITER_PHYSICAL_LENGTH(/*struct LINE_DELIMITER*/m_lineDelimiter,\
   /*int*/m_physicalLength) {\
-  m_physicalLength = m_PStringLength((m_lineDelimitor).practicalLine);\
-  (m_physicalLength) += (m_lineDelimitor).eolLength;\
+  m_physicalLength = m_PStringLength((m_lineDelimiter).practicalLine);\
+  (m_physicalLength) += (m_lineDelimiter).eolLength;\
 }
 
-// "LINES PARTITION" :
+// "LINE DELIMITERS" :
 //  ----- ---------
 
-// Create a LINES PARTITION instance.
+// Create a LINE DELIMITERS instance.
 //
 // Passed:
 // - azh_handle:
-// - expectedItemsNumber: #SEE GreenCollectionCreateInstance-expectedItemsNumber@c-ansi/green.h <line delimitor>
+// - expectedItemsNumber: #SEE GreenCollectionCreateInstance-expectedItemsNumber@c-ansi/green.h <line delimiter>
 // - cfr_linesComparatorPrivateHandle:
-#define /*int*/ LINES_PARTITION_CREATE_INSTANCE(/*GREEN_COLLECTION_HANDLE* */azh_handle,\
+#define /*int*/ LINE_DELIMITERS_CREATE_INSTANCE(/*GREEN_COLLECTION_HANDLE* */azh_handle,\
   /*int*/ expectedItemsNumber,\
   /*GREEN_HANDLER__KEYS_COMPARE_FUNCTION*/n_linesComparatorKeysCompareFunction,\
   /*void* */ cfr_linesComparatorHandle) \
-  GreenCollectionCreateInstance(azh_handle,  expectedItemsNumber,  sizeof(struct LINE_DELIMITOR),\
+  GreenCollectionCreateInstance(azh_handle,  expectedItemsNumber,  sizeof(struct LINE_DELIMITER),\
     NULL,n_linesComparatorKeysCompareFunction,NULL, cfr_linesComparatorHandle)
 
 
-// #SEE GreenCollectionGetCount@c-ansi/green.h <line delimitor>
-#define /*int*/ LINES_PARTITION_GET_COUNT(/*GREEN_COLLECTION_HANDLE*/cp_handle,\
-  /*LINE_DELIMITOR_STUFF* */navnt_lineDelimitorStuff) \
-  GreenCollectionGetCount(cp_handle,(char**)(navnt_lineDelimitorStuff))
+// #SEE GreenCollectionGetCount@c-ansi/green.h <line delimiter>
+#define /*int*/ LINE_DELIMITERS_GET_COUNT(/*GREEN_COLLECTION_HANDLE*/cp_handle,\
+  /*LINE_DELIMITER_STUFF* */navnt_lineDelimiterStuff) \
+  GreenCollectionGetCount(cp_handle,(char**)(navnt_lineDelimiterStuff))
 
 
-// #SEE GreenCollectionFetch@c-ansi/green.h <line delimitor>
-#define /*int*/ LINES_PARTITION_FETCH(/*GREEN_COLLECTION_HANDLE*/cp_handle, /*int*/n_entry,\
-  /*LINE_DELIMITOR_STUFF* */acnt_lineDelimitorStuff) \
-  GreenCollectionFetch(cp_handle,n_entry,(char**)(acnt_lineDelimitorStuff))
+// #SEE GreenCollectionFetch@c-ansi/green.h <line delimiter>
+#define /*int*/ LINE_DELIMITERS_FETCH(/*GREEN_COLLECTION_HANDLE*/cp_handle, /*int*/n_entry,\
+  /*LINE_DELIMITER_STUFF* */acnt_lineDelimiterStuff) \
+  GreenCollectionFetch(cp_handle,n_entry,(char**)(acnt_lineDelimiterStuff))
 
 
 // EOLs parsing function
@@ -115,22 +115,22 @@ typedef struct LINE_DELIMITOR* LINE_DELIMITOR_STUFF;
 //     . 0 : means "indefinite" : that is, parse as many as possible true lines (i.e physically 
 //       terminated with EOL) in that pass.
 //       If NOT physically terminated with an EOL, the remaining portion is an incomplete line and
-//       is discarded (i.e does NOT appear as last line of the line delimitors)
+//       is discarded (i.e does NOT appear as last line of the line delimiters)
 //     . > 0 : max number of physical lines to parse in that "pass".
 // - nav_parsedLength: NULL special value if not used
-// - linesPartitionHandle: current lines partition.
+// - lineDelimitersHandle: current partition.
 //   + for the first "pass" : pass a "clean" partition (i.e formal count == 0)
 //   + for each extra "pass" : pass the partition again (do NOT "clean" between two passes)
 //
 // Modified:
 // - *nav_parsedLength: (if used) TOTAL parsing length (related to physical eol of last parsed line)
-// - linesPartitionHandle: updated with new parsed lines
+// - lineDelimitersHandle: updated with new parsed lines
 //
 // Ret:
 // - >= 0: number of NEW lines parsed in that pass
 // - -1 : unexpected problem ; anomaly is raised
 int ParseAsciiLines(struct P_STRING input, int n_trueLinesParsingLimit,
-  int *nav_parsedLength,  GREEN_COLLECTION_HANDLE linesPartitionHandle) ;
+  int *nav_parsedLength,  GREEN_COLLECTION_HANDLE lineDelimitersHandle) ;
 
 
 

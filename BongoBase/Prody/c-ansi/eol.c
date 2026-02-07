@@ -32,19 +32,19 @@ int RemoveAsciiEol (char *line) {
 
 // Public function : see description in .h
 int ParseAsciiLines (struct P_STRING input, int n_trueLinesParsingLimit,
-  int *nav_parsedLength,  GREEN_COLLECTION_HANDLE linesPartitionHandle) {
+  int *nav_parsedLength,  GREEN_COLLECTION_HANDLE lineDelimitersHandle) {
   m_DIGGY_BOLLARD()
   const char *ptr =input.string;
   const char *stopPtr =input.stop ;
   int parsedLinesCount = 0;
-  LINE_DELIMITOR_STUFF nt_lineDelimitorStuff = (LINE_DELIMITOR_STUFF) UNDEFINED;
+  LINE_DELIMITER_STUFF nt_lineDelimiterStuff = (LINE_DELIMITER_STUFF) UNDEFINED;
 
-  m_TRACK_IF(LINES_PARTITION_GET_COUNT(linesPartitionHandle, &nt_lineDelimitorStuff) < 0)
+  m_TRACK_IF(LINE_DELIMITERS_GET_COUNT(lineDelimitersHandle, &nt_lineDelimiterStuff) < 0)
 
-  if (nt_lineDelimitorStuff != NULL) {
+  if (nt_lineDelimiterStuff != NULL) {
     int physicalLengh = UNDEFINED;
-    m_GET_LINE_DELIMITOR_PHYSICAL_LENGTH(*nt_lineDelimitorStuff, physicalLengh)
-    ptr = nt_lineDelimitorStuff->practicalLine.string + physicalLengh ;
+    m_GET_LINE_DELIMITER_PHYSICAL_LENGTH(*nt_lineDelimiterStuff, physicalLengh)
+    ptr = nt_lineDelimiterStuff->practicalLine.string + physicalLengh ;
     m_ASSERT(ptr >= input.string && ptr <= input.stop)
   } // if
 
@@ -66,10 +66,10 @@ int ParseAsciiLines (struct P_STRING input, int n_trueLinesParsingLimit,
       ptr++;
     } // while
     if (ptr < stopPtr || n_trueLinesParsingLimit == -1) {
-      LINES_PARTITION_FETCH(linesPartitionHandle,-1,&nt_lineDelimitorStuff) ;
-      nt_lineDelimitorStuff->practicalLine.string = linePtr ;
-      nt_lineDelimitorStuff->practicalLine.stop = ptr ;
-      nt_lineDelimitorStuff->eolLength = eolLength ;
+      LINE_DELIMITERS_FETCH(lineDelimitersHandle,-1,&nt_lineDelimiterStuff) ;
+      nt_lineDelimiterStuff->practicalLine.string = linePtr ;
+      nt_lineDelimiterStuff->practicalLine.stop = ptr ;
+      nt_lineDelimiterStuff->eolLength = eolLength ;
       parsedLinesCount++ ;
     } // if
     ptr += eolLength ; 
