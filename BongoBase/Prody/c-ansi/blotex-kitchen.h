@@ -209,6 +209,7 @@ typedef int (*UPDATE_BLOTTAB_SPOT_FUNCTION)(
 #define NOT_SUPPORTED__ABANDONMENT_CAUSE "Not supported"
 
 // Make function abandon parsing (return ANSWER__NO)
+// This macro requires initial call to m_PREPARE_ABANDON() .
 //
 // Passed:
 // - p_cause : parsing abandonment cause format 
@@ -225,6 +226,24 @@ typedef int (*UPDATE_BLOTTAB_SPOT_FUNCTION)(
     m_TRACK_IF(GStringPrintf(nc_abandonmentInfo,0,"In %s [" FMT_P_STRING "] : ",\
       emp_sequenceType, m_P_STRING_2_FMT_ARGS((*ema_sequence))) < 0)\
     m_TRACK_IF(GStringPrintf(nc_abandonmentInfo,-1, __VA_ARGS__) < 0)\
+  } \
+  m_DIGGY_RETURN(ANSWER__NO)\
+}
+
+// Make function abandon out of parsing (return ANSWER__NO)
+// This macro does NOT require initial call to m_PREPARE_ABANDON() .
+//
+// Passed:
+// - p_cause : (out of parsing) abandonment cause format 
+// - ... : abandonment cause:
+//  + mandatory const char* : abandonment cause format
+//  + cause format's optional variable arguments
+//
+// Changed (Implicit) variables:
+// - nc_abandonmentInfo:
+#define m_ABANDON_S(...) {\
+  if (nc_abandonmentInfo != NULL) {\
+    m_TRACK_IF(GStringPrintf(nc_abandonmentInfo,0, __VA_ARGS__) < 0)\
   } \
   m_DIGGY_RETURN(ANSWER__NO)\
 }
@@ -330,9 +349,8 @@ int ParseBlotregRequestAtom(struct P_STRING *a_sequence, int *ac_as, int *ac_ind
 // Interpret as ...  blotreg index
 //
 // Passed:
-// - a_sequence:
 // - as:
-// - n_blotexValue: NULL special pointer => NO actual criterion
+// - na_blotexValue: NULL special pointer => NO actual criterion
 // 
 // Changed:
 // - *ac_blotregIndexLabel: only significant if no abandon
@@ -343,16 +361,17 @@ int ParseBlotregRequestAtom(struct P_STRING *a_sequence, int *ac_as, int *ac_ind
 // - ANSWER__YES: Ok,
 // - ANSWER__NO: 'str/int mismatch' error; abandon processing 
 // - 1: unexpected problem; anomaly is raised
-int AsBlotregIndex(struct P_STRING *a_sequence, int as, struct BLOTEX_VALUE* na_blotexValue,
-  int *ac_blotregIndexLabel, struct G_KEY* acc_gKey, G_STRING_STUFF nc_abandonmentInfo) ; 
+int AsBlotregIndex(int as, struct BLOTEX_VALUE* na_blotexValue, int *ac_blotregIndexLabel,
+  struct G_KEY* acc_gKey, G_STRING_STUFF nc_abandonmentInfo) ; 
 
 
-
-// Interpret blotvar read op as ...  blotex value
+// Interpret blotvar as ...  blotex value
 //
 // Passed:
 // - n_blotvarStuff: NULL special pointer => not existing
-// - n_readOpAs: -1 special value => read op not specified
+// - n_as: "as" specifier:
+//   +  -1 special value: (not specified) blotex value corresponds to existence of blotvar
+//   +  >0: set blotex value as indicated 
 // - c_entry: only significant if blotvar exists
 // - workingGStringsHandle:
 // 
@@ -363,8 +382,26 @@ int AsBlotregIndex(struct P_STRING *a_sequence, int as, struct BLOTEX_VALUE* na_
 // Ret:
 // - RETURNED: Ok
 // - 1: unexpected problem; anomaly is raised
-int BlotvarReadOpAsBlotexValue(g_BLOTVAR_STUFF n_blotvarStuff, int n_readOpAs, int c_entry,
-   G_STRINGS_HANDLE workingGStringsHandle, struct BLOTEX_VALUE *a_blotexValue);
+int BlotvarAs2BlotexValue(g_BLOTVAR_STUFF n_blotvarStuff, int n_as, int c_entry,
+  G_STRINGS_HANDLE workingGStringsHandle, struct BLOTEX_VALUE *a_blotexValue); 
+
+// Interpret blotex value as ... blotvar
+//
+// Passed:
+// - blotexValue:
+// - as: blotvar "as" specifier:
+// - nc_abandonmentInfo: NULL pointer => not used
+// 
+// Changed:
+// - c_blotvarStuff: NOT significant in case of type mismatch 
+// - nc_abandonmentInfo: (when used) only significant in case type mismatch
+
+// Ret: parsed successfully ? 
+// - ANSWER__YES: Ok,
+// - ANSWER__NO: type mismatch; abandon processing 
+// - -1: unexpected problem
+int BlotexValue2BlotvarLValueAs(struct BLOTEX_VALUE blotexValue, g_BLOTVAR_STUFF c_blotvarStuff,
+  int lValueAs, G_STRING_STUFF nc_abandonmentInfo) ; 
 
 
 // Enumeration of <comp op> | <str comp op> | <fact op> terminal symbols 
@@ -403,6 +440,21 @@ enum {
 // - RETURNED: Ok
 // - -1: unexpected problem
 int ParseCompOp(int compOpExtension, struct P_STRING *a_sequence, int *an_compOp) ;
+
+// Apply fact operator (on integer atoms)  
+//
+// Passed:
+// - *a_blotval1:
+// - blotval2:
+//
+// Changed:
+// - *a_blotval1:
+//
+// Ret:
+// - RETURNED: Ok
+// - -1: unexpected problem
+int ApplyFactOp(gen_BLOTVAL *a_blotval1, int factOp, gen_BLOTVAL blotval2);
+
 
 // Parse comparison operator in register/table request, if present... 
 //
@@ -582,7 +634,7 @@ int ParseAndComputeSimpleBlotvarReference(struct P_STRING *a_sequence,
 // Changed:
 // - *a_sequence: after parsing 
 // - *ac_blotvarReference: only significant if "success" ; corresponding blotvar reference
-// - *ac_as: only significant if "success" 
+// - *ac_lValueAs: only significant if "success" 
 // - nc_abandonmentInfo: 
 //
 // Ret: Computed successfully ? 
@@ -591,7 +643,7 @@ int ParseAndComputeSimpleBlotvarReference(struct P_STRING *a_sequence,
 // - -1: unexpected problem
 int ParseAndComputeLValueBlotregOps(       
   struct P_STRING *a_sequence, struct P_STRING blotregName, g_BLOTREG_HANDLE n_blotregHandle,
-  struct BLOTVAR_REFERENCE *ac_blotvarReference, int *ac_as, G_STRING_STUFF nc_abandonmentInfo) ;
+  struct BLOTVAR_REFERENCE *ac_blotvarReference, int *ac_lValueAs, G_STRING_STUFF nc_abandonmentInfo) ;
 
 
 

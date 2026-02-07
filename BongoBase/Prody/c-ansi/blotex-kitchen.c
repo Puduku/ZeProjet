@@ -251,11 +251,9 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
 
 
 // See .h 
-int AsBlotregIndex(struct P_STRING *a_sequence, int as, struct BLOTEX_VALUE* na_blotexValue,
-  int *ac_blotregIndexLabel, struct G_KEY* ac_gKey, G_STRING_STUFF nc_abandonmentInfo) { 
+int AsBlotregIndex(int as, struct BLOTEX_VALUE* na_blotexValue, int *ac_blotregIndexLabel,
+  struct G_KEY* ac_gKey, G_STRING_STUFF nc_abandonmentInfo) { 
   m_DIGGY_BOLLARD()
-
-  m_PREPARE_ABANDON(a_sequence,"(blotreg index)")
 
   switch (as) {
   case AS__VALUE_INT: // [ '#' ]
@@ -274,18 +272,18 @@ m_RAISE(ANOMALY__NOT_AVAILABLE)
   if (na_blotexValue != NULL) {
     switch (as) {
     case AS__VALUE_INT: // [ '#' ]
-      if (na_blotexValue->asValue == AS__VALUE_STR) m_ABANDON(EXPECT_INTEX__ABANDONMENT_CAUSE)
+      if (na_blotexValue->asValue == AS__VALUE_STR) m_ABANDON_S(EXPECT_INTEX__ABANDONMENT_CAUSE)
       *ac_gKey = m_GKey_AcolytValue(na_blotexValue->select.c_blotval); 
     break; case AS__ENTRY: // '!#' (r-value) 
-      if (na_blotexValue->asValue == AS__VALUE_STR) m_ABANDON(EXPECT_INTEX__ABANDONMENT_CAUSE)
+      if (na_blotexValue->asValue == AS__VALUE_STR) m_ABANDON_S(EXPECT_INTEX__ABANDONMENT_CAUSE)
 m_RAISE(ANOMALY__NOT_AVAILABLE)
     break; case AS__ID: // '!' 
       *ac_gKey = m_GKey_AcolytValue(na_blotexValue->select.c_blotval); 
     break; case AS__VALUE_STR: // '$'
-      if (na_blotexValue->asValue == AS__VALUE_INT) m_ABANDON(EXPECT_STREX__ABANDONMENT_CAUSE)
+      if (na_blotexValue->asValue == AS__VALUE_INT) m_ABANDON_S(EXPECT_STREX__ABANDONMENT_CAUSE)
       *ac_gKey = m_GKey_PString(na_blotexValue->select.c_strex.v_str);
     break; case AS__NAME:  // '!$'
-      if (na_blotexValue->asValue == AS__VALUE_INT) m_ABANDON(EXPECT_STREX__ABANDONMENT_CAUSE)
+      if (na_blotexValue->asValue == AS__VALUE_INT) m_ABANDON_S(EXPECT_STREX__ABANDONMENT_CAUSE)
       *ac_gKey = m_GKey_PString(na_blotexValue->select.c_strex.v_str);
     break; default: m_RAISE(ANOMALY__VALUE__D,as)
     } // switch
@@ -294,8 +292,8 @@ m_RAISE(ANOMALY__NOT_AVAILABLE)
   m_DIGGY_RETURN(ANSWER__YES)
 } // AsBlotegIndex 
 
-// See .h 
-int BlotvarReadOpAsBlotexValue(g_BLOTVAR_STUFF n_blotvarStuff, int n_readOpAs, int c_entry,
+// See . h
+int BlotvarAs2BlotexValue(g_BLOTVAR_STUFF n_blotvarStuff, int n_as, int c_entry, 
   G_STRINGS_HANDLE workingGStringsHandle, struct BLOTEX_VALUE *a_blotexValue) {
   m_DIGGY_BOLLARD()
 
@@ -304,39 +302,61 @@ int BlotvarReadOpAsBlotexValue(g_BLOTVAR_STUFF n_blotvarStuff, int n_readOpAs, i
   const struct P_STRING* cap_str = (const struct P_STRING*)UNDEFINED;
   char cb_fugaciousStr = (char)UNDEFINED;
 
-  switch (n_readOpAs) {
+  switch (n_as) {
   case -1:
     asValue = AS__VALUE_INT;
     c_blotval = BOOLEAN_BLOTVAL(n_blotvarStuff != NULL); 
-  break; case AS__VALUE_INT:
+  break; case AS__VALUE_INT: // <blotvar as int>
     asValue = AS__VALUE_INT;
     c_blotval = n_blotvarStuff != NULL? n_blotvarStuff[g_BLOTVAR_VALUE_ELEMENT].acolyt.cen_value:
       FALSE__BLOTVAL;
-  break; case AS__ENTRY: // (r-value)
+  break; case AS__ID: // <blotvar id>
     asValue = AS__VALUE_INT;
-    c_blotval = n_blotvarStuff != NULL? c_entry: FALSE__BLOTVAL; 
-  break; case AS__ID:
-m_RAISE(ANOMALY__NOT_AVAILABLE)
-  break; case AS__VALUE_STR:
+    c_blotval = n_blotvarStuff != NULL? n_blotvarStuff[g_BLOTVAR_NAME_ELEMENT].acolyt.cen_value:
+      FALSE__BLOTVAL;
+  break; case AS__ENTRY: // <blotvar entry> (r-value) 
+    asValue = AS__VALUE_INT;
+    c_blotval = n_blotvarStuff != NULL? c_entry: FALSE__BLOTVAL;
+  break; case AS__VALUE_STR: // <blotvar strex> 
     asValue = AS__VALUE_STR;
     cap_str = n_blotvarStuff != NULL? &n_blotvarStuff[g_BLOTVAR_VALUE_ELEMENT].cv_pString:
       ap_aTrivialEmptyPString;
     cb_fugaciousStr = n_blotvarStuff != NULL; // TODO: really FUGACIOUS????
-  break; case AS__NAME:
-    asValue = AS__VALUE_STR;
-    cap_str =  n_blotvarStuff != NULL? &n_blotvarStuff[g_BLOTVAR_NAME_ELEMENT].cv_pString:
+  break; case AS__NAME:  // <blotvar name> 
+    asValue = AS__VALUE_STR,
+    cap_str = n_blotvarStuff != NULL? &n_blotvarStuff[g_BLOTVAR_NAME_ELEMENT].cv_pString:
       ap_aTrivialEmptyPString;
     cb_fugaciousStr = n_blotvarStuff != NULL; // TODO: really FUGACIOUS????
   break; default:
-    m_TRACK()
+    m_RAISE(ANOMALY__VALUE__D,n_as)
   } // switch
 
   m_TRACK_IF(SetBlotexValue(workingGStringsHandle,a_blotexValue,asValue,c_blotval,
       cap_str,cb_fugaciousStr) != RETURNED)
 
   m_DIGGY_RETURN(RETURNED)
-} // BlotvarReadOpAsBlotexValue
+} // BlotvarAs2BlotexValue
 
+// See . h
+int BlotexValue2BlotvarLValueAs(struct BLOTEX_VALUE blotexValue, g_BLOTVAR_STUFF c_blotvarStuff,
+  int lValueAs, G_STRING_STUFF nc_abandonmentInfo) {
+  m_DIGGY_BOLLARD()
+  switch (lValueAs) {
+  case AS__VALUE_INT: // [ '#' ]
+    if (blotexValue.asValue != AS__VALUE_INT) m_ABANDON_S(EXPECT_INTEX__ABANDONMENT_CAUSE)
+    c_blotvarStuff[g_BLOTVAR_VALUE_ELEMENT].acolyt.cen_value = blotexValue.select.c_blotval;
+  break; case AS__ID: // '!' 
+m_RAISE(ANOMALY__NOT_AVAILABLE)
+  break; case AS__VALUE_STR: // '$'
+    if (blotexValue.asValue != AS__VALUE_STR) m_ABANDON_S(EXPECT_STREX__ABANDONMENT_CAUSE)
+    m_TRACK_IF(GStringCopy(c_blotvarStuff+g_BLOTVAR_VALUE_ELEMENT,0,
+      blotexValue.select.c_strex.v_str) < 0)
+  break; case AS__NAME:  // '!$'
+m_RAISE(ANOMALY__NOT_AVAILABLE)
+  break; default: m_RAISE(ANOMALY__VALUE__D,lValueAs) } // switch
+
+  m_DIGGY_RETURN(ANSWER__YES)
+} // BlotexValue2BlotvarLValueAs
 
 
 // See .h
@@ -353,6 +373,32 @@ int ParseCompOp(int compOpExtension, struct P_STRING *a_sequence, int *an_compOp
   m_DIGGY_RETURN(RETURNED)
 } // ParseCompOp
 
+// See .h
+int ApplyFactOp(gen_BLOTVAL *a_blotval1, int factOp, gen_BLOTVAL blotval2) {
+  m_DIGGY_BOLLARD()
+  switch (factOp) {
+  case EQUAL__COMP_OP:
+    *a_blotval1 = BOOLEAN_BLOTVAL(*a_blotval1 == blotval2);
+  break; case LESS__COMP_OP:
+    *a_blotval1 = BOOLEAN_BLOTVAL(*a_blotval1 < blotval2);
+  break; case LESS_EQUAL__COMP_OP:
+    *a_blotval1 = BOOLEAN_BLOTVAL(*a_blotval1 <= blotval2);
+  break; case GREATER__COMP_OP:
+    *a_blotval1 = BOOLEAN_BLOTVAL(*a_blotval1 > blotval2);
+  break; case GREATER_EQUAL__COMP_OP:
+    *a_blotval1 = BOOLEAN_BLOTVAL(*a_blotval1 >= blotval2);
+  break; case NOT_EQUAL__COMP_OP:
+    *a_blotval1 = BOOLEAN_BLOTVAL(*a_blotval1 != blotval2);
+  break; case MULTIPLY__FACT_OP__COMP_OP:
+    *a_blotval1 = *a_blotval1 * blotval2;
+  break; case DIVIDE__FACT_OP__COMP_OP:
+    *a_blotval1 = *a_blotval1 / blotval2;
+  break; default:
+    m_RAISE(ANOMALY__VALUE__D,factOp);
+  } // switch
+
+  m_DIGGY_RETURN(RETURNED)
+} // ApplyFactOp
 
 // See .h
 int ParseRequestCompOp(struct P_STRING *a_sequence, char b_str,
@@ -587,7 +633,7 @@ m_DIGGY_VAR_P(blotregHandle)
 // See .h
 int ParseAndComputeLValueBlotregOps( 
   struct P_STRING *a_sequence, struct P_STRING blotregName, g_BLOTREG_HANDLE n_blotregHandle, 
-  struct BLOTVAR_REFERENCE *ac_blotvarReference, int *ac_as, G_STRING_STUFF nc_abandonmentInfo) {
+  struct BLOTVAR_REFERENCE *ac_blotvarReference, int *ac_lValueAs, G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
   struct P_STRING lexeme;
 
@@ -596,18 +642,18 @@ int ParseAndComputeLValueBlotregOps(
   if (n_blotregHandle == NULL) m_ABANDON(UNKNOWN_BLOTREG__ABANDONMENT_CAUSE)
   ac_blotvarReference->blotregHandle = n_blotregHandle; 
   ac_blotvarReference->blotvarReference = CURRENT__BLOTVAR_REFERENCE;
-  *ac_as = UNDEFINED; // For the moment 
+  *ac_lValueAs = UNDEFINED; // For the moment 
 
   m_PParsePassSpaces(a_sequence,NULL);
 
-  int n_as = -1; // No blotreg read/set op a priori 
+  int n_lValueAs = -1; // No blotreg read/set op a priori 
   PParsePassSingleChar(a_sequence,NULL,'=',&lexeme); 
   if (!b_EMPTY_P_STRING(lexeme)) { // <blotreg ref op set int> | <blotreg ref op set str>... 
-    m_TRACK_IF(ParseAs(b_L_VALUE,a_sequence,&n_as) != RETURNED)
+    m_TRACK_IF(ParseAs(b_L_VALUE,a_sequence,&n_lValueAs) != RETURNED)
   } // if
   
-  if (n_as == -1) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
-  *ac_as = n_as ;
+  if (n_lValueAs == -1) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
+  *ac_lValueAs = n_lValueAs ;
 
   m_DIGGY_RETURN(ANSWER__YES)
 } // ParseAndComputeLValueBlotregOps
