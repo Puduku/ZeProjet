@@ -218,7 +218,7 @@ int DelimitBlotregRequest(struct P_STRING *a_sequence, struct P_STRING *ac_blotr
 m_DIGGY_VAR_P_STRING(*a_sequence)
   m_PREPARE_ABANDON(a_sequence, "<blotreg request>")
 
-  PParseTillMatch(a_sequence,m_PString(":?"),NULL, ac_blotregRequestSequence);
+  PParseTillMatch(a_sequence,o_PString(":?"),NULL, ac_blotregRequestSequence);
 m_DIGGY_VAR_P_STRING(*ac_blotregRequestSequence)
 m_DIGGY_VAR_P_STRING(*a_sequence)
   if (b_EMPTY_P_STRING(*a_sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
@@ -442,10 +442,10 @@ int ParseLogical2Op(struct P_STRING *a_sequence,
   m_DIGGY_BOLLARD()
   struct P_STRING lexeme; // UNDEFINED
   m_PParsePassSpaces(a_sequence,NULL);
-  PParseMatch(a_sequence,m_PString("and"),NULL,&lexeme);
+  PParseMatch(a_sequence,o_PString("and"),NULL,&lexeme);
   if (!b_EMPTY_P_STRING(lexeme)) *a_criteriaOpFlags = CRITERIA_OP_FLAGS__AND;
   else { 
-    PParseMatch(a_sequence,m_PString("or"),NULL,&lexeme); 
+    PParseMatch(a_sequence,o_PString("or"),NULL,&lexeme); 
     if (!b_EMPTY_P_STRING(lexeme)) *a_criteriaOpFlags = CRITERIA_OP_FLAGS__OR;
     else *a_criteriaOpFlags = ALL_FLAGS_OFF0;
   } // if

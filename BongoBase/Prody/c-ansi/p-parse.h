@@ -138,7 +138,7 @@ int PParseMatchAmongR(struct P_STRING* a_sequence, TO_CHAR_FUNCTION n_toCharFunc
 #define m_P_PARSE_MATCH_AMONG_C(/*struct P_STRING*/m_sequence, /*TO_CHAR_FUNCTION*/n_toCharFunction,\
   /*int*/avn_matchedEntry,/*int* */navn_matchedId,/*struct P_STRING* */na_lexeme,\
   /*int*/ tokensCount,/*const char* p_token0, int n_id0, */ ...) {\
-  m_ASSIGN_LOCAL_P_STRINGS_IDS(sp_localTokens,sn_localIds,tokensCount,__VA_ARGS__)\
+  m_LOCAL_P_STRINGS_IDS(sp_localTokens,sn_localIds,tokensCount,__VA_ARGS__)\
   PParseMatchAmongR(&(m_sequence),n_toCharFunction,avn_matchedEntry,navn_matchedId,na_lexeme,\
     tokensCount, sp_localTokens,sn_localIds);\
 }   
@@ -201,7 +201,7 @@ int PParseTillFirstMatchR(struct P_STRING* a_sequence, TO_CHAR_FUNCTION n_toChar
 #define m_P_PARSE_TILL_FIRST_MATCH_C(/*struct P_STRING*/ m_sequence,\
   /*TO_CHAR_FUNCTION*/ n_toCharFunction,/*int* */navn_matchedEntry, /*struct P_STRING* */na_lexeme,\
   /*int*/ tokensCount, /*const char* p_token0, */ ...) {\
-  m_ASSIGN_LOCAL_P_STRINGS(sp_localTokens,tokensCount,__VA_ARGS__)\
+  m_LOCAL_P_STRINGS(sp_localTokens,tokensCount,__VA_ARGS__)\
   PParseTillFirstMatchR(&(m_sequence),n_toCharFunction,navn_matchedEntry,(int*)UNDEFINED,\
     na_lexeme, tokensCount, sp_localTokens, NULL);\
 } 

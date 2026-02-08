@@ -100,7 +100,7 @@ static int Blotlib2ExecutorExecuteC(void *r_handle, const struct BLOTFUNC *ap_bl
   switch (ap_blotfunc->entry.localBlotfuncNameEntry) {
   case 1:  // Verbe
     m_ASSERT(b_EqualToCString(ap_blotfunc->call.arguments,"savoir, 1ps"))
-    m_ASSERT(GStringCopy(c_surrogate,0,m_PString("sait")) >= 0)
+    m_ASSERT(GStringCopy(c_surrogate,0,o_PString("sait")) >= 0)
   break; case 2: // Nombre
     answer = ReadGenericIntegerPString(ap_blotfunc->call.arguments, ac_blotval,(int*)NULL);
     m_TRACK_IF(answer < 0)
@@ -125,7 +125,7 @@ static int BlotcodeExecutorTest (int expectedTestNumber, BLOTCODE_EXECUTOR_HANDL
   SUCKER_HANDLE outputSuckerHandle, G_STRING_STUFF outputGStringStuff,  const char *p_template,
   int expectedAnswer, int c_expectedBlotcodeConstructionStatus,  const char *ccp_expectedOutput) {
   m_DIGGY_BOLLARD()
-  struct P_STRING localTemplate = m_PString(p_template);
+  struct P_STRING localTemplate = o_PString(p_template);
   m_ASSERT(expectedTestNumber == ++testNumber)
   m_DIGGY_VAR_D(testNumber)
   G_STRING_STUFF nh_parsingErrorInfo = NULL;

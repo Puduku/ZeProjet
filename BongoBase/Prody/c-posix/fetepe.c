@@ -158,7 +158,7 @@ static int CheckReadFtpCommandStatus (void * r_virtualHandle, const char *p_read
   int answer = ANSWER__NO; // a priori 
 
   m_ASSERT(readLength > 0)
-  struct P_STRING readPortion = m_PString2(p_readBuffer,readLength);
+  struct P_STRING readPortion = o_PString2(p_readBuffer,readLength);
   int count = ParseAsciiLines(readPortion,0,ac_messageLength,lineDelimitersHandle);
   m_TRACK_IF(count < 0)
 

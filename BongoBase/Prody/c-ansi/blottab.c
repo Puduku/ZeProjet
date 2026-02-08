@@ -326,7 +326,7 @@ static inline int ml_BlotexlibExecutorParseAndComputeBlottabRequest(
   struct P_STRING lexeme = UNDEFINED_P_STRING;
   struct P_STRING subSequence = UNDEFINED_P_STRING; 
 
-  PParseTillMatch(a_sequence,m_PString(":?"),NULL, &subSequence);
+  PParseTillMatch(a_sequence,o_PString(":?"),NULL, &subSequence);
 m_DIGGY_VAR_P_STRING(subSequence)
 m_DIGGY_VAR_P_STRING(*a_sequence)
   if (b_EMPTY_P_STRING(*a_sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
@@ -447,7 +447,7 @@ static inline int ml_BlotexlibExecutorParseAndComputeBlottabCreation(
 
   struct P_STRING subSequence = UNDEFINED_P_STRING; 
 
-  PParseTillMatch(a_sequence,m_PString("]?"),NULL, &subSequence);
+  PParseTillMatch(a_sequence,o_PString("]?"),NULL, &subSequence);
 m_DIGGY_VAR_P_STRING(subSequence)
 m_DIGGY_VAR_P_STRING(*a_sequence)
   if (b_EMPTY_P_STRING(*a_sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)

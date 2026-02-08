@@ -59,20 +59,13 @@ const struct P_STRING *ap_aTrivialEmptyPString ;
 // - n_length: 
 //   + >= 0: raw string length (may include '\0' chars)
 //   + -1 special value: '\0'-terminated C string
-static inline struct P_STRING m_PString2(const char *p_string, int n_length) {
-  struct P_STRING pString = { .string = p_string, .stop = p_string + (n_length<0? strlen(p_string):
-    n_length), } ;
-  return pString; 
-} // m_PString2
+struct P_STRING o_PString2(const char *p_string, int n_length) ;
 
 // Establish (regular) string portion.
 // 
 // Passed:
 // - p_cString: '\0'-terminated C-string (pointer)
-static inline struct P_STRING m_PString(const char *p_cString) {
-  struct P_STRING pString = { .string = p_cString, .stop = p_cString + strlen(p_cString), } ;
-  return pString; 
-} // m_PString
+struct P_STRING o_PString(const char *p_cString) ;
 
 
 // Assign simple "C-strings" to "string portions".
@@ -85,20 +78,11 @@ static inline struct P_STRING m_PString(const char *p_cString) {
 //
 // Assigned :
 // - s_pStrings:
-static inline int m_AssignPStrings(struct P_STRING* s_pStrings, int stringsCount,
-  /*const char* p_cString0, */ ...) {
-  va_list cStringsIds;
-  struct P_STRING *pStringsPtr = s_pStrings;
-  va_start(cStringsIds,stringsCount);
-  int i = 0; while(i++ < stringsCount) {
-    *(pStringsPtr++) = m_PString(va_arg(cStringsIds, const char*));
-  } // while
-  va_end(cStringsIds);
-  return RETURNED;
-} // m_AssignPStrings
+void o_PStrings(struct P_STRING* s_pStrings, int stringsCount,
+  /*const char* p_cString0, */ ...) ;
 
 // Assign simple "C-strings" to LOCAL "string portions". 
-// (Wraps m_AssignPStringsIds()) 
+// (Wraps o_PStrings()) 
 //
 // Passed: 
 // - ms_localPStrings: 
@@ -107,11 +91,11 @@ static inline int m_AssignPStrings(struct P_STRING* s_pStrings, int stringsCount
 // - ...: other c-string(s) / id(s)
 //
 // Assigned (local var):
-// - m_pString:
-#define m_ASSIGN_LOCAL_P_STRINGS(/*struct P_STRING* */ms_localPStrings,/*int*/stringsCount,\
+// - ms_localPStrings: 
+#define m_LOCAL_P_STRINGS(/*struct P_STRING* */ms_localPStrings,/*int*/stringsCount,\
   /*const char* p_cString0, */ ...)\
   struct P_STRING ms_localPStrings[stringsCount];\
-  m_ASSERT(m_AssignPStrings(ms_localPStrings, stringsCount,__VA_ARGS__) == RETURNED)
+  o_PStrings(ms_localPStrings, stringsCount,__VA_ARGS__);
 
 // Assign simple "C-strings" to "string portions" (with ids).
 //
@@ -125,23 +109,12 @@ static inline int m_AssignPStrings(struct P_STRING* s_pStrings, int stringsCount
 //
 // Assigned :
 // - s_pStrings:
-static inline int m_AssignPStringsIds(struct P_STRING* s_pStrings, int* sn_ids, int stringsCount,
-  /*const char* p_cString0 ,int n_id0, */ ...) {
-  va_list cStringsIds;
-  struct P_STRING *pStringsPtr = s_pStrings;
-  int *n_idPtr = sn_ids;  
-  va_start(cStringsIds,stringsCount);
-  int i = 0; while(i++ < stringsCount) {
-    *(pStringsPtr++) = m_PString(va_arg(cStringsIds, const char*));
-    *(n_idPtr)++ = va_arg(cStringsIds, int);
-  } // while
-  va_end(cStringsIds);
-  return RETURNED;
-} // m_AssignPStringsIds
+void o_PStringsIds(struct P_STRING* s_pStrings, int* sn_ids, int stringsCount,
+  /*const char* p_cString0 ,int n_id0, */ ...) ;
 
 
 // Assign simple "C-strings" to LOCAL "string portions" (with ids).
-// (Wraps m_AssignPStringsIds()) 
+// (Wraps o_PStringsIds()) 
 //
 // Passed: 
 // - ms_localPStrings: 
@@ -152,11 +125,12 @@ static inline int m_AssignPStringsIds(struct P_STRING* s_pStrings, int* sn_ids, 
 // - ...: other c-string(s) / id(s)
 //
 // Assigned (local var):
-// - m_pString:
-#define m_ASSIGN_LOCAL_P_STRINGS_IDS(/*struct P_STRING* */ms_localPStrings,/*int* */ms_localIds,\
+// - ms_localPStrings: 
+// - ms_localIds: 
+#define m_LOCAL_P_STRINGS_IDS(/*struct P_STRING* */ms_localPStrings,/*int* */ms_localIds,\
   /*int*/ stringsCount,/*const char* p_cString0 ,int n_id0, */ ...)\
   struct P_STRING ms_localPStrings[stringsCount]; int ms_localIds[stringsCount];\
-  m_ASSERT(m_AssignPStringsIds(ms_localPStrings,ms_localIds, stringsCount,__VA_ARGS__) == RETURNED)
+  o_PStringsIds(ms_localPStrings,ms_localIds, stringsCount,__VA_ARGS__);
 
 
 
@@ -572,7 +546,7 @@ int ParanoidConvertPString(struct P_STRING *aep_pString, char b_cTerminated,
   } else emep_string = emc_localString_ ## m_pString;\
   m_ASSERT(CopyPString(emep_string, em_requiredBufferSize, m_pString) == \
     em_requiredBufferSize-1)\
-  m_pString = m_PString2(emep_string,em_requiredBufferSize-1);\
+  m_pString = o_PString2(emep_string,em_requiredBufferSize-1);\
 
 // 
 // Passed:

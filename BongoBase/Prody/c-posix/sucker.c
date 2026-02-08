@@ -81,7 +81,7 @@ int StreamButtAdeptSuck(void *r_handle,  char b_kickButt, struct P_STRING *ac_ch
   switch (ErwRead(handle->h_erwHandle,NULL,&readChunk,&readChunkLength)) {
     case RW_STATUS__OK :
     break; case RW_STATUS__TERMINATING :
-      *ac_chunk = m_PString2(readChunk,readChunkLength);
+      *ac_chunk = o_PString2(readChunk,readChunkLength);
     break; case RW_STATUS__TRY_AGAIN :
       m_ASSERT(readChunkLength == 0)
       answer = ANSWER__NO; // flop

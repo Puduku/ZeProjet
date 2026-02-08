@@ -915,7 +915,7 @@ static inline int m_BlotexlibExecutorExecuteCFunctionEval(BLOTEXLIB_EXECUTOR_HAN
   m_PREPARE_ABANDON(&arguments, "Eval") 
   m_PParsePassSpaces(&arguments,NULL);
   { struct P_STRING subSequence = UNDEFINED_P_STRING;
-    PParseTillMatch(&arguments,m_PString(":="),NULL, &subSequence); // TODO: improve; i.e: "joker" sequences???...
+    PParseTillMatch(&arguments,o_PString(":="),NULL, &subSequence); // TODO: improve; i.e: "joker" sequences???...
     if (b_EMPTY_P_STRING(arguments)) arguments = subSequence; // No assignation
     else { // Assignation 
       b_lValueReference = b_TRUE;

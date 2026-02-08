@@ -154,8 +154,8 @@ struct BLOTFUNC_KEY_NAME {
 // - *a_blotfuncKeyName:
 static void o_BlotfuncKeyName(struct BLOTFUNC_KEY_NAME *a_blotfuncKeyName, const char* n_prefix,
   const char* name) {
-  a_blotfuncKeyName->prefix = m_PString(n_prefix == NULL? GOOD_OLD_EMPTY_C_STRING: n_prefix);
-  a_blotfuncKeyName->name = m_PString(name);
+  a_blotfuncKeyName->prefix = o_PString(n_prefix == NULL? GOOD_OLD_EMPTY_C_STRING: n_prefix);
+  a_blotfuncKeyName->name = o_PString(name);
 } // o_BlotfuncKeyName 
 
 // GREEN_HANDLER__COMPARE_FUNCTION
@@ -375,7 +375,7 @@ m_DIGGY_VAR_P_STRING(referral)
   PParsePassChars(&referral,b_REGULAR_SCAN,b_PASS_CHARS_TILL,NULL,'.',&(blotfuncKeyName.prefix));
   if (b_EMPTY_P_STRING(referral)) {
     blotfuncKeyName.name = blotfuncKeyName.prefix; 
-    blotfuncKeyName.prefix = m_PString(GOOD_OLD_EMPTY_C_STRING);
+    blotfuncKeyName.prefix = o_PString(GOOD_OLD_EMPTY_C_STRING);
   } else {
     PParseOffset(&referral,1,NULL);
     blotfuncKeyName.name = referral;
@@ -606,7 +606,7 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
   m_C_STACK_CLEAR(handle->h_flowControlStack)
 
   struct P_STRING blotinstSequence; 
-  blotinstSequence = m_PString(GOOD_OLD_EMPTY_C_STRING);
+  blotinstSequence = o_PString(GOOD_OLD_EMPTY_C_STRING);
 
 // Report error in some Blot instruction
 //
@@ -639,7 +639,7 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
   struct BLOTINST *vc_blotinstPtr = (struct BLOTINST *) UNDEFINED;
   struct P_STRING decor; // UNDEFINED 
   struct P_STRING dummy; // UNDEFINED 
-  dummy = m_PString("N/A");
+  dummy = o_PString("N/A");
 
   char b_blotblog = b_FALSE0;
   while (!b_EMPTY_P_STRING(fp_template)) {
@@ -647,7 +647,7 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
 m_DIGGY_VAR_P_STRING(fp_template)
 m_DIGGY_VAR_D(b_blotblog)
     if (!b_blotblog) {
-      PParseTillMatch(&fp_template,m_PString("##<<"),NULL, &decor);
+      PParseTillMatch(&fp_template,o_PString("##<<"),NULL, &decor);
       if (!b_EMPTY_P_STRING(decor)) {
         v_templatePartitionEntry = GreenCollectionFetch(handle->h_templatePartitionsHandle, -1,
           (char**)&ti_templatePartitionStuff);
@@ -715,9 +715,9 @@ m_DIGGY_VAR_P_STRING(blotinstSequence)
 
     // Stage 3: Finding actual "tokens" within blotinst "sequence" 
     struct P_STRING litteralKeyw, referral, litteralBlotval; 
-    litteralKeyw = m_PString(GOOD_OLD_EMPTY_C_STRING);
-    referral = m_PString(GOOD_OLD_EMPTY_C_STRING);
-    litteralBlotval = m_PString(GOOD_OLD_EMPTY_C_STRING);
+    litteralKeyw = o_PString(GOOD_OLD_EMPTY_C_STRING);
+    referral = o_PString(GOOD_OLD_EMPTY_C_STRING);
+    litteralBlotval = o_PString(GOOD_OLD_EMPTY_C_STRING);
 
     if (b_arguments) { // Found '(' <arguments> ')' 
       if (!b_EMPTY_P_STRING(basicToken2)) { // two tokens 

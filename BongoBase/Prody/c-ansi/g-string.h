@@ -147,7 +147,7 @@ int GStringConvert(G_STRING_STUFF stuff,  IS_CHAR_FUNCTION n_isNeutralCharFuncti
 // Modified:
 // - stuff: "logically" empty string with "initial" acolyt
 #define m_G_STRING_CLEAR(/*G_STRING_STUFF*/stuff) {\
-  m_TRACK_IF(GStringImport(stuff,m_PString(GOOD_OLD_EMPTY_C_STRING)) < 0)\
+  m_TRACK_IF(GStringImport(stuff,o_PString(GOOD_OLD_EMPTY_C_STRING)) < 0)\
   memset(&(stuff)->acolyt,0,sizeof((stuff)->acolyt));\
 }
   

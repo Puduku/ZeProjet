@@ -57,7 +57,7 @@ int GStringCopy(G_STRING_STUFF stuff, int n_offset, struct P_STRING pString) {
   stuff->c_copiedLength = CopyPString(stuff->nhi_string + (n_offset),
     stuff->c_bufferSize - (n_offset),pString) + (n_offset);
 
-  stuff->cv_pString = m_PString2(stuff->nhi_string,stuff->c_copiedLength);
+  stuff->cv_pString = o_PString2(stuff->nhi_string,stuff->c_copiedLength);
 
   m_DIGGY_RETURN(stuff->c_copiedLength)
 } // GStringCopy
@@ -101,7 +101,7 @@ int GStringPrintf(G_STRING_STUFF stuff,  int n_offset,  const char *p_format, ..
   } // for
   stuff->c_copiedLength = n_offset + ret;
 
-  stuff->cv_pString = m_PString2(stuff->nhi_string,stuff->c_copiedLength);
+  stuff->cv_pString = o_PString2(stuff->nhi_string,stuff->c_copiedLength);
   m_DIGGY_RETURN(stuff->c_copiedLength)
 } // GStringPrintf
 

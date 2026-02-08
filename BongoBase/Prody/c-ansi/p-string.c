@@ -16,6 +16,46 @@
 const struct P_STRING* ap_aTrivialEmptyPString = { 0 } ;  
 
 // Public function: see .h
+struct P_STRING o_PString2(const char *p_string, int n_length) {
+  struct P_STRING pString = { .string = p_string, .stop = p_string + (n_length<0? strlen(p_string):
+    n_length), } ;
+  return pString; 
+} // o_PString2
+
+// Public function: see .h
+struct P_STRING o_PString(const char *p_cString) {
+  struct P_STRING pString = { .string = p_cString, .stop = p_cString + strlen(p_cString), } ;
+  return pString; 
+} // o_PString
+
+// Public function: see .h
+void o_PStrings(struct P_STRING* s_pStrings, int stringsCount,
+  /*const char* p_cString0, */ ...) {
+  va_list cStringsIds;
+  struct P_STRING *pStringsPtr = s_pStrings;
+  va_start(cStringsIds,stringsCount);
+  int i = 0; while(i++ < stringsCount) {
+    *(pStringsPtr++) = o_PString(va_arg(cStringsIds, const char*));
+  } // while
+  va_end(cStringsIds);
+} // o_PStrings
+
+// Public function: see .h
+void o_PStringsIds(struct P_STRING* s_pStrings, int* sn_ids, int stringsCount,
+  /*const char* p_cString0 ,int n_id0, */ ...) {
+  va_list cStringsIds;
+  struct P_STRING *pStringsPtr = s_pStrings;
+  int *n_idPtr = sn_ids;  
+  va_start(cStringsIds,stringsCount);
+  int i = 0; while(i++ < stringsCount) {
+    *(pStringsPtr++) = o_PString(va_arg(cStringsIds, const char*));
+    *(n_idPtr)++ = va_arg(cStringsIds, int);
+  } // while
+  va_end(cStringsIds);
+} // o_PStringsIds
+
+
+// Public function: see .h
 int VerifyCPString(struct P_STRING *a_pString) { 
   m_DIGGY_BOLLARD()
   const char *ptr = a_pString->string - 1;
@@ -141,7 +181,7 @@ int ParanoidComparePStrings(struct P_STRING pString1, struct P_STRING pString2,
 
 // Public function: see .h
 int b_EqualToCString(struct P_STRING pString1, const char *p_cString2) {
-  int comparison = ComparePStrings(pString1,m_PString(p_cString2),NULL,NULL,!b_SUB_STRING_2);
+  int comparison = ComparePStrings(pString1,o_PString(p_cString2),NULL,NULL,!b_SUB_STRING_2);
   switch (comparison) {
   case LESS_THAN__COMPARISON:
   case GREATER_THAN__COMPARISON:
@@ -251,7 +291,7 @@ const char *ScanPStringTillMatch(struct P_STRING pString, struct P_STRING subPSt
   while (++ptr < pString.stop) {
     if (ptr+subLength <= pString.stop) {
       //TODO: utiliser les sub-strings ?
-      struct P_STRING ptrPString = m_PString2(ptr,subLength);
+      struct P_STRING ptrPString = o_PString2(ptr,subLength);
       int comparison = ComparePStrings(ptrPString,  subPString,  NULL,
         n_toCharFunction, !b_SUB_STRING_2); 
       if (comparison == EQUAL_TO__COMPARISON) break ;

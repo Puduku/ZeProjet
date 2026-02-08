@@ -20,7 +20,7 @@ static inline int m_GTokenAssign(g_G_TOKEN_STUFF stuff, const char*pcf_litteral,
   m_DIGGY_BOLLARD()
   m_CHECK_G_STRINGS_COLLECTION_CONVEYANCE(n_gTokensHandle,FIRST_ELEMENT0,
     VALUED_STRING__G_STRING_CONVEYANCE)
-  int completed = g_GTokenImport(stuff, m_PString(pcf_litteral));
+  int completed = g_GTokenImport(stuff, o_PString(pcf_litteral));
   switch (completed) {
   case COMPLETED__OK:
   break; case COMPLETED__BUT:
