@@ -66,40 +66,54 @@ struct BLOTLIB {
 } ;
 typedef struct BLOTLIB *BLOTLIB_STUFF; 
 
-//
-#define m_ASSIGN_BLOTLIB(/*struct BLOTLIB*/m_blotlib,  /*const char* */mnp_prefix,\
-  /*int*/m_localBlotfuncNamesNumber,  /*const char** */mcp_localBlotfuncNames, \
-  /*BLOTLIB_EXECUTOR_FACTORY__CREATE_PRODUCT_INSTANCE_FUNCTION*/ \
-  m_blotlibExecutorFactoryCreateProductInstanceFunction,\
-  /*void* */mpr_blotlibExecutorFactoryHandle,\
-  /*BLOTLIB_EXECUTOR__EXECUTE_C_FUNCTION*/m_blotlibExecutorExecuteCFunction,\
-  /*BLOTLIB_EXECUTOR__DESTROY_INSTANCE_FUNCTION*/m_blotlibExecutorDestroyInstanceFunction) {\
-  (m_blotlib).np_prefix = mnp_prefix;\
-  (m_blotlib).localBlotfuncNamesNumber = m_localBlotfuncNamesNumber; \
-  (m_blotlib).cp_localBlotfuncNames = mcp_localBlotfuncNames;\
-  (m_blotlib).blotlibExecutorFactoryCreateProductInstanceFunction =\
-  m_blotlibExecutorFactoryCreateProductInstanceFunction;\
-  (m_blotlib).pr_blotlibExecutorFactoryHandle = mpr_blotlibExecutorFactoryHandle;\
-  (m_blotlib).c_blotlibExecutorExecuteCFunction = m_blotlibExecutorExecuteCFunction;\
-  (m_blotlib).c_blotlibExecutorDestroyInstanceFunction = m_blotlibExecutorDestroyInstanceFunction;\
-}
+// Assign blotlib  
+// 
+// Passed:
+// - blotlibStuff: blotlib to assign
+// 
+// Changed:
+// - blotlibStuff: assigned blotlib
+static void o_Blotlib(BLOTLIB_STUFF blotlibStuff, const char* np_prefix,
+  int localBlotfuncNamesNumber, const char** cp_localBlotfuncNames,
+  BLOTLIB_EXECUTOR_FACTORY__CREATE_PRODUCT_INSTANCE_FUNCTION 
+  blotlibExecutorFactoryCreateProductInstanceFunction,
+  void* pr_blotlibExecutorFactoryHandle,
+  BLOTLIB_EXECUTOR__EXECUTE_C_FUNCTION blotlibExecutorExecuteCFunction,
+  BLOTLIB_EXECUTOR__DESTROY_INSTANCE_FUNCTION blotlibExecutorDestroyInstanceFunction) {
+  blotlibStuff->np_prefix = np_prefix;
+  blotlibStuff->localBlotfuncNamesNumber = localBlotfuncNamesNumber;
+  blotlibStuff->cp_localBlotfuncNames = cp_localBlotfuncNames;
+  blotlibStuff->blotlibExecutorFactoryCreateProductInstanceFunction =
+    blotlibExecutorFactoryCreateProductInstanceFunction;
+  blotlibStuff->pr_blotlibExecutorFactoryHandle = pr_blotlibExecutorFactoryHandle;
+  blotlibStuff->c_blotlibExecutorExecuteCFunction = blotlibExecutorExecuteCFunction;
+  blotlibStuff->c_blotlibExecutorDestroyInstanceFunction = blotlibExecutorDestroyInstanceFunction;
+} // o_Blotlib
 
 // BLOTFUNCs (blot functions)
 // --------------------------
 
-// 
-#define m_ASSIGN_BLOTFUNC_CALL(/*struct BLOTFUNC_CALL*/m_blotfuncCallStruct,\
-  /*struct P_STRING*/ m_referral, /*struct P_STRING*/ m_arguments) {\
-  (m_blotfuncCallStruct).referral =  m_referral;\
-  (m_blotfuncCallStruct).arguments = m_arguments;\
-}
-
+// Assign blotfunc call
 //
-#define m_ASSIGN_BLOTFUNC_ENTRY(/*struct BLOTFUNC_ENTRY*/m_blotfuncEntry,\
- /*int*/m_blotlibEntry, /*int*/m_localBlotfuncNameEntry) {\
- (m_blotfuncEntry).blotlibEntry = m_blotlibEntry;\
- (m_blotfuncEntry).localBlotfuncNameEntry = m_localBlotfuncNameEntry;\
-}
+// Passed:
+// - a_blotfuncCall: 
+
+// Changed:
+// - *a_blotfuncCall: 
+static void o_BlotfuncCall(struct BLOTFUNC_CALL *a_blotfuncCall,
+  struct P_STRING referral, struct P_STRING arguments) {
+  a_blotfuncCall->referral = referral;
+  a_blotfuncCall->arguments = arguments;
+} // o_BlotfuncCall
+
+// Assign blotfunc entry 
+// Passed:
+// - 
+static void o_BlotfuncEntry(struct BLOTFUNC_ENTRY *a_blotfuncEntry,
+ int m_blotlibEntry, int m_localBlotfuncNameEntry) {
+ a_blotfuncEntry->blotlibEntry = m_blotlibEntry;
+ a_blotfuncEntry->localBlotfuncNameEntry = m_localBlotfuncNameEntry;
+} // o_BlotfuncEntry
 
 // "Ultra but dirty" GREEN ITEM:
 typedef struct BLOTFUNC_ENTRY *BLOTFUNC_ENTRY_STUFF;
@@ -131,16 +145,18 @@ struct BLOTFUNC_KEY_NAME {
   struct P_STRING name ;
 } ;
 
+// Assign "blotfunc key name"...
 //
-#define m_ASSIGN_BLOTFUNC_KEY_NAME(/*struct BLOTFUNC_KEY_NAME*/m_blotfuncKeyName,\
-  /*char* */n_prefix, /*char* */m_name) {\
-  if (n_prefix != NULL) {\
-    m_blotfuncKeyName.prefix = m_PString(n_prefix);\
-  } else {\
-    m_blotfuncKeyName.prefix = m_PString(GOOD_OLD_EMPTY_C_STRING);\
-  }\
-  m_blotfuncKeyName.name = m_PString(m_name); \
-} 
+// Passed:
+// - a_blotfuncKeyName:
+// 
+// Changed:
+// - *a_blotfuncKeyName:
+static void o_BlotfuncKeyName(struct BLOTFUNC_KEY_NAME *a_blotfuncKeyName, const char* n_prefix,
+  const char* name) {
+  a_blotfuncKeyName->prefix = m_PString(n_prefix == NULL? GOOD_OLD_EMPTY_C_STRING: n_prefix);
+  a_blotfuncKeyName->name = m_PString(name);
+} // o_BlotfuncKeyName 
 
 // GREEN_HANDLER__COMPARE_FUNCTION
 static int BlotfuncsHandlerCompare (void *cpr_handle,  char b_frozen, int indexLabel,  int keyRank,
@@ -157,16 +173,16 @@ static int BlotfuncsHandlerCompare (void *cpr_handle,  char b_frozen, int indexL
   m_BLOTFUNCS_HANDLER_GET_BLOTLIB(p_handle, p_blotfuncEntryStuff->blotlibEntry, blotlibStuff)
   m_ASSERT(p_blotfuncEntryStuff->localBlotfuncNameEntry < blotlibStuff->localBlotfuncNamesNumber)
   struct BLOTFUNC_KEY_NAME aBlotfuncKeyName;
-  m_ASSIGN_BLOTFUNC_KEY_NAME(aBlotfuncKeyName, blotlibStuff->np_prefix,
-    blotlibStuff->cp_localBlotfuncNames[p_blotfuncEntryStuff->localBlotfuncNameEntry])
+  o_BlotfuncKeyName(&aBlotfuncKeyName, blotlibStuff->np_prefix,
+    blotlibStuff->cp_localBlotfuncNames[p_blotfuncEntryStuff->localBlotfuncNameEntry]);
 
   struct BLOTFUNC_KEY_NAME bBlotfuncKeyName ;
   if (npr_bGreenItemStuff != NULL) {
     p_blotfuncEntryStuff = (BLOTFUNC_ENTRY_STUFF) npr_bGreenItemStuff;
     m_BLOTFUNCS_HANDLER_GET_BLOTLIB(p_handle, p_blotfuncEntryStuff->blotlibEntry, blotlibStuff)
     m_ASSERT(p_blotfuncEntryStuff->localBlotfuncNameEntry < blotlibStuff->localBlotfuncNamesNumber)
-    m_ASSIGN_BLOTFUNC_KEY_NAME(bBlotfuncKeyName, blotlibStuff->np_prefix,
-      blotlibStuff->cp_localBlotfuncNames[p_blotfuncEntryStuff->localBlotfuncNameEntry])
+    o_BlotfuncKeyName(&bBlotfuncKeyName, blotlibStuff->np_prefix,
+      blotlibStuff->cp_localBlotfuncNames[p_blotfuncEntryStuff->localBlotfuncNameEntry]);
   } else bBlotfuncKeyName = *((struct BLOTFUNC_KEY_NAME*)cpr_bKeys); 
 
   int comparison = ComparePStrings(aBlotfuncKeyName.prefix, bBlotfuncKeyName.prefix,
@@ -267,10 +283,9 @@ int BlotcodeLinkBlotlib (BLOTCODE_HANDLE ep_handle,  const char* nfp_blotlibPref
   BLOTLIB_STUFF blotlibStuff = (BLOTLIB_STUFF)UNDEFINED;
   blotlibEntry = GreenCollectionFetch(ep_handle->h_blotlibsHandle, -1,  (char **) &blotlibStuff);
   m_TRACK_IF(blotlibEntry < 0)
-  m_ASSIGN_BLOTLIB(*blotlibStuff,  nfp_blotlibPrefix,  localBlotfuncNamesNumber,
-    cfp_localBlotfuncNames,  blotlibExecutorFactoryCreateProductInstanceFunction,
-    fpr_blotlibExecutorFactoryHandle,  blotlibExecutorExecuteCFunction,
-    blotlibExecutorDestroyInstanceFunction)
+  o_Blotlib(blotlibStuff, nfp_blotlibPrefix,localBlotfuncNamesNumber,cfp_localBlotfuncNames,
+    blotlibExecutorFactoryCreateProductInstanceFunction,fpr_blotlibExecutorFactoryHandle,
+    blotlibExecutorExecuteCFunction,blotlibExecutorDestroyInstanceFunction);
 
   m_DIGGY_RETURN(blotlibEntry)
 } // BlotcodeLinkBlotlib 
@@ -299,7 +314,7 @@ int BlotcodeFreeze(BLOTCODE_HANDLE ep_handle) {
     for (j = 0; j < blotlibPtr->localBlotfuncNamesNumber ; j++) {   
       int ret = GreenCollectionFetch(ep_handle->ch_blotfuncsHandle, -1, (char**)&blotfuncEntryStuff);
       m_TRACK_IF(ret < 0)
-      m_ASSIGN_BLOTFUNC_ENTRY(*blotfuncEntryStuff, i,j)
+      o_BlotfuncEntry(blotfuncEntryStuff, i,j);
     } // for
   } // for 
 
@@ -481,26 +496,32 @@ struct TEMPLATE_PARTITION {
 typedef struct TEMPLATE_PARTITION *TEMPLATE_PARTITION_STUFF ;
 
 
+// Passed:
+// - a_templatePartition:
 // 
-#define m_ASSIGN_DECOR_TEMPLATE_PARTITION(\
-  /*struct TEMPLATE_PARTITION*/ m_templatePartitionStruct,\
-  /*const struct P_STRING*/ p_decor) {\
-  (m_templatePartitionStruct).b_blotinst = b_FALSE0;\
-  (m_templatePartitionStruct).select.c_decor = p_decor;\
-} 
+// Changed:
+// - *a_templatePartition:
+static void o_DecorTemplatePartition(struct TEMPLATE_PARTITION *a_templatePartition,
+  const struct P_STRING p_decor) {
+  a_templatePartition->b_blotinst = b_FALSE0;
+  a_templatePartition->select.c_decor = p_decor;
+} // o_DecorTemplatePartition 
 
 
+// Passed:
+// - a_templatePartition:
 // 
-#define m_ASSIGN_DEFAULT_BLOTINST_TEMPLATE_PARTITION(\
-  /*struct TEMPLATE_PARTITION*/ m_templatePartitionStruct) {\
-  (m_templatePartitionStruct).b_blotinst = b_TRUE;\
-  (m_templatePartitionStruct).select.c_blotinst.blotkeywId =  NONE__BLOTKEYW_ID;\
-  (m_templatePartitionStruct).select.c_blotinst.b_blotfunc = b_FALSE0;\
-  (m_templatePartitionStruct).select.c_blotinst.b_blotval = b_FALSE0;\
-  (m_templatePartitionStruct).select.c_blotinst.n_subEntry = -1;\
-  (m_templatePartitionStruct).select.c_blotinst.b_masterBlotval = b_FALSE0;\
-  (m_templatePartitionStruct).select.c_blotinst.n_masterEntry = -1;\
-} 
+// Changed:
+// - *a_templatePartition:
+static void o_DefautlBlotinstTemplatePartition(struct TEMPLATE_PARTITION *a_templatePartition) {
+  a_templatePartition->b_blotinst = b_TRUE;
+  a_templatePartition->select.c_blotinst.blotkeywId =  NONE__BLOTKEYW_ID;
+  a_templatePartition->select.c_blotinst.b_blotfunc = b_FALSE0;
+  a_templatePartition->select.c_blotinst.b_blotval = b_FALSE0;
+  a_templatePartition->select.c_blotinst.n_subEntry = -1;
+  a_templatePartition->select.c_blotinst.b_masterBlotval = b_FALSE0;
+  a_templatePartition->select.c_blotinst.n_masterEntry = -1;
+} // o_DefautlBlotinstTemplatePartition 
 
 
 // BLOTCODE executors
@@ -631,7 +652,7 @@ m_DIGGY_VAR_D(b_blotblog)
         v_templatePartitionEntry = GreenCollectionFetch(handle->h_templatePartitionsHandle, -1,
           (char**)&ti_templatePartitionStuff);
         m_TRACK_IF(v_templatePartitionEntry < 0)
-        m_ASSIGN_DECOR_TEMPLATE_PARTITION(*ti_templatePartitionStuff, decor)
+        o_DecorTemplatePartition(ti_templatePartitionStuff, decor);
       } // if
       if (b_EMPTY_P_STRING(fp_template)) { // "##<<' NOT located 
         break;
@@ -724,7 +745,7 @@ m_DIGGY_VAR_P_STRING(blotinstSequence)
     v_templatePartitionEntry = GreenCollectionFetch(handle->h_templatePartitionsHandle, -1,
       (char**)&ti_templatePartitionStuff) ;
     m_TRACK_IF(v_templatePartitionEntry < 0)
-    m_ASSIGN_DEFAULT_BLOTINST_TEMPLATE_PARTITION(*ti_templatePartitionStuff)
+    o_DefautlBlotinstTemplatePartition(ti_templatePartitionStuff);
     vc_blotinstPtr = &ti_templatePartitionStuff->select.c_blotinst; 
 
     if (b_arguments) {
@@ -732,7 +753,7 @@ m_DIGGY_VAR_P_STRING(blotinstSequence)
         &vc_blotinstPtr->c_blotfunc.entry)) {
       case RESULT__FOUND: 
         vc_blotinstPtr->b_blotfunc = b_TRUE;
-        m_ASSIGN_BLOTFUNC_CALL(vc_blotinstPtr->c_blotfunc.call, referral, c_arguments) 
+        o_BlotfuncCall(&vc_blotinstPtr->c_blotfunc.call, referral, c_arguments); 
       break; case RESULT__NOT_FOUND:
         m_REPORT_ERROR(referral, "Unknown blotfunc")
       break; default:
