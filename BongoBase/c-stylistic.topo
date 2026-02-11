@@ -1,79 +1,10 @@
 // c-stylistic.topo
 // (c) Puduku - 2025
-// ================== DRAFT ==========================
-
-// Using stylistic devices in C (and other programmming languages)
-// Idea: In order to design applications and programme them properly, we also need to learn
-// how to juggle with words and figures of speech... 
-// In Programming/software development, one can (very roughly) distinct the two following phases:
-// - preliminary conception/design 
-// - developement: writing, compiling testing, debugging, fxing, improving, documenting,...
-//
-// During preliminary conception phase...
-// A new design does not emerges from nothing. Rather, new programming concepts (modules,
-// classes, processes and so on) are based on adaptation and extension (generalization or
-// specification) of existing concepts (ideas, principles, theories) and artifacts
-// (devices and natural phenomena).
-// The major "engines" used by humans to derive new concepts from existing ones are the
-// metaphors and the metonymies...
-// In fact, to impress a new concept on the humain brain, it is not always necessary to resort
-// to particularly relevant metaphors. It is enough for the references used to be simple and
-// striking.
-// As such, it is common to name a new application concept with regard to history and
-// mythology. But of course, if you want to be really striking, you have to be original.
-// That is, the first person who came up with the idea of comparing a computer to a piece of
-// fruit made a lasting impression; all subsequent attempts to make an impression by
-// comparing computers to (other) pieces of fruit were completely in vain... 
-
-// Writing code phase...
-// It directly appears that an important aspect of code writing is about applying "good"
-// naming conventions. 
-// The never-ending debate about ‘good naming conventions’ in the realm of software is as
-// old as the software industry itself...
-// The difficulty of the exercise lies in the fact that programmers DO need to be rigorous
-// in their naming conventions... But naming conventions that are too rigid or dogmatic 
-// are also completely counterproductive...
-// Let us consider two particular ‘extremes’:
-// - minimalist naming conventions, based on simple, short names with no hierarchy, make
-//   the code far too obscure and inevitably lead to endless naming conflicts;
-// - the other extreme, based on very descriptive names (which are therefore very long) and
-//   using systematic hierarchy, is no more manageable:
-//   + long names composed of several words are NOT easily identified by humans and
-//     unreasonably increase the weight of the code. 
-//   + The excessive length of such code lines (200 characters or more) is also a concern, as
-//     it makes routine operations—such as visual comparison (side by side) between
-//     versions—very tedious.
-
-// Therefore, legible code must be both concise and unambiguous (with names that ‘speak’ to
-// us). How can we achieve two seemingly contradictory goals at the same time?
-// Fortunately, figures of speech come to our rescue...
-
-// The basic rule is: when referring to (and therefore naming) an entity, avoid 
-// circumlocutions and compound names. Use simple metaphors as much as possible.
-
-// Another simple technique is to use metonymies and synecdoches.
-// In fact, we often use metonymies unconsciously. In particular, when, in a (laudable)
-// effort to be concise, we name the principal module of our project after the project
-// itself, we are using metonymy.
-// However, it is important to bear in mind that this stylistic device can also create
-// unfortunate confusion.
-// Let me give you a simple example. A project I worked on for many years consisted of
-// software AND specific hardware. The software part was (quite naturally) named after the
-// project itself. Unfortunately, management quickly ended up confusing the software part of
-// the project with the whole thing. The head of the software development team became the de
-// facto manager of the entire project (including the hardware part) without this ever being
-// clearly formalised. This explains (from my humble point of view) many of the erratic
-// decisions that ensued...
-
-// Examples of useful figures of speech and other rhetorical technics:
-// - Personification: using a knowm character to name your application
-// - humoristic references
-// -  ....
-
-
-
-# Stylistic Devices in C and Other Programming Languages: Naming Conventions and Rhetoric
-NOTICE: This note was completely rewritten with the assistance of AI
+// c-stylistic.topo
+// (c) Puduku - 2025
+// # Stylistic Devices in C and Other Programming Languages: Naming Conventions and Rhetoric
+// NOTICE: This note was completely rewritten with the assistance of AI
+#if 0
 ## Introduction
 
 Writing quality software requires more than technical skill—it demands an 
@@ -270,9 +201,4 @@ learning the craft of naming: understanding when to apply rules, when to break
 them, and how to use figures of speech to achieve clarity without compromise.
 
 Invest in learning rhetoric. Your code will be better for it.
-
-
-
-
-
-
+#endif
