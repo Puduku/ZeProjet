@@ -1,8 +1,9 @@
 // c-handle.topo - A note about THE handle concept in C
+// (c) Puduku - 2026
 
 // As far as I can figure out, "handle" appeared in programs in the late '80s ; this coincided with
 // the emergence of what I would describe as pre-object programming style (I mean no pejorative
-// connotation by this description) in ‘general’ languages such as C. As that time, as a non-native
+// connotation by this description) in 'general' languages such as C. As that time, as a non-native
 // English speaker, I did not even understood that word "handle" that I simply confused with
 // "handler".
 // Many years later, I had a revelation when I saw Julie grab her enormous suitcase as it rolled
