@@ -196,20 +196,28 @@
 // 'constness' constraint (for one time, C++ marks a real point over C :p)...
 // (**) As illustration of the idiom "Being between Scylla and Charybdis".
 
-// Number 2: Silent overflows. There is NO bullet-proof means in C to detect basic integer 
-// overflows !... (*)
-// Initially, that limitation was consistent with the language's philosophy: it's up to the
-// programmer to anticipate. Such approach remains reasonable and applicable while programmers keep
-// control on the nature of integer data (size and  signedness). However, inopportune typedefs
-// (which "opacify" without reason - just for the pleasure - the data types) complicate the
-// situation... (R)
-// (*) This serious problem persists in C++. C++ does well provide a mechanism that mimics ADA's
-// exceptions, but that mechanism is actually useless regarding numbers' OVERFLOWS. The problem is
-// that, though an 'overflow_error' is well defined with the C++ standard, we still have to raise it
-// "manually" in the code if we want to handle it as exception.  It's like you have a shiny car in
-// your hands, with a lot of sophisticated controls on the dashboard, but there's no engine under
-// the hood - you have to pedal (and to simulate the engine noise with your mouth) to move
-// forward...
+// Number 2: Silent Overflows: The Absence of Overflow Detection
+//
+// There is no bulletproof means in C to detect basic integer overflows.
+//
+// Initially, this limitation was consistent with C's philosophy: it's 
+// the programmer's responsibility to anticipate overflow. That approach 
+// remains reasonable while programmers maintain control over integer 
+// data—its size and signedness. However, careless typedefs (which 
+// "opacify" data types without reason, sometimes merely for aesthetic 
+// consistency) complicate this responsibility considerably.
+//
+// What adds insult to injury: my Videopac toy "computer" from 1978—
+// with its modest one-byte integers—properly reported overflow via the 
+// CPU flags register. Modern C simply ignores the problem.
+//
+// This serious problem persists in C++. While C++ provides a mechanism 
+// mimicking Ada's exceptions, it proves useless for integer overflows. 
+// An 'overflow_error' is well defined in the standard, yet you must 
+// raise it explicitly in your code to handle it as an exception. It's 
+// like owning a shiny car with sophisticated dashboard controls but 
+// no engine under the hood—you have to pedal and simulate engine 
+// noise with your mouth just to move forward.
 
 // Number 1: Unreadable C interface headers - mess with portability flags. (R)
 // This is not an originel flaw of the language. But now, after more than forty years of (often
@@ -220,17 +228,22 @@
 // Number 0: Desesperatly poor makeup of many standard C libraries (string handling, etc...) =>
 // rather dishonest argument (against the C LANGUAGE) of C++ bigots.
 
-// Number -1: '\0'-terminated strings convention (legacy of assembly languages ?) 
-// Practical problem in brief: crappy representation of strings => crappy code and functions
-// manipulating strings => presence of a lot of crappy code in C programs "in general"...
-// The convention of strings terminated with '\0' is rarely questionned by programmers because it
-// seems so simple and efficient. In specific cases - "early" programs developped in the 70s (as
-// with my videopac toy "computer" from the year 1978), "low level" drivers, etc. - this
-// representation is indeed, by far, the most effective one can imagine...
-// ...Unfortunately, there is a huge DOWNSIDE: this representation simply does NOT allow you to
-// handle ORDINARY PORTIONS of such strings... Now, - what bad luck! -, in common applications, MOST
-// of strings processings (notably the "parsings") precisely manipulate strings PORTIONS.
-
+// Number -1: The '\0'-Terminated Strings Convention (Legacy of Assembly Languages?)
+//
+// Practical problem: The null-terminated string representation creates 
+// poor string-handling code and functions, resulting in pervasive 
+// problematic code in typical C programs.
+// 
+// Programmers rarely question this convention because it appears 
+// simple and efficient. In specific cases—early programs developed in 
+// the 1970s (like my Videopac toy "computer" from 1978), low-level 
+// drivers, and the like—this representation is indeed the most 
+// effective one could imagine.
+//
+// Yet there is a significant downside: this representation simply 
+// cannot handle ordinary portions of strings. And here's the cruel // 
+// irony: in common applications, most string processing (notably 
+// parsing) precisely manipulates string portions.
 
 // Moralited:
 // C, qualified (ag l'edpoque du moins) de langage "edvolued", paraist aujourd'hui bien rustique
