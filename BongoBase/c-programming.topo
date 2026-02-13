@@ -140,7 +140,7 @@
 //     NB: example of freeloader can be found in "Flint" project...
 //
 // - instances and handles ; data encapsulation
-//   + Nothing should exist but objects' instances !!! (*) (**) that "fundamental" programming
+//   + Should only exist object instances !!! (*) (**) that "fundamental" programming
 //     concept - i.e association principle of code and data (so-called "methods" and "attributes")
 //     can be easily implemented in C by means of "instances" and "handles".
 //     . An "instance" is simply an allocation in memory (generally heap) of some data structure.
@@ -252,4 +252,5 @@
 //    + More generally, avoid the pitfall of excessive dualisation of the truth. In particular, take 
 //      the time to consider the unary and ternary verities, which are most relevant in many 
 //      situations. (see also c-verities.topo, section "Verities in computing")
+
 
