@@ -167,6 +167,15 @@ int ConcatenateStrexValue(G_STRINGS_HANDLE workingGStringsHandle,
 // Parsing blot expressions: helpers 
 // ================================= 
 
+// See .h 
+int ParseEndOfSequence(struct P_STRING *a_sequence, G_STRING_STUFF nc_abandonmentInfo) {
+  m_DIGGY_BOLLARD()
+  m_PParsePassSpaces(a_sequence,NULL);
+  if (!b_EMPTY_P_STRING(*a_sequence)) m_ABANDON_S(NOT_PARSABLE__ABANDONMENT_CAUSE)
+  m_DIGGY_RETURN(ANSWER__YES) 
+} // ParseEndOfSequence
+
+
 // IS_CHAR_FUNCTION:
 int IsEntityNameChar(int c) {
   return (c == '_' || isalnum(c));
@@ -479,6 +488,23 @@ int ParseInt1Op(struct P_STRING *a_sequence, int *an_int1Op) {
   m_DIGGY_RETURN(RETURNED)
 } // ParseInt1Op
 
+// See .h
+int ApplyInt1Op(int int1Op, gen_BLOTVAL *a_blotval) {
+  m_DIGGY_BOLLARD()
+  switch (int1Op) {
+  break; case NOT__INT_1OP:
+    if (*a_blotval == TRUE__BLOTVAL0)
+      *a_blotval = FALSE__BLOTVAL;
+    else *a_blotval = TRUE__BLOTVAL0;
+  break; case PLUS__INT_1OP:
+  break; case MINUS__INT_1OP:
+    *a_blotval = -(*a_blotval);
+  break; default:
+     m_RAISE(ANOMALY__VALUE__D,int1Op)
+  } // switch
+
+  m_DIGGY_RETURN(RETURNED)
+} // Int1OpAs
 
 // See .h
 int ParseIntConstant(struct P_STRING *a_sequence, G_STRINGS_HANDLE workingGStringsHandle,
@@ -523,6 +549,23 @@ int ParseTermOp(struct P_STRING *a_sequence, int *an_termOp) {
   m_DIGGY_RETURN(RETURNED)
 } // ParseTermOp
 
+// See .h
+int ApplyTermOp(gen_BLOTVAL *a_blotval1, int termOp, gen_BLOTVAL blotval2) {
+  m_DIGGY_BOLLARD()
+  switch (termOp) {
+  case ADD__TERM_OP:
+    *a_blotval1 += blotval2;
+  break; case SUBTRACT__TERM_OP:
+    *a_blotval1 -= blotval2;
+  break; case AND__TERM_OP:
+    *a_blotval1 = *a_blotval1 && blotval2;
+  break; case OR__TERM_OP:
+    *a_blotval1 = *a_blotval1 || blotval2;
+  break; default:
+    m_RAISE(ANOMALY__VALUE__D,termOp)
+  } // switch
+  m_DIGGY_RETURN(RETURNED)
+} // ApplyTermOp
 
 // IS_CHAR_FUNCTION:
 static int IsFormatSpecifierChar(int c) {
@@ -531,7 +574,8 @@ static int IsFormatSpecifierChar(int c) {
 
 
 // See .h
-int ParseFormat(struct P_STRING *a_sequence, int *ac_format, G_STRING_STUFF nc_abandonmentInfo) {
+int ParseFormatAndSeparator(struct P_STRING *a_sequence, int *ac_format,
+  G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
   struct P_STRING lexeme; // UNDEFINED
 
@@ -563,8 +607,46 @@ int ParseFormat(struct P_STRING *a_sequence, int *ac_format, G_STRING_STUFF nc_a
   if (n_format < 0) m_ABANDON(INVALID_FORMAT__ABANDONMENT_CAUSE) 
   *ac_format = n_format;
 
+  m_PRECISE_ABANDON(a_sequence, "','") 
+  m_PParsePassSpaces(a_sequence,NULL);
+  PParsePassSingleChar(a_sequence,NULL,',',&lexeme);
+  if (b_EMPTY_P_STRING(lexeme)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
+  m_PParsePassSpaces(a_sequence,NULL);
+
   m_DIGGY_RETURN(ANSWER__YES)
-} // ParseFormat
+} // ParseFormatAndSeparator
+
+// See .h
+int ApplyFormat(int format, struct BLOTEX_VALUE blotexValue, G_STRING_STUFF c_surrogate,
+  G_STRING_STUFF nc_abandonmentInfo) {
+  m_DIGGY_BOLLARD()
+
+  switch (format) {
+  case D__FORMAT:
+    if (blotexValue.asValue != AS__VALUE_INT) m_ABANDON_S(EXPECT_INTEX__ABANDONMENT_CAUSE)
+    GStringPrintf(c_surrogate,0,"%d", blotexValue.select.c_blotval);
+  break; case LS__FORMAT:
+    if (blotexValue.asValue != AS__VALUE_STR) m_ABANDON_S(EXPECT_STREX__ABANDONMENT_CAUSE)
+    GStringPrintf(c_surrogate,0,FMT_P_STRING,m_P_STRING_2_FMT_ARGS(
+      blotexValue.select.c_strex.v_str));
+  break; case LX__FORMAT:
+    if (blotexValue.asValue != AS__VALUE_INT) m_ABANDON_S(EXPECT_INTEX__ABANDONMENT_CAUSE)
+    GStringPrintf(c_surrogate,0,"%x",blotexValue.select.c_blotval);
+  break; case UX__FORMAT:
+    if (blotexValue.asValue != AS__VALUE_INT) m_ABANDON_S(EXPECT_INTEX__ABANDONMENT_CAUSE)
+    GStringPrintf(c_surrogate,0,"%X", blotexValue.select.c_blotval);
+  break; case LE__FORMAT:
+    if (blotexValue.asValue != AS__VALUE_INT) m_ABANDON_S(EXPECT_INTEX__ABANDONMENT_CAUSE)
+m_RAISE(ANOMALY__NOT_AVAILABLE)
+  break; case BE__FORMAT:
+    if (blotexValue.asValue != AS__VALUE_INT) m_ABANDON_S(EXPECT_INTEX__ABANDONMENT_CAUSE)
+m_RAISE(ANOMALY__NOT_AVAILABLE)
+  break; default:
+    m_RAISE(ANOMALY__VALUE__D,format)
+  } // switch
+
+  m_DIGGY_RETURN(ANSWER__YES)
+} // ApplyFormat
 
 int ParseBlottabsLabel(struct P_STRING *a_sequence, int *an_blottabsLabel) {
   m_DIGGY_BOLLARD()

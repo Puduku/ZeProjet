@@ -260,6 +260,22 @@ typedef int (*UPDATE_BLOTTAB_SPOT_FUNCTION)(
 // Parsing blot expressions: helpers 
 // ================================= 
 
+// Ensure the sequence is fully parsed.
+//
+// Passed:
+// - *a_sequence: before parsing
+//
+// Changed:
+// - *a_sequence: after parsing 
+// - nc_abandonmentInfo: only significant if abandon
+// 
+// Ret: parsed successfully ? 
+// - ANSWER__YES: Ok,
+// - ANSWER__NO: trailing sequence; abandon processing 
+// - 1: unexpected problem; anomaly is raised
+int ParseEndOfSequence(struct P_STRING *a_sequence, G_STRING_STUFF nc_abandonmentInfo) ;
+
+
 // IS_CHAR_FUNCTION:
 // Recognize any character corresponding to <entity>
 int IsEntityNameChar(int c) ;
@@ -445,6 +461,7 @@ int ParseCompOp(int compOpExtension, struct P_STRING *a_sequence, int *an_compOp
 //
 // Passed:
 // - *a_blotval1:
+// - factOp:
 // - blotval2:
 //
 // Changed:
@@ -499,6 +516,21 @@ int ParseLogical2Op(struct P_STRING *a_sequence, int *a_criteriaOpFlags);
 // - RETURNED: Ok
 // - 1: unexpected problem; anomaly is raised
 int ParseInt1Op(struct P_STRING *a_sequence, int *an_int1Op);
+
+// Apply unary operator (on integer blotval) 
+//
+// Passed:
+// - int1Op:
+// - *a_blotval:
+//
+// Changed:
+// - *a_blotval1
+//
+// Ret:
+// - RETURNED: Ok
+// - -1: unexpected problem
+int ApplyInt1Op(int int1Op, gen_BLOTVAL *a_blotval) ;
+
 
 #define b_INT_CONSTANT b_TRUE
 
@@ -563,6 +595,21 @@ enum {
 //   + >=0 : corresponding int 2op 
 int ParseTermOp(struct P_STRING *a_sequence, int *an_termOp);
 
+// Apply term operator (on integer terms)  
+//
+// Passed:
+// - *a_blotval1:
+// - termOp:
+// - blotval2:
+//
+// Changed:
+// - *a_blotval1:
+//
+// Ret:
+// - RETURNED: Ok
+// - -1: unexpected problem
+int ApplyTermOp(gen_BLOTVAL *a_blotval1, int termOp, gen_BLOTVAL blotva2);
+
 // Terminal symbols (of <format> terminal symbol)
 enum {
              D__FORMAT,
@@ -573,7 +620,7 @@ enum {
             BE__FORMAT,
 } ;
 
-// Parse <format> 
+// Parse <format> ','  
 //
 // Passed:
 // - *a_sequence: before parsing
@@ -586,8 +633,24 @@ enum {
 // Ret:
 // - ANSWER__YES: Ok,
 // - ANSWER__NO: 'invalid format' error; abandon processing 
-int ParseFormat(struct P_STRING *a_sequence, int *ac_format, G_STRING_STUFF nc_abandonmentInfo);
+int ParseFormatAndSeparator(struct P_STRING *a_sequence, int *ac_format,
+  G_STRING_STUFF nc_abandonmentInfo);
 
+// Apply format on surrogate
+// 
+// Passed:
+// - format:
+// - blotexValue:
+// 
+// Changed:
+// - c_surrogate: only significant if no abandon
+// - nc_abandonmentInfo: only significant if abandon 
+// 
+// Ret:
+// - ANSWER__YES: Ok,
+// - ANSWER__NO: mismatch between format and blotex; abandon processing 
+int ApplyFormat(int format, struct BLOTEX_VALUE blotexValue, G_STRING_STUFF c_surrogate,
+  G_STRING_STUFF nc_abandonmentInfo) ;
 
 // Parse blottabs label  
 //
@@ -644,6 +707,8 @@ int ParseAndComputeSimpleBlotvarReference(struct P_STRING *a_sequence,
 int ParseAndComputeLValueBlotregOps(       
   struct P_STRING *a_sequence, struct P_STRING blotregName, g_BLOTREG_HANDLE n_blotregHandle,
   struct BLOTVAR_REFERENCE *ac_blotvarReference, int *ac_lValueAs, G_STRING_STUFF nc_abandonmentInfo) ;
+
+
 
 
 

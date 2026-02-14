@@ -52,19 +52,25 @@ const struct P_STRING *ap_aTrivialEmptyPString ;
 #define UNDEFINED_P_STRING { (const char*)UNDEFINED } 
 
 
-// Establish (regular) string portion.
+// Assign (regular) string portion.
 // 
 // Passed:
 // - p_string: raw string (pointer)
 // - n_length: 
 //   + >= 0: raw string length (may include '\0' chars)
 //   + -1 special value: '\0'-terminated C string
+// 
+// Ret:
+// assigned string portion
 struct P_STRING o_PString2(const char *p_string, int n_length) ;
 
-// Establish (regular) string portion.
+// Assign (regular) string portion.
 // 
 // Passed:
 // - p_cString: '\0'-terminated C-string (pointer)
+// 
+// Ret:
+// assigned string portion
 struct P_STRING o_PString(const char *p_cString) ;
 
 

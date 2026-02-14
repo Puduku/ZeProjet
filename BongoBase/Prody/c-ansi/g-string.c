@@ -226,7 +226,7 @@ static int GStringsDisengage(void *r_handle,  char *r_greenItemStuff) {
 // - m_bareGKey:
 // - m_gKeysComparison:
 // - ap_gKey:
-#define m_ASSIGN_BARE_G_KEY__G_KEY(/*union BARE_G_KEY*/ m_bareGKey,\
+#define m_BARE_G_KEY__G_KEY(/*union BARE_G_KEY*/ m_bareGKey,\
   /*int*/ m_gKeysComparison,  /*const struct G_KEY* */ ap_gKey) {\
   m_ASSERT((ap_gKey)->gKeysComparison == m_gKeysComparison)\
   m_bareGKey = ap_gKey->bare;\
@@ -238,7 +238,7 @@ static int GStringsDisengage(void *r_handle,  char *r_greenItemStuff) {
 // - p_gStringStuff:
 // - c_pStringIntrinsicValueFunction:
 // - cpr_pStringIntrinsicValueFunctionHandle:
-#define m_ASSIGN_BARE_G_KEY__G_STRING(/*union BARE_G_KEY*/m_bareGKey, /*int*/gKeysComparison,\
+#define m_BARE_G_KEY__G_STRING(/*union BARE_G_KEY*/m_bareGKey, /*int*/gKeysComparison,\
   /*G_STRING_STUFF*/ p_gStringStuff,\
   /*P_STRING_INTRINSIC_VALUE_FUNCTION*/c_pStringIntrinsicValueFunction,\
   /*void* */cpr_pStringIntrinsicValueFunctionHandle) {\
@@ -278,7 +278,7 @@ m_DIGGY_INFO("indexLabel=%d keyRank=%d",indexLabel,keyRank)
   union BARE_G_KEY aBareGKey ;
   { G_STRING_STUFF p_aGStringStuff = (G_STRING_STUFF) pr_aGreenItemStuff +
       ap_keySettings->gStringSetElement;
-    m_ASSIGN_BARE_G_KEY__G_STRING(aBareGKey,  ap_keySettings->gKeysComparison, p_aGStringStuff,
+    m_BARE_G_KEY__G_STRING(aBareGKey,  ap_keySettings->gKeysComparison, p_aGStringStuff,
       ap_keySettings->select.intrinsicValueComparison.pStringIntrinsicValueFunction,
       ap_keySettings->select.intrinsicValueComparison.pr_pStringIntrinsicValueFunctionHandle);
   } // G_STRING_STUFF
@@ -288,12 +288,12 @@ m_DIGGY_INFO("indexLabel=%d keyRank=%d",indexLabel,keyRank)
   if (npr_bGreenItemStuff != NULL) {
     G_STRING_STUFF p_bGStringStuff = (G_STRING_STUFF) npr_bGreenItemStuff + 
       ap_keySettings->gStringSetElement;
-    m_ASSIGN_BARE_G_KEY__G_STRING(bBareGKey,  ap_keySettings->gKeysComparison, p_bGStringStuff,
+    m_BARE_G_KEY__G_STRING(bBareGKey,  ap_keySettings->gKeysComparison, p_bGStringStuff,
       ap_keySettings->select.intrinsicValueComparison.pStringIntrinsicValueFunction,
       ap_keySettings->select.intrinsicValueComparison.pr_pStringIntrinsicValueFunctionHandle);
   } else {
     const struct G_KEY *ap_bGKey = ((const struct G_KEY *)cpr_bKeys) + keyRank;
-    m_ASSIGN_BARE_G_KEY__G_KEY(bBareGKey,  ap_keySettings->gKeysComparison,  ap_bGKey)
+    m_BARE_G_KEY__G_KEY(bBareGKey,  ap_keySettings->gKeysComparison,  ap_bGKey)
   } // if
   
   // Compare bare keys:

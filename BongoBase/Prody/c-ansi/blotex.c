@@ -626,17 +626,7 @@ m_DIGGY_VAR_P(cn_blotregHandle)
 
   if (n_int1Op >= 0) {
     if (ac_blotexAtomValue->asValue != AS__VALUE_INT) m_ABANDON(EXPECT_INTEX__ABANDONMENT_CAUSE)
-    switch (n_int1Op) {
-    break; case NOT__INT_1OP:
-      if (ac_blotexAtomValue->select.c_blotval == TRUE__BLOTVAL0)
-        ac_blotexAtomValue->select.c_blotval = FALSE__BLOTVAL;
-      else ac_blotexAtomValue->select.c_blotval = TRUE__BLOTVAL0;
-    break; case PLUS__INT_1OP:
-    break; case MINUS__INT_1OP:
-      ac_blotexAtomValue->select.c_blotval = -(ac_blotexAtomValue->select.c_blotval);
-    break; default:
-      m_RAISE(ANOMALY__VALUE__D,n_int1Op)
-    } // switch
+    m_TRACK_IF(ApplyInt1Op(n_int1Op, &ac_blotexAtomValue->select.c_blotval) != RETURNED) 
   } // if 
 
   m_DIGGY_RETURN(ANSWER__YES)
@@ -728,20 +718,8 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
     m_CHECK_ABANDON(BlotexlibExecutorParseAndComputeIntexTerm(handle,a_sequence,b_FALSE0, &intexTermValue,
       nc_abandonmentInfo))
     m_ASSERT(intexTermValue.asValue == AS__VALUE_INT)
-    switch (n_termOp) {
-    case ADD__TERM_OP:
-      a_intexValue->select.c_blotval += intexTermValue.select.c_blotval;
-    break; case SUBTRACT__TERM_OP:
-      a_intexValue->select.c_blotval -= intexTermValue.select.c_blotval;
-    break; case AND__TERM_OP:
-      a_intexValue->select.c_blotval = a_intexValue->select.c_blotval && 
-        intexTermValue.select.c_blotval;
-    break; case OR__TERM_OP:
-      a_intexValue->select.c_blotval = a_intexValue->select.c_blotval || 
-        intexTermValue.select.c_blotval;
-    break; default:
-      m_RAISE(ANOMALY__VALUE__D,n_termOp) 
-    } // switch
+    m_TRACK_IF(ApplyTermOp(&a_intexValue->select.c_blotval,n_termOp,intexTermValue.select.c_blotval)
+      != RETURNED)
   } // while 
 
   m_DIGGY_RETURN(ANSWER__YES)
@@ -995,44 +973,15 @@ static inline int m_BlotexlibExecutorExecuteCFunctionOutputF(BLOTEXLIB_EXECUTOR_
   m_DIGGY_BOLLARD()
   m_TRACK_IF(GStringsClear(handle->h_workingGStringsHandle,b_LIGHT_CLEAR) < 0)
   int n_format = -1;
-  m_CHECK_ABANDON(ParseFormat(&arguments,&n_format,nc_abandonmentInfo))
+  m_CHECK_ABANDON(ParseFormatAndSeparator(&arguments,&n_format,nc_abandonmentInfo))
      
-  m_PREPARE_ABANDON(&arguments, "OutputF") 
-  m_PParsePassSpaces(&arguments,NULL);
-  struct P_STRING lexeme = UNDEFINED_P_STRING;
-  PParsePassSingleChar(&arguments,NULL,',',&lexeme);
-  if (b_EMPTY_P_STRING(lexeme)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
-  m_PParsePassSpaces(&arguments,NULL);
   struct BLOTEX_VALUE c_blotexValue = UNDEFINED_BLOTEX_VALUE;
   m_CHECK_ABANDON(BlotexlibExecutorParseAndComputeBlotex(handle,&arguments,&c_blotexValue,
     nc_abandonmentInfo))
 
-  m_PParsePassSpaces(&arguments,NULL);
-  if (!b_EMPTY_P_STRING(arguments)) m_ABANDON(NOT_PARSABLE__ABANDONMENT_CAUSE)
+  m_CHECK_ABANDON(ParseEndOfSequence(&arguments,nc_abandonmentInfo))
 
-  switch (n_format) {
-  case D__FORMAT:
-    if (c_blotexValue.asValue != AS__VALUE_INT) m_ABANDON(EXPECT_INTEX__ABANDONMENT_CAUSE)
-    GStringPrintf(c_surrogate,0,"%d", c_blotexValue.select.c_blotval);
-  break; case LS__FORMAT:
-    if (c_blotexValue.asValue != AS__VALUE_STR) m_ABANDON(EXPECT_STREX__ABANDONMENT_CAUSE)
-    GStringPrintf(c_surrogate,0,FMT_P_STRING,m_P_STRING_2_FMT_ARGS(
-      c_blotexValue.select.c_strex.v_str));
-  break; case LX__FORMAT:
-    if (c_blotexValue.asValue != AS__VALUE_INT) m_ABANDON(EXPECT_INTEX__ABANDONMENT_CAUSE)
-    GStringPrintf(c_surrogate,0,"%x",c_blotexValue.select.c_blotval);
-  break; case UX__FORMAT:
-    if (c_blotexValue.asValue != AS__VALUE_INT) m_ABANDON(EXPECT_INTEX__ABANDONMENT_CAUSE)
-    GStringPrintf(c_surrogate,0,"%X", c_blotexValue.select.c_blotval);
-  break; case LE__FORMAT:
-    if (c_blotexValue.asValue != AS__VALUE_INT) m_ABANDON(EXPECT_INTEX__ABANDONMENT_CAUSE)
-m_RAISE(ANOMALY__NOT_AVAILABLE)
-  break; case BE__FORMAT:
-    if (c_blotexValue.asValue != AS__VALUE_INT) m_ABANDON(EXPECT_INTEX__ABANDONMENT_CAUSE)
-m_RAISE(ANOMALY__NOT_AVAILABLE)
-  break; default:
-    m_RAISE(ANOMALY__VALUE__D,n_format)
-  } // switch
+  m_CHECK_ABANDON(ApplyFormat(n_format,c_blotexValue,c_surrogate,nc_abandonmentInfo))
 
   *ac_blotval = TRUE__BLOTVAL0;
   m_DIGGY_RETURN(ANSWER__YES)
