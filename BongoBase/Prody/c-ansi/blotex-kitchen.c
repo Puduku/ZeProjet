@@ -168,6 +168,16 @@ int ConcatenateStrexValue(G_STRINGS_HANDLE workingGStringsHandle,
 // ================================= 
 
 // See .h 
+int ParseExistingSequence(struct P_STRING *a_sequence,const char *p_sequenceType,
+  G_STRING_STUFF nc_abandonmentInfo) {
+  m_DIGGY_BOLLARD()
+  m_PREPARE_ABANDON(a_sequence,p_sequenceType)
+  m_PParsePassSpaces(a_sequence,NULL);
+  if (b_EMPTY_P_STRING(*a_sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
+  m_DIGGY_RETURN(ANSWER__YES) 
+} // ParseExistingSequence
+
+// See .h 
 int ParseEndOfSequence(struct P_STRING *a_sequence, G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
   m_PParsePassSpaces(a_sequence,NULL);
@@ -507,14 +517,14 @@ int ApplyInt1Op(int int1Op, gen_BLOTVAL *a_blotval) {
 } // Int1OpAs
 
 // See .h
-int ParseIntConstant(struct P_STRING *a_sequence, G_STRINGS_HANDLE workingGStringsHandle,
-  char *ab_intConstant, struct BLOTEX_VALUE *ac_blotexValue) {
+int ParseIntConstant(struct P_STRING *a_sequence, char *ab_parsed,
+  struct BLOTEX_VALUE *ac_blotexValue) {
   m_DIGGY_BOLLARD()
   struct P_STRING lexeme = UNDEFINED_P_STRING;
   gen_BLOTVAL c_blotval = UNDEFINED;
   PParseGenericInteger(a_sequence,&c_blotval,&lexeme);
-  if ((*ab_intConstant = !b_EMPTY_P_STRING(lexeme))) m_TRACK_IF(SetBlotexValue(
-    workingGStringsHandle,ac_blotexValue,AS__VALUE_INT, c_blotval, (const struct P_STRING*) UNDEFINED,
+  if ((*ab_parsed = !b_EMPTY_P_STRING(lexeme))) m_TRACK_IF(SetBlotexValue(
+    (G_STRINGS_HANDLE)UNDEFINED,ac_blotexValue,AS__VALUE_INT, c_blotval, (const struct P_STRING*) UNDEFINED,
     (char)UNDEFINED) != RETURNED)
 
   m_DIGGY_RETURN(RETURNED)
@@ -522,12 +532,12 @@ int ParseIntConstant(struct P_STRING *a_sequence, G_STRINGS_HANDLE workingGStrin
 
 // See .h
 int ParseStrConstant(struct P_STRING *a_sequence, G_STRINGS_HANDLE workingGStringsHandle,
-  char *acb_strConstant, struct BLOTEX_VALUE *acc_blotexValue, G_STRING_STUFF nc_abandonmentInfo) {
+  char *acb_parsed, struct BLOTEX_VALUE *acc_blotexValue, G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
   struct P_STRING lexeme = UNDEFINED_P_STRING;
   m_PREPARE_ABANDON(a_sequence, "<str constant>")
   PParsePassSingleChar(a_sequence,NULL,'"',&lexeme);
-  if ((*acb_strConstant = !b_EMPTY_P_STRING(lexeme))) { // <str constant> ... 
+  if ((*acb_parsed = !b_EMPTY_P_STRING(lexeme))) { // <str constant> ... 
     PParsePassChars(a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_TILL,NULL,'"', &lexeme);
     if (b_EMPTY_P_STRING(*a_sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
     PParseOffset(a_sequence,1,NULL);
@@ -536,6 +546,45 @@ int ParseStrConstant(struct P_STRING *a_sequence, G_STRINGS_HANDLE workingGStrin
   } // if 
   m_DIGGY_RETURN(ANSWER__YES)
 } // ParseStrConstant
+
+// See .h
+int ProbeBlotexAtom(struct P_STRING *a_sequence,G_STRINGS_HANDLE workingGStringsHandle, 
+  int *ac_probedBlotexAtom, struct BLOTEX_VALUE *acc_blotexAtomValue,G_STRING_STUFF nc_abandonmentInfo) { 
+  m_DIGGY_BOLLARD()
+  char b_parsed = (char) UNDEFINED; 
+  m_TRACK_IF(ParseIntConstant(a_sequence, &b_parsed, acc_blotexAtomValue) != RETURNED)
+  *ac_probedBlotexAtom = CONSTANT__PROBED_BLOTEX_ATOM; // a priori
+  if (!b_parsed) {
+    m_CHECK_ABANDON(ParseStrConstant(a_sequence,workingGStringsHandle, &b_parsed,
+      acc_blotexAtomValue,nc_abandonmentInfo))
+    if (!b_parsed) {
+      struct P_STRING lexeme = UNDEFINED_P_STRING;
+      PParsePassSingleChar(a_sequence,NULL,'(',&lexeme);
+      if (!b_EMPTY_P_STRING(lexeme)) *ac_probedBlotexAtom = BLOTEX__PROBED_BLOTEX_ATOM;
+      else *ac_probedBlotexAtom = OTHER__PROBED_BLOTEX_ATOM; 
+    } // if 
+  } // if 
+  m_DIGGY_RETURN(ANSWER__YES) 
+} // ProbeBlotexAtom
+
+// See .h
+int ParseBlotexAtomBlotexEnd(struct P_STRING *a_sequence,G_STRING_STUFF nc_abandonmentInfo){
+  m_DIGGY_BOLLARD()
+  struct P_STRING lexeme = UNDEFINED_P_STRING;
+  m_PREPARE_ABANDON(a_sequence, "<intex atom> | <strex atom>")
+  PParsePassSingleChar(a_sequence,NULL,')',&lexeme);
+  if (b_EMPTY_P_STRING(lexeme)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE) 
+  m_DIGGY_RETURN(ANSWER__YES) 
+} // ParseBlotexAtomBlotexEnd
+
+
+// See .h
+char ob_ParseOpIndicator(struct P_STRING *a_sequence) {
+  m_DIGGY_BOLLARD()
+  struct P_STRING lexeme = UNDEFINED_P_STRING;
+  PParsePassSingleChar(a_sequence,NULL,'?',&lexeme);
+  m_DIGGY_RETURN(!b_EMPTY_P_STRING(lexeme))
+} // ob_ParseOpIndicator
 
 
 // See .h

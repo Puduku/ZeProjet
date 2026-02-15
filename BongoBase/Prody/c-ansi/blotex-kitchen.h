@@ -260,7 +260,24 @@ typedef int (*UPDATE_BLOTTAB_SPOT_FUNCTION)(
 // Parsing blot expressions: helpers 
 // ================================= 
 
-// Ensure the sequence is fully parsed.
+// Ensure the sequence is NOT yet fully parsed (after elimination of white spaces).
+//
+// Passed:
+// - *a_sequence: before parsing
+// - p_sequenceType:
+//
+// Changed:
+// - *a_sequence: after parsing 
+// - nc_abandonmentInfo: only significant if abandon
+// 
+// Ret: parsed successfully ? 
+// - ANSWER__YES: Ok,
+// - ANSWER__NO: empty sequence; abandon processing 
+// - 1: unexpected problem; anomaly is raised
+int ParseExistingSequence(struct P_STRING *a_sequence, const char *p_sequenceType,
+  G_STRING_STUFF nc_abandonmentInfo) ;
+
+// Ensure the sequence is fully parsed (after elimination of white spaces).
 //
 // Passed:
 // - *a_sequence: before parsing
@@ -532,31 +549,27 @@ int ParseInt1Op(struct P_STRING *a_sequence, int *an_int1Op);
 int ApplyInt1Op(int int1Op, gen_BLOTVAL *a_blotval) ;
 
 
-#define b_INT_CONSTANT b_TRUE
-
 // Passed:
 // - *a_sequence: expect <int constant>
 //
 // Changed:
 // - *a_sequence: after parsing 
-// - *ab_intConstant:
+// - *ab_parsed:
 // - *acc_blotexValue:
 //
 // Ret: 
 // - RETURNED: Ok,
 // - -1: unexpected problem
-int ParseIntConstant(struct P_STRING *a_sequence, G_STRINGS_HANDLE workingGStringsHandle,
-  char *ab_intConstant, struct BLOTEX_VALUE *ac_blotexValue) ;
+int ParseIntConstant(struct P_STRING *a_sequence, char *ab_parsed,
+  struct BLOTEX_VALUE *ac_blotexValue) ;
 
-
-#define b_STR_CONSTANT b_TRUE
 
 // Passed:
 // - *a_sequence: expect <str constant>
 //
 // Changed:
 // - *a_sequence: after parsing 
-// - *acb_strConstant:
+// - *acb_parsed:
 // - *acc_blotexValue:
 // - nc_abandonmentInfo: only significant if abandon 
 //
@@ -565,7 +578,48 @@ int ParseIntConstant(struct P_STRING *a_sequence, G_STRINGS_HANDLE workingGStrin
 // - ANSWER__NO: 'syntax' error; abandon processing 
 // - -1: unexpected problem
 int ParseStrConstant(struct P_STRING *a_sequence, G_STRINGS_HANDLE workingGStringsHandle,
-  char *acb_strConstant, struct BLOTEX_VALUE *acc_blotexValue, G_STRING_STUFF nc_abandonmentInfo) ;
+  char *acb_parsed, struct BLOTEX_VALUE *acc_blotexValue, G_STRING_STUFF nc_abandonmentInfo) ;
+
+// Passed:
+// - *a_sequence: before parsing
+// - workingGStringsHandle: 
+//
+// Changed:
+// - *a_sequence: after parsing 
+// - *ac_probedBlotexAtom: only significant if "success"
+// - *acc_blotexAtomValue: only significant if "success": constant case
+// - nc_abandonmentInfo: 
+//
+// Ret: Probed successfully ? 
+// - ANSWER__YES: Ok,
+// - ANSWER__NO: 'syntax' 'not found' error; abandon processing 
+// - -1: unexpected problem
+int ProbeBlotexAtom(struct P_STRING *a_sequence,G_STRINGS_HANDLE workingGStringsHandle, 
+  int *ac_probedBlotexAtom, struct BLOTEX_VALUE *acc_blotexAtomValue,G_STRING_STUFF nc_abandonmentInfo) ; 
+
+// Passed:
+// - *a_sequence: before parsing
+//
+// Changed:
+// - *a_sequence: after parsing 
+// - nc_abandonmentInfo: 
+//
+// Ret: Probed successfully ? 
+// - ANSWER__YES: Ok,
+// - ANSWER__NO: 'syntax' error; abandon processing 
+// - -1: unexpected problem
+int ParseBlotexAtomBlotexEnd(struct P_STRING *a_sequence,G_STRING_STUFF nc_abandonmentInfo);
+
+// Parse operation indicator 
+//
+// Passed:
+// - *a_sequence:
+//
+// Changed:
+// - *a_sequence: after parsing 
+//
+// Ret: Parsed ? (TRUE/FALSE) 
+char ob_ParseOpIndicator(struct P_STRING *a_sequence) ;
 
 
 // Terminal symbols (of <int 1op> terminal symbol)
@@ -690,7 +744,6 @@ int ParseAndComputeSimpleBlotvarReference(struct P_STRING *a_sequence,
 // Expect <blotreg ref op set int> | <blotreg ref op set str> 
 //
 // Passed:
-// - handle: 
 // - *a_sequence: before parsing
 // - blotregName: register name
 //
@@ -704,12 +757,16 @@ int ParseAndComputeSimpleBlotvarReference(struct P_STRING *a_sequence,
 // - ANSWER__YES: Ok,
 // - ANSWER__NO: 'syntax' 'not found' error; abandon processing 
 // - -1: unexpected problem
-int ParseAndComputeLValueBlotregOps(       
-  struct P_STRING *a_sequence, struct P_STRING blotregName, g_BLOTREG_HANDLE n_blotregHandle,
-  struct BLOTVAR_REFERENCE *ac_blotvarReference, int *ac_lValueAs, G_STRING_STUFF nc_abandonmentInfo) ;
+int ParseAndComputeLValueBlotregOps(struct P_STRING *a_sequence, struct P_STRING blotregName,
+  g_BLOTREG_HANDLE n_blotregHandle, struct BLOTVAR_REFERENCE *ac_blotvarReference, int *ac_lValueAs,
+  G_STRING_STUFF nc_abandonmentInfo) ;
 
 
-
+enum {
+  CONSTANT__PROBED_BLOTEX_ATOM,
+  BLOTEX__PROBED_BLOTEX_ATOM, // '(' ...
+  OTHER__PROBED_BLOTEX_ATOM,
+} ;
 
 
 #endif // __C_ANSI_BLOTEX_KITCHEN_H_INCLUDED__
