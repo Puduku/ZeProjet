@@ -560,16 +560,11 @@ static int BlotexlibExecutorProbeBlotexAtom(BLOTEXLIB_EXECUTOR_HANDLE handle,
   G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD_S()
 
-  m_PREPARE_ABANDON(a_sequence, "<intex atom> | <strex atom>") 
-  m_CHECK_ABANDON(ParseExistingSequence(a_sequence,"<intex atom> | <strex atom>",
-    nc_abandonmentInfo)) 
-
-  int n_int1Op = -1; // a priori
-  m_TRACK_IF(ParseInt1Op(a_sequence, &n_int1Op) != RETURNED) 
+  int n_int1Op = UNDEFINED; 
 
 m_DIGGY_VAR_P_STRING(*a_sequence)
   int c_probedBlotexAtom = UNDEFINED;
-  m_CHECK_ABANDON(ProbeBlotexAtom(a_sequence,handle->h_workingGStringsHandle,
+  m_CHECK_ABANDON(ProbeBlotexAtom(a_sequence,handle->h_workingGStringsHandle,&n_int1Op,
     &c_probedBlotexAtom, ac_blotexAtomValue,nc_abandonmentInfo))
   switch (c_probedBlotexAtom) {
   case CONSTANT__PROBED_BLOTEX_ATOM: 
@@ -610,10 +605,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
     m_RAISE(ANOMALY__VALUE__D,c_probedBlotexAtom)
   } // switch
 
-  if (n_int1Op >= 0) {
-    if (ac_blotexAtomValue->asValue != AS__VALUE_INT) m_ABANDON(EXPECT_INTEX__ABANDONMENT_CAUSE)
-    m_TRACK_IF(ApplyInt1Op(n_int1Op, &ac_blotexAtomValue->select.c_blotval) != RETURNED) 
-  } // if 
+  m_CHECK_ABANDON(ApplyInt1Op(n_int1Op, ac_blotexAtomValue,nc_abandonmentInfo))
 
   m_DIGGY_RETURN(ANSWER__YES)
 } // BlotexlibExecutorProbeBlotexAtom

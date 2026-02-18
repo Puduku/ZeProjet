@@ -499,22 +499,25 @@ int ParseInt1Op(struct P_STRING *a_sequence, int *an_int1Op) {
 } // ParseInt1Op
 
 // See .h
-int ApplyInt1Op(int int1Op, gen_BLOTVAL *a_blotval) {
+int ApplyInt1Op(int n_int1Op,struct BLOTEX_VALUE *ac_blotexValue,G_STRING_STUFF nc_abandonmentInfo){
   m_DIGGY_BOLLARD()
-  switch (int1Op) {
-  break; case NOT__INT_1OP:
-    if (*a_blotval == TRUE__BLOTVAL0)
-      *a_blotval = FALSE__BLOTVAL;
-    else *a_blotval = TRUE__BLOTVAL0;
-  break; case PLUS__INT_1OP:
-  break; case MINUS__INT_1OP:
-    *a_blotval = -(*a_blotval);
-  break; default:
-     m_RAISE(ANOMALY__VALUE__D,int1Op)
-  } // switch
+  if (n_int1Op >= 0) {
+    if (ac_blotexValue->asValue != AS__VALUE_INT) m_ABANDON_S(EXPECT_INTEX__ABANDONMENT_CAUSE)
+    switch (n_int1Op) {
+    break; case NOT__INT_1OP:
+      if (ac_blotexValue->select.c_blotval == TRUE__BLOTVAL0)
+        ac_blotexValue->select.c_blotval = FALSE__BLOTVAL;
+      else ac_blotexValue->select.c_blotval = TRUE__BLOTVAL0;
+    break; case PLUS__INT_1OP:
+    break; case MINUS__INT_1OP:
+      ac_blotexValue->select.c_blotval = -(ac_blotexValue->select.c_blotval);
+    break; default:
+      m_RAISE(ANOMALY__VALUE__D,n_int1Op)
+    } // switch
+  } // if
 
   m_DIGGY_RETURN(RETURNED)
-} // Int1OpAs
+} // ApplyInt1Op 
 
 // See .h
 int ParseIntConstant(struct P_STRING *a_sequence, char *ab_parsed,
@@ -548,9 +551,17 @@ int ParseStrConstant(struct P_STRING *a_sequence, G_STRINGS_HANDLE workingGStrin
 } // ParseStrConstant
 
 // See .h
-int ProbeBlotexAtom(struct P_STRING *a_sequence,G_STRINGS_HANDLE workingGStringsHandle, 
-  int *ac_probedBlotexAtom, struct BLOTEX_VALUE *acc_blotexAtomValue,G_STRING_STUFF nc_abandonmentInfo) { 
+int ProbeBlotexAtom(struct P_STRING *a_sequence,G_STRINGS_HANDLE workingGStringsHandle,
+  int *acn_int1Op, int *ac_probedBlotexAtom, struct BLOTEX_VALUE *acc_blotexAtomValue,
+  G_STRING_STUFF nc_abandonmentInfo) { 
   m_DIGGY_BOLLARD()
+
+  //m_PREPARE_ABANDON(a_sequence, "<intex atom> | <strex atom>")
+  m_CHECK_ABANDON(ParseExistingSequence(a_sequence,"<intex atom> | <strex atom>",
+    nc_abandonmentInfo))
+
+  m_TRACK_IF(ParseInt1Op(a_sequence, acn_int1Op) != RETURNED)
+
   char b_parsed = (char) UNDEFINED; 
   m_TRACK_IF(ParseIntConstant(a_sequence, &b_parsed, acc_blotexAtomValue) != RETURNED)
   *ac_probedBlotexAtom = CONSTANT__PROBED_BLOTEX_ATOM; // a priori

@@ -534,19 +534,21 @@ int ParseLogical2Op(struct P_STRING *a_sequence, int *a_criteriaOpFlags);
 // - 1: unexpected problem; anomaly is raised
 int ParseInt1Op(struct P_STRING *a_sequence, int *an_int1Op);
 
-// Apply unary operator (on integer blotval) 
+// Apply unary operator (on blotex atom value, when applicable, i.e int value) 
 //
 // Passed:
-// - int1Op:
-// - *a_blotval:
+// - n_int1Op: -1 special value: no unary operator to apply (see ProbeBlotexAtom()) 
+// - *ac_blotexValue:
 //
 // Changed:
-// - *a_blotval1
+// - *ac_blotvalValue (when successful)
+// - nc_abandonmentInfo (when not successful)
 //
-// Ret:
-// - RETURNED: Ok
+// Ret: applied succesfully ?
+// - ANSWER__YES: Ok,
+// - ANSWER__NO: 'expect int' error; abandon processing 
 // - -1: unexpected problem
-int ApplyInt1Op(int int1Op, gen_BLOTVAL *a_blotval) ;
+int ApplyInt1Op(int n_int1Op,struct BLOTEX_VALUE *ac_blotexValue,G_STRING_STUFF nc_abandonmentInfo);
 
 
 // Passed:
@@ -586,6 +588,7 @@ int ParseStrConstant(struct P_STRING *a_sequence, G_STRINGS_HANDLE workingGStrin
 //
 // Changed:
 // - *a_sequence: after parsing 
+// - *acn_int1Op: only significant if "success"
 // - *ac_probedBlotexAtom: only significant if "success"
 // - *acc_blotexAtomValue: only significant if "success": constant case
 // - nc_abandonmentInfo: 
@@ -594,8 +597,9 @@ int ParseStrConstant(struct P_STRING *a_sequence, G_STRINGS_HANDLE workingGStrin
 // - ANSWER__YES: Ok,
 // - ANSWER__NO: 'syntax' 'not found' error; abandon processing 
 // - -1: unexpected problem
-int ProbeBlotexAtom(struct P_STRING *a_sequence,G_STRINGS_HANDLE workingGStringsHandle, 
-  int *ac_probedBlotexAtom, struct BLOTEX_VALUE *acc_blotexAtomValue,G_STRING_STUFF nc_abandonmentInfo) ; 
+int ProbeBlotexAtom(struct P_STRING *a_sequence,G_STRINGS_HANDLE workingGStringsHandle,
+  int *acn_int1Op, int *ac_probedBlotexAtom, struct BLOTEX_VALUE *acc_blotexAtomValue,
+  G_STRING_STUFF nc_abandonmentInfo) ; 
 
 // Passed:
 // - *a_sequence: before parsing
@@ -620,6 +624,11 @@ int ParseBlotexAtomBlotexEnd(struct P_STRING *a_sequence,G_STRING_STUFF nc_aband
 //
 // Ret: Parsed ? (TRUE/FALSE) 
 char ob_ParseOpIndicator(struct P_STRING *a_sequence) ;
+
+
+
+
+
 
 
 // Terminal symbols (of <int 1op> terminal symbol)
