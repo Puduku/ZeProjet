@@ -169,7 +169,7 @@
 //     This ensures respect of clear (instanciation and) initialization / execution / destruction
 //     cycle.
 //   + Pure constructors and destructors. Constructors and destructors are two "special" methods of
-//     our objects; their objective is purely "technical" and must be clearly distinguished from
+//     our objects; their role is purely "technical" and must be clearly distinguished from
 //     other "functional" methods... Therefore, from a functional point of view, such methods may
 //     not fail. In practice, this means that the C functions which implement constructors and
 //     destructors always return the unary status "RETURNED"; any "technical" problem would give
@@ -252,5 +252,6 @@
 //    + More generally, avoid the pitfall of excessive dualisation of the truth. In particular, take 
 //      the time to consider the unary and ternary verities, which are most relevant in many 
 //      situations. (see also c-verities.topo, section "Verities in computing")
+
 
 
