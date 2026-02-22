@@ -376,7 +376,32 @@ int DelimitBlotregRequest(struct P_STRING *a_sequence, struct P_STRING *ac_blotr
 int ParseBlotregRequestAtom(struct P_STRING *a_sequence, int *ac_as, int *ac_indexSeekFlags,
   G_STRING_STUFF nc_abandonmentInfo) ;
 
+// Parse r-value blotreg select op.
+//
+// Passed:
+// - *a_sequence: before parsing
+//
+// Changed:
+// - *a_sequence: after parsing 
+//
+// Ret: select op parsed ? (TRUE/FALSE)
+char b_ParseRValueBlotregOpSelect(struct P_STRING *a_sequence); 
 
+
+// Parse r-value blotreg fetch ops.
+//
+// Passed:
+// - *a_sequence: before parsing
+//
+// Changed:
+// - *a_sequence: after parsing  
+// - *an_indexFetchFlags: (null if no other blotreg op)  
+// - *acn_as: (only significant if read blotreg op)  
+//
+// Ret: 
+// - RETURNED: Ok,
+// - 1: unexpected problem; anomaly is raised
+int ParseRValueBlotregFetchOps(struct P_STRING *a_sequence, int *an_indexFetchFlags, int *acn_as);
 
 
 // Interpret as ...  blotreg index
@@ -582,6 +607,12 @@ int ParseIntConstant(struct P_STRING *a_sequence, char *ab_parsed,
 int ParseStrConstant(struct P_STRING *a_sequence, G_STRINGS_HANDLE workingGStringsHandle,
   char *acb_parsed, struct BLOTEX_VALUE *acc_blotexValue, G_STRING_STUFF nc_abandonmentInfo) ;
 
+enum {
+  CONSTANT__PROBED_BLOTEX_ATOM,
+  BLOTEX__PROBED_BLOTEX_ATOM, // '(' ...
+  OTHER__PROBED_BLOTEX_ATOM,
+} ;
+
 // Passed:
 // - *a_sequence: before parsing
 // - workingGStringsHandle: 
@@ -608,13 +639,13 @@ int ProbeBlotexAtom(struct P_STRING *a_sequence,G_STRINGS_HANDLE workingGStrings
 // - *a_sequence: after parsing 
 // - nc_abandonmentInfo: 
 //
-// Ret: Probed successfully ? 
+// Ret: Parsed successfully ? 
 // - ANSWER__YES: Ok,
 // - ANSWER__NO: 'syntax' error; abandon processing 
 // - -1: unexpected problem
 int ParseBlotexAtomBlotexEnd(struct P_STRING *a_sequence,G_STRING_STUFF nc_abandonmentInfo);
 
-// Parse operation indicator 
+// Parse operations indicator 
 //
 // Passed:
 // - *a_sequence:
@@ -623,12 +654,7 @@ int ParseBlotexAtomBlotexEnd(struct P_STRING *a_sequence,G_STRING_STUFF nc_aband
 // - *a_sequence: after parsing 
 //
 // Ret: Parsed ? (TRUE/FALSE) 
-char ob_ParseOpIndicator(struct P_STRING *a_sequence) ;
-
-
-
-
-
+char b_ParseOpsIndicator(struct P_STRING *a_sequence) ;
 
 
 // Terminal symbols (of <int 1op> terminal symbol)
@@ -771,11 +797,18 @@ int ParseAndComputeLValueBlotregOps(struct P_STRING *a_sequence, struct P_STRING
   G_STRING_STUFF nc_abandonmentInfo) ;
 
 
-enum {
-  CONSTANT__PROBED_BLOTEX_ATOM,
-  BLOTEX__PROBED_BLOTEX_ATOM, // '(' ...
-  OTHER__PROBED_BLOTEX_ATOM,
-} ;
+// Parse assignation [ <blotex ref> ':=' ] <blotex>
+//
+// Passed:
+// - *a_sequence: before parsing
+//
+// Changed:
+// - *a_sequence: after parsing 
+// - *ac_subSequence: only significant if assignation
+//
+// Ret: Assignation ? (TRUE / FALSE) 
+char b_ParseBlotexAssignation(struct P_STRING *a_sequence, struct P_STRING *ac_subSequence) ; 
+
 
 
 #endif // __C_ANSI_BLOTEX_KITCHEN_H_INCLUDED__

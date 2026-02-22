@@ -266,7 +266,42 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
   } // if
 
   m_DIGGY_RETURN(ANSWER__YES)
-} // DelimitBlotregRequest
+} // ParseBlotregRequestAtom
+
+
+// See .h 
+char b_ParseRValueBlotregOpSelect(struct P_STRING *a_sequence) {
+  m_DIGGY_BOLLARD()
+  struct P_STRING lexeme;
+  m_PParsePassSpaces(a_sequence,NULL);
+  PParsePassSingleChar(a_sequence,NULL,':',&lexeme);
+  m_DIGGY_RETURN(!b_EMPTY_P_STRING(lexeme))
+} // b_ParseRValueBlotregOpSelect 
+
+// See .h 
+int ParseRValueBlotregFetchOps(struct P_STRING *a_sequence, int *an_indexFetchFlags, int *acn_as) {
+  m_DIGGY_BOLLARD()
+  *an_indexFetchFlags = -1; // No blotreg fetch op a priori 
+  struct P_STRING lexeme;
+  PParsePassSingleChar(a_sequence,NULL,'^',&lexeme);
+  if (!b_EMPTY_P_STRING(lexeme)) { // <blotreg op reset>...
+    *an_indexFetchFlags = INDEX_FETCH_FLAG__RESET;
+  } // if
+  PParsePassSingleChar(a_sequence,NULL,'+',&lexeme);
+  if (!b_EMPTY_P_STRING(lexeme)) { // <blotreg op next>...
+    if (*an_indexFetchFlags < 0) *an_indexFetchFlags = ALL_FLAGS_OFF0;
+    m_SET_FLAG_ON(*an_indexFetchFlags,INDEX_FETCH_FLAG__NEXT)
+  } // if
+  
+  *acn_as = -1; // No blotreg read/set op a priori  
+  PParsePassSingleChar(a_sequence,NULL,'=',&lexeme); 
+  if (!b_EMPTY_P_STRING(lexeme)) { // <blotreg op read int> | <blotreg op read str> (R-value)
+    // <blotreg ref op set int> | <blotreg ref op set str> (L-value)... 
+    m_TRACK_IF(ParseAs(!b_L_VALUE,a_sequence,acn_as) != RETURNED)
+    if (*an_indexFetchFlags < 0) *an_indexFetchFlags = ALL_FLAGS_OFF0;
+  } // if
+  m_DIGGY_RETURN(RETURNED)
+} // ParseRValueBlotregFetchOps
 
 
 // See .h 
@@ -590,12 +625,12 @@ int ParseBlotexAtomBlotexEnd(struct P_STRING *a_sequence,G_STRING_STUFF nc_aband
 
 
 // See .h
-char ob_ParseOpIndicator(struct P_STRING *a_sequence) {
+char b_ParseOpsIndicator(struct P_STRING *a_sequence) {
   m_DIGGY_BOLLARD()
   struct P_STRING lexeme = UNDEFINED_P_STRING;
   PParsePassSingleChar(a_sequence,NULL,'?',&lexeme);
   m_DIGGY_RETURN(!b_EMPTY_P_STRING(lexeme))
-} // ob_ParseOpIndicator
+} // b_ParseOpsIndicator
 
 
 // See .h
@@ -799,5 +834,20 @@ int ParseAndComputeLValueBlotregOps(
 
   m_DIGGY_RETURN(ANSWER__YES)
 } // ParseAndComputeLValueBlotregOps
+
+// See .h
+char b_ParseBlotexAssignation(struct P_STRING *a_sequence, struct P_STRING *ac_subSequence) {
+  m_DIGGY_BOLLARD()
+  PParseTillMatch(a_sequence,o_PString(":="),NULL,ac_subSequence); // TODO: improve; i.e: "joker" sequences???...
+  char b_assignation = !b_EMPTY_P_STRING(*a_sequence);
+  if (b_assignation) { 
+    PParseOffset(a_sequence,2,NULL);
+  } else { // NO assignation
+    *a_sequence = *ac_subSequence; 
+  } // if
+  m_PParsePassSpaces(a_sequence,NULL); // TODO: ag virer ???
+  
+  m_DIGGY_RETURN(b_assignation)
+} // b_ParseBlotexAssignation
 
 

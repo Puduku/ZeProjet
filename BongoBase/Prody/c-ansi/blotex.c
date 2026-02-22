@@ -384,7 +384,6 @@ static int BlotexlibExecutorParseAndComputeRValueBlotregOps(BLOTEXLIB_EXECUTOR_H
   struct P_STRING *a_sequence, struct P_STRING blotregName, g_BLOTREG_HANDLE n_blotregHandle,
   struct BLOTEX_VALUE *ac_blotexValue, G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
-  struct P_STRING lexeme;
 
   m_PREPARE_ABANDON(a_sequence, "<int blotreg ops> | <str blotreg ops>") 
 
@@ -392,31 +391,13 @@ static int BlotexlibExecutorParseAndComputeRValueBlotregOps(BLOTEXLIB_EXECUTOR_H
 
   m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle,ac_blotexValue, AS__VALUE_INT,TRUE__BLOTVAL0,
     (struct P_STRING*)UNDEFINED,(char)UNDEFINED) != RETURNED) // actually UNDEFINED 
-  int n_indexFetchFlags = -1; // a priori
-  m_PParsePassSpaces(a_sequence,NULL);
-
-  PParsePassSingleChar(a_sequence,NULL,':',&lexeme); 
-  if (!b_EMPTY_P_STRING(lexeme)) { // <blotreg op select>...
+  if (b_ParseRValueBlotregOpSelect(a_sequence)) { // <blotreg op select>...
     m_CHECK_ABANDON(m_BlotexlibExecutorParseAndComputeBlotregRequest(handle,a_sequence,n_blotregHandle,
       nc_abandonmentInfo)) 
   } // if
-  PParsePassSingleChar(a_sequence,NULL,'^',&lexeme);
-  if (!b_EMPTY_P_STRING(lexeme)) { // <blotreg op reset>...
-    n_indexFetchFlags = INDEX_FETCH_FLAG__RESET; 
-  } // if
-  PParsePassSingleChar(a_sequence,NULL,'+',&lexeme);
-  if (!b_EMPTY_P_STRING(lexeme)) { // <blotreg op next>...
-    if (n_indexFetchFlags < 0) n_indexFetchFlags = ALL_FLAGS_OFF0;
-    m_SET_FLAG_ON(n_indexFetchFlags,INDEX_FETCH_FLAG__NEXT)
-  } // if
-
-  int n_as = -1; // No blotreg read/set op a priori 
-  PParsePassSingleChar(a_sequence,NULL,'=',&lexeme); 
-  if (!b_EMPTY_P_STRING(lexeme)) { // <blotreg op read int> | <blotreg op read str> (R-value)
-    // <blotreg ref op set int> | <blotreg ref op set str> (L-value)... 
-    m_TRACK_IF(ParseAs(!b_L_VALUE,a_sequence,&n_as) != RETURNED)
-    if (n_indexFetchFlags < 0) n_indexFetchFlags = ALL_FLAGS_OFF0; 
-  } // if
+  int n_indexFetchFlags = UNDEFINED;
+  int cn_as = UNDEFINED; 
+  m_TRACK_IF(ParseRValueBlotregFetchOps(a_sequence,&n_indexFetchFlags,&cn_as) != RETURNED)
   
   if (n_indexFetchFlags < 0) {
     m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle,ac_blotexValue, AS__VALUE_INT,TRUE__BLOTVAL0,
@@ -431,7 +412,7 @@ m_DIGGY_VAR_INDEX_FETCH_FLAGS(n_indexFetchFlags)
     case RESULT__NOT_FOUND:
 m_ASSERT(nt_blotvarStuff == NULL)
     case RESULT__FOUND:
-      m_TRACK_IF(BlotvarAs2BlotexValue(nt_blotvarStuff,n_as,c_entry,
+      m_TRACK_IF(BlotvarAs2BlotexValue(nt_blotvarStuff,cn_as,c_entry,
         handle->h_workingGStringsHandle, ac_blotexValue) != RETURNED)
     break; default: m_TRACK()
     } // switch
@@ -579,7 +560,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
       g_BLOTREG_HANDLE cn_blotregHandle = (void*)UNDEFINED;
       m_TRACK_IF(BlotexlibExecutorParseAndComputeBlotregOrBlottabXName(handle,a_sequence, &n_blottabsLabel,
         &name, &cnr_blottabHandle,&cn_blotregHandle) != RETURNED) 
-      if (ob_ParseOpIndicator(a_sequence)) { 
+      if (b_ParseOpsIndicator(a_sequence)) { 
         if (n_blottabsLabel >= 0) { // <int blottabX ops> | <str blottabX ops> ...
           m_CHECK_ABANDON(handle->blottabExecutorImplementations[n_blottabsLabel].
             l_blotexlibExecutorParseAndComputeRValueBlottabOpsFunction(handle,b_OPS,a_sequence,
@@ -795,7 +776,6 @@ static inline int m_BlotexlibExecutorProbeBlotexRef(BLOTEXLIB_EXECUTOR_HANDLE ha
   struct BLOTTAB_SPOT_REFERENCE *acc_blottabSpotReference, G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD_S()
 m_DIGGY_VAR_P_STRING(*a_sequence) 
-  struct P_STRING lexeme = UNDEFINED_P_STRING;
 
   *acc_lValueAs = UNDEFINED;
 
@@ -804,8 +784,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
   g_BLOTREG_HANDLE cn_blotregHandle = (g_BLOTREG_HANDLE)UNDEFINED;
   m_TRACK_IF(BlotexlibExecutorParseAndComputeBlotregOrBlottabXName(handle,a_sequence,
     an_fieldReferenceBlottabsLabel,&name, &cnr_blottabHandle,&cn_blotregHandle) != RETURNED)
-  PParsePassSingleChar(a_sequence,NULL,'?',&lexeme);
-  if (!b_EMPTY_P_STRING(lexeme)) { 
+  if (b_ParseOpsIndicator(a_sequence)) { 
     if (*an_fieldReferenceBlottabsLabel >= 0) { // Parsing <int blottab ref> or <str blottab ref> ...
       m_CHECK_ABANDON(handle->blottabExecutorImplementations[*an_fieldReferenceBlottabsLabel].
         l_blotexlibExecutorParseAndComputeLValueBlottabSetOpFunction(handle,b_OPS,a_sequence,name,
@@ -833,7 +812,6 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
       } // if 
       m_CHECK_ABANDON(ParseAndComputeSimpleBlotvarReference(a_sequence, cn_blotregHandle,
         acc_blotvarReference, nc_abandonmentInfo))
-      m_PParsePassSpaces(a_sequence,NULL);
       // Expect <blotvar as int> | <blotvar id> | <blotvar as str> | <blotvar name>  
       m_CHECK_ABANDON(ParseAs(b_L_VALUE,a_sequence, acc_lValueAs))
     } // if
@@ -869,20 +847,15 @@ static inline int m_BlotexlibExecutorExecuteCFunctionEval(BLOTEXLIB_EXECUTOR_HAN
   int cc_lValueAs = UNDEFINED; // only significant with assignation of single blotvar/blotreg
 
   m_PREPARE_ABANDON(&arguments, "Eval") 
-  m_PParsePassSpaces(&arguments,NULL);
-  { struct P_STRING subSequence = UNDEFINED_P_STRING;
-    PParseTillMatch(&arguments,o_PString(":="),NULL, &subSequence); // TODO: improve; i.e: "joker" sequences???...
-    if (b_EMPTY_P_STRING(arguments)) arguments = subSequence; // No assignation
-    else { // Assignation 
+  { struct P_STRING c_subSequence = UNDEFINED_P_STRING;
+    if (b_ParseBlotexAssignation(&arguments, &c_subSequence)) {
       b_lValueReference = b_TRUE;
-      m_CHECK_ABANDON(m_BlotexlibExecutorProbeBlotexRef(handle,&subSequence, &n_fieldReferenceBlottabsLabel,
-        &cc_lValueBlotvarReference,&cc_lValueAs, &cc_lValueBlottabSpotReference, nc_abandonmentInfo))
-      m_PParsePassSpaces(&subSequence,NULL);
-      if (!b_EMPTY_P_STRING(subSequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
-      PParseOffset(&arguments,2,NULL);
-      m_PParsePassSpaces(&arguments,NULL);
+      m_CHECK_ABANDON(m_BlotexlibExecutorProbeBlotexRef(handle,&c_subSequence,
+        &n_fieldReferenceBlottabsLabel, &cc_lValueBlotvarReference,&cc_lValueAs,
+        &cc_lValueBlottabSpotReference, nc_abandonmentInfo))
+      m_CHECK_ABANDON(ParseEndOfSequence(&c_subSequence, nc_abandonmentInfo)) 
     } // if
-  } // subSequence
+  } // c_subSequence
 
   struct BLOTEX_VALUE c_blotexValue = UNDEFINED_BLOTEX_VALUE; 
   m_CHECK_ABANDON(BlotexlibExecutorParseAndComputeBlotex(handle,&arguments,&c_blotexValue,
