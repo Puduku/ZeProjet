@@ -492,8 +492,7 @@ m_DIGGY_VAR_P(a_name)
 
   ParseBlottabsLabel(a_sequence, an_blottabsLabel); 
   // Parse <entity> corresponding to blottab name:
-  PParsePassChars(a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_WHILE,IsEntityNameChar,
-    (char)UNDEFINED,a_name); 
+  o_ParseEntity(a_sequence,a_name);
 m_DIGGY_VAR_P_STRING(*a_name)
 m_DIGGY_VAR_D(*an_blottabsLabel)
   if (*an_blottabsLabel >= 0) {

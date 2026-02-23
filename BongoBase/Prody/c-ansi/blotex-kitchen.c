@@ -187,9 +187,21 @@ int ParseEndOfSequence(struct P_STRING *a_sequence, G_STRING_STUFF nc_abandonmen
 
 
 // IS_CHAR_FUNCTION:
-int IsEntityNameChar(int c) {
+// Recognize any character corresponding to <entity>
+static int IsEntityNameChar(int c) {
   return (c == '_' || isalnum(c));
 } // IsEntityNameChar 
+
+// See .h 
+int o_ParseEntity(struct P_STRING *a_sequence, struct P_STRING *a_entityName) {
+  m_DIGGY_BOLLARD()
+  m_PParsePassSpaces(a_sequence,NULL);
+  PParsePassChars(a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_WHILE,IsEntityNameChar,
+    (char)UNDEFINED,a_entityName); // <entity>
+  m_DIGGY_RETURN(RETURNED)
+} // o_ParseEntity
+
+
 
 
 #define  AS__ENTRY__XX "!#" 

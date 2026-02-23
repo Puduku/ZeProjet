@@ -128,9 +128,8 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
   *ac_asValue = UNDEFINED;
  
   m_PREPARE_ABANDON(a_sequence,"<entity> [ <<as value int>> | <<as value str>> ]")
-  m_PParsePassSpaces(a_sequence,NULL);
-  PParsePassChars(a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_WHILE,IsEntityNameChar,
-    (char)UNDEFINED,&fieldName); // <entity>
+  o_ParseEntity(a_sequence,&fieldName); 
+  
   m_TRACK_IF(ParseAsValue(a_sequence, ac_asValue) != RETURNED)  
   if (*ac_asValue == -1) *ac_asValue = AS__VALUE_INT;
 
@@ -460,9 +459,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
   do {
     m_ASSERT(++i < 10)
     s_blottabIndexFlags10[i] = ALL_FLAGS_OFF0;
-    m_PParsePassSpaces(&subSequence,NULL);
-    PParsePassChars(&subSequence,b_REGULAR_SCAN,b_PASS_CHARS_WHILE,IsEntityNameChar,
-      (char)UNDEFINED,s_names10 + i); // <entity>
+    o_ParseEntity(&subSequence,s_names10 + i);
 m_DIGGY_VAR_P_STRING(s_names10[i])
     m_TRACK_IF(ParseAsValue(&subSequence, &n_asValue) != RETURNED)  
 m_DIGGY_VAR_D(n_asValue)

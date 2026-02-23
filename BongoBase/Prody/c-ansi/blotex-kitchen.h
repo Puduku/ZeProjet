@@ -293,9 +293,20 @@ int ParseExistingSequence(struct P_STRING *a_sequence, const char *p_sequenceTyp
 int ParseEndOfSequence(struct P_STRING *a_sequence, G_STRING_STUFF nc_abandonmentInfo) ;
 
 
-// IS_CHAR_FUNCTION:
-// Recognize any character corresponding to <entity>
-int IsEntityNameChar(int c) ;
+
+// Parse entity name (may be empty)
+//
+// Passed:
+// - *a_sequence: before parsing
+//
+// Changed:
+// - *a_sequence: after parsing 
+// - *a_entityName:  
+// 
+// Ret:
+// - RETURNED: Ok
+int o_ParseEntity(struct P_STRING *a_sequence, struct P_STRING *a_entityName) ;
+
 
 #define b_L_VALUE b_TRUE
 #define b_R_VALUE b_FALSE0 
