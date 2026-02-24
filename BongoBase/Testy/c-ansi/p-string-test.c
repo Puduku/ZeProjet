@@ -284,7 +284,7 @@ static int TestsScanPStringTillMatch(void) {
   /*TO_CHAR_FUNCTION*/ n_toCharFunction,  /*int*/expectedOffset, b_expectLocated) {\
   struct P_STRING pString = o_PString2(p_string,n_length);\
   struct P_STRING subPString = o_PString2(p_subString,n_subLength);\
-  retScan = ScanPStringTillMatch(pString, subPString, n_toCharFunction);\
+  retScan = o_ScanPStringTillMatch(pString, subPString, n_toCharFunction);\
   m_ASSERT((expectedOffset) == (retScan - p_string)) \
   m_ASSERT(retScan <= pString.stop) \
   int emb_located = b_SCAN_P_STRING_LOCATED(pString, retScan);\

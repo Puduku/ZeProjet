@@ -26,7 +26,7 @@
 //
 // Ret:
 // - RETURNED
-int PParseSequence(struct P_STRING *a_sequence, const char* scanPtr, struct P_STRING* na_lexeme); 
+int o_PParseSequence(struct P_STRING *a_sequence, const char* scanPtr, struct P_STRING* na_lexeme); 
 
 // 2. PParsePass*() functions: pass specific characters
 
@@ -44,7 +44,7 @@ int PParseSequence(struct P_STRING *a_sequence, const char* scanPtr, struct P_ST
 //
 // Ret:
 // - RETURNED
-int PParsePassSingleChar(struct P_STRING *a_sequence, IS_CHAR_FUNCTION n_isCharFunction, char c_char,
+int o_PParsePassSingleChar(struct P_STRING *a_sequence, IS_CHAR_FUNCTION n_isCharFunction, char c_char,
   struct P_STRING* na_lexeme) ;
 
 // Parse a string portion sequence according to chars scanned by ScanPString() function. 
@@ -67,7 +67,7 @@ int PParsePassSingleChar(struct P_STRING *a_sequence, IS_CHAR_FUNCTION n_isCharF
 //
 // Ret:
 // - RETURNED
-int PParsePassChars(struct P_STRING* a_sequence, char b_regularScan, char b_passCharsTill,
+int o_PParsePassChars(struct P_STRING* a_sequence, char b_regularScan, char b_passCharsTill,
   IS_CHAR_FUNCTION n_isCharFunction, char c_char, struct P_STRING* na_lexeme) ;
 
 // Parse a string portion sequence : pass all white spaces... 
@@ -82,10 +82,10 @@ int PParsePassChars(struct P_STRING* a_sequence, char b_regularScan, char b_pass
 //
 // Ret:
 // - RETURNED
-static inline int m_PParsePassSpaces(struct P_STRING* a_sequence, struct P_STRING* na_lexeme) {
-  return PParsePassChars(a_sequence,b_REGULAR_SCAN, b_PASS_CHARS_WHILE,isspace,(char)UNDEFINED,
+static inline int om_PParsePassSpaces(struct P_STRING* a_sequence, struct P_STRING* na_lexeme) {
+  return o_PParsePassChars(a_sequence,b_REGULAR_SCAN, b_PASS_CHARS_WHILE,isspace,(char)UNDEFINED,
     na_lexeme);
-} // m_PParsePassSpaces
+} // om_PParsePassSpaces
 
 
 // 3. PParseMatch*() functions: pass matching tokens 
@@ -104,6 +104,7 @@ static inline int m_PParsePassSpaces(struct P_STRING* a_sequence, struct P_STRIN
 //
 // Ret:
 // - RETURNED
+// - -1 special value: anomaly is raised
 int PParseMatch(struct P_STRING* a_sequence, const struct P_STRING p_token,
   TO_CHAR_FUNCTION n_toCharFunction, struct P_STRING*  na_lexeme) ;
 
@@ -129,6 +130,7 @@ int PParseMatch(struct P_STRING* a_sequence, const struct P_STRING p_token,
 //
 // Ret:
 // - RETURNED
+// - -1 special value: anomaly is raised
 int PParseMatchAmongR(struct P_STRING* a_sequence, TO_CHAR_FUNCTION n_toCharFunction,
   int* avn_matchedEntry, int* cnavn_matchedId, struct P_STRING* na_lexeme, int tokensCount,
   struct P_STRING*  sp_tokens, int*  nsn_ids) ;
@@ -139,8 +141,8 @@ int PParseMatchAmongR(struct P_STRING* a_sequence, TO_CHAR_FUNCTION n_toCharFunc
   /*int*/avn_matchedEntry,/*int* */navn_matchedId,/*struct P_STRING* */na_lexeme,\
   /*int*/ tokensCount,/*const char* p_token0, int n_id0, */ ...) {\
   m_LOCAL_P_STRINGS_IDS(sp_localTokens,sn_localIds,tokensCount,__VA_ARGS__)\
-  PParseMatchAmongR(&(m_sequence),n_toCharFunction,avn_matchedEntry,navn_matchedId,na_lexeme,\
-    tokensCount, sp_localTokens,sn_localIds);\
+  m_TRACK_IF(PParseMatchAmongR(&(m_sequence),n_toCharFunction,avn_matchedEntry,navn_matchedId,na_lexeme,\
+    tokensCount, sp_localTokens,sn_localIds) < 0);\
 }   
 
 // 4. PParseTill*Match*() functions: scan till matching tokens 

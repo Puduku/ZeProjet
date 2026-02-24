@@ -280,7 +280,7 @@ const char *ScanPString(struct P_STRING pString, char b_regularScan, char b_pass
 
 
 // Public function : see description in .h
-const char *ScanPStringTillMatch(struct P_STRING pString, struct P_STRING subPString,
+const char *o_ScanPStringTillMatch(struct P_STRING pString, struct P_STRING subPString,
   TO_CHAR_FUNCTION n_toCharFunction) {
   m_DIGGY_BOLLARD()
 
@@ -299,11 +299,11 @@ const char *ScanPStringTillMatch(struct P_STRING pString, struct P_STRING subPSt
   } // while 
 
   m_DIGGY_RETURN(ptr) 
-} // ScanPStringTillMatch
+} // o_ScanPStringTillMatch
 
 
 // Public function : see description in .h
-const char *ScanPStringTillFirstMatchR(struct P_STRING pString, TO_CHAR_FUNCTION n_toCharFunction,
+const char *o_ScanPStringTillFirstMatchR(struct P_STRING pString, TO_CHAR_FUNCTION n_toCharFunction,
   int *navn_matchedEntry, int *cnavn_matchedId, int subStringsCount,
   const struct P_STRING sp_subPStrings[], int nsn_ids[]) {
   m_DIGGY_BOLLARD()
@@ -319,7 +319,7 @@ const char *ScanPStringTillFirstMatchR(struct P_STRING pString, TO_CHAR_FUNCTION
   } // while 
 
   m_DIGGY_RETURN(pString.string) 
-} // ScanPStringTillFirstMatchR
+} // o_ScanPStringTillFirstMatchR
 
 // Public function : see description in .h
 const char *ScanPStringTillFirstMatchV(struct P_STRING pString, TO_CHAR_FUNCTION n_toCharFunction,
@@ -332,7 +332,7 @@ const char *ScanPStringTillFirstMatchV(struct P_STRING pString, TO_CHAR_FUNCTION
   int *n_idPtr = sn_ids; 
   int i = 0; while (i++ < subStringsCount) *(subPStringPtr++) = va_arg(subPStringsIds,
     struct P_STRING), *(n_idPtr++) = va_arg(subPStringsIds,int) ;
-  m_DIGGY_RETURN(ScanPStringTillFirstMatchR(pString,n_toCharFunction,navn_matchedEntry,
+  m_DIGGY_RETURN(o_ScanPStringTillFirstMatchR(pString,n_toCharFunction,navn_matchedEntry,
     navn_matchedId,subStringsCount,s_subPStrings,sn_ids))
 } // ScanPStringTillFirstMatchV
 

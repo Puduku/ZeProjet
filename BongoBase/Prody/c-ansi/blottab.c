@@ -179,10 +179,10 @@ static inline int ml_BlotexlibExecutorParseAndComputeLValueBlottabSetOp(
   m_PREPARE_ABANDON(a_sequence, "<blottab ref op set int> | <blottab ref op set str>") 
   if (n_blottabHandle == NULL) m_ABANDON(UNKNOWN_BLOTTAB__ABANDONMENT_CAUSE)
   int n_indexFetchFlags = -1; // a priori 
-  m_PParsePassSpaces(a_sequence,NULL);
+  om_PParsePassSpaces(a_sequence,NULL);
 
   int n_asValue = -1; // No blottab read/set op a priori 
-  PParsePassSingleChar(a_sequence,NULL,'=',&lexeme); 
+  o_PParsePassSingleChar(a_sequence,NULL,'=',&lexeme); 
   int c_element = UNDEFINED; // Only significant with blottab read/set op
   if (!b_EMPTY_P_STRING(lexeme)) { // <blottab op read int> | <blottab op read str> (R-value)
     // <blottab ref op set int> | <blottab ref op set str> (L-value)... 
@@ -219,11 +219,11 @@ static int l_BlotexlibExecutorParseAndRetrieveBlottabSpot(BLOTEXLIB_EXECUTOR_HAN
   struct P_STRING *a_sequence, BLOTTAB_HANDLE blottabHandle, g_G_STRING_SET_STUFF* act_blotsetStuff,
   int *ac_element, int *ac_asValue, G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD_S()
-  m_PParsePassSpaces(a_sequence,NULL);
+  om_PParsePassSpaces(a_sequence,NULL);
 
   m_PREPARE_ABANDON(a_sequence, "<blottab spot>") 
   struct P_STRING lexeme = UNDEFINED_P_STRING;
-  PParsePassSingleChar(a_sequence,NULL,'[',&lexeme); 
+  o_PParsePassSingleChar(a_sequence,NULL,'[',&lexeme); 
   if (b_EMPTY_P_STRING(lexeme)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE) 
 
   struct BLOTEX_VALUE entryBlotexValue = {UNDEFINED};
@@ -236,9 +236,9 @@ static int l_BlotexlibExecutorParseAndRetrieveBlottabSpot(BLOTEXLIB_EXECUTOR_HAN
   m_TRACK_IF(GStringsFetch(blottabHandle->h_tableHandle, entry, act_blotsetStuff) < 0)
   if (*act_blotsetStuff == NULL) m_ABANDON(NOT_EXISTING_BLOTSET__ABANDONMENT_CAUSE)
 
-  PParsePassSingleChar(a_sequence,NULL,']',&lexeme); 
+  o_PParsePassSingleChar(a_sequence,NULL,']',&lexeme); 
   if (b_EMPTY_P_STRING(lexeme)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
-  PParsePassSingleChar(a_sequence,NULL,'.',&lexeme); 
+  o_PParsePassSingleChar(a_sequence,NULL,'.',&lexeme); 
   if (b_EMPTY_P_STRING(lexeme)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
 
   *ac_asValue = UNDEFINED; 
@@ -342,8 +342,8 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
 m_DIGGY_VAR_P_STRING(subSequence)
     
     int n_indexSeekFlags = UNDEFINED;
-    m_PParsePassSpaces(&subSequence,NULL);
-    PParsePassSingleChar(&subSequence,NULL,'*',&lexeme);
+    om_PParsePassSpaces(&subSequence,NULL);
+    o_PParsePassSingleChar(&subSequence,NULL,'*',&lexeme);
 m_DIGGY_VAR_P_STRING(lexeme)
     if (!b_EMPTY_P_STRING(lexeme)) n_indexSeekFlags = INDEX_SEEK_FLAGS__ANY;
     else {  // select with actual criterion
@@ -374,7 +374,7 @@ m_DIGGY_VAR_P_STRING(subSequence)
     m_ASSERT(criteriaNumber < 5)
     criteria5[criteriaNumber++] = m_GRequestCriterion_GKeys(tableIndexLabel,
       n_indexSeekFlags,&gKey, criteriaOpFlags);
-    m_PParsePassSpaces(&subSequence,NULL);
+    om_PParsePassSpaces(&subSequence,NULL);
   } while (!b_EMPTY_P_STRING(subSequence)) ; 
 
   switch (GStringsIndexRequestR(blottabHandle->h_tableHandle,NULL,criteriaNumber,criteria5)) {
@@ -481,7 +481,7 @@ m_DIGGY_VAR_D(n_asValue2)
       m_SET_FLAG_ON(s_blottabIndexFlags10[i],STR__BLOTTAB_INDEX_FLAG)
     break; default: m_RAISE(ANOMALY__VALUE__D,n_asValue2)
     } // switch
-    m_PParsePassSpaces(&subSequence,NULL);
+    om_PParsePassSpaces(&subSequence,NULL);
   } while (!b_EMPTY_P_STRING(subSequence)) ; 
 
   switch(ml_BlotexlibExecutorCreateBlottab(handle, blottabsLabel,nonExistingBlottabName, i+1, s_names10,
@@ -510,9 +510,9 @@ static inline int ml_BlotexlibExecutorParseAndComputeRValueBlottabOps(
     (struct P_STRING*)UNDEFINED,(char)UNDEFINED) != RETURNED) // a priori
 
   int n_indexFetchFlags = -1; // a priori 
-  m_PParsePassSpaces(a_sequence,NULL);
+  om_PParsePassSpaces(a_sequence,NULL);
 
-  PParsePassSingleChar(a_sequence,NULL,'[',&lexeme); 
+  o_PParsePassSingleChar(a_sequence,NULL,'[',&lexeme); 
   if (!b_EMPTY_P_STRING(lexeme)) { // <blottab op create> ...
     if (n_blottabHandle != NULL) m_ABANDON(ALREADY_EXISTS_BLOTTAB__ABANDONMENT_CAUSE)
     m_CHECK_ABANDON(ml_BlotexlibExecutorParseAndComputeBlottabCreation(handle,a_sequence,blottabsLabel,
@@ -520,16 +520,16 @@ static inline int ml_BlotexlibExecutorParseAndComputeRValueBlottabOps(
 
   } else {
     if (n_blottabHandle == NULL) m_ABANDON(UNKNOWN_BLOTTAB__ABANDONMENT_CAUSE) 
-    PParsePassSingleChar(a_sequence,NULL,':',&lexeme); 
+    o_PParsePassSingleChar(a_sequence,NULL,':',&lexeme); 
     if (!b_EMPTY_P_STRING(lexeme)) { // <blottab op select> ...
       m_CHECK_ABANDON(ml_BlotexlibExecutorParseAndComputeBlottabRequest(handle,a_sequence,
         n_blottabHandle, nc_abandonmentInfo))
     } // if
-    PParsePassSingleChar(a_sequence,NULL,'^',&lexeme);
+    o_PParsePassSingleChar(a_sequence,NULL,'^',&lexeme);
     if (!b_EMPTY_P_STRING(lexeme)) { // <blottab op reset>
       n_indexFetchFlags = INDEX_FETCH_FLAG__RESET; 
     } // if
-    PParsePassSingleChar(a_sequence,NULL,'+',&lexeme);
+    o_PParsePassSingleChar(a_sequence,NULL,'+',&lexeme);
     if (!b_EMPTY_P_STRING(lexeme)) { // <blottab op next>
       if (n_indexFetchFlags < 0) n_indexFetchFlags = ALL_FLAGS_OFF0;
       m_SET_FLAG_ON(n_indexFetchFlags,INDEX_FETCH_FLAG__NEXT)
@@ -537,7 +537,7 @@ static inline int ml_BlotexlibExecutorParseAndComputeRValueBlottabOps(
   } // if
 
   int n_asValue = -1; // No blottab read/set op a priori 
-  PParsePassSingleChar(a_sequence,NULL,'=',&lexeme); 
+  o_PParsePassSingleChar(a_sequence,NULL,'=',&lexeme); 
   int c_element = UNDEFINED; // Only significant with blottab read/set op
   if (!b_EMPTY_P_STRING(lexeme)) { // <blottab op read int> | <blottab op read str> (R-value)
     // <blottab ref op set int> | <blottab ref op set str> (L-value)... 
@@ -601,7 +601,7 @@ static inline int ml_BlotexlibExecutorParseAndComputeRValueBlottabSpot(
   g_G_STRING_SET_STUFF t_blotsetStuff = (g_G_STRING_SET_STUFF)UNDEFINED;
   m_CHECK_ABANDON(l_BlotexlibExecutorParseAndRetrieveBlottabSpot(handle,a_sequence,n_blottabHandle,
     &t_blotsetStuff,&element, &asValue,nc_abandonmentInfo))
-  m_PParsePassSpaces(a_sequence,NULL);
+  om_PParsePassSpaces(a_sequence,NULL);
 
   switch (asValue) {
   case AS__VALUE_INT:

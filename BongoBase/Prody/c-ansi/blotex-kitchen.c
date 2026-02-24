@@ -172,7 +172,7 @@ int ParseExistingSequence(struct P_STRING *a_sequence,const char *p_sequenceType
   G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
   m_PREPARE_ABANDON(a_sequence,p_sequenceType)
-  m_PParsePassSpaces(a_sequence,NULL);
+  om_PParsePassSpaces(a_sequence,NULL);
   if (b_EMPTY_P_STRING(*a_sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
   m_DIGGY_RETURN(ANSWER__YES) 
 } // ParseExistingSequence
@@ -180,7 +180,7 @@ int ParseExistingSequence(struct P_STRING *a_sequence,const char *p_sequenceType
 // See .h 
 int ParseEndOfSequence(struct P_STRING *a_sequence, G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
-  m_PParsePassSpaces(a_sequence,NULL);
+  om_PParsePassSpaces(a_sequence,NULL);
   if (!b_EMPTY_P_STRING(*a_sequence)) m_ABANDON_S(NOT_PARSABLE__ABANDONMENT_CAUSE)
   m_DIGGY_RETURN(ANSWER__YES) 
 } // ParseEndOfSequence
@@ -195,8 +195,8 @@ static int IsEntityNameChar(int c) {
 // See .h 
 int o_ParseEntity(struct P_STRING *a_sequence, struct P_STRING *a_entityName) {
   m_DIGGY_BOLLARD()
-  m_PParsePassSpaces(a_sequence,NULL);
-  PParsePassChars(a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_WHILE,IsEntityNameChar,
+  om_PParsePassSpaces(a_sequence,NULL);
+  o_PParsePassChars(a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_WHILE,IsEntityNameChar,
     (char)UNDEFINED,a_entityName); // <entity>
   m_DIGGY_RETURN(RETURNED)
 } // o_ParseEntity
@@ -214,7 +214,7 @@ int o_ParseEntity(struct P_STRING *a_sequence, struct P_STRING *a_entityName) {
 int ParseAs(char b_lValue, struct P_STRING *a_sequence, int *a_as) {
   m_DIGGY_BOLLARD()
   struct P_STRING lexeme; // UNDEFINED
-  m_PParsePassSpaces(a_sequence,NULL);
+  om_PParsePassSpaces(a_sequence,NULL);
 m_DIGGY_VAR_P_STRING(*a_sequence)
   int n_matchedEntry = UNDEFINED;
   m_P_PARSE_MATCH_AMONG_C(*a_sequence,NULL,&n_matchedEntry,a_as,&lexeme, 5,
@@ -231,7 +231,7 @@ m_DIGGY_VAR_D(*a_as)
 int ParseAsValue(struct P_STRING *a_sequence, int *an_asValue) {
   m_DIGGY_BOLLARD()
   struct P_STRING lexeme; // UNDEFINED
-  m_PParsePassSpaces(a_sequence,NULL);
+  om_PParsePassSpaces(a_sequence,NULL);
 m_DIGGY_VAR_P_STRING(*a_sequence)
   int n_matchedEntry = UNDEFINED;
   m_P_PARSE_MATCH_AMONG_C(*a_sequence,NULL,&n_matchedEntry,an_asValue,&lexeme, 2,
@@ -269,7 +269,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
 
   // <blotreg request atom int> | <blotreg request atom str> ...
   m_TRACK_IF(ParseAs(b_R_VALUE,a_sequence,ac_as) != RETURNED)
-  PParsePassSingleChar(a_sequence,NULL,'*',&lexeme);
+  o_PParsePassSingleChar(a_sequence,NULL,'*',&lexeme);
   if (!b_EMPTY_P_STRING(lexeme)) *ac_indexSeekFlags = INDEX_SEEK_FLAGS__ANY;
   else {  // select with actual criterion
     m_TRACK_IF(ParseRequestCompOp(a_sequence,*ac_as != AS__VALUE_INT,
@@ -285,8 +285,8 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
 char b_ParseRValueBlotregOpSelect(struct P_STRING *a_sequence) {
   m_DIGGY_BOLLARD()
   struct P_STRING lexeme;
-  m_PParsePassSpaces(a_sequence,NULL);
-  PParsePassSingleChar(a_sequence,NULL,':',&lexeme);
+  om_PParsePassSpaces(a_sequence,NULL);
+  o_PParsePassSingleChar(a_sequence,NULL,':',&lexeme);
   m_DIGGY_RETURN(!b_EMPTY_P_STRING(lexeme))
 } // b_ParseRValueBlotregOpSelect 
 
@@ -295,18 +295,18 @@ int ParseRValueBlotregFetchOps(struct P_STRING *a_sequence, int *an_indexFetchFl
   m_DIGGY_BOLLARD()
   *an_indexFetchFlags = -1; // No blotreg fetch op a priori 
   struct P_STRING lexeme;
-  PParsePassSingleChar(a_sequence,NULL,'^',&lexeme);
+  o_PParsePassSingleChar(a_sequence,NULL,'^',&lexeme);
   if (!b_EMPTY_P_STRING(lexeme)) { // <blotreg op reset>...
     *an_indexFetchFlags = INDEX_FETCH_FLAG__RESET;
   } // if
-  PParsePassSingleChar(a_sequence,NULL,'+',&lexeme);
+  o_PParsePassSingleChar(a_sequence,NULL,'+',&lexeme);
   if (!b_EMPTY_P_STRING(lexeme)) { // <blotreg op next>...
     if (*an_indexFetchFlags < 0) *an_indexFetchFlags = ALL_FLAGS_OFF0;
     m_SET_FLAG_ON(*an_indexFetchFlags,INDEX_FETCH_FLAG__NEXT)
   } // if
   
   *acn_as = -1; // No blotreg read/set op a priori  
-  PParsePassSingleChar(a_sequence,NULL,'=',&lexeme); 
+  o_PParsePassSingleChar(a_sequence,NULL,'=',&lexeme); 
   if (!b_EMPTY_P_STRING(lexeme)) { // <blotreg op read int> | <blotreg op read str> (R-value)
     // <blotreg ref op set int> | <blotreg ref op set str> (L-value)... 
     m_TRACK_IF(ParseAs(!b_L_VALUE,a_sequence,acn_as) != RETURNED)
@@ -471,7 +471,7 @@ int ParseRequestCompOp(struct P_STRING *a_sequence, char b_str,
   int *an_indexSeekFlags) {
   m_DIGGY_BOLLARD()
   *an_indexSeekFlags = -1; // a priori
-  m_PParsePassSpaces(a_sequence,NULL);
+  om_PParsePassSpaces(a_sequence,NULL);
 m_DIGGY_VAR_P_STRING(*a_sequence)
 
   int n_compOp = UNDEFINED;
@@ -507,7 +507,7 @@ int ParseLogical2Op(struct P_STRING *a_sequence,
   int *a_criteriaOpFlags) {
   m_DIGGY_BOLLARD()
   struct P_STRING lexeme; // UNDEFINED
-  m_PParsePassSpaces(a_sequence,NULL);
+  om_PParsePassSpaces(a_sequence,NULL);
   PParseMatch(a_sequence,o_PString("and"),NULL,&lexeme);
   if (!b_EMPTY_P_STRING(lexeme)) *a_criteriaOpFlags = CRITERIA_OP_FLAGS__AND;
   else { 
@@ -530,7 +530,7 @@ int ParseInt1Op(struct P_STRING *a_sequence, int *an_int1Op) {
   m_DIGGY_BOLLARD()
   struct P_STRING lexeme = UNDEFINED_P_STRING;
   *an_int1Op = -1; // a priori
-  PParsePassSingleChar(a_sequence,IsInt1Op,(char)UNDEFINED,&lexeme);
+  o_PParsePassSingleChar(a_sequence,IsInt1Op,(char)UNDEFINED,&lexeme);
   if (!b_EMPTY_P_STRING(lexeme)) { // <int 1op>
     switch (lexeme.string[0]) {
     case '!' : *an_int1Op = NOT__INT_1OP;
@@ -539,7 +539,7 @@ int ParseInt1Op(struct P_STRING *a_sequence, int *an_int1Op) {
     break; default:
       m_RAISE(ANOMALY__VALUE__D,lexeme.string[0])
     } // switch
-    m_PParsePassSpaces(a_sequence,NULL);
+    om_PParsePassSpaces(a_sequence,NULL);
   } // if
 
   m_DIGGY_RETURN(RETURNED)
@@ -586,9 +586,9 @@ int ParseStrConstant(struct P_STRING *a_sequence, G_STRINGS_HANDLE workingGStrin
   m_DIGGY_BOLLARD()
   struct P_STRING lexeme = UNDEFINED_P_STRING;
   m_PREPARE_ABANDON(a_sequence, "<str constant>")
-  PParsePassSingleChar(a_sequence,NULL,'"',&lexeme);
+  o_PParsePassSingleChar(a_sequence,NULL,'"',&lexeme);
   if ((*acb_parsed = !b_EMPTY_P_STRING(lexeme))) { // <str constant> ... 
-    PParsePassChars(a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_TILL,NULL,'"', &lexeme);
+    o_PParsePassChars(a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_TILL,NULL,'"', &lexeme);
     if (b_EMPTY_P_STRING(*a_sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
     PParseOffset(a_sequence,1,NULL);
     m_TRACK_IF(SetBlotexValue(workingGStringsHandle,acc_blotexValue,AS__VALUE_STR,UNDEFINED,&lexeme,
@@ -617,7 +617,7 @@ int ProbeBlotexAtom(struct P_STRING *a_sequence,G_STRINGS_HANDLE workingGStrings
       acc_blotexAtomValue,nc_abandonmentInfo))
     if (!b_parsed) {
       struct P_STRING lexeme = UNDEFINED_P_STRING;
-      PParsePassSingleChar(a_sequence,NULL,'(',&lexeme);
+      o_PParsePassSingleChar(a_sequence,NULL,'(',&lexeme);
       if (!b_EMPTY_P_STRING(lexeme)) *ac_probedBlotexAtom = BLOTEX__PROBED_BLOTEX_ATOM;
       else *ac_probedBlotexAtom = OTHER__PROBED_BLOTEX_ATOM; 
     } // if 
@@ -630,7 +630,7 @@ int ParseBlotexAtomBlotexEnd(struct P_STRING *a_sequence,G_STRING_STUFF nc_aband
   m_DIGGY_BOLLARD()
   struct P_STRING lexeme = UNDEFINED_P_STRING;
   m_PREPARE_ABANDON(a_sequence, "<intex atom> | <strex atom>")
-  PParsePassSingleChar(a_sequence,NULL,')',&lexeme);
+  o_PParsePassSingleChar(a_sequence,NULL,')',&lexeme);
   if (b_EMPTY_P_STRING(lexeme)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE) 
   m_DIGGY_RETURN(ANSWER__YES) 
 } // ParseBlotexAtomBlotexEnd
@@ -640,7 +640,7 @@ int ParseBlotexAtomBlotexEnd(struct P_STRING *a_sequence,G_STRING_STUFF nc_aband
 char b_ParseOpsIndicator(struct P_STRING *a_sequence) {
   m_DIGGY_BOLLARD()
   struct P_STRING lexeme = UNDEFINED_P_STRING;
-  PParsePassSingleChar(a_sequence,NULL,'?',&lexeme);
+  o_PParsePassSingleChar(a_sequence,NULL,'?',&lexeme);
   m_DIGGY_RETURN(!b_EMPTY_P_STRING(lexeme))
 } // b_ParseOpsIndicator
 
@@ -688,10 +688,10 @@ int ParseFormatAndSeparator(struct P_STRING *a_sequence, int *ac_format,
 
   int n_format = -1; // a priori
   m_PREPARE_ABANDON(a_sequence, "<format>") 
-  m_PParsePassSpaces(a_sequence,NULL);
-  PParsePassSingleChar(a_sequence,NULL,'%',&lexeme);
+  om_PParsePassSpaces(a_sequence,NULL);
+  o_PParsePassSingleChar(a_sequence,NULL,'%',&lexeme);
   if (b_EMPTY_P_STRING(lexeme)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
-  PParsePassChars(a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_WHILE,IsFormatSpecifierChar,(char)UNDEFINED,
+  o_PParsePassChars(a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_WHILE,IsFormatSpecifierChar,(char)UNDEFINED,
     &lexeme);
   int length = m_PStringLength(lexeme);
   if (length > 0) {
@@ -715,10 +715,10 @@ int ParseFormatAndSeparator(struct P_STRING *a_sequence, int *ac_format,
   *ac_format = n_format;
 
   m_PRECISE_ABANDON(a_sequence, "','") 
-  m_PParsePassSpaces(a_sequence,NULL);
-  PParsePassSingleChar(a_sequence,NULL,',',&lexeme);
+  om_PParsePassSpaces(a_sequence,NULL);
+  o_PParsePassSingleChar(a_sequence,NULL,',',&lexeme);
   if (b_EMPTY_P_STRING(lexeme)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
-  m_PParsePassSpaces(a_sequence,NULL);
+  om_PParsePassSpaces(a_sequence,NULL);
 
   m_DIGGY_RETURN(ANSWER__YES)
 } // ParseFormatAndSeparator
@@ -760,7 +760,7 @@ int ParseBlottabsLabel(struct P_STRING *a_sequence, int *an_blottabsLabel) {
   *an_blottabsLabel = -1; // a priori
   struct P_STRING lexeme; // UNDEFINED
   while (b_TRUE) { 
-    PParsePassSingleChar(a_sequence,NULL,'^',&lexeme);
+    o_PParsePassSingleChar(a_sequence,NULL,'^',&lexeme);
     if (b_EMPTY_P_STRING(lexeme)) break;
     (*an_blottabsLabel)++; 
   } // while 
@@ -780,7 +780,7 @@ m_DIGGY_VAR_P(blotregHandle)
 
   m_PREPARE_ABANDON(a_sequence,"<blotvar>")
 
-  m_PParsePassSpaces(a_sequence,NULL);
+  om_PParsePassSpaces(a_sequence,NULL);
 
   // Retrieve blotvar reference:
   PParseOffset(a_sequence,1,&lexeme);
@@ -789,7 +789,7 @@ m_DIGGY_VAR_P(blotregHandle)
   switch (lexeme.string[0]) {
   case '.' : // '.' <entity> : 
     ac_blotvarReference->blotvarReference = NAME__BLOTVAR_REFERENCE;
-    PParsePassChars(a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_WHILE,IsEntityNameChar,
+    o_PParsePassChars(a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_WHILE,IsEntityNameChar,
       (char)UNDEFINED,&lexeme);
     ac_blotvarReference->c_select.c_name = lexeme;
   break; case '[' : // '[' <intex> ']' :
@@ -800,7 +800,7 @@ m_DIGGY_VAR_P(blotregHandle)
     else if (genericInteger > INT_MAX || genericInteger < 0) m_ABANDON(
       VALUE_ERROR__ABANDONMENT_CAUSE)
     else ac_blotvarReference->c_select.c_entry = genericInteger;
-    PParsePassSingleChar(a_sequence,NULL,']',&lexeme);
+    o_PParsePassSingleChar(a_sequence,NULL,']',&lexeme);
     if (b_EMPTY_P_STRING(lexeme)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
   break; case '{' : // '{' <intex> '}' : 
     ac_blotvarReference->blotvarReference = TOKEN_ID__BLOTVAR_REFERENCE;
@@ -809,7 +809,7 @@ m_DIGGY_VAR_P(blotregHandle)
     else if (genericInteger > INT_MAX || genericInteger < 0) m_ABANDON(
       VALUE_ERROR__ABANDONMENT_CAUSE)
     else ac_blotvarReference->c_select.c_tokenId = genericInteger;
-    PParsePassSingleChar(a_sequence,NULL,'}',&lexeme);
+    o_PParsePassSingleChar(a_sequence,NULL,'}',&lexeme);
     if (b_EMPTY_P_STRING(lexeme)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
   break; default:
     m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE) 
@@ -833,10 +833,10 @@ int ParseAndComputeLValueBlotregOps(
   ac_blotvarReference->blotvarReference = CURRENT__BLOTVAR_REFERENCE;
   *ac_lValueAs = UNDEFINED; // For the moment 
 
-  m_PParsePassSpaces(a_sequence,NULL);
+  om_PParsePassSpaces(a_sequence,NULL);
 
   int n_lValueAs = -1; // No blotreg read/set op a priori 
-  PParsePassSingleChar(a_sequence,NULL,'=',&lexeme); 
+  o_PParsePassSingleChar(a_sequence,NULL,'=',&lexeme); 
   if (!b_EMPTY_P_STRING(lexeme)) { // <blotreg ref op set int> | <blotreg ref op set str>... 
     m_TRACK_IF(ParseAs(b_L_VALUE,a_sequence,&n_lValueAs) != RETURNED)
   } // if
@@ -857,7 +857,7 @@ char b_ParseBlotexAssignation(struct P_STRING *a_sequence, struct P_STRING *ac_s
   } else { // NO assignation
     *a_sequence = *ac_subSequence; 
   } // if
-  m_PParsePassSpaces(a_sequence,NULL); // TODO: ag virer ???
+  om_PParsePassSpaces(a_sequence,NULL); // TODO: ag virer ???
   
   m_DIGGY_RETURN(b_assignation)
 } // b_ParseBlotexAssignation

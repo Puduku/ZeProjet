@@ -307,6 +307,7 @@ typedef int (*TO_CHAR_FUNCTION) (int c) ;
 //   + LESS_THAN__COMPARISON : string 1 'less than' string 2
 //   + EQUAL_TO__COMPARISON : strings are "identical"
 //   + GREATER_THAN__COMPARISON : string 1 'greater than' string 2
+// - -1: unexpected problem, anomaly is raised
 int ComparePStrings(struct P_STRING pString1, struct P_STRING pString2,
   IS_CHAR_FUNCTION n_isNeutralCharFunction, TO_CHAR_FUNCTION n_toCharFunction, char b_subString2);
 
@@ -363,6 +364,7 @@ int ParanoidComparePStrings(struct P_STRING pString1, struct P_STRING pString2,
 //   + LESS_THAN__COMPARISON : 1st string 'lexilically before' 2nd (sub-)string
 //   + EQUAL_TO__COMPARISON : 1st string and 2nd (sub)-string "match" 
 //   + GREATER_THAN__COMPARISON : string 1 'lexilically  after' (sub-)string 2
+// - -1: unexpected problem, anomaly is raised
 int ComparePStringsAmongR(struct P_STRING pString1, 
   IS_CHAR_FUNCTION n_isNeutralCharFunction, TO_CHAR_FUNCTION n_toCharFunction, char b_subString2,
   int *navn_matchedEntry, int *cnavn_matchedId, int string2sCount, const struct P_STRING sp_pString2s[],
@@ -416,11 +418,11 @@ const char *ScanPString(struct P_STRING pString,
 // Returned:
 // (!= NULL) scanning position; use b_SCAN_P_STRING_LOCATED() below to check whether
 // sub-string is actually located. 
-const char *ScanPStringTillMatch(struct P_STRING pString, struct P_STRING subPString,
+const char *o_ScanPStringTillMatch(struct P_STRING pString, struct P_STRING subPString,
   TO_CHAR_FUNCTION n_toCharFunction);
 
 
-// Extend ScanPStringTillMatch "scanning" function : 
+// Extend o_ScanPStringTillMatch "scanning" function : 
 // Locate first matching sub-string, among DIFFERENT sub-strings. 
 //
 // Passed:
@@ -444,8 +446,9 @@ const char *ScanPStringTillMatch(struct P_STRING pString, struct P_STRING subPSt
 //   string candidate which (first) matched 
 //
 // Returned:
-// (!= NULL) scanning position; use b_SCAN_P_STRING_LOCATED() below to check whether
-// sub-string is actually located. 
+// - != NULL: scanning position; use b_SCAN_P_STRING_LOCATED() below to check whether
+//   sub-string is actually located. 
+// - NULL special value: anomaly is raised
 const char *ScanPStringTillFirstMatch(struct P_STRING pString, TO_CHAR_FUNCTION n_toCharFunction,
   int *navn_matchedEntry, int *navn_matchedId, int subStringsCount, /*struct P_STRING subPString0,
   int sn_id0, */ ...);
@@ -458,6 +461,10 @@ const char *ScanPStringTillFirstMatch(struct P_STRING pString, TO_CHAR_FUNCTION 
 // - subPString0: 1st possible sub string to locate
 // - n_id0: id of 1st possible sub string to locate (-1 special value to SKIP that sub-string)
 // - other possible sub strings (...) : indicate all other possible sub-strings to match ;
+//
+// Returned:
+// - != NULL: scanning position
+// - NULL special value: anomaly is raised
 const char *ScanPStringTillFirstMatchV(struct P_STRING pString, TO_CHAR_FUNCTION n_toCharFunction,
   int *navn_matchedEntry, int *navn_matchedId, int subStringsCount, va_list subPStringsIds);
 
@@ -468,7 +475,10 @@ const char *ScanPStringTillFirstMatchV(struct P_STRING pString, TO_CHAR_FUNCTION
 // - nsn_ids:
 // (Instead of:)
 // - subPStringsIds:
-const char *ScanPStringTillFirstMatchR(struct P_STRING pString, TO_CHAR_FUNCTION n_toCharFunction,
+//
+// Returned:
+// - (!= NULL) scanning position
+const char *o_ScanPStringTillFirstMatchR(struct P_STRING pString, TO_CHAR_FUNCTION n_toCharFunction,
   int *navn_matchedEntry, int *navn_matchedId, int subStringsCount,
   const struct P_STRING sp_subPStrings[], int nsn_ids[]) ;
 
