@@ -348,8 +348,7 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(indexSeekFlags)
     m_ASSERT(criteriaNumber < 5)
     criteria5[criteriaNumber++] = m_GRequestCriterion_GKeys(blotregIndexLabel,
       indexSeekFlags,&gKey, criteriaOpFlags);
-    om_PParsePassSpaces(&subSequence,NULL);
-  } while (!b_EMPTY_P_STRING(subSequence)) ; 
+  } while (!b_EmptySequence(&subSequence)) ; 
 
   switch (g_BlotregIndexRequestR(blotregHandle,NULL,criteriaNumber,criteria5)) {
   case COMPLETED__OK:
@@ -455,7 +454,6 @@ static inline int m_BlotexlibExecutorParseAndComputeBlotexAtomBlotvar(BLOTEXLIB_
   m_TRACK_IF(FetchBlotvar(&c_blotvarReference, b_R_VALUE,&nt_blotvarStuff, &vn_entry) != RETURNED)
   if (nt_blotvarStuff == NULL) m_ABANDON(UNKNOWN_BLOTVAR__ABANDONMENT_CAUSE) 
 m_ASSERT(vn_entry >= 0)
-  om_PParsePassSpaces(a_sequence,NULL); // TODO: ag virer ??????
 
   int as = UNDEFINED;
   m_TRACK_IF(ParseAs(b_R_VALUE,a_sequence,&as) != RETURNED)
@@ -615,7 +613,6 @@ static int BlotexlibExecutorParseAndComputeIntexTerm(BLOTEXLIB_EXECUTOR_HANDLE h
 
   m_ASSERT((!b_initialIntexAtomValue) || (a_intexTermValue->asValue == AS__VALUE_INT))
   m_PREPARE_ABANDON(a_sequence, "<intex term>") 
-  om_PParsePassSpaces(a_sequence,NULL);
   int n_factOp = UNDEFINED;
 
   if (!b_initialIntexAtomValue) {
@@ -711,9 +708,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
 
   struct BLOTEX_VALUE strexAtomValue = UNDEFINED_BLOTEX_VALUE; 
   struct P_STRING lexeme = UNDEFINED_P_STRING;
-  while (b_TRUE) {
-    o_PParsePassSingleChar(a_sequence,NULL,'+',&lexeme);
-    if (b_EMPTY_P_STRING(lexeme)) break;
+  while (b_ParseStrexAtomOp(a_sequence)) {
   
     m_CHECK_ABANDON(BlotexlibExecutorProbeBlotexAtom(handle,a_sequence,&strexAtomValue,
       nc_abandonmentInfo))
@@ -735,7 +730,6 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
   m_CHECK_ABANDON(BlotexlibExecutorProbeBlotexAtom(handle,a_sequence,ac_blotexValue,
     nc_abandonmentInfo))
 
-  om_PParsePassSpaces(a_sequence,NULL);
   switch (ac_blotexValue->asValue) {
   case AS__VALUE_STR: // <strex>
     m_CHECK_ABANDON(m_BlotexlibExecutorParseAndComputeFullStrex(handle,a_sequence,ac_blotexValue,
@@ -860,8 +854,7 @@ static inline int m_BlotexlibExecutorExecuteCFunctionEval(BLOTEXLIB_EXECUTOR_HAN
   m_CHECK_ABANDON(BlotexlibExecutorParseAndComputeBlotex(handle,&arguments,&c_blotexValue,
     nc_abandonmentInfo))
 
-  om_PParsePassSpaces(&arguments,NULL);
-  if (!b_EMPTY_P_STRING(arguments)) m_ABANDON(NOT_PARSABLE__ABANDONMENT_CAUSE)
+  m_CHECK_ABANDON(ParseEndOfSequence(&arguments,nc_abandonmentInfo))
 
   if (b_lValueReference) { // Assignation
     if (n_fieldReferenceBlottabsLabel >= 0) { // blottab assignation

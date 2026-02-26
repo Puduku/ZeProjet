@@ -167,21 +167,28 @@ int ConcatenateStrexValue(G_STRINGS_HANDLE workingGStringsHandle,
 // Parsing blot expressions: helpers 
 // ================================= 
 
+
+// See .h 
+int b_EmptySequence(struct P_STRING *a_sequence) {
+  m_DIGGY_BOLLARD()
+  om_PParsePassSpaces(a_sequence,NULL);
+  m_DIGGY_RETURN(b_EMPTY_P_STRING(*a_sequence))
+} // b_EmptySequence
+
+
 // See .h 
 int ParseExistingSequence(struct P_STRING *a_sequence,const char *p_sequenceType,
   G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
   m_PREPARE_ABANDON(a_sequence,p_sequenceType)
-  om_PParsePassSpaces(a_sequence,NULL);
-  if (b_EMPTY_P_STRING(*a_sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
+  if (b_EmptySequence(a_sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
   m_DIGGY_RETURN(ANSWER__YES) 
 } // ParseExistingSequence
 
 // See .h 
 int ParseEndOfSequence(struct P_STRING *a_sequence, G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
-  om_PParsePassSpaces(a_sequence,NULL);
-  if (!b_EMPTY_P_STRING(*a_sequence)) m_ABANDON_S(NOT_PARSABLE__ABANDONMENT_CAUSE)
+  if (!b_EmptySequence(a_sequence)) m_ABANDON_S(NOT_PARSABLE__ABANDONMENT_CAUSE)
   m_DIGGY_RETURN(ANSWER__YES) 
 } // ParseEndOfSequence
 
@@ -430,6 +437,7 @@ int ParseCompOp(int compOpExtension, struct P_STRING *a_sequence, int *an_compOp
   m_DIGGY_BOLLARD()
   struct P_STRING lexeme; // UNDEFINED
   int n_matchedEntry = UNDEFINED;
+  om_PParsePassSpaces(a_sequence,NULL);
   m_P_PARSE_MATCH_AMONG_C(*a_sequence,NULL,&n_matchedEntry,an_compOp,&lexeme, 9,
     "===", compOpExtension == STR__COMP_OP_EXTENSION? LIKE__STR__COMP_OP: -1,
     "!=",NOT_EQUAL__COMP_OP, ">=",GREATER_EQUAL__COMP_OP, "<=",LESS_EQUAL__COMP_OP,
@@ -644,6 +652,13 @@ char b_ParseOpsIndicator(struct P_STRING *a_sequence) {
   m_DIGGY_RETURN(!b_EMPTY_P_STRING(lexeme))
 } // b_ParseOpsIndicator
 
+// See .h
+char b_ParseStrexAtomOp(struct P_STRING *a_sequence) {
+  m_DIGGY_BOLLARD()
+  struct P_STRING lexeme = UNDEFINED_P_STRING;
+  o_PParsePassSingleChar(a_sequence,NULL,'+',&lexeme);
+  m_DIGGY_RETURN(!b_EMPTY_P_STRING(lexeme))
+} // b_ParseStrexAtomOp
 
 // See .h
 int ParseTermOp(struct P_STRING *a_sequence, int *an_termOp) {

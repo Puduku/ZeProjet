@@ -260,6 +260,15 @@ typedef int (*UPDATE_BLOTTAB_SPOT_FUNCTION)(
 // Parsing blot expressions: helpers 
 // ================================= 
 
+// Check if sequence is empty (after white spaces elimination)
+//
+// Passed:
+// - *a_sequence: before parsing
+//
+// Ret: Empty sequence ? (TRUE/FALSE)
+int b_EmptySequence(struct P_STRING *a_sequence) ;
+
+
 // Ensure the sequence is NOT yet fully parsed (after elimination of white spaces).
 //
 // Passed:
@@ -585,6 +594,18 @@ int ParseInt1Op(struct P_STRING *a_sequence, int *an_int1Op);
 // - ANSWER__NO: 'expect int' error; abandon processing 
 // - -1: unexpected problem
 int ApplyInt1Op(int n_int1Op,struct BLOTEX_VALUE *ac_blotexValue,G_STRING_STUFF nc_abandonmentInfo);
+
+
+// Parse <strex atom op>
+//
+// Passed:
+// - *a_sequence:
+//
+// Changed:
+// - *a_sequence: after parsing 
+//
+// Ret: Parsed ? (TRUE/FALSE) 
+char b_ParseStrexAtomOp(struct P_STRING *a_sequence) ;
 
 
 // Passed:

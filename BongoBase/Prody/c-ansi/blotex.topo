@@ -32,8 +32,9 @@
 //
 // Blot expressions are made of operations:
 // <intex> ::= <intex term> ( <term op> <intex term> )*  
-// <strex> ::= <strex atom> ( '+' <strex atom> )*  
+// <strex> ::= <strex atom> ( <strex atom op> <strex atom> )*  
 // '+' operator applied on string atoms is a concatenation.
+// <strex atom op> ::= '+'
 // <term op> ::= '+' | '-' | '&&' | '||'
 // Pseudo-logical operators '&&' (logical AND) and '||' (logical OR) combine integer expressions
 // together, "seen" as booleans (see below).
