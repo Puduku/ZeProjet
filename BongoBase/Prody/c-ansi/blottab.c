@@ -174,17 +174,14 @@ static inline int ml_BlotexlibExecutorParseAndComputeLValueBlottabSetOp(
   BLOTTAB_HANDLE n_blottabHandle, struct BLOTTAB_SPOT_REFERENCE *ac_blottabSpotReference,
   G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
-  struct P_STRING lexeme = UNDEFINED_P_STRING;
 
   m_PREPARE_ABANDON(a_sequence, "<blottab ref op set int> | <blottab ref op set str>") 
   if (n_blottabHandle == NULL) m_ABANDON(UNKNOWN_BLOTTAB__ABANDONMENT_CAUSE)
   int n_indexFetchFlags = -1; // a priori 
-  om_PParsePassSpaces(a_sequence,NULL);
 
   int n_asValue = -1; // No blottab read/set op a priori 
-  o_PParsePassSingleChar(a_sequence,NULL,'=',&lexeme); 
   int c_element = UNDEFINED; // Only significant with blottab read/set op
-  if (!b_EMPTY_P_STRING(lexeme)) { // <blottab op read int> | <blottab op read str> (R-value)
+  if (b_ParseOpReadSet(a_sequence)) { // <blottab op read int> | <blottab op read str> (R-value)
     // <blottab ref op set int> | <blottab ref op set str> (L-value)... 
     m_CHECK_ABANDON(ParseAndRetrieveBlottabElement(a_sequence, n_blottabHandle->hp_fieldAttributesHandle,
       NULL,&c_element, &n_asValue, nc_abandonmentInfo))
@@ -219,10 +216,10 @@ static int l_BlotexlibExecutorParseAndRetrieveBlottabSpot(BLOTEXLIB_EXECUTOR_HAN
   struct P_STRING *a_sequence, BLOTTAB_HANDLE blottabHandle, g_G_STRING_SET_STUFF* act_blotsetStuff,
   int *ac_element, int *ac_asValue, G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD_S()
-  om_PParsePassSpaces(a_sequence,NULL);
 
   m_PREPARE_ABANDON(a_sequence, "<blottab spot>") 
   struct P_STRING lexeme = UNDEFINED_P_STRING;
+  om_PParsePassSpaces(a_sequence,NULL);
   o_PParsePassSingleChar(a_sequence,NULL,'[',&lexeme); 
   if (b_EMPTY_P_STRING(lexeme)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE) 
 
@@ -529,17 +526,15 @@ static inline int ml_BlotexlibExecutorParseAndComputeRValueBlottabOps(
     if (!b_EMPTY_P_STRING(lexeme)) { // <blottab op reset>
       n_indexFetchFlags = INDEX_FETCH_FLAG__RESET; 
     } // if
-    o_PParsePassSingleChar(a_sequence,NULL,'+',&lexeme);
-    if (!b_EMPTY_P_STRING(lexeme)) { // <blottab op next>
+    if (b_ParseOpNext(a_sequence)) { // <op next>...
       if (n_indexFetchFlags < 0) n_indexFetchFlags = ALL_FLAGS_OFF0;
       m_SET_FLAG_ON(n_indexFetchFlags,INDEX_FETCH_FLAG__NEXT)
     } // if
   } // if
 
   int n_asValue = -1; // No blottab read/set op a priori 
-  o_PParsePassSingleChar(a_sequence,NULL,'=',&lexeme); 
   int c_element = UNDEFINED; // Only significant with blottab read/set op
-  if (!b_EMPTY_P_STRING(lexeme)) { // <blottab op read int> | <blottab op read str> (R-value)
+  if (b_ParseOpReadSet(a_sequence)) { // <blottab op read int> | <blottab op read str> (R-value)
     // <blottab ref op set int> | <blottab ref op set str> (L-value)... 
     m_CHECK_ABANDON(ParseAndRetrieveBlottabElement(a_sequence, n_blottabHandle->hp_fieldAttributesHandle,
       NULL,&c_element, &n_asValue, nc_abandonmentInfo))
@@ -601,7 +596,6 @@ static inline int ml_BlotexlibExecutorParseAndComputeRValueBlottabSpot(
   g_G_STRING_SET_STUFF t_blotsetStuff = (g_G_STRING_SET_STUFF)UNDEFINED;
   m_CHECK_ABANDON(l_BlotexlibExecutorParseAndRetrieveBlottabSpot(handle,a_sequence,n_blottabHandle,
     &t_blotsetStuff,&element, &asValue,nc_abandonmentInfo))
-  om_PParsePassSpaces(a_sequence,NULL);
 
   switch (asValue) {
   case AS__VALUE_INT:

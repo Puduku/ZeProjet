@@ -76,22 +76,21 @@
 //
 // <blottab2 spot> ::= ( ( ( '.' <entity> [ '#' <intex> ] ) | ( '@' <intex> [ ':' <intex> ] ) )
 //   [ '[' <intex> ']' ] [ <str portion> ] )+ 
-// <int blottab2 spot> ::= [ <blottab2 spot> ] '=' <int blottab2 spec> 
-// <str blottab2 spot> ::= [ <blottab2 spot> ] '=' <str blottab2 spec> 
+// <int blottab2 spot> ::= [ <blottab2 spot> ] <read set op> <int blottab2 spec> 
+// <str blottab2 spot> ::= [ <blottab2 spot> ] <read set op> <str blottab2 spec> 
 
 
 // Operations:
 // -----------
-// <int blottab2 ops> ::= [ <blottab2 op select> ] [ <blottab2 op reset> ] [ <blottab2 op next> ]
+// <int blottab2 ops> ::= [ <blottab2 op select> ] [ <blottab2 op reset> ] [ <op next> ]
 //   [ <blottab2 op read int> ] 
 // <blottab2 op select> ::= ':' <blottab2 request>
 // <blottab2 op reset> ::= '^'
-// <blottab2 op next> ::= '+'
-// <blottab2 op read int> ::= '=' <int blottab2 spec> 
+// <blottab2 op read int> ::= <read set op> <int blottab2 spec> 
 //
-// <str blottab2 ops> ::= [ <blottab2 op select> ] [ <blottab2 op reset> ] [ <blottab2 op next> ]
+// <str blottab2 ops> ::= [ <blottab2 op select> ] [ <blottab2 op reset> ] [ <op next> ]
 //   [ <blottab2 op insert> ] <blottab2 op read str>
-// <blottab2 op read str> ::= '=' <str blottab2 spec>
+// <blottab2 op read str> ::= <read set op> <str blottab2 spec>
 //
 // Selections based on physical filel types ('#' => INT(LE/BE) '$' => chars)
 // pamphlet physical spot type : byte sequence ($) or int (BE / LE) (#)
@@ -99,8 +98,8 @@
 // Like blotreg and blottabs requests, blottab2 requests are made of "atoms" : 
 // <blottab2 request> ::= <blottab2 request atom> ( <logical 2op> <blottab2 request atom> )* ':?'
 // <blottab2 request atom> ::= '*' | <blottab2 request atom int> | <blottab2 request atom str>
-// <blottab2 request atom int> ::= '=' <int blottab2 spec> <comp op> <intex> )
-// <blottab2 request atom str> ::= '=' <str blottab2 spec> <str comp op> <strex>
+// <blottab2 request atom int> ::= <read set op> <int blottab2 spec> <comp op> <intex> )
+// <blottab2 request atom str> ::= <read set op> <str blottab2 spec> <str comp op> <strex>
 
 // TODO: date logical type (ag dedfinir dans blotex ?)
 

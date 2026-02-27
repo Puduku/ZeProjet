@@ -407,6 +407,27 @@ int ParseBlotregRequestAtom(struct P_STRING *a_sequence, int *ac_as, int *ac_ind
 // Ret: select op parsed ? (TRUE/FALSE)
 char b_ParseRValueBlotregOpSelect(struct P_STRING *a_sequence); 
 
+// Parse <op read set> 
+//
+// Passed:
+// - *a_sequence: before parsing
+//
+// Changed:
+// - *a_sequence: after parsing 
+//
+// Ret: <op read set> parsed ? (TRUE/FALSE)
+char b_ParseOpReadSet(struct P_STRING *a_sequence);
+
+// Parse <op next> aka. '+'
+//
+// Passed:
+// - *a_sequence: before parsing
+//
+// Changed:
+// - *a_sequence: after parsing 
+//
+// Ret: <op next> parsed ? (TRUE/FALSE)
+char b_ParseOpNext(struct P_STRING *a_sequence);
 
 // Parse r-value blotreg fetch ops.
 //
@@ -677,7 +698,7 @@ int ProbeBlotexAtom(struct P_STRING *a_sequence,G_STRINGS_HANDLE workingGStrings
 // - -1: unexpected problem
 int ParseBlotexAtomBlotexEnd(struct P_STRING *a_sequence,G_STRING_STUFF nc_abandonmentInfo);
 
-// Parse operations indicator 
+// Parse operations indicator <ops indicator>
 //
 // Passed:
 // - *a_sequence:

@@ -37,17 +37,16 @@
 // Blottab 'r-value' operations:
 // -----------------------------
 // <int blottab ops> ::= <blottab op create> | ( [ <blottab op select> ] [ <blottab op reset> ]
-//   [ <blottab op insert> ] [ <blottab op next> ] [ <blottab op read int> ] ) 
+//   [ <blottab op insert> ] [ <op next> ] [ <blottab op read int> ] ) 
 // <blottab op create> ::=  '[' <blottab creation> 
 // <blottab op select> ::= ':' <blottab request>
 // <blottab op reset> ::= '^'
-// <blottab op next> ::= '+'
 // <blottab op insert> ::= '@'
-// <blottab op read int> ::= '=' <entity> [ <<as value int>> ] 
+// <blottab op read int> ::= <op read set> <entity> [ <<as value int>> ] 
 //
-// <str blottab ops> ::= [ <blottab op select> ] [ <blottab op reset> ] [ <blottab op next> ]
+// <str blottab ops> ::= [ <blottab op select> ] [ <blottab op reset> ] [ <op next> ]
 //   [ <blottab op insert> ] <blottab op read str>
-// <blottab op read str> ::= '=' <entity> <<as value str>> 
+// <blottab op read str> ::= <op read set> <entity> <<as value str>> 
 //
 // Blottabs must be explicitely created
 // <blottab creation> ::= ( <entity> [ <<as value int>> | <<as value str>> ]2 )+ ']?' 
@@ -68,9 +67,9 @@
 // Blot table 'l-value' operations:
 // --------------------------------
 // Set current int value operation (l-value): 
-// <blottab ref op set int> ::= '=' <entity> [ <<as value int>> ] 
+// <blottab ref op set int> ::= <op read set> <entity> [ <<as value int>> ] 
 // Set current str value operation (l-value): 
-// <blottab ref op set str> ::= '=' <entity> <<as value str>> 
+// <blottab ref op set str> ::= <op read set> <entity> <<as value str>> 
 
 // Blotab 'l-value' spots:
 // -----------------------

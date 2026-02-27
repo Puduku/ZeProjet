@@ -707,7 +707,6 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
   m_PREPARE_ABANDON(a_sequence, "<strex>") 
 
   struct BLOTEX_VALUE strexAtomValue = UNDEFINED_BLOTEX_VALUE; 
-  struct P_STRING lexeme = UNDEFINED_P_STRING;
   while (b_ParseStrexAtomOp(a_sequence)) {
   
     m_CHECK_ABANDON(BlotexlibExecutorProbeBlotexAtom(handle,a_sequence,&strexAtomValue,

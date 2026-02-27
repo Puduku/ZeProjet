@@ -136,24 +136,26 @@
 // The global value of the operations corresponds to that of the last operation of the sequence.
 // Note: without explicit operation, the default global value is the 'false' pseudo-boolean blotval.
 // Most of register operations have an integer value: 
-// <int blotreg> ::= <entity> '?' <int blotreg ops>  
-// <int blotreg ops> ::=  [ <blotreg op select> ] [ <blotreg op reset> ] [ <blotreg op next> ]
+// <int blotreg> ::= <entity> <ops indicator> <int blotreg ops>  
+// <ops indicator> ::= '?'
+// <int blotreg ops> ::=  [ <blotreg op select> ] [ <blotreg op reset> ] [ <op next> ]
 //   [ <blotreg op read int> ] 
 // Selection operation; value is pseudo-boolean "true" blotval: 
 // <blotreg op select> ::= ':' <blotreg request>
 // Reset operation; value is pseudo-boolean "true" blotval: 
 // <blotreg op reset> ::= '^'
 // Reset operation; value is pseudo-boolean blotval ("false" when no more):
-// <blotreg op next> ::= '+'
+// <op next> ::= '+'
 // Read current integer value operation (r-value): 
-// <blotreg op read int> ::= '=' [ <<as value int>> | <<as entry>> | <<as id>> ]
+// <blotreg op read int> ::= <op read set> [ <<as value int>> | <<as entry>> | <<as id>> ]
+// <op read set> ::= '='
 //
 // When the last operation of the sequence reads a string value, the global value of the operations
 // sequence is that string value: 
-// <str blotreg> ::= <entity> '?' <str blotreg ops>  
-// <str blotreg ops> ::= [ <blotreg op select> ] [ <blotreg op reset> ] [ <blotreg op next> ]
+// <str blotreg> ::= <entity> <ops indicator> <str blotreg ops>  
+// <str blotreg ops> ::= [ <blotreg op select> ] [ <blotreg op reset> ] [ <op next> ]
 //   <blotreg op read str>
-// <blotreg op read str> ::= '=' ( <<as value str>> | <<as name>> )  
+// <blotreg op read str> ::= <op read set> ( <<as value str>> | <<as name>> )  
 //
 // Blotreg requests are made of "atoms" : 
 // <blotreg request> ::= <blotreg request atom> ( <logical 2op> <blotreg request atom> )* ':?'
@@ -167,12 +169,12 @@
 //
 // Register 'l-value' operations :
 // Set current int value operation (l-value): 
-// <blotreg ref op set int> ::= '=' [ <<as value int>> | <<as id>> ]
-// <int blotreg ref> ::= <entity> '?' <blotreg ref op set int>
+// <blotreg ref op set int> ::= <op read set> [ <<as value int>> | <<as id>> ]
+// <int blotreg ref> ::= <entity> <ops indicator> <blotreg ref op set int>
 //
 // Set current str value operation (l-value): 
-// <blotreg ref op set str> ::= '=' ( <<as value str>> | <<as name>> )  
-// <str blotreg ref> ::= <entity> '?' <blotreg ref op set str> 
+// <blotreg ref op set str> ::= <op read set> ( <<as value str>> | <<as name>> )  
+// <str blotreg ref> ::= <entity> <ops indicator> <blotreg ref op set str> 
 //
 //
 // Blot table 'r-value' operations :
@@ -185,20 +187,24 @@
 
 // NOTICE: see "GENUINE" blottab extensions in c-ansi/blottab.topo
 // "GENUINE" Blot table 'r-value' operations and spots :
-// <int blottab> ::= '^' <entity> ( ( '?' <int blottab ops> ) | <int blottab spot> ) 
-// <str blottab> ::= '^' <entity> ( ( '?' <str blottab ops> ) | <str blottab spot> )  
+// <int blottab> ::= '^' <entity> ( ( <ops indicator> <int blottab ops> ) | <int blottab spot> ) 
+// <str blottab> ::= '^' <entity> ( ( <ops indicator> <str blottab ops> ) | <str blottab spot> )  
 //
 // "GENUINE" Blot table 'l-value' operations and spots :
-// <int blottab ref> ::= '^' <entity> ( ( '?' <blottab ref op set int> ) | <int blottab spot ref> )
-// <str blottab ref> ::= '^' <entity> ( ( '?' <blottab ref op set str> ) | <str blottab spot ref> )
+// <int blottab ref> ::= '^' <entity> ( ( <ops indicator> <blottab ref op set int> ) | 
+//   <int blottab spot ref> )
+// <str blottab ref> ::= '^' <entity> ( ( <ops indicator> <blottab ref op set str> ) |
+//   <str blottab spot ref> )
 //
 // "SUPER" Blot table 'r-value' operations and spots:
-// <int blottab2> ::= '^^' <entity> ( ( '?' <int blottab2 ops> ) | <int blottab2 spot> )
-// <str blottab2> ::= '^^' <entity> ( ( '?' <str blottab2 ops> ) | <str blottab2 spot> ) 
+// <int blottab2> ::= '^^' <entity> ( ( <ops indicator> <int blottab2 ops> ) | <int blottab2 spot> )
+// <str blottab2> ::= '^^' <entity> ( ( <ops indicator> <str blottab2 ops> ) | <str blottab2 spot> ) 
 //
 // "SUPER" Blot table 'l-value' operations and spots:
-// <int blottab2 ref> ::= '^^' <entity> ( ( '?' <blottab2 ref op set int> ) | <int blottab2 spot ref> )
-// <str blottab2 ref> ::= '^^' <entity> ( ( '?' <blottab2 ref op set str> ) | <str blottab2 spot ref> )
+// <int blottab2 ref> ::= '^^' <entity> ( ( <ops indicator> <blottab2 ref op set int> ) |
+//   <int blottab2 spot ref> )
+// <str blottab2 ref> ::= '^^' <entity> ( ( <ops indicator> <blottab2 ref op set str> ) |
+//   <str blottab2 spot ref> )
 //
 //
 // Examples of <blotex> :

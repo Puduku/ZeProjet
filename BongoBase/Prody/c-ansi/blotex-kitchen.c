@@ -297,6 +297,25 @@ char b_ParseRValueBlotregOpSelect(struct P_STRING *a_sequence) {
   m_DIGGY_RETURN(!b_EMPTY_P_STRING(lexeme))
 } // b_ParseRValueBlotregOpSelect 
 
+
+// See .h 
+char b_ParseOpReadSet(struct P_STRING *a_sequence) {
+  m_DIGGY_BOLLARD()
+  struct P_STRING lexeme = UNDEFINED_P_STRING;
+  om_PParsePassSpaces(a_sequence,NULL);
+  o_PParsePassSingleChar(a_sequence,NULL,'=',&lexeme); 
+  m_DIGGY_RETURN(!b_EMPTY_P_STRING(lexeme)) ;
+} // b_ParseOpReadSet 
+
+// See .h 
+char b_ParseOpNext(struct P_STRING *a_sequence) {
+  m_DIGGY_BOLLARD()
+  struct P_STRING lexeme = UNDEFINED_P_STRING;
+  om_PParsePassSpaces(a_sequence,NULL);
+  o_PParsePassSingleChar(a_sequence,NULL,'+',&lexeme); 
+  m_DIGGY_RETURN(!b_EMPTY_P_STRING(lexeme)) ;
+} // b_ParseOpNext 
+
 // See .h 
 int ParseRValueBlotregFetchOps(struct P_STRING *a_sequence, int *an_indexFetchFlags, int *acn_as) {
   m_DIGGY_BOLLARD()
@@ -306,15 +325,13 @@ int ParseRValueBlotregFetchOps(struct P_STRING *a_sequence, int *an_indexFetchFl
   if (!b_EMPTY_P_STRING(lexeme)) { // <blotreg op reset>...
     *an_indexFetchFlags = INDEX_FETCH_FLAG__RESET;
   } // if
-  o_PParsePassSingleChar(a_sequence,NULL,'+',&lexeme);
-  if (!b_EMPTY_P_STRING(lexeme)) { // <blotreg op next>...
+  if (b_ParseOpNext(a_sequence)) { // <op next>...
     if (*an_indexFetchFlags < 0) *an_indexFetchFlags = ALL_FLAGS_OFF0;
     m_SET_FLAG_ON(*an_indexFetchFlags,INDEX_FETCH_FLAG__NEXT)
   } // if
   
   *acn_as = -1; // No blotreg read/set op a priori  
-  o_PParsePassSingleChar(a_sequence,NULL,'=',&lexeme); 
-  if (!b_EMPTY_P_STRING(lexeme)) { // <blotreg op read int> | <blotreg op read str> (R-value)
+  if (b_ParseOpReadSet(a_sequence)) { // <blotreg op read int> | <blotreg op read str> (R-value)
     // <blotreg ref op set int> | <blotreg ref op set str> (L-value)... 
     m_TRACK_IF(ParseAs(!b_L_VALUE,a_sequence,acn_as) != RETURNED)
     if (*an_indexFetchFlags < 0) *an_indexFetchFlags = ALL_FLAGS_OFF0;
@@ -839,7 +856,6 @@ int ParseAndComputeLValueBlotregOps(
   struct P_STRING *a_sequence, struct P_STRING blotregName, g_BLOTREG_HANDLE n_blotregHandle, 
   struct BLOTVAR_REFERENCE *ac_blotvarReference, int *ac_lValueAs, G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
-  struct P_STRING lexeme;
 
   m_PREPARE_ABANDON(a_sequence, "<blotreg ref op set int> | <blotreg ref op set str>")
 
@@ -851,8 +867,7 @@ int ParseAndComputeLValueBlotregOps(
   om_PParsePassSpaces(a_sequence,NULL);
 
   int n_lValueAs = -1; // No blotreg read/set op a priori 
-  o_PParsePassSingleChar(a_sequence,NULL,'=',&lexeme); 
-  if (!b_EMPTY_P_STRING(lexeme)) { // <blotreg ref op set int> | <blotreg ref op set str>... 
+  if (b_ParseOpReadSet(a_sequence)) { // <blotreg ref op set int> | <blotreg ref op set str>... 
     m_TRACK_IF(ParseAs(b_L_VALUE,a_sequence,&n_lValueAs) != RETURNED)
   } // if
   
