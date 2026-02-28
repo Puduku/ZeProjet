@@ -131,6 +131,13 @@
 // recettes.bolo!# => index (entry) of bolo blotvar in recettes register
 // .toto!# => index (entry) of toto global blotvar 
 //
+// Operations:
+// <op select> ::= ':' 
+// <op reset> ::= '^'
+// <op next> ::= '+'
+// <op read set> ::= '='
+// <op insert> ::= '@'
+//
 // Register 'r-value' operations :
 // Register operations may be combined together in a sequence.
 // The global value of the operations corresponds to that of the last operation of the sequence.
@@ -138,22 +145,19 @@
 // Most of register operations have an integer value: 
 // <int blotreg> ::= <entity> <ops indicator> <int blotreg ops>  
 // <ops indicator> ::= '?'
-// <int blotreg ops> ::=  [ <blotreg op select> ] [ <blotreg op reset> ] [ <op next> ]
+// <int blotreg ops> ::=  [ <blotreg op select> ] [ <op reset> ] [ <op next> ]
 //   [ <blotreg op read int> ] 
 // Selection operation; value is pseudo-boolean "true" blotval: 
-// <blotreg op select> ::= ':' <blotreg request>
+// <blotreg op select> ::= <op select> <blotreg request>
 // Reset operation; value is pseudo-boolean "true" blotval: 
-// <blotreg op reset> ::= '^'
 // Reset operation; value is pseudo-boolean blotval ("false" when no more):
-// <op next> ::= '+'
 // Read current integer value operation (r-value): 
 // <blotreg op read int> ::= <op read set> [ <<as value int>> | <<as entry>> | <<as id>> ]
-// <op read set> ::= '='
 //
 // When the last operation of the sequence reads a string value, the global value of the operations
 // sequence is that string value: 
 // <str blotreg> ::= <entity> <ops indicator> <str blotreg ops>  
-// <str blotreg ops> ::= [ <blotreg op select> ] [ <blotreg op reset> ] [ <op next> ]
+// <str blotreg ops> ::= [ <blotreg op select> ] [ <op reset> ] [ <op next> ]
 //   <blotreg op read str>
 // <blotreg op read str> ::= <op read set> ( <<as value str>> | <<as name>> )  
 //

@@ -396,16 +396,6 @@ int DelimitBlotregRequest(struct P_STRING *a_sequence, struct P_STRING *ac_blotr
 int ParseBlotregRequestAtom(struct P_STRING *a_sequence, int *ac_as, int *ac_indexSeekFlags,
   G_STRING_STUFF nc_abandonmentInfo) ;
 
-// Parse r-value blotreg select op.
-//
-// Passed:
-// - *a_sequence: before parsing
-//
-// Changed:
-// - *a_sequence: after parsing 
-//
-// Ret: select op parsed ? (TRUE/FALSE)
-char b_ParseRValueBlotregOpSelect(struct P_STRING *a_sequence); 
 
 // Parse <op read set> 
 //
@@ -418,6 +408,28 @@ char b_ParseRValueBlotregOpSelect(struct P_STRING *a_sequence);
 // Ret: <op read set> parsed ? (TRUE/FALSE)
 char b_ParseOpReadSet(struct P_STRING *a_sequence);
 
+// Parse <op select> aka. ':'
+//
+// Passed:
+// - *a_sequence: before parsing
+//
+// Changed:
+// - *a_sequence: after parsing 
+//
+// Ret: <op next> parsed ? (TRUE/FALSE)
+char b_ParseOpSelect(struct P_STRING *a_sequence);
+
+// Parse <op reset> aka. '^'
+//
+// Passed:
+// - *a_sequence: before parsing
+//
+// Changed:
+// - *a_sequence: after parsing 
+//
+// Ret: <op next> parsed ? (TRUE/FALSE)
+char b_ParseOpReset(struct P_STRING *a_sequence);
+
 // Parse <op next> aka. '+'
 //
 // Passed:
@@ -428,6 +440,17 @@ char b_ParseOpReadSet(struct P_STRING *a_sequence);
 //
 // Ret: <op next> parsed ? (TRUE/FALSE)
 char b_ParseOpNext(struct P_STRING *a_sequence);
+
+// Parse <op insert> aka. '@'
+//
+// Passed:
+// - *a_sequence: before parsing
+//
+// Changed:
+// - *a_sequence: after parsing 
+//
+// Ret: <op next> parsed ? (TRUE/FALSE)
+char b_ParseOpInsert(struct P_STRING *a_sequence);
 
 // Parse r-value blotreg fetch ops.
 //

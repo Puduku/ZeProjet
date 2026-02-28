@@ -36,15 +36,13 @@
 
 // Blottab 'r-value' operations:
 // -----------------------------
-// <int blottab ops> ::= <blottab op create> | ( [ <blottab op select> ] [ <blottab op reset> ]
-//   [ <blottab op insert> ] [ <op next> ] [ <blottab op read int> ] ) 
+// <int blottab ops> ::= <blottab op create> | ( [ <blottab op select> ] [ <op reset> ]
+//   [ <op insert> ] [ <op next> ] [ <blottab op read int> ] ) 
 // <blottab op create> ::=  '[' <blottab creation> 
-// <blottab op select> ::= ':' <blottab request>
-// <blottab op reset> ::= '^'
-// <blottab op insert> ::= '@'
+// <blottab op select> ::= <op select> <blottab request>
 // <blottab op read int> ::= <op read set> <entity> [ <<as value int>> ] 
 //
-// <str blottab ops> ::= [ <blottab op select> ] [ <blottab op reset> ] [ <op next> ]
+// <str blottab ops> ::= [ <blottab op select> ] [ <op reset> ] [ <op next> ]
 //   [ <blottab op insert> ] <blottab op read str>
 // <blottab op read str> ::= <op read set> <entity> <<as value str>> 
 //

@@ -289,16 +289,6 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
 
 
 // See .h 
-char b_ParseRValueBlotregOpSelect(struct P_STRING *a_sequence) {
-  m_DIGGY_BOLLARD()
-  struct P_STRING lexeme;
-  om_PParsePassSpaces(a_sequence,NULL);
-  o_PParsePassSingleChar(a_sequence,NULL,':',&lexeme);
-  m_DIGGY_RETURN(!b_EMPTY_P_STRING(lexeme))
-} // b_ParseRValueBlotregOpSelect 
-
-
-// See .h 
 char b_ParseOpReadSet(struct P_STRING *a_sequence) {
   m_DIGGY_BOLLARD()
   struct P_STRING lexeme = UNDEFINED_P_STRING;
@@ -317,12 +307,38 @@ char b_ParseOpNext(struct P_STRING *a_sequence) {
 } // b_ParseOpNext 
 
 // See .h 
+char b_ParseOpSelect(struct P_STRING *a_sequence) {
+  m_DIGGY_BOLLARD()
+  struct P_STRING lexeme = UNDEFINED_P_STRING;
+  om_PParsePassSpaces(a_sequence,NULL);
+  o_PParsePassSingleChar(a_sequence,NULL,':',&lexeme); 
+  m_DIGGY_RETURN(!b_EMPTY_P_STRING(lexeme)) ;
+} // b_ParseOpSelect
+
+// See .h 
+char b_ParseOpReset(struct P_STRING *a_sequence) {
+  m_DIGGY_BOLLARD()
+  struct P_STRING lexeme = UNDEFINED_P_STRING;
+  om_PParsePassSpaces(a_sequence,NULL);
+  o_PParsePassSingleChar(a_sequence,NULL,'^',&lexeme); 
+  m_DIGGY_RETURN(!b_EMPTY_P_STRING(lexeme)) ;
+} // b_ParseOpReset
+
+// See .h 
+char b_ParseOpInsert(struct P_STRING *a_sequence) {
+  m_DIGGY_BOLLARD()
+  struct P_STRING lexeme = UNDEFINED_P_STRING;
+  om_PParsePassSpaces(a_sequence,NULL);
+  o_PParsePassSingleChar(a_sequence,NULL,'@',&lexeme); 
+  m_DIGGY_RETURN(!b_EMPTY_P_STRING(lexeme)) ;
+} // b_ParseOpInsert
+
+
+// See .h 
 int ParseRValueBlotregFetchOps(struct P_STRING *a_sequence, int *an_indexFetchFlags, int *acn_as) {
   m_DIGGY_BOLLARD()
   *an_indexFetchFlags = -1; // No blotreg fetch op a priori 
-  struct P_STRING lexeme;
-  o_PParsePassSingleChar(a_sequence,NULL,'^',&lexeme);
-  if (!b_EMPTY_P_STRING(lexeme)) { // <blotreg op reset>...
+  if (b_ParseOpReset(a_sequence)) { // <op reset>...
     *an_indexFetchFlags = INDEX_FETCH_FLAG__RESET;
   } // if
   if (b_ParseOpNext(a_sequence)) { // <op next>...

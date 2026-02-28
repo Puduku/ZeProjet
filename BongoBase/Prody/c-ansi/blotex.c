@@ -390,7 +390,7 @@ static int BlotexlibExecutorParseAndComputeRValueBlotregOps(BLOTEXLIB_EXECUTOR_H
 
   m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle,ac_blotexValue, AS__VALUE_INT,TRUE__BLOTVAL0,
     (struct P_STRING*)UNDEFINED,(char)UNDEFINED) != RETURNED) // actually UNDEFINED 
-  if (b_ParseRValueBlotregOpSelect(a_sequence)) { // <blotreg op select>...
+  if (b_ParseOpSelect(a_sequence)) { // <blotreg op select>...
     m_CHECK_ABANDON(m_BlotexlibExecutorParseAndComputeBlotregRequest(handle,a_sequence,n_blotregHandle,
       nc_abandonmentInfo)) 
   } // if

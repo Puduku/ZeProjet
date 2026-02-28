@@ -517,13 +517,11 @@ static inline int ml_BlotexlibExecutorParseAndComputeRValueBlottabOps(
 
   } else {
     if (n_blottabHandle == NULL) m_ABANDON(UNKNOWN_BLOTTAB__ABANDONMENT_CAUSE) 
-    o_PParsePassSingleChar(a_sequence,NULL,':',&lexeme); 
-    if (!b_EMPTY_P_STRING(lexeme)) { // <blottab op select> ...
+      if (b_ParseOpSelect(a_sequence)) { // <blottab op select>...
       m_CHECK_ABANDON(ml_BlotexlibExecutorParseAndComputeBlottabRequest(handle,a_sequence,
         n_blottabHandle, nc_abandonmentInfo))
     } // if
-    o_PParsePassSingleChar(a_sequence,NULL,'^',&lexeme);
-    if (!b_EMPTY_P_STRING(lexeme)) { // <blottab op reset>
+    if (b_ParseOpReset(a_sequence)) { // <op reset>...
       n_indexFetchFlags = INDEX_FETCH_FLAG__RESET; 
     } // if
     if (b_ParseOpNext(a_sequence)) { // <op next>...

@@ -82,13 +82,12 @@
 
 // Operations:
 // -----------
-// <int blottab2 ops> ::= [ <blottab2 op select> ] [ <blottab2 op reset> ] [ <op next> ]
+// <int blottab2 ops> ::= [ <blottab2 op select> ] [ <op reset> ] [ <op next> ]
 //   [ <blottab2 op read int> ] 
-// <blottab2 op select> ::= ':' <blottab2 request>
-// <blottab2 op reset> ::= '^'
-// <blottab2 op read int> ::= <read set op> <int blottab2 spec> 
+// <blottab2 op select> ::= <op select> <blottab2 request>
+// <blottab2 op read int> ::= <op read set> <int blottab2 spec> 
 //
-// <str blottab2 ops> ::= [ <blottab2 op select> ] [ <blottab2 op reset> ] [ <op next> ]
+// <str blottab2 ops> ::= [ <blottab2 op select> ] [ <op reset> ] [ <op next> ]
 //   [ <blottab2 op insert> ] <blottab2 op read str>
 // <blottab2 op read str> ::= <read set op> <str blottab2 spec>
 //
