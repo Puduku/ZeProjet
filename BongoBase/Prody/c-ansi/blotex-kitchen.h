@@ -401,12 +401,25 @@ int ParseBlotregRequestAtom(struct P_STRING *a_sequence, int *ac_as, int *ac_ind
 //
 // Passed:
 // - *a_sequence: before parsing
+// - *an_indexFetchFlags: 
+//
+// Changed:
+// - *a_sequence: after parsing 
+// - *an_indexFetchFlags: 
+//
+// Ret: <op read set> parsed ? (TRUE/FALSE)
+char b_ParseOpReadSet(struct P_STRING *a_sequence, int *an_indexFetchFlags);
+
+// Parse <op create> aka. '['
+//
+// Passed:
+// - *a_sequence: before parsing
 //
 // Changed:
 // - *a_sequence: after parsing 
 //
-// Ret: <op read set> parsed ? (TRUE/FALSE)
-char b_ParseOpReadSet(struct P_STRING *a_sequence);
+// Ret: <op create> parsed ? (TRUE/FALSE)
+char b_ParseOpCreate(struct P_STRING *a_sequence);
 
 // Parse <op select> aka. ':'
 //
@@ -423,49 +436,41 @@ char b_ParseOpSelect(struct P_STRING *a_sequence);
 //
 // Passed:
 // - *a_sequence: before parsing
+// - *an_indexFetchFlags:
 //
 // Changed:
 // - *a_sequence: after parsing 
+// - *an_indexFetchFlags:
 //
 // Ret: <op next> parsed ? (TRUE/FALSE)
-char b_ParseOpReset(struct P_STRING *a_sequence);
+char b_ParseOpReset(struct P_STRING *a_sequence, int *an_indexFetchFlags);
 
 // Parse <op next> aka. '+'
 //
 // Passed:
 // - *a_sequence: before parsing
+// - *an_indexFetchFlags:
 //
 // Changed:
 // - *a_sequence: after parsing 
+// - *an_indexFetchFlags:
 //
 // Ret: <op next> parsed ? (TRUE/FALSE)
-char b_ParseOpNext(struct P_STRING *a_sequence);
+char b_ParseOpNext(struct P_STRING *a_sequence, int *an_indexFetchFlags);
 
 // Parse <op insert> aka. '@'
 //
 // Passed:
 // - *a_sequence: before parsing
+// - *an_indexFetchFlags:
 //
 // Changed:
 // - *a_sequence: after parsing 
+// - *an_indexFetchFlags:
 //
 // Ret: <op next> parsed ? (TRUE/FALSE)
-char b_ParseOpInsert(struct P_STRING *a_sequence);
+char b_ParseOpInsert(struct P_STRING *a_sequence, int *an_indexFetchFlags);
 
-// Parse r-value blotreg fetch ops.
-//
-// Passed:
-// - *a_sequence: before parsing
-//
-// Changed:
-// - *a_sequence: after parsing  
-// - *an_indexFetchFlags: (null if no other blotreg op)  
-// - *acn_as: (only significant if read blotreg op)  
-//
-// Ret: 
-// - RETURNED: Ok,
-// - 1: unexpected problem; anomaly is raised
-int ParseRValueBlotregFetchOps(struct P_STRING *a_sequence, int *an_indexFetchFlags, int *acn_as);
 
 
 // Interpret as ...  blotreg index

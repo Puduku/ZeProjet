@@ -394,9 +394,14 @@ static int BlotexlibExecutorParseAndComputeRValueBlotregOps(BLOTEXLIB_EXECUTOR_H
     m_CHECK_ABANDON(m_BlotexlibExecutorParseAndComputeBlotregRequest(handle,a_sequence,n_blotregHandle,
       nc_abandonmentInfo)) 
   } // if
-  int n_indexFetchFlags = UNDEFINED;
   int cn_as = UNDEFINED; 
-  m_TRACK_IF(ParseRValueBlotregFetchOps(a_sequence,&n_indexFetchFlags,&cn_as) != RETURNED)
+  int n_indexFetchFlags = -1; // No blotreg fetch op a priori 
+  b_ParseOpReset(a_sequence,&n_indexFetchFlags); // <op reset>...
+  b_ParseOpNext(a_sequence,&n_indexFetchFlags);
+  cn_as = -1; // No blotreg read/set op a priori  
+  if (b_ParseOpReadSet(a_sequence,&n_indexFetchFlags)) { // <blotreg op read int> | <blotreg op read str> (R-value)
+    m_TRACK_IF(ParseAs(!b_L_VALUE,a_sequence,&cn_as) != RETURNED)
+  } // if
   
   if (n_indexFetchFlags < 0) {
     m_TRACK_IF(SetBlotexValue(handle->h_workingGStringsHandle,ac_blotexValue, AS__VALUE_INT,TRUE__BLOTVAL0,

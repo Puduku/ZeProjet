@@ -67,8 +67,8 @@
 // supported.
 //
 // REMINDER (see c-ansi/blotex.topo) :
-// <int blottab2> ::= '^^' <entity> ( ( '?' <int blottab2 ops> ) | <int blottab2 spot> )
-// <str blottab2> ::= '^^' <entity> ( ( '?' <str blottab2 ops> ) | <str blottab2 spot> )
+// <int blottab2> ::= '^^' <entity> ( ( <ops indicator> <int blottab2 ops> ) | <int blottab2 spot> )
+// <str blottab2> ::= '^^' <entity> ( ( <ops indicator> <str blottab2 ops> ) | <str blottab2 spot> )
 
 
 // Spots:
@@ -104,7 +104,7 @@
 
 // EXAMPLES:
 // ---------
-// Operation examples : '^^' <entity> '?' ( <int blottab2 ops>  | <str blottab2 ops> )
+// Operation examples : '^^' <entity> <ops indicator> ( <int blottab2 ops>  | <str blottab2 ops> )
 // => dumping pamphlet RLCM1K:
 //   ^^RLCM1K?: * :?  
 // => dumping pamphlet RLCM1K, limited to spots having 2 depth max:

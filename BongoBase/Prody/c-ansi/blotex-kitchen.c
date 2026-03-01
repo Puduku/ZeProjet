@@ -289,21 +289,39 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
 
 
 // See .h 
-char b_ParseOpReadSet(struct P_STRING *a_sequence) {
+char b_ParseOpReadSet(struct P_STRING *a_sequence, int *an_indexFetchFlags) {
   m_DIGGY_BOLLARD()
   struct P_STRING lexeme = UNDEFINED_P_STRING;
   om_PParsePassSpaces(a_sequence,NULL);
   o_PParsePassSingleChar(a_sequence,NULL,'=',&lexeme); 
-  m_DIGGY_RETURN(!b_EMPTY_P_STRING(lexeme)) ;
+  if (!b_EMPTY_P_STRING(lexeme)) {
+    if (*an_indexFetchFlags < 0) *an_indexFetchFlags = ALL_FLAGS_OFF0;
+    m_DIGGY_RETURN(b_TRUE)
+  } // if
+  m_DIGGY_RETURN(b_FALSE0)
 } // b_ParseOpReadSet 
 
 // See .h 
-char b_ParseOpNext(struct P_STRING *a_sequence) {
+char b_ParseOpCreate(struct P_STRING *a_sequence) {
+  m_DIGGY_BOLLARD()
+  struct P_STRING lexeme = UNDEFINED_P_STRING;
+  om_PParsePassSpaces(a_sequence,NULL);
+  o_PParsePassSingleChar(a_sequence,NULL,'[',&lexeme); 
+  m_DIGGY_RETURN(!b_EMPTY_P_STRING(lexeme)) ;
+} // b_ParseOpCreate
+
+// See .h 
+char b_ParseOpNext(struct P_STRING *a_sequence, int *an_indexFetchFlags) {
   m_DIGGY_BOLLARD()
   struct P_STRING lexeme = UNDEFINED_P_STRING;
   om_PParsePassSpaces(a_sequence,NULL);
   o_PParsePassSingleChar(a_sequence,NULL,'+',&lexeme); 
-  m_DIGGY_RETURN(!b_EMPTY_P_STRING(lexeme)) ;
+  if (!b_EMPTY_P_STRING(lexeme)) {
+    if (*an_indexFetchFlags < 0) *an_indexFetchFlags = ALL_FLAGS_OFF0;
+    m_SET_FLAG_ON(*an_indexFetchFlags,INDEX_FETCH_FLAG__NEXT)
+    m_DIGGY_RETURN(b_TRUE)
+  } // if
+  m_DIGGY_RETURN(b_FALSE0)
 } // b_ParseOpNext 
 
 // See .h 
@@ -316,44 +334,32 @@ char b_ParseOpSelect(struct P_STRING *a_sequence) {
 } // b_ParseOpSelect
 
 // See .h 
-char b_ParseOpReset(struct P_STRING *a_sequence) {
+char b_ParseOpReset(struct P_STRING *a_sequence, int *an_indexFetchFlags) {
   m_DIGGY_BOLLARD()
   struct P_STRING lexeme = UNDEFINED_P_STRING;
   om_PParsePassSpaces(a_sequence,NULL);
   o_PParsePassSingleChar(a_sequence,NULL,'^',&lexeme); 
-  m_DIGGY_RETURN(!b_EMPTY_P_STRING(lexeme)) ;
+  if (!b_EMPTY_P_STRING(lexeme)) {
+    if (*an_indexFetchFlags < 0) *an_indexFetchFlags = ALL_FLAGS_OFF0;
+    m_SET_FLAG_ON(*an_indexFetchFlags,INDEX_FETCH_FLAG__RESET)
+    m_DIGGY_RETURN(b_TRUE)
+  } // if
+  m_DIGGY_RETURN(b_FALSE0)
 } // b_ParseOpReset
 
 // See .h 
-char b_ParseOpInsert(struct P_STRING *a_sequence) {
+char b_ParseOpInsert(struct P_STRING *a_sequence, int *an_indexFetchFlags) {
   m_DIGGY_BOLLARD()
   struct P_STRING lexeme = UNDEFINED_P_STRING;
   om_PParsePassSpaces(a_sequence,NULL);
   o_PParsePassSingleChar(a_sequence,NULL,'@',&lexeme); 
-  m_DIGGY_RETURN(!b_EMPTY_P_STRING(lexeme)) ;
+  if (!b_EMPTY_P_STRING(lexeme)) {
+    if (*an_indexFetchFlags < 0) *an_indexFetchFlags = ALL_FLAGS_OFF0;
+m_RAISE(ANOMALY__NOT_AVAILABLE)
+    m_DIGGY_RETURN(b_TRUE)
+  } // if
+  m_DIGGY_RETURN(b_FALSE0)
 } // b_ParseOpInsert
-
-
-// See .h 
-int ParseRValueBlotregFetchOps(struct P_STRING *a_sequence, int *an_indexFetchFlags, int *acn_as) {
-  m_DIGGY_BOLLARD()
-  *an_indexFetchFlags = -1; // No blotreg fetch op a priori 
-  if (b_ParseOpReset(a_sequence)) { // <op reset>...
-    *an_indexFetchFlags = INDEX_FETCH_FLAG__RESET;
-  } // if
-  if (b_ParseOpNext(a_sequence)) { // <op next>...
-    if (*an_indexFetchFlags < 0) *an_indexFetchFlags = ALL_FLAGS_OFF0;
-    m_SET_FLAG_ON(*an_indexFetchFlags,INDEX_FETCH_FLAG__NEXT)
-  } // if
-  
-  *acn_as = -1; // No blotreg read/set op a priori  
-  if (b_ParseOpReadSet(a_sequence)) { // <blotreg op read int> | <blotreg op read str> (R-value)
-    // <blotreg ref op set int> | <blotreg ref op set str> (L-value)... 
-    m_TRACK_IF(ParseAs(!b_L_VALUE,a_sequence,acn_as) != RETURNED)
-    if (*an_indexFetchFlags < 0) *an_indexFetchFlags = ALL_FLAGS_OFF0;
-  } // if
-  m_DIGGY_RETURN(RETURNED)
-} // ParseRValueBlotregFetchOps
 
 
 // See .h 
@@ -883,7 +889,9 @@ int ParseAndComputeLValueBlotregOps(
   om_PParsePassSpaces(a_sequence,NULL);
 
   int n_lValueAs = -1; // No blotreg read/set op a priori 
-  if (b_ParseOpReadSet(a_sequence)) { // <blotreg ref op set int> | <blotreg ref op set str>... 
+  int n_indexFetchFlags = -1;
+  if (b_ParseOpReadSet(a_sequence,&n_indexFetchFlags)) { // <blotreg ref op set int> | <blotreg ref op set str>... 
+    m_ASSERT(n_indexFetchFlags == ALL_FLAGS_OFF0)
     m_TRACK_IF(ParseAs(b_L_VALUE,a_sequence,&n_lValueAs) != RETURNED)
   } // if
   
