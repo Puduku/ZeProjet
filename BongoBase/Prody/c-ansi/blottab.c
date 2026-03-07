@@ -217,25 +217,23 @@ static int l_BlotexlibExecutorParseAndRetrieveBlottabSpot(BLOTEXLIB_EXECUTOR_HAN
   m_DIGGY_BOLLARD_S()
 
   m_PREPARE_ABANDON(a_sequence, "<blottab spot>") 
-  struct P_STRING lexeme = UNDEFINED_P_STRING;
-  om_PParsePassSpaces(a_sequence,NULL);
-  o_PParsePassSingleChar(a_sequence,NULL,'[',&lexeme); 
-  if (b_EMPTY_P_STRING(lexeme)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE) 
-
+  int specifierFlags = ENTRY__SPECIFIER_FLAG;
+  m_CHECK_ABANDON(ParseSpecifier(a_sequence,&specifierFlags,NULL,nc_abandonmentInfo))
   struct BLOTEX_VALUE entryBlotexValue = {UNDEFINED};
   m_CHECK_ABANDON(BlotexlibExecutorParseAndComputeBlotex(handle,a_sequence,&entryBlotexValue,
     nc_abandonmentInfo))
+  if (entryBlotexValue.asValue != AS__VALUE_INT) m_ABANDON(EXPECT_INTEX__ABANDONMENT_CAUSE)
+  else if (entryBlotexValue.select.c_blotval > INT_MAX || entryBlotexValue.select.c_blotval < 0)
+    m_ABANDON(VALUE_ERROR__ABANDONMENT_CAUSE)
 
   int entry = entryBlotexValue.select.c_blotval;
-  if (entry < 0) m_ABANDON(VALUE_ERROR__ABANDONMENT_CAUSE)
   *act_blotsetStuff = (g_G_STRING_SET_STUFF)UNDEFINED;
   m_TRACK_IF(GStringsFetch(blottabHandle->h_tableHandle, entry, act_blotsetStuff) < 0)
   if (*act_blotsetStuff == NULL) m_ABANDON(NOT_EXISTING_BLOTSET__ABANDONMENT_CAUSE)
 
-  o_PParsePassSingleChar(a_sequence,NULL,']',&lexeme); 
-  if (b_EMPTY_P_STRING(lexeme)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
-  o_PParsePassSingleChar(a_sequence,NULL,'.',&lexeme); 
-  if (b_EMPTY_P_STRING(lexeme)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
+  m_CHECK_ABANDON(ParseEndSpecifier(a_sequence,specifierFlags,nc_abandonmentInfo))
+  specifierFlags = NAME__SPECIFIER_FLAG;
+  m_CHECK_ABANDON(ParseSpecifier(a_sequence,&specifierFlags,NULL,nc_abandonmentInfo))
 
   *ac_asValue = UNDEFINED; 
   *ac_element = UNDEFINED;

@@ -201,7 +201,7 @@ typedef int (*UPDATE_BLOTTAB_SPOT_FUNCTION)(
 #define NOT_PARSABLE__ABANDONMENT_CAUSE "Not parsable"
 #define VALUE_ERROR__ABANDONMENT_CAUSE "Value error"
 #define EXPECT_STREX__ABANDONMENT_CAUSE "Expect strex value"
-#define EXPECT_INTEX__ABANDONMENT_CAUSE "Expect strex value"
+#define EXPECT_INTEX__ABANDONMENT_CAUSE "Expect intex value"
 #define UNKNOWN_BLOTVAR__ABANDONMENT_CAUSE "Unknown blotvar"
 #define UNKNOWN_BLOTREG__ABANDONMENT_CAUSE "Unknown blotreg"
 #define INVALID_FORMAT__ABANDONMENT_CAUSE "Invalid format"
@@ -361,6 +361,48 @@ int ParseAs(char b_lValue, struct P_STRING *a_sequence, int *a_as) ;
 // - RETURNED: Ok
 // - 1: unexpected problem; anomaly is raised
 int ParseAsValue(struct P_STRING *a_sequence, int *an_asValue) ;
+
+
+#define     NAME__SPECIFIER_FLAG 0x01
+#define    ENTRY__SPECIFIER_FLAG 0x02
+#define TOKEN_ID__SPECIFIER_FLAG 0x04
+
+
+// Parse (begin of) specifier 
+//
+// Passed:
+// - *a_sequence: before parsing
+// - *a_specifierFlags: expected specifiers to parse
+// - nac_blotvarReference: NULL special pointer: not used
+//
+// Changed:
+// - *a_sequence: after parsing 
+// - *a_specifierFlags: parsed specifier (only significant if no abandon)
+// - *nac_blotvarReference: (when used) only significant if no abandon
+// - nc_abandonmentInfo: only significant if abandon
+// 
+// Ret: parsed successfully ? 
+// - ANSWER__YES: Ok,
+// - ANSWER__NO: not localized; abandon processing 
+// - 1: unexpected problem; anomaly is raised
+int ParseSpecifier(struct P_STRING *a_sequence, int *a_specifierFlags, int *nac_blotvarReference,
+  G_STRING_STUFF nc_abandonmentInfo); 
+
+// Parse end of specifier 
+//
+// Passed:
+// - *a_sequence: before parsing
+//
+// Changed:
+// - *a_sequence: after parsing 
+// - nc_abandonmentInfo: only significant if abandon
+// 
+// Ret: parsed successfully ? 
+// - ANSWER__YES: Ok,
+// - ANSWER__NO: not localized; abandon processing 
+// - 1: unexpected problem; anomaly is raised
+int ParseEndSpecifier(struct P_STRING *a_sequence, int specifierFlag, G_STRING_STUFF nc_abandonmentInfo);
+
 
 // Delimit <bloteg request> 
 //
@@ -837,24 +879,6 @@ int ApplyFormat(int format, struct BLOTEX_VALUE blotexValue, G_STRING_STUFF c_su
 // Ret: RETURNED (Ok)
 int ParseBlottabsLabel(struct P_STRING *a_sequence, int *an_blottabsLabel);
 
-// Complete parsing of "simple" blotvar reference.
-//
-// Passed:
-// - *a_sequence: expected: [ last part of ] <blotvar> 
-// - blotregHandle: 
-//
-// Changed:
-// - *a_sequence: after parsing 
-// - ac_blotvarReference: only significant if success
-// - nc_abandonmentInfo: only significant if abandon 
-//
-// Ret: "simple" blotvar successfully parsed ? 
-// - ANSWER__YES: success
-// - ANSWER__NO: abandon 
-// - -1: unexpected problem
-int ParseAndComputeSimpleBlotvarReference(struct P_STRING *a_sequence, 
-  g_BLOTREG_HANDLE blotregHandle, struct BLOTVAR_REFERENCE *ac_blotvarReference,
-  G_STRING_STUFF nc_abandonmentInfo) ;
 
 // Parse and compute blotreg operations (l-values) :
 // Expect <blotreg ref op set int> | <blotreg ref op set str> 

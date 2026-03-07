@@ -83,6 +83,11 @@
 // are identified by their name (may be empty):
 // <entity> ::= ( <<letter>> | <<digit>> | '_' )*
 //
+// TODO: -1 entry ?
+// <entry specifier> ::= '[' <intex> ']'
+// <name specifier> ::= '.' <entity>
+// <token id specifier> ::= '{' <entity> '}'
+//
 // Variables and registers
 // A blot variable (blotvar) stores a blotex value.
 // A blot register (blotreg) is a collection of blovars
@@ -90,7 +95,7 @@
 //
 // Formally a "simple" blotvar is referenced as following (in which the 1st entity name identifies
 // the register) :
-// <blotvar> ::= <entity> ( '.' <entity>  | '[' <intex> ']' ) 
+// <blotvar> ::= <entity> ( <name specifier>  | <entry specifier> | <token id specifier> ) 
 // Blotvar examples: 
 // .toto => toto blotvar of global register
 // recettes.bolo => bolo blotvar of recettes register
@@ -132,6 +137,7 @@
 // .toto!# => index (entry) of toto global blotvar 
 //
 // Operations:
+// <op create> ::= '['
 // <op select> ::= ':' 
 // <op reset> ::= '^'
 // <op next> ::= '+'

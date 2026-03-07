@@ -299,6 +299,7 @@ int BlotexlibExecutorParseAndComputeBlotex(BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct P_STRING *a_sequence, struct BLOTEX_VALUE *ac_blotexValue,
   G_STRING_STUFF nc_abandonmentInfo) ;
 
+
 // TODO: ParseStrPortion dans kitchen???
 // Parse <str portion>
 //

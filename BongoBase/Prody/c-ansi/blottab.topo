@@ -59,7 +59,7 @@
 
 // Blotab 'r-value' spots:
 // -----------------------
-// <blottab spot> ::= '[' <intex> ']' '.' <entity> 
+// <blottab spot> ::= <entry specifier> <name specifier> 
 // <int blottab spot> ::= <blottab spot> [ <<as value int>> ] 
 // <str blottab spot> ::= <blottab spot> <<as value str>>
 

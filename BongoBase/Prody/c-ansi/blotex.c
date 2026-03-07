@@ -425,6 +425,63 @@ m_ASSERT(nt_blotvarStuff == NULL)
   m_DIGGY_RETURN(ANSWER__YES)
 } // BlotexlibExecutorParseAndComputeRValueBlotregOps
 
+// Complete parsing of "simple" blotvar reference.
+//
+// Passed:
+// - handle:
+// - *a_sequence: expected: [ last part of ] <blotvar> 
+// - blotregHandle: 
+//
+// Changed:
+// - *a_sequence: after parsing 
+// - ac_blotvarReference: only significant if success
+// - nc_abandonmentInfo: only significant if abandon 
+//
+// Ret: "simple" blotvar successfully parsed ? 
+// - ANSWER__YES: success
+// - ANSWER__NO: abandon 
+// - -1: unexpected problem
+static int BlotlibExecutorParseAndComputeSimpleBlotvarReference(BLOTEXLIB_EXECUTOR_HANDLE handle,
+  struct P_STRING *a_sequence, g_BLOTREG_HANDLE blotregHandle,
+  struct BLOTVAR_REFERENCE *ac_blotvarReference, G_STRING_STUFF nc_abandonmentInfo) {
+  m_DIGGY_BOLLARD_S()
+m_DIGGY_VAR_P_STRING(*a_sequence)
+m_DIGGY_VAR_P(blotregHandle)
+  ac_blotvarReference->blotregHandle = blotregHandle;
+
+  m_PREPARE_ABANDON(a_sequence,"<blotvar>")
+
+  struct BLOTEX_VALUE intexValue = {UNDEFINED};
+  // Retrieve blotvar reference:
+  int specifierFlags = NAME__SPECIFIER_FLAG | ENTRY__SPECIFIER_FLAG | TOKEN_ID__SPECIFIER_FLAG;
+  m_CHECK_ABANDON(ParseSpecifier(a_sequence,&specifierFlags,&ac_blotvarReference->blotvarReference,
+    nc_abandonmentInfo))
+  switch (specifierFlags) {
+  case NAME__SPECIFIER_FLAG:
+    o_ParseEntity(a_sequence,&ac_blotvarReference->c_select.c_name);
+  break; case ENTRY__SPECIFIER_FLAG:
+    m_CHECK_ABANDON(BlotexlibExecutorParseAndComputeBlotex(handle,a_sequence,&intexValue,
+      nc_abandonmentInfo))
+    if (intexValue.asValue != AS__VALUE_INT) m_ABANDON(EXPECT_INTEX__ABANDONMENT_CAUSE)
+    else if (intexValue.select.c_blotval > INT_MAX || intexValue.select.c_blotval < 0) m_ABANDON(
+      VALUE_ERROR__ABANDONMENT_CAUSE)
+    ac_blotvarReference->c_select.c_entry = intexValue.select.c_blotval;  
+    m_CHECK_ABANDON(ParseEndSpecifier(a_sequence,specifierFlags,nc_abandonmentInfo))
+  break; case TOKEN_ID__SPECIFIER_FLAG:
+    m_CHECK_ABANDON(BlotexlibExecutorParseAndComputeBlotex(handle,a_sequence,&intexValue,
+      nc_abandonmentInfo))
+    if (intexValue.asValue != AS__VALUE_INT) m_ABANDON(EXPECT_INTEX__ABANDONMENT_CAUSE)
+    else if (intexValue.select.c_blotval > INT_MAX || intexValue.select.c_blotval < 0) m_ABANDON(
+      VALUE_ERROR__ABANDONMENT_CAUSE)
+    ac_blotvarReference->c_select.c_tokenId = intexValue.select.c_blotval;  
+    m_CHECK_ABANDON(ParseEndSpecifier(a_sequence,specifierFlags,nc_abandonmentInfo))
+  break; default:
+    m_RAISE(ANOMALY__VALUE__D,specifierFlags)
+  } // switch
+  m_DIGGY_RETURN(ANSWER__YES) ;
+} // BlotlibExecutorParseAndComputeSimpleBlotvarReference 
+
+
 // Complete blotvar reference parsing and compute blotex atom value.
 //
 // Passed:
@@ -454,8 +511,8 @@ static inline int m_BlotexlibExecutorParseAndComputeBlotexAtomBlotvar(BLOTEXLIB_
     "<blotvar as int> | <blotvar entry> | <blotvar id> | <blotvar as str> | <blotvar name>") 
 
   if (n_blotregHandle == NULL) m_ABANDON(UNKNOWN_BLOTREG__ABANDONMENT_CAUSE)
-  m_CHECK_ABANDON(ParseAndComputeSimpleBlotvarReference(a_sequence, n_blotregHandle, &c_blotvarReference,
-    nc_abandonmentInfo))
+  m_CHECK_ABANDON(BlotlibExecutorParseAndComputeSimpleBlotvarReference(handle, a_sequence,
+    n_blotregHandle, &c_blotvarReference, nc_abandonmentInfo))
   m_TRACK_IF(FetchBlotvar(&c_blotvarReference, b_R_VALUE,&nt_blotvarStuff, &vn_entry) != RETURNED)
   if (nt_blotvarStuff == NULL) m_ABANDON(UNKNOWN_BLOTVAR__ABANDONMENT_CAUSE) 
 m_ASSERT(vn_entry >= 0)
@@ -807,8 +864,8 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
           m_TRACK()
         } // switch
       } // if 
-      m_CHECK_ABANDON(ParseAndComputeSimpleBlotvarReference(a_sequence, cn_blotregHandle,
-        acc_blotvarReference, nc_abandonmentInfo))
+      m_CHECK_ABANDON(BlotlibExecutorParseAndComputeSimpleBlotvarReference(handle,a_sequence,
+        cn_blotregHandle, acc_blotvarReference, nc_abandonmentInfo))
       // Expect <blotvar as int> | <blotvar id> | <blotvar as str> | <blotvar name>  
       m_CHECK_ABANDON(ParseAs(b_L_VALUE,a_sequence, acc_lValueAs))
     } // if

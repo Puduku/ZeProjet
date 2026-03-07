@@ -249,6 +249,58 @@ m_DIGGY_VAR_D(*an_asValue)
   m_DIGGY_RETURN(RETURNED)
 } // ParseAsValue 
 
+
+// See .h 
+int ParseSpecifier(struct P_STRING *a_sequence, int *a_specifierFlags, int *nac_blotvarReference,
+  G_STRING_STUFF nc_abandonmentInfo) {
+  m_DIGGY_BOLLARD()
+
+  struct P_STRING lexeme = UNDEFINED_P_STRING;
+  om_PParsePassSpaces(a_sequence,NULL);
+  // Retrieve blotvar reference:
+  PParseOffset(a_sequence,1,&lexeme);
+  if (b_EMPTY_P_STRING(lexeme)) m_ABANDON_S(SYNTAX_ERROR__ABANDONMENT_CAUSE)
+  switch (lexeme.string[0]) {
+  case '.' : // <name specifier> : 
+    if (b_FLAG_SET_OFF(*a_specifierFlags,NAME__SPECIFIER_FLAG)) m_ABANDON_S(
+      SYNTAX_ERROR__ABANDONMENT_CAUSE)
+    *a_specifierFlags = NAME__SPECIFIER_FLAG;
+    if (nac_blotvarReference != NULL) *nac_blotvarReference = NAME__BLOTVAR_REFERENCE;
+  break; case '[' : // <entry specifier>  :
+    if (b_FLAG_SET_OFF(*a_specifierFlags,ENTRY__SPECIFIER_FLAG)) m_ABANDON_S(
+      SYNTAX_ERROR__ABANDONMENT_CAUSE)
+    *a_specifierFlags = ENTRY__SPECIFIER_FLAG;
+    if (nac_blotvarReference != NULL) *nac_blotvarReference = ENTRY__BLOTVAR_REFERENCE;
+  break; case '{' : // <token id specifier> : 
+    if (b_FLAG_SET_OFF(*a_specifierFlags,TOKEN_ID__SPECIFIER_FLAG)) m_ABANDON_S(
+      SYNTAX_ERROR__ABANDONMENT_CAUSE)
+    *a_specifierFlags = TOKEN_ID__SPECIFIER_FLAG;
+    if (nac_blotvarReference != NULL) *nac_blotvarReference = TOKEN_ID__BLOTVAR_REFERENCE;
+  break; default:
+    m_ABANDON_S(SYNTAX_ERROR__ABANDONMENT_CAUSE)
+  } // switch
+
+  m_DIGGY_RETURN(ANSWER__YES)
+} // ParseSpecifier 
+
+// See .h 
+int ParseEndSpecifier(struct P_STRING *a_sequence, int specifierFlag, G_STRING_STUFF nc_abandonmentInfo) {
+  m_DIGGY_BOLLARD()
+  char singleChar = (char) UNDEFINED;
+  struct P_STRING lexeme = UNDEFINED_P_STRING;
+  switch (specifierFlag) {
+  case ENTRY__SPECIFIER_FLAG:
+    singleChar = ']';
+  break; case TOKEN_ID__SPECIFIER_FLAG:    
+    singleChar = '}';
+  break; default: 
+    m_RAISE(ANOMALY__VALUE__D,specifierFlag)
+  } // switch
+  o_PParsePassSingleChar(a_sequence,NULL,singleChar,&lexeme);
+  if (b_EMPTY_P_STRING(lexeme)) m_ABANDON_S(SYNTAX_ERROR__ABANDONMENT_CAUSE)
+  m_DIGGY_RETURN(ANSWER__YES)
+} // ParseEndSpecifier
+
 // See .h 
 int DelimitBlotregRequest(struct P_STRING *a_sequence, struct P_STRING *ac_blotregRequestSequence,
   G_STRING_STUFF nc_abandonmentInfo) { 
@@ -820,57 +872,6 @@ int ParseBlottabsLabel(struct P_STRING *a_sequence, int *an_blottabsLabel) {
   } // while 
   m_DIGGY_RETURN(RETURNED)
 } // ParseBlottabsLabel
-
-
-// See .h
-int ParseAndComputeSimpleBlotvarReference(struct P_STRING *a_sequence, 
-  g_BLOTREG_HANDLE blotregHandle, struct BLOTVAR_REFERENCE *ac_blotvarReference,
-  G_STRING_STUFF nc_abandonmentInfo) {
-  m_DIGGY_BOLLARD_S()
-m_DIGGY_VAR_P_STRING(*a_sequence)
-m_DIGGY_VAR_P(blotregHandle)
-  ac_blotvarReference->blotregHandle = blotregHandle;
-  struct P_STRING lexeme = UNDEFINED_P_STRING;
-
-  m_PREPARE_ABANDON(a_sequence,"<blotvar>")
-
-  om_PParsePassSpaces(a_sequence,NULL);
-
-  // Retrieve blotvar reference:
-  PParseOffset(a_sequence,1,&lexeme);
-  if (b_EMPTY_P_STRING(lexeme)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE) 
-  GENERIC_INTEGER genericInteger = UNDEFINED;
-  switch (lexeme.string[0]) {
-  case '.' : // '.' <entity> : 
-    ac_blotvarReference->blotvarReference = NAME__BLOTVAR_REFERENCE;
-    o_PParsePassChars(a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_WHILE,IsEntityNameChar,
-      (char)UNDEFINED,&lexeme);
-    ac_blotvarReference->c_select.c_name = lexeme;
-  break; case '[' : // '[' <intex> ']' :
-    ac_blotvarReference->blotvarReference = ENTRY__BLOTVAR_REFERENCE;
-    PParseGenericInteger(a_sequence,&genericInteger,&lexeme);
-    if (b_EMPTY_P_STRING(lexeme)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
-    // TODO: support empty or -1 entry when l-value (for smart fetch) 
-    else if (genericInteger > INT_MAX || genericInteger < 0) m_ABANDON(
-      VALUE_ERROR__ABANDONMENT_CAUSE)
-    else ac_blotvarReference->c_select.c_entry = genericInteger;
-    o_PParsePassSingleChar(a_sequence,NULL,']',&lexeme);
-    if (b_EMPTY_P_STRING(lexeme)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
-  break; case '{' : // '{' <intex> '}' : 
-    ac_blotvarReference->blotvarReference = TOKEN_ID__BLOTVAR_REFERENCE;
-    PParseGenericInteger(a_sequence,&genericInteger,&lexeme);
-    if (b_EMPTY_P_STRING(lexeme)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
-    else if (genericInteger > INT_MAX || genericInteger < 0) m_ABANDON(
-      VALUE_ERROR__ABANDONMENT_CAUSE)
-    else ac_blotvarReference->c_select.c_tokenId = genericInteger;
-    o_PParsePassSingleChar(a_sequence,NULL,'}',&lexeme);
-    if (b_EMPTY_P_STRING(lexeme)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
-  break; default:
-    m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE) 
-  } // switch
-
-  m_DIGGY_RETURN(ANSWER__YES) ;
-} // ParseAndComputeSimpleBlotvarReference 
 
 
 // See .h
