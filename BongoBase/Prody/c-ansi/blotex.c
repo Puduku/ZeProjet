@@ -325,7 +325,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
   struct G_REQUEST_CRITERION criteria5[5] ;  
   struct P_STRING subSequence; 
 
-  m_CHECK_ABANDON(DelimitBlotregRequest(a_sequence,&subSequence,nc_abandonmentInfo))
+  m_CHECK_ABANDON(DelimitBlotregRequest(a_sequence,NULL,&subSequence,nc_abandonmentInfo))
   struct BLOTEX_VALUE blotexValue = UNDEFINED_BLOTEX_VALUE ; 
   struct G_KEY gKey = {UNDEFINED};
   do {
@@ -383,7 +383,7 @@ static int BlotexlibExecutorParseAndComputeRValueBlotregOps(BLOTEXLIB_EXECUTOR_H
   struct P_STRING *a_sequence, struct P_STRING blotregName, g_BLOTREG_HANDLE n_blotregHandle,
   struct BLOTEX_VALUE *ac_blotexValue, G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
-
+m_DIGGY_VAR_P_STRING(*a_sequence)
   m_PREPARE_ABANDON(a_sequence, "<int blotreg ops> | <str blotreg ops>") 
 
   if (n_blotregHandle == NULL) m_ABANDON(UNKNOWN_BLOTREG__ABANDONMENT_CAUSE) 
@@ -548,7 +548,7 @@ static int BlotexlibExecutorParseAndComputeBlotregOrBlottabXName(BLOTEXLIB_EXECU
   struct P_STRING *a_sequence, int *an_blottabsLabel, struct P_STRING *a_name,
   void ** acnr_blottabHandle, g_BLOTREG_HANDLE *acn_blotregHandle) {
   m_DIGGY_BOLLARD()
-m_DIGGY_VAR_P(a_name)
+m_DIGGY_VAR_P_STRING(*a_sequence)
 
   ParseBlottabsLabel(a_sequence, an_blottabsLabel); 
   // Parse <entity> corresponding to blottab name:

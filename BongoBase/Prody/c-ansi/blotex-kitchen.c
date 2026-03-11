@@ -302,11 +302,11 @@ int ParseEndSpecifier(struct P_STRING *a_sequence, int specifierFlag, G_STRING_S
 } // ParseEndSpecifier
 
 // See .h 
-int DelimitBlotregRequest(struct P_STRING *a_sequence, struct P_STRING *ac_blotregRequestSequence,
-  G_STRING_STUFF nc_abandonmentInfo) { 
+int DelimitBlotregRequest(struct P_STRING *a_sequence,const char *np_sequenceType, 
+  struct P_STRING *ac_blotregRequestSequence, G_STRING_STUFF nc_abandonmentInfo) { 
   m_DIGGY_BOLLARD()
 m_DIGGY_VAR_P_STRING(*a_sequence)
-  m_PREPARE_ABANDON(a_sequence, "<blotreg request>")
+  m_PREPARE_ABANDON(a_sequence, (np_sequenceType != NULL? np_sequenceType:"<blotreg request>"))
 
   PParseTillMatch(a_sequence,o_PString(":?"),NULL, ac_blotregRequestSequence);
 m_DIGGY_VAR_P_STRING(*ac_blotregRequestSequence)
@@ -317,6 +317,32 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
   m_DIGGY_RETURN(ANSWER__YES)
 } // DelimitBlotregRequest
 
+// See .h 
+int DelimitCreationSequence(struct P_STRING *a_sequence, const char *p_sequenceType,
+  struct P_STRING *ac_creationSequence, G_STRING_STUFF nc_abandonmentInfo){
+  m_DIGGY_BOLLARD()
+m_DIGGY_VAR_P_STRING(*a_sequence)
+  m_PREPARE_ABANDON(a_sequence,p_sequenceType)
+
+  PParseTillMatch(a_sequence,o_PString("]?"),NULL, ac_creationSequence);
+m_DIGGY_VAR_P_STRING(*ac_creationSequence)
+m_DIGGY_VAR_P_STRING(*a_sequence)
+  if (b_EMPTY_P_STRING(*a_sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
+  PParseOffset(a_sequence,2,NULL);
+
+  m_DIGGY_RETURN(ANSWER__YES)
+} // DelimitCreationSequence
+
+// See .h 
+char b_ParseAnything(struct P_STRING *a_sequence) {
+  m_DIGGY_BOLLARD()
+m_DIGGY_VAR_P_STRING(*a_sequence)
+  struct P_STRING lexeme = UNDEFINED_P_STRING;
+  om_PParsePassSpaces(a_sequence,NULL);
+m_DIGGY_VAR_P_STRING(*a_sequence)
+  o_PParsePassSingleChar(a_sequence,NULL,'*',&lexeme); 
+  m_DIGGY_RETURN(!b_EMPTY_P_STRING(lexeme))
+} // b_ParseAnything
 
 // See .h 
 int ParseBlotregRequestAtom(struct P_STRING *a_sequence, int *ac_as, int *ac_indexSeekFlags,
@@ -324,12 +350,10 @@ int ParseBlotregRequestAtom(struct P_STRING *a_sequence, int *ac_as, int *ac_ind
   m_DIGGY_BOLLARD()
 m_DIGGY_VAR_P_STRING(*a_sequence)
   m_PREPARE_ABANDON(a_sequence, "<blotreg request atom>")
-  struct P_STRING lexeme;
 
   // <blotreg request atom int> | <blotreg request atom str> ...
   m_TRACK_IF(ParseAs(b_R_VALUE,a_sequence,ac_as) != RETURNED)
-  o_PParsePassSingleChar(a_sequence,NULL,'*',&lexeme);
-  if (!b_EMPTY_P_STRING(lexeme)) *ac_indexSeekFlags = INDEX_SEEK_FLAGS__ANY;
+  if (b_ParseAnything(a_sequence)) *ac_indexSeekFlags = INDEX_SEEK_FLAGS__ANY;
   else {  // select with actual criterion
     m_TRACK_IF(ParseRequestCompOp(a_sequence,*ac_as != AS__VALUE_INT,
       ac_indexSeekFlags) != RETURNED)
@@ -529,6 +553,7 @@ int ParseCompOp(int compOpExtension, struct P_STRING *a_sequence, int *an_compOp
   struct P_STRING lexeme; // UNDEFINED
   int n_matchedEntry = UNDEFINED;
   om_PParsePassSpaces(a_sequence,NULL);
+m_DIGGY_VAR_P_STRING(*a_sequence)
   m_P_PARSE_MATCH_AMONG_C(*a_sequence,NULL,&n_matchedEntry,an_compOp,&lexeme, 9,
     "===", compOpExtension == STR__COMP_OP_EXTENSION? LIKE__STR__COMP_OP: -1,
     "!=",NOT_EQUAL__COMP_OP, ">=",GREATER_EQUAL__COMP_OP, "<=",LESS_EQUAL__COMP_OP,
@@ -576,7 +601,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
   int n_compOp = UNDEFINED;
   m_TRACK_IF(ParseCompOp(b_str? STR__COMP_OP_EXTENSION:
     NO__COMP_OP_EXTENSION, a_sequence, &n_compOp) != RETURNED)
-
+m_DIGGY_VAR_D(n_compOp)
   switch (n_compOp) {
   case -1: 
     *an_indexSeekFlags = -1;
@@ -701,13 +726,12 @@ int ProbeBlotexAtom(struct P_STRING *a_sequence,G_STRINGS_HANDLE workingGStrings
   int *acn_int1Op, int *ac_probedBlotexAtom, struct BLOTEX_VALUE *acc_blotexAtomValue,
   G_STRING_STUFF nc_abandonmentInfo) { 
   m_DIGGY_BOLLARD()
-
-  //m_PREPARE_ABANDON(a_sequence, "<intex atom> | <strex atom>")
+m_DIGGY_VAR_P_STRING(*a_sequence)
   m_CHECK_ABANDON(ParseExistingSequence(a_sequence,"<intex atom> | <strex atom>",
     nc_abandonmentInfo))
 
   m_TRACK_IF(ParseInt1Op(a_sequence, acn_int1Op) != RETURNED)
-
+m_DIGGY_VAR_D(*acn_int1Op)
   char b_parsed = (char) UNDEFINED; 
   m_TRACK_IF(ParseIntConstant(a_sequence, &b_parsed, acc_blotexAtomValue) != RETURNED)
   *ac_probedBlotexAtom = CONSTANT__PROBED_BLOTEX_ATOM; // a priori
@@ -721,6 +745,7 @@ int ProbeBlotexAtom(struct P_STRING *a_sequence,G_STRINGS_HANDLE workingGStrings
       else *ac_probedBlotexAtom = OTHER__PROBED_BLOTEX_ATOM; 
     } // if 
   } // if 
+m_DIGGY_VAR_D(*ac_probedBlotexAtom)
   m_DIGGY_RETURN(ANSWER__YES) 
 } // ProbeBlotexAtom
 

@@ -49,13 +49,13 @@
 // <blottab op read str> ::= <op read set> <entity> <<as value str>> 
 //
 // Blottabs must be explicitely created
-// <blottab creation> ::= ( <entity> [ <<as value int>> | <<as value str>> ]2 )+ ']?' 
+// <blottab creation> ::= ( <entity> [ <<as value int>> | <<as value str>> ]2 )+ <end create> 
 //
 // Like blotreg requests, blottab requests are made of "atoms" : 
 // <blottab request> ::= <blottab request atom> ( <logical 2op> <blottab request atom> )* ':?'
 // <blottab request atom> ::= <blottab request atom int> | <blottab request atom str>
-// <blottab request atom int> ::= <entity> [ <<as value int>> ] ( '*' | ( <comp op> <intex> ) )
-// <blottab request atom str> ::= <entity> <<as value str>> ( '*' | ( <str comp op> <strex> ) )
+// <blottab request atom int> ::= <entity> [ <<as value int>> ] ( <anything> | ( <comp op> <intex> ) )
+// <blottab request atom str> ::= <entity> <<as value str>> ( <anything> | ( <str comp op> <strex> ) )
 
 // Blotab 'r-value' spots:
 // -----------------------

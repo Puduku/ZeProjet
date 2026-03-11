@@ -144,6 +144,9 @@
 // <op read set> ::= '='
 // <op insert> ::= '@'
 //
+// <end select> ::= ':?'
+// <end create> ::= ']?'
+//
 // Register 'r-value' operations :
 // Register operations may be combined together in a sequence.
 // The global value of the operations corresponds to that of the last operation of the sequence.
@@ -167,13 +170,15 @@
 //   <blotreg op read str>
 // <blotreg op read str> ::= <op read set> ( <<as value str>> | <<as name>> )  
 //
+// <anything> ::= '*'
 // Blotreg requests are made of "atoms" : 
-// <blotreg request> ::= <blotreg request atom> ( <logical 2op> <blotreg request atom> )* ':?'
+// <blotreg request> ::= <blotreg request atom> ( <logical 2op> <blotreg request atom> )*
+//   <end select>
 // <blotreg request atom> ::= <blotreg request atom int> | <blotreg request atom str>
-// <blotreg request atom int> ::= [ <<as value int>> | <<as entry>> | <<as id>> ] ( '*' | (
+// <blotreg request atom int> ::= [ <<as value int>> | <<as entry>> | <<as id>> ] ( <anything> | (
 //   <comp op> <intex> ) )
-// <blotreg request atom str> ::= ( <<as value str>> | <<as name>> ) ( '*' | ( <str comp op> <strex>
-//   ) )
+// <blotreg request atom str> ::= ( <<as value str>> | <<as name>> ) ( <anything> | ( <str comp op>
+//   <strex>  ) )
 //
 // <logical 2op> ::= 'and' | 'or'
 //

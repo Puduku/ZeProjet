@@ -311,19 +311,16 @@ static inline int ml_BlotexlibExecutorParseAndComputeBlottabRequest(
   BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING *a_sequence, BLOTTAB_HANDLE blottabHandle,
   G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
-
+m_DIGGY_VAR_P_STRING(*a_sequence)
   m_PREPARE_ABANDON(a_sequence, "<blottab request>") 
 
   int criteriaNumber = 0;
   struct G_REQUEST_CRITERION criteria5[5] ;  
-  struct P_STRING lexeme = UNDEFINED_P_STRING;
   struct P_STRING subSequence = UNDEFINED_P_STRING; 
 
-  PParseTillMatch(a_sequence,o_PString(":?"),NULL, &subSequence);
-m_DIGGY_VAR_P_STRING(subSequence)
-m_DIGGY_VAR_P_STRING(*a_sequence)
-  if (b_EMPTY_P_STRING(*a_sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
-  PParseOffset(a_sequence,2,NULL);
+  m_CHECK_ABANDON(DelimitBlotregRequest(a_sequence,"<blottab request>",&subSequence,
+    nc_abandonmentInfo))
+
   m_PRECISE_ABANDON(&subSequence, "<blottab request atom>") 
   struct BLOTEX_VALUE blotexValue = UNDEFINED_BLOTEX_VALUE; 
   struct G_KEY gKey = { UNDEFINED };
@@ -336,12 +333,8 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
 m_DIGGY_VAR_P_STRING(subSequence)
     
     int n_indexSeekFlags = UNDEFINED;
-    om_PParsePassSpaces(&subSequence,NULL);
-    o_PParsePassSingleChar(&subSequence,NULL,'*',&lexeme);
-m_DIGGY_VAR_P_STRING(lexeme)
-    if (!b_EMPTY_P_STRING(lexeme)) n_indexSeekFlags = INDEX_SEEK_FLAGS__ANY;
+    if (b_ParseAnything(&subSequence)) n_indexSeekFlags = INDEX_SEEK_FLAGS__ANY;
     else {  // select with actual criterion
-m_DIGGY_VAR_P_STRING(lexeme)
       m_TRACK_IF(ParseRequestCompOp(&subSequence,asValue != AS__VALUE_INT,
         &n_indexSeekFlags) != RETURNED)
       if (n_indexSeekFlags < 0) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
@@ -368,8 +361,7 @@ m_DIGGY_VAR_P_STRING(subSequence)
     m_ASSERT(criteriaNumber < 5)
     criteria5[criteriaNumber++] = m_GRequestCriterion_GKeys(tableIndexLabel,
       n_indexSeekFlags,&gKey, criteriaOpFlags);
-    om_PParsePassSpaces(&subSequence,NULL);
-  } while (!b_EMPTY_P_STRING(subSequence)) ; 
+  } while (!b_EmptySequence(&subSequence)) ; 
 
   switch (GStringsIndexRequestR(blottabHandle->h_tableHandle,NULL,criteriaNumber,criteria5)) {
   case COMPLETED__OK:
@@ -436,15 +428,17 @@ static inline int ml_BlotexlibExecutorParseAndComputeBlottabCreation(
   G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
 
-  m_PREPARE_ABANDON(a_sequence, "<blottab creation>") 
+//  m_PREPARE_ABANDON(a_sequence, "<blottab creation>") 
 
   struct P_STRING subSequence = UNDEFINED_P_STRING; 
 
-  PParseTillMatch(a_sequence,o_PString("]?"),NULL, &subSequence);
-m_DIGGY_VAR_P_STRING(subSequence)
-m_DIGGY_VAR_P_STRING(*a_sequence)
-  if (b_EMPTY_P_STRING(*a_sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
-  PParseOffset(a_sequence,2,NULL);
+  m_CHECK_ABANDON(DelimitCreationSequence(a_sequence,"<blottab creation>",&subSequence,
+    nc_abandonmentInfo))
+//  PParseTillMatch(a_sequence,o_PString("]?"),NULL, &subSequence);
+//m_DIGGY_VAR_P_STRING(subSequence)
+//m_DIGGY_VAR_P_STRING(*a_sequence)
+//  if (b_EMPTY_P_STRING(*a_sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
+//  PParseOffset(a_sequence,2,NULL);
 
   struct P_STRING s_names10[10]; // UNDEFINED
   int s_blottabIndexFlags10[10]; // UNDEFINED

@@ -408,18 +408,53 @@ int ParseEndSpecifier(struct P_STRING *a_sequence, int specifierFlag, G_STRING_S
 //
 // Passed:
 // - *a_sequence: before parsing
+// - np_sequenceType: 
 //
 // Changed:
 // - *a_sequence: after parsing 
 // - *ac_blotregRequestSequence: delimited blotreg request 
 // - nc_abandonmentInfo: only significant if abandon
 // 
-// Ret: parsed successfully ? 
+// Ret: delimited successfully ? 
 // - ANSWER__YES: Ok,
 // - ANSWER__NO: not localized; abandon processing 
 // - 1: unexpected problem; anomaly is raised
-int DelimitBlotregRequest(struct P_STRING *a_sequence, struct P_STRING *ac_blotregRequestSequence,
-  G_STRING_STUFF nc_abandonmentInfo);
+int DelimitBlotregRequest(struct P_STRING *a_sequence, const char *np_sequenceType,
+  struct P_STRING *ac_blotregRequestSequence, G_STRING_STUFF nc_abandonmentInfo);
+
+// Delimit "creation" sequence  
+//
+// Passed:
+// - *a_sequence: before parsing
+// - p_sequenceType: 
+//
+// Changed:
+// - *a_sequence: after parsing 
+// - *ac_creationSequence: delimited creation sequence
+// - nc_abandonmentInfo: only significant if abandon
+// 
+// Ret: delimited successfully ? 
+// - ANSWER__YES: Ok,
+// - ANSWER__NO: not localized; abandon processing 
+// - 1: unexpected problem; anomaly is raised
+int DelimitCreationSequence(struct P_STRING *a_sequence, const char *p_sequenceType,
+  struct P_STRING *ac_creationSequence, G_STRING_STUFF nc_abandonmentInfo);
+
+
+
+
+
+// Parse <anything> aka. '*'
+//
+// Passed:
+// - *a_sequence: before parsing
+//
+// Changed:
+// - *a_sequence: after parsing 
+// - *an_indexFetchFlags:
+//
+// Ret: <op next> parsed ? (TRUE/FALSE)
+char b_ParseAnything(struct P_STRING *a_sequence);
 
 //
 // Passed:
