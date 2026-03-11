@@ -434,11 +434,6 @@ static inline int ml_BlotexlibExecutorParseAndComputeBlottabCreation(
 
   m_CHECK_ABANDON(DelimitCreationSequence(a_sequence,"<blottab creation>",&subSequence,
     nc_abandonmentInfo))
-//  PParseTillMatch(a_sequence,o_PString("]?"),NULL, &subSequence);
-//m_DIGGY_VAR_P_STRING(subSequence)
-//m_DIGGY_VAR_P_STRING(*a_sequence)
-//  if (b_EMPTY_P_STRING(*a_sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
-//  PParseOffset(a_sequence,2,NULL);
 
   struct P_STRING s_names10[10]; // UNDEFINED
   int s_blottabIndexFlags10[10]; // UNDEFINED
@@ -469,8 +464,7 @@ m_DIGGY_VAR_D(n_asValue2)
       m_SET_FLAG_ON(s_blottabIndexFlags10[i],STR__BLOTTAB_INDEX_FLAG)
     break; default: m_RAISE(ANOMALY__VALUE__D,n_asValue2)
     } // switch
-    om_PParsePassSpaces(&subSequence,NULL);
-  } while (!b_EMPTY_P_STRING(subSequence)) ; 
+  } while (!b_EmptySequence(&subSequence)) ; 
 
   switch(ml_BlotexlibExecutorCreateBlottab(handle, blottabsLabel,nonExistingBlottabName, i+1, s_names10,
     s_blottabIndexFlags10, ac_blottabHandle)) {
