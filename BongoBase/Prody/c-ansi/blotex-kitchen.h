@@ -55,21 +55,19 @@ int BlotregDestroyInstance(void *xhr_handle) ;
 #define g_BLOTVAR_STUFF g_G_PARAM_STUFF
 
 // specific blotvar reference (of a register) 
-enum {
-  NAME__BLOTVAR_REFERENCE, // blotvar identified as '.' <entity> 
-  ENTRY__BLOTVAR_REFERENCE, // blotvar identified as '[' <intex> ']'
-  TOKEN_ID__BLOTVAR_REFERENCE, // blotvar identified as {' <intex> '}'
-  CURRENT__BLOTVAR_REFERENCE // Current blotvar '?=' 
-};
+
+#define     NAME__SPECIFIER_FLAG 0x01
+#define    ENTRY__SPECIFIER_FLAG 0x02
+#define TOKEN_ID__SPECIFIER_FLAG 0x04
 
 struct BLOTVAR_REFERENCE {
   g_BLOTREG_HANDLE blotregHandle;
-  int blotvarReference;
+  int n_specifierFlag; // -1 special value => current blotvar reference 
   union {
-    struct P_STRING c_name; // Only significant with NAME__BLOTVAR_REFERENCE
-    int c_entry; // Only significant with ENTRY__BLOTVAR_REFERENCE
-    int c_tokenId; // Only significant with TOKEN_ID__BLOTVAR_REFERENCE
-  } c_select; // NOT significant with CURRENT__BLOTVAR_REFERENCE
+    struct P_STRING c_name; // Only significant with NAME__SPECIFIER_FLAG 
+    int c_entry; // Only significant with ENTRY__SPECIFIER_FLAG
+    int c_tokenId; // Only significant with TOKEN_ID__SPECIFIER_FLAG
+  } c_select; // NOT significant with current blotvar reference
 } ;
 
 #define UNDEFINED_BLOTVAR_REFERENCE { (g_BLOTREG_HANDLE) UNDEFINED }
@@ -314,7 +312,7 @@ int ParseEndOfSequence(struct P_STRING *a_sequence, G_STRING_STUFF nc_abandonmen
 // 
 // Ret:
 // - RETURNED: Ok
-int o_ParseEntity(struct P_STRING *a_sequence, struct P_STRING *a_entityName) ;
+int o_ParseEntityName(struct P_STRING *a_sequence, struct P_STRING *a_entityName) ;
 
 
 #define b_L_VALUE b_TRUE
@@ -327,10 +325,6 @@ enum {
   AS__ID,       // '!'
   AS__VALUE_STR,// '$'
 } ;
-
-static inline int mb_AsValue(int as) {
-  return as == AS__VALUE_INT || as == AS__VALUE_STR;
-} // mb_AsValue
 
 
 // Parse "as" specifier (not present : default to '#" value int) 
@@ -363,29 +357,22 @@ int ParseAs(char b_lValue, struct P_STRING *a_sequence, int *a_as) ;
 int ParseAsValue(struct P_STRING *a_sequence, int *an_asValue) ;
 
 
-#define     NAME__SPECIFIER_FLAG 0x01
-#define    ENTRY__SPECIFIER_FLAG 0x02
-#define TOKEN_ID__SPECIFIER_FLAG 0x04
-
-
 // Parse (begin of) specifier 
 //
 // Passed:
 // - *a_sequence: before parsing
 // - *a_specifierFlags: expected specifiers to parse
-// - nac_blotvarReference: NULL special pointer: not used
 //
 // Changed:
 // - *a_sequence: after parsing 
 // - *a_specifierFlags: parsed specifier (only significant if no abandon)
-// - *nac_blotvarReference: (when used) only significant if no abandon
 // - nc_abandonmentInfo: only significant if abandon
 // 
 // Ret: parsed successfully ? 
 // - ANSWER__YES: Ok,
 // - ANSWER__NO: not localized; abandon processing 
 // - 1: unexpected problem; anomaly is raised
-int ParseSpecifier(struct P_STRING *a_sequence, int *a_specifierFlags, int *nac_blotvarReference,
+int ParseSpecifier(struct P_STRING *a_sequence, int *a_specifierFlags, 
   G_STRING_STUFF nc_abandonmentInfo); 
 
 // Parse end of specifier 

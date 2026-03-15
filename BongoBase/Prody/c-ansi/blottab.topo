@@ -21,13 +21,13 @@
 
 // REMINDER (see c-ansi/blotex.topo) :
 // "GENUINE" Blot table 'r-value' operations and spots :
-// <int blottab> ::= '^' <entity> ( ( <ops indicator> <int blottab ops> ) | <int blottab spot> )
-// <str blottab> ::= '^' <entity> ( ( <ops indicator> <str blottab ops> ) | <str blottab spot> )
+// <int blottab> ::= '^' <entity name> ( ( <ops indicator> <int blottab ops> ) | <int blottab spot> )
+// <str blottab> ::= '^' <entity name> ( ( <ops indicator> <str blottab ops> ) | <str blottab spot> )
 //
 // "GENUINE" Blot table 'l-value' operations and spots :
-// <int blottab ref> ::= '^' <entity> ( ( <ops indicator> <blottab ref op set int> ) |
+// <int blottab ref> ::= '^' <entity name> ( ( <ops indicator> <blottab ref op set int> ) |
 //   <int blottab spot ref> )
-// <str blottab ref> ::= '^' <entity> ( ( <ops indicator> <blottab ref op set str> ) |
+// <str blottab ref> ::= '^' <entity name> ( ( <ops indicator> <blottab ref op set str> ) |
 //   <str blottab spot ref> )
 //
 //
@@ -42,20 +42,20 @@
 //   [ <op insert> ] [ <op next> ] [ <blottab op read int> ] ) 
 // <blottab op create> ::= <op create> <blottab creation> 
 // <blottab op select> ::= <op select> <blottab request>
-// <blottab op read int> ::= <op read set> <entity> [ <<as value int>> ] 
+// <blottab op read int> ::= <op read set> <entity name> [ <<as value int>> ] 
 //
 // <str blottab ops> ::= [ <blottab op select> ] [ <op reset> ] [ <op insert> ] [ <op next> ]
 //   <blottab op read str>
-// <blottab op read str> ::= <op read set> <entity> <<as value str>> 
+// <blottab op read str> ::= <op read set> <entity name> <<as value str>> 
 //
 // Blottabs must be explicitely created
-// <blottab creation> ::= ( <entity> [ <<as value int>> | <<as value str>> ]2 )+ <end create> 
+// <blottab creation> ::= ( <entity name> [ <<as value int>> | <<as value str>> ]2 )+ <end create> 
 //
 // Like blotreg requests, blottab requests are made of "atoms" : 
 // <blottab request> ::= <blottab request atom> ( <logical 2op> <blottab request atom> )* ':?'
 // <blottab request atom> ::= <blottab request atom int> | <blottab request atom str>
-// <blottab request atom int> ::= <entity> [ <<as value int>> ] ( <anything> | ( <comp op> <intex> ) )
-// <blottab request atom str> ::= <entity> <<as value str>> ( <anything> | ( <str comp op> <strex> ) )
+// <blottab request atom int> ::= <entity name> [ <<as value int>> ] ( <anything> | ( <comp op> <intex> ) )
+// <blottab request atom str> ::= <entity name> <<as value str>> ( <anything> | ( <str comp op> <strex> ) )
 
 // Blotab 'r-value' spots:
 // -----------------------
@@ -67,9 +67,9 @@
 // Blot table 'l-value' operations:
 // --------------------------------
 // Set current int value operation (l-value): 
-// <blottab ref op set int> ::= <op read set> <entity> [ <<as value int>> ] 
+// <blottab ref op set int> ::= <op read set> <entity name> [ <<as value int>> ] 
 // Set current str value operation (l-value): 
-// <blottab ref op set str> ::= <op read set> <entity> <<as value str>> 
+// <blottab ref op set str> ::= <op read set> <entity name> <<as value str>> 
 
 // Blotab 'l-value' spots:
 // -----------------------

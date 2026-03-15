@@ -127,8 +127,8 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
   struct P_STRING fieldName = UNDEFINED_P_STRING;
   *ac_asValue = UNDEFINED;
  
-  m_PREPARE_ABANDON(a_sequence,"<entity> [ <<as value int>> | <<as value str>> ]")
-  o_ParseEntity(a_sequence,&fieldName); 
+  m_PREPARE_ABANDON(a_sequence,"<entity name> [ <<as value int>> | <<as value str>> ]")
+  o_ParseEntityName(a_sequence,&fieldName); 
   
   m_TRACK_IF(ParseAsValue(a_sequence, ac_asValue) != RETURNED)  
   if (*ac_asValue == -1) *ac_asValue = AS__VALUE_INT;
@@ -218,7 +218,7 @@ static int l_BlotexlibExecutorParseAndRetrieveBlottabSpot(BLOTEXLIB_EXECUTOR_HAN
 
   m_PREPARE_ABANDON(a_sequence, "<blottab spot>") 
   int specifierFlags = ENTRY__SPECIFIER_FLAG;
-  m_CHECK_ABANDON(ParseSpecifier(a_sequence,&specifierFlags,NULL,nc_abandonmentInfo))
+  m_CHECK_ABANDON(ParseSpecifier(a_sequence,&specifierFlags,nc_abandonmentInfo))
   struct BLOTEX_VALUE entryBlotexValue = {UNDEFINED};
   m_CHECK_ABANDON(BlotexlibExecutorParseAndComputeBlotex(handle,a_sequence,&entryBlotexValue,
     nc_abandonmentInfo))
@@ -233,7 +233,7 @@ static int l_BlotexlibExecutorParseAndRetrieveBlottabSpot(BLOTEXLIB_EXECUTOR_HAN
 
   m_CHECK_ABANDON(ParseEndSpecifier(a_sequence,specifierFlags,nc_abandonmentInfo))
   specifierFlags = NAME__SPECIFIER_FLAG;
-  m_CHECK_ABANDON(ParseSpecifier(a_sequence,&specifierFlags,NULL,nc_abandonmentInfo))
+  m_CHECK_ABANDON(ParseSpecifier(a_sequence,&specifierFlags,nc_abandonmentInfo))
 
   *ac_asValue = UNDEFINED; 
   *ac_element = UNDEFINED;
@@ -442,7 +442,7 @@ static inline int ml_BlotexlibExecutorParseAndComputeBlottabCreation(
   do {
     m_ASSERT(++i < 10)
     s_blottabIndexFlags10[i] = ALL_FLAGS_OFF0;
-    o_ParseEntity(&subSequence,s_names10 + i);
+    o_ParseEntityName(&subSequence,s_names10 + i);
 m_DIGGY_VAR_P_STRING(s_names10[i])
     m_TRACK_IF(ParseAsValue(&subSequence, &n_asValue) != RETURNED)  
 m_DIGGY_VAR_D(n_asValue)

@@ -63,12 +63,12 @@ int FetchBlotvar(const struct BLOTVAR_REFERENCE *ap_blotvarReference, char cb_lV
 
   int ret = UNDEFINED;
   *ant_blotvarStuff = (g_BLOTVAR_STUFF)UNDEFINED;
-  switch (ap_blotvarReference->blotvarReference) {
-  case NAME__BLOTVAR_REFERENCE:
-  case TOKEN_ID__BLOTVAR_REFERENCE:
+  switch (ap_blotvarReference->n_specifierFlag) {
+  case NAME__SPECIFIER_FLAG:
+  case TOKEN_ID__SPECIFIER_FLAG:
     { struct G_KEY gKey ;
       int indexLabel = UNDEFINED;
-      if (ap_blotvarReference->blotvarReference == NAME__BLOTVAR_REFERENCE) {
+      if (ap_blotvarReference->n_specifierFlag == NAME__SPECIFIER_FLAG) {
         indexLabel = NAME__BLOTREG_INDEX_LABEL;
 m_DIGGY_VAR_P_STRING(ap_blotvarReference->c_select.c_name)
         gKey = m_GKey_PString(ap_blotvarReference->c_select.c_name);
@@ -84,10 +84,10 @@ m_DIGGY_VAR_P(ap_blotvarReference->blotregHandle)
       break; case RESULT__NOT_FOUND:
         if (cb_lValue) { 
           m_ASSERT(*ant_blotvarStuff != NULL)
-          if (ap_blotvarReference->blotvarReference == NAME__BLOTVAR_REFERENCE)
+          if (ap_blotvarReference->n_specifierFlag == NAME__SPECIFIER_FLAG)
             m_TRACK_IF(m_GParamNameCopy(*ant_blotvarStuff,0,ap_blotvarReference->c_select.c_name)
               < 0)
-          else { // TOKEN_ID__BLOTVAR_REFERENCE 
+          else { // TOKEN_ID__SPECIFIER_FLAG
             m_TRACK_IF(GParamNameAssign(*ant_blotvarStuff,(struct P_STRING*)NULL,
               ap_blotvarReference->c_select.c_tokenId, ap_blotvarReference->blotregHandle)
               < 0)
@@ -97,12 +97,12 @@ m_DIGGY_VAR_P(ap_blotvarReference->blotregHandle)
         m_TRACK()
       } // switch
     } // gKey 
-  break; case ENTRY__BLOTVAR_REFERENCE:
+  break; case ENTRY__SPECIFIER_FLAG:
     ret = g_BlotregFetch(ap_blotvarReference->blotregHandle,
       ap_blotvarReference->c_select.c_entry, ant_blotvarStuff);
     m_TRACK_IF(ret < 0)
 m_ASSERT(ret == ap_blotvarReference->c_select.c_entry)
-  break; case CURRENT__BLOTVAR_REFERENCE:
+  break; case -1: // current blotvar reference 
     switch (g_BlotregIndexFetch(ap_blotvarReference->blotregHandle,NULL,
       INDEX_FETCH_FLAGS__CURRENT, ant_blotvarStuff, navn_entry)){
     case RESULT__FOUND:
@@ -113,7 +113,7 @@ m_ASSERT(*ant_blotvarStuff == NULL)
     } // switch   
  
   break; default:
-    m_RAISE(ANOMALY__VALUE__D,ap_blotvarReference->blotvarReference)  
+    m_RAISE(ANOMALY__VALUE__D,ap_blotvarReference->n_specifierFlag)  
   } // switch
 
   m_DIGGY_RETURN(RETURNED)
@@ -194,19 +194,19 @@ int ParseEndOfSequence(struct P_STRING *a_sequence, G_STRING_STUFF nc_abandonmen
 
 
 // IS_CHAR_FUNCTION:
-// Recognize any character corresponding to <entity>
+// Recognize any character corresponding to <entity name>
 static int IsEntityNameChar(int c) {
   return (c == '_' || isalnum(c));
 } // IsEntityNameChar 
 
 // See .h 
-int o_ParseEntity(struct P_STRING *a_sequence, struct P_STRING *a_entityName) {
+int o_ParseEntityName(struct P_STRING *a_sequence, struct P_STRING *a_entityName) {
   m_DIGGY_BOLLARD()
   om_PParsePassSpaces(a_sequence,NULL);
   o_PParsePassChars(a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_WHILE,IsEntityNameChar,
-    (char)UNDEFINED,a_entityName); // <entity>
+    (char)UNDEFINED,a_entityName); // <entity name>
   m_DIGGY_RETURN(RETURNED)
-} // o_ParseEntity
+} // o_ParseEntityName
 
 
 
@@ -251,7 +251,7 @@ m_DIGGY_VAR_D(*an_asValue)
 
 
 // See .h 
-int ParseSpecifier(struct P_STRING *a_sequence, int *a_specifierFlags, int *nac_blotvarReference,
+int ParseSpecifier(struct P_STRING *a_sequence, int *a_specifierFlags, 
   G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
 
@@ -265,17 +265,14 @@ int ParseSpecifier(struct P_STRING *a_sequence, int *a_specifierFlags, int *nac_
     if (b_FLAG_SET_OFF(*a_specifierFlags,NAME__SPECIFIER_FLAG)) m_ABANDON_S(
       SYNTAX_ERROR__ABANDONMENT_CAUSE)
     *a_specifierFlags = NAME__SPECIFIER_FLAG;
-    if (nac_blotvarReference != NULL) *nac_blotvarReference = NAME__BLOTVAR_REFERENCE;
   break; case '[' : // <entry specifier>  :
     if (b_FLAG_SET_OFF(*a_specifierFlags,ENTRY__SPECIFIER_FLAG)) m_ABANDON_S(
       SYNTAX_ERROR__ABANDONMENT_CAUSE)
     *a_specifierFlags = ENTRY__SPECIFIER_FLAG;
-    if (nac_blotvarReference != NULL) *nac_blotvarReference = ENTRY__BLOTVAR_REFERENCE;
   break; case '{' : // <token id specifier> : 
     if (b_FLAG_SET_OFF(*a_specifierFlags,TOKEN_ID__SPECIFIER_FLAG)) m_ABANDON_S(
       SYNTAX_ERROR__ABANDONMENT_CAUSE)
     *a_specifierFlags = TOKEN_ID__SPECIFIER_FLAG;
-    if (nac_blotvarReference != NULL) *nac_blotvarReference = TOKEN_ID__BLOTVAR_REFERENCE;
   break; default:
     m_ABANDON_S(SYNTAX_ERROR__ABANDONMENT_CAUSE)
   } // switch
@@ -909,7 +906,7 @@ int ParseAndComputeLValueBlotregOps(
 
   if (n_blotregHandle == NULL) m_ABANDON(UNKNOWN_BLOTREG__ABANDONMENT_CAUSE)
   ac_blotvarReference->blotregHandle = n_blotregHandle; 
-  ac_blotvarReference->blotvarReference = CURRENT__BLOTVAR_REFERENCE;
+  ac_blotvarReference->n_specifierFlag = -1; // current blotvar reference  
   *ac_lValueAs = UNDEFINED; // For the moment 
 
   om_PParsePassSpaces(a_sequence,NULL);

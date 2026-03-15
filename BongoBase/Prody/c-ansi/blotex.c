@@ -454,11 +454,10 @@ m_DIGGY_VAR_P(blotregHandle)
   struct BLOTEX_VALUE intexValue = {UNDEFINED};
   // Retrieve blotvar reference:
   int specifierFlags = NAME__SPECIFIER_FLAG | ENTRY__SPECIFIER_FLAG | TOKEN_ID__SPECIFIER_FLAG;
-  m_CHECK_ABANDON(ParseSpecifier(a_sequence,&specifierFlags,&ac_blotvarReference->blotvarReference,
-    nc_abandonmentInfo))
-  switch (specifierFlags) {
+  m_CHECK_ABANDON(ParseSpecifier(a_sequence,&specifierFlags, nc_abandonmentInfo))
+  switch (ac_blotvarReference->n_specifierFlag = specifierFlags) {
   case NAME__SPECIFIER_FLAG:
-    o_ParseEntity(a_sequence,&ac_blotvarReference->c_select.c_name);
+    o_ParseEntityName(a_sequence,&ac_blotvarReference->c_select.c_name);
   break; case ENTRY__SPECIFIER_FLAG:
     m_CHECK_ABANDON(BlotexlibExecutorParseAndComputeBlotex(handle,a_sequence,&intexValue,
       nc_abandonmentInfo))
@@ -486,7 +485,7 @@ m_DIGGY_VAR_P(blotregHandle)
 //
 // Passed:
 // - handle:
-// - *a_sequence: after parsing of register name <entity> 
+// - *a_sequence: after parsing of register name <entity name> 
 // - blotregName: register name
 //
 // Changed:
@@ -551,8 +550,8 @@ static int BlotexlibExecutorParseAndComputeBlotregOrBlottabXName(BLOTEXLIB_EXECU
 m_DIGGY_VAR_P_STRING(*a_sequence)
 
   ParseBlottabsLabel(a_sequence, an_blottabsLabel); 
-  // Parse <entity> corresponding to blottab name:
-  o_ParseEntity(a_sequence,a_name);
+  // Parse <entity name> corresponding to blottab name:
+  o_ParseEntityName(a_sequence,a_name);
 m_DIGGY_VAR_P_STRING(*a_name)
 m_DIGGY_VAR_D(*an_blottabsLabel)
   if (*an_blottabsLabel >= 0) {

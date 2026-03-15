@@ -67,14 +67,16 @@
 // supported.
 //
 // REMINDER (see c-ansi/blotex.topo) :
-// <int blottab2> ::= '^^' <entity> ( ( <ops indicator> <int blottab2 ops> ) | <int blottab2 spot> )
-// <str blottab2> ::= '^^' <entity> ( ( <ops indicator> <str blottab2 ops> ) | <str blottab2 spot> )
+// <int blottab2> ::= '^^' <entity name> ( ( <ops indicator> <int blottab2 ops> ) | 
+//   <int blottab2 spot> )
+// <str blottab2> ::= '^^' <entity name> ( ( <ops indicator> <str blottab2 ops> ) |
+//   <str blottab2 spot> )
 
 
 // Spots:
 // ------
 //
-// <blottab2 spot> ::= ( ( ( '.' <entity> [ '#' <intex> ] ) | ( '@' <intex> [ ':' <intex> ] ) )
+// <blottab2 spot> ::= ( ( ( '.' <entity name> [ '#' <intex> ] ) | ( '@' <intex> [ ':' <intex> ] ) )
 //   [ '[' <intex> ']' ] [ <str portion> ] )+ 
 // <int blottab2 spot> ::= [ <blottab2 spot> ] <read set op> <int blottab2 spec> 
 // <str blottab2 spot> ::= [ <blottab2 spot> ] <read set op> <str blottab2 spec> 
@@ -104,7 +106,7 @@
 
 // EXAMPLES:
 // ---------
-// Operation examples : '^^' <entity> <ops indicator> ( <int blottab2 ops>  | <str blottab2 ops> )
+// Operation examples : '^^' <entity name> <ops indicator> ( <int blottab2 ops>  | <str blottab2 ops> )
 // => dumping pamphlet RLCM1K:
 //   ^^RLCM1K?: * :?  
 // => dumping pamphlet RLCM1K, limited to spots having 2 depth max:
@@ -126,7 +128,7 @@
 // => Read current spot name in implicit pamphlet: 
 //   ^^?=n 
 //
-// Spot examples : '^^' <entity> ( <int blottab2 spot> | <str blottab2 spot> )
+// Spot examples : '^^' <entity name> ( <int blottab2 spot> | <str blottab2 spot> )
 // => Spots the total length of the 6 occurences of the AMeLim field: 
 //   ^^RLC04K.AMeLim=l 
 // => the value (string content) of the 1st occurence of AMeLim:
