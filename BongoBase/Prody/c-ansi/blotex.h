@@ -244,7 +244,7 @@ int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
 //
 // Passed:
 // - handle:
-// - asValue: AS__VALUE_INT / AS__VALUE_STR 
+// - b_strValue: b_INT_VALUE / b_STR_VALUE
 // - c_blotval:
 // - cap_str:
 // - cb_fugaciousStr: (TRUE/FALSE) NOTICE: if you intialize TWICE a
@@ -257,8 +257,8 @@ int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
 // - RETURNED: Ok
 // - -1: unexpected problem; anomaly is raised
 int BlotexlibExecutorSetBlotexValue(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct BLOTEX_VALUE *a_blotexValue, int asValue,
-  gen_BLOTVAL c_blotval, const struct P_STRING* cap_str, char cb_fugaciousStr) ;
+  struct BLOTEX_VALUE *a_blotexValue, char b_strValue, gen_BLOTVAL c_blotval,
+  const struct P_STRING* cap_str, char cb_fugaciousStr);
 
 
 // Passed:

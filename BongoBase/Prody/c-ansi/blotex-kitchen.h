@@ -95,7 +95,8 @@ int FetchBlotvar(const struct BLOTVAR_REFERENCE *ap_blotvarReference, char cb_lV
 // -------------
 
 struct BLOTEX_VALUE {
-  int asValue;
+//  int asValue; // 
+  char b_strValue; 
   union {
     gen_BLOTVAL c_blotval;
     struct {
@@ -105,35 +106,37 @@ struct BLOTEX_VALUE {
   } select;
 };
 
-#define UNDEFINED_BLOTEX_VALUE { (int) UNDEFINED } 
+#define UNDEFINED_BLOTEX_VALUE { (char) UNDEFINED } 
 
 #define b_FUGACIOUS_STR b_TRUE
+
+#define b_STR_VALUE b_TRUE
+#define b_INT_VALUE (!b_STR_VALUE) 
 
 // Set blotex INITIAL value
 // TODO: manage double initialization ???
 //
 // Passed:
-// - c_workingGStringsHandle: only significant with AS__VALUE_STR
-// - asValue: AS__VALUE_INT / AS__VALUE_STR 
-// - c_blotval: only significant with AS__VALUE_INT
-// - cap_str: only significant with AS__VALUE_STR
-// - cb_fugaciousStr: only significant with AS__VALUE_STR; (TRUE/FALSE) NOTICE: if you intialize
+// - c_workingGStringsHandle: only significant with str value 
+// - b_strValue: b_STR_VALUE (TRUE) / b_INT_VALUE (FALSE)  
+// - c_blotval: only significant with b_INT_VALUE 
+// - cap_str: only significant with b_STR_VALUE 
+// - cb_fugaciousStr: only significant with b_STR_VALUE; (TRUE/FALSE) NOTICE: if you intialize
 //   TWICE a fugacious string, the first working string buffer is "lost"  
 // 
 // changed:
-// - c_workingGStringsHandle: when AS__VALUE_STR
+// - c_workingGStringsHandle: when b_STR_VALUE
 // - a_blotexValue: 
 //
 // Ret: 
 // - RETURNED: Ok
 // - -1: unexpected problem; anomaly is raised
 int SetBlotexValue(G_STRINGS_HANDLE c_workingGStringsHandle, struct BLOTEX_VALUE *a_blotexValue,
-  int asValue, gen_BLOTVAL c_blotval, const struct P_STRING* cap_str, char cb_fugaciousStr) ;
+  char b_strValue, gen_BLOTVAL c_blotval, const struct P_STRING* cap_str, char cb_fugaciousStr) ;
 
 
 // Passed:
 // - workingGStringsHandle:
-// - ac_blotexValue: 
 // - a_strexValue1: 
 // - p_str2:
 // 
@@ -151,7 +154,8 @@ int ConcatenateStrexValue(G_STRINGS_HANDLE workingGStringsHandle,
 // BLOTTAB:
 // --------
 struct BLOTTAB_SPOT_REFERENCE {
-  int asValue; 
+//  int asValue; 
+  char b_strValue;
   void *r_blottabHandle; // at some "current" position 
   void *r_spot; // "field" identification (complete spot reference) 
 } ;
@@ -349,12 +353,12 @@ int ParseAs(char b_lValue, struct P_STRING *a_sequence, int *a_as) ;
 //
 // Changed:
 // - *a_sequence: after parsing 
-// - *an_asValue: (>=0) corresponding "as" "value" specifier (-1 if not present) 
+// - *anb_strValue: (>=0) TRUE=>str value specifier; FALSE=>int value specifier (-1 if not present)
 // 
 // Ret:
 // - RETURNED: Ok
 // - 1: unexpected problem; anomaly is raised
-int ParseAsValue(struct P_STRING *a_sequence, int *an_asValue) ;
+int ParseAsValue(struct P_STRING *a_sequence, char *anb_strValue) ;
 
 
 // Parse (begin of) specifier 

@@ -124,28 +124,24 @@ m_ASSERT(*ant_blotvarStuff == NULL)
 
 // Public function: see .h
 int SetBlotexValue(G_STRINGS_HANDLE c_workingGStringsHandle,struct BLOTEX_VALUE *a_blotexValue,
-  int asValue, gen_BLOTVAL c_blotval, const struct P_STRING* cap_str, char cb_fugaciousStr) {
+  char b_strValue, gen_BLOTVAL c_blotval, const struct P_STRING* cap_str, char cb_fugaciousStr) {
   m_DIGGY_BOLLARD()
-  switch ((a_blotexValue->asValue = asValue)) {
-  case AS__VALUE_STR:
-    { G_STRING_STUFF t_workingGStringStuff = (G_STRING_STUFF)UNDEFINED;
-      m_TRACK_IF((a_blotexValue->select.c_strex.workingGStringEntry =
-        GStringsFetch(c_workingGStringsHandle,-1, &t_workingGStringStuff)) < 0)
-      if (cb_fugaciousStr) {
-        m_TRACK_IF(GStringCopy(t_workingGStringStuff,0, *cap_str) < 0)
-      } else {
-        switch(GStringImport(t_workingGStringStuff, *cap_str)) {
-        case COMPLETED__OK:
-        break; case COMPLETED__BUT: 
-        break; default:
-          m_TRACK()
-        } // switch
-      } // if
-      a_blotexValue->select.c_strex.v_str = t_workingGStringStuff->cv_pString;
-    } // t_workingGStringStuff
-  break; case AS__VALUE_INT:
-    a_blotexValue->select.c_blotval = c_blotval;
-  break; default: m_RAISE(ANOMALY__VALUE__D,asValue) } // switch  
+  if ((a_blotexValue->b_strValue = b_strValue)) { 
+    G_STRING_STUFF t_workingGStringStuff = (G_STRING_STUFF)UNDEFINED;
+    m_TRACK_IF((a_blotexValue->select.c_strex.workingGStringEntry =
+      GStringsFetch(c_workingGStringsHandle,-1, &t_workingGStringStuff)) < 0)
+    if (cb_fugaciousStr) {
+      m_TRACK_IF(GStringCopy(t_workingGStringStuff,0, *cap_str) < 0)
+    } else {
+      switch(GStringImport(t_workingGStringStuff, *cap_str)) {
+      case COMPLETED__OK:
+      break; case COMPLETED__BUT: 
+      break; default:
+        m_TRACK()
+      } // switch
+    } // if
+    a_blotexValue->select.c_strex.v_str = t_workingGStringStuff->cv_pString;
+  } else  a_blotexValue->select.c_blotval = c_blotval;
   m_DIGGY_RETURN(RETURNED)
 } // SetBlotexValue
 
@@ -153,7 +149,7 @@ int SetBlotexValue(G_STRINGS_HANDLE c_workingGStringsHandle,struct BLOTEX_VALUE 
 int ConcatenateStrexValue(G_STRINGS_HANDLE workingGStringsHandle,
   struct BLOTEX_VALUE *a_strexValue1, struct P_STRING p_str2) {
   m_DIGGY_BOLLARD()
-  m_ASSERT(a_strexValue1->asValue == AS__VALUE_STR)
+  m_ASSERT(a_strexValue1->b_strValue)
   G_STRING_STUFF t_workingGStringStuff = (G_STRING_STUFF)UNDEFINED;
   m_TRACK_IF(GStringsFetch(workingGStringsHandle,
     a_strexValue1->select.c_strex.workingGStringEntry, &t_workingGStringStuff) !=
@@ -235,17 +231,20 @@ m_DIGGY_VAR_D(*a_as)
 } // ParseAs 
 
 // See .h 
-int ParseAsValue(struct P_STRING *a_sequence, int *an_asValue) {
+int ParseAsValue(struct P_STRING *a_sequence, char *anb_strValue) {
   m_DIGGY_BOLLARD()
   struct P_STRING lexeme; // UNDEFINED
   om_PParsePassSpaces(a_sequence,NULL);
 m_DIGGY_VAR_P_STRING(*a_sequence)
   int n_matchedEntry = UNDEFINED;
-  m_P_PARSE_MATCH_AMONG_C(*a_sequence,NULL,&n_matchedEntry,an_asValue,&lexeme, 2,
+  int n_as = UNDEFINED;
+  m_P_PARSE_MATCH_AMONG_C(*a_sequence,NULL,&n_matchedEntry,&n_as,&lexeme, 2,
     AS__VALUE_INT__X,AS__VALUE_INT, AS__VALUE_STR__X,AS__VALUE_STR)
 m_DIGGY_VAR_P_STRING(*a_sequence)
 m_DIGGY_VAR_P_STRING(lexeme)
-m_DIGGY_VAR_D(*an_asValue)
+m_DIGGY_VAR_D(n_as)
+  if (n_as == -1) *anb_strValue = -1; 
+  else *anb_strValue = (n_as == AS__VALUE_STR);
   m_DIGGY_RETURN(RETURNED)
 } // ParseAsValue 
 
@@ -457,18 +456,18 @@ m_RAISE(ANOMALY__NOT_AVAILABLE)
   if (na_blotexValue != NULL) {
     switch (as) {
     case AS__VALUE_INT: // [ '#' ]
-      if (na_blotexValue->asValue == AS__VALUE_STR) m_ABANDON_S(EXPECT_INTEX__ABANDONMENT_CAUSE)
+      if (na_blotexValue->b_strValue) m_ABANDON_S(EXPECT_INTEX__ABANDONMENT_CAUSE)
       *ac_gKey = m_GKey_AcolytValue(na_blotexValue->select.c_blotval); 
     break; case AS__ENTRY: // '!#' (r-value) 
-      if (na_blotexValue->asValue == AS__VALUE_STR) m_ABANDON_S(EXPECT_INTEX__ABANDONMENT_CAUSE)
+      if (na_blotexValue->b_strValue) m_ABANDON_S(EXPECT_INTEX__ABANDONMENT_CAUSE)
 m_RAISE(ANOMALY__NOT_AVAILABLE)
     break; case AS__ID: // '!' 
       *ac_gKey = m_GKey_AcolytValue(na_blotexValue->select.c_blotval); 
     break; case AS__VALUE_STR: // '$'
-      if (na_blotexValue->asValue == AS__VALUE_INT) m_ABANDON_S(EXPECT_STREX__ABANDONMENT_CAUSE)
+      if (!na_blotexValue->b_strValue) m_ABANDON_S(EXPECT_STREX__ABANDONMENT_CAUSE)
       *ac_gKey = m_GKey_PString(na_blotexValue->select.c_strex.v_str);
     break; case AS__NAME:  // '!$'
-      if (na_blotexValue->asValue == AS__VALUE_INT) m_ABANDON_S(EXPECT_STREX__ABANDONMENT_CAUSE)
+      if (!na_blotexValue->b_strValue) m_ABANDON_S(EXPECT_STREX__ABANDONMENT_CAUSE)
       *ac_gKey = m_GKey_PString(na_blotexValue->select.c_strex.v_str);
     break; default: m_RAISE(ANOMALY__VALUE__D,as)
     } // switch
@@ -482,33 +481,33 @@ int BlotvarAs2BlotexValue(g_BLOTVAR_STUFF n_blotvarStuff, int n_as, int c_entry,
   G_STRINGS_HANDLE workingGStringsHandle, struct BLOTEX_VALUE *a_blotexValue) {
   m_DIGGY_BOLLARD()
 
-  int asValue = UNDEFINED;
+  char b_strValue = (char)UNDEFINED;
   gen_BLOTVAL c_blotval = UNDEFINED; 
   const struct P_STRING* cap_str = (const struct P_STRING*)UNDEFINED;
   char cb_fugaciousStr = (char)UNDEFINED;
 
   switch (n_as) {
   case -1:
-    asValue = AS__VALUE_INT;
+    b_strValue = b_INT_VALUE;
     c_blotval = BOOLEAN_BLOTVAL(n_blotvarStuff != NULL); 
   break; case AS__VALUE_INT: // <blotvar as int>
-    asValue = AS__VALUE_INT;
+    b_strValue = b_INT_VALUE;
     c_blotval = n_blotvarStuff != NULL? n_blotvarStuff[g_BLOTVAR_VALUE_ELEMENT].acolyt.cen_value:
       FALSE__BLOTVAL;
   break; case AS__ID: // <blotvar id>
-    asValue = AS__VALUE_INT;
+    b_strValue = b_INT_VALUE;
     c_blotval = n_blotvarStuff != NULL? n_blotvarStuff[g_BLOTVAR_NAME_ELEMENT].acolyt.cen_value:
       FALSE__BLOTVAL;
   break; case AS__ENTRY: // <blotvar entry> (r-value) 
-    asValue = AS__VALUE_INT;
+    b_strValue = b_INT_VALUE;
     c_blotval = n_blotvarStuff != NULL? c_entry: FALSE__BLOTVAL;
   break; case AS__VALUE_STR: // <blotvar strex> 
-    asValue = AS__VALUE_STR;
+    b_strValue = b_STR_VALUE;
     cap_str = n_blotvarStuff != NULL? &n_blotvarStuff[g_BLOTVAR_VALUE_ELEMENT].cv_pString:
       ap_aTrivialEmptyPString;
     cb_fugaciousStr = n_blotvarStuff != NULL; // TODO: really FUGACIOUS????
   break; case AS__NAME:  // <blotvar name> 
-    asValue = AS__VALUE_STR,
+    b_strValue = b_STR_VALUE,
     cap_str = n_blotvarStuff != NULL? &n_blotvarStuff[g_BLOTVAR_NAME_ELEMENT].cv_pString:
       ap_aTrivialEmptyPString;
     cb_fugaciousStr = n_blotvarStuff != NULL; // TODO: really FUGACIOUS????
@@ -516,7 +515,7 @@ int BlotvarAs2BlotexValue(g_BLOTVAR_STUFF n_blotvarStuff, int n_as, int c_entry,
     m_RAISE(ANOMALY__VALUE__D,n_as)
   } // switch
 
-  m_TRACK_IF(SetBlotexValue(workingGStringsHandle,a_blotexValue,asValue,c_blotval,
+  m_TRACK_IF(SetBlotexValue(workingGStringsHandle,a_blotexValue,b_strValue,c_blotval,
       cap_str,cb_fugaciousStr) != RETURNED)
 
   m_DIGGY_RETURN(RETURNED)
@@ -528,12 +527,12 @@ int BlotexValue2BlotvarLValueAs(struct BLOTEX_VALUE blotexValue, g_BLOTVAR_STUFF
   m_DIGGY_BOLLARD()
   switch (lValueAs) {
   case AS__VALUE_INT: // [ '#' ]
-    if (blotexValue.asValue != AS__VALUE_INT) m_ABANDON_S(EXPECT_INTEX__ABANDONMENT_CAUSE)
+    if (blotexValue.b_strValue) m_ABANDON_S(EXPECT_INTEX__ABANDONMENT_CAUSE)
     c_blotvarStuff[g_BLOTVAR_VALUE_ELEMENT].acolyt.cen_value = blotexValue.select.c_blotval;
   break; case AS__ID: // '!' 
 m_RAISE(ANOMALY__NOT_AVAILABLE)
   break; case AS__VALUE_STR: // '$'
-    if (blotexValue.asValue != AS__VALUE_STR) m_ABANDON_S(EXPECT_STREX__ABANDONMENT_CAUSE)
+    if (!blotexValue.b_strValue) m_ABANDON_S(EXPECT_STREX__ABANDONMENT_CAUSE)
     m_TRACK_IF(GStringCopy(c_blotvarStuff+g_BLOTVAR_VALUE_ELEMENT,0,
       blotexValue.select.c_strex.v_str) < 0)
   break; case AS__NAME:  // '!$'
@@ -670,7 +669,7 @@ int ParseInt1Op(struct P_STRING *a_sequence, int *an_int1Op) {
 int ApplyInt1Op(int n_int1Op,struct BLOTEX_VALUE *ac_blotexValue,G_STRING_STUFF nc_abandonmentInfo){
   m_DIGGY_BOLLARD()
   if (n_int1Op >= 0) {
-    if (ac_blotexValue->asValue != AS__VALUE_INT) m_ABANDON_S(EXPECT_INTEX__ABANDONMENT_CAUSE)
+    if (ac_blotexValue->b_strValue) m_ABANDON_S(EXPECT_INTEX__ABANDONMENT_CAUSE)
     switch (n_int1Op) {
     break; case NOT__INT_1OP:
       if (ac_blotexValue->select.c_blotval == TRUE__BLOTVAL0)
@@ -695,7 +694,7 @@ int ParseIntConstant(struct P_STRING *a_sequence, char *ab_parsed,
   gen_BLOTVAL c_blotval = UNDEFINED;
   PParseGenericInteger(a_sequence,&c_blotval,&lexeme);
   if ((*ab_parsed = !b_EMPTY_P_STRING(lexeme))) m_TRACK_IF(SetBlotexValue(
-    (G_STRINGS_HANDLE)UNDEFINED,ac_blotexValue,AS__VALUE_INT, c_blotval, (const struct P_STRING*) UNDEFINED,
+    (G_STRINGS_HANDLE)UNDEFINED,ac_blotexValue,b_INT_VALUE, c_blotval, (const struct P_STRING*) UNDEFINED,
     (char)UNDEFINED) != RETURNED)
 
   m_DIGGY_RETURN(RETURNED)
@@ -712,7 +711,7 @@ int ParseStrConstant(struct P_STRING *a_sequence, G_STRINGS_HANDLE workingGStrin
     o_PParsePassChars(a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_TILL,NULL,'"', &lexeme);
     if (b_EMPTY_P_STRING(*a_sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
     PParseOffset(a_sequence,1,NULL);
-    m_TRACK_IF(SetBlotexValue(workingGStringsHandle,acc_blotexValue,AS__VALUE_STR,UNDEFINED,&lexeme,
+    m_TRACK_IF(SetBlotexValue(workingGStringsHandle,acc_blotexValue,b_STR_VALUE,UNDEFINED,&lexeme,
       !b_FUGACIOUS_STR) != RETURNED) // TODO: FUGACIOUS???
   } // if 
   m_DIGGY_RETURN(ANSWER__YES)
@@ -858,23 +857,23 @@ int ApplyFormat(int format, struct BLOTEX_VALUE blotexValue, G_STRING_STUFF c_su
 
   switch (format) {
   case D__FORMAT:
-    if (blotexValue.asValue != AS__VALUE_INT) m_ABANDON_S(EXPECT_INTEX__ABANDONMENT_CAUSE)
+    if (blotexValue.b_strValue) m_ABANDON_S(EXPECT_INTEX__ABANDONMENT_CAUSE)
     GStringPrintf(c_surrogate,0,"%d", blotexValue.select.c_blotval);
   break; case LS__FORMAT:
-    if (blotexValue.asValue != AS__VALUE_STR) m_ABANDON_S(EXPECT_STREX__ABANDONMENT_CAUSE)
+    if (!blotexValue.b_strValue) m_ABANDON_S(EXPECT_STREX__ABANDONMENT_CAUSE)
     GStringPrintf(c_surrogate,0,FMT_P_STRING,m_P_STRING_2_FMT_ARGS(
       blotexValue.select.c_strex.v_str));
   break; case LX__FORMAT:
-    if (blotexValue.asValue != AS__VALUE_INT) m_ABANDON_S(EXPECT_INTEX__ABANDONMENT_CAUSE)
+    if (blotexValue.b_strValue) m_ABANDON_S(EXPECT_INTEX__ABANDONMENT_CAUSE)
     GStringPrintf(c_surrogate,0,"%x",blotexValue.select.c_blotval);
   break; case UX__FORMAT:
-    if (blotexValue.asValue != AS__VALUE_INT) m_ABANDON_S(EXPECT_INTEX__ABANDONMENT_CAUSE)
+    if (blotexValue.b_strValue) m_ABANDON_S(EXPECT_INTEX__ABANDONMENT_CAUSE)
     GStringPrintf(c_surrogate,0,"%X", blotexValue.select.c_blotval);
   break; case LE__FORMAT:
-    if (blotexValue.asValue != AS__VALUE_INT) m_ABANDON_S(EXPECT_INTEX__ABANDONMENT_CAUSE)
+    if (blotexValue.b_strValue) m_ABANDON_S(EXPECT_INTEX__ABANDONMENT_CAUSE)
 m_RAISE(ANOMALY__NOT_AVAILABLE)
   break; case BE__FORMAT:
-    if (blotexValue.asValue != AS__VALUE_INT) m_ABANDON_S(EXPECT_INTEX__ABANDONMENT_CAUSE)
+    if (blotexValue.b_strValue) m_ABANDON_S(EXPECT_INTEX__ABANDONMENT_CAUSE)
 m_RAISE(ANOMALY__NOT_AVAILABLE)
   break; default:
     m_RAISE(ANOMALY__VALUE__D,format)

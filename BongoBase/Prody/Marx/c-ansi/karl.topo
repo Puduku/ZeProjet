@@ -4,23 +4,23 @@
 
 // KARL: Kit for Analysis and Rendering Layer
 // "Extend" blotex to parse blottab2 - based on pamphlets (see c-ansi/engels.topo) 
-//
+
 // Using karl in blot code
 // =========================
-//
+
 // structure : verset / alinea / paragraph / section / article / topic ( = spots)
 // Blot pamplets operations
 //
 // See engels.topo for the description of pamphlets structure (spot / group / aggregate...) 
 // NOTICE: contrary to blotregs and blottabs, there is NO "global" blottab2. Hence a blottab2 with
 // empty entity name is simply a notation to refer the "current" blottab2 (cursor) 
-//
+
 // Specifiers:
 // -----------
-//
+
 // <int blottab2 spec> ::= 'L' | 't' | 'z' | 'O' | 'i' | 'j' | 'p' | 'e' | 'l' | 'o' | 's' | 'I'
 // <str blottab2 spec> ::= 'P' | 'T' | 'N' | 'd' | 'n' | 'r' | 'D' | 'v' | 'V' | 'w'
-//
+
 // Description of specifiers 
 //   =r : raw reference
 //   =D : pamphlet description
@@ -65,7 +65,7 @@
 // ---------------------------------------------------------
 // NOTICE:  <int blottab2 ref> and <str blottab2 ref> 'l-value' spots and operations are NOT
 // supported.
-//
+
 // REMINDER (see c-ansi/blotex.topo) :
 // <int blottab2> ::= '^^' <entity name> ( ( <ops indicator> <int blottab2 ops> ) | 
 //   <int blottab2 spot> )
@@ -75,7 +75,7 @@
 
 // Spots:
 // ------
-//
+
 // <blottab2 spot> ::= ( ( ( '.' <entity name> [ '#' <intex> ] ) | ( '@' <intex> [ ':' <intex> ] ) )
 //   [ '[' <intex> ']' ] [ <str portion> ] )+ 
 // <int blottab2 spot> ::= [ <blottab2 spot> ] <read set op> <int blottab2 spec> 
@@ -88,11 +88,11 @@
 //   [ <blottab2 op read int> ] 
 // <blottab2 op select> ::= <op select> <blottab2 request>
 // <blottab2 op read int> ::= <op read set> <int blottab2 spec> 
-//
+
 // <str blottab2 ops> ::= [ <blottab2 op select> ] [ <op reset> ] [ <op next> ]
 //   [ <blottab2 op insert> ] <blottab2 op read str>
 // <blottab2 op read str> ::= <read set op> <str blottab2 spec>
-//
+
 // Selections based on physical filel types ('#' => INT(LE/BE) '$' => chars)
 // pamphlet physical spot type : byte sequence ($) or int (BE / LE) (#)
 // TODO: logical selections (based on logical data type) ?)
@@ -127,7 +127,7 @@
 //   ^^?+
 // => Read current spot name in implicit pamphlet: 
 //   ^^?=n 
-//
+
 // Spot examples : '^^' <entity name> ( <int blottab2 spot> | <str blottab2 spot> )
 // => Spots the total length of the 6 occurences of the AMeLim field: 
 //   ^^RLC04K.AMeLim=l 

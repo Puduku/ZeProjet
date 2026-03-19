@@ -4,7 +4,7 @@
 
 // Description: blot expressions management 
 // Basic stuff allowing to add some "intelligence" (based on expression evaluation) in blotcode.
-//
+
 // NOTE: blotex lib provides "script-like programming" capabilites to blot code.
 // Advantage: enhance flexibility of blot code, BUT keep in mind the drawback:
 // scripting features means natural tendency to produce complex (or tricky) code (solely
@@ -14,68 +14,69 @@
 
 // I. Blot expressions (blotex) 
 // ============================ 
+
 // Legend:
+// -------
 // - <entity name>         => "soft" lexeme ; leading white spaces are systematically REMOVED
 // - <<single char>>       => "hard" lexeme ; leading white spaces are NOT REMOVED
 // - [ <int 1op> ]         => zero or one occurence of <int 1op>
 // - ( <entity name> )+    => one occurence of <entity name> at least
 // - ( <<single char>> )*  => any occurence(s) number of <<single char>> 
 // - [ <<single char>>> ]2 => zero, one or two occurence(s) of <<as value>>
-//
-// Blot expressions:
-// -----------------
-//
-// There two main types of ('r-value') blot expressions: 
+
+// General blot expressions (r-value):
+// -----------------------------------
+// There are two main types of ('r-value') blot expressions: 
 // - "string" blot expression => "strex" type
 // - "blotval" (aka. signed integer) blot expression => "intex" type:
 // <blotex> ::= <intex> | <strex> 
-//
+
 // Blot expressions are made of operations applied on integer terms and string atoms:
 // <intex> ::= <intex term> ( <term op> <intex term> )*  
 // <strex> ::= <strex atom> ( <strex atom op> <strex atom> )*  
-//
+
 // '+' operator applied on string atoms is a concatenation.
 // <strex atom op> ::= '+'
-//
+
 // <term op> ::= '+' | '-' | '&&' | '||'
 // Pseudo-logical operators '&&' (logical AND) and '||' (logical OR) combine integer terms
 // together, "seen" as booleans (see below).
-//
+
 // Integer terms are made of factoral operations applied on integer atoms:
 // <intex term> ::= <intex atom> ( <fact op> <intex atom> )*  
-//
+
 // Integer comparisons are assimilated to factoral operations:
 // <fact op> ::= '*' | '/' | <comp op> 
-//
+
 // General comparison operators are:
 // <comp op> ::= '>' | '<' | '>=' | '<=' | '==' | '!='
 // A comparison result is a "pseudo-boolean" blotval integer.
 // Reminder: blotval's convention : 
 // - 0 : represents "true" boolean value
 // - !=0 : represents "false" boolean value
-//
+
 // Integer and string atoms are made of constants, blot expressions between brackets, variables
 // references, strings comparisons, "register" and "table" operations:
 // <intex atom> ::= [ <int 1op> ] ( ( '(' <intex> ')' ) | <int constant> | <blotvar as int> |
 //   <blotvar entry> | <blotvar id> | <int blotreg> | <int some blottab> | <strex comp> ) 
 // <strex atom> ::= ( '(' <strex> ')' ) | <str constant> | <blotvar as str> | <blotvar name> |
 //   <str blotreg> | <str some blottab>
-//
+
 // Unary operators modify integer atoms. Pseudo-logical operator '!' "negates" the integer
 // expression "seen" as boolean:
 // <int 1op> ::= '!' | '+' | '-' 
-//
+
 // A string comparison is valued as (pseudo-boolean) integer atom:
 // <strex comp> ::= <strex> <str comp op> <strex>
 // <str comp op> ::=  <comp op>  | '===' 
 // '===' corresponds to "like" comparison
-//
+
 // Constant expressions:
 // <int constant> : any integer constants of C language... 
 // <str constant> ::= '"' ( <<single char>> )* '"'
 // String constant example: "Julie" 
 // Integer constant examples: 69 , 0xCACABEBE
-//
+
 // Blotvar implicit and explicit integer value:
 // A blotvar value is implicitly an integer value.
 // However, reference to integer value of a blotvar may be explicit:
@@ -84,66 +85,63 @@
 // Examples:
 // .toto => 'toto' global blotvar's integer value 
 // .toto# => ALSO 'toto' global blotvar's integer value
-//
+
 // Blotvar string value: 
 // <blotvar as str> ::= <blotvar> <<as value str>> 
 // Examples:
 // .toto$           => toto global blotvar string value 
 // recettes[.toto]$ => string value of recettes register's blotvar indexed by toto global blotvar
-//
+
 // A blot variable (blotvar) stores a blotex value.
 // Formally a "simple" blotvar is referenced as following (in which the 1st entity name identifies
 // the register, see below) :
 // <blotvar> ::= <entity name> ( <name specifier>  | <entry specifier> | <token id specifier> ) 
-//
+
 // The different entities (blot register, blot variables, etc.) are identified by their
 // name (may be empty):
 // <entity name> ::= ( <<letter>> | <<digit>> | '_' )*
-//
+
 // The different specifiers are:
 // <name specifier> ::= '.' <entity name>
 // TODO: -1 entry ?
 // <entry specifier> ::= '[' <intex> ']'
 // <token id specifier> ::= '{' <intex> '}'
-//
+
 // Blotvar name and entry:
 // <blotvar name> ::= <blotvar> <<as name>>
 // <blotvar entry> ::= <blotvar> <<as entry>>
-//
+
 // "As" suffixes allow to qualify integer and string entities:
 // <<as value int>> ::= '#'
 // <<as entry>> ::= '!#'
 // <<as id>> ::= '!'
 // <<as value str>> ::= '$'
 // <<as name>> ::= '!$'
-// 
+ 
 // Blotvar examples: 
 // .toto => toto blotvar of global register
 // recettes.bolo => bolo blotvar of recettes register
 // recettes[0] => 1st blotvar stored in recettes register 
 // [1] => 2nd blotvar stored in global register 
 // recettes[.toto] => recettes register's blotvar indexed by toto global blotvar   
-//
+
 // Examples of blot expressions:
 // .toto!$ => toto global blotvar's name, that is "toto"
 // recettes[0]!$ => name of 1st blotvar stored in recettes register   
 // recettes.bolo!# => index (entry) of bolo blotvar in recettes register
 // .toto!# => index (entry) of toto global blotvar 
-//
+
+// General blot references ('l-value'):
+// ------------------------------------
+
+// "int" blotex references are usable as 'l-value':
+// <int blotex ref> ::= <blotvar as int> | <blotvar id> | <int blotreg ref> | <int some blottab ref>
+// "str" blotex references are usable as 'l-value':
+// <str blotex ref> ::= <blotvar as str> | <blotvar name> | <str blotreg ref> | <str some blottab ref>
+ 
 // Blot register:
 // --------------
-//
-// Operations:
-// <op create> ::= '['
-// <op select> ::= ':' 
-// <op reset> ::= '^'
-// <op next> ::= '+'
-// <op read set> ::= '='
-// <op insert> ::= '@'
-//
-// <end select> ::= ':?'
-// <end create> ::= ']?'
-//
+
 // A blot register (blotreg) is a collection of blovars
 // (the register with empty entity name is called the global register)
 // Register 'r-value' operations :
@@ -155,21 +153,29 @@
 // <ops indicator> ::= '?'
 // <int blotreg ops> ::=  [ <blotreg op select> ] [ <op reset> ] [ <op next> ]
 //   [ <blotreg op read int> ] 
+
+// Register (and table) operations:
+// <op create> ::= '['
+// <op select> ::= ':' 
+// <op reset> ::= '^'
+// <op next> ::= '+'
+// <op read set> ::= '='
+// <op insert> ::= '@'
+
 // Selection operation; value is pseudo-boolean "true" blotval: 
 // <blotreg op select> ::= <op select> <blotreg request>
 // Reset operation; value is pseudo-boolean "true" blotval: 
 // Reset operation; value is pseudo-boolean blotval ("false" when no more):
 // Read current integer value operation (r-value): 
 // <blotreg op read int> ::= <op read set> [ <<as value int>> | <<as entry>> | <<as id>> ]
-//
+
 // When the last operation of the sequence reads a string value, the global value of the operations
 // sequence is that string value: 
 // <str blotreg> ::= <entity name> <ops indicator> <str blotreg ops>  
 // <str blotreg ops> ::= [ <blotreg op select> ] [ <op reset> ] [ <op next> ]
 //   <blotreg op read str>
 // <blotreg op read str> ::= <op read set> ( <<as value str>> | <<as name>> )  
-//
-// <anything> ::= '*'
+
 // Blotreg requests are made of "atoms" : 
 // <blotreg request> ::= <blotreg request atom> ( <logical 2op> <blotreg request atom> )*
 //   <end select>
@@ -178,18 +184,14 @@
 //   <comp op> <intex> ) )
 // <blotreg request atom str> ::= ( <<as value str>> | <<as name>> ) ( <anything> | ( <str comp op>
 //   <strex>  ) )
-//
+
+// <anything> ::= '*'
+
 // <logical 2op> ::= 'and' | 'or'
-//
-// Register 'l-value' operations :
-// Set current int value operation (l-value): 
-// <blotreg ref op set int> ::= <op read set> [ <<as value int>> | <<as id>> ]
-// <int blotreg ref> ::= <entity name> <ops indicator> <blotreg ref op set int>
-//
-// Set current str value operation (l-value): 
-// <blotreg ref op set str> ::= <op read set> ( <<as value str>> | <<as name>> )  
-// <str blotreg ref> ::= <entity name> <ops indicator> <blotreg ref op set str> 
-//
+
+// <end select> ::= ':?'
+// <end create> ::= ']?'
+
 // Examples of register operations :
 // recettes?: !$ * :$                              => select all items, ordered by name  
 // recettes?: !$ === "*bolo*" and # >= 69 :?       => new register selection 
@@ -199,62 +201,67 @@
 // recettes?+=                                     => fetch and read int value 
 // recettes?=$                                     => read current str value 
 // recettes?: !$ === "*bolo*" :?+=$                => read str value of 1st 'bolo' recette  
-//
-//
-// Blot tables:
-// ------------
+
+// Register 'l-value' operations:
+// ------------------------------
+
+// Set current int value operation (l-value): 
+// <int blotreg ref> ::= <entity name> <ops indicator> <blotreg ref op set int>
+// <blotreg ref op set int> ::= <op read set> [ <<as value int>> | <<as id>> ]
+
+// Set current str value operation (l-value): 
+// <str blotreg ref> ::= <entity name> <ops indicator> <blotreg ref op set str> 
+// <blotreg ref op set str> ::= <op read set> ( <<as value str>> | <<as name>> )  
+
+// Blot tables ('r-values' and 'l-values'):
+// ----------------------------------------
+// NOTICE: blot table (blottab) is a generic concept. 
+// - see "GENUINE" blottab extensions in c-ansi/blottab.topo
+// - other blottab2 (resp. blottab3) extensions are called "super" (resp. "hyper") blot tables. 
+
 // Blot table 'r-value' operations :
 // <int some blottab> ::= <int blottab> | <int blottab2> | <int blottab3> 
 // <str some blottab> ::= <str blottab> | <str blottab2> | <str blottab3> 
-//
+
 // Blot table 'l-value' operations :
 // <int some blottab ref> ::= <int blottab ref> | <int blottab2 ref> | <int blottab3 ref> 
 // <str some blottab ref> ::= <str blottab ref> | <str blottab2 ref> | <str blottab3 ref> 
 
-// NOTICE: see "GENUINE" blottab extensions in c-ansi/blottab.topo
 // "GENUINE" Blot table 'r-value' operations and spots :
 // <int blottab> ::= '^' <entity name> ( ( <ops indicator> <int blottab ops> ) | <int blottab spot> ) 
 // <str blottab> ::= '^' <entity name> ( ( <ops indicator> <str blottab ops> ) | <str blottab spot> )  
-//
+
 // "GENUINE" Blot table 'l-value' operations and spots :
 // <int blottab ref> ::= '^' <entity name> ( ( <ops indicator> <blottab ref op set int> ) | 
 //   <int blottab spot ref> )
 // <str blottab ref> ::= '^' <entity name> ( ( <ops indicator> <blottab ref op set str> ) |
 //   <str blottab spot ref> )
-//
+
 // "SUPER" Blot table 'r-value' operations and spots:
 // <int blottab2> ::= '^^' <entity name> ( ( <ops indicator> <int blottab2 ops> ) | <int blottab2 spot> )
 // <str blottab2> ::= '^^' <entity name> ( ( <ops indicator> <str blottab2 ops> ) | <str blottab2 spot> ) 
-//
+
 // "SUPER" Blot table 'l-value' operations and spots:
 // <int blottab2 ref> ::= '^^' <entity name> ( ( <ops indicator> <blottab2 ref op set int> ) |
 //   <int blottab2 spot ref> )
 // <str blottab2 ref> ::= '^^' <entity name> ( ( <ops indicator> <blottab2 ref op set str> ) |
 //   <str blottab2 spot ref> )
-//
-// 
-// 'l-values':
-// ----------
-//
-// "int" blotex references are usable as 'l-value' :
-// <int blotex ref> ::= <blotvar as int> | <blotvar id> | <int blotreg ref> | <int some blottab ref>
-// "str" blotex references are usable as 'l-value' :
-// <str blotex ref> ::= <blotvar as str> | <blotvar name> | <str blotreg ref> | <str some blottab ref>
-//
+
 // Misc. :
 // -------
-//
+
 // <str portion> ::= '{' [ <intex> ] [ ( ':' | '-' ) [ <intex> ] ] '}'
-//
-// II. "blotex" library's functions (placed in blot code)
-// ================================ 
-//
+
+
+// II. "blotex" library's blot functions
+// ===================================== 
+
 // Eval ([ <int blotex ref> := ] <intex>)
 // Eval ([ <str blotex ref> := ] <strex>)
 // ---- 
-//
+
 // Evaluate the blotex and eventually assign the result into a blotvar.
-//
+
 // Passed:
 // - int blotex ref: int blotex reference (if passed)
 //   If the blotvar was not existing, it is automatically allocated by the function
@@ -262,7 +269,7 @@
 //   If the blotvar was not existing, it is automatically allocated by the function
 // - intex: blotex integer expression
 // - strex: blotex string expression
-//
+
 // Possible abandonment reasons:
 // - assignement error:
 //   + mismatch between blotvar and blotex types
@@ -273,24 +280,24 @@
 //   + unknown blotvar / blotex function in blotex expression 
 //   + value error in blotex expression
 //   + overflow error : 
-//
+
 // Blotval:
 // - blotex is a strex => string length 
 // - blotex is a intex => blotex value 
-//
+
 // Surrogate: None 
-//
+
 // Examples:
 //   Eval (.var$ := "craboutchas")         => assign "craboutchas" to 'var' global variable 
 //   Eval (recettes?=!$ := "bolo")         => assign "bolo" name to current blotvar of 'recettes'
 //                                            register
-//
-//
+
+
 // OutputF (<format> ',' <blotex> ) 
 // -------
-//
+
 // Replace blot with content, following format
-//
+
 // Passed:
 // - format
 //   <format> ::= '%' [ <modifiers> ] ( <alla c specifier> | <binary specifier> )
@@ -304,7 +311,7 @@
 // - blotex: 
 //   strex for 's' specifier 
 //   intex otherwise 
-//
+
 // Possible abandonment reasons:
 // - formatting error:
 //   + wrong format 
@@ -316,12 +323,12 @@
 //   + unknown blotvar / blotex function in blotex expression 
 //   + value error in blotex expression
 //   + overflow error : 
-//
+
 // Blotval (if not abandonned):
 // 0 ("true") 
-//
+
 // Surrogate: output content as specified in parameters... 
-//
+
 // Examples:
 //   OutputF (%d, var) 
 //   OutputF (%03d, var) 
@@ -334,6 +341,4 @@
 //    order. 
 //   OutputF (%s, var$) 
 //   OutputF (%.10s, var$) 
-
-
 

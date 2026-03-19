@@ -47,8 +47,9 @@
 //
 // Modified:
 // - m_flags: flag is set
-#define m_SET_FLAG(m_flags,flag,b_on) if (b_on) m_SET_FLAG_ON(m_flags,flag) else \
-  m_SET_FLAG_OFF(m_flags,flag) 
+#define m_SET_FLAG(m_flags,flag,b_on) {\
+  if (b_on) m_SET_FLAG_ON(m_flags,flag) else m_SET_FLAG_OFF(m_flags,flag)\
+}
 
 // Check whether flag is ON 
 //
