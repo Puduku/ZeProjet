@@ -20,14 +20,14 @@
 // BLOTREG: 
 // --------
 
+// A blotreg is nothing but a g-param collection...
+#define g_BLOTREG_HANDLE g_G_PARAMS_HANDLE
+
 // blotreg indexes :
 #define NAME__BLOTREG_INDEX_LABEL      0
 #define TOKEN_ID__BLOTREG_INDEX_LABEL  1
 #define INT_VALUE__BLOTREG_INDEX_LABEL 2
 #define STR_VALUE__BLOTREG_INDEX_LABEL 3
-
-// A blotreg is nothing but a g-param colllection...
-#define g_BLOTREG_HANDLE g_G_PARAMS_HANDLE
 
 // The four indexes are added to the register.
 // #SEE NAMED_OBJECT_CREATE_INSTANCE_FUNCTION @ c-ansi/named-object.h <blotreg>
@@ -49,10 +49,11 @@ int BlotregDestroyInstance(void *xhr_handle) ;
 // BLOTVAR: 
 // --------
 
+// A blotvar is nothing but a g-param
+#define g_BLOTVAR_STUFF g_G_PARAM_STUFF
+
 #define g_BLOTVAR_NAME_ELEMENT G_PARAM_NAME_ELEMENT
 #define g_BLOTVAR_VALUE_ELEMENT G_PARAM_VALUE_ELEMENT 
-
-#define g_BLOTVAR_STUFF g_G_PARAM_STUFF
 
 // specific blotvar reference (of a register) 
 
@@ -76,8 +77,8 @@ struct BLOTVAR_REFERENCE {
 //
 // Passed:
 // - ap_blotvarReference: blotvar reference 
-// - cb_lValue: ONLY significant with NAME__BLOTVAR_REFERENCE / TOKEN_ID__BLOTVAR_REFERENCE; 
-//   r-value=>do not create if not found ; l-value=>do create if not found
+// - b_lValue: r-value=>do not create if not found ;
+//     l-value=>do create if not found (only possible with NAME__ / TOKEN_ID__SPECIFIER_FLAG; 
 // - navn_entry: NULL address if not used
 // 
 // Changed:
@@ -94,8 +95,10 @@ int FetchBlotvar(const struct BLOTVAR_REFERENCE *ap_blotvarReference, char cb_lV
 // BLOTEX_VALUE:
 // -------------
 
+#define b_STR_VALUE b_TRUE
+#define b_INT_VALUE (!b_STR_VALUE) 
+
 struct BLOTEX_VALUE {
-//  int asValue; // 
   char b_strValue; 
   union {
     gen_BLOTVAL c_blotval;
@@ -110,51 +113,47 @@ struct BLOTEX_VALUE {
 
 #define b_FUGACIOUS_STR b_TRUE
 
-#define b_STR_VALUE b_TRUE
-#define b_INT_VALUE (!b_STR_VALUE) 
-
 // Set blotex INITIAL value
 // TODO: manage double initialization ???
 //
 // Passed:
-// - c_workingGStringsHandle: only significant with str value 
 // - b_strValue: b_STR_VALUE (TRUE) / b_INT_VALUE (FALSE)  
 // - c_blotval: only significant with b_INT_VALUE 
-// - cap_str: only significant with b_STR_VALUE 
+// - c_workingGStringsHandle: only significant with b_STR_VALUE 
+// - c_str: only significant with b_STR_VALUE 
 // - cb_fugaciousStr: only significant with b_STR_VALUE; (TRUE/FALSE) NOTICE: if you intialize
 //   TWICE a fugacious string, the first working string buffer is "lost"  
 // 
-// changed:
-// - c_workingGStringsHandle: when b_STR_VALUE
+// Changed:
 // - a_blotexValue: 
+// - c_workingGStringsHandle: when b_STR_VALUE
 //
 // Ret: 
 // - RETURNED: Ok
 // - -1: unexpected problem; anomaly is raised
-int SetBlotexValue(G_STRINGS_HANDLE c_workingGStringsHandle, struct BLOTEX_VALUE *a_blotexValue,
-  char b_strValue, gen_BLOTVAL c_blotval, const struct P_STRING* cap_str, char cb_fugaciousStr) ;
+int SetBlotexValue(struct BLOTEX_VALUE *a_blotexValue, char b_strValue, gen_BLOTVAL c_blotval,
+  G_STRINGS_HANDLE c_workingGStringsHandle, struct P_STRING c_str, char cb_fugaciousStr) ;
 
 
 // Passed:
-// - workingGStringsHandle:
 // - a_strexValue1: 
+// - workingGStringsHandle:
 // - p_str2:
 // 
 // changed:
-// - workingGStringsHandle:
 // - a_strtexValue1: 
+// - workingGStringsHandle:
 //
 // Ret: 
 // - RETURNED: Ok
 // - -1: unexpected problem; anomaly is raised
-int ConcatenateStrexValue(G_STRINGS_HANDLE workingGStringsHandle,
-  struct BLOTEX_VALUE *a_strexValue1, struct P_STRING p_str2) ;
+int ConcatenateStrexValue(struct BLOTEX_VALUE *a_strexValue1,G_STRINGS_HANDLE workingGStringsHandle,
+  struct P_STRING p_str2) ;
 
 
 // BLOTTAB:
 // --------
 struct BLOTTAB_SPOT_REFERENCE {
-//  int asValue; 
   char b_strValue;
   void *r_blottabHandle; // at some "current" position 
   void *r_spot; // "field" identification (complete spot reference) 
@@ -175,8 +174,11 @@ typedef int (*UPDATE_BLOTTAB_SPOT_FUNCTION)(
   struct BLOTTAB_SPOT_REFERENCE blottabSpotReference, struct BLOTEX_VALUE blotexValue);
 
 
-// Parsing blot expressions: framework 
-// =================================== 
+// Parsing blot expressions:
+// ========================= 
+
+// Framework: 
+// ---------- 
 
 // Prepare parsing function for potential abandonment.   
 //
@@ -259,8 +261,8 @@ typedef int (*UPDATE_BLOTTAB_SPOT_FUNCTION)(
     m_DIGGY_RETURN(ANSWER__NO) \
   break; default: m_TRACK() } 
 
-// Parsing blot expressions: helpers 
-// ================================= 
+// Helpers: 
+// -------- 
 
 // Check if sequence is empty (after white spaces elimination)
 //
@@ -430,10 +432,6 @@ int DelimitBlotregRequest(struct P_STRING *a_sequence, const char *np_sequenceTy
 // - 1: unexpected problem; anomaly is raised
 int DelimitCreationSequence(struct P_STRING *a_sequence, const char *p_sequenceType,
   struct P_STRING *ac_creationSequence, G_STRING_STUFF nc_abandonmentInfo);
-
-
-
-
 
 // Parse <anything> aka. '*'
 //

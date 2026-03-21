@@ -50,6 +50,7 @@ const struct P_STRING *ap_aTrivialEmptyPString ;
 // -------------------------
 
 #define UNDEFINED_P_STRING { (const char*)UNDEFINED } 
+#define UNDEFINED_P_STRING_PAR (struct P_STRING) UNDEFINED_P_STRING 
 
 
 // Assign (regular) string portion.

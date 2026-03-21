@@ -173,7 +173,7 @@ int BlotexlibExecutorFactoryDestroyInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE xh
 
 // This function, which wraps BlotcodeExecutorGetBlotlibExecutorHandle(), retrieves the executor
 // handle of =>blotex<= library.
-// This function is useful to access to all blotex variables... 
+// This function is useful to access to all blotex entities... 
 //
 // Passed:
 // - handle:
@@ -193,7 +193,7 @@ int l_BlotcodeExecutorGetBlotexlibExecutorHandle(BLOTCODE_EXECUTOR_HANDLE handle
 
 #define GLOBAL_BLOTREG_NAME GOOD_OLD_EMPTY_C_STRING
 
-// Notice: blot registers are based on g-params 
+// Reminder: blot registers are based on g-params 
 // blotvar <=> g-param 
 // blotreg <=> g-params (i.e g-param collection)
 
@@ -232,21 +232,16 @@ int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct P_STRING blotregName, g_BLOTREG_HANDLE *na_blotregHandle);
 
 
-// Interface for blottab implementations:
-// ======================================
-
-// These functions allow implementation of actual blottabs ("Genuine", "Super", "Hyper") 
-
-// Blotex values:
-// --------------
+// Blotex value:
+// -------------
 
 // Set blotex INITIAL value
 //
 // Passed:
-// - handle:
+// - handle: see l_BlotcodeExecutorGetBlotexlibExecutorHandle()
 // - b_strValue: b_INT_VALUE / b_STR_VALUE
 // - c_blotval:
-// - cap_str:
+// - c_str:
 // - cb_fugaciousStr: (TRUE/FALSE) NOTICE: if you intialize TWICE a
 //   fugacious string, the first working string buffer is "lost"  
 // 
@@ -258,11 +253,11 @@ int BlotexlibExecutorCreateBlotreg(BLOTEXLIB_EXECUTOR_HANDLE handle,
 // - -1: unexpected problem; anomaly is raised
 int BlotexlibExecutorSetBlotexValue(BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct BLOTEX_VALUE *a_blotexValue, char b_strValue, gen_BLOTVAL c_blotval,
-  const struct P_STRING* cap_str, char cb_fugaciousStr);
+  struct P_STRING c_str, char cb_fugaciousStr);
 
 
 // Passed:
-// - handle:
+// - handle: see l_BlotcodeExecutorGetBlotexlibExecutorHandle()
 // - ac_blotexValue: 
 // - a_strexValue1: 
 // - p_str2:
@@ -276,14 +271,14 @@ int BlotexlibExecutorSetBlotexValue(BLOTEXLIB_EXECUTOR_HANDLE handle,
 int BlotexlibExecutorConcatenateStrexValue(BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct BLOTEX_VALUE *a_strexValue1, struct P_STRING p_str2) ;
 
-// Parsing blot expressions:
-// -------------------------
+// Parsing blot expression:
+// ------------------------
 
 // TODO: ParseBlotex() dans kitchen???
 // Parse <blotex>
 //
 // Passed:
-// - handle:
+// - handle: see l_BlotcodeExecutorGetBlotexlibExecutorHandle()
 // - *a_sequence: before parsing
 //
 // Changed:
@@ -304,7 +299,7 @@ int BlotexlibExecutorParseAndComputeBlotex(BLOTEXLIB_EXECUTOR_HANDLE handle,
 // Parse <str portion>
 //
 // Passed:
-// - handle:
+// - handle: see l_BlotcodeExecutorGetBlotexlibExecutorHandle()
 // - *a_sequence: before parsing; expect '{' [ <intex> ] [ ( ':' | '-' ) [ <intex> ] ] '}'
 //
 // Changed:
@@ -324,10 +319,13 @@ int BlotexlibExecutorParseAndComputeStrPortion(BLOTEXLIB_EXECUTOR_HANDLE handle,
 // blottabs:
 // ---------
 
+// Interface for blottab implementations:
+// These functions allow implementation of actual blottabs ("Genuine", "Super", "Hyper") 
+
 // Add new blottab in blotex executor's blot tables.
 // 
 // Passed:
-// - handle:
+// - handle: see l_BlotcodeExecutorGetBlotexlibExecutorHandle()
 // - blottabsLabel: GENUINE_BLOTTABS_LABEL0; 1 => "Super" blottabs' label, etc.
 // - blottabName: must correspond to NON-existing blottab 
 // - hr_blottabHandle: new blottab's handle to be added
@@ -342,7 +340,7 @@ int BlotexlibExecutorAddBlottab(BLOTEXLIB_EXECUTOR_HANDLE handle, int blottabsLa
 // Retrieve some blot table of blotex executor...
 // 
 // Passed:
-// - handle:
+// - handle: see l_BlotcodeExecutorGetBlotexlibExecutorHandle()
 // - blottabsLabel: GENUINE_BLOTTABS_LABEL0; 1 => "Super" blottabs' label, etc.
 // - blottabName: blot table's name 
 //

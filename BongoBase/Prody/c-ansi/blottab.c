@@ -470,7 +470,7 @@ static inline int ml_BlotexlibExecutorParseAndComputeRValueBlottabOps(
 
   m_PREPARE_ABANDON(a_sequence, "<int blottab ops> | <str blottab ops>") 
   m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,ac_blotexValue, b_INT_VALUE,TRUE__BLOTVAL0,
-    (struct P_STRING*)UNDEFINED,(char)UNDEFINED) != RETURNED) // a priori
+    UNDEFINED_P_STRING_PAR,(char)UNDEFINED) != RETURNED) // a priori
 
   int n_indexFetchFlags = -1; // a priori 
 
@@ -501,7 +501,7 @@ m_ASSERT(cnb_strValue != -1)
   
   if (n_indexFetchFlags < 0) {
     m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,ac_blotexValue, b_INT_VALUE,TRUE__BLOTVAL0,
-      (struct P_STRING*)UNDEFINED,(char)UNDEFINED) != RETURNED)
+      UNDEFINED_P_STRING_PAR,(char)UNDEFINED) != RETURNED)
   } else {
     g_G_STRING_SET_STUFF ct_blotsetStuff = (g_G_STRING_SET_STUFF)UNDEFINED;
     int c_entry = UNDEFINED;
@@ -514,16 +514,16 @@ m_DIGGY_VAR_INDEX_FETCH_FLAGS(n_indexFetchFlags)
 m_DIGGY_VAR_D(cnb_strValue)
       if (cnb_strValue == -1) {
         m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,ac_blotexValue, b_INT_VALUE,TRUE__BLOTVAL0,
-          (struct P_STRING*)UNDEFINED,(char)UNDEFINED) != RETURNED)
+          UNDEFINED_P_STRING_PAR,(char)UNDEFINED) != RETURNED)
       } else {
         m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,ac_blotexValue,cnb_strValue,
-          ct_blotsetStuff[c_element].acolyt.cen_value,&ct_blotsetStuff[c_element].cv_pString,
+          ct_blotsetStuff[c_element].acolyt.cen_value,ct_blotsetStuff[c_element].cv_pString,
           b_FUGACIOUS_STR) != RETURNED) // TODO: really FUGACIOUS????
       } // if
 
     break; case RESULT__NOT_FOUND:
       m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,ac_blotexValue,cnb_strValue,FALSE__BLOTVAL,
-        ap_aTrivialEmptyPString,!b_FUGACIOUS_STR) != RETURNED)
+        *ap_aTrivialEmptyPString,!b_FUGACIOUS_STR) != RETURNED)
     break; default: m_TRACK()
     } // switch
   } // if
@@ -549,12 +549,11 @@ static inline int ml_BlotexlibExecutorParseAndComputeRValueBlottabSpot(
 
   if (b_strValue) {
     m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,ac_blotexValue,b_STR_VALUE,UNDEFINED,
-      &t_blotsetStuff[element].cv_pString,b_FUGACIOUS_STR) !=
+      t_blotsetStuff[element].cv_pString,b_FUGACIOUS_STR) !=
       RETURNED) // TODO: really FUGACIOUS????
   } else {
     m_TRACK_IF(BlotexlibExecutorSetBlotexValue(handle,ac_blotexValue, b_INT_VALUE,
-      t_blotsetStuff[element].acolyt.cen_value,(struct P_STRING*)UNDEFINED,
-      (char)UNDEFINED) != RETURNED)
+      t_blotsetStuff[element].acolyt.cen_value,UNDEFINED_P_STRING_PAR, (char)UNDEFINED) != RETURNED)
   } // if
 
   m_DIGGY_RETURN(ANSWER__YES) 

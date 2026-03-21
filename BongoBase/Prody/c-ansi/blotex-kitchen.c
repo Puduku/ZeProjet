@@ -57,11 +57,10 @@ int BlotregDestroyInstance(void *xhr_handle) {
 // --------
 
 // See .h
-int FetchBlotvar(const struct BLOTVAR_REFERENCE *ap_blotvarReference, char cb_lValue,
+int FetchBlotvar(const struct BLOTVAR_REFERENCE *ap_blotvarReference, char b_lValue,
   g_BLOTVAR_STUFF *ant_blotvarStuff, int *navn_entry) {
   m_DIGGY_BOLLARD()
 
-  int ret = UNDEFINED;
   *ant_blotvarStuff = (g_BLOTVAR_STUFF)UNDEFINED;
   switch (ap_blotvarReference->n_specifierFlag) {
   case NAME__SPECIFIER_FLAG:
@@ -78,11 +77,11 @@ m_DIGGY_VAR_P_STRING(ap_blotvarReference->c_select.c_name)
       } // if
 m_DIGGY_VAR_P(ap_blotvarReference->blotregHandle)
       switch (gm_BlotregIndexSingleFetch(ap_blotvarReference->blotregHandle,NULL,indexLabel,
-        INDEX_SEEK_FLAGS__EQUAL,&gKey,cb_lValue?  INDEX_FETCH_FLAGS__FETCH:
+        INDEX_SEEK_FLAGS__EQUAL,&gKey,b_lValue?  INDEX_FETCH_FLAGS__FETCH:
         INDEX_FETCH_FLAGS__SEEK_ONLY, ant_blotvarStuff, navn_entry)) {
       case RESULT__FOUND:
       break; case RESULT__NOT_FOUND:
-        if (cb_lValue) { 
+        if (b_lValue) {
           m_ASSERT(*ant_blotvarStuff != NULL)
           if (ap_blotvarReference->n_specifierFlag == NAME__SPECIFIER_FLAG)
             m_TRACK_IF(m_GParamNameCopy(*ant_blotvarStuff,0,ap_blotvarReference->c_select.c_name)
@@ -98,10 +97,9 @@ m_DIGGY_VAR_P(ap_blotvarReference->blotregHandle)
       } // switch
     } // gKey 
   break; case ENTRY__SPECIFIER_FLAG:
-    ret = g_BlotregFetch(ap_blotvarReference->blotregHandle,
-      ap_blotvarReference->c_select.c_entry, ant_blotvarStuff);
-    m_TRACK_IF(ret < 0)
-m_ASSERT(ret == ap_blotvarReference->c_select.c_entry)
+    m_ASSERT(g_BlotregFetch(ap_blotvarReference->blotregHandle,
+      ap_blotvarReference->c_select.c_entry, ant_blotvarStuff) ==
+      ap_blotvarReference->c_select.c_entry)
   break; case -1: // current blotvar reference 
     switch (g_BlotregIndexFetch(ap_blotvarReference->blotregHandle,NULL,
       INDEX_FETCH_FLAGS__CURRENT, ant_blotvarStuff, navn_entry)){
@@ -123,17 +121,17 @@ m_ASSERT(*ant_blotvarStuff == NULL)
 // -------------
 
 // Public function: see .h
-int SetBlotexValue(G_STRINGS_HANDLE c_workingGStringsHandle,struct BLOTEX_VALUE *a_blotexValue,
-  char b_strValue, gen_BLOTVAL c_blotval, const struct P_STRING* cap_str, char cb_fugaciousStr) {
+int SetBlotexValue(struct BLOTEX_VALUE *a_blotexValue, char b_strValue, gen_BLOTVAL c_blotval,
+  G_STRINGS_HANDLE c_workingGStringsHandle, struct P_STRING c_str, char cb_fugaciousStr) {
   m_DIGGY_BOLLARD()
   if ((a_blotexValue->b_strValue = b_strValue)) { 
     G_STRING_STUFF t_workingGStringStuff = (G_STRING_STUFF)UNDEFINED;
     m_TRACK_IF((a_blotexValue->select.c_strex.workingGStringEntry =
       GStringsFetch(c_workingGStringsHandle,-1, &t_workingGStringStuff)) < 0)
     if (cb_fugaciousStr) {
-      m_TRACK_IF(GStringCopy(t_workingGStringStuff,0, *cap_str) < 0)
+      m_TRACK_IF(GStringCopy(t_workingGStringStuff,0, c_str) < 0)
     } else {
-      switch(GStringImport(t_workingGStringStuff, *cap_str)) {
+      switch(GStringImport(t_workingGStringStuff, c_str)) {
       case COMPLETED__OK:
       break; case COMPLETED__BUT: 
       break; default:
@@ -146,8 +144,8 @@ int SetBlotexValue(G_STRINGS_HANDLE c_workingGStringsHandle,struct BLOTEX_VALUE 
 } // SetBlotexValue
 
 // Public function: see .h
-int ConcatenateStrexValue(G_STRINGS_HANDLE workingGStringsHandle,
-  struct BLOTEX_VALUE *a_strexValue1, struct P_STRING p_str2) {
+int ConcatenateStrexValue(struct BLOTEX_VALUE *a_strexValue1,G_STRINGS_HANDLE workingGStringsHandle,
+  struct P_STRING p_str2) {
   m_DIGGY_BOLLARD()
   m_ASSERT(a_strexValue1->b_strValue)
   G_STRING_STUFF t_workingGStringStuff = (G_STRING_STUFF)UNDEFINED;
@@ -483,7 +481,7 @@ int BlotvarAs2BlotexValue(g_BLOTVAR_STUFF n_blotvarStuff, int n_as, int c_entry,
 
   char b_strValue = (char)UNDEFINED;
   gen_BLOTVAL c_blotval = UNDEFINED; 
-  const struct P_STRING* cap_str = (const struct P_STRING*)UNDEFINED;
+  struct P_STRING str = UNDEFINED_P_STRING;
   char cb_fugaciousStr = (char)UNDEFINED;
 
   switch (n_as) {
@@ -503,20 +501,20 @@ int BlotvarAs2BlotexValue(g_BLOTVAR_STUFF n_blotvarStuff, int n_as, int c_entry,
     c_blotval = n_blotvarStuff != NULL? c_entry: FALSE__BLOTVAL;
   break; case AS__VALUE_STR: // <blotvar strex> 
     b_strValue = b_STR_VALUE;
-    cap_str = n_blotvarStuff != NULL? &n_blotvarStuff[g_BLOTVAR_VALUE_ELEMENT].cv_pString:
-      ap_aTrivialEmptyPString;
+    str = n_blotvarStuff != NULL? n_blotvarStuff[g_BLOTVAR_VALUE_ELEMENT].cv_pString:
+      *ap_aTrivialEmptyPString;
     cb_fugaciousStr = n_blotvarStuff != NULL; // TODO: really FUGACIOUS????
   break; case AS__NAME:  // <blotvar name> 
     b_strValue = b_STR_VALUE,
-    cap_str = n_blotvarStuff != NULL? &n_blotvarStuff[g_BLOTVAR_NAME_ELEMENT].cv_pString:
-      ap_aTrivialEmptyPString;
+    str = n_blotvarStuff != NULL? n_blotvarStuff[g_BLOTVAR_NAME_ELEMENT].cv_pString:
+      *ap_aTrivialEmptyPString;
     cb_fugaciousStr = n_blotvarStuff != NULL; // TODO: really FUGACIOUS????
   break; default:
     m_RAISE(ANOMALY__VALUE__D,n_as)
   } // switch
 
-  m_TRACK_IF(SetBlotexValue(workingGStringsHandle,a_blotexValue,b_strValue,c_blotval,
-      cap_str,cb_fugaciousStr) != RETURNED)
+  m_TRACK_IF(SetBlotexValue(a_blotexValue,b_strValue,c_blotval,workingGStringsHandle,
+      str,cb_fugaciousStr) != RETURNED)
 
   m_DIGGY_RETURN(RETURNED)
 } // BlotvarAs2BlotexValue
@@ -693,9 +691,9 @@ int ParseIntConstant(struct P_STRING *a_sequence, char *ab_parsed,
   struct P_STRING lexeme = UNDEFINED_P_STRING;
   gen_BLOTVAL c_blotval = UNDEFINED;
   PParseGenericInteger(a_sequence,&c_blotval,&lexeme);
-  if ((*ab_parsed = !b_EMPTY_P_STRING(lexeme))) m_TRACK_IF(SetBlotexValue(
-    (G_STRINGS_HANDLE)UNDEFINED,ac_blotexValue,b_INT_VALUE, c_blotval, (const struct P_STRING*) UNDEFINED,
-    (char)UNDEFINED) != RETURNED)
+  if ((*ab_parsed = !b_EMPTY_P_STRING(lexeme))) m_TRACK_IF(SetBlotexValue(ac_blotexValue,
+    b_INT_VALUE, c_blotval,(G_STRINGS_HANDLE)UNDEFINED, UNDEFINED_P_STRING_PAR, (char)UNDEFINED)
+    != RETURNED)
 
   m_DIGGY_RETURN(RETURNED)
 } // ParseIntConstant
@@ -711,7 +709,7 @@ int ParseStrConstant(struct P_STRING *a_sequence, G_STRINGS_HANDLE workingGStrin
     o_PParsePassChars(a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_TILL,NULL,'"', &lexeme);
     if (b_EMPTY_P_STRING(*a_sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
     PParseOffset(a_sequence,1,NULL);
-    m_TRACK_IF(SetBlotexValue(workingGStringsHandle,acc_blotexValue,b_STR_VALUE,UNDEFINED,&lexeme,
+    m_TRACK_IF(SetBlotexValue(acc_blotexValue,b_STR_VALUE,UNDEFINED,workingGStringsHandle,lexeme,
       !b_FUGACIOUS_STR) != RETURNED) // TODO: FUGACIOUS???
   } // if 
   m_DIGGY_RETURN(ANSWER__YES)
