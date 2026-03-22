@@ -112,11 +112,11 @@
 // <blotvar entry> ::= <blotvar> <<as entry>>
 
 // "As" suffixes allow to qualify integer and string entities:
-// <<as value int>> ::= '#'
-// <<as entry>> ::= '!#'
-// <<as id>> ::= '!'
-// <<as value str>> ::= '$'
-// <<as name>> ::= '!$'
+// <as value int> ::= '#'
+// <as entry> ::= '!#'
+// <as id> ::= '!'
+// <as value str> ::= '$'
+// <as name> ::= '!$'
  
 // Blotvar examples: 
 // .toto => toto blotvar of global register

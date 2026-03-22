@@ -119,8 +119,8 @@ int BlottabDestroyInstance(void *xhr_handle) {
 // - ANSWER__YES: Ok
 // - ANSWER__NO: parsing abandoned
 static int ParseAndRetrieveBlottabElement(struct P_STRING *a_sequence,
-  G_STRINGS_HANDLE fieldAttributesHandle, int *nac_tableIndexLabel, int *cac_element, char *acb_strValue,
-  G_STRING_STUFF nc_abandonmentInfo) {
+  G_STRINGS_HANDLE fieldAttributesHandle, int *nac_tableIndexLabel, int *cac_element,
+  signed char *acb_strValue, G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
 m_DIGGY_VAR_P_STRING(*a_sequence)
   g_G_STRING_SET_STUFF fieldAttributeStuff = (g_G_STRING_SET_STUFF)UNDEFINED;
@@ -177,9 +177,9 @@ static inline int ml_BlotexlibExecutorParseAndComputeLValueBlottabSetOp(
   if (n_blottabHandle == NULL) m_ABANDON(UNKNOWN_BLOTTAB__ABANDONMENT_CAUSE)
   int n_indexFetchFlags = -1; // a priori 
 
-  char nb_strValue = -1; // No blottab read/set op a priori 
+  signed char nb_strValue = -1; // No blottab read/set op a priori 
   int c_element = UNDEFINED; // Only significant with blottab read/set op
-  if (b_ParseOpReadSet(a_sequence,&n_indexFetchFlags)) { 
+  if (ob_ParseOpReadSet(a_sequence,&n_indexFetchFlags)) { 
     // <blottab ref op set int> | <blottab ref op set str> (L-value)... 
     m_CHECK_ABANDON(ParseAndRetrieveBlottabElement(a_sequence, n_blottabHandle->hp_fieldAttributesHandle,
       NULL,&c_element, &nb_strValue, nc_abandonmentInfo))
@@ -211,7 +211,7 @@ m_ASSERT(nb_strValue != -1)
 // - -1: unexpected problem
 static int l_BlotexlibExecutorParseAndRetrieveBlottabSpot(BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct P_STRING *a_sequence, BLOTTAB_HANDLE blottabHandle, g_G_STRING_SET_STUFF* act_blotsetStuff,
-  int *ac_element, char *acb_strValue, G_STRING_STUFF nc_abandonmentInfo) {
+  int *ac_element, signed char *acb_strValue, G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD_S()
 
   m_PREPARE_ABANDON(a_sequence, "<blottab spot>") 
@@ -253,7 +253,7 @@ static inline int ml_BlotexlibExecutorParseAndComputeLValueBlottabSpot(
 
   m_PREPARE_ABANDON(a_sequence, "<int blottab spot> | <str blottab spot>") 
   if (n_blottabHandle == NULL) m_ABANDON(UNKNOWN_BLOTTAB__ABANDONMENT_CAUSE)
-  char b_strValue = (char)UNDEFINED; 
+  signed char b_strValue = (char)UNDEFINED; 
   int element = UNDEFINED;
   g_G_STRING_SET_STUFF t_blotsetStuff = (g_G_STRING_SET_STUFF)UNDEFINED;
   m_CHECK_ABANDON(l_BlotexlibExecutorParseAndRetrieveBlottabSpot(handle,a_sequence,n_blottabHandle,
@@ -323,7 +323,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
   struct BLOTEX_VALUE blotexValue = UNDEFINED_BLOTEX_VALUE; 
   struct G_KEY gKey = { UNDEFINED };
   do {
-    char b_strValue = (char)UNDEFINED;  
+    signed char b_strValue = (char)UNDEFINED;  
     int tableIndexLabel = UNDEFINED;
     // <blottab request atom int> | <blottab request atom str> ...
     m_CHECK_ABANDON(ParseAndRetrieveBlottabElement(&subSequence, blottabHandle->hp_fieldAttributesHandle,
@@ -331,7 +331,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
 m_DIGGY_VAR_P_STRING(subSequence)
     
     int n_indexSeekFlags = UNDEFINED;
-    if (b_ParseAnything(&subSequence)) n_indexSeekFlags = INDEX_SEEK_FLAGS__ANY;
+    if (ob_ParseAnything(&subSequence)) n_indexSeekFlags = INDEX_SEEK_FLAGS__ANY;
     else {  // select with actual criterion
       m_TRACK_IF(ParseRequestCompOp(&subSequence,b_strValue != b_INT_VALUE,
         &n_indexSeekFlags) != RETURNED)
@@ -357,7 +357,7 @@ m_DIGGY_VAR_P_STRING(subSequence)
     m_ASSERT(criteriaNumber < 5)
     criteria5[criteriaNumber++] = m_GRequestCriterion_GKeys(tableIndexLabel,
       n_indexSeekFlags,&gKey, criteriaOpFlags);
-  } while (!b_EmptySequence(&subSequence)) ; 
+  } while (!ob_EmptySequence(&subSequence)) ; 
 
   switch (GStringsIndexRequestR(blottabHandle->h_tableHandle,NULL,criteriaNumber,criteria5)) {
   case COMPLETED__OK:
@@ -431,7 +431,7 @@ static inline int ml_BlotexlibExecutorParseAndComputeBlottabCreation(
 
   struct P_STRING s_names10[10]; // UNDEFINED
   int s_blottabIndexFlags10[10]; // UNDEFINED
-  char nb_strValue = (char)UNDEFINED, nb_strValue2 = (char)UNDEFINED;
+  signed char nb_strValue = (signed char)UNDEFINED, nb_strValue2 = (signed char)UNDEFINED;
   int i = -1;
   do {
     m_ASSERT(++i < 10)
@@ -446,7 +446,7 @@ m_DIGGY_VAR_D(nb_strValue2)
 
     if (nb_strValue2 != -1) m_SET_FLAG(s_blottabIndexFlags10[i],STR__BLOTTAB_INDEX_FLAG,
       nb_strValue2)
-  } while (!b_EmptySequence(&subSequence)) ; 
+  } while (!ob_EmptySequence(&subSequence)) ; 
 
   switch(ml_BlotexlibExecutorCreateBlottab(handle, blottabsLabel,nonExistingBlottabName, i+1, s_names10,
     s_blottabIndexFlags10, ac_blottabHandle)) {
@@ -474,25 +474,26 @@ static inline int ml_BlotexlibExecutorParseAndComputeRValueBlottabOps(
 
   int n_indexFetchFlags = -1; // a priori 
 
-  char cnb_strValue = (char)UNDEFINED; // Only significant if n_indexFetchFlags != -1 
+  signed char cnb_strValue = (signed char)UNDEFINED; // Only significant if n_indexFetchFlags != -1
   int c_element = UNDEFINED; // Only significant if n_indexFetchFlags != -1 and cnb_strValue != -1
-  if (b_ParseOpCreate(a_sequence)) { // <blottab op create>...
+  if (ob_ParseOpCreate(a_sequence)) { // <blottab op create>...
     if (n_blottabHandle != NULL) m_ABANDON(ALREADY_EXISTS_BLOTTAB__ABANDONMENT_CAUSE)
     m_CHECK_ABANDON(ml_BlotexlibExecutorParseAndComputeBlottabCreation(handle,a_sequence,blottabsLabel,
       blottabName, &n_blottabHandle, nc_abandonmentInfo))
 
   } else {
     if (n_blottabHandle == NULL) m_ABANDON(UNKNOWN_BLOTTAB__ABANDONMENT_CAUSE) 
-    if (b_ParseOpSelect(a_sequence)) { // <blottab op select>...
+    if (ob_ParseOpSelect(a_sequence)) { // <blottab op select>...
       m_CHECK_ABANDON(ml_BlotexlibExecutorParseAndComputeBlottabRequest(handle,a_sequence,
         n_blottabHandle, nc_abandonmentInfo))
     } // if
-    b_ParseOpReset(a_sequence,&n_indexFetchFlags); // <op reset>...
+    ob_ParseOpReset(a_sequence,&n_indexFetchFlags); // <op reset>...
     // TODO <op insert>
-    b_ParseOpNext(a_sequence,&n_indexFetchFlags); // <op next>...
+    ob_ParseOpNext(a_sequence,&n_indexFetchFlags); // <op next>...
 
     cnb_strValue = -1; // No blottab read/set op a priori 
-    if (b_ParseOpReadSet(a_sequence,&n_indexFetchFlags)) { // <blottab op read int> | <blottab op read str> (R-value)
+    if (ob_ParseOpReadSet(a_sequence,&n_indexFetchFlags)) {
+      // <blottab op read int> | <blottab op read str> (R-value)
       m_CHECK_ABANDON(ParseAndRetrieveBlottabElement(a_sequence,
         n_blottabHandle->hp_fieldAttributesHandle, NULL,&c_element, &cnb_strValue, nc_abandonmentInfo))
 m_ASSERT(cnb_strValue != -1)
@@ -541,7 +542,7 @@ static inline int ml_BlotexlibExecutorParseAndComputeRValueBlottabSpot(
 
   m_PREPARE_ABANDON(a_sequence, "<int blottab spot> | <str blottab spot>") 
   if (n_blottabHandle == NULL) m_ABANDON(UNKNOWN_BLOTTAB__ABANDONMENT_CAUSE)
-  char b_strValue = (char)UNDEFINED; 
+  signed char b_strValue = (char)UNDEFINED; 
   int element = UNDEFINED;
   g_G_STRING_SET_STUFF t_blotsetStuff = (g_G_STRING_SET_STUFF)UNDEFINED;
   m_CHECK_ABANDON(l_BlotexlibExecutorParseAndRetrieveBlottabSpot(handle,a_sequence,n_blottabHandle,

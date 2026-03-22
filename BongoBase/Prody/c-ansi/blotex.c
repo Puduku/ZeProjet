@@ -348,7 +348,7 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(indexSeekFlags)
     m_ASSERT(criteriaNumber < 5)
     criteria5[criteriaNumber++] = m_GRequestCriterion_GKeys(blotregIndexLabel,
       indexSeekFlags,&gKey, criteriaOpFlags);
-  } while (!b_EmptySequence(&subSequence)) ; 
+  } while (!ob_EmptySequence(&subSequence)) ; 
 
   switch (g_BlotregIndexRequestR(blotregHandle,NULL,criteriaNumber,criteria5)) {
   case COMPLETED__OK:
@@ -390,16 +390,17 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
 
   m_TRACK_IF(SetBlotexValue(ac_blotexValue,b_INT_VALUE,TRUE__BLOTVAL0,(G_STRINGS_HANDLE)UNDEFINED,
     UNDEFINED_P_STRING_PAR,(char)UNDEFINED) != RETURNED) // 'true' value a priori 
-  if (b_ParseOpSelect(a_sequence)) { // <blotreg op select>...
+  if (ob_ParseOpSelect(a_sequence)) { // <blotreg op select>...
     m_CHECK_ABANDON(m_BlotexlibExecutorParseAndComputeBlotregRequest(handle,a_sequence,n_blotregHandle,
       nc_abandonmentInfo)) 
   } // if
   int cn_as = UNDEFINED; 
   int n_indexFetchFlags = -1; // No blotreg fetch op a priori 
-  b_ParseOpReset(a_sequence,&n_indexFetchFlags); // <op reset>...
-  b_ParseOpNext(a_sequence,&n_indexFetchFlags);
+  ob_ParseOpReset(a_sequence,&n_indexFetchFlags); // <op reset>...
+  ob_ParseOpNext(a_sequence,&n_indexFetchFlags);
   cn_as = -1; // No blotreg read/set op a priori  
-  if (b_ParseOpReadSet(a_sequence,&n_indexFetchFlags)) { // <blotreg op read int> | <blotreg op read str> (R-value)
+  if (ob_ParseOpReadSet(a_sequence,&n_indexFetchFlags)) {
+    // <blotreg op read int> | <blotreg op read str> (R-value)
     m_TRACK_IF(ParseAs(!b_L_VALUE,a_sequence,&cn_as) != RETURNED)
   } // if
   
@@ -615,7 +616,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
       g_BLOTREG_HANDLE cn_blotregHandle = (void*)UNDEFINED;
       m_TRACK_IF(BlotexlibExecutorParseAndComputeBlotregOrBlottabXName(handle,a_sequence, &n_blottabsLabel,
         &name, &cnr_blottabHandle,&cn_blotregHandle) != RETURNED) 
-      if (b_ParseOpsIndicator(a_sequence)) { 
+      if (ob_ParseOpsIndicator(a_sequence)) { 
         if (n_blottabsLabel >= 0) { // <int blottabX ops> | <str blottabX ops> ...
           m_CHECK_ABANDON(handle->blottabExecutorImplementations[n_blottabsLabel].
             l_blotexlibExecutorParseAndComputeRValueBlottabOpsFunction(handle,b_OPS,a_sequence,
@@ -765,7 +766,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
   m_PREPARE_ABANDON(a_sequence, "<strex>") 
 
   struct BLOTEX_VALUE strexAtomValue = UNDEFINED_BLOTEX_VALUE; 
-  while (b_ParseStrexAtomOp(a_sequence)) {
+  while (ob_ParseStrexAtomOp(a_sequence)) {
   
     m_CHECK_ABANDON(BlotexlibExecutorProbeBlotexAtom(handle,a_sequence,&strexAtomValue,
       nc_abandonmentInfo))
@@ -833,7 +834,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
   g_BLOTREG_HANDLE cn_blotregHandle = (g_BLOTREG_HANDLE)UNDEFINED;
   m_TRACK_IF(BlotexlibExecutorParseAndComputeBlotregOrBlottabXName(handle,a_sequence,
     an_fieldReferenceBlottabsLabel,&name, &cnr_blottabHandle,&cn_blotregHandle) != RETURNED)
-  if (b_ParseOpsIndicator(a_sequence)) { 
+  if (ob_ParseOpsIndicator(a_sequence)) { 
     if (*an_fieldReferenceBlottabsLabel >= 0) { // Parsing <int blottab ref> or <str blottab ref> ...
       m_CHECK_ABANDON(handle->blottabExecutorImplementations[*an_fieldReferenceBlottabsLabel].
         l_blotexlibExecutorParseAndComputeLValueBlottabSetOpFunction(handle,b_OPS,a_sequence,name,
@@ -897,7 +898,7 @@ static inline int m_BlotexlibExecutorExecuteCFunctionEval(BLOTEXLIB_EXECUTOR_HAN
 
   m_PREPARE_ABANDON(&arguments, "Eval") 
   { struct P_STRING c_subSequence = UNDEFINED_P_STRING;
-    if (b_ParseBlotexAssignation(&arguments, &c_subSequence)) {
+    if (ob_ParseBlotexAssignation(&arguments, &c_subSequence)) {
       b_lValueReference = b_TRUE;
       m_CHECK_ABANDON(m_BlotexlibExecutorProbeBlotexRef(handle,&c_subSequence,
         &n_fieldReferenceBlottabsLabel, &cc_lValueBlotvarReference,&cc_lValueAs,

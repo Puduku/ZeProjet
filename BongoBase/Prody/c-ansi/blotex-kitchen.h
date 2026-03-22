@@ -270,8 +270,7 @@ typedef int (*UPDATE_BLOTTAB_SPOT_FUNCTION)(
 // - *a_sequence: before parsing
 //
 // Ret: Empty sequence ? (TRUE/FALSE)
-int b_EmptySequence(struct P_STRING *a_sequence) ;
-
+char ob_EmptySequence(struct P_STRING *a_sequence) ;
 
 // Ensure the sequence is NOT yet fully parsed (after elimination of white spaces).
 //
@@ -332,12 +331,12 @@ enum {
   AS__VALUE_STR,// '$'
 } ;
 
-
-// Parse "as" specifier (not present : default to '#" value int) 
+// Parse "as" specifier (not present : default to '#" value int):  
+// <as value int> | <as entry> | <as id> | <as value str> | <as name>
 //
 // Passed:
 // - *a_sequence: before parsing
-// - b_lValue: TRUE => "as entry" not accepted 
+// - b_lValue: TRUE => <as entry> not accepted 
 //
 // Changed:
 // - *a_sequence: after parsing 
@@ -348,7 +347,8 @@ enum {
 // - 1: unexpected problem; anomaly is raised
 int ParseAs(char b_lValue, struct P_STRING *a_sequence, int *a_as) ;
 
-// Parse "as" "value" specifier if present
+// Parse "as" "value" specifier if present:
+// <as value int> | <as value str>
 //
 // Passed:
 // - *a_sequence: before parsing
@@ -360,10 +360,10 @@ int ParseAs(char b_lValue, struct P_STRING *a_sequence, int *a_as) ;
 // Ret:
 // - RETURNED: Ok
 // - 1: unexpected problem; anomaly is raised
-int ParseAsValue(struct P_STRING *a_sequence, char *anb_strValue) ;
+int ParseAsValue(struct P_STRING *a_sequence, signed char *anb_strValue) ;
 
 
-// Parse (begin of) specifier 
+// Parse (begin of) specifier: <name specifier> | <entry specifier> | <token id specifier>
 //
 // Passed:
 // - *a_sequence: before parsing
@@ -443,8 +443,9 @@ int DelimitCreationSequence(struct P_STRING *a_sequence, const char *p_sequenceT
 // - *an_indexFetchFlags:
 //
 // Ret: <op next> parsed ? (TRUE/FALSE)
-char b_ParseAnything(struct P_STRING *a_sequence);
+char ob_ParseAnything(struct P_STRING *a_sequence);
 
+// Parse <blotreg request atom int> | <blotreg request atom str>
 //
 // Passed:
 // - *a_sequence: before parsing
@@ -462,7 +463,6 @@ char b_ParseAnything(struct P_STRING *a_sequence);
 int ParseBlotregRequestAtom(struct P_STRING *a_sequence, int *ac_as, int *ac_indexSeekFlags,
   G_STRING_STUFF nc_abandonmentInfo) ;
 
-
 // Parse <op read set> 
 //
 // Passed:
@@ -474,7 +474,7 @@ int ParseBlotregRequestAtom(struct P_STRING *a_sequence, int *ac_as, int *ac_ind
 // - *an_indexFetchFlags: 
 //
 // Ret: <op read set> parsed ? (TRUE/FALSE)
-char b_ParseOpReadSet(struct P_STRING *a_sequence, int *an_indexFetchFlags);
+char ob_ParseOpReadSet(struct P_STRING *a_sequence, int *an_indexFetchFlags);
 
 // Parse <op create> aka. '['
 //
@@ -485,7 +485,7 @@ char b_ParseOpReadSet(struct P_STRING *a_sequence, int *an_indexFetchFlags);
 // - *a_sequence: after parsing 
 //
 // Ret: <op create> parsed ? (TRUE/FALSE)
-char b_ParseOpCreate(struct P_STRING *a_sequence);
+char ob_ParseOpCreate(struct P_STRING *a_sequence);
 
 // Parse <op select> aka. ':'
 //
@@ -496,7 +496,7 @@ char b_ParseOpCreate(struct P_STRING *a_sequence);
 // - *a_sequence: after parsing 
 //
 // Ret: <op next> parsed ? (TRUE/FALSE)
-char b_ParseOpSelect(struct P_STRING *a_sequence);
+char ob_ParseOpSelect(struct P_STRING *a_sequence);
 
 // Parse <op reset> aka. '^'
 //
@@ -509,7 +509,7 @@ char b_ParseOpSelect(struct P_STRING *a_sequence);
 // - *an_indexFetchFlags:
 //
 // Ret: <op next> parsed ? (TRUE/FALSE)
-char b_ParseOpReset(struct P_STRING *a_sequence, int *an_indexFetchFlags);
+char ob_ParseOpReset(struct P_STRING *a_sequence, int *an_indexFetchFlags);
 
 // Parse <op next> aka. '+'
 //
@@ -522,7 +522,7 @@ char b_ParseOpReset(struct P_STRING *a_sequence, int *an_indexFetchFlags);
 // - *an_indexFetchFlags:
 //
 // Ret: <op next> parsed ? (TRUE/FALSE)
-char b_ParseOpNext(struct P_STRING *a_sequence, int *an_indexFetchFlags);
+char ob_ParseOpNext(struct P_STRING *a_sequence, int *an_indexFetchFlags);
 
 // Parse <op insert> aka. '@'
 //
@@ -535,8 +535,7 @@ char b_ParseOpNext(struct P_STRING *a_sequence, int *an_indexFetchFlags);
 // - *an_indexFetchFlags:
 //
 // Ret: <op next> parsed ? (TRUE/FALSE)
-char b_ParseOpInsert(struct P_STRING *a_sequence, int *an_indexFetchFlags);
-
+char ob_ParseOpInsert(struct P_STRING *a_sequence, int *an_indexFetchFlags);
 
 
 // Interpret as ...  blotreg index
@@ -720,7 +719,7 @@ int ApplyInt1Op(int n_int1Op,struct BLOTEX_VALUE *ac_blotexValue,G_STRING_STUFF 
 // - *a_sequence: after parsing 
 //
 // Ret: Parsed ? (TRUE/FALSE) 
-char b_ParseStrexAtomOp(struct P_STRING *a_sequence) ;
+char ob_ParseStrexAtomOp(struct P_STRING *a_sequence) ;
 
 
 // Passed:
@@ -801,7 +800,7 @@ int ParseBlotexAtomBlotexEnd(struct P_STRING *a_sequence,G_STRING_STUFF nc_aband
 // - *a_sequence: after parsing 
 //
 // Ret: Parsed ? (TRUE/FALSE) 
-char b_ParseOpsIndicator(struct P_STRING *a_sequence) ;
+char ob_ParseOpsIndicator(struct P_STRING *a_sequence) ;
 
 
 // Terminal symbols (of <int 1op> terminal symbol)
@@ -936,7 +935,7 @@ int ParseAndComputeLValueBlotregOps(struct P_STRING *a_sequence, struct P_STRING
 // - *ac_subSequence: only significant if assignation
 //
 // Ret: Assignation ? (TRUE / FALSE) 
-char b_ParseBlotexAssignation(struct P_STRING *a_sequence, struct P_STRING *ac_subSequence) ; 
+char ob_ParseBlotexAssignation(struct P_STRING *a_sequence, struct P_STRING *ac_subSequence) ; 
 
 
 
