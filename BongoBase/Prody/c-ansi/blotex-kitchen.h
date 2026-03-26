@@ -305,7 +305,6 @@ int ParseExistingSequence(struct P_STRING *a_sequence, const char *p_sequenceTyp
 int ParseEndOfSequence(struct P_STRING *a_sequence, G_STRING_STUFF nc_abandonmentInfo) ;
 
 
-
 // Parse entity name (may be empty)
 //
 // Passed:
@@ -463,6 +462,34 @@ char ob_ParseAnything(struct P_STRING *a_sequence);
 int ParseBlotregRequestAtom(struct P_STRING *a_sequence, int *ac_as, int *ac_indexSeekFlags,
   G_STRING_STUFF nc_abandonmentInfo) ;
 
+// Parse END OF <blotreg request atom int> | <blotreg request atom str> 
+//
+// Passed:
+// - *a_sequence: before parsing 
+// - as: 
+// - indexSeekFlags:
+// - gKeys5:
+// - criteria5:
+// - *a_criteriaNumber:
+// - c_blotexValue: only significant with actual criterion (i.e indexSeekFlags !=
+//     INDEX_SEEK_FLAGS__ANY) 
+// 
+// Changed:
+// - *a_sequence: after parsing 
+// - gKeys5:
+// - criteria5:
+// - *a_criteriaNumber:
+// - nc_abandonmentInfo: only significant if abandon
+// 
+// Ret: parsed successfully ? 
+// - ANSWER__YES: Ok,
+// - ANSWER__NO: 'str/int mismatch' error; abandon processing 
+// - 1: unexpected problem; anomaly is raised
+int ParseBlotregRequestAtomEnd(struct P_STRING *a_sequence, int as, int indexSeekFlags,
+ struct G_KEY gKeys5[5], struct G_REQUEST_CRITERION criteria5[5], int *a_criteriaNumber,
+ struct BLOTEX_VALUE c_blotexValue, G_STRING_STUFF nc_abandonmentInfo) ; 
+
+
 // Parse <op read set> 
 //
 // Passed:
@@ -536,25 +563,6 @@ char ob_ParseOpNext(struct P_STRING *a_sequence, int *an_indexFetchFlags);
 //
 // Ret: <op next> parsed ? (TRUE/FALSE)
 char ob_ParseOpInsert(struct P_STRING *a_sequence, int *an_indexFetchFlags);
-
-
-// Interpret as ...  blotreg index
-//
-// Passed:
-// - as:
-// - na_blotexValue: NULL special pointer => NO actual criterion
-// 
-// Changed:
-// - *ac_blotregIndexLabel: only significant if no abandon
-// - *acc_gKey: only significant if no abandon AND actual criterion
-// - nc_abandonmentInfo: only significant if abandon
-// 
-// Ret: parsed successfully ? 
-// - ANSWER__YES: Ok,
-// - ANSWER__NO: 'str/int mismatch' error; abandon processing 
-// - 1: unexpected problem; anomaly is raised
-int AsBlotregIndex(int as, struct BLOTEX_VALUE* na_blotexValue, int *ac_blotregIndexLabel,
-  struct G_KEY* acc_gKey, G_STRING_STUFF nc_abandonmentInfo) ; 
 
 
 // Interpret blotvar as ...  blotex value

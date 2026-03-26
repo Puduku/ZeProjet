@@ -357,6 +357,85 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
   m_DIGGY_RETURN(ANSWER__YES)
 } // ParseBlotregRequestAtom
 
+// Interpret as ...  blotreg index
+//
+// Passed:
+// - as:
+// - nap_blotexValue: NULL special pointer => NO actual criterion
+// - cac_gKey: only significant if actual criterion
+// 
+// Changed:
+// - *ac_blotregIndexLabel: only significant if no abandon
+// - *cac_gKey: only significant if no abandon
+// - nc_abandonmentInfo: only significant if abandon
+// 
+// Ret: parsed successfully ? 
+// - ANSWER__YES: Ok,
+// - ANSWER__NO: 'str/int mismatch' error; abandon processing 
+// - 1: unexpected problem; anomaly is raised
+static int AsBlotregIndex(int as, const struct BLOTEX_VALUE* nap_blotexValue, int *ac_blotregIndexLabel,
+  struct G_KEY* cac_gKey, G_STRING_STUFF nc_abandonmentInfo) { 
+  m_DIGGY_BOLLARD()
+
+  switch (as) {
+  case AS__VALUE_INT: // [ '#' ]
+    *ac_blotregIndexLabel = INT_VALUE__BLOTREG_INDEX_LABEL;
+  break; case AS__ENTRY: // '!#' (r-value) 
+m_RAISE(ANOMALY__NOT_AVAILABLE)
+  break; case AS__ID: // '!' 
+    *ac_blotregIndexLabel = TOKEN_ID__BLOTREG_INDEX_LABEL;
+  break; case AS__VALUE_STR: // '$'
+    *ac_blotregIndexLabel = STR_VALUE__BLOTREG_INDEX_LABEL;
+  break; case AS__NAME:  // '!$'
+    *ac_blotregIndexLabel = NAME__BLOTREG_INDEX_LABEL;
+  break; default: m_RAISE(ANOMALY__VALUE__D,as)
+  } // switch
+
+  if (nap_blotexValue != NULL) {
+    switch (as) {
+    case AS__VALUE_INT: // [ '#' ]
+      if (nap_blotexValue->b_strValue) m_ABANDON_S(EXPECT_INTEX__ABANDONMENT_CAUSE)
+      *cac_gKey = m_GKey_AcolytValue(nap_blotexValue->select.c_blotval); 
+    break; case AS__ENTRY: // '!#' (r-value) 
+      if (nap_blotexValue->b_strValue) m_ABANDON_S(EXPECT_INTEX__ABANDONMENT_CAUSE)
+m_RAISE(ANOMALY__NOT_AVAILABLE)
+    break; case AS__ID: // '!' 
+      *cac_gKey = m_GKey_AcolytValue(nap_blotexValue->select.c_blotval); 
+    break; case AS__VALUE_STR: // '$'
+      if (!nap_blotexValue->b_strValue) m_ABANDON_S(EXPECT_STREX__ABANDONMENT_CAUSE)
+      *cac_gKey = m_GKey_PString(nap_blotexValue->select.c_strex.v_str);
+    break; case AS__NAME:  // '!$'
+      if (!nap_blotexValue->b_strValue) m_ABANDON_S(EXPECT_STREX__ABANDONMENT_CAUSE)
+      *cac_gKey = m_GKey_PString(nap_blotexValue->select.c_strex.v_str);
+    break; default: m_RAISE(ANOMALY__VALUE__D,as)
+    } // switch
+  } // if
+
+  m_DIGGY_RETURN(ANSWER__YES)
+} // AsBlotregIndex 
+
+// See .h 
+int ParseBlotregRequestAtomEnd(struct P_STRING *a_sequence, int as, int indexSeekFlags,
+  struct G_KEY gKeys5[5], struct G_REQUEST_CRITERION criteria5[5], int *a_criteriaNumber,
+  struct BLOTEX_VALUE c_blotexValue, G_STRING_STUFF nc_abandonmentInfo) { 
+  m_DIGGY_BOLLARD()
+  int blotregIndexLabel = UNDEFINED;
+
+  m_ASSERT(*a_criteriaNumber < 5)
+  struct G_KEY *gKeyPtr = gKeys5 + *a_criteriaNumber;
+  struct G_REQUEST_CRITERION *criterionPtr = criteria5 + (*a_criteriaNumber)++;
+
+  m_CHECK_ABANDON(AsBlotregIndex(as,indexSeekFlags != INDEX_SEEK_FLAGS__ANY?
+    &c_blotexValue: NULL,&blotregIndexLabel,gKeyPtr, nc_abandonmentInfo))
+
+  int criteriaOpFlags = UNDEFINED;
+  m_TRACK_IF(ParseLogical2Op(a_sequence, &criteriaOpFlags) != RETURNED)
+
+  *criterionPtr = m_GRequestCriterion_GKeys(blotregIndexLabel,indexSeekFlags,gKeyPtr,
+    criteriaOpFlags);
+
+  m_DIGGY_RETURN(ANSWER__YES)
+} // ParseBlotregRequestAtomEnd
 
 // See .h 
 char ob_ParseOpReadSet(struct P_STRING *a_sequence, int *an_indexFetchFlags) {
@@ -431,48 +510,6 @@ m_RAISE(ANOMALY__NOT_AVAILABLE)
   m_DIGGY_RETURN(b_FALSE0)
 } // ob_ParseOpInsert
 
-
-// See .h 
-int AsBlotregIndex(int as, struct BLOTEX_VALUE* na_blotexValue, int *ac_blotregIndexLabel,
-  struct G_KEY* ac_gKey, G_STRING_STUFF nc_abandonmentInfo) { 
-  m_DIGGY_BOLLARD()
-
-  switch (as) {
-  case AS__VALUE_INT: // [ '#' ]
-    *ac_blotregIndexLabel = INT_VALUE__BLOTREG_INDEX_LABEL;
-  break; case AS__ENTRY: // '!#' (r-value) 
-m_RAISE(ANOMALY__NOT_AVAILABLE)
-  break; case AS__ID: // '!' 
-    *ac_blotregIndexLabel = TOKEN_ID__BLOTREG_INDEX_LABEL;
-  break; case AS__VALUE_STR: // '$'
-    *ac_blotregIndexLabel = STR_VALUE__BLOTREG_INDEX_LABEL;
-  break; case AS__NAME:  // '!$'
-    *ac_blotregIndexLabel = NAME__BLOTREG_INDEX_LABEL;
-  break; default: m_RAISE(ANOMALY__VALUE__D,as)
-  } // switch
-
-  if (na_blotexValue != NULL) {
-    switch (as) {
-    case AS__VALUE_INT: // [ '#' ]
-      if (na_blotexValue->b_strValue) m_ABANDON_S(EXPECT_INTEX__ABANDONMENT_CAUSE)
-      *ac_gKey = m_GKey_AcolytValue(na_blotexValue->select.c_blotval); 
-    break; case AS__ENTRY: // '!#' (r-value) 
-      if (na_blotexValue->b_strValue) m_ABANDON_S(EXPECT_INTEX__ABANDONMENT_CAUSE)
-m_RAISE(ANOMALY__NOT_AVAILABLE)
-    break; case AS__ID: // '!' 
-      *ac_gKey = m_GKey_AcolytValue(na_blotexValue->select.c_blotval); 
-    break; case AS__VALUE_STR: // '$'
-      if (!na_blotexValue->b_strValue) m_ABANDON_S(EXPECT_STREX__ABANDONMENT_CAUSE)
-      *ac_gKey = m_GKey_PString(na_blotexValue->select.c_strex.v_str);
-    break; case AS__NAME:  // '!$'
-      if (!na_blotexValue->b_strValue) m_ABANDON_S(EXPECT_STREX__ABANDONMENT_CAUSE)
-      *ac_gKey = m_GKey_PString(na_blotexValue->select.c_strex.v_str);
-    break; default: m_RAISE(ANOMALY__VALUE__D,as)
-    } // switch
-  } // if
-
-  m_DIGGY_RETURN(ANSWER__YES)
-} // AsBlotegIndex 
 
 // See . h
 int BlotvarAs2BlotexValue(g_BLOTVAR_STUFF n_blotvarStuff, int n_as, int c_entry, 

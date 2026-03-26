@@ -322,15 +322,14 @@ static inline int m_BlotexlibExecutorParseAndComputeBlotregRequest(BLOTEXLIB_EXE
 m_DIGGY_VAR_P_STRING(*a_sequence)
 
   int criteriaNumber = 0;
-  struct G_REQUEST_CRITERION criteria5[5] ;  
   struct P_STRING subSequence; 
 
   m_CHECK_ABANDON(DelimitBlotregRequest(a_sequence,NULL,&subSequence,nc_abandonmentInfo))
   struct BLOTEX_VALUE blotexValue = UNDEFINED_BLOTEX_VALUE ; 
-  struct G_KEY gKey = {UNDEFINED};
+  struct G_KEY gKeys5[5] ;
+  struct G_REQUEST_CRITERION criteria5[5] ;  
   do {
     int as = UNDEFINED;  
-    int blotregIndexLabel = UNDEFINED; 
     int indexSeekFlags = UNDEFINED;
     
     m_CHECK_ABANDON(ParseBlotregRequestAtom(&subSequence,&as,&indexSeekFlags,nc_abandonmentInfo))
@@ -339,15 +338,8 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
       BlotexlibExecutorParseAndComputeBlotex(handle,&subSequence,&blotexValue,nc_abandonmentInfo))
 
 m_DIGGY_VAR_INDEX_SEEK_FLAGS(indexSeekFlags)
-    m_CHECK_ABANDON(AsBlotregIndex(as,indexSeekFlags != INDEX_SEEK_FLAGS__ANY?
-      &blotexValue: NULL,&blotregIndexLabel,&gKey, nc_abandonmentInfo))
-    
-    int criteriaOpFlags = UNDEFINED;
-    m_TRACK_IF(ParseLogical2Op(&subSequence, &criteriaOpFlags) != RETURNED)
-
-    m_ASSERT(criteriaNumber < 5)
-    criteria5[criteriaNumber++] = m_GRequestCriterion_GKeys(blotregIndexLabel,
-      indexSeekFlags,&gKey, criteriaOpFlags);
+     m_CHECK_ABANDON(ParseBlotregRequestAtomEnd(&subSequence,as,indexSeekFlags,gKeys5,criteria5,
+      &criteriaNumber, blotexValue, nc_abandonmentInfo))
   } while (!ob_EmptySequence(&subSequence)) ; 
 
   switch (g_BlotregIndexRequestR(blotregHandle,NULL,criteriaNumber,criteria5)) {
