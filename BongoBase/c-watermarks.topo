@@ -14,6 +14,9 @@
 // between the indicators of the entity. That is, the "general" indicators appear on "the left"
 // of the watermark whilst "depending" and "specific" indicators are put on "the right" in the
 // watermark.
+// NOTICE: Only use indicators when convinced they help programmers avoid bugs.
+// Anything not useful becomes harmful through visual noise and confusion.
+// Think of these indicators like road signs—essential for safety, wasteful if excessive.
 
 // Legend : (?) => relevance of the indicator is still not clear... 
 
