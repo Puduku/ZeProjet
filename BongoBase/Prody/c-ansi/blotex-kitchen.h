@@ -113,26 +113,38 @@ struct BLOTEX_VALUE {
 
 #define b_FUGACIOUS_STR b_TRUE
 
-// Set blotex INITIAL value
+// Set intex INITIAL value
 // TODO: manage double initialization ???
 //
 // Passed:
-// - b_strValue: b_STR_VALUE (TRUE) / b_INT_VALUE (FALSE)  
-// - c_blotval: only significant with b_INT_VALUE 
-// - c_workingGStringsHandle: only significant with b_STR_VALUE 
-// - c_str: only significant with b_STR_VALUE 
-// - cb_fugaciousStr: only significant with b_STR_VALUE; (TRUE/FALSE) NOTICE: if you intialize
-//   TWICE a fugacious string, the first working string buffer is "lost"  
+// - blotval: 
 // 
 // Changed:
-// - a_blotexValue: 
+// - a_intexValue: 
+//
+// Ret: 
+// - RETURNED: Ok
+// - -1: unexpected problem; anomaly is raised
+int SetIntexValue(struct BLOTEX_VALUE *a_intexValue, gen_BLOTVAL blotval);
+
+// Set strex INITIAL value
+// TODO: manage double initialization ???
+//
+// Passed:
+// - workingGStringsHandle: 
+// - str: 
+// - b_fugaciousStr: NOTICE: if you intialize TWICE a fugacious string, the first working string
+//   buffer is "lost"  
+// 
+// Changed:
+// - a_strexValue: 
 // - c_workingGStringsHandle: when b_STR_VALUE
 //
 // Ret: 
 // - RETURNED: Ok
 // - -1: unexpected problem; anomaly is raised
-int SetBlotexValue(struct BLOTEX_VALUE *a_blotexValue, char b_strValue, gen_BLOTVAL c_blotval,
-  G_STRINGS_HANDLE c_workingGStringsHandle, struct P_STRING c_str, char cb_fugaciousStr) ;
+int SetStrexValue(struct BLOTEX_VALUE *a_strexValue, G_STRINGS_HANDLE workingGStringsHandle,
+  struct P_STRING str, char b_fugaciousStr) ;
 
 
 // Passed:
@@ -565,14 +577,14 @@ char ob_ParseOpNext(struct P_STRING *a_sequence, int *an_indexFetchFlags);
 char ob_ParseOpInsert(struct P_STRING *a_sequence, int *an_indexFetchFlags);
 
 
-// Interpret blotvar as ...  blotex value
+// Get blotvar 'r-value' as blotex value
 //
 // Passed:
 // - n_blotvarStuff: NULL special pointer => not existing
 // - n_as: "as" specifier:
 //   +  -1 special value: (not specified) blotex value corresponds to existence of blotvar
 //   +  >0: set blotex value as indicated 
-// - c_entry: only significant if blotvar exists
+// - c_entry: only significant for existing blotvar
 // - workingGStringsHandle:
 // 
 // Changed:
@@ -582,26 +594,27 @@ char ob_ParseOpInsert(struct P_STRING *a_sequence, int *an_indexFetchFlags);
 // Ret:
 // - RETURNED: Ok
 // - 1: unexpected problem; anomaly is raised
-int BlotvarAs2BlotexValue(g_BLOTVAR_STUFF n_blotvarStuff, int n_as, int c_entry,
+int GetBlotvarRValue(g_BLOTVAR_STUFF n_blotvarStuff, int n_as, int c_entry,
   G_STRINGS_HANDLE workingGStringsHandle, struct BLOTEX_VALUE *a_blotexValue); 
 
-// Interpret blotex value as ... blotvar
+// Set blotvar 'l-value' as blotex value
 //
 // Passed:
+// - blotvarStuff: the blotvar to change 
+// - lValueAs: 
 // - blotexValue:
-// - as: blotvar "as" specifier:
 // - nc_abandonmentInfo: NULL pointer => not used
 // 
 // Changed:
-// - c_blotvarStuff: NOT significant in case of type mismatch 
+// - blotvarStuff: NOT set in case of type mismatch 
 // - nc_abandonmentInfo: (when used) only significant in case type mismatch
 
-// Ret: parsed successfully ? 
+// Ret: successful ? 
 // - ANSWER__YES: Ok,
 // - ANSWER__NO: type mismatch; abandon processing 
 // - -1: unexpected problem
-int BlotexValue2BlotvarLValueAs(struct BLOTEX_VALUE blotexValue, g_BLOTVAR_STUFF c_blotvarStuff,
-  int lValueAs, G_STRING_STUFF nc_abandonmentInfo) ; 
+int SetBlotvarLValue(g_BLOTVAR_STUFF blotvarStuff,int lValueAs, struct BLOTEX_VALUE blotexValue,
+  G_STRING_STUFF nc_abandonmentInfo) ; 
 
 
 // Enumeration of <comp op> | <str comp op> | <fact op> terminal symbols 
@@ -641,7 +654,7 @@ enum {
 // - -1: unexpected problem
 int ParseCompOp(int compOpExtension, struct P_STRING *a_sequence, int *an_compOp) ;
 
-// Apply fact operator (on integer atoms)  
+// Compute fact operator (on integer atoms)  
 //
 // Passed:
 // - *a_blotval1:
@@ -654,7 +667,7 @@ int ParseCompOp(int compOpExtension, struct P_STRING *a_sequence, int *an_compOp
 // Ret:
 // - RETURNED: Ok
 // - -1: unexpected problem
-int ApplyFactOp(gen_BLOTVAL *a_blotval1, int factOp, gen_BLOTVAL blotval2);
+int ComputeFactOp(gen_BLOTVAL *a_blotval1, int factOp, gen_BLOTVAL blotval2);
 
 
 // Parse comparison operator in register/table request, if present... 
@@ -701,7 +714,7 @@ int ParseLogical2Op(struct P_STRING *a_sequence, int *a_criteriaOpFlags);
 // - 1: unexpected problem; anomaly is raised
 int ParseInt1Op(struct P_STRING *a_sequence, int *an_int1Op);
 
-// Apply unary operator (on blotex atom value, when applicable, i.e int value) 
+// Compute unary operator (on blotex atom value, when applicable, i.e int value) 
 //
 // Passed:
 // - n_int1Op: -1 special value: no unary operator to apply (see ProbeBlotexAtom()) 
@@ -715,7 +728,7 @@ int ParseInt1Op(struct P_STRING *a_sequence, int *an_int1Op);
 // - ANSWER__YES: Ok,
 // - ANSWER__NO: 'expect int' error; abandon processing 
 // - -1: unexpected problem
-int ApplyInt1Op(int n_int1Op,struct BLOTEX_VALUE *ac_blotexValue,G_STRING_STUFF nc_abandonmentInfo);
+int ComputeInt1Op(int n_int1Op,struct BLOTEX_VALUE *ac_blotexValue,G_STRING_STUFF nc_abandonmentInfo);
 
 
 // Parse <strex atom op>
@@ -838,7 +851,7 @@ enum {
 //   + >=0 : corresponding int 2op 
 int ParseTermOp(struct P_STRING *a_sequence, int *an_termOp);
 
-// Apply term operator (on integer terms)  
+// Compute term operator (on integer terms)  
 //
 // Passed:
 // - *a_blotval1:
@@ -851,7 +864,7 @@ int ParseTermOp(struct P_STRING *a_sequence, int *an_termOp);
 // Ret:
 // - RETURNED: Ok
 // - -1: unexpected problem
-int ApplyTermOp(gen_BLOTVAL *a_blotval1, int termOp, gen_BLOTVAL blotva2);
+int ComputeTermOp(gen_BLOTVAL *a_blotval1, int termOp, gen_BLOTVAL blotva2);
 
 // Terminal symbols (of <format> terminal symbol)
 enum {
@@ -879,7 +892,7 @@ enum {
 int ParseFormatAndSeparator(struct P_STRING *a_sequence, int *ac_format,
   G_STRING_STUFF nc_abandonmentInfo);
 
-// Apply format on surrogate
+// Compute format on surrogate
 // 
 // Passed:
 // - format:
@@ -892,7 +905,7 @@ int ParseFormatAndSeparator(struct P_STRING *a_sequence, int *ac_format,
 // Ret:
 // - ANSWER__YES: Ok,
 // - ANSWER__NO: mismatch between format and blotex; abandon processing 
-int ApplyFormat(int format, struct BLOTEX_VALUE blotexValue, G_STRING_STUFF c_surrogate,
+int ComputeFormat(int format, struct BLOTEX_VALUE blotexValue, G_STRING_STUFF c_surrogate,
   G_STRING_STUFF nc_abandonmentInfo) ;
 
 // Parse blottabs label  

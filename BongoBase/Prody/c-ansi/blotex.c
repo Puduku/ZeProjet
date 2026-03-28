@@ -285,8 +285,10 @@ int BlotexlibExecutorSetBlotexValue(BLOTEXLIB_EXECUTOR_HANDLE handle,
   struct P_STRING c_str, char cb_fugaciousStr) {
   m_DIGGY_BOLLARD()
 
-  m_TRACK_IF(SetBlotexValue(a_blotexValue,b_strValue,c_blotval,handle->h_workingGStringsHandle,
-    c_str, cb_fugaciousStr) != RETURNED)
+  if (b_strValue) m_TRACK_IF(SetStrexValue(a_blotexValue,handle->h_workingGStringsHandle, c_str,
+    cb_fugaciousStr) != RETURNED)
+  else m_TRACK_IF(SetIntexValue(a_blotexValue,c_blotval) != RETURNED)
+  
   m_DIGGY_RETURN(RETURNED)
 } // BlotexlibExecutorSetBlotexValue
 
@@ -380,8 +382,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
 
   if (n_blotregHandle == NULL) m_ABANDON(UNKNOWN_BLOTREG__ABANDONMENT_CAUSE) 
 
-  m_TRACK_IF(SetBlotexValue(ac_blotexValue,b_INT_VALUE,TRUE__BLOTVAL0,(G_STRINGS_HANDLE)UNDEFINED,
-    UNDEFINED_P_STRING_PAR,(char)UNDEFINED) != RETURNED) // 'true' value a priori 
+  m_TRACK_IF(SetIntexValue(ac_blotexValue,TRUE__BLOTVAL0) != RETURNED) // 'true' value a priori 
   if (ob_ParseOpSelect(a_sequence)) { // <blotreg op select>...
     m_CHECK_ABANDON(m_BlotexlibExecutorParseAndComputeBlotregRequest(handle,a_sequence,n_blotregHandle,
       nc_abandonmentInfo)) 
@@ -406,7 +407,7 @@ m_DIGGY_VAR_INDEX_FETCH_FLAGS(n_indexFetchFlags)
     case RESULT__NOT_FOUND:
 m_ASSERT(nt_blotvarStuff == NULL)
     case RESULT__FOUND:
-      m_TRACK_IF(BlotvarAs2BlotexValue(nt_blotvarStuff,cn_as,c_entry,
+      m_TRACK_IF(GetBlotvarRValue(nt_blotvarStuff,cn_as,c_entry,
         handle->h_workingGStringsHandle, ac_blotexValue) != RETURNED)
     break; default: m_TRACK()
     } // switch
@@ -509,7 +510,7 @@ m_ASSERT(vn_entry >= 0)
   int as = UNDEFINED;
   m_TRACK_IF(ParseAs(b_R_VALUE,a_sequence,&as) != RETURNED)
 
-  m_TRACK_IF(BlotvarAs2BlotexValue(nt_blotvarStuff,as, vn_entry,handle->h_workingGStringsHandle,
+  m_TRACK_IF(GetBlotvarRValue(nt_blotvarStuff,as, vn_entry,handle->h_workingGStringsHandle,
     ac_blotexAtomValue) != RETURNED)
 
   m_DIGGY_RETURN(ANSWER__YES)
@@ -634,7 +635,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
     m_RAISE(ANOMALY__VALUE__D,c_probedBlotexAtom)
   } // switch
 
-  m_CHECK_ABANDON(ApplyInt1Op(n_int1Op, ac_blotexAtomValue,nc_abandonmentInfo))
+  m_CHECK_ABANDON(ComputeInt1Op(n_int1Op, ac_blotexAtomValue,nc_abandonmentInfo))
 
   m_DIGGY_RETURN(ANSWER__YES)
 } // BlotexlibExecutorProbeBlotexAtom
@@ -680,7 +681,7 @@ static int BlotexlibExecutorParseAndComputeIntexTerm(BLOTEXLIB_EXECUTOR_HANDLE h
     m_CHECK_ABANDON(BlotexlibExecutorProbeBlotexAtom(handle,a_sequence,&intexAtomValue,
       nc_abandonmentInfo));
     if (intexAtomValue.b_strValue) m_ABANDON(EXPECT_INTEX__ABANDONMENT_CAUSE)
-    m_TRACK_IF(ApplyFactOp(&a_intexTermValue->select.c_blotval,n_factOp,
+    m_TRACK_IF(ComputeFactOp(&a_intexTermValue->select.c_blotval,n_factOp,
       intexAtomValue.select.c_blotval) != RETURNED)
   } // while
 
@@ -724,7 +725,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
     m_CHECK_ABANDON(BlotexlibExecutorParseAndComputeIntexTerm(handle,a_sequence,b_FALSE0, &intexTermValue,
       nc_abandonmentInfo))
     m_ASSERT(!intexTermValue.b_strValue)
-    m_TRACK_IF(ApplyTermOp(&a_intexValue->select.c_blotval,n_termOp,intexTermValue.select.c_blotval)
+    m_TRACK_IF(ComputeTermOp(&a_intexValue->select.c_blotval,n_termOp,intexTermValue.select.c_blotval)
       != RETURNED)
   } // while 
 
@@ -926,7 +927,7 @@ static inline int m_BlotexlibExecutorExecuteCFunctionEval(BLOTEXLIB_EXECUTOR_HAN
       m_TRACK_IF(FetchBlotvar(&cc_lValueBlotvarReference, b_L_VALUE,&cnt_blotvarStuff,NULL) !=
         RETURNED)
       if (cnt_blotvarStuff == NULL) m_ABANDON(NOT_EXISTING_L_VALUE__ABANDONMENT_CAUSE)
-      m_CHECK_ABANDON(BlotexValue2BlotvarLValueAs(c_blotexValue, cnt_blotvarStuff, cc_lValueAs,
+      m_CHECK_ABANDON(SetBlotvarLValue(cnt_blotvarStuff, cc_lValueAs, c_blotexValue,
         nc_abandonmentInfo))
     } // if
   } // if
@@ -971,7 +972,7 @@ static inline int m_BlotexlibExecutorExecuteCFunctionOutputF(BLOTEXLIB_EXECUTOR_
 
   m_CHECK_ABANDON(ParseEndOfSequence(&arguments,nc_abandonmentInfo))
 
-  m_CHECK_ABANDON(ApplyFormat(n_format,c_blotexValue,c_surrogate,nc_abandonmentInfo))
+  m_CHECK_ABANDON(ComputeFormat(n_format,c_blotexValue,c_surrogate,nc_abandonmentInfo))
 
   *ac_blotval = TRUE__BLOTVAL0;
   m_DIGGY_RETURN(ANSWER__YES)
