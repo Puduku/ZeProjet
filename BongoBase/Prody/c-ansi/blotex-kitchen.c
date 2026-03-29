@@ -129,7 +129,7 @@ int SetIntexValue(struct BLOTEX_VALUE *a_intexValue, gen_BLOTVAL blotval){
 } // SetIntexValue
 
 // Public function: see .h
-int SetStrexValue(struct BLOTEX_VALUE *a_strexValue, G_STRINGS_HANDLE workingGStringsHandle,
+int SetStrexValue(G_STRINGS_HANDLE workingGStringsHandle, struct BLOTEX_VALUE *a_strexValue,
   struct P_STRING str, char b_fugaciousStr) {
   m_DIGGY_BOLLARD()
   a_strexValue->b_strValue = b_STR_VALUE; 
@@ -151,7 +151,7 @@ int SetStrexValue(struct BLOTEX_VALUE *a_strexValue, G_STRINGS_HANDLE workingGSt
 } // SetStrexValue 
 
 // Public function: see .h
-int ConcatenateStrexValue(struct BLOTEX_VALUE *a_strexValue1,G_STRINGS_HANDLE workingGStringsHandle,
+int ConcatenateStrexValue(G_STRINGS_HANDLE workingGStringsHandle,struct BLOTEX_VALUE *a_strexValue1,
   struct P_STRING p_str2) {
   m_DIGGY_BOLLARD()
   m_ASSERT(a_strexValue1->b_strValue)
@@ -165,9 +165,8 @@ int ConcatenateStrexValue(struct BLOTEX_VALUE *a_strexValue1,G_STRINGS_HANDLE wo
 } // ConcatenateStrexValue
 
 
-// Parsing blot expressions: helpers 
-// ================================= 
-
+// Parsing and computing functions: 
+// =============================== 
 
 // See .h 
 char ob_EmptySequence(struct P_STRING *a_sequence) {
@@ -208,8 +207,6 @@ int o_ParseEntityName(struct P_STRING *a_sequence, struct P_STRING *a_entityName
     (char)UNDEFINED,a_entityName); // <entity name>
   m_DIGGY_RETURN(RETURNED)
 } // o_ParseEntityName
-
-
 
 
 #define  AS__ENTRY__XX "!#" 
@@ -557,7 +554,7 @@ int GetBlotvarRValue(g_BLOTVAR_STUFF n_blotvarStuff, int n_as, int c_entry,
     m_RAISE(ANOMALY__VALUE__D,n_as)
   } // switch
 
-  if (b_strValue) m_TRACK_IF(SetStrexValue(a_blotexValue,workingGStringsHandle,str,cb_fugaciousStr)
+  if (b_strValue) m_TRACK_IF(SetStrexValue(workingGStringsHandle,a_blotexValue,str,cb_fugaciousStr)
     != RETURNED)
   else m_TRACK_IF(SetIntexValue(a_blotexValue,c_blotval) != RETURNED)
 
@@ -743,8 +740,9 @@ int ParseIntConstant(struct P_STRING *a_sequence, char *ab_parsed,
 } // ParseIntConstant
 
 // See .h
-int ParseStrConstant(struct P_STRING *a_sequence, G_STRINGS_HANDLE workingGStringsHandle,
-  char *acb_parsed, struct BLOTEX_VALUE *acc_blotexValue, G_STRING_STUFF nc_abandonmentInfo) {
+int ParseStrConstant(struct P_STRING *a_sequence, char *acb_parsed,
+  G_STRINGS_HANDLE workingGStringsHandle, struct BLOTEX_VALUE *acc_blotexValue,
+  G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
   struct P_STRING lexeme = UNDEFINED_P_STRING;
   m_PREPARE_ABANDON(a_sequence, "<str constant>")
@@ -753,15 +751,15 @@ int ParseStrConstant(struct P_STRING *a_sequence, G_STRINGS_HANDLE workingGStrin
     o_PParsePassChars(a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_TILL,NULL,'"', &lexeme);
     if (b_EMPTY_P_STRING(*a_sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
     PParseOffset(a_sequence,1,NULL);
-    m_TRACK_IF(SetStrexValue(acc_blotexValue,workingGStringsHandle,lexeme,!b_FUGACIOUS_STR) !=
+    m_TRACK_IF(SetStrexValue(workingGStringsHandle,acc_blotexValue,lexeme,!b_FUGACIOUS_STR) !=
       RETURNED) // TODO: FUGACIOUS???
   } // if 
   m_DIGGY_RETURN(ANSWER__YES)
 } // ParseStrConstant
 
 // See .h
-int ProbeBlotexAtom(struct P_STRING *a_sequence,G_STRINGS_HANDLE workingGStringsHandle,
-  int *acn_int1Op, int *ac_probedBlotexAtom, struct BLOTEX_VALUE *acc_blotexAtomValue,
+int ProbeBlotexAtom(struct P_STRING *a_sequence, int *acn_int1Op, int *ac_probedBlotexAtom,
+  G_STRINGS_HANDLE workingGStringsHandle, struct BLOTEX_VALUE *acc_blotexAtomValue,
   G_STRING_STUFF nc_abandonmentInfo) { 
   m_DIGGY_BOLLARD()
 m_DIGGY_VAR_P_STRING(*a_sequence)
@@ -774,7 +772,7 @@ m_DIGGY_VAR_D(*acn_int1Op)
   m_TRACK_IF(ParseIntConstant(a_sequence, &b_parsed, acc_blotexAtomValue) != RETURNED)
   *ac_probedBlotexAtom = CONSTANT__PROBED_BLOTEX_ATOM; // a priori
   if (!b_parsed) {
-    m_CHECK_ABANDON(ParseStrConstant(a_sequence,workingGStringsHandle, &b_parsed,
+    m_CHECK_ABANDON(ParseStrConstant(a_sequence,&b_parsed, workingGStringsHandle,
       acc_blotexAtomValue,nc_abandonmentInfo))
     if (!b_parsed) {
       struct P_STRING lexeme = UNDEFINED_P_STRING;
@@ -938,7 +936,7 @@ int ParseBlottabsLabel(struct P_STRING *a_sequence, int *an_blottabsLabel) {
 
 
 // See .h
-int ParseAndComputeLValueBlotregOps( 
+int ParseLValueBlotregOps( 
   struct P_STRING *a_sequence, struct P_STRING blotregName, g_BLOTREG_HANDLE n_blotregHandle, 
   struct BLOTVAR_REFERENCE *ac_blotvarReference, int *ac_lValueAs, G_STRING_STUFF nc_abandonmentInfo) {
   m_DIGGY_BOLLARD()
@@ -964,7 +962,7 @@ int ParseAndComputeLValueBlotregOps(
   *ac_lValueAs = n_lValueAs ;
 
   m_DIGGY_RETURN(ANSWER__YES)
-} // ParseAndComputeLValueBlotregOps
+} // ParseLValueBlotregOps
 
 // See .h
 char ob_ParseBlotexAssignation(struct P_STRING *a_sequence, struct P_STRING *ac_subSequence) {
@@ -980,5 +978,48 @@ char ob_ParseBlotexAssignation(struct P_STRING *a_sequence, struct P_STRING *ac_
   
   m_DIGGY_RETURN(b_assignation)
 } // ob_ParseBlotexAssignation
+
+
+// Public function; see .h
+char ob_ParseStrPortion(struct P_STRING *a_sequence) {
+  m_DIGGY_BOLLARD()
+  struct P_STRING lexeme;
+  om_PParsePassSpaces(a_sequence,NULL);
+
+  o_PParsePassSingleChar(a_sequence,NULL,'{',&lexeme);
+  m_DIGGY_RETURN(!b_EMPTY_P_STRING(lexeme))
+} // ob_ParseStrPortion
+
+// IS_CHAR_FUNCTION:
+static int IsPortionOpChar(int c) { 
+  return (c == ':' || c == '-');
+} // IsPortionOpChar 
+
+// Public function; see .h
+char ob_ParseStrPortionOffset(struct P_STRING *a_sequence, int *ac_portionOp) {
+  m_DIGGY_BOLLARD()
+  struct P_STRING lexeme;
+
+  o_PParsePassSingleChar(a_sequence,IsPortionOpChar,(char)UNDEFINED,&lexeme);
+  
+  if (!b_EMPTY_P_STRING(lexeme)) {
+    if (lexeme.string[0] == ':') *ac_portionOp = OFFSET__PORTION_OP; else *ac_portionOp =
+      LENGTH__PORTION_OP; 
+    m_DIGGY_RETURN(b_TRUE)
+  } // if
+  m_DIGGY_RETURN(b_FALSE0)
+} // ob_ParseStrPortionOffset
+
+// Public function; see .h
+int ParseStrPortionEnd(struct P_STRING *a_sequence,G_STRING_STUFF nc_abandonmentInfo) {
+  m_DIGGY_BOLLARD()
+  struct P_STRING lexeme;
+
+  m_PREPARE_ABANDON(a_sequence,"<str portion>")
+  o_PParsePassSingleChar(a_sequence,NULL,'}',&lexeme);
+  if (b_EMPTY_P_STRING(lexeme)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
+  m_DIGGY_RETURN(ANSWER__YES)
+} // ParseStrPortionEnd
+
 
 

@@ -250,7 +250,7 @@
 // Misc. :
 // -------
 
-// <str portion> ::= '{' [ <intex> ] [ ( ':' | '-' ) [ <intex> ] ] '}'
+// <str portion> ::= [ '{' [ <intex> ] [ ( ':' | '-' ) [ <intex> ] ] '}' ]
 
 
 // II. "blotex" library's blot functions

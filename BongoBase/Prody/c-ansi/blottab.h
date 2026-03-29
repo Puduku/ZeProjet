@@ -42,15 +42,15 @@ int BlottabCreateInstance(BLOTTAB_HANDLE *azh_handle, int fieldsNumber,
 int BlottabDestroyInstance(void *xhr_handle) ;
 
 
-// #SEE l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_L_VALUE_BLOTTAB_SET_OP_FUNCTION@c-ansi/blotex.h
+// #SEE l_BLOTEXLIB_EXECUTOR_PARSE_L_VALUE_BLOTTAB_SET_OP_FUNCTION@c-ansi/blotex.h
 // => See also: BlotexlibExecutorFactoryCreateInstance() 
-int l_BlotexlibExecutorParseAndComputeLValueBlottabSetOp(BLOTEXLIB_EXECUTOR_HANDLE handle, 
+int l_BlotexlibExecutorParseLValueBlottabSetOp(BLOTEXLIB_EXECUTOR_HANDLE handle, 
   char b_spot, struct P_STRING *a_sequence, struct P_STRING blottabName, void* nr_blottabHandle, 
   struct BLOTTAB_SPOT_REFERENCE *ac_blottabSpotReference, G_STRING_STUFF nc_abandonmentInfo);
 
-// #SEE l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION@c-ansi/blotex.h
+// #SEE l_BLOTEXLIB_EXECUTOR_PARSE_R_VALUE_BLOTTAB_OPS_FUNCTION@c-ansi/blotex.h
 // => See also: BlotexlibExecutorFactoryCreateInstance() 
-int l_BlotexlibExecutorParseAndComputeRValueBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
+int l_BlotexlibExecutorParseRValueBlottabOps(BLOTEXLIB_EXECUTOR_HANDLE handle,
   char b_spot, struct P_STRING *a_sequence, int blottabsLabel, struct P_STRING blottabName,
   void* nr_blottabHandle, struct BLOTEX_VALUE *ac_blotexValue, G_STRING_STUFF nc_abandonmentInfo);
 

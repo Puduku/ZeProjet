@@ -137,19 +137,19 @@ int SetIntexValue(struct BLOTEX_VALUE *a_intexValue, gen_BLOTVAL blotval);
 //   buffer is "lost"  
 // 
 // Changed:
+// - c_workingGStringsHandle:
 // - a_strexValue: 
-// - c_workingGStringsHandle: when b_STR_VALUE
 //
 // Ret: 
 // - RETURNED: Ok
 // - -1: unexpected problem; anomaly is raised
-int SetStrexValue(struct BLOTEX_VALUE *a_strexValue, G_STRINGS_HANDLE workingGStringsHandle,
+int SetStrexValue(G_STRINGS_HANDLE workingGStringsHandle, struct BLOTEX_VALUE *a_strexValue,
   struct P_STRING str, char b_fugaciousStr) ;
 
 
 // Passed:
-// - a_strexValue1: 
 // - workingGStringsHandle:
+// - a_strexValue1: 
 // - p_str2:
 // 
 // changed:
@@ -159,12 +159,13 @@ int SetStrexValue(struct BLOTEX_VALUE *a_strexValue, G_STRINGS_HANDLE workingGSt
 // Ret: 
 // - RETURNED: Ok
 // - -1: unexpected problem; anomaly is raised
-int ConcatenateStrexValue(struct BLOTEX_VALUE *a_strexValue1,G_STRINGS_HANDLE workingGStringsHandle,
+int ConcatenateStrexValue(G_STRINGS_HANDLE workingGStringsHandle,struct BLOTEX_VALUE *a_strexValue1,
   struct P_STRING p_str2) ;
 
 
 // BLOTTAB:
 // --------
+
 struct BLOTTAB_SPOT_REFERENCE {
   char b_strValue;
   void *r_blottabHandle; // at some "current" position 
@@ -186,8 +187,8 @@ typedef int (*UPDATE_BLOTTAB_SPOT_FUNCTION)(
   struct BLOTTAB_SPOT_REFERENCE blottabSpotReference, struct BLOTEX_VALUE blotexValue);
 
 
-// Parsing blot expressions:
-// ========================= 
+// Parsing and computing blot expressions:
+// ======================================= 
 
 // Framework: 
 // ---------- 
@@ -218,6 +219,7 @@ typedef int (*UPDATE_BLOTTAB_SPOT_FUNCTION)(
 #define VALUE_ERROR__ABANDONMENT_CAUSE "Value error"
 #define EXPECT_STREX__ABANDONMENT_CAUSE "Expect strex value"
 #define EXPECT_INTEX__ABANDONMENT_CAUSE "Expect intex value"
+#define EXPECT_POSITIVE__ABANDONMENT_CAUSE "Expect positive value"
 #define UNKNOWN_BLOTVAR__ABANDONMENT_CAUSE "Unknown blotvar"
 #define UNKNOWN_BLOTREG__ABANDONMENT_CAUSE "Unknown blotreg"
 #define INVALID_FORMAT__ABANDONMENT_CAUSE "Invalid format"
@@ -273,8 +275,13 @@ typedef int (*UPDATE_BLOTTAB_SPOT_FUNCTION)(
     m_DIGGY_RETURN(ANSWER__NO) \
   break; default: m_TRACK() } 
 
-// Helpers: 
-// -------- 
+// Parsing/computing functions: 
+// ---------------------------- 
+
+// LEGEND: 
+// [K] : pure blotex kitchen function ; potentially not useful to external modules (blottab
+// implementation, etc.) 
+
 
 // Check if sequence is empty (after white spaces elimination)
 //
@@ -760,6 +767,7 @@ int ParseIntConstant(struct P_STRING *a_sequence, char *ab_parsed,
 
 // Passed:
 // - *a_sequence: expect <str constant>
+// - workingGStringsHandle:
 //
 // Changed:
 // - *a_sequence: after parsing 
@@ -771,8 +779,9 @@ int ParseIntConstant(struct P_STRING *a_sequence, char *ab_parsed,
 // - ANSWER__YES: Ok,
 // - ANSWER__NO: 'syntax' error; abandon processing 
 // - -1: unexpected problem
-int ParseStrConstant(struct P_STRING *a_sequence, G_STRINGS_HANDLE workingGStringsHandle,
-  char *acb_parsed, struct BLOTEX_VALUE *acc_blotexValue, G_STRING_STUFF nc_abandonmentInfo) ;
+int ParseStrConstant(struct P_STRING *a_sequence, char *acb_parsed,
+  G_STRINGS_HANDLE workingGStringsHandle, struct BLOTEX_VALUE *acc_blotexValue,
+  G_STRING_STUFF nc_abandonmentInfo) ;
 
 enum {
   CONSTANT__PROBED_BLOTEX_ATOM,
@@ -795,8 +804,8 @@ enum {
 // - ANSWER__YES: Ok,
 // - ANSWER__NO: 'syntax' 'not found' error; abandon processing 
 // - -1: unexpected problem
-int ProbeBlotexAtom(struct P_STRING *a_sequence,G_STRINGS_HANDLE workingGStringsHandle,
-  int *acn_int1Op, int *ac_probedBlotexAtom, struct BLOTEX_VALUE *acc_blotexAtomValue,
+int ProbeBlotexAtom(struct P_STRING *a_sequence, int *acn_int1Op, int *ac_probedBlotexAtom,
+  G_STRINGS_HANDLE workingGStringsHandle, struct BLOTEX_VALUE *acc_blotexAtomValue,
   G_STRING_STUFF nc_abandonmentInfo) ; 
 
 // Passed:
@@ -876,7 +885,7 @@ enum {
             BE__FORMAT,
 } ;
 
-// Parse <format> ','  
+// Parse <format> ',' [K] 
 //
 // Passed:
 // - *a_sequence: before parsing
@@ -892,7 +901,7 @@ enum {
 int ParseFormatAndSeparator(struct P_STRING *a_sequence, int *ac_format,
   G_STRING_STUFF nc_abandonmentInfo);
 
-// Compute format on surrogate
+// Compute format on surrogate [K]
 // 
 // Passed:
 // - format:
@@ -924,7 +933,7 @@ int ComputeFormat(int format, struct BLOTEX_VALUE blotexValue, G_STRING_STUFF c_
 int ParseBlottabsLabel(struct P_STRING *a_sequence, int *an_blottabsLabel);
 
 
-// Parse and compute blotreg operations (l-values) :
+// Parse (and compute) blotreg operations (l-values) :
 // Expect <blotreg ref op set int> | <blotreg ref op set str> 
 //
 // Passed:
@@ -941,7 +950,7 @@ int ParseBlottabsLabel(struct P_STRING *a_sequence, int *an_blottabsLabel);
 // - ANSWER__YES: Ok,
 // - ANSWER__NO: 'syntax' 'not found' error; abandon processing 
 // - -1: unexpected problem
-int ParseAndComputeLValueBlotregOps(struct P_STRING *a_sequence, struct P_STRING blotregName,
+int ParseLValueBlotregOps(struct P_STRING *a_sequence, struct P_STRING blotregName,
   g_BLOTREG_HANDLE n_blotregHandle, struct BLOTVAR_REFERENCE *ac_blotvarReference, int *ac_lValueAs,
   G_STRING_STUFF nc_abandonmentInfo) ;
 
@@ -958,6 +967,48 @@ int ParseAndComputeLValueBlotregOps(struct P_STRING *a_sequence, struct P_STRING
 // Ret: Assignation ? (TRUE / FALSE) 
 char ob_ParseBlotexAssignation(struct P_STRING *a_sequence, struct P_STRING *ac_subSequence) ; 
 
+
+// Parse <str portion> (start)
+//
+// Passed:
+// - *a_sequence: before parsing
+//
+// Changed:
+// - *a_sequence: after parsing 
+//
+// Ret: <str portion> identified ? (TRUE / FALSE) 
+char ob_ParseStrPortion(struct P_STRING *a_sequence) ;
+
+enum {
+  OFFSET__PORTION_OP,
+  LENGTH__PORTION_OP,
+} ; 
+
+// Parse <str portion> portion op. 
+//
+// Passed:
+// - *a_sequence: before parsing
+//
+// Changed:
+// - *a_sequence: after parsing 
+// - *ac_portionOp: only significant if identified 
+//
+// Ret: portion op. identified ? (TRUE / FALSE) 
+char ob_ParseStrPortionOffset(struct P_STRING *a_sequence, int *ac_portionOp) ;
+
+// Parse <str portion> end 
+//
+// Passed:
+// - *a_sequence: before parsing
+//
+// Changed:
+// - *a_sequence: after parsing 
+//
+// Ret: parsed successfully ? 
+// - ANSWER__YES: Ok,
+// - ANSWER__NO: 'syntax' error; abandon processing 
+// - -1: unexpected problem
+int ParseStrPortionEnd(struct P_STRING *a_sequence,G_STRING_STUFF nc_abandonmentInfo) ;
 
 
 #endif // __C_ANSI_BLOTEX_KITCHEN_H_INCLUDED__

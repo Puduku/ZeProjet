@@ -37,8 +37,8 @@ typedef struct BLOTEXLIB_EXECUTOR *BLOTEXLIB_EXECUTOR_HANDLE; // Public handle
 #define b_SPOT b_TRUE
 #define b_OPS !b_SPOT
 
-// #REF l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_L_VALUE_BLOTTAB_SET_OP_FUNCTION
-// Parse and compute 'l-value' blottab operations or spot:
+// #REF l_BLOTEXLIB_EXECUTOR_PARSE_L_VALUE_BLOTTAB_SET_OP_FUNCTION
+// Parse (and compute) 'l-value' blottab operations or spot:
 // expect <blottab ref op set int> | <blottab ref op set str> (OPS) 
 // expect <int blottab spot ref> | <str blottab spot ref> (SPOT) 
 //
@@ -58,14 +58,14 @@ typedef struct BLOTEXLIB_EXECUTOR *BLOTEXLIB_EXECUTOR_HANDLE; // Public handle
 // - ANSWER__YES: Ok,
 // - ANSWER__NO: 'syntax' 'not found' 'already exist' error; abandon processing 
 // - -1: unexpected problem
-typedef int (*l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_L_VALUE_BLOTTAB_SET_OP_FUNCTION)(
+typedef int (*l_BLOTEXLIB_EXECUTOR_PARSE_L_VALUE_BLOTTAB_SET_OP_FUNCTION)(
   BLOTEXLIB_EXECUTOR_HANDLE handle, char b_spot, struct P_STRING *a_sequence,
   struct P_STRING blottabName, void* nr_blottabHandle,
   struct BLOTTAB_SPOT_REFERENCE *ac_blottabSpotReference, G_STRING_STUFF nc_abandonmentInfo) ;
 
 
-// #REF l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION
-// Parse and compute 'r-value' blottab operations:
+// #REF l_BLOTEXLIB_EXECUTOR_PARSE_R_VALUE_BLOTTAB_OPS_FUNCTION
+// Parse (and compute) 'r-value' blottab operations:
 // expect <int blottab ops> | <str blottab ops> (OPS)
 // expect <int blottab spot> | <str blottab spot> (SPOT)
 //
@@ -86,7 +86,7 @@ typedef int (*l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_L_VALUE_BLOTTAB_SET_OP_FUNC
 // - ANSWER__YES: Ok,
 // - ANSWER__NO: 'syntax' 'not found' 'already exist' error; abandon processing 
 // - -1: unexpected problem
-typedef int (*l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION)(
+typedef int (*l_BLOTEXLIB_EXECUTOR_PARSE_R_VALUE_BLOTTAB_OPS_FUNCTION)(
   BLOTEXLIB_EXECUTOR_HANDLE handle, char b_spot, struct P_STRING *a_sequence, int blottabslabel,
   struct P_STRING blottabName, void* nr_blottabHandle, struct BLOTEX_VALUE *ac_blotexValue,
   G_STRING_STUFF nc_abandonmentInfo) ;
@@ -98,13 +98,16 @@ typedef int (*l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTIO
 
 #define GENUINE_BLOTTABS_LABEL0 0
 
+// Back to blotex library executor factory: 
+// ---------------------------------------
+
 // Create blotex library executor factory; also register "Genuine" blottab implementation
 // (GENUINE_BLOTTABS_LABEL0)
 //
 // Passed:
 // - *azh_handle: "un-initialized" handle
-// - l_blotexlibExecutorParseAndComputeLValueGenuineBlottabSetOpFunction:
-// - l_blotexlibExecutorParseAndComputeRValueGenuineBlottabOpsFunction:
+// - l_blotexlibExecutorParseLValueGenuineBlottabSetOpFunction:
+// - l_blotexlibExecutorParseRValueGenuineBlottabOpsFunction:
 // - updateCurrentGenuineBlotsetFieldFunction:
 // - genuineBlottabDestroyInstanceFunction:
 //
@@ -115,10 +118,10 @@ typedef int (*l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTIO
 // - RETURNED: OK, created and initialized
 // - -1: unexpected problem
 int BlotexlibExecutorFactoryCreateInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE *azh_handle,
-  l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_L_VALUE_BLOTTAB_SET_OP_FUNCTION
-  l_blotexlibExecutorParseAndComputeLValueGenuineBlottabSetOpFunction,
-  l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION
-  l_blotexlibExecutorParseAndComputeRValueGenuineBlottabOpsFunction,
+  l_BLOTEXLIB_EXECUTOR_PARSE_L_VALUE_BLOTTAB_SET_OP_FUNCTION
+  l_blotexlibExecutorParseLValueGenuineBlottabSetOpFunction,
+  l_BLOTEXLIB_EXECUTOR_PARSE_R_VALUE_BLOTTAB_OPS_FUNCTION
+  l_blotexlibExecutorParseRValueGenuineBlottabOpsFunction,
   UPDATE_BLOTTAB_SPOT_FUNCTION updateGenuineBlottabSpotFunction,
   NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION genuineBlottabDestroyInstanceFunction) ;
 
@@ -126,8 +129,8 @@ int BlotexlibExecutorFactoryCreateInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE *az
 // => Your are supposed to register ALL blotab implementations before linking blotex library...
 //
 // Passed:
-// - l_blotexlibExecutorParseAndComputeLValueBlottabSetOpFunction:
-// - l_blotexlibExecutorParseAndComputeRValueBlottabOpsFunction:
+// - l_blotexlibExecutorParseLValueBlottabSetOpFunction:
+// - l_blotexlibExecutorParseRValueBlottabOpsFunction:
 // - updateBlottabSpotFunction:
 //
 // Returned:
@@ -135,10 +138,10 @@ int BlotexlibExecutorFactoryCreateInstance(BLOTEXLIB_EXECUTOR_FACTORY_HANDLE *az
 // - -1: unexpected problem
 int BlotexlibExecutorFactoryRegisterBlottabImplementation(
   BLOTEXLIB_EXECUTOR_FACTORY_HANDLE handle,
-  l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_L_VALUE_BLOTTAB_SET_OP_FUNCTION
-  l_blotexlibExecutorParseAndComputeLValueBlottabSetOpFunction,
-  l_BLOTEXLIB_EXECUTOR_PARSE_AND_COMPUTE_R_VALUE_BLOTTAB_OPS_FUNCTION
-  l_blotexlibExecutorParseAndComputeRValueBlottabOpsFunction,
+  l_BLOTEXLIB_EXECUTOR_PARSE_L_VALUE_BLOTTAB_SET_OP_FUNCTION
+  l_blotexlibExecutorParseLValueBlottabSetOpFunction,
+  l_BLOTEXLIB_EXECUTOR_PARSE_R_VALUE_BLOTTAB_OPS_FUNCTION
+  l_blotexlibExecutorParseRValueBlottabOpsFunction,
   UPDATE_BLOTTAB_SPOT_FUNCTION updateBlottabSpotFunction,
   NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION blottabDestroyInstanceFunction) ;
 
@@ -274,12 +277,24 @@ int BlotexlibExecutorConcatenateStrexValue(BLOTEXLIB_EXECUTOR_HANDLE handle,
 // Parsing blot expression:
 // ------------------------
 
-// TODO: ParseBlotex() dans kitchen???
+#define BLOTEX_CHECK_FLAG__INT_ONLY      0x01
+#define BLOTEX_CHECK_FLAG__POSITIVE_ONLY 0x02
+#define BLOTEX_CHECK_FLAG__STR_ONLY      0x04
+
+enum {
+  BLOTEX_CHECK_FLAGS__NONE0             = ALL_FLAGS_OFF0,
+  BLOTEX_CHECK_FLAGS__INT_ONLY          = BLOTEX_CHECK_FLAG__INT_ONLY, 
+  BLOTEX_CHECK_FLAGS__POSITIVE_INT_ONLY = BLOTEX_CHECK_FLAG__INT_ONLY |
+    BLOTEX_CHECK_FLAG__POSITIVE_ONLY,
+  BLOTEX_CHECK_FLAGS__STR_ONLY          = BLOTEX_CHECK_FLAG__STR_ONLY, 
+} ;
+
 // Parse <blotex>
 //
 // Passed:
 // - handle: see l_BlotcodeExecutorGetBlotexlibExecutorHandle()
 // - *a_sequence: before parsing
+// - blotexCheckFlags:
 //
 // Changed:
 // - *a_sequence: after parsing 
@@ -290,30 +305,30 @@ int BlotexlibExecutorConcatenateStrexValue(BLOTEXLIB_EXECUTOR_HANDLE handle,
 // - ANSWER__YES: Ok,
 // - ANSWER__NO: 'syntax' 'not found' error; abandon processing 
 // - -1: unexpected problem
-int BlotexlibExecutorParseAndComputeBlotex(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING *a_sequence, struct BLOTEX_VALUE *ac_blotexValue,
-  G_STRING_STUFF nc_abandonmentInfo) ;
+int BlotexlibExecutorParseBlotex(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING *a_sequence,
+  int blotexCheckFlags, struct BLOTEX_VALUE *ac_blotexValue, G_STRING_STUFF nc_abandonmentInfo) ;
 
 
-// TODO: ParseStrPortion dans kitchen???
 // Parse <str portion>
+// NOTICE: the offset/length values are warranted consistent vis-a-vis total length. 
 //
 // Passed:
 // - handle: see l_BlotcodeExecutorGetBlotexlibExecutorHandle()
-// - *a_sequence: before parsing; expect '{' [ <intex> ] [ ( ':' | '-' ) [ <intex> ] ] '}'
+// - *a_sequence: before parsing
+// - totalLength: >= 0
 //
 // Changed:
 // - *a_sequence: after parsing 
-// - *ac_offset: >= 0; only significant if parsed successfully
-// - *acn_length: (-1 special value for all rest of string) only significant if parsed successfully
+// - *ac_offset: only significant if parsed successfully; warranted consistent (>= 0)
+// - *ac_length: only significant if parsed successfully; warranted consistent (>= 0)
 // - nc_abandonmentInfo: only significant if "parsing abandoned"
 //
-// Ret: Computed successfully ? 
+// Ret: Parsed successfully ? 
 // - ANSWER__YES: Ok,
-// - ANSWER__NO: 'syntax' 'not found' error; abandon processing 
+// - ANSWER__NO: 'syntax' 'not found' 'value' error; abandon processing 
 // - -1: unexpected problem
-int BlotexlibExecutorParseAndComputeStrPortion(BLOTEXLIB_EXECUTOR_HANDLE handle,
-  struct P_STRING *a_sequence, int *ac_offset, int *acn_length, G_STRING_STUFF nc_abandonmentInfo);
+int BlotexlibExecutorParseStrPortion(BLOTEXLIB_EXECUTOR_HANDLE handle, struct P_STRING *a_sequence,
+  int totalLength, int *ac_offset, int *ac_length, G_STRING_STUFF nc_abandonmentInfo);
 
 
 // blottabs:
