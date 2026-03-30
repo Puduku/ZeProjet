@@ -217,14 +217,11 @@ static int l_BlotexlibExecutorParseAndRetrieveBlottabSpot(BLOTEXLIB_EXECUTOR_HAN
   m_PREPARE_ABANDON(a_sequence, "<blottab spot>") 
   int specifierFlags = ENTRY__SPECIFIER_FLAG;
   m_CHECK_ABANDON(ParseSpecifier(a_sequence,&specifierFlags,nc_abandonmentInfo))
-  struct BLOTEX_VALUE entryBlotexValue = UNDEFINED_BLOTEX_VALUE;
-  m_CHECK_ABANDON(BlotexlibExecutorParseBlotex(handle,a_sequence,BLOTEX_CHECK_FLAGS__NONE0,
-    &entryBlotexValue, nc_abandonmentInfo))
-  if (entryBlotexValue.b_strValue) m_ABANDON(EXPECT_INTEX__ABANDONMENT_CAUSE)
-  else if (entryBlotexValue.select.c_blotval > INT_MAX || entryBlotexValue.select.c_blotval < 0)
-    m_ABANDON(VALUE_ERROR__ABANDONMENT_CAUSE)
+  struct BLOTEX_VALUE entryIntexValue = UNDEFINED_BLOTEX_VALUE;
+  m_CHECK_ABANDON(BlotexlibExecutorParseBlotex(handle,a_sequence,
+    BLOTEX_CHECK_FLAGS__POSITIVE_INT_ONLY, &entryIntexValue, nc_abandonmentInfo))
 
-  int entry = entryBlotexValue.select.c_blotval;
+  int entry = entryIntexValue.select.c_blotval;
   *act_blotsetStuff = (g_G_STRING_SET_STUFF)UNDEFINED;
   m_TRACK_IF(GStringsFetch(blottabHandle->h_tableHandle, entry, act_blotsetStuff) < 0)
   if (*act_blotsetStuff == NULL) m_ABANDON(NOT_EXISTING_BLOTSET__ABANDONMENT_CAUSE)
@@ -321,7 +318,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
 
   m_PRECISE_ABANDON(&subSequence, "<blottab request atom>") 
   struct BLOTEX_VALUE blotexValue = UNDEFINED_BLOTEX_VALUE; 
-  struct G_KEY gKey = { UNDEFINED };
+  struct G_KEY gKey = { UNDEFINED }; // TODO: bugged => gKeys5 
   do {
     signed char b_strValue = (char)UNDEFINED;  
     int tableIndexLabel = UNDEFINED;
@@ -337,14 +334,12 @@ m_DIGGY_VAR_P_STRING(subSequence)
         &n_indexSeekFlags) != RETURNED)
       if (n_indexSeekFlags < 0) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
 
-      m_CHECK_ABANDON(BlotexlibExecutorParseBlotex(handle,&subSequence,BLOTEX_CHECK_FLAGS__NONE0,
-        &blotexValue, nc_abandonmentInfo))
+      m_CHECK_ABANDON(BlotexlibExecutorParseBlotex(handle,&subSequence,om_BlotexCheckFlags(
+        b_strValue), &blotexValue, nc_abandonmentInfo))
       if (b_strValue) {
-        if (!blotexValue.b_strValue) m_ABANDON(EXPECT_STREX__ABANDONMENT_CAUSE)
 m_DIGGY_VAR_P_STRING(blotexValue.select.c_strex.v_str)
         gKey = m_GKey_PString(blotexValue.select.c_strex.v_str);
       } else {
-        if (blotexValue.b_strValue) m_ABANDON(EXPECT_INTEX__ABANDONMENT_CAUSE)
         gKey = m_GKey_AcolytValue(blotexValue.select.c_blotval); 
       } // if
     } // if

@@ -289,6 +289,14 @@ enum {
   BLOTEX_CHECK_FLAGS__STR_ONLY          = BLOTEX_CHECK_FLAG__STR_ONLY, 
 } ;
 
+// Passed:
+// - b_strValue: TRUE/FALSE 
+//
+// Ret: corresponding flag(s)
+static inline int om_BlotexCheckFlags(char b_strValue) {
+  return (b_strValue? BLOTEX_CHECK_FLAGS__STR_ONLY: BLOTEX_CHECK_FLAGS__INT_ONLY);
+} // om_BlotexCheckFlags
+
 // Parse <blotex>
 //
 // Passed:

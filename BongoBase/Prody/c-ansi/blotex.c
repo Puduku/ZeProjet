@@ -801,10 +801,10 @@ int BlotexlibExecutorParseStrPortion(BLOTEXLIB_EXECUTOR_HANDLE handle,
   *ac_offset = 0; *ac_length = totalLength; // a priori
   if (ob_ParseStrPortion(a_sequence)) {
     struct BLOTEX_VALUE blotexValue = UNDEFINED_BLOTEX_VALUE;
-    *ac_length = totalLength - *ac_offset; // a priori
     m_CHECK_ABANDON(BlotexlibExecutorParseBlotex(handle,a_sequence,
       BLOTEX_CHECK_FLAGS__POSITIVE_INT_ONLY,&blotexValue,nc_abandonmentInfo))
     if ((*ac_offset = blotexValue.select.c_blotval) > totalLength) *ac_offset = totalLength;
+    *ac_length = totalLength - *ac_offset; // a priori
     int portionOp = UNDEFINED;
     if (ob_ParseStrPortionOffset(a_sequence,&portionOp)) {
       // TODO: handle absence of <intex>
