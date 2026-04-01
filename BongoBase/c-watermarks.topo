@@ -17,7 +17,7 @@
 // NOTICE: Only use indicators when convinced they help programmers avoid bugs.
 // Anything not useful becomes harmful through visual noise and confusion.
 // Think of these indicators like road signs - essential for safety, wasteful if excessive.
-// However, in actual situations, it appears sometimes necessary to combine up to four indicators
+// However, in actual situations, it appears sometimes necessary to combine up to five indicators
 // in your variables and parameters. These clusters of indicators provide a near-certain
 // indication of areas in the code that need improvement. Until you can put the ideal implementation
 // in place - which may require significant changes - keep these indicators as they are as long as
