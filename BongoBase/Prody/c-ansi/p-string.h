@@ -381,12 +381,15 @@ int ComparePStringsAmongR(struct P_STRING pString1,
 #define b_PASS_CHARS_TILL b_TRUE
 #define b_PASS_CHARS_WHILE b_FALSE0
 
+#define b_QUOTED b_TRUE
+
 // Simple string (char to char) "scanning" function 
 // Locate first char having / NOT having a property
 // NOTE: not be confused with SScanfPString() declared below... 
 //
 // Passed:
 // - pString : string portion to scan. 
+// - b_quoted: when true: pass quoted text as though it was single quotation mark. 
 // - b_regularScan 
 //   + b_REGULAR_SCAN (TRUE) :
 //   + b_REVERTED_SCAN (FALSE) :
@@ -399,7 +402,7 @@ int ComparePStringsAmongR(struct P_STRING pString1,
 // Returned:
 // (!= NULL) scanning position ; use b_SCAN_P_STRING_LOCATED() below to check whether char
 // is actually located. 
-const char *ScanPString(struct P_STRING pString,
+const char *ScanPString(struct P_STRING pString, char b_quoted,
   char b_regularScan, char b_passCharsTill, IS_CHAR_FUNCTION n_isCharFunction, int c_char);
 
 
@@ -410,6 +413,7 @@ const char *ScanPString(struct P_STRING pString,
 //
 // Passed:
 // - pString: string to scan #SEE struct-P_STRING
+// - b_quoted: when true: pass quoted text as though it was single quotation mark. 
 // - subPString: sub string to locate
 // - n_toCharFunction: 
 //   + NULL: not provided; no conversion before  comparison 
@@ -419,8 +423,8 @@ const char *ScanPString(struct P_STRING pString,
 // Returned:
 // (!= NULL) scanning position; use b_SCAN_P_STRING_LOCATED() below to check whether
 // sub-string is actually located. 
-const char *o_ScanPStringTillMatch(struct P_STRING pString, struct P_STRING subPString,
-  TO_CHAR_FUNCTION n_toCharFunction);
+const char *o_ScanPStringTillMatch(struct P_STRING pString, char b_quoted, 
+  struct P_STRING subPString, TO_CHAR_FUNCTION n_toCharFunction);
 
 
 // Extend o_ScanPStringTillMatch "scanning" function : 
@@ -428,6 +432,7 @@ const char *o_ScanPStringTillMatch(struct P_STRING pString, struct P_STRING subP
 //
 // Passed:
 // - pString: string to scan #SEE struct-P_STRING
+// - b_quoted: when true: pass quoted text as though it was single quotation mark. 
 // - n_toCharFunction: 
 //   + NULL: not provided; no conversion before  comparison 
 //   + != NULL: conversion applied on (each char of) both strings before comparison ; "binary"
@@ -450,9 +455,9 @@ const char *o_ScanPStringTillMatch(struct P_STRING pString, struct P_STRING subP
 // - != NULL: scanning position; use b_SCAN_P_STRING_LOCATED() below to check whether
 //   sub-string is actually located. 
 // - NULL special value: anomaly is raised
-const char *ScanPStringTillFirstMatch(struct P_STRING pString, TO_CHAR_FUNCTION n_toCharFunction,
-  int *navn_matchedEntry, int *navn_matchedId, int subStringsCount, /*struct P_STRING subPString0,
-  int sn_id0, */ ...);
+const char *ScanPStringTillFirstMatch(struct P_STRING pString, char b_quoted, 
+  TO_CHAR_FUNCTION n_toCharFunction, int *navn_matchedEntry, int *navn_matchedId,
+  int subStringsCount, /*struct P_STRING subPString0, int sn_id0, */ ...);
 
 // See ScanPStringTillFirstMatch()
 // 
@@ -462,12 +467,9 @@ const char *ScanPStringTillFirstMatch(struct P_STRING pString, TO_CHAR_FUNCTION 
 // - subPString0: 1st possible sub string to locate
 // - n_id0: id of 1st possible sub string to locate (-1 special value to SKIP that sub-string)
 // - other possible sub strings (...) : indicate all other possible sub-strings to match ;
-//
-// Returned:
-// - != NULL: scanning position
-// - NULL special value: anomaly is raised
-const char *ScanPStringTillFirstMatchV(struct P_STRING pString, TO_CHAR_FUNCTION n_toCharFunction,
-  int *navn_matchedEntry, int *navn_matchedId, int subStringsCount, va_list subPStringsIds);
+const char *ScanPStringTillFirstMatchV(struct P_STRING pString, char b_quoted, 
+  TO_CHAR_FUNCTION n_toCharFunction, int *navn_matchedEntry, int *navn_matchedId,
+  int subStringsCount, va_list subPStringsIds);
 
 // See ScanPStringTillFirstMatchV()
 // 
@@ -479,9 +481,9 @@ const char *ScanPStringTillFirstMatchV(struct P_STRING pString, TO_CHAR_FUNCTION
 //
 // Returned:
 // - (!= NULL) scanning position
-const char *o_ScanPStringTillFirstMatchR(struct P_STRING pString, TO_CHAR_FUNCTION n_toCharFunction,
-  int *navn_matchedEntry, int *navn_matchedId, int subStringsCount,
-  const struct P_STRING sp_subPStrings[], int nsn_ids[]) ;
+const char *o_ScanPStringTillFirstMatchR(struct P_STRING pString, char b_quoted,
+  TO_CHAR_FUNCTION n_toCharFunction, int *navn_matchedEntry, int *navn_matchedId,
+  int subStringsCount, const struct P_STRING sp_subPStrings[], int nsn_ids[]) ;
 
 // Boolean interpretation (located or not) of scan pointer returned by ScanPString*()
 // functions.

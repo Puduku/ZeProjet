@@ -226,7 +226,7 @@ static int TestsScanPString(void) {
 #define m_TEST_SCAN_P_STRING(/*const char* */p_string, /*int*/n_length, b_regularScan,\
   b_passCharsTill,  /*IS_CHAR_FUNCTION*/isCharFunction, /*int*/expectedOffset, b_expectLocated) {\
   struct P_STRING pString = o_PString2(p_string,n_length);\
-  retScan = ScanPString(pString,b_regularScan,b_passCharsTill,isCharFunction,UNDEFINED);\
+  retScan = ScanPString(pString,!b_QUOTED,b_regularScan,b_passCharsTill,isCharFunction,UNDEFINED);\
   m_ASSERT((expectedOffset) == (retScan - p_string)) \
   m_ASSERT(retScan <= pString.stop) \
   int emb_located = b_SCAN_P_STRING_LOCATED(pString, retScan);\
@@ -284,7 +284,7 @@ static int TestsScanPStringTillMatch(void) {
   /*TO_CHAR_FUNCTION*/ n_toCharFunction,  /*int*/expectedOffset, b_expectLocated) {\
   struct P_STRING pString = o_PString2(p_string,n_length);\
   struct P_STRING subPString = o_PString2(p_subString,n_subLength);\
-  retScan = o_ScanPStringTillMatch(pString, subPString, n_toCharFunction);\
+  retScan = o_ScanPStringTillMatch(pString,!b_QUOTED, subPString, n_toCharFunction);\
   m_ASSERT((expectedOffset) == (retScan - p_string)) \
   m_ASSERT(retScan <= pString.stop) \
   int emb_located = b_SCAN_P_STRING_LOCATED(pString, retScan);\
@@ -359,7 +359,7 @@ static int TestsScanPStringTillFirstMatch(void) {
   struct P_STRING subPString2 = o_PString(p_subCString2);\
   int em_matchedEntry = UNDEFINED;\
   int em_matchedId = UNDEFINED;\
-  retScan = ScanPStringTillFirstMatch(pString,NULL,&em_matchedEntry,&em_matchedId,3,subPString0,0,\
+  retScan = ScanPStringTillFirstMatch(pString,!b_QUOTED,NULL,&em_matchedEntry,&em_matchedId,3,subPString0,0,\
     subPString1,0, subPString2,0);\
   m_ASSERT((expectedOffset) == (retScan - p_cString)) \
   m_ASSERT(retScan <= pString.stop) \

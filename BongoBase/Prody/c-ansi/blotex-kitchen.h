@@ -968,7 +968,7 @@ int ParseLValueBlotregOps(struct P_STRING *a_sequence, struct P_STRING blotregNa
 char ob_ParseBlotexAssignation(struct P_STRING *a_sequence, struct P_STRING *ac_subSequence) ; 
 
 
-// Parse <str portion> (start)
+// Parse <str portion> (start) [K]
 //
 // Passed:
 // - *a_sequence: before parsing
@@ -984,7 +984,7 @@ enum {
   LENGTH__PORTION_OP,
 } ; 
 
-// Parse <str portion> portion op. 
+// Parse <str portion> portion op. [K] 
 //
 // Passed:
 // - *a_sequence: before parsing
@@ -996,7 +996,7 @@ enum {
 // Ret: portion op. identified ? (TRUE / FALSE) 
 char ob_ParseStrPortionOffset(struct P_STRING *a_sequence, int *ac_portionOp) ;
 
-// Parse <str portion> end 
+// Parse <str portion> end [K] 
 //
 // Passed:
 // - *a_sequence: before parsing
