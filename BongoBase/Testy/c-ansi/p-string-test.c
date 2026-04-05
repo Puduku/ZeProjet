@@ -223,10 +223,10 @@ static int TestsComparePStrings(void) {
 // - RETURNED: Ok
 // - -1: anomaly is raised
 static int TestsScanPString(void) {
-#define m_TEST_SCAN_P_STRING(/*const char* */p_string, /*int*/n_length, b_regularScan,\
-  b_passCharsTill,  /*IS_CHAR_FUNCTION*/isCharFunction, /*int*/expectedOffset, b_expectLocated) {\
+#define m_TEST_SCAN_P_STRING(/*const char* */p_string, /*int*/n_length, scanFlag1,\
+  scanFlag2,  /*IS_CHAR_FUNCTION*/isCharFunction, /*int*/expectedOffset, b_expectLocated) {\
   struct P_STRING pString = o_PString2(p_string,n_length);\
-  retScan = ScanPString(pString,!b_QUOTED,b_regularScan,b_passCharsTill,isCharFunction,UNDEFINED);\
+  retScan = ScanPString(pString,(scanFlag1)|(scanFlag2),isCharFunction,UNDEFINED);\
   m_ASSERT((expectedOffset) == (retScan - p_string)) \
   m_ASSERT(retScan <= pString.stop) \
   int emb_located = b_SCAN_P_STRING_LOCATED(pString, retScan);\
@@ -235,37 +235,37 @@ static int TestsScanPString(void) {
 } 
 
 #define m_TEST_REGULAR_SCAN_P_STRING(/*const char* */p_string, /*int*/n_length,\
-  b_passCharsTill,  /*IS_CHAR_FUNCTION*/isCharFunction, /*int*/expectedOffset, b_expectLocated) \
-  m_TEST_SCAN_P_STRING(p_string,n_length,b_REGULAR_SCAN, b_passCharsTill, isCharFunction,\
+  scanFlag2,  /*IS_CHAR_FUNCTION*/isCharFunction, /*int*/expectedOffset, b_expectLocated) \
+  m_TEST_SCAN_P_STRING(p_string,n_length,REGULAR__SCAN_FLAG0, scanFlag2, isCharFunction,\
   expectedOffset, b_expectLocated)   
 
-#define m_TEST_SCAN_C_P_STRING(/*const char* */p_cString, /*int*/b_passCharsTill,\
+#define m_TEST_SCAN_C_P_STRING(/*const char* */p_cString, scanFlag2,\
   /*IS_CHAR_FUNCTION*/isCharFunction, /*int*/expectedOffset, b_expectLocated) {\
-  m_TEST_REGULAR_SCAN_P_STRING(p_cString, -1, b_passCharsTill, isCharFunction,\
+  m_TEST_REGULAR_SCAN_P_STRING(p_cString, -1, scanFlag2, isCharFunction,\
     expectedOffset,b_expectLocated)\
 }
 
 // VERS1 = "Tout cela ne vaut pas
   m_DIGGY_BOLLARD()
 
-  m_TEST_SCAN_C_P_STRING(VERS1,b_PASS_CHARS_WHILE,isdigit ,0       ,b_EXPECT_LOCATED)
-  m_TEST_SCAN_C_P_STRING(VERS1,b_PASS_CHARS_TILL ,isdigit ,vers1Len,!b_EXPECT_LOCATED)
-  m_TEST_SCAN_C_P_STRING(VERS1,b_PASS_CHARS_TILL ,isLowerC,5       ,b_EXPECT_LOCATED)
-  m_TEST_SCAN_C_P_STRING(VERS1,b_PASS_CHARS_WHILE,isupper ,1       ,b_EXPECT_LOCATED)
+  m_TEST_SCAN_C_P_STRING(VERS1,PASS_CHARS_WHILE__SCAN_FLAG,isdigit ,0       ,b_EXPECT_LOCATED)
+  m_TEST_SCAN_C_P_STRING(VERS1,PASS_CHARS_TILL__SCAN_FLAG0 ,isdigit ,vers1Len,!b_EXPECT_LOCATED)
+  m_TEST_SCAN_C_P_STRING(VERS1,PASS_CHARS_TILL__SCAN_FLAG0 ,isLowerC,5       ,b_EXPECT_LOCATED)
+  m_TEST_SCAN_C_P_STRING(VERS1,PASS_CHARS_WHILE__SCAN_FLAG,isupper ,1       ,b_EXPECT_LOCATED)
 
-  m_TEST_REGULAR_SCAN_P_STRING("Tout cela..." , 4, b_PASS_CHARS_TILL , isLowerC,
+  m_TEST_REGULAR_SCAN_P_STRING("Tout cela..." , 4, PASS_CHARS_TILL__SCAN_FLAG0 , isLowerC,
     4, !b_EXPECT_LOCATED)
-  m_TEST_REGULAR_SCAN_P_STRING("Tout cela..." , 5, b_PASS_CHARS_TILL , isLowerC,
+  m_TEST_REGULAR_SCAN_P_STRING("Tout cela..." , 5, PASS_CHARS_TILL__SCAN_FLAG0 , isLowerC,
     5, !b_EXPECT_LOCATED)
-  m_TEST_REGULAR_SCAN_P_STRING("Tout cela..." , 6, b_PASS_CHARS_TILL , isLowerC,
+  m_TEST_REGULAR_SCAN_P_STRING("Tout cela..." , 6, PASS_CHARS_TILL__SCAN_FLAG0 , isLowerC,
     5, b_EXPECT_LOCATED)
-  m_TEST_REGULAR_SCAN_P_STRING("Tout cela..." , 7, b_PASS_CHARS_TILL , isLowerC,
+  m_TEST_REGULAR_SCAN_P_STRING("Tout cela..." , 7, PASS_CHARS_TILL__SCAN_FLAG0 , isLowerC,
     5, b_EXPECT_LOCATED)
-  m_TEST_REGULAR_SCAN_P_STRING("Tout cela..." , 6, b_PASS_CHARS_WHILE, isLowerC,
+  m_TEST_REGULAR_SCAN_P_STRING("Tout cela..." , 6, PASS_CHARS_WHILE__SCAN_FLAG, isLowerC,
     0, b_EXPECT_LOCATED)
-  m_TEST_REGULAR_SCAN_P_STRING("Tout\0cela...", 7, b_PASS_CHARS_TILL , isLowerC,
+  m_TEST_REGULAR_SCAN_P_STRING("Tout\0cela...", 7, PASS_CHARS_TILL__SCAN_FLAG0 , isLowerC,
     5, b_EXPECT_LOCATED)
-  m_TEST_REGULAR_SCAN_P_STRING("Tout\0cela...",-1, b_PASS_CHARS_TILL , isLowerC,
+  m_TEST_REGULAR_SCAN_P_STRING("Tout\0cela...",-1, PASS_CHARS_TILL__SCAN_FLAG0 , isLowerC,
     4, !b_EXPECT_LOCATED)
 
   m_DIGGY_RETURN(RETURNED)
@@ -284,7 +284,7 @@ static int TestsScanPStringTillMatch(void) {
   /*TO_CHAR_FUNCTION*/ n_toCharFunction,  /*int*/expectedOffset, b_expectLocated) {\
   struct P_STRING pString = o_PString2(p_string,n_length);\
   struct P_STRING subPString = o_PString2(p_subString,n_subLength);\
-  retScan = o_ScanPStringTillMatch(pString,!b_QUOTED, subPString, n_toCharFunction);\
+  retScan = o_ScanPStringTillMatch(pString,ALL_FLAGS_OFF0, subPString, n_toCharFunction);\
   m_ASSERT((expectedOffset) == (retScan - p_string)) \
   m_ASSERT(retScan <= pString.stop) \
   int emb_located = b_SCAN_P_STRING_LOCATED(pString, retScan);\
@@ -359,7 +359,7 @@ static int TestsScanPStringTillFirstMatch(void) {
   struct P_STRING subPString2 = o_PString(p_subCString2);\
   int em_matchedEntry = UNDEFINED;\
   int em_matchedId = UNDEFINED;\
-  retScan = ScanPStringTillFirstMatch(pString,!b_QUOTED,NULL,&em_matchedEntry,&em_matchedId,3,subPString0,0,\
+  retScan = ScanPStringTillFirstMatch(pString,ALL_FLAGS_OFF0,NULL,&em_matchedEntry,&em_matchedId,3,subPString0,0,\
     subPString1,0, subPString2,0);\
   m_ASSERT((expectedOffset) == (retScan - p_cString)) \
   m_ASSERT(retScan <= pString.stop) \

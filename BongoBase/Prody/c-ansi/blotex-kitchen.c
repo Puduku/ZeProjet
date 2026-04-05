@@ -203,7 +203,7 @@ static int IsEntityNameChar(int c) {
 int o_ParseEntityName(struct P_STRING *a_sequence, struct P_STRING *a_entityName) {
   m_DIGGY_BOLLARD()
   om_PParsePassSpaces(a_sequence,NULL);
-  o_PParsePassChars(a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_WHILE,IsEntityNameChar,
+  o_PParsePassChars(a_sequence,PASS_CHARS_WHILE__SCAN_FLAGS,IsEntityNameChar,
     (char)UNDEFINED,a_entityName); // <entity name>
   m_DIGGY_RETURN(RETURNED)
 } // o_ParseEntityName
@@ -748,7 +748,7 @@ int ParseStrConstant(struct P_STRING *a_sequence, char *acb_parsed,
   m_PREPARE_ABANDON(a_sequence, "<str constant>")
   o_PParsePassSingleChar(a_sequence,NULL,'"',&lexeme);
   if ((*acb_parsed = !b_EMPTY_P_STRING(lexeme))) { // <str constant> ... 
-    o_PParsePassChars(a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_TILL,NULL,'"', &lexeme);
+    o_PParsePassChars(a_sequence,PASS_CHARS_TILL__SCAN_FLAGS,NULL,'"', &lexeme);
     if (b_EMPTY_P_STRING(*a_sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
     PParseOffset(a_sequence,1,NULL);
     m_TRACK_IF(SetStrexValue(workingGStringsHandle,acc_blotexValue,lexeme,!b_FUGACIOUS_STR) !=
@@ -858,7 +858,7 @@ int ParseFormatAndSeparator(struct P_STRING *a_sequence, int *ac_format,
   om_PParsePassSpaces(a_sequence,NULL);
   o_PParsePassSingleChar(a_sequence,NULL,'%',&lexeme);
   if (b_EMPTY_P_STRING(lexeme)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
-  o_PParsePassChars(a_sequence,b_REGULAR_SCAN,b_PASS_CHARS_WHILE,IsFormatSpecifierChar,(char)UNDEFINED,
+  o_PParsePassChars(a_sequence,PASS_CHARS_WHILE__SCAN_FLAGS,IsFormatSpecifierChar,(char)UNDEFINED,
     &lexeme);
   int length = m_PStringLength(lexeme);
   if (length > 0) {

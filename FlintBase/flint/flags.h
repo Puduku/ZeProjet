@@ -92,6 +92,9 @@
 #define m_SWITCH_FLAG(m_flags,flag) if (b_FLAG_SET_ON(m_flags,flag)) m_SET_FLAG_OFF(m_flags,flag)\
   else m_SET_FLAG_ON(m_flags,flag) 
 
+// Pseudo-flag (when off)
+#define FLAG_OFF0 0
+
 // "No flag"
 #define ALL_FLAGS_OFF0 0
 

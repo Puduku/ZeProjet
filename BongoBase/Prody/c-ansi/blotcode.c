@@ -374,7 +374,7 @@ static int BlotcodeFindBlotfunc(BLOTCODE_HANDLE p_handle, struct P_STRING referr
   m_ASSERT(p_handle->b_frozen) 
   m_INDEX_REQUEST_AUTOMATIC_BUFFER(indexRequestAutomaticBuffer)
 m_DIGGY_VAR_P_STRING(referral)
-  o_PParsePassChars(&referral,b_REGULAR_SCAN,b_PASS_CHARS_TILL,NULL,'.',&(blotfuncKeyName.prefix));
+  o_PParsePassChars(&referral,PASS_CHARS_TILL__SCAN_FLAGS,NULL,'.',&(blotfuncKeyName.prefix));
   if (b_EMPTY_P_STRING(referral)) {
     blotfuncKeyName.name = blotfuncKeyName.prefix; 
     blotfuncKeyName.prefix = o_PString(GOOD_OLD_EMPTY_C_STRING);
@@ -686,21 +686,21 @@ m_DIGGY_VAR_P_STRING(blotinstSequence)
     char b_arguments = b_FALSE0; // No arguments lexeme a priori
     struct P_STRING basicToken1, basicToken2, c_arguments ;
     om_PParsePassSpaces(&blotinstSequence, NULL);
-    o_PParsePassChars(&blotinstSequence,b_REGULAR_SCAN, b_PASS_CHARS_WHILE,IsBasicTokenChar,
+    o_PParsePassChars(&blotinstSequence,PASS_CHARS_WHILE__SCAN_FLAGS,IsBasicTokenChar,
       (char)UNDEFINED, &basicToken1);
 
     om_PParsePassSpaces(&blotinstSequence, NULL);
-    o_PParsePassChars(&blotinstSequence,b_REGULAR_SCAN, b_PASS_CHARS_WHILE,IsBasicTokenChar,
+    o_PParsePassChars(&blotinstSequence,PASS_CHARS_WHILE__SCAN_FLAGS,IsBasicTokenChar,
       (char)UNDEFINED, &basicToken2);
 
     om_PParsePassSpaces(&blotinstSequence, NULL);
-    o_PParsePassChars(&blotinstSequence,b_REGULAR_SCAN, b_PASS_CHARS_TILL,NULL,'(', &dummy);
+    o_PParsePassChars(&blotinstSequence,PASS_CHARS_TILL__SCAN_FLAGS,NULL,'(', &dummy);
     if (!b_EMPTY_P_STRING(dummy)) {
       m_REPORT_ERROR(dummy,"Unexpected content before " DELIMITOR__C,'(')
     } // if
     if ((b_arguments = !b_EMPTY_P_STRING(blotinstSequence))) {
       PParseOffset(&blotinstSequence,1, NULL);
-      o_PParsePassChars(&blotinstSequence,b_REVERTED_SCAN, b_PASS_CHARS_TILL,NULL,')', &c_arguments);
+      o_PParsePassChars(&blotinstSequence,REVERTED_PASS_CHARS_TILL__SCAN_FLAGS,NULL,')', &c_arguments);
       if (b_EMPTY_P_STRING(blotinstSequence)) {
         m_REPORT_ERROR(c_arguments,"Missing " DELIMITOR__C, ')')
       } // if

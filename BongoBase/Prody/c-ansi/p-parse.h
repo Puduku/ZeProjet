@@ -51,12 +51,9 @@ int o_PParsePassSingleChar(struct P_STRING *a_sequence, IS_CHAR_FUNCTION n_isCha
 //
 // Passed:
 // - *a_sequence: as passed to (and updated by) ScanPString*() function
-// - b_regularScan 
-//   + b_REGULAR_SCAN (TRUE) :
-//   + b_REVERTED_SCAN (FALSE) :
-// - b_passCharsTill:  
-//   + b_PASS_CHARS_TILL (TRUE) : seek 1st character HAVING the property
-//   + b_PASS_CHARS_WHILE (FALSE) : seek 1st character NOT HAVING the property
+// - scanFlags: Used flags: 
+//   + REVERTED__SCAN_FLAG: 
+//   + PASS_CHARS_WHILE__SCAN_FLAG: seek 1st character NOT HAVING the property
 // - n_isCharFunction: property evaluation function (see IS_CHAR_FUNCTION) (NULL if not used) 
 // - c_char: only significant if n_isCharFunction == NULL 
 // - na_lexeme: NULL if not used
@@ -67,7 +64,7 @@ int o_PParsePassSingleChar(struct P_STRING *a_sequence, IS_CHAR_FUNCTION n_isCha
 //
 // Ret:
 // - RETURNED
-int o_PParsePassChars(struct P_STRING* a_sequence, char b_regularScan, char b_passCharsTill,
+int o_PParsePassChars(struct P_STRING* a_sequence, int scanFlags,
   IS_CHAR_FUNCTION n_isCharFunction, char c_char, struct P_STRING* na_lexeme) ;
 
 // Parse a string portion sequence : pass all white spaces... 
@@ -83,7 +80,7 @@ int o_PParsePassChars(struct P_STRING* a_sequence, char b_regularScan, char b_pa
 // Ret:
 // - RETURNED
 static inline int om_PParsePassSpaces(struct P_STRING* a_sequence, struct P_STRING* na_lexeme) {
-  return o_PParsePassChars(a_sequence,b_REGULAR_SCAN, b_PASS_CHARS_WHILE,isspace,(char)UNDEFINED,
+  return o_PParsePassChars(a_sequence,PASS_CHARS_WHILE__SCAN_FLAGS,isspace,(char)UNDEFINED,
     na_lexeme);
 } // om_PParsePassSpaces
 
