@@ -306,7 +306,7 @@ int DelimitBlotregRequest(struct P_STRING *a_sequence,const char *np_sequenceTyp
 m_DIGGY_VAR_P_STRING(*a_sequence)
   m_PREPARE_ABANDON(a_sequence, (np_sequenceType != NULL? np_sequenceType:"<blotreg request>"))
 
-  PParseTillMatch(a_sequence,o_PString(":?"),NULL, ac_blotregRequestSequence);
+  o_PParseTillMatch(a_sequence,FLAG_OFF0,o_PString(":?"),NULL, ac_blotregRequestSequence);
 m_DIGGY_VAR_P_STRING(*ac_blotregRequestSequence)
 m_DIGGY_VAR_P_STRING(*a_sequence)
   if (b_EMPTY_P_STRING(*a_sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
@@ -322,7 +322,7 @@ int DelimitCreationSequence(struct P_STRING *a_sequence, const char *p_sequenceT
 m_DIGGY_VAR_P_STRING(*a_sequence)
   m_PREPARE_ABANDON(a_sequence,p_sequenceType)
 
-  PParseTillMatch(a_sequence,o_PString("]?"),NULL, ac_creationSequence);
+  o_PParseTillMatch(a_sequence,FLAG_OFF0,o_PString("]?"),NULL, ac_creationSequence);
 m_DIGGY_VAR_P_STRING(*ac_creationSequence)
 m_DIGGY_VAR_P_STRING(*a_sequence)
   if (b_EMPTY_P_STRING(*a_sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
@@ -967,7 +967,7 @@ int ParseLValueBlotregOps(
 // See .h
 char ob_ParseBlotexAssignation(struct P_STRING *a_sequence, struct P_STRING *ac_subSequence) {
   m_DIGGY_BOLLARD()
-  PParseTillMatch(a_sequence,o_PString(":="),NULL,ac_subSequence); // TODO: improve; i.e: "joker" sequences???...
+  o_PParseTillMatch(a_sequence,QUOTED__SCAN_FLAG,o_PString(":="),NULL,ac_subSequence);
   char b_assignation = !b_EMPTY_P_STRING(*a_sequence);
   if (b_assignation) { 
     PParseOffset(a_sequence,2,NULL);

@@ -76,20 +76,20 @@ int PParseMatchAmongR(struct P_STRING* a_sequence, TO_CHAR_FUNCTION n_toCharFunc
 } // PParseMatchAmongR
 
 // Public function: see .h
-int PParseTillMatch(struct P_STRING* a_sequence, struct P_STRING p_token,
+int o_PParseTillMatch(struct P_STRING* a_sequence,int scanFlags, struct P_STRING p_token,
   TO_CHAR_FUNCTION n_toCharFunction, struct P_STRING*  na_lexeme) {
-  const char *scanPtr = o_ScanPStringTillMatch(*a_sequence,IGNORE_QUOTED__SCAN_FLAGS,p_token, n_toCharFunction);
+  const char *scanPtr = o_ScanPStringTillMatch(*a_sequence,scanFlags,p_token, n_toCharFunction);
   return o_PParseSequence(a_sequence,scanPtr, na_lexeme);
-} // PParseTillMatch
+} // o_PParseTillMatch
 
 // Public function: see .h
-int PParseTillFirstMatchR(struct P_STRING* a_sequence, TO_CHAR_FUNCTION n_toCharFunction,
-  int* navn_matchedEntry, int* cnavn_matchedId, struct P_STRING* na_lexeme, int tokensCount,
-  struct P_STRING*  sp_tokens, int*  nsn_ids) {
-  const char *scanPtr = o_ScanPStringTillFirstMatchR(*a_sequence,IGNORE_QUOTED__SCAN_FLAGS,n_toCharFunction,
-    navn_matchedEntry,cnavn_matchedId,tokensCount,sp_tokens,nsn_ids);
+int o_PParseTillFirstMatchR(struct P_STRING* a_sequence, int scanFlags,
+  TO_CHAR_FUNCTION n_toCharFunction, int* navn_matchedEntry, int* cnavn_matchedId,
+  struct P_STRING* na_lexeme, int tokensCount, struct P_STRING*  sp_tokens, int*  nsn_ids) {
+  const char *scanPtr = o_ScanPStringTillFirstMatchR(*a_sequence,scanFlags,
+    n_toCharFunction, navn_matchedEntry,cnavn_matchedId,tokensCount,sp_tokens,nsn_ids);
   return o_PParseSequence(a_sequence,scanPtr, na_lexeme);
-} // PParseTillFirstMatchR
+} // o_PParseTillFirstMatchR
 
 
 // Public function: see .h

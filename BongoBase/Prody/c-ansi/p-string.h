@@ -382,6 +382,7 @@ int ComparePStringsAmongR(struct P_STRING pString1,
 #define PASS_CHARS_WHILE__SCAN_FLAG  0x02
 #define  PASS_CHARS_TILL__SCAN_FLAG0 FLAG_OFF0 
 #define           QUOTED__SCAN_FLAG  0x04
+// TODO: handle single quote 
 
 #define                  REGULAR__SCAN_FLAGS               ALL_FLAGS_OFF0 
 #define                 REVERTED__SCAN_FLAGS          REVERTED__SCAN_FLAG

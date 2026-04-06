@@ -649,7 +649,7 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
 m_DIGGY_VAR_P_STRING(fp_template)
 m_DIGGY_VAR_D(b_blotblog)
     if (!b_blotblog) {
-      PParseTillMatch(&fp_template,o_PString("##<<"),NULL, &decor);
+      o_PParseTillMatch(&fp_template,IGNORE_QUOTED__SCAN_FLAGS,o_PString("##<<"),NULL, &decor);
       if (!b_EMPTY_P_STRING(decor)) {
         v_templatePartitionEntry = GreenCollectionFetch(handle->h_templatePartitionsHandle, -1,
           (char**)&ti_templatePartitionStuff);
@@ -664,7 +664,8 @@ m_DIGGY_VAR_D(b_blotblog)
 
     int c_delimitorEntry = UNDEFINED ;
 m_DIGGY_VAR_P_STRING(fp_template)
-    m_P_PARSE_TILL_FIRST_MATCH_C(fp_template,NULL, &c_delimitorEntry, &blotinstSequence,2,";;",">>")
+    m_P_PARSE_TILL_FIRST_MATCH_C(fp_template,QUOTED__SCAN_FLAGS,NULL, &c_delimitorEntry,
+      &blotinstSequence,2,";;",">>")
     if (b_EMPTY_P_STRING(fp_template)) { // NO ending ";;" or ">>" located 
 m_DIGGY_VAR_P_STRING(fp_template)
       m_REPORT_ERROR(dummy,"Missing " DELIMITOR__S, ";; or >>")

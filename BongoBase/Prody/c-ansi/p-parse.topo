@@ -2,9 +2,11 @@
 // (c) Puduku - 2023
 
 // Goal: Handle ordinary parsings without excessive headaches...
-// Idea: give up distinction made a priori between syntactic and lexical analyses.
-// Principle: some parsing = mixed hierarchical and sequential assembly of elementary parsing
-// steps...
+// Idea: give up distinction made a priori between syntactic and lexical analysis.
+// Principle: some parsing = mixed hierarchical and sequential assembly of elementary syntactic
+// parsing steps. 
+// If there is a lexical analysis - which takes place before the syntactic analysis - it simply
+// involves parsing the character strings enclosed in quotes as basic tokens.
 
 // A parsing step is thus an elementary operation which extracts "head" lexeme from a sequence (of
 // characters)

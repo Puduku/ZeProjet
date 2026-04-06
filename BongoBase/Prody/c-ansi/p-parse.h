@@ -149,6 +149,8 @@ int PParseMatchAmongR(struct P_STRING* a_sequence, TO_CHAR_FUNCTION n_toCharFunc
 //
 // Passed:
 // - *a_sequence: as passed to (and updated by) ScanPString*() function
+// - scanFlags: used flags are:
+//   + QUOTED__SCAN_FLAG: pass quoted text (between '"') as though it was single quotation mark.
 // - a_token:
 // - n_toCharFunction:
 // - na_lexeme: NULL if not used
@@ -159,7 +161,7 @@ int PParseMatchAmongR(struct P_STRING* a_sequence, TO_CHAR_FUNCTION n_toCharFunc
 //
 // Ret:
 // - RETURNED
-int PParseTillMatch(struct P_STRING* a_sequence, struct P_STRING p_token,
+int o_PParseTillMatch(struct P_STRING* a_sequence, int scanFlags, struct P_STRING p_token,
   TO_CHAR_FUNCTION n_toCharFunction, struct P_STRING*  na_lexeme) ;
 
 // Parse a string portion sequence according to sub strings (tokens) list scanned by
@@ -167,6 +169,8 @@ int PParseTillMatch(struct P_STRING* a_sequence, struct P_STRING p_token,
 //
 // Passed:
 // - *a_sequence: as passed to (and updated by) ScanPString*() function
+// - scanFlags: used flags are:
+//   + QUOTED__SCAN_FLAG: pass quoted text (between '"') as though it was single quotation mark.
 // - n_toCharFunction:
 // - navn_matchedEntry: NULL pointer if not used 
 // - cnavn_matchedId: Not significant if tokens ids not used; NULL pointer if not used 
@@ -185,9 +189,9 @@ int PParseTillMatch(struct P_STRING* a_sequence, struct P_STRING p_token,
 //
 // Ret:
 // - RETURNED
-int PParseTillFirstMatchR(struct P_STRING* a_sequence, TO_CHAR_FUNCTION n_toCharFunction,
-  int* navn_matchedEntry, int* cnavn_matchedId, struct P_STRING* na_lexeme, int tokensCount,
-  struct P_STRING*  sp_tokens, int*  nsn_ids) ;
+int o_PParseTillFirstMatchR(struct P_STRING* a_sequence, int scanFlags,
+  TO_CHAR_FUNCTION n_toCharFunction, int* navn_matchedEntry, int* cnavn_matchedId,
+  struct P_STRING* na_lexeme, int tokensCount, struct P_STRING*  sp_tokens, int*  nsn_ids) ;
 
 // Wraps PParseTillFirstMatchR() above: use C-strings as sub-strings in lieu of string portions.
 // Note: tokens ids NOT supported
@@ -197,12 +201,12 @@ int PParseTillFirstMatchR(struct P_STRING* a_sequence, TO_CHAR_FUNCTION n_toChar
 // - other C sub-strings 
 // (Instead of:)
 // - sp_tokens: possible sub-strings (p-strings) 
-#define m_P_PARSE_TILL_FIRST_MATCH_C(/*struct P_STRING*/ m_sequence,\
+#define m_P_PARSE_TILL_FIRST_MATCH_C(/*struct P_STRING*/ m_sequence,/*int*/scanFlags,\
   /*TO_CHAR_FUNCTION*/ n_toCharFunction,/*int* */navn_matchedEntry, /*struct P_STRING* */na_lexeme,\
   /*int*/ tokensCount, /*const char* p_token0, */ ...) {\
   m_LOCAL_P_STRINGS(sp_localTokens,tokensCount,__VA_ARGS__)\
-  PParseTillFirstMatchR(&(m_sequence),n_toCharFunction,navn_matchedEntry,(int*)UNDEFINED,\
-    na_lexeme, tokensCount, sp_localTokens, NULL);\
+  o_PParseTillFirstMatchR(&(m_sequence),scanFlags,n_toCharFunction,navn_matchedEntry,\
+    (int*)UNDEFINED, na_lexeme, tokensCount, sp_localTokens, NULL);\
 } 
 
 // 5. PParse*() functions: miscellaneous parsing 
