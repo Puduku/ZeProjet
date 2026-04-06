@@ -244,6 +244,10 @@
 // cannot handle ordinary portions of strings. And here's the cruel
 // irony: in common applications, most string processing (notably 
 // parsing) precisely manipulates string portions.
+// 
+// And in addition to what has just been stated, let us not forget to mention
+// this other fundamental flaw in the convention. It imposes byte-by-byte copying
+// and simply prohibits optimizing the copying of long character strings. 
 
 // Moralited:
 // C, qualified (ag l'edpoque du moins) de langage "edvolued", paraist aujourd'hui bien rustique
