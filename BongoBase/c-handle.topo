@@ -10,7 +10,7 @@
 // by on the baggage carousel at the airport. She grabbed it easily because, being very pragmatical,
 // her suitcase had auxiliary handles on EACH of its sides. I then finally understood the metaphor of
 // the '80s programmers. The "handle" is just a small device allowing to grip the real object,
-// and the  FUNDAMENTAL property of the the relation handle-object is that a given object may have
+// and the  FUNDAMENTAL property of the relation handle-object is that a given object may have
 // multiple handles in general.  According to me this concept of handle as such is one the most
 // fundamental concept in programming theory. I mean I think it's ever more fundamental than that of
 // "pointer" for instance (for which guys got the "Turing prize" if I remember well). And it is
