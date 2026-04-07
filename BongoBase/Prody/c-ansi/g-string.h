@@ -45,7 +45,7 @@ static inline struct P_STRING m_GStringGetLogicalPString(G_STRING_STUFF stuff) {
 } // m_GStringGetLogicalPString 
 
 // #REF GStringCopy
-// Copy (or concatenate...) a string portion into a "g-string".
+// Copy (or concatenate...) a string portion into a g-string.
 // ATTENTION: source and destination MAY NOT overlap
 // Note1: concatenation of empty string is a neutral operation; however, if  "destination" was 
 // "disengaged" (nhi_string == NULL), an empty string is well COPIED in destination. 
@@ -68,7 +68,7 @@ static inline struct P_STRING m_GStringGetLogicalPString(G_STRING_STUFF stuff) {
 int GStringCopy(G_STRING_STUFF stuff, int n_offset, struct P_STRING pString);
 
 
-// Copy (or concatenate...) a g-string into a "g-string"
+// Copy (or concatenate...) a g-string into a g-string.
 // Note1: the acolyt is NOT copied
 // See GStringCopy() above
 static inline int m_GStringGCopy(G_STRING_STUFF stuff, int n_offset, G_STRING_STUFF p_gStringStuff) {
@@ -266,11 +266,11 @@ int GStringsFetch(G_STRINGS_HANDLE cp_handle, int n_entry, g_G_STRING_SET_STUFF*
 int GStringsGetCount (G_STRINGS_HANDLE cp_handle,  g_G_STRING_SET_STUFF *navnt_gStringSetStuff);
 
 
-enum { // #REF enum-G_KEYS_COMPARISON 
-        P_STRING__G_KEYS_COMPARISON, //
- INTRINSIC_VALUE__G_KEYS_COMPARISON, //
-    ACOLYT_VALUE__G_KEYS_COMPARISON, // mutually exclusive with other ACOLYT_*__G_KEYS_COMPARISON
-   ACOLYT_HANDLE__G_KEYS_COMPARISON, // mutually exclusive with other ACOLYT_*__G_KEYS_COMPARISON
+enum { // #REF enum-GS_KEYS_COMPARISON 
+        P_STRING__GS_KEYS_COMPARISON, //
+ INTRINSIC_VALUE__GS_KEYS_COMPARISON, //
+    ACOLYT_VALUE__GS_KEYS_COMPARISON, // mutually exclusive with other ACOLYT_*__GS_KEYS_COMPARISON
+   ACOLYT_HANDLE__GS_KEYS_COMPARISON, // mutually exclusive with other ACOLYT_*__GS_KEYS_COMPARISON
 } ;
 
 // #REF P_STRING_INTRINSIC_VALUE_FUNCTION - "custom" function definition
@@ -292,21 +292,21 @@ typedef GENERIC_INTEGER (*P_STRING_INTRINSIC_VALUE_FUNCTION) (void *pr_handle,
 // - keysNumber: >= 1; 1:plain index; >=2:compound index  #SKIP
 // - key1GStringSetElement: between [0 ; <g-string set cardinality>[ ; the g-string set's
 //   element serving as first key of the index
-// - key1GKeysComparison: #see enum-G_KEYS_COMPARISON
-//   ACOLYT_VALUE__G_KEYS_COMPARISON : only possible with VALUED_STRING__G_STRING_CONVEYANCE
-//   ACOLYT_HANDLE__G_KEYS_COMPARISON : only possible with NAMED_OBJECT__G_STRING_CONVEYANCE
-// - cn_key1IsNeutralCharFunction: only significant with P_STRING__G_KEYS_COMPARISON 
+// - key1GsKeysComparison: #see enum-GS_KEYS_COMPARISON
+//   ACOLYT_VALUE__GS_KEYS_COMPARISON : only possible with VALUED_STRING__G_STRING_CONVEYANCE
+//   ACOLYT_HANDLE__GS_KEYS_COMPARISON : only possible with NAMED_OBJECT__G_STRING_CONVEYANCE
+// - cn_key1IsNeutralCharFunction: only significant with P_STRING__GS_KEYS_COMPARISON 
 //   + NULL: DO NOT eliminate neutral chars before comparison 
 //   + non NULL: eliminate neutral chars before comparison 
-// - cn_key1ToCharFunction: only significant with P_STRING__G_KEYS_COMPARISON 
+// - cn_key1ToCharFunction: only significant with P_STRING__GS_KEYS_COMPARISON 
 //   + NULL: NO conversion applied before comparison 
 //   + non NULL: conversion applied before comparison 
-// - c_key1PStringIntrinsicValueFunction: only significant with INTRINSIC_VALUE__G_KEYS_COMPARISON
+// - c_key1PStringIntrinsicValueFunction: only significant with INTRINSIC_VALUE__GS_KEYS_COMPARISON
 // - cfpr_key1PStringIntrinsicValueFunctionHandle: only significant with
-//   INTRINSIC_VALUE__G_KEYS_COMPARISON
+//   INTRINSIC_VALUE__GS_KEYS_COMPARISON
 // - ... : g-string set(s element for second key (etc.) if any ...
 int GStringsAddIndex(G_STRINGS_HANDLE handle,  int keysNumber, int key1GStringSetElement,
-  int key1GKeysComparison,  IS_CHAR_FUNCTION cn_key1IsNeutralCharFunction,
+  int key1GsKeysComparison,  IS_CHAR_FUNCTION cn_key1IsNeutralCharFunction,
   TO_CHAR_FUNCTION cn_key1ToCharFunction,
   P_STRING_INTRINSIC_VALUE_FUNCTION c_key1PStringIntrinsicValueFunction,
   void *cfpr_key1PStringIntrinsicValueFunctionHandle,  ...);
@@ -317,24 +317,24 @@ int GStringsAddIndex(G_STRINGS_HANDLE handle,  int keysNumber, int key1GStringSe
 static inline int m_GStringsAddPlainLexicalIndex(G_STRINGS_HANDLE handle,
   IS_CHAR_FUNCTION n_keyIsNeutralCharFunction, TO_CHAR_FUNCTION n_keyToCharFunction) {
   m_DIGGY_BOLLARD_S()
-  m_DIGGY_RETURN(GStringsAddIndex(handle, 1, 0, P_STRING__G_KEYS_COMPARISON,
+  m_DIGGY_RETURN(GStringsAddIndex(handle, 1, 0, P_STRING__GS_KEYS_COMPARISON,
      n_keyIsNeutralCharFunction, n_keyToCharFunction, (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,
      (void*)UNDEFINED))
 } // m_GStringsAddPlainLexicalIndex
 
 
 // (Internal use)
-union BARE_G_KEY {
-  struct P_STRING cp_pString; // with P_STRING__G_KEYS_COMPARISON
-  GENERIC_INTEGER cen_intrinsicValue; // with INTRINSIC_VALUE___G_KEYS_COMPARISON
-  GENERIC_INTEGER cen_acolytValue; // with ACOLYT_VALUE__G_KEYS_COMPARISON 
-  void *cnr_acolytHandle; // with ACOLYT_HANDLE__G_KEYS_COMPARISON
+union BARE_GS_KEY {
+  struct P_STRING cp_pString; // with P_STRING__GS_KEYS_COMPARISON
+  GENERIC_INTEGER cen_intrinsicValue; // with INTRINSIC_VALUE___GS_KEYS_COMPARISON
+  GENERIC_INTEGER cen_acolytValue; // with ACOLYT_VALUE__GS_KEYS_COMPARISON 
+  void *cnr_acolytHandle; // with ACOLYT_HANDLE__GS_KEYS_COMPARISON
 }; 
 
-// #REF struct-G_KEY
-struct G_KEY { //
-  int gKeysComparison ; // #SEE enum-G_KEYS_COMPARISON
-  union BARE_G_KEY bare ;// bare g-key 
+// #REF struct-GS_KEY
+struct GS_KEY { //
+  int gsKeysComparison ; // #SEE enum-GS_KEYS_COMPARISON
+  union BARE_GS_KEY bare ;// bare g-key 
 }; 
 
 // Establish a g-key for string (lexical) comparison
@@ -344,11 +344,11 @@ struct G_KEY { //
 //
 // Ret:
 // - g-key
-static inline struct G_KEY m_GKey_PString(const struct P_STRING p_pString) {\
-  struct G_KEY gKey = { .gKeysComparison = P_STRING__G_KEYS_COMPARISON,
+static inline struct GS_KEY m_GsKey(const struct P_STRING p_pString) {\
+  struct GS_KEY gsKey = { .gsKeysComparison = P_STRING__GS_KEYS_COMPARISON,
     .bare.cp_pString = p_pString }; 
-  return gKey;
-} // GKey_PString 
+  return gsKey;
+} // m_GsKey 
 
 // Establish a g-key for 'intrinsic (generic) values' comparison
 //
@@ -357,11 +357,11 @@ static inline struct G_KEY m_GKey_PString(const struct P_STRING p_pString) {\
 //
 // Ret:
 // - g-key
-static inline struct G_KEY m_GKey_IntrinsicValue(GENERIC_INTEGER en_intrinsicValue) {\
-  struct G_KEY gKey = { .gKeysComparison = INTRINSIC_VALUE__G_KEYS_COMPARISON,
+static inline struct GS_KEY m_GsKey2(GENERIC_INTEGER en_intrinsicValue) {\
+  struct GS_KEY gsKey = { .gsKeysComparison = INTRINSIC_VALUE__GS_KEYS_COMPARISON,
     .bare.cen_intrinsicValue = en_intrinsicValue }; 
-  return gKey;
-} // GKey_PString 
+  return gsKey;
+} // m_GsKey2 
 
 
 // Establish a g-key for 'acolyt (generic) values' comparison
@@ -371,11 +371,11 @@ static inline struct G_KEY m_GKey_IntrinsicValue(GENERIC_INTEGER en_intrinsicVal
 //
 // Ret:
 // - g-key
-static inline struct G_KEY m_GKey_AcolytValue(GENERIC_INTEGER en_acolytValue) {\
-  struct G_KEY gKey = { .gKeysComparison = ACOLYT_VALUE__G_KEYS_COMPARISON,
+static inline struct GS_KEY m_GsKey3(GENERIC_INTEGER en_acolytValue) {\
+  struct GS_KEY gsKey = { .gsKeysComparison = ACOLYT_VALUE__GS_KEYS_COMPARISON,
     .bare.cen_acolytValue = en_acolytValue }; 
-  return gKey;
-} // GKey_PString 
+  return gsKey;
+} // m_GsKey3
 
 // Establish a g-key for 'acolyt handles' comparison
 //
@@ -384,11 +384,11 @@ static inline struct G_KEY m_GKey_AcolytValue(GENERIC_INTEGER en_acolytValue) {\
 //
 // Ret:
 // - g-key
-static inline struct G_KEY m_GKey_AcolytHandle(void* nr_acolytHandle) {\
-  struct G_KEY gKey = { .gKeysComparison = ACOLYT_HANDLE__G_KEYS_COMPARISON,
+static inline struct GS_KEY m_GsKey4(void* nr_acolytHandle) {\
+  struct GS_KEY gsKey = { .gsKeysComparison = ACOLYT_HANDLE__GS_KEYS_COMPARISON,
     .bare.cnr_acolytHandle = nr_acolytHandle }; 
-  return gKey;
-} // GKey_PString 
+  return gsKey;
+} // m_GsKey4
 
 
 // #REF GStringsIndexRequest <gStringSet>
@@ -396,19 +396,19 @@ static inline struct G_KEY m_GKey_AcolytHandle(void* nr_acolytHandle) {\
 // Passed keys :
 // - cfps_keys1: (1st criterion) search key(s) value(s) of item (regarding index) ;
 //   not significant without actual index seek flag (INDEX_SEEK_FLAGS__ANY)
-//   type of comparison (see enum-G_KEYS_COMPARISON) must correspond to that assigned to index
+//   type of comparison (see enum-GS_KEYS_COMPARISON) must correspond to that assigned to index
 //   (see GStringsAddIndex() above) 
 // - ... (variadic parameters) : search key(s) value(s) for other criteria...  
 int GStringsIndexRequest(G_STRINGS_HANDLE cp_handle,
   INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaNumber,
-  int indexLabel1, unsigned int indexSeekFlags1, const struct G_KEY *cfps_keys1, ...);
+  int indexLabel1, unsigned int indexSeekFlags1, const struct GS_KEY *cfps_keys1, ...);
 
 
 // #SEE m_GRequestCriterion  
-static inline struct G_REQUEST_CRITERION m_GRequestCriterion_GKeys(int indexLabel,
-  unsigned int indexSeekFlags, const struct G_KEY* cfps_keys, unsigned int u_criteriaOpFlags) {
+static inline struct G_REQUEST_CRITERION m_GRequestCriterion_GsKeys(int indexLabel,
+  unsigned int indexSeekFlags, const struct GS_KEY* cfps_keys, unsigned int u_criteriaOpFlags) {
   return m_GRequestCriterion(indexLabel,indexSeekFlags, cfps_keys, u_criteriaOpFlags);
-} // m_GRequestCriterion_GKeys
+} // m_GRequestCriterion_GsKeys
 
 // #SEE GStringsIndexRequest <gStringSet>
 int GStringsIndexRequestR(G_STRINGS_HANDLE cp_handle,
@@ -427,7 +427,7 @@ int GStringsIndexFetch(G_STRINGS_HANDLE cp_handle,
 // #SEE GStringsIndexFetch <gStringSet>
 static inline int m_GStringsIndexSingleFetch(G_STRINGS_HANDLE cp_handle, 
   INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, 
-  int indexLabel, unsigned int indexSeekFlags, const struct G_KEY *cfps_keys,
+  int indexLabel, unsigned int indexSeekFlags, const struct GS_KEY *cfps_keys,
   unsigned int indexFetchFlags, g_G_STRING_SET_STUFF *acvnt_gStringSetStuff, int *nacvn_entry) {
   m_DIGGY_BOLLARD_S() 
   m_TRACK_IF(GStringsIndexRequest(cp_handle,nf_indexRequestAutomaticBuffer,1,indexLabel,

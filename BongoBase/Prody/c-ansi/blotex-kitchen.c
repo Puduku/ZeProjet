@@ -27,16 +27,16 @@ int BlotregCreateInstance(void **azhr_handle, struct P_STRING f_name, va_list ar
   m_TRACK_IF(l_GParamsCreateInstance(azh_handle,BATEAU__EXPECTED_ITEMS_NUMBER) !=
     RETURNED) 
   g_BLOTREG_HANDLE handle = *azh_handle;
-  m_ASSERT(g_GParamsAddIndex(handle,1,G_PARAM_NAME_ELEMENT,P_STRING__G_KEYS_COMPARISON,NULL,NULL,
+  m_ASSERT(g_GParamsAddIndex(handle,1,G_PARAM_NAME_ELEMENT,P_STRING__GS_KEYS_COMPARISON,NULL,NULL,
     (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) == NAME__BLOTREG_INDEX_LABEL)
-  m_ASSERT(g_GParamsAddIndex(handle,1,G_PARAM_NAME_ELEMENT,ACOLYT_VALUE__G_KEYS_COMPARISON,
+  m_ASSERT(g_GParamsAddIndex(handle,1,G_PARAM_NAME_ELEMENT,ACOLYT_VALUE__GS_KEYS_COMPARISON,
     (IS_CHAR_FUNCTION)UNDEFINED,(TO_CHAR_FUNCTION)UNDEFINED,
     (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) == TOKEN_ID__BLOTREG_INDEX_LABEL)
-  m_ASSERT(g_GParamsAddIndex(handle,1,G_PARAM_VALUE_ELEMENT,ACOLYT_VALUE__G_KEYS_COMPARISON,
+  m_ASSERT(g_GParamsAddIndex(handle,1,G_PARAM_VALUE_ELEMENT,ACOLYT_VALUE__GS_KEYS_COMPARISON,
     (IS_CHAR_FUNCTION)UNDEFINED,(TO_CHAR_FUNCTION)UNDEFINED,
     (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) ==
     INT_VALUE__BLOTREG_INDEX_LABEL)
-  m_ASSERT(g_GParamsAddIndex(handle,1,G_PARAM_VALUE_ELEMENT, P_STRING__G_KEYS_COMPARISON,NULL,NULL,
+  m_ASSERT(g_GParamsAddIndex(handle,1,G_PARAM_VALUE_ELEMENT, P_STRING__GS_KEYS_COMPARISON,NULL,NULL,
     (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) ==
     STR_VALUE__BLOTREG_INDEX_LABEL)
  m_DIGGY_RETURN(RETURNED)
@@ -65,19 +65,19 @@ int FetchBlotvar(const struct BLOTVAR_REFERENCE *ap_blotvarReference, char b_lVa
   switch (ap_blotvarReference->n_specifierFlag) {
   case NAME__SPECIFIER_FLAG:
   case TOKEN_ID__SPECIFIER_FLAG:
-    { struct G_KEY gKey ;
+    { struct GS_KEY gsKey ;
       int indexLabel = UNDEFINED;
       if (ap_blotvarReference->n_specifierFlag == NAME__SPECIFIER_FLAG) {
         indexLabel = NAME__BLOTREG_INDEX_LABEL;
 m_DIGGY_VAR_P_STRING(ap_blotvarReference->c_select.c_name)
-        gKey = m_GKey_PString(ap_blotvarReference->c_select.c_name);
+        gsKey = m_GsKey(ap_blotvarReference->c_select.c_name);
       } else {
         indexLabel = TOKEN_ID__BLOTREG_INDEX_LABEL;
-        gKey = m_GKey_AcolytValue(ap_blotvarReference->c_select.c_tokenId);
+        gsKey = m_GsKey3(ap_blotvarReference->c_select.c_tokenId);
       } // if
 m_DIGGY_VAR_P(ap_blotvarReference->blotregHandle)
       switch (gm_BlotregIndexSingleFetch(ap_blotvarReference->blotregHandle,NULL,indexLabel,
-        INDEX_SEEK_FLAGS__EQUAL,&gKey,b_lValue?  INDEX_FETCH_FLAGS__FETCH:
+        INDEX_SEEK_FLAGS__EQUAL,&gsKey,b_lValue?  INDEX_FETCH_FLAGS__FETCH:
         INDEX_FETCH_FLAGS__SEEK_ONLY, ant_blotvarStuff, navn_entry)) {
       case RESULT__FOUND:
       break; case RESULT__NOT_FOUND:
@@ -95,7 +95,7 @@ m_DIGGY_VAR_P(ap_blotvarReference->blotregHandle)
       break; default:
         m_TRACK()
       } // switch
-    } // gKey 
+    } // gsKey 
   break; case ENTRY__SPECIFIER_FLAG:
     m_ASSERT(g_BlotregFetch(ap_blotvarReference->blotregHandle,
       ap_blotvarReference->c_select.c_entry, ant_blotvarStuff) ==
@@ -306,7 +306,8 @@ int DelimitBlotregRequest(struct P_STRING *a_sequence,const char *np_sequenceTyp
 m_DIGGY_VAR_P_STRING(*a_sequence)
   m_PREPARE_ABANDON(a_sequence, (np_sequenceType != NULL? np_sequenceType:"<blotreg request>"))
 
-  o_PParseTillMatch(a_sequence,FLAG_OFF0,o_PString(":?"),NULL, ac_blotregRequestSequence);
+  m_TRACK_IF(PParseTillMatch(a_sequence,FLAG_OFF0,o_PString(":?"),NULL, ac_blotregRequestSequence)
+    != RETURNED)
 m_DIGGY_VAR_P_STRING(*ac_blotregRequestSequence)
 m_DIGGY_VAR_P_STRING(*a_sequence)
   if (b_EMPTY_P_STRING(*a_sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
@@ -322,7 +323,8 @@ int DelimitCreationSequence(struct P_STRING *a_sequence, const char *p_sequenceT
 m_DIGGY_VAR_P_STRING(*a_sequence)
   m_PREPARE_ABANDON(a_sequence,p_sequenceType)
 
-  o_PParseTillMatch(a_sequence,FLAG_OFF0,o_PString("]?"),NULL, ac_creationSequence);
+  m_TRACK_IF(PParseTillMatch(a_sequence,FLAG_OFF0,o_PString("]?"),NULL, ac_creationSequence) !=
+    RETURNED)
 m_DIGGY_VAR_P_STRING(*ac_creationSequence)
 m_DIGGY_VAR_P_STRING(*a_sequence)
   if (b_EMPTY_P_STRING(*a_sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
@@ -366,11 +368,11 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
 // Passed:
 // - as:
 // - nap_blotexValue: NULL special pointer => NO actual criterion
-// - cac_gKey: only significant if actual criterion
+// - cac_gsKey: only significant if actual criterion
 // 
 // Changed:
 // - *ac_blotregIndexLabel: only significant if no abandon
-// - *cac_gKey: only significant if no abandon
+// - *cac_gsKey: only significant if no abandon
 // - nc_abandonmentInfo: only significant if abandon
 // 
 // Ret: parsed successfully ? 
@@ -378,7 +380,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
 // - ANSWER__NO: 'str/int mismatch' error; abandon processing 
 // - 1: unexpected problem; anomaly is raised
 static inline int m_AsBlotregIndex(int as, const struct BLOTEX_VALUE* nap_blotexValue,
-  int *ac_blotregIndexLabel, struct G_KEY* cac_gKey, G_STRING_STUFF nc_abandonmentInfo) { 
+  int *ac_blotregIndexLabel, struct GS_KEY* cac_gsKey, G_STRING_STUFF nc_abandonmentInfo) { 
   m_DIGGY_BOLLARD()
 
   switch (as) {
@@ -399,18 +401,18 @@ m_RAISE(ANOMALY__NOT_AVAILABLE)
     switch (as) {
     case AS__VALUE_INT: // [ '#' ]
       if (nap_blotexValue->b_strValue) m_ABANDON_S(EXPECT_INTEX__ABANDONMENT_CAUSE)
-      *cac_gKey = m_GKey_AcolytValue(nap_blotexValue->select.c_blotval); 
+      *cac_gsKey = m_GsKey3(nap_blotexValue->select.c_blotval); 
     break; case AS__ENTRY: // '!#' (r-value) 
       if (nap_blotexValue->b_strValue) m_ABANDON_S(EXPECT_INTEX__ABANDONMENT_CAUSE)
 m_RAISE(ANOMALY__NOT_AVAILABLE)
     break; case AS__ID: // '!' 
-      *cac_gKey = m_GKey_AcolytValue(nap_blotexValue->select.c_blotval); 
+      *cac_gsKey = m_GsKey3(nap_blotexValue->select.c_blotval); 
     break; case AS__VALUE_STR: // '$'
       if (!nap_blotexValue->b_strValue) m_ABANDON_S(EXPECT_STREX__ABANDONMENT_CAUSE)
-      *cac_gKey = m_GKey_PString(nap_blotexValue->select.c_strex.v_str);
+      *cac_gsKey = m_GsKey(nap_blotexValue->select.c_strex.v_str);
     break; case AS__NAME:  // '!$'
       if (!nap_blotexValue->b_strValue) m_ABANDON_S(EXPECT_STREX__ABANDONMENT_CAUSE)
-      *cac_gKey = m_GKey_PString(nap_blotexValue->select.c_strex.v_str);
+      *cac_gsKey = m_GsKey(nap_blotexValue->select.c_strex.v_str);
     break; default: m_RAISE(ANOMALY__VALUE__D,as)
     } // switch
   } // if
@@ -420,22 +422,22 @@ m_RAISE(ANOMALY__NOT_AVAILABLE)
 
 // See .h 
 int ParseBlotregRequestAtomEnd(struct P_STRING *a_sequence, int as, int indexSeekFlags,
-  struct G_KEY gKeys5[5], struct G_REQUEST_CRITERION criteria5[5], int *a_criteriaNumber,
+  struct GS_KEY gsKeys5[5], struct G_REQUEST_CRITERION criteria5[5], int *a_criteriaNumber,
   struct BLOTEX_VALUE c_blotexValue, G_STRING_STUFF nc_abandonmentInfo) { 
   m_DIGGY_BOLLARD()
   int blotregIndexLabel = UNDEFINED;
 
   m_ASSERT(*a_criteriaNumber < 5)
-  struct G_KEY *gKeyPtr = gKeys5 + *a_criteriaNumber;
+  struct GS_KEY *gsKeyPtr = gsKeys5 + *a_criteriaNumber;
   struct G_REQUEST_CRITERION *criterionPtr = criteria5 + (*a_criteriaNumber)++;
 
   m_CHECK_ABANDON(m_AsBlotregIndex(as,indexSeekFlags != INDEX_SEEK_FLAGS__ANY?
-    &c_blotexValue: NULL,&blotregIndexLabel,gKeyPtr, nc_abandonmentInfo))
+    &c_blotexValue: NULL,&blotregIndexLabel,gsKeyPtr, nc_abandonmentInfo))
 
   int criteriaOpFlags = UNDEFINED;
   m_TRACK_IF(ParseLogical2Op(a_sequence, &criteriaOpFlags) != RETURNED)
 
-  *criterionPtr = m_GRequestCriterion_GKeys(blotregIndexLabel,indexSeekFlags,gKeyPtr,
+  *criterionPtr = m_GRequestCriterion_GsKeys(blotregIndexLabel,indexSeekFlags,gsKeyPtr,
     criteriaOpFlags);
 
   m_DIGGY_RETURN(ANSWER__YES)
@@ -965,9 +967,9 @@ int ParseLValueBlotregOps(
 } // ParseLValueBlotregOps
 
 // See .h
-char ob_ParseBlotexAssignation(struct P_STRING *a_sequence, struct P_STRING *ac_subSequence) {
+signed char b_ParseBlotexAssignation(struct P_STRING *a_sequence, struct P_STRING *ac_subSequence) {
   m_DIGGY_BOLLARD()
-  o_PParseTillMatch(a_sequence,QUOTED__SCAN_FLAG,o_PString(":="),NULL,ac_subSequence);
+  m_TRACK_IF(PParseTillMatch(a_sequence,QUOTED__SCAN_FLAG,o_PString(":="),NULL,ac_subSequence) != RETURNED)
   char b_assignation = !b_EMPTY_P_STRING(*a_sequence);
   if (b_assignation) { 
     PParseOffset(a_sequence,2,NULL);
@@ -977,7 +979,7 @@ char ob_ParseBlotexAssignation(struct P_STRING *a_sequence, struct P_STRING *ac_
   om_PParsePassSpaces(a_sequence,NULL); // TODO: ag virer ???
   
   m_DIGGY_RETURN(b_assignation)
-} // ob_ParseBlotexAssignation
+} // b_ParseBlotexAssignation
 
 
 // Public function; see .h

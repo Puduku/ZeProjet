@@ -252,10 +252,10 @@ static int BlotcodeFindBlotkeyw (BLOTCODE_HANDLE p_handle,
   m_INDEX_REQUEST_AUTOMATIC_BUFFER(indexRequestAutomaticBuffer)
   G_STRING_STUFF t_blotkeywStuff = (G_STRING_STUFF) UNDEFINED;
 
-  struct G_KEY gKey = m_GKey_PString(*ap_litteralKeyw); 
+  struct GS_KEY gsKey = m_GsKey(*ap_litteralKeyw); 
 
   int result = gm_GTokensIndexSingleFetch(p_handle->h_blotkeywsHandle, indexRequestAutomaticBuffer,
-    INDEX_LABEL0,INDEX_SEEK_FLAGS__EQUAL,&gKey,INDEX_FETCH_FLAGS__READ_ONLY,&t_blotkeywStuff,
+    INDEX_LABEL0,INDEX_SEEK_FLAGS__EQUAL,&gsKey,INDEX_FETCH_FLAGS__READ_ONLY,&t_blotkeywStuff,
     NULL); 
   switch(result) { 
   case RESULT__FOUND:
@@ -649,7 +649,8 @@ int BlotcodeExecutorParseTemplate (BLOTCODE_EXECUTOR_HANDLE handle,
 m_DIGGY_VAR_P_STRING(fp_template)
 m_DIGGY_VAR_D(b_blotblog)
     if (!b_blotblog) {
-      o_PParseTillMatch(&fp_template,IGNORE_QUOTED__SCAN_FLAGS,o_PString("##<<"),NULL, &decor);
+      m_TRACK_IF(PParseTillMatch(&fp_template,IGNORE_QUOTED__SCAN_FLAGS,o_PString("##<<"),NULL,
+        &decor) != RETURNED)
       if (!b_EMPTY_P_STRING(decor)) {
         v_templatePartitionEntry = GreenCollectionFetch(handle->h_templatePartitionsHandle, -1,
           (char**)&ti_templatePartitionStuff);

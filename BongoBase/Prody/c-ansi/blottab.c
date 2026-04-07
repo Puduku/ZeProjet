@@ -52,7 +52,7 @@ int BlottabCreateInstance(BLOTTAB_HANDLE *azh_handle, int fieldsNumber,
     BLOTTAB_FIELD_ATTRIBUTE_ELEMENTS_NUMBER, VALUED_STRING__G_STRING_CONVEYANCE,
     (const int *)UNDEFINED, (NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION)UNDEFINED) != RETURNED)
   m_ASSERT(GStringsAddIndex(handle->hp_fieldAttributesHandle,1,
-    0,P_STRING__G_KEYS_COMPARISON,(IS_CHAR_FUNCTION)NULL,(TO_CHAR_FUNCTION)NULL,
+    0,P_STRING__GS_KEYS_COMPARISON,(IS_CHAR_FUNCTION)NULL,(TO_CHAR_FUNCTION)NULL,
     (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) == INDEX_LABEL0)
 
   g_G_STRING_SET_STUFF fieldAttributeStuff = (g_G_STRING_SET_STUFF)UNDEFINED; 
@@ -63,11 +63,11 @@ int BlottabCreateInstance(BLOTTAB_HANDLE *azh_handle, int fieldsNumber,
     m_TRACK_IF(GStringCopy(fieldAttributeStuff,0, s_names[i]) < 0) 
     fieldAttributeStuff->acolyt.cen_value = s_blottabIndexFlags[i] ; 
     if (b_FLAG_SET_ON(s_blottabIndexFlags[i],STR__BLOTTAB_INDEX_FLAG)) m_TRACK_IF((c_indexLabel =
-      GStringsAddIndex(handle->h_tableHandle,1,i, P_STRING__G_KEYS_COMPARISON,NULL,NULL,
+      GStringsAddIndex(handle->h_tableHandle,1,i, P_STRING__GS_KEYS_COMPARISON,NULL,NULL,
       (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED, (void*)UNDEFINED)) < 0)
     fieldAttributeStuff[BLOTTAB_FIELD_ATTRIBUTE_STR_INDEX_ELEMENT].acolyt.cen_value = c_indexLabel ;
     if (b_FLAG_SET_ON(s_blottabIndexFlags[i],INT__BLOTTAB_INDEX_FLAG)) m_TRACK_IF((c_indexLabel =
-      GStringsAddIndex(handle->h_tableHandle,1,i,ACOLYT_VALUE__G_KEYS_COMPARISON ,NULL,NULL,
+      GStringsAddIndex(handle->h_tableHandle,1,i,ACOLYT_VALUE__GS_KEYS_COMPARISON ,NULL,NULL,
       (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED)) < 0)
     fieldAttributeStuff[BLOTTAB_FIELD_ATTRIBUTE_INT_INDEX_ELEMENT].acolyt.cen_value = c_indexLabel ;
   } // for
@@ -133,7 +133,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
   m_TRACK_IF(ParseAsValue(a_sequence, acb_strValue) != RETURNED)  
   if (*acb_strValue == -1) *acb_strValue = b_INT_VALUE;
 
-  const struct G_KEY p_fieldKey = m_GKey_PString(fieldName);
+  const struct GS_KEY p_fieldKey = m_GsKey(fieldName);
   int result = UNDEFINED;
   int entry = UNDEFINED;
   switch (result = m_GStringsIndexSingleFetch(fieldAttributesHandle,(INDEX_REQUEST_AUTOMATIC_BUFFER)NULL,
@@ -318,7 +318,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
 
   m_PRECISE_ABANDON(&subSequence, "<blottab request atom>") 
   struct BLOTEX_VALUE blotexValue = UNDEFINED_BLOTEX_VALUE; 
-  struct G_KEY gKey = { UNDEFINED }; // TODO: bugged => gKeys5 
+  struct GS_KEY gsKey = { UNDEFINED }; // TODO: bugged => gsKeys5 
   do {
     signed char b_strValue = (char)UNDEFINED;  
     int tableIndexLabel = UNDEFINED;
@@ -338,9 +338,9 @@ m_DIGGY_VAR_P_STRING(subSequence)
         b_strValue), &blotexValue, nc_abandonmentInfo))
       if (b_strValue) {
 m_DIGGY_VAR_P_STRING(blotexValue.select.c_strex.v_str)
-        gKey = m_GKey_PString(blotexValue.select.c_strex.v_str);
+        gsKey = m_GsKey(blotexValue.select.c_strex.v_str);
       } else {
-        gKey = m_GKey_AcolytValue(blotexValue.select.c_blotval); 
+        gsKey = m_GsKey3(blotexValue.select.c_blotval); 
       } // if
     } // if
 m_DIGGY_VAR_INDEX_SEEK_FLAGS(n_indexSeekFlags)
@@ -350,8 +350,8 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(n_indexSeekFlags)
 m_DIGGY_VAR_P_STRING(subSequence)
 
     m_ASSERT(criteriaNumber < 5)
-    criteria5[criteriaNumber++] = m_GRequestCriterion_GKeys(tableIndexLabel,
-      n_indexSeekFlags,&gKey, criteriaOpFlags);
+    criteria5[criteriaNumber++] = m_GRequestCriterion_GsKeys(tableIndexLabel,
+      n_indexSeekFlags,&gsKey, criteriaOpFlags);
   } while (!ob_EmptySequence(&subSequence)) ; 
 
   switch (GStringsIndexRequestR(blottabHandle->h_tableHandle,NULL,criteriaNumber,criteria5)) {

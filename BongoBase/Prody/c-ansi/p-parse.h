@@ -47,7 +47,7 @@ int o_PParseSequence(struct P_STRING *a_sequence, const char* scanPtr, struct P_
 int o_PParsePassSingleChar(struct P_STRING *a_sequence, IS_CHAR_FUNCTION n_isCharFunction, char c_char,
   struct P_STRING* na_lexeme) ;
 
-// Parse a string portion sequence according to chars scanned by ScanPString() function. 
+// Parse a string portion sequence according to chars scanned by o_ScanPString() function.
 //
 // Passed:
 // - *a_sequence: as passed to (and updated by) ScanPString*() function
@@ -161,7 +161,8 @@ int PParseMatchAmongR(struct P_STRING* a_sequence, TO_CHAR_FUNCTION n_toCharFunc
 //
 // Ret:
 // - RETURNED
-int o_PParseTillMatch(struct P_STRING* a_sequence, int scanFlags, struct P_STRING p_token,
+// - -1 special value: anomaly is raised
+int PParseTillMatch(struct P_STRING* a_sequence, int scanFlags, struct P_STRING p_token,
   TO_CHAR_FUNCTION n_toCharFunction, struct P_STRING*  na_lexeme) ;
 
 // Parse a string portion sequence according to sub strings (tokens) list scanned by
@@ -189,7 +190,8 @@ int o_PParseTillMatch(struct P_STRING* a_sequence, int scanFlags, struct P_STRIN
 //
 // Ret:
 // - RETURNED
-int o_PParseTillFirstMatchR(struct P_STRING* a_sequence, int scanFlags,
+// - -1 special value: anomaly is raised
+int PParseTillFirstMatchR(struct P_STRING* a_sequence, int scanFlags,
   TO_CHAR_FUNCTION n_toCharFunction, int* navn_matchedEntry, int* cnavn_matchedId,
   struct P_STRING* na_lexeme, int tokensCount, struct P_STRING*  sp_tokens, int*  nsn_ids) ;
 
@@ -205,8 +207,8 @@ int o_PParseTillFirstMatchR(struct P_STRING* a_sequence, int scanFlags,
   /*TO_CHAR_FUNCTION*/ n_toCharFunction,/*int* */navn_matchedEntry, /*struct P_STRING* */na_lexeme,\
   /*int*/ tokensCount, /*const char* p_token0, */ ...) {\
   m_LOCAL_P_STRINGS(sp_localTokens,tokensCount,__VA_ARGS__)\
-  o_PParseTillFirstMatchR(&(m_sequence),scanFlags,n_toCharFunction,navn_matchedEntry,\
-    (int*)UNDEFINED, na_lexeme, tokensCount, sp_localTokens, NULL);\
+  m_TRACK_IF(PParseTillFirstMatchR(&(m_sequence),scanFlags,n_toCharFunction,navn_matchedEntry,\
+    (int*)UNDEFINED, na_lexeme, tokensCount, sp_localTokens, NULL) != RETURNED)\
 } 
 
 // 5. PParse*() functions: miscellaneous parsing 

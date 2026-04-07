@@ -225,14 +225,11 @@ int ComparePStringsAmongR(struct P_STRING pString1,
 } // ComparePStringsAmongR
 
 
-
-
 #undef CURRENT_TRACKING_VALUE
 #define CURRENT_TRACKING_VALUE NULL 
 
-
 // Public function : see description in .h
-const char *ScanPString(struct P_STRING pString, int scanFlags, IS_CHAR_FUNCTION n_isCharFunction,
+const char *o_ScanPString(struct P_STRING pString, int scanFlags, IS_CHAR_FUNCTION n_isCharFunction,
   int c_char) {
   m_DIGGY_BOLLARD()
   const char *ptr = (const char*)UNDEFINED;
@@ -308,12 +305,11 @@ const char *ScanPString(struct P_STRING pString, int scanFlags, IS_CHAR_FUNCTION
 #undef b_PASS_CHAR2
 
   m_DIGGY_RETURN(ptr)
-}  // ScanPString
-
+}  // o_ScanPString
 
 
 // Public function : see description in .h
-const char *o_ScanPStringTillMatch(struct P_STRING pString, int scanFlags,
+const char *ScanPStringTillMatch(struct P_STRING pString, int scanFlags,
   struct P_STRING subPString, TO_CHAR_FUNCTION n_toCharFunction) {
   m_DIGGY_BOLLARD()
 
@@ -330,6 +326,7 @@ const char *o_ScanPStringTillMatch(struct P_STRING pString, int scanFlags,
         struct P_STRING ptrPString = o_PString2(ptr,subLength);
         int comparison = ComparePStrings(ptrPString,  subPString,  NULL,
           n_toCharFunction, !b_SUB_STRING_2); 
+        m_TRACK_IF(comparison < 0) 
         if (comparison == EQUAL_TO__COMPARISON) break ;
       }  // if
     } // while 
@@ -342,17 +339,18 @@ const char *o_ScanPStringTillMatch(struct P_STRING pString, int scanFlags,
         struct P_STRING ptrPString = o_PString2(ptr,subLength);
         int comparison = ComparePStrings(ptrPString,  subPString,  NULL,
           n_toCharFunction, !b_SUB_STRING_2); 
+        m_TRACK_IF(comparison < 0) 
         if (comparison == EQUAL_TO__COMPARISON) break ;
       }  // if
     } // while 
   } // if
 
   m_DIGGY_RETURN(ptr) 
-} // o_ScanPStringTillMatch
+} // ScanPStringTillMatch
 
 
 // Public function : see description in .h
-const char *o_ScanPStringTillFirstMatchR(struct P_STRING pString, int scanFlags,
+const char *ScanPStringTillFirstMatchR(struct P_STRING pString, int scanFlags,
   TO_CHAR_FUNCTION n_toCharFunction, int *navn_matchedEntry, int *cnavn_matchedId,
   int subStringsCount, const struct P_STRING sp_subPStrings[], int nsn_ids[]) {
   m_DIGGY_BOLLARD()
@@ -369,6 +367,7 @@ const char *o_ScanPStringTillFirstMatchR(struct P_STRING pString, int scanFlags,
       } else {
         int comparison = ComparePStringsAmongR(pString,(IS_CHAR_FUNCTION)NULL,n_toCharFunction,
           b_SUB_STRING_2,navn_matchedEntry,cnavn_matchedId, subStringsCount,sp_subPStrings, nsn_ids);
+        m_TRACK_IF(comparison < 0)
         if (comparison == EQUAL_TO__COMPARISON) break ;
         pString.string++; 
         b_inside = (!b_EMPTY_P_STRING(pString) && *pString.string == '"');\
@@ -378,13 +377,14 @@ const char *o_ScanPStringTillFirstMatchR(struct P_STRING pString, int scanFlags,
     while (!b_EMPTY_P_STRING(pString)) {
       int comparison = ComparePStringsAmongR(pString,(IS_CHAR_FUNCTION)NULL,n_toCharFunction,
         b_SUB_STRING_2,navn_matchedEntry,cnavn_matchedId, subStringsCount,sp_subPStrings, nsn_ids);
+      m_TRACK_IF(comparison < 0)
       if (comparison == EQUAL_TO__COMPARISON) break ;
       pString.string++; 
     } // while 
   } // if
 
   m_DIGGY_RETURN(pString.string) 
-} // o_ScanPStringTillFirstMatchR
+} // ScanPStringTillFirstMatchR
 
 // Public function : see description in .h
 const char *ScanPStringTillFirstMatchV(struct P_STRING pString, int scanFlags,
@@ -398,8 +398,10 @@ const char *ScanPStringTillFirstMatchV(struct P_STRING pString, int scanFlags,
   int *n_idPtr = sn_ids; 
   int i = 0; while (i++ < subStringsCount) *(subPStringPtr++) = va_arg(subPStringsIds,
     struct P_STRING), *(n_idPtr++) = va_arg(subPStringsIds,int) ;
-  m_DIGGY_RETURN(o_ScanPStringTillFirstMatchR(pString,scanFlags,n_toCharFunction,navn_matchedEntry,
-    navn_matchedId,subStringsCount,s_subPStrings,sn_ids))
+  const char *ret = ScanPStringTillFirstMatchR(pString,scanFlags,n_toCharFunction,navn_matchedEntry,
+    navn_matchedId,subStringsCount,s_subPStrings,sn_ids);
+  m_TRACK_IF(ret == NULL)
+  m_DIGGY_RETURN(ret)
 } // ScanPStringTillFirstMatchV
 
 // Public function : see description in .h

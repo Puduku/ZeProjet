@@ -328,7 +328,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
 
   m_CHECK_ABANDON(DelimitBlotregRequest(a_sequence,NULL,&subSequence,nc_abandonmentInfo))
   struct BLOTEX_VALUE blotexValue = UNDEFINED_BLOTEX_VALUE ; 
-  struct G_KEY gKeys5[5] ;
+  struct GS_KEY gsKeys5[5] ;
   struct G_REQUEST_CRITERION criteria5[5] ;  
   do {
     int as = UNDEFINED;  
@@ -341,7 +341,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
         nc_abandonmentInfo))
 
 m_DIGGY_VAR_INDEX_SEEK_FLAGS(indexSeekFlags)
-     m_CHECK_ABANDON(ParseBlotregRequestAtomEnd(&subSequence,as,indexSeekFlags,gKeys5,criteria5,
+     m_CHECK_ABANDON(ParseBlotregRequestAtomEnd(&subSequence,as,indexSeekFlags,gsKeys5,criteria5,
       &criteriaNumber, blotexValue, nc_abandonmentInfo))
   } while (!ob_EmptySequence(&subSequence)) ; 
 
@@ -925,7 +925,9 @@ static inline int m_BlotexlibExecutorExecuteCFunctionEval(BLOTEXLIB_EXECUTOR_HAN
 
   m_PREPARE_ABANDON(&arguments, "Eval") 
   { struct P_STRING c_subSequence = UNDEFINED_P_STRING;
-    if (ob_ParseBlotexAssignation(&arguments, &c_subSequence)) {
+    signed char b_blotexAssignation = b_ParseBlotexAssignation(&arguments, &c_subSequence);
+    m_TRACK_IF(b_blotexAssignation == -1)
+    if (b_blotexAssignation) {
       b_lValueReference = b_TRUE;
       m_CHECK_ABANDON(m_BlotexlibExecutorProbeBlotexRef(handle,&c_subSequence,
         &n_fieldReferenceBlottabsLabel, &cc_lValueBlotvarReference,&cc_lValueAs,

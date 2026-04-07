@@ -63,9 +63,9 @@ int NamedObjectsAddNamedObject(NAMED_OBJECTS_HANDLE handle, struct P_STRING name
   void *nhr_namedObjectHandle, g_NAMED_OBJECT_STUFF *at_namedObjectStuff, ...){ 
   m_DIGGY_BOLLARD()
   int completed = COMPLETED__OK; // a priori
-  struct G_KEY gKey = m_GKey_PString(name);
+  struct GS_KEY gsKey = m_GsKey(name);
   switch (m_GStringsIndexSingleFetch(handle->h_gStringsHandle,NULL,INDEX_LABEL0,
-    INDEX_SEEK_FLAGS__EQUAL,&gKey, INDEX_FETCH_FLAGS__FETCH,at_namedObjectStuff,NULL)) {
+    INDEX_SEEK_FLAGS__EQUAL,&gsKey, INDEX_FETCH_FLAGS__FETCH,at_namedObjectStuff,NULL)) {
   case RESULT__FOUND:
     completed = COMPLETED__BUT;
   break; case RESULT__NOT_FOUND:
@@ -87,9 +87,9 @@ int NamedObjectsGetNamedObject(NAMED_OBJECTS_HANDLE handle, struct P_STRING name
   void **acvnr_namedObjectHandle){ 
   m_DIGGY_BOLLARD()
   g_NAMED_OBJECT_STUFF ct_namedObjectStuff = (g_NAMED_OBJECT_STUFF)UNDEFINED;
-  struct G_KEY gKey = m_GKey_PString(name);
+  struct GS_KEY gsKey = m_GsKey(name);
   int result = m_GStringsIndexSingleFetch(handle->h_gStringsHandle,NULL,INDEX_LABEL0,
-    INDEX_SEEK_FLAGS__EQUAL,&gKey, INDEX_FETCH_FLAGS__SEEK_ONLY,&ct_namedObjectStuff,NULL);
+    INDEX_SEEK_FLAGS__EQUAL,&gsKey, INDEX_FETCH_FLAGS__SEEK_ONLY,&ct_namedObjectStuff,NULL);
   switch (result) {
   case RESULT__FOUND:
     *acvnr_namedObjectHandle = ct_namedObjectStuff->acolyt.cnhr_handle;

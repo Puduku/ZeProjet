@@ -487,7 +487,7 @@ int ParseBlotregRequestAtom(struct P_STRING *a_sequence, int *ac_as, int *ac_ind
 // - *a_sequence: before parsing 
 // - as: 
 // - indexSeekFlags:
-// - gKeys5:
+// - gsKeys5:
 // - criteria5:
 // - *a_criteriaNumber:
 // - c_blotexValue: only significant with actual criterion (i.e indexSeekFlags !=
@@ -495,7 +495,7 @@ int ParseBlotregRequestAtom(struct P_STRING *a_sequence, int *ac_as, int *ac_ind
 // 
 // Changed:
 // - *a_sequence: after parsing 
-// - gKeys5:
+// - gsKeys5:
 // - criteria5:
 // - *a_criteriaNumber:
 // - nc_abandonmentInfo: only significant if abandon
@@ -505,7 +505,7 @@ int ParseBlotregRequestAtom(struct P_STRING *a_sequence, int *ac_as, int *ac_ind
 // - ANSWER__NO: 'str/int mismatch' error; abandon processing 
 // - 1: unexpected problem; anomaly is raised
 int ParseBlotregRequestAtomEnd(struct P_STRING *a_sequence, int as, int indexSeekFlags,
- struct G_KEY gKeys5[5], struct G_REQUEST_CRITERION criteria5[5], int *a_criteriaNumber,
+ struct GS_KEY gsKeys5[5], struct G_REQUEST_CRITERION criteria5[5], int *a_criteriaNumber,
  struct BLOTEX_VALUE c_blotexValue, G_STRING_STUFF nc_abandonmentInfo) ; 
 
 
@@ -965,7 +965,7 @@ int ParseLValueBlotregOps(struct P_STRING *a_sequence, struct P_STRING blotregNa
 // - *ac_subSequence: only significant if assignation
 //
 // Ret: Assignation ? (TRUE / FALSE) 
-char ob_ParseBlotexAssignation(struct P_STRING *a_sequence, struct P_STRING *ac_subSequence) ; 
+signed char b_ParseBlotexAssignation(struct P_STRING *a_sequence, struct P_STRING *ac_subSequence);
 
 
 // Parse <str portion> (start) [K]
@@ -976,7 +976,8 @@ char ob_ParseBlotexAssignation(struct P_STRING *a_sequence, struct P_STRING *ac_
 // Changed:
 // - *a_sequence: after parsing 
 //
-// Ret: <str portion> identified ? (TRUE / FALSE) 
+// Ret: <str portion> identified ?
+// - >= 0: (TRUE / FALSE) 
 char ob_ParseStrPortion(struct P_STRING *a_sequence) ;
 
 enum {

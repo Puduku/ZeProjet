@@ -114,7 +114,7 @@ static int GStringsTest (const char *p_vers3) {
   m_RAISE_IF(completed != COMPLETED__OK, ANOMALY__CORRUPTED_INDEXES)
 
   m_TRACK_IF(m_GStringsIndexSingleFetch(h_gStrings, (INDEX_REQUEST_AUTOMATIC_BUFFER)NULL,
-    NON_CASE__INDEX_LABEL, INDEX_SEEK_FLAGS__ANY, (const struct G_KEY*)UNDEFINED,
+    NON_CASE__INDEX_LABEL, INDEX_SEEK_FLAGS__ANY, (const struct GS_KEY*)UNDEFINED,
     INDEX_FETCH_FLAGS__READ_ONLY, &gStringStuff, NULL) != RESULT__FOUND)
   m_ASSERT(strcmp(gStringStuff->nhi_string,p_vers3) == 0)
 
@@ -134,7 +134,7 @@ static int GStringsTest (const char *p_vers3) {
     INDEX_FETCH_FLAGS__READ_NEXT, &gStringStuff, NULL) != RESULT__NOT_FOUND)
 
   m_TRACK_IF(m_GStringsIndexSingleFetch(h_gStrings, (INDEX_REQUEST_AUTOMATIC_BUFFER)NULL,
-    CASE__INDEX_LABEL, INDEX_SEEK_FLAGS__ANY, (const struct G_KEY*)UNDEFINED,
+    CASE__INDEX_LABEL, INDEX_SEEK_FLAGS__ANY, (const struct GS_KEY*)UNDEFINED,
     INDEX_FETCH_FLAGS__READ_ONLY, &gStringStuff, NULL) != RESULT__FOUND)
   m_ASSERT(strcmp(gStringStuff->nhi_string,LOWER_FOOTER) == 0)
 

@@ -226,7 +226,7 @@ static int TestsScanPString(void) {
 #define m_TEST_SCAN_P_STRING(/*const char* */p_string, /*int*/n_length, scanFlag1,\
   scanFlag2,  /*IS_CHAR_FUNCTION*/isCharFunction, /*int*/expectedOffset, b_expectLocated) {\
   struct P_STRING pString = o_PString2(p_string,n_length);\
-  retScan = ScanPString(pString,(scanFlag1)|(scanFlag2),isCharFunction,UNDEFINED);\
+  retScan = o_ScanPString(pString,(scanFlag1)|(scanFlag2),isCharFunction,UNDEFINED);\
   m_ASSERT((expectedOffset) == (retScan - p_string)) \
   m_ASSERT(retScan <= pString.stop) \
   int emb_located = b_SCAN_P_STRING_LOCATED(pString, retScan);\
@@ -284,7 +284,7 @@ static int TestsScanPStringTillMatch(void) {
   /*TO_CHAR_FUNCTION*/ n_toCharFunction,  /*int*/expectedOffset, b_expectLocated) {\
   struct P_STRING pString = o_PString2(p_string,n_length);\
   struct P_STRING subPString = o_PString2(p_subString,n_subLength);\
-  retScan = o_ScanPStringTillMatch(pString,ALL_FLAGS_OFF0, subPString, n_toCharFunction);\
+  retScan = ScanPStringTillMatch(pString,ALL_FLAGS_OFF0, subPString, n_toCharFunction);\
   m_ASSERT((expectedOffset) == (retScan - p_string)) \
   m_ASSERT(retScan <= pString.stop) \
   int emb_located = b_SCAN_P_STRING_LOCATED(pString, retScan);\

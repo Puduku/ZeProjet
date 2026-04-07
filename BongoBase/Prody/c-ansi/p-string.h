@@ -409,7 +409,7 @@ int ComparePStringsAmongR(struct P_STRING pString1,
 // Returned:
 // (!= NULL) scanning position ; use b_SCAN_P_STRING_LOCATED() below to check whether char
 // is actually located. 
-const char *ScanPString(struct P_STRING pString, int scanFlags, IS_CHAR_FUNCTION n_isCharFunction,
+const char *o_ScanPString(struct P_STRING pString, int scanFlags, IS_CHAR_FUNCTION n_isCharFunction,
   int c_char);
 
 
@@ -429,13 +429,14 @@ const char *ScanPString(struct P_STRING pString, int scanFlags, IS_CHAR_FUNCTION
 //     comparison is NOT possible
 //
 // Returned:
-// (!= NULL) scanning position; use b_SCAN_P_STRING_LOCATED() below to check whether
+// - NULL: anomaly is raised
+// - != NULL: scanning position; use b_SCAN_P_STRING_LOCATED() below to check whether
 // sub-string is actually located. 
-const char *o_ScanPStringTillMatch(struct P_STRING pString, int scanFlags, 
+const char *ScanPStringTillMatch(struct P_STRING pString, int scanFlags, 
   struct P_STRING subPString, TO_CHAR_FUNCTION n_toCharFunction);
 
 
-// Extend o_ScanPStringTillMatch "scanning" function : 
+// Extend ScanPStringTillMatch "scanning" function : 
 // Locate first matching sub-string, among DIFFERENT sub-strings. 
 //
 // Passed:
@@ -489,8 +490,9 @@ const char *ScanPStringTillFirstMatchV(struct P_STRING pString, int scanFlags,
 // - subPStringsIds:
 //
 // Returned:
-// - (!= NULL) scanning position
-const char *o_ScanPStringTillFirstMatchR(struct P_STRING pString, int scanFlags,
+// - NULL: anomaly is raised
+// - != NULL: scanning position
+const char *ScanPStringTillFirstMatchR(struct P_STRING pString, int scanFlags,
   TO_CHAR_FUNCTION n_toCharFunction, int *navn_matchedEntry, int *navn_matchedId,
   int subStringsCount, const struct P_STRING sp_subPStrings[], int nsn_ids[]) ;
 
@@ -589,7 +591,7 @@ if (emnh_heapString_ ## mx_pString != NULL) free(emnh_heapString_ ## mx_pString)
 
 
 // Wraps sscanf() 
-// NOTE: not be confused with ScanPString() declared above... 
+// NOTE: not be confused with o_ScanPString() declared above... 
 // 
 // Ret:
 // - 0 : number of param actualy read
