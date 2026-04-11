@@ -422,23 +422,21 @@ m_RAISE(ANOMALY__NOT_AVAILABLE)
 
 // See .h 
 int ParseBlotregRequestAtomEnd(struct P_STRING *a_sequence, int as, int indexSeekFlags,
-  struct GS_KEY gsKeys5[5], struct G_REQUEST_CRITERION criteria5[5], int *a_criteriaNumber,
+  struct GS_REQUEST_CRITERIA *a_criteria52, 
   struct BLOTEX_VALUE c_blotexValue, G_STRING_STUFF nc_abandonmentInfo) { 
   m_DIGGY_BOLLARD()
   int blotregIndexLabel = UNDEFINED;
 
-  m_ASSERT(*a_criteriaNumber < 5)
-  struct GS_KEY *gsKeyPtr = gsKeys5 + *a_criteriaNumber;
-  struct G_REQUEST_CRITERION *criterionPtr = criteria5 + (*a_criteriaNumber)++;
+struct GS_KEY c_gsKey = UNDEFINED_GS_KEY; // only significant if actual criterion 
 
   m_CHECK_ABANDON(m_AsBlotregIndex(as,indexSeekFlags != INDEX_SEEK_FLAGS__ANY?
-    &c_blotexValue: NULL,&blotregIndexLabel,gsKeyPtr, nc_abandonmentInfo))
+    &c_blotexValue: NULL,&blotregIndexLabel,&c_gsKey, nc_abandonmentInfo))
 
   int criteriaOpFlags = UNDEFINED;
   m_TRACK_IF(ParseLogical2Op(a_sequence, &criteriaOpFlags) != RETURNED)
 
-  *criterionPtr = m_GRequestCriterion_GsKeys(blotregIndexLabel,indexSeekFlags,gsKeyPtr,
-    criteriaOpFlags);
+  m_TRACK_IF(GsRequestCriteriaAddCriterion(a_criteria52, blotregIndexLabel,
+indexSeekFlags, c_gsKey,UNDEFINED_GS_KEY_PAR,criteriaOpFlags) < 0) 
 
   m_DIGGY_RETURN(ANSWER__YES)
 } // ParseBlotregRequestAtomEnd

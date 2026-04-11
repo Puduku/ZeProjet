@@ -285,6 +285,7 @@ int l_BlotexlibExecutorParseLValueBlottabSetOp(BLOTEXLIB_EXECUTOR_HANDLE handle,
   m_DIGGY_RETURN(answer)
 } // l_BlotexlibExecutorParseLValueBlottabSetOp
 
+
 // Parse and compute blottab request. 
 //
 // Passed:
@@ -309,8 +310,6 @@ static inline int ml_BlotexlibExecutorParseBlottabRequest(
 m_DIGGY_VAR_P_STRING(*a_sequence)
   m_PREPARE_ABANDON(a_sequence, "<blottab request>") 
 
-  int criteriaNumber = 0;
-  struct G_REQUEST_CRITERION criteria5[5] ;  
   struct P_STRING subSequence = UNDEFINED_P_STRING; 
 
   m_CHECK_ABANDON(DelimitBlotregRequest(a_sequence,"<blottab request>",&subSequence,
@@ -318,9 +317,10 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
 
   m_PRECISE_ABANDON(&subSequence, "<blottab request atom>") 
   struct BLOTEX_VALUE blotexValue = UNDEFINED_BLOTEX_VALUE; 
-  struct GS_KEY gsKey = { UNDEFINED }; // TODO: bugged => gsKeys5 
+  struct GS_REQUEST_CRITERIA criteria52 = m_GsRequestCriteria0();
   do {
     signed char b_strValue = (char)UNDEFINED;  
+    struct GS_KEY c_gsKey = UNDEFINED_GS_KEY; // Only significant with actual criterion
     int tableIndexLabel = UNDEFINED;
     // <blottab request atom int> | <blottab request atom str> ...
     m_CHECK_ABANDON(ParseAndRetrieveBlottabElement(&subSequence, blottabHandle->hp_fieldAttributesHandle,
@@ -338,9 +338,9 @@ m_DIGGY_VAR_P_STRING(subSequence)
         b_strValue), &blotexValue, nc_abandonmentInfo))
       if (b_strValue) {
 m_DIGGY_VAR_P_STRING(blotexValue.select.c_strex.v_str)
-        gsKey = m_GsKey(blotexValue.select.c_strex.v_str);
+        c_gsKey = m_GsKey(blotexValue.select.c_strex.v_str);
       } else {
-        gsKey = m_GsKey3(blotexValue.select.c_blotval); 
+        c_gsKey = m_GsKey3(blotexValue.select.c_blotval); 
       } // if
     } // if
 m_DIGGY_VAR_INDEX_SEEK_FLAGS(n_indexSeekFlags)
@@ -349,12 +349,11 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(n_indexSeekFlags)
     m_TRACK_IF(ParseLogical2Op(&subSequence, &criteriaOpFlags) != RETURNED)
 m_DIGGY_VAR_P_STRING(subSequence)
 
-    m_ASSERT(criteriaNumber < 5)
-    criteria5[criteriaNumber++] = m_GRequestCriterion_GsKeys(tableIndexLabel,
-      n_indexSeekFlags,&gsKey, criteriaOpFlags);
+    m_TRACK_IF(GsRequestCriteriaAddCriterion(&criteria52,tableIndexLabel,
+      n_indexSeekFlags,c_gsKey, UNDEFINED_GS_KEY_PAR, criteriaOpFlags) < 0) 
   } while (!ob_EmptySequence(&subSequence)) ; 
 
-  switch (GStringsIndexRequestR(blottabHandle->h_tableHandle,NULL,criteriaNumber,criteria5)) {
+  switch (GStringsIndexRequestR52(blottabHandle->h_tableHandle,NULL,&criteria52)) {
   case COMPLETED__OK:
   break ; case COMPLETED__BUT: // Request rectified
     m_RAISE(ANOMALY__UNEXPECTED_CASE)

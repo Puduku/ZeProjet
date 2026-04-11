@@ -337,6 +337,9 @@ struct GS_KEY { //
   union BARE_GS_KEY bare ;// bare g-key 
 }; 
 
+#define UNDEFINED_GS_KEY { UNDEFINED } 
+#define UNDEFINED_GS_KEY_PAR (struct GS_KEY) UNDEFINED_GS_KEY
+
 // Establish a g-key for string (lexical) comparison
 //
 // Passed:
@@ -404,6 +407,7 @@ int GStringsIndexRequest(G_STRINGS_HANDLE cp_handle,
   int indexLabel1, unsigned int indexSeekFlags1, const struct GS_KEY *cfps_keys1, ...);
 
 
+// Added value: ensure adding gs key(s) properly to criterion
 // #SEE m_GRequestCriterion  
 static inline struct G_REQUEST_CRITERION m_GRequestCriterion_GsKeys(int indexLabel,
   unsigned int indexSeekFlags, const struct GS_KEY* cfps_keys, unsigned int u_criteriaOpFlags) {
@@ -413,7 +417,45 @@ static inline struct G_REQUEST_CRITERION m_GRequestCriterion_GsKeys(int indexLab
 // #SEE GStringsIndexRequest <gStringSet>
 int GStringsIndexRequestR(G_STRINGS_HANDLE cp_handle,
   INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaNumber,
-  const struct G_REQUEST_CRITERION *sp_criteria) ;
+  const struct G_REQUEST_CRITERION *sp_criteria);
+
+struct GS_REQUEST_CRITERIA {
+  int count5;
+  struct GS_KEY sc_gsKeys52[5][2] ;
+  struct G_REQUEST_CRITERION sc_criteria5[5] ;
+} ;
+
+// Set-up initial criteria (0 criterion)
+static inline struct GS_REQUEST_CRITERIA m_GsRequestCriteria0(void) {
+  struct GS_REQUEST_CRITERIA gsRequestCriteria = { .count5 = 0 } ;
+  return gsRequestCriteria; 
+} // m_GsRequestCriteria
+
+
+// Add new criterion (5 criteria MAX) 
+//
+// Passed:
+// - *a_criteria:
+// - indexLabel:
+// - indexSeekFlags:
+// - c_gsKey1: only significant if actual criterion
+// - c_gsKey2: only significant if actual criterion (and 2nd key is used) 
+// - criteriaOpFlags:
+// 
+// Changed:
+// - *a_criteria: new criterion added
+// Ret:
+// - >0: number of criteria
+// - -1 special value: anomaly raised
+int GsRequestCriteriaAddCriterion(struct GS_REQUEST_CRITERIA *a_criteria52, int indexLabel,
+ unsigned int indexSeekFlags, struct GS_KEY c_gsKey1, struct GS_KEY c_gsKey2,
+ unsigned int criteriaOpFlags) ;
+
+// Same purpose than GStringsIndexRequestR(), but allow passing criteria more easily...
+// #SEE GStringsIndexRequest <gStringSet>
+int GStringsIndexRequestR52(G_STRINGS_HANDLE cp_handle,
+  INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer,
+  const struct GS_REQUEST_CRITERIA *ap_criteria52) ;
 
 
 // #REF GStringsIndexFetch <gStringSet>

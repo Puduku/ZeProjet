@@ -323,13 +323,11 @@ static inline int m_BlotexlibExecutorParseBlotregRequest(BLOTEXLIB_EXECUTOR_HAND
   m_DIGGY_BOLLARD()
 m_DIGGY_VAR_P_STRING(*a_sequence)
 
-  int criteriaNumber = 0;
   struct P_STRING subSequence; 
 
   m_CHECK_ABANDON(DelimitBlotregRequest(a_sequence,NULL,&subSequence,nc_abandonmentInfo))
   struct BLOTEX_VALUE blotexValue = UNDEFINED_BLOTEX_VALUE ; 
-  struct GS_KEY gsKeys5[5] ;
-  struct G_REQUEST_CRITERION criteria5[5] ;  
+  struct GS_REQUEST_CRITERIA criteria52 = m_GsRequestCriteria0();
   do {
     int as = UNDEFINED;  
     int indexSeekFlags = UNDEFINED;
@@ -341,11 +339,11 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
         nc_abandonmentInfo))
 
 m_DIGGY_VAR_INDEX_SEEK_FLAGS(indexSeekFlags)
-     m_CHECK_ABANDON(ParseBlotregRequestAtomEnd(&subSequence,as,indexSeekFlags,gsKeys5,criteria5,
-      &criteriaNumber, blotexValue, nc_abandonmentInfo))
+     m_CHECK_ABANDON(ParseBlotregRequestAtomEnd(&subSequence,as,indexSeekFlags,&criteria52,
+       blotexValue, nc_abandonmentInfo))
   } while (!ob_EmptySequence(&subSequence)) ; 
 
-  switch (g_BlotregIndexRequestR(blotregHandle,NULL,criteriaNumber,criteria5)) {
+  switch (g_BlotregIndexRequestR52(blotregHandle,NULL,&criteria52)) {
   case COMPLETED__OK:
   break ; case COMPLETED__BUT: // Request rectified
     m_RAISE(ANOMALY__UNEXPECTED_CASE)

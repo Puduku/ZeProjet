@@ -43,6 +43,8 @@ int BlotregCreateInstance(void **azhr_handle, struct P_STRING f_name, va_list ar
 
 #define g_BlotregIndexRequestR g_GParamsIndexRequestR
 
+#define g_BlotregIndexRequestR52 g_GParamsIndexRequestR52
+
 // #SEE NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION @ c-ansi/g-string.h <blotreg>
 int BlotregDestroyInstance(void *xhr_handle) ;
 
@@ -487,17 +489,13 @@ int ParseBlotregRequestAtom(struct P_STRING *a_sequence, int *ac_as, int *ac_ind
 // - *a_sequence: before parsing 
 // - as: 
 // - indexSeekFlags:
-// - gsKeys5:
-// - criteria5:
-// - *a_criteriaNumber:
+// - *a_criteria52:
 // - c_blotexValue: only significant with actual criterion (i.e indexSeekFlags !=
 //     INDEX_SEEK_FLAGS__ANY) 
 // 
 // Changed:
 // - *a_sequence: after parsing 
-// - gsKeys5:
-// - criteria5:
-// - *a_criteriaNumber:
+// - *a_criteria52:
 // - nc_abandonmentInfo: only significant if abandon
 // 
 // Ret: parsed successfully ? 
@@ -505,7 +503,7 @@ int ParseBlotregRequestAtom(struct P_STRING *a_sequence, int *ac_as, int *ac_ind
 // - ANSWER__NO: 'str/int mismatch' error; abandon processing 
 // - 1: unexpected problem; anomaly is raised
 int ParseBlotregRequestAtomEnd(struct P_STRING *a_sequence, int as, int indexSeekFlags,
- struct GS_KEY gsKeys5[5], struct G_REQUEST_CRITERION criteria5[5], int *a_criteriaNumber,
+struct GS_REQUEST_CRITERIA *a_criteria52,
  struct BLOTEX_VALUE c_blotexValue, G_STRING_STUFF nc_abandonmentInfo) ; 
 
 

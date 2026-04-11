@@ -70,6 +70,9 @@ int l_GParamsCreateInstance(g_G_PARAMS_HANDLE *azh_handle,int expectedItemsNumbe
 // #SEE GStringsIndexRequestR @ c-ansi/g-string.h <g-param>
 #define g_GParamsIndexRequestR GStringsIndexRequestR
 
+// #SEE GStringsIndexRequestR52 @ c-ansi/g-string.h <g-param>
+#define g_GParamsIndexRequestR52 GStringsIndexRequestR52
+
 // #SEE m_GStringsIndexSingleFetch @ c-ansi/g-string.h <g-param> 
 #define gm_GParamsIndexSingleFetch m_GStringsIndexSingleFetch 
 
