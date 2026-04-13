@@ -136,7 +136,7 @@ static int BlotexlibExecutorFactoryCreateProductInstance(void *pr_handle,
       p_handle->blottabImplementations[i].updateBlottabSpotFunction;
   } // for
 
-  m_TRACK_IF(G_STRINGS_CREATE_INSTANCE(&productHandle->h_workingGStringsHandle,5) != RETURNED) 
+  m_TRACK_IF(m_GStringsCreateInstance(&productHandle->h_workingGStringsHandle,5) != RETURNED) 
 
   m_DIGGY_RETURN(RETURNED)
 } // BlotexlibExecutorFactoryCreateProductInstance

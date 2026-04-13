@@ -180,8 +180,10 @@ typedef G_STRING_STUFF g_G_STRING_SET_STUFF;
 int GStringSetCreateInstance(g_G_STRING_SET_STUFF *azh_stuff,  int cardinality);
 
 // #SEE GStringSetCreateInstance <g-string>
-#define /*int*/ G_STRING_CREATE_INSTANCE(/*G_STRING_STUFF* */ azh_stuff) \
-GStringSetCreateInstance(azh_stuff,1)
+static inline int m_GStringCreateInstance(G_STRING_STUFF* azh_stuff) { 
+  m_DIGGY_BOLLARD_S()
+  m_DIGGY_RETURN(GStringSetCreateInstance(azh_stuff,1))
+} // m_GStringCreateInstance
 
 
 // #REF GStringSetDestroyInstance <g-string set>
@@ -201,8 +203,11 @@ GStringSetCreateInstance(azh_stuff,1)
 int GStringSetDestroyInstance(g_G_STRING_SET_STUFF xh_notNamedObjectStuff,  int cardinality);
 
 // #SEE GStringSetDestroyInstance <g-string>
-#define /*int*/ G_STRING_DESTROY_INSTANCE(/*G_STRING_STUFF*/ xh_notNamedObjectStuff) \
-  GStringSetDestroyInstance(xh_notNamedObjectStuff,1)
+static inline int m_GStringDestroyInstance(G_STRING_STUFF xh_notNamedObjectStuff) { 
+  m_DIGGY_BOLLARD_S()
+  m_DIGGY_RETURN(GStringSetDestroyInstance(xh_notNamedObjectStuff,1))
+} // m_GStringDestroyInstance 
+
 
 
 // "g-strings collections"
@@ -249,11 +254,13 @@ int GStringsCreateInstance(G_STRINGS_HANDLE* azh_handle, int expectedItemsNumber
   int gStringSetCardinality, int n_gStringConveyance, const int *cnfps_gStringConveyances,
   NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION c_namedObjectDestroyInstanceFunction);
 
-// #REF G_STRINGS_CREATE_INSTANCE <g-string>
+// #REF m_GStringsCreateInstance <g-string>
 // #SEE GStringsCreateInstance <g-string>
-#define /*int*/ G_STRINGS_CREATE_INSTANCE(/*G_STRINGS_HANDLE*/ azh_handle,\
-  /*int*/ expectedItemsNumber)  GStringsCreateInstance(azh_handle,expectedItemsNumber,1,-1,NULL,\
-  (NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION)UNDEFINED)
+static inline int m_GStringsCreateInstance(G_STRINGS_HANDLE* azh_handle, int expectedItemsNumber) {
+  m_DIGGY_BOLLARD_S()
+  m_DIGGY_RETURN(GStringsCreateInstance(azh_handle,expectedItemsNumber,1,-1,NULL,
+    (NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION)UNDEFINED))
+} // m_GStringsCreateInstance
 
 
 // #REF GStringsFetch <gStringSet> 
@@ -499,7 +506,7 @@ int GStringsPullOut(G_STRINGS_HANDLE handle, G_STRINGS_ARRAY *at_gStringsArray);
 int GStringsFreeze(G_STRINGS_HANDLE handle, G_STRINGS_ARRAY **nap_gStringsArray);
 
 
-// #REF GET_G_STRING_SET_STUFF <g-string set>
+// #REF m_GetGStringSetStuff <g-string set>
 // Get particular item of a <g-string-set> array...
 //
 // Passed:
@@ -508,10 +515,12 @@ int GStringsFreeze(G_STRINGS_HANDLE handle, G_STRINGS_ARRAY **nap_gStringsArray)
 // - u_gStringSetCardinality: that passed to GStringsCreateInstance()...
 //
 // Ret: <g-string-set> stuff 
-#define /*g_G_STRING_SET_STUFF*/ GET_G_STRING_SET_STUFF(/*char* */ u_greenArray,  /*int*/ u_entry,\
-  /*int*/ u_gStringSetCardinality) \
-( (g_G_STRING_SET_STUFF) r_GET_GREEN_ITEM_STUFF(u_greenArray,u_entry,\
-  sizeof(struct G_STRING)*u_gStringSetCardinality) )
+static inline g_G_STRING_SET_STUFF m_GetGStringSetStuff(char* greenArray, int entry,
+  int gStringSetCardinality) {
+  m_DIGGY_BOLLARD_S()
+  m_DIGGY_RETURN( (g_G_STRING_SET_STUFF) mr_GetGreenItemStuff(greenArray,entry,\
+  sizeof(struct G_STRING)*gStringSetCardinality) )
+} // m_GetGStringSetStuff
 
 
 #define b_FULL_CLEAR b_TRUE

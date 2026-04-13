@@ -30,6 +30,16 @@
 #define b_FALSE0 0
 #define b_TRUE  (!b_FALSE0)
 
+// Check concordance between two boolean values.
+//
+// Passed:
+// - b_venus:
+// - b_mars:
+//
+// Ret: TRUE/FALSE
+static inline char mb_Accord(char b_venus, char b_mars) {
+  return (b_venus? b_mars: !b_mars);
+} // mb_Accord
 
 // 2. Generic integers
 // ------------------- 

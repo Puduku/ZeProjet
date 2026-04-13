@@ -544,12 +544,12 @@ int GetBlotvarRValue(g_BLOTVAR_STUFF n_blotvarStuff, int n_as, int c_entry,
     b_strValue = b_STR_VALUE;
     str = n_blotvarStuff != NULL? n_blotvarStuff[g_BLOTVAR_VALUE_ELEMENT].cv_pString:
       *ap_aTrivialEmptyPString;
-    cb_fugaciousStr = n_blotvarStuff != NULL; // TODO: really FUGACIOUS????
+    cb_fugaciousStr = n_blotvarStuff != NULL; 
   break; case AS__NAME:  // <blotvar name> 
     b_strValue = b_STR_VALUE,
     str = n_blotvarStuff != NULL? n_blotvarStuff[g_BLOTVAR_NAME_ELEMENT].cv_pString:
       *ap_aTrivialEmptyPString;
-    cb_fugaciousStr = n_blotvarStuff != NULL; // TODO: really FUGACIOUS????
+    cb_fugaciousStr = n_blotvarStuff != NULL;
   break; default:
     m_RAISE(ANOMALY__VALUE__D,n_as)
   } // switch
@@ -752,7 +752,7 @@ int ParseStrConstant(struct P_STRING *a_sequence, char *acb_parsed,
     if (b_EMPTY_P_STRING(*a_sequence)) m_ABANDON(SYNTAX_ERROR__ABANDONMENT_CAUSE)
     PParseOffset(a_sequence,1,NULL);
     m_TRACK_IF(SetStrexValue(workingGStringsHandle,acc_blotexValue,lexeme,!b_FUGACIOUS_STR) !=
-      RETURNED) // TODO: FUGACIOUS???
+      RETURNED) // TODO: handle permanancy : PROCESS / PARSER / VARIABLE
   } // if 
   m_DIGGY_RETURN(ANSWER__YES)
 } // ParseStrConstant

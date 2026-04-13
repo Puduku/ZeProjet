@@ -1254,7 +1254,7 @@ static int  NotEnabledEquate(void *cpr_handle,  char b_frozen,
 // - handle:
 // - entry:
 #define /*char* */ r_GREEN_COLLECTION_GET_GREEN_ITEM_STUFF(/*GREEN_COLLECTION_HANDLE*/ handle,\
-  /*int*/entry)  r_GET_GREEN_ITEM_STUFF((handle)->h_greenArray, (entry), (handle)->greenItemSize)
+  /*int*/entry)  mr_GetGreenItemStuff((handle)->h_greenArray, (entry), (handle)->greenItemSize)
 
 
 // ENTRY_RAW_COMPARE_FUNCTION

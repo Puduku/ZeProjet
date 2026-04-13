@@ -16,6 +16,7 @@
 #include "c-ansi/types.h"
 #include "c-ansi/magic.h"
 #include "flint/flags.h"
+#include "c-ansi/diggy.h"
 
 
 ////////////////////////////
@@ -439,8 +440,10 @@ int GreenCollectionIndexRequestR(GREEN_COLLECTION_HANDLE cp_handle,
 // Return:
 // - True : search key(s) value(s) is(are) significant with index request 
 // - False : search key(s) value(s) is(are) not significant with index request 
-#define b_SIGNIFICANT_GREEN_COLLECTION_INDEX_KEYS(/*unsigned int*/indexSeekFlags) \
-  (b_FLAG_SET_OFF(indexSeekFlags,INDEX_SEEK_FLAG__ANY))
+static inline char mb_SignificantGreenCollectionIndexKeys(unsigned int indexSeekFlags) {
+  m_DIGGY_BOLLARD_S()
+  m_DIGGY_RETURN (b_FLAG_SET_OFF(indexSeekFlags,INDEX_SEEK_FLAG__ANY));
+} // mb_SignificantGreenCollectionIndexKeys
 
      
 enum {
@@ -625,9 +628,10 @@ int GreenCollectionFreeze(GREEN_COLLECTION_HANDLE handle,  char **nap_greenArray
 // - u_greenItemSize: that passed to GreenCollectionCreateInstance()...
 //
 // Ret: green item (raw address) 
-#define /*char* */ r_GET_GREEN_ITEM_STUFF(/*char* */ u_greenArray,  /*int*/ u_entry,\
-  /*int*/ u_greenItemSize) \
-( (u_greenArray) + (u_entry)*(u_greenItemSize) )
+static inline char*  mr_GetGreenItemStuff(char*  greenArray, int entry, int greenItemSize) {
+  m_DIGGY_BOLLARD_S()
+  m_DIGGY_RETURN( greenArray + entry*greenItemSize )
+} // mr_GetGreenItemStuff
 
 
 // TODO: interest de cette macro (dans .h du moins ) ???

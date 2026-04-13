@@ -20,7 +20,7 @@ static int GStringTest (const char *p_vers3) {
   m_DIGGY_BOLLARD()
 
   G_STRING_STUFF h_gString = (G_STRING_STUFF) UNDEFINED;
-  m_TRACK_IF(G_STRING_CREATE_INSTANCE(&h_gString) != RETURNED)
+  m_TRACK_IF(m_GStringCreateInstance(&h_gString) != RETURNED)
 
   m_ASSERT(GStringCopy(h_gString,0,o_PString(VERS1)) >= 0)
   m_ASSERT(h_gString->nhi_string != NULL)
@@ -32,7 +32,7 @@ static int GStringTest (const char *p_vers3) {
   m_ASSERT(ret == strlen(VERS3))
   m_ASSERT(strcmp(h_gString->nhi_string,p_vers3) == 0)
 
-  m_TRACK_IF(G_STRING_DESTROY_INSTANCE(h_gString) != RETURNED)
+  m_TRACK_IF(m_GStringDestroyInstance(h_gString) != RETURNED)
 
   m_DIGGY_RETURN(RETURNED)
 } // GStringTest
@@ -71,7 +71,7 @@ static int GStringsTest (const char *p_vers3) {
 
   G_STRINGS_HANDLE h_gStrings = (G_STRINGS_HANDLE) UNDEFINED;
   
-  m_TRACK_IF(G_STRINGS_CREATE_INSTANCE(&h_gStrings,100) != RETURNED)
+  m_TRACK_IF(m_GStringsCreateInstance(&h_gStrings,100) != RETURNED)
 
   m_ASSERT(m_GStringsAddPlainLexicalIndex(h_gStrings, NULL, NULL) == NON_CASE__INDEX_LABEL)
 

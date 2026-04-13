@@ -82,7 +82,7 @@ static int BlotcodeExecutorTest (int expectedTestNumber, BLOTCODE_EXECUTOR_HANDL
   m_ASSERT(expectedTestNumber == ++testNumber)
   m_DIGGY_VAR_D(testNumber)
   static G_STRING_STUFF n_info = NULL;
-  if (n_info == NULL) m_TRACK_IF(G_STRING_CREATE_INSTANCE(&n_info) !=
+  if (n_info == NULL) m_TRACK_IF(m_GStringCreateInstance(&n_info) !=
     RETURNED)
   m_ASSERT(n_info != NULL)
 
@@ -233,7 +233,7 @@ int main (int argc, char** argv) {
 
 
   G_STRING_STUFF h_outputGStringStuff = (G_STRING_STUFF)UNDEFINED;
-  m_TRACK_IF(G_STRING_CREATE_INSTANCE(&h_outputGStringStuff) != RETURNED)
+  m_TRACK_IF(m_GStringCreateInstance(&h_outputGStringStuff) != RETURNED)
 
   //m_TRACK_IF(m_SuckerPlugDButt_GString(h_outputSuckerHandle, h_outputGStringStuff) != RETURNED) 
   G_STRING_BUTT_ADEPT_HANDLE h_gStringButtAdeptHandle = (G_STRING_BUTT_ADEPT_HANDLE)UNDEFINED; 
@@ -294,7 +294,7 @@ int main (int argc, char** argv) {
     h_outputGStringStuff, DUMMY_TEMPLATE13, ANSWER__YES,  BLOTCODE_CONSTRUCTION_STATUS__OK,
     DUMMY_OUTPUT13) != RETURNED) 
 
-  m_TRACK_IF(G_STRING_DESTROY_INSTANCE(h_outputGStringStuff) != RETURNED)
+  m_TRACK_IF(m_GStringDestroyInstance(h_outputGStringStuff) != RETURNED)
 
   m_TRACK_IF(GStringButtAdeptDestroyInstance(h_gStringButtAdeptHandle) != RETURNED)
   m_TRACK_IF(BlotcodeExecutorDestroyInstance(h_blotcodeExecutorHandle) != RETURNED)

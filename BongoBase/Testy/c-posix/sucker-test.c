@@ -24,7 +24,7 @@
 int main (int argc, char** argv) {
   unsigned int dgFlags = ParseTestyCommandArguments(argc,argv,SANDBOX__TESTY_FLAG | DATADIR__TESTY_FLAG) ;
   G_STRING_STUFF h_dummySFilePathnameStuff = (G_STRING_STUFF)UNDEFINED;
-  m_TRACK_IF(G_STRING_CREATE_INSTANCE(&h_dummySFilePathnameStuff) != RETURNED)
+  m_TRACK_IF(m_GStringCreateInstance(&h_dummySFilePathnameStuff) != RETURNED)
   m_TRACK_IF(GStringPrintf(h_dummySFilePathnameStuff,0,"%s/%s", p_testyDatadirPath,
     DUMMY_ORIG_FILENAME) < 0)
   const char *dummyCopyFilePathname = DUMMY_COPY_FILENAME;
@@ -60,7 +60,7 @@ int main (int argc, char** argv) {
     p_fileStreamSimpleWaitingPlan, 1024, dummyCopyFile) != RETURNED)
 
   G_STRING_STUFF h_gStringStuff = (G_STRING_STUFF) UNDEFINED;
-  m_TRACK_IF(G_STRING_CREATE_INSTANCE(&h_gStringStuff) != RETURNED)
+  m_TRACK_IF(m_GStringCreateInstance(&h_gStringStuff) != RETURNED)
   G_STRING_BUTT_ADEPT_HANDLE h_gStringButtAdeptHandle = (G_STRING_BUTT_ADEPT_HANDLE)UNDEFINED;
   m_TRACK_IF(GStringButtAdeptCreateInstance(&h_gStringButtAdeptHandle,h_gStringStuff) != RETURNED)
 
@@ -71,12 +71,12 @@ int main (int argc, char** argv) {
   m_ASSERT(suckedLength == 1668) // data/prout-orig file size 
 
   m_TRACK_IF(SuckerDestroyInstance(h_handle) != RETURNED)
-  m_TRACK_IF(G_STRING_DESTROY_INSTANCE(h_gStringStuff) != RETURNED)
+  m_TRACK_IF(m_GStringDestroyInstance(h_gStringStuff) != RETURNED)
   m_TRACK_IF(BrokenPipeFixDestroyInstance(h_brokenPipeFixHandle) != RETURNED)
   m_TRACK_IF(StandardAlarmSystemDestroyInstance(h_alarmSystemHandle) != RETURNED)
   //m_TRACK_IF(PthreadAlarmSystemDestroyInstance(h_alarmSystemHandle) != RETURNED)
 
-  m_TRACK_IF(G_STRING_DESTROY_INSTANCE(h_dummySFilePathnameStuff) != RETURNED)
+  m_TRACK_IF(m_GStringDestroyInstance(h_dummySFilePathnameStuff) != RETURNED)
   m_TRACK_IF(StreamButtAdeptDestroyInstance(h_streamSButtAdeptHandle) != RETURNED)
   m_TRACK_IF(GStringButtAdeptDestroyInstance(h_gStringButtAdeptHandle) != RETURNED)
   

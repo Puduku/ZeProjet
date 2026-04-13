@@ -195,7 +195,7 @@ int FetepeCreateInstance (FETEPE_HANDLE *azh_handle, ALARM_SYSTEM_HANDLE nf_alar
   if ((handle->command.status.n_logFunction = n_logCommandStatusFunction) != NULL) {
     handle->command.status.cr_logFunctionHandle = cfr_logCommandStatusFunctionHandle ;
   } // if
-  m_TRACK_IF(G_STRING_CREATE_INSTANCE(&handle->command.status.h_line) != RETURNED)
+  m_TRACK_IF(m_GStringCreateInstance(&handle->command.status.h_line) != RETURNED)
   m_TRACK_IF(LINE_DELIMITERS_CREATE_INSTANCE(&handle->command.status.h_lineDelimitersHandle,10,
     NULL,(void *)UNDEFINED) != RETURNED)
   handle->command.socket.nh_connectedDescriptor = -1;
@@ -217,7 +217,7 @@ int FetepeCreateInstance (FETEPE_HANDLE *azh_handle, ALARM_SYSTEM_HANDLE nf_alar
   m_TRACK_IF(SuckerCreateInstance(&handle->data.h_suckerHandle, transferSizeLimit) != RETURNED)
   m_TRACK_IF(LINE_DELIMITERS_CREATE_INSTANCE(&handle->data.h_lsLines,100, NULL,(void *)UNDEFINED)
     != RETURNED)
-  m_TRACK_IF(G_STRING_CREATE_INSTANCE(&handle->data.h_lsOutput) != RETURNED)
+  m_TRACK_IF(m_GStringCreateInstance(&handle->data.h_lsOutput) != RETURNED)
   m_TRACK_IF(GStringButtAdeptCreateInstance(&handle->data.h_lsOutputButtAdeptHandle,
     handle->data.h_lsOutput) != RETURNED)
 
@@ -1242,7 +1242,7 @@ int FetepeDisconnect (FETEPE_HANDLE handle) {
 // Public function ; see description in .h
 int FetepeDestroyInstance (FETEPE_HANDLE xh_handle) { 
   m_DIGGY_BOLLARD()
-  m_TRACK_IF(G_STRING_DESTROY_INSTANCE(xh_handle->command.status.h_line) != RETURNED)
+  m_TRACK_IF(m_GStringDestroyInstance(xh_handle->command.status.h_line) != RETURNED)
   m_TRACK_IF(GreenCollectionDestroyInstance(xh_handle->command.status.h_lineDelimitersHandle) !=
     RETURNED)
 
@@ -1252,7 +1252,7 @@ int FetepeDestroyInstance (FETEPE_HANDLE xh_handle) {
   m_TRACK_IF(PdDestroyInstance(xh_handle->data.h_listeningSocketPdHandle) != RETURNED)
   m_TRACK_IF(SuckerDestroyInstance(xh_handle->data.h_suckerHandle) != RETURNED)
   m_TRACK_IF(GreenCollectionDestroyInstance(xh_handle->data.h_lsLines) != RETURNED)
-  m_TRACK_IF(G_STRING_DESTROY_INSTANCE(xh_handle->data.h_lsOutput) != RETURNED)
+  m_TRACK_IF(m_GStringDestroyInstance(xh_handle->data.h_lsOutput) != RETURNED)
   m_TRACK_IF(GStringButtAdeptDestroyInstance(xh_handle->data.h_lsOutputButtAdeptHandle) != 
     RETURNED)
   m_TRACK_IF(StreamButtAdeptDestroyInstance(xh_handle->data.h_streamButtAdeptHandle) !=

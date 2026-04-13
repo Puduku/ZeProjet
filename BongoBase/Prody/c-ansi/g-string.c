@@ -477,7 +477,6 @@ int GStringsIndexRequest(G_STRINGS_HANDLE cp_handle,
 
   { va_list arguments;
     va_start(arguments,cfps_keys1);
-//m_ASSERT(criteriaNumber == 1) // TODO: other criteria
     m_TRACK_IF(GreenCollectionIndexRequestV(cp_handle->h_greenCollectionHandle,
       nf_indexRequestAutomaticBuffer, criteriaNumber, indexLabel1, indexSeekFlags1,
       (void*)cfps_keys1, arguments) != RETURNED)

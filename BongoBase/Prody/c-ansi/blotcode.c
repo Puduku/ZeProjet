@@ -570,7 +570,7 @@ int BlotcodeExecutorCreateInstance(BLOTCODE_EXECUTOR_HANDLE *azh_handle,
 
   m_C_STACK_INIT(handle->h_flowControlStack)
 
-  m_TRACK_IF(G_STRING_CREATE_INSTANCE(&handle->h_blotfuncSurrogate) != RETURNED) 
+  m_TRACK_IF(m_GStringCreateInstance(&handle->h_blotfuncSurrogate) != RETURNED) 
   m_DIGGY_RETURN(RETURNED)
 } // BlotcodeExecutorCreateInstance
 
@@ -1086,7 +1086,7 @@ int BlotcodeExecutorDestroyInstance (BLOTCODE_EXECUTOR_HANDLE xh_handle) {
 
   m_TRACK_IF(GreenCollectionDestroyInstance(xh_handle->h_templatePartitionsHandle) != RETURNED)
 
-  m_TRACK_IF(G_STRING_DESTROY_INSTANCE(xh_handle->h_blotfuncSurrogate) != RETURNED)
+  m_TRACK_IF(m_GStringDestroyInstance(xh_handle->h_blotfuncSurrogate) != RETURNED)
 
   free(xh_handle) ;
 

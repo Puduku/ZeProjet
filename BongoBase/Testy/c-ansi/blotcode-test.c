@@ -130,7 +130,7 @@ static int BlotcodeExecutorTest (int expectedTestNumber, BLOTCODE_EXECUTOR_HANDL
   m_DIGGY_VAR_D(testNumber)
   G_STRING_STUFF nh_parsingErrorInfo = NULL;
 
-  if (nh_parsingErrorInfo == NULL) m_TRACK_IF(G_STRING_CREATE_INSTANCE(&nh_parsingErrorInfo) < 0)
+  if (nh_parsingErrorInfo == NULL) m_TRACK_IF(m_GStringCreateInstance(&nh_parsingErrorInfo) < 0)
 
 m_DIGGY_VAR_GEN(p_template,s)
   int answer = BlotcodeExecutorParseTemplate(handle,  localTemplate, NULL, nh_parsingErrorInfo);
@@ -254,7 +254,7 @@ int main (int argc, char** argv) {
     RETURNED)
 
   G_STRING_STUFF h_outputGStringStuff = (G_STRING_STUFF)UNDEFINED;
-  m_TRACK_IF(G_STRING_CREATE_INSTANCE(&h_outputGStringStuff) != RETURNED)
+  m_TRACK_IF(m_GStringCreateInstance(&h_outputGStringStuff) != RETURNED)
 
   //m_TRACK_IF(m_SuckerPlugDButt_GString(h_outputSuckerHandle, h_outputGStringStuff) != RETURNED) 
   G_STRING_BUTT_ADEPT_HANDLE h_gStringButtAdeptHandle = (G_STRING_BUTT_ADEPT_HANDLE)UNDEFINED; 
@@ -311,7 +311,7 @@ int main (int argc, char** argv) {
     h_outputGStringStuff, DUMMY_TEMPLATE12, ANSWER__YES,  BLOTCODE_CONSTRUCTION_STATUS__OK,
     DUMMY_OUTPUT12) != RETURNED) 
 
-  m_TRACK_IF(G_STRING_DESTROY_INSTANCE(h_outputGStringStuff) != RETURNED)
+  m_TRACK_IF(m_GStringDestroyInstance(h_outputGStringStuff) != RETURNED)
 
   m_TRACK_IF(GStringButtAdeptDestroyInstance(h_gStringButtAdeptHandle) != RETURNED)
   m_TRACK_IF(BlotcodeExecutorDestroyInstance(h_blotcodeExecutorHandle) != RETURNED)

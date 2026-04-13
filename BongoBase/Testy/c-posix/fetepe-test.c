@@ -64,7 +64,7 @@ int main (int argc, char** argv) {
   m_DIGGY_VAR_STRING(rep)
 
   G_STRINGS_HANDLE h_fileNames = (G_STRINGS_HANDLE) UNDEFINED;
-  m_TRACK_IF(G_STRINGS_CREATE_INSTANCE(&h_fileNames,100) != RETURNED)
+  m_TRACK_IF(m_GStringsCreateInstance(&h_fileNames,100) != RETURNED)
 
   ret = FetepeNlist(h_handle,NULL,0,h_fileNames) ;
   m_TRACK_IF(ret < 0)
