@@ -22,11 +22,13 @@
 
 #ifdef DIGGY
 // When -DDIGGY compilation directive is present:
+// ----------------------------------------------
 
 #include "diggy/diggy.h"
 
-#else
+#else // DIGGY
 // When -DDIGGY compilation directive is absent:
+// ---------------------------------------------
 
 // m_DIGGY_BOLLARD() macro is just a place holder
 #define m_DIGGY_BOLLARD() ;
@@ -41,7 +43,7 @@
 // u_ret: value to return
 #define m_DIGGY_RETURN(u_ret) return u_ret;
 
-#endif
+#endif // DIGGY
 
 #endif // __C_ANSI_DIGGY_H_INCLUDED__
 

@@ -6,7 +6,6 @@
 #include "diggy/diggy.h"
 #include "testy/getopts.h"
 #include "diggy/vars.h"
-#include "testy/c-ansi-diggy-vars.h"
 
 
 struct TEST_ITEM {

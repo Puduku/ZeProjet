@@ -19,10 +19,6 @@
 // I. Base m_DIGGY_VAR() macro
 // ---------------------------
 
-// #REF DIGGY_VAR_XXX_MACRO
-// Notation:
-// m_DIGGY_VAR_<XXX>()      => display of 'XXX' type variable in DIGGY system...
-
 // #REF DIGGY_PRINT_IMAGE_ACTION
 // Actions to output (directly in stdout) some variable content IMAGE
 // NOTE: IMAGE means DISPLAYABLE (basic visible ASCII characters) content...
@@ -52,7 +48,6 @@
 // 1. Digging in "general" variables
 
 
-// #SEE DIGGY_VAR_XXX_MACRO
 // "General" var display
 //
 // Passed
@@ -62,7 +57,6 @@
 #define m_DIGGY_VAR_GEN(m_var,m_specifier) \
   m_DIGGY_VAR(m_var,printf("%" #m_specifier, m_var);)
 
-// #SEE DIGGY_VAR_XXX_MACRO
 // Simple integer var display
 // Wraps m_DIGGY_VAR_GEN above
 //
@@ -70,7 +64,6 @@
 // - m_var: "int" type var expression to display
 #define m_DIGGY_VAR_D(m_var)  m_DIGGY_VAR_GEN(m_var,d)
 
-// #SEE DIGGY_VAR_XXX_MACRO
 // Simple pointer var display
 // Wraps m_DIGGY_VAR_GEN above
 //
@@ -88,7 +81,6 @@
 void DiggyPrintStringImage(const char *np_string);
 
 
-// #SEE DIGGY_VAR_XXX_MACRO
 // Simple "C-string" var display
 //
 // Passed
@@ -107,7 +99,6 @@ void DiggyPrintStringImage(const char *np_string);
 void DiggyPrintDataImage(const char *p_data, int length);
 
 
-// #SEE DIGGY_VAR_XXX_MACRO
 // Simple "data" var display
 //
 // Passed
@@ -128,7 +119,6 @@ void DiggyPrintDataImage(const char *p_data, int length);
 void DiggyPrintValueImage(int value, const char *p_image);
 
 
-// #SEE DIGGY_VAR_XXX_MACRO
 // Display variable name and content using ad hoc image display function.
 //
 // Passed

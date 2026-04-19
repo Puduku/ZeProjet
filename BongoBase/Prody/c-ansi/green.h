@@ -3,21 +3,19 @@
 // (c) Puduku - 2023
 
 // #SEE double-inclusion-4-generic-imaged-enums @ flint/images.h <__C_ANSI_GREEN_H_INCLUDED__>
-
 #ifndef __C_ANSI_GREEN_H_INCLUDED__
 #define __C_ANSI_GREEN_H_INCLUDED__ 0
 #endif
 
 #if __C_ANSI_GREEN_H_INCLUDED__ == 0 || __C_ANSI_GREEN_H_INCLUDED__ == 2 
-
 #if __C_ANSI_GREEN_H_INCLUDED__ == 0
 
 #include "c-ansi/stderr.h"
 #include "c-ansi/types.h"
 #include "c-ansi/magic.h"
 #include "flint/flags.h"
+#include "c-ansi/green-index.h"
 #include "c-ansi/diggy.h"
-
 
 ////////////////////////////
 #include "c-ansi/green.topo"
@@ -26,7 +24,6 @@
 
 // Green item handlers ("virtual objects") 
 // ---------------------------------------
-
 
 // #REF GREEN_HANDLER__DISENGAGE_FUNCTION - Custom function definition.
 // Disengage green item but DO NOT free the instance!
@@ -251,38 +248,6 @@ int GreenCollectionGetCount(GREEN_COLLECTION_HANDLE cp_handle, char **navntr_gre
 // - -1: unexpected problem ; anomaly is raised
 int GreenCollectionAddIndex(GREEN_COLLECTION_HANDLE handle,  int keysNumber) ;
 
-
-// * Truly index-based seek flags:
-// NOT key-based seek flag: mutually exclusive with other truly index-based seek flags: 
-#define INDEX_SEEK_FLAG__ANY     0x01
-// Key-based seek flags: 
-#define INDEX_SEEK_FLAG__EQUAL   0x02
-#define INDEX_SEEK_FLAG__LESS    0x04
-#define INDEX_SEEK_FLAG__GREATER 0x08 
-// * NON-index based seek flag: mutually exclusive with truly index-based seek flags: 
-#define INDEX_SEEK_FLAG__LIKE    0x10 
-
-#endif // __C_ANSI_GREEN_H_INCLUDED__ == 0
-
-#undef __FLINT_IMAGES_H_INCLUDED__
-#define __FLINT_IMAGES_H_INCLUDED__ __C_ANSI_GREEN_H_INCLUDED__
-#include "flint/images.h"
-
-// #REF enum-INDEX_SEEK
-m_DEFINE_ENUM_ALIAS_BEGIN(m_IndexSeekFlagsImage)
-  // seek in collection regarding index
-  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__ANY           ,INDEX_SEEK_FLAG__ANY) 
-  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__EQUAL         ,INDEX_SEEK_FLAG__EQUAL) 
-  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__LESS          ,INDEX_SEEK_FLAG__LESS) 
-  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__LESS_EQUAL    ,INDEX_SEEK_FLAG__EQUAL | INDEX_SEEK_FLAG__LESS) 
-  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__GREATER       ,INDEX_SEEK_FLAG__GREATER) 
-  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__GREATER_EQUAL ,INDEX_SEEK_FLAG__EQUAL | INDEX_SEEK_FLAG__GREATER) 
-  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__NOT_EQUAL     ,INDEX_SEEK_FLAG__LESS | INDEX_SEEK_FLAG__GREATER) 
-  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__LIKE          ,INDEX_SEEK_FLAG__LIKE) 
-m_DEFINE_ENUM_ALIAS_END()
-
-#if __C_ANSI_GREEN_H_INCLUDED__ == 0
-
 // This variable is required by m_INDEX_REQUEST_AUTOMATIC_BUFFER() macro below. 
 extern const int p_indexRequestAutomaticBufferSize;
 
@@ -293,15 +258,6 @@ typedef char *INDEX_REQUEST_AUTOMATIC_BUFFER ;
 // by GreenCollectionIndexFetch().
 #define m_INDEX_REQUEST_AUTOMATIC_BUFFER(m_indexRequestAutomaticBuffer) \
 char m_indexRequestAutomaticBuffer[p_indexRequestAutomaticBufferSize] ; 
-
-#define CRITERIA_OP_FLAG__CLOSE1      0x001 // Close one bracket before op.
-#define CRITERIA_OP_FLAG__CLOSE2      0x002 // Close two brackets before op.
-#define CRITERIA_OP_FLAG__CLOSE3      0x004 // Close three brackets before op.
-#define CRITERIA_OP_FLAG__AND         0x010 // And op.
-#define CRITERIA_OP_FLAG__OR          0x020 // Or op.
-#define CRITERIA_OP_FLAG__OPEN1       0x100 // Open one bracket after op. 
-#define CRITERIA_OP_FLAG__OPEN2       0x200 // Open two brackets after op. 
-#define CRITERIA_OP_FLAG__OPEN3       0x400 // Open three brackets after op. 
 
 #endif // __C_ANSI_GREEN_H_INCLUDED__ == 0
 
@@ -329,24 +285,6 @@ m_DEFINE_ENUM_ALIAS_BEGIN(m_CriteriaOpFlagsImage)
 m_DEFINE_ENUM_ALIAS_END()
 
 #if __C_ANSI_GREEN_H_INCLUDED__ == 0
-
-// Passed:
-// - criteriaOpFlags
-static inline int m_OpenBracketsNumber(unsigned int criteriaOpFlags) {
-  if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__OPEN3)) return 3;
-  else if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__OPEN2)) return 2;
-  else if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__OPEN1)) return 1;
-  return 0;
-} // m_OpenBracketsNumber 
-
-// Passed:
-// - criteriaOpFlags
-static inline int m_CloseBracketsNumber(unsigned int criteriaOpFlags) {
-  if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE3)) return 3;
-  else if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE2)) return 2;
-  else if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE1)) return 1;
-  return 0;
-} // m_CloseBracketsNumber 
 
 // Ex.
 // x AND (( y OR u OR z) AND ( w OR t))  <== request
@@ -396,14 +334,6 @@ int GreenCollectionIndexRequestV(GREEN_COLLECTION_HANDLE cp_handle,
   int indexLabel1, unsigned int indexSeekFlags1, void *cfpr_keys1, va_list extraCriteria);
 
 
-// May or may be NOT index-based selection:
-struct G_REQUEST_CRITERION {
-  int indexLabel;
-  unsigned int indexSeekFlags;
-  const void *cfpr_keys; // Only significant with Key-based seek flag(s)
-  unsigned int criteriaOpFlags;
-} ;
-
 // #REF m_GRequestCriterion <keys>
 // Establish request criterion
 //
@@ -421,7 +351,7 @@ static inline struct G_REQUEST_CRITERION m_GRequestCriterion(int indexLabel,
   struct G_REQUEST_CRITERION requestCriterion = { .indexLabel = indexLabel,
     .indexSeekFlags = indexSeekFlags, .cfpr_keys = cfpr_keys, .criteriaOpFlags = criteriaOpFlags };
   return requestCriterion;
- } // m_GRequestCriterion
+} // m_GRequestCriterion
 
 
 
@@ -459,6 +389,10 @@ enum {
 } ;
 
 #endif // __C_ANSI_GREEN_H_INCLUDED__ == 0
+
+#undef __FLINT_IMAGES_H_INCLUDED__
+#define __FLINT_IMAGES_H_INCLUDED__ __C_ANSI_GREEN_H_INCLUDED__
+#include "flint/images.h"
 
 // #REF enum-INDEX_FETCH
 m_DEFINE_ENUM_ALIAS_BEGIN(m_IndexFetchFlagsImage)
