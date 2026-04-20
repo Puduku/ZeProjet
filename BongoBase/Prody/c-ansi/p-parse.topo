@@ -5,8 +5,10 @@
 // Idea: give up distinction made a priori between syntactic and lexical analysis.
 // Principle: some parsing = mixed hierarchical and sequential assembly of elementary syntactic
 // parsing steps. 
-// If there is a lexical analysis - which takes place before the syntactic analysis - it simply
-// involves parsing the character strings enclosed in quotes as basic tokens.
+// If there is a lexical analysis - which formally takes place before the syntactic analysis - it
+// simply involves parsing the character strings enclosed in quotes as basic tokens. In this
+// implementation, such lexical anlysis can be "emulated" during the syntactic analysis using
+// QUOTED__SCAN_FLAG flag.
 
 // A parsing step is thus an elementary operation which extracts "head" lexeme from a sequence (of
 // characters)
