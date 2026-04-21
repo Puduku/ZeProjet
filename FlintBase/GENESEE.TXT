@@ -22,7 +22,7 @@ Hence:
   lower-case names.
 - Position directories follows "non UNIX" file naming convention: name's first letter is in
   UPPER-CASE (*).
-(*) In "MS-DOS/Windozes", files names are NOT "case sensitive", hence that distinction does not work. 
+(*) In "MS-DOS/Windozes", files names are NOT case sensitive, hence that distinction does not work. 
 
 Dummy example:
 /home/toto/
@@ -46,12 +46,15 @@ Dummy example:
 
 Typically, one defines environment variable that refers to a position directory ; e.g :
 export PROJECTS=/home/toto/Projects
+Projects location could be be moved in another place; that's why PROJECTS environment variable is really necessary. 
 export MANHATTAN=$PROJECTS/Manhattan
+Same observation for Manhattan project location.
 It is generally not usefull to create environement variable to refer to a structure directory ; e.g
-export MANHATTAN_TESTS=$MANHATTAN/tests # Clumsy definition
+export MANHATTAN_TESTS=$MANHATTAN/tests
+MANHATTAN_TESTS environement variable is clumsy because 'tests' sub-directory is structural to Manhattan project.
   
-In short, the position directories are the "movable" part of the "tree", whereas the "structure 
-directories" correspond to the "un-mutable" parts of the tree. The "frontier" between the two 
+In short, the 'position directories' are the "movable" branches of the tree, whereas the 'structure 
+directories' correspond to the "un-mutable" parts of the tree. The "frontier" between the two 
 concepts remains not so clear... but that does not really matter. The point is simply to get some
 visible beacons in the countryside, so that the orientation (whithin the whole system tree)
 becomes somewhat easier... 
@@ -82,7 +85,7 @@ executable files'. Considering the well accepted definition of 'binary' as:  'ra
 human-readible format', The (double) contradiction is the following:
 1. scripts files are well executable files but are NOT binary
 2. most of binary files are not executable files (e.g: image files)
-Given our choice is to stick to the convention: 'bin/' <=> executable files for extensive commands'
+Given our choice is to stick to the convention: 'bin/' <=> executable files for extensive command
 directory, we also advise not using bin/ structure directories for binary files that are NOT
 executables !
 Notice: as consequence of these conventions, '.' (current working working) must NOT be referenced
@@ -115,7 +118,7 @@ Use case: (based on dummy example above)
   Of course, each "cook" executable file is specific to its position.
 - Executing 'cook' exclusive command:  
   + 'cook' is normally not executable as extensive command 
-  + 'cook' is executable as exclusive commands, hence you are always "obliged" to specify the position
+  + 'cook' is executable as exclusive command, hence you are always "obliged" to specify the position
     of the cook 'instance' you want to execute:
     [Projects] $ MyRecipes/Hungarian-goulash/cook
     [MyRecipes] $ Hungarian-goulash/cook
