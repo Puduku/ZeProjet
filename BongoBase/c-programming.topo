@@ -72,18 +72,17 @@
 //     framework vis-a-vis the new programming languages (those offering full-fledged type systems)
 //     of the epoch. Hence, the "initiative" was totally clumsy, and by the way largely
 //     counter-productive...
-//     (*) to emphasize our point of view, "typedef" is a CARICATURE of type definition ; the point
+//     (*) to emphasize our point of view, 'typedef' is a CARICATURE of type definition ; the point
 //     is just to understand and keep in mind the limitations (from 'P' perspective) of that
 //     'L'-level mechanism.
 // (3) that is representation of "shared" data structures (protocol messages, EDI, etc.).
 //     The method imposes STRICT control of data alignment, structure padding and packing in memory.
 //     The techniques "of course" exist (#pragma) in C, but generally have very bad impact on
 //     process performance, and, above all, are not portable - what is quite paradoxical when your
-//     purpose is to represent "open" specifications...
+//     purpose is to represent open specifications...
 //     Morality: from our point of view, this technique of data format representation is a "good"
 //     example of "false good idea"...  Finally, it's less complicated to rely on "grassroots"
-//     methods - those based on explicit "offset" and  "data length" definitions and
-//     manipulations...
+//     methods - those based on explicit offset and data length definitions and manipulations...
 // (4) That pointer definition given at L-level is disputable. Fortunately, our P-abstraction
 //     let us NOT having to deal with such philosophical (and somewhat vain) questions...
 
