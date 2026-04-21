@@ -12,7 +12,7 @@ Landscape:
 - island: all gardens' place (main directory position)
   The island is not so huge. It is easy to find your way around - especially when moving from one
   garden to another.
-  Hence, as long as your are also located in the island, all gardens of the island are simply
+  Hence, as long as you stay located in the island, all gardens of the island are simply+
   referenced with RELATIVE paths.
   However, out of the island, it's quite "terra incognita"...
   So, all emplacements outside the island are referenced with ABSOLUTE paths...
