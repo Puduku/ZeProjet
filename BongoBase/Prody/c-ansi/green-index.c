@@ -18,11 +18,38 @@
 // Overview: 
 // "GREEN INDEX" ("proto" object)
 // ^ uses
-// "GREEN INDEXES" ("proto" object)
+// "GREEN INDEXES" (REAL object)
 
 char b_diggyGreenCollectionExam = b_TRUE;
 
 /////////// 1. GREEN INDEX ("proto" object......) ////////////////////
+
+// Index's virtual function to compare two items.
+//
+// Passed:
+// - r_handle:
+// - indexLabel:
+// - aEntry: entry for "A"
+// - n_bEntry: >= 0 => entry for "B"
+// - cpr_bKeys: raw key(s) for "B" when entry for "B" not provided
+//
+// Ret: 
+// - >=0: "comparison" between :"A" and "B" with that key component... 
+//   + LESS_THAN__COMPARISON : "A" 'less than' "B" 
+//   + EQUAL_TO__COMPARISON : "A" and "B" are "identical"
+//   + GREATER_THAN__COMPARISON : "A" 'greater than' "B" 
+// - -1: unexpected problem; anomaly is raised
+typedef int (*ENTRY_COMPARE_FUNCTION) (void *r_handle, int indexLabel, int aEntry, int n_bEntry,
+  const void *cpr_bKeys) ;
+
+struct GREEN_INDEX {
+  int *hsc_array; // - Physical size given by global instance's itemsPhysicalNumber
+                  // - 'count' first items are significant
+  int count; // >= 0
+  ENTRY_COMPARE_FUNCTION entryCompareFunction;
+  void* r_entryFunctionsHandle;
+  int indexLabel;
+};
 
 // Passed:
 // - az_index:
@@ -40,6 +67,47 @@ char b_diggyGreenCollectionExam = b_TRUE;
   (az_index)->indexLabel = m_indexLabel;\
 }
 
+
+// Passed:
+// - a_index:
+// - indexEntry:
+#define m_GREEN_INDEX_REMOVE(/*struct GREEN_INDEX* */a_index, /*int*/indexEntry) \
+  memmove((a_index)->hsc_array + (indexEntry),  (a_index)->hsc_array + (indexEntry) + 1,\
+  sizeof(int) * (((a_index)->count -= 1) - (indexEntry)));
+
+
+// Passed:
+// - a_index:
+// - newIndexEntry:
+// - newEntry:
+#define m_GREEN_INDEX_ADD(/*struct GREEN_INDEX* */a_index,  /*int*/newIndexEntry,\
+  /*int*/newEntry) {\
+  memmove((a_index)->hsc_array + newIndexEntry + 1,  (a_index)->hsc_array + newIndexEntry,\
+    sizeof(int) * (s_index->count++ - newIndexEntry));\
+  (a_index)->hsc_array[newIndexEntry] = newEntry;\
+}
+
+
+// Passed:
+// - a_index:
+#define m_GREEN_INDEX_CLEAR(/*struct GREEN_INDEX* */a_index) {\
+  (a_index)->count = 0 ;\
+}
+
+// Passed:
+// - a_index:
+//
+// Ret
+// number of "active" index entries
+#define GREEN_INDEX_GET_COUNT(/*struct GREEN_INDEX* */a_index)  ((a_index)->count)
+
+
+// Passed:
+// - a_index:
+// - newItemsPhysicalNumber:
+#define m_GREEN_INDEX_RESIZE(/*struct GREEN_INDEX* */a_index,  /*int*/newItemsPhysicalNumber) {\
+  m_REALLOC_ARRAY((a_index)->hsc_array, newItemsPhysicalNumber)\
+}
 
 // Compare two items of the index
 //
@@ -63,8 +131,26 @@ char b_diggyGreenCollectionExam = b_TRUE;
     DIFFERENCE_2_COMPARISON(em_aEntry - n_bEntry) ;\
 }
 
-// See .h
-int GreenIndexBSearch(struct GREEN_INDEX *a_index,
+// Binary search of "B" in index
+//
+// Passed:
+// - a_index: index to use
+// - n_bEntry: >= 0 => entry in index for "B"
+// - cpr_bKeys: raw key(s) for "B" when entry for "B" not provided
+// - cac_indexEntries: only significant if entry in index is specified for "B". 
+//
+// Modified:
+// - *an_indexEntry: >=0 => found entry in index
+//   -1 => "B" is not referenced in index ("Not found")
+// - *a_top: "best" top index entry established so far ; when "Not found", corresponds to the
+//   closest entry in the index that is on top of "B"
+// - *cac_indexEntries: (when used) only significant if found entry in index; delimit ALL "B"
+//   entries 
+//
+// Ret:
+// - RETURNED
+// - -1: anomaly is raised
+static int GreenIndexBSearch(struct GREEN_INDEX *a_index,
   int n_bEntry, const void *cpr_bKeys, int *an_indexEntry, int *a_top,
   struct INDEX_ENTRIES *cac_indexEntries) {
   m_DIGGY_BOLLARD_S()
@@ -298,7 +384,6 @@ m_DIGGY_VAR_D(a_indexSequence->indexEntriesNumber2)
   m_DIGGY_RETURN(RETURNED)
 } // GreenIndexSeek
 
-
 // Passed:
 // -a_index:
 //
@@ -361,41 +446,62 @@ static int GreenIndexVerifyEntry(struct GREEN_INDEX *a_index, int entry, int exp
   m_DIGGY_RETURN(completed)
 } // GreenIndexVerifyEntry 
 
-///////////// 2. GREEN INDEXES "proto" object //////////////
+// Passed:
+// - ax_index:
+#define m_GREEN_INDEX_FREE(/*struct GREEN_INDEX* */ax_index) {\
+  free(ax_index->hsc_array);\
+}
+
+///////////// 2. GREEN INDEXES REAL object //////////////
+
+struct GREEN_INDEXES {
+  ENTRY_RAW_COMPARE_FUNCTION entryRawCompareFunction;
+  ENTRY_RAW_EQUATE_FUNCTION entryRawEquateFunction;
+  void *r_entryRawFunctionsHandle;
+  int indexesNumber ; // when ENABLED ; >= 0
+  int *vnhs_keysNumbers; // NULL when indexesNumber == 0
+  struct GREEN_INDEX *vnhs_indexes ; // NULL when indexesNumber == 0
+};
+
+// Public function: see .h
+int GreenIndexesCreateInstance(GREEN_INDEXES_HANDLE *azh_handle,
+  ENTRY_RAW_COMPARE_FUNCTION entryRawCompareFunction,
+  ENTRY_RAW_EQUATE_FUNCTION entryRawEquateFunction, void* r_entryRawFunctionsHandle) {
+  m_DIGGY_BOLLARD()
+  m_MALLOC_INSTANCE(*azh_handle)
+  GREEN_INDEXES_HANDLE handle = *azh_handle;
+  handle->entryRawCompareFunction = entryRawCompareFunction;
+  handle->entryRawEquateFunction = entryRawEquateFunction;
+  handle->r_entryRawFunctionsHandle = r_entryRawFunctionsHandle;
+  handle->indexesNumber = 0;
+  handle->vnhs_keysNumbers = NULL;
+  handle->vnhs_indexes = NULL;
+  m_DIGGY_RETURN(RETURNED)
+} // GreenIndexesCreateInstance
+
 
 // ENTRY_COMPARE_FUNCTION
-int GreenIndexesEntryCompare (void *r_handle, int indexLabel, int aEntry,
+static int GreenIndexesEntryCompare (void *r_handle, int indexLabel, int aEntry,
   int n_bEntry, const void *cpr_bKeys) {
   m_DIGGY_BOLLARD_S()
-  struct GREEN_INDEXES *a_indexes = (struct GREEN_INDEXES *)r_handle;  
+  GREEN_INDEXES_HANDLE handle = (GREEN_INDEXES_HANDLE)r_handle;  
   int comparison = UNDEFINED;
-  m_ASSERT(indexLabel < a_indexes->indexesNumber) 
-  int j = 0; for ( ; j < a_indexes->vnhs_keysNumbers[indexLabel] ; j++) {
-    m_TRACK_IF((comparison = a_indexes->entryRawCompareFunction(
-      a_indexes->r_entryRawFunctionsHandle, indexLabel, j, aEntry, n_bEntry,cpr_bKeys)) < 0)
+  m_ASSERT(indexLabel < handle->indexesNumber) 
+  int j = 0; for ( ; j < handle->vnhs_keysNumbers[indexLabel] ; j++) {
+    m_TRACK_IF((comparison = handle->entryRawCompareFunction(
+      handle->r_entryRawFunctionsHandle, indexLabel, j, aEntry, n_bEntry,cpr_bKeys)) < 0)
     if (comparison != EQUAL_TO__COMPARISON) break ;
   } // for
   m_DIGGY_RETURN(comparison)
 } // GreenIndexesEntryCompare
 
-// Adequate an item with a key.
-//
-// Passed:
-// - a_indexes:
-// - indexLabel:
-// - aEntry: entry for "A"
-// - pr_bKeys: raw key(s) for "B" 
-//
-// Ret: adequation between "A" (entry) and "B" (key) ?
-// - ANSWER__YES: 
-// - ANSWER__NO: 
-// - -1: unexpected problem; anomaly is raised
-int GreenIndexesEntryEquate(struct GREEN_INDEXES *a_indexes, int indexLabel, int aEntry,
+// Public function: see .h
+int GreenIndexesEntryEquate(GREEN_INDEXES_HANDLE handle, int indexLabel, int aEntry,
   const void *pr_bKeys) {
   int answer = UNDEFINED;
-  m_ASSERT(indexLabel < a_indexes->indexesNumber) 
-  int j = 0; for ( ; j < a_indexes->vnhs_keysNumbers[indexLabel] ; j++) {
-    m_TRACK_IF((answer = a_indexes->entryRawEquateFunction(a_indexes->r_entryRawFunctionsHandle,
+  m_ASSERT(indexLabel < handle->indexesNumber) 
+  int j = 0; for ( ; j < handle->vnhs_keysNumbers[indexLabel] ; j++) {
+    m_TRACK_IF((answer = handle->entryRawEquateFunction(handle->r_entryRawFunctionsHandle,
       indexLabel, j, aEntry, pr_bKeys)) < 0)
     if (answer != ANSWER__YES) break ;
   } // for
@@ -404,55 +510,33 @@ int GreenIndexesEntryEquate(struct GREEN_INDEXES *a_indexes, int indexLabel, int
 } // GreenIndexesEntryEquate
 
 
-// Passed:
-// - a_indexes:
-// - itemsPhysicalNumber:
-// - keysNumber:
-//
-// Return:
-// new index label (technically equal to entry in indexes array)
-int GreenIndexesAddIndex(struct GREEN_INDEXES *a_indexes, int itemsPhysicalNumber,
+// Public function; see .h
+int GreenIndexesAddIndex(GREEN_INDEXES_HANDLE handle, int itemsPhysicalNumber,
   int keysNumber) {
   m_DIGGY_BOLLARD_S()
-  m_REALLOC_ARRAY(a_indexes->vnhs_indexes,a_indexes->indexesNumber+1)
-  m_REALLOC_ARRAY(a_indexes->vnhs_keysNumbers,a_indexes->indexesNumber+1)
-  struct GREEN_INDEX *a_index = a_indexes->vnhs_indexes + a_indexes->indexesNumber ;
+  m_REALLOC_ARRAY(handle->vnhs_indexes,handle->indexesNumber+1)
+  m_REALLOC_ARRAY(handle->vnhs_keysNumbers,handle->indexesNumber+1)
+  struct GREEN_INDEX *a_index = handle->vnhs_indexes + handle->indexesNumber ;
 
-  a_indexes->vnhs_keysNumbers[a_indexes->indexesNumber] = keysNumber;
-  m_GREEN_INDEX_INIT(a_index, itemsPhysicalNumber, GreenIndexesEntryCompare, a_indexes,
-    a_indexes->indexesNumber)
-  m_DIGGY_RETURN(a_indexes->indexesNumber++)
+  handle->vnhs_keysNumbers[handle->indexesNumber] = keysNumber;
+  m_GREEN_INDEX_INIT(a_index, itemsPhysicalNumber, GreenIndexesEntryCompare, handle,
+    handle->indexesNumber)
+  m_DIGGY_RETURN(handle->indexesNumber++)
 } // GreenIndexesAddIndex
 
 
-// Passed:
-// - a_indexes:
-// - newItemsPhysicalNumber:
-int GreenIndexesResize (struct GREEN_INDEXES *a_indexes, int newItemsPhysicalNumber) {
+// Public function; see .h
+int GreenIndexesResize (GREEN_INDEXES_HANDLE handle, int newItemsPhysicalNumber) {
   m_DIGGY_BOLLARD_S()
   int i = 0;
-  struct GREEN_INDEX *cs_index = a_indexes->vnhs_indexes;
-  for ( ; i < a_indexes->indexesNumber ; i++, cs_index++) {
+  struct GREEN_INDEX *cs_index = handle->vnhs_indexes;
+  for ( ; i < handle->indexesNumber ; i++, cs_index++) {
     m_GREEN_INDEX_RESIZE(cs_index, newItemsPhysicalNumber)
   } // for
 
   m_DIGGY_RETURN(RETURNED)
 } // GreenIndexesResize
 
-
-// Passed:
-// - mx_indexes:
-#define m_GREEN_INDEXES_FREE(/*struct GREEN_INDEXES*/mx_indexes) {\
-  int em_i = 0;\
-  struct GREEN_INDEX *emcs_index = (mx_indexes).vnhs_indexes;\
-  for ( ; em_i < (mx_indexes).indexesNumber ; em_i++, emcs_index++) {\
-    m_GREEN_INDEX_FREE(emcs_index);\
-  }\
-  if ((mx_indexes).indexesNumber > 0) {\
-    free((mx_indexes).vnhs_indexes);\
-    free((mx_indexes).vnhs_keysNumbers);\
-  }\
-}
 
 // Remove reference on item in all indexes (no action if not referenced in some index)
 //
@@ -490,28 +574,15 @@ int GreenIndexesResize (struct GREEN_INDEXES *a_indexes, int newItemsPhysicalNum
   }\
 }
 
-// Perform "equation" of entry with a key. 
-//
-// Passed:
-// - a_indexes:
-// - indexLabel: 
-// - aEntry: "A" entry 
-// - indexSeekFlags: 
-// - pr_bKeys: "B" keys(s) 
-//
-// Returned:
-// - >=0: "equation" between :"A" and "B" with that key component... 
-//   + ANSWER__YES : "A" item and "B" key(s) are similar 
-//   + ANSWER__NO : "A" item and "B" key(s) are NOT similar 
-// - -1: unexpected problem; anomaly is raised
-int GreenIndexesSeekEntryEquate(struct GREEN_INDEXES* a_indexes, int indexLabel, int aEntry,
+// Public function; see .h
+int GreenIndexesSeekEntryEquate(GREEN_INDEXES_HANDLE handle, int indexLabel, int aEntry,
   unsigned int indexSeekFlags, const void *pr_bKeys) {
   m_DIGGY_BOLLARD_S()
   if (indexSeekFlags == INDEX_SEEK_FLAGS__ANY) return ANSWER__YES;
 
   int answer = ANSWER__NO; // a priori
   if (indexSeekFlags != INDEX_SEEK_FLAGS__LIKE) {
-    int comparison = GreenIndexesEntryCompare(a_indexes, indexLabel, aEntry, -1, pr_bKeys);
+    int comparison = GreenIndexesEntryCompare(handle, indexLabel, aEntry, -1, pr_bKeys);
     m_TRACK_IF(comparison < 0)
     switch (indexSeekFlags) {
     case INDEX_SEEK_FLAGS__EQUAL:
@@ -532,7 +603,7 @@ int GreenIndexesSeekEntryEquate(struct GREEN_INDEXES* a_indexes, int indexLabel,
       m_RAISE(ANOMALY__VALUE__D,indexSeekFlags)
     } // switch
   } else { // INDEX_SEEK_FLAGS__LIKE
-    m_TRACK_IF((answer = GreenIndexesEntryEquate(a_indexes,indexLabel, aEntry, pr_bKeys)) < 0)
+    m_TRACK_IF((answer = GreenIndexesEntryEquate(handle,indexLabel, aEntry, pr_bKeys)) < 0)
   } // if 
   m_DIGGY_RETURN(answer)
 } // GreenIndexesSeekEntryEquate
@@ -567,10 +638,10 @@ int GreenIndexesSeekEntryEquate(struct GREEN_INDEXES* a_indexes, int indexLabel,
 // - superfluous closing brackets are ignored
 //
 // Passed:
-// - a_indexes: indexes global handler
+// - handle: indexes global handler
 // - a_indexIterator: contains criteria criteria
 // - m_i: criterion entry 
-#define m_CRITERIA_HANDLER_EQUATION_AND_CLOSE_BRACKETS(/*struct GREEN_INDEXES* */a_indexes,\
+#define m_CRITERIA_HANDLER_EQUATION_AND_CLOSE_BRACKETS(/*struct GREEN_INDEXES* */handle,\
   /*struct INDEX_ITERATOR* */a_indexIterator, /*int*/m_i) \
 if (m_i == 0) {\
   if (a_indexIterator->criteriaNumber5 == 1) statuses[0] = 'O' ; \
@@ -585,7 +656,7 @@ if (m_i == 0) {\
       a_indexIterator->criteria[m_i+1].criteriaOpFlags, CRITERIA_OP_FLAG__AND)) em_cn++;\
   } else if (em_cn > i_stackEntry) em_cn = i_stackEntry; \
   if (*v_statusPtr == 'U') {\
-    int answer = GreenIndexesSeekEntryEquate(a_indexes,\
+    int answer = GreenIndexesSeekEntryEquate(handle,\
       a_indexIterator->criteria[m_i].indexLabel,*nan_entry,\
       a_indexIterator->criteria[m_i].indexSeekFlags,\
       a_indexIterator->criteria[m_i].cfpr_keys);\
@@ -655,40 +726,23 @@ if (m_i == 0) {\
   m_ASSERT(*v_statusPtr == 'O' || *v_statusPtr == 'K') \
   if (*v_statusPtr == 'O') break;
 
-// Update index iterator sequence.
-//
-// Passed:
-// - a_indexes: 
-// - a_indexIterator-> : current index iterator
-// - nan_entry: 
-//   + == NULL: "new sequence" (aka "soft reset") case
-//   + != NULL: "next item" case
-//
-// Changed:
-// - a_indexIterator-> : new state of index iterator 
-// - *nan_entry: (only significant whith "next item" case) item entry to retrieve : 
-//   + -1 special value : not found, that is "disabled" or "no more"
-//   + >= 0: corresponding entry
-//
-// Ret:
-// - RETURNED: Ok
-// - -1: anomaly is raised
-int GreenIndexesSeek(struct GREEN_INDEXES* a_indexes, struct INDEX_ITERATOR *a_indexIterator,
+// Public function; see .h
+int GreenIndexesSeek(GREEN_INDEXES_HANDLE handle, struct INDEX_ITERATOR *a_indexIterator,
   int *nan_entry) {
   m_DIGGY_BOLLARD_S()
-  m_ASSERT(a_indexIterator->criteria[0].indexLabel < a_indexes->indexesNumber) 
+  m_ASSERT(a_indexIterator->criteria[0].indexLabel < handle->indexesNumber) 
 
   m_CRITERIA_HANDLER_CREATE()
 
   do {
-    m_TRACK_IF(GreenIndexSeek(a_indexes->vnhs_indexes + a_indexIterator->criteria[0].indexLabel,
+    m_TRACK_IF(GreenIndexSeek(handle->vnhs_indexes + a_indexIterator->criteria[0].indexLabel,
       a_indexIterator->b_descending, a_indexIterator->criteria[0].indexSeekFlags,
       a_indexIterator->criteria[0].cfpr_keys, &a_indexIterator->indexSequence, nan_entry) !=
       RETURNED) 
     if (nan_entry != NULL && *nan_entry >= 0) {
       m_CRITERIA_HANDLER_RESET(a_indexIterator)
       int i = 0; for (; i < a_indexIterator->criteriaNumber5; i++) {
-        m_CRITERIA_HANDLER_EQUATION_AND_CLOSE_BRACKETS(a_indexes,a_indexIterator,i)
+        m_CRITERIA_HANDLER_EQUATION_AND_CLOSE_BRACKETS(handle,a_indexIterator,i)
         m_CRITERIA_HANDLER_OPEN_BRACKETS(a_indexIterator,i)
       } // for
       m_CRITERIA_HANDLER_CHECK_STATUS()
@@ -699,55 +753,33 @@ if (nan_entry != NULL) m_DIGGY_VAR_D(*nan_entry)
   m_DIGGY_RETURN(RETURNED)
 } // GreenIndexesSeek
 
-// Get current entry in index sequence.
-//
-// Passed:
-// - a_indexes:
-// - a_indexIterator:
-//
-// Changed:
-// - *an_entry: 
-//   + -1 special value : not found
-//   + >= 0: corresponding entry
-//
-// Ret:
-// - RETURNED: Ok
-// - -1: anomaly is raised
-int GreenIndexesCurrent(struct GREEN_INDEXES* a_indexes,
+// Public function; see .h
+int GreenIndexesCurrent(GREEN_INDEXES_HANDLE handle,
   struct INDEX_ITERATOR *a_indexIterator, int *an_entry) {
   m_DIGGY_BOLLARD_S()
-  m_ASSERT(a_indexIterator->criteria[0].indexLabel < a_indexes->indexesNumber) 
-  struct GREEN_INDEX *a_index = a_indexes->vnhs_indexes + a_indexIterator->criteria[0].indexLabel;
+  m_ASSERT(a_indexIterator->criteria[0].indexLabel < handle->indexesNumber) 
+  struct GREEN_INDEX *a_index = handle->vnhs_indexes + a_indexIterator->criteria[0].indexLabel;
   
   m_TRACK_IF(m_GreenIndexCurrent(a_index,&a_indexIterator->indexSequence,an_entry) != RETURNED) 
 
   m_DIGGY_RETURN(RETURNED)
 } // GreenIndexesCurrent
 
-// Ret:
-// - ANSWER__YES: indexes are enabled (i.e at least one index has been added) 
-// - ANSWER__NO: indexes are NOT enabled
-// - -1: anomaly is raised
-int GreenIndexesVerifyEnabled (struct GREEN_INDEXES *a_indexes) {
+// Public function; see .h
+int GreenIndexesVerifyEnabled (GREEN_INDEXES_HANDLE handle) {
   m_DIGGY_BOLLARD_S()
-  m_DIGGY_RETURN(a_indexes->indexesNumber > 0?  ANSWER__YES: ANSWER__NO) 
+  m_DIGGY_RETURN(handle->indexesNumber > 0?  ANSWER__YES: ANSWER__NO) 
 } // GreenIndexesVerifyEnabled
 
 
-// Passed:
-// - a_indexes:
-//
-// Ret:
-// - COMPLETED__OK:
-// - COMPLETED__BUT: some index is corrupted
-// - -1: anomaly is raised
-int GreenIndexesVerify (struct GREEN_INDEXES *a_indexes) {
+// Public function; see .h
+int GreenIndexesVerify (GREEN_INDEXES_HANDLE handle) {
   m_DIGGY_BOLLARD_S()
   int completed = COMPLETED__OK; // a priori
   int i = 0;
-  struct GREEN_INDEX *s_index = a_indexes->vnhs_indexes ;
+  struct GREEN_INDEX *s_index = handle->vnhs_indexes ;
 
-  for ( ; i < a_indexes->indexesNumber ; i++, s_index++) {
+  for ( ; i < handle->indexesNumber ; i++, s_index++) {
 m_DIGGY_VAR_D(i)
     switch (GreenIndexVerify(s_index)) {
     case COMPLETED__OK:
@@ -763,28 +795,17 @@ m_DIGGY_VAR_D(i)
 } // GreenIndexesVerify
 
 
-// NOT callable if indexes are not enabled 
-// 
-// Passed:
-// - a_indexes:
-//
-// Changed:
-// - *ac_commonCount: only significant with COMPLETED__OK
-//
-// Ret:
-// - COMPLETED__OK: all indexes have the same number of entries
-// - COMPLETED__BUT: at least two indexes have different numbers of entries
-// - -1: anomaly is raised
-int GreenIndexesVerifyCount (struct GREEN_INDEXES *a_indexes,int *ac_commonCount) {
+// Public function; see .h
+int GreenIndexesVerifyCount (GREEN_INDEXES_HANDLE handle,int *ac_commonCount) {
   m_DIGGY_BOLLARD_S()
-  m_ASSERT(a_indexes->indexesNumber > 0)
+  m_ASSERT(handle->indexesNumber > 0)
 
   *ac_commonCount = UNDEFINED; 
   int n_lastCount = -1;
   int completed = COMPLETED__OK; // a priori
-  struct GREEN_INDEX *s_index = a_indexes->vnhs_indexes ;
+  struct GREEN_INDEX *s_index = handle->vnhs_indexes ;
   int i = 0;
-  for ( ; i < a_indexes->indexesNumber ; i++, s_index++) {
+  for ( ; i < handle->indexesNumber ; i++, s_index++) {
     int thatCount = GREEN_INDEX_GET_COUNT(s_index);
     if (n_lastCount != -1 && thatCount != n_lastCount) {
       completed = COMPLETED__BUT;
@@ -799,24 +820,14 @@ int GreenIndexesVerifyCount (struct GREEN_INDEXES *a_indexes,int *ac_commonCount
 } // GreenIndexesVerifyCount
 
 
-// 
-// Passed:
-// - a_indexes:
-// - entry: entry to verify presence in different indexes
-// - expectedHits : typically 0 or 1
-//
-// Returned
-// - COMPLETED__OK: number of "hits" (aka number of times the entry is present in the stack)
-//                  is as expected is as expected in EACH index
-// - COMPLETED__BUT: number of "hits" NOT as expected in 
-// - -1: unexpected problem ; anomaly is raised
-int GreenIndexesVerifyEntry (struct GREEN_INDEXES *a_indexes, int entry, int expectedHits) {
+// Public function; see .h
+int GreenIndexesVerifyEntry (GREEN_INDEXES_HANDLE handle, int entry, int expectedHits) {
   m_DIGGY_BOLLARD_S()
 
   int completed = COMPLETED__OK; // a priori
   int i = 0;
-  struct GREEN_INDEX *s_index = a_indexes->vnhs_indexes ;
-  for ( ; i < a_indexes->indexesNumber ; i++, s_index++) {
+  struct GREEN_INDEX *s_index = handle->vnhs_indexes ;
+  for ( ; i < handle->indexesNumber ; i++, s_index++) {
     switch (GreenIndexVerifyEntry(s_index, entry, expectedHits)) {
     case COMPLETED__OK:
     break; case COMPLETED__BUT:
@@ -831,19 +842,63 @@ int GreenIndexesVerifyEntry (struct GREEN_INDEXES *a_indexes, int entry, int exp
 } // GreenIndexesVerifyEntry 
 
 
-// Passed:
-// - a_indexes
-//
-// Ret:
-// - RETURNED:
-// - -1: anomaly is raised
-int GreenIndexesClear (struct GREEN_INDEXES *a_indexes) {
+// Public function; see .h
+int GreenIndexesClear (GREEN_INDEXES_HANDLE handle) {
   m_DIGGY_BOLLARD_S()
   int i = 0 ;
-  struct GREEN_INDEX *s_index = a_indexes->vnhs_indexes ;
-  for ( ; i < a_indexes->indexesNumber ; i++, s_index++) {
+  struct GREEN_INDEX *s_index = handle->vnhs_indexes ;
+  for ( ; i < handle->indexesNumber ; i++, s_index++) {
     m_GREEN_INDEX_CLEAR(s_index)
   } // for
 
   m_DIGGY_RETURN(RETURNED)
 } // GreenIndexesClear
+
+
+// Public function; see .h
+int GreenIndexesRemove(GREEN_INDEXES_HANDLE handle, int entry) {
+  m_DIGGY_BOLLARD()
+  int n_indexEntry = UNDEFINED, top = UNDEFINED;
+  int i = 0;
+  struct GREEN_INDEX *s_index = handle->vnhs_indexes;
+  for ( ; i < handle->indexesNumber ; i ++, s_index++) {
+    m_TRACK_IF(GreenIndexBSearch(s_index, entry,(void *)UNDEFINED,&n_indexEntry,&top,
+      (struct INDEX_ENTRIES*)UNDEFINED) != RETURNED)
+    if (n_indexEntry >= 0) {
+      m_GREEN_INDEX_REMOVE(s_index,n_indexEntry)
+    } // if
+  } // for
+  m_DIGGY_RETURN(RETURNED)
+ }
+
+// Public function; see .h
+int GreenIndexesAdd(GREEN_INDEXES_HANDLE handle, int entry) {
+  m_DIGGY_BOLLARD()
+  int n_indexEntry = UNDEFINED, top = UNDEFINED;
+  int i = 0;
+  struct GREEN_INDEX *s_index = handle->vnhs_indexes;
+  for ( ; i < handle->indexesNumber ; i ++, s_index++) {
+    m_TRACK_IF(GreenIndexBSearch(s_index, entry, (void*)UNDEFINED, &n_indexEntry, &top,
+      (struct INDEX_ENTRIES*)UNDEFINED) != RETURNED)
+    if (n_indexEntry == -1) {
+      m_GREEN_INDEX_ADD(s_index,top,entry)
+    } // if
+  } // for
+  m_DIGGY_RETURN(RETURNED)
+}
+
+// Public function; see .h
+int GreenIndexesDestroyInstance(GREEN_INDEXES_HANDLE xh_handle) {
+  m_DIGGY_BOLLARD()
+  int i = 0;
+  struct GREEN_INDEX *cs_index = xh_handle->vnhs_indexes;
+  for ( ; i < xh_handle->indexesNumber ; i++, cs_index++) {
+    m_GREEN_INDEX_FREE(cs_index);
+  } // for
+  if (xh_handle->indexesNumber > 0) {
+    free(xh_handle->vnhs_indexes);
+    free(xh_handle->vnhs_keysNumbers);
+  } // if
+  free(xh_handle);
+  m_DIGGY_RETURN(RETURNED)
+} // GreenIndexesDestroyInstance
