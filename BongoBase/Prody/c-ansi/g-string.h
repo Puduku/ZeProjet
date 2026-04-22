@@ -235,8 +235,8 @@ typedef int (*NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION) (void *xhr_handle) ;
 // 
 // Passed:
 // - azh_handle: (address of) new handle to initialize
-// - expectedItemsNumber:
-//   #SEE GreenCollectionCreateInstance-expectedItemsNumber@c-ansi/green.h <<g-string set>>
+// - expectedItemCount:
+//   #SEE GreenCollectionCreateInstance-expectedItemCount@c-ansi/green.h <<g-string set>>
 // - gStringSetCardinality: number of elements in a set (>0 ; 0 value is taken for a BUG) #SKIP
 // - n_gStringConveyance: (-1 special value: not used) general conveyance
 //   #see enum-G_STRING_CONVEYANCE 
@@ -250,15 +250,15 @@ typedef int (*NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION) (void *xhr_handle) ;
 // Returned:
 // - RETURNED: Ok, <g-string set> collection is instancied
 // - -1: unexpected problem; anomaly is raised 
-int GStringsCreateInstance(G_STRINGS_HANDLE* azh_handle, int expectedItemsNumber,
+int GStringsCreateInstance(G_STRINGS_HANDLE* azh_handle, int expectedItemCount,
   int gStringSetCardinality, int n_gStringConveyance, const int *cnfps_gStringConveyances,
   NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION c_namedObjectDestroyInstanceFunction);
 
 // #REF m_GStringsCreateInstance <g-string>
 // #SEE GStringsCreateInstance <g-string>
-static inline int m_GStringsCreateInstance(G_STRINGS_HANDLE* azh_handle, int expectedItemsNumber) {
+static inline int m_GStringsCreateInstance(G_STRINGS_HANDLE* azh_handle, int expectedItemCount) {
   m_DIGGY_BOLLARD_S()
-  m_DIGGY_RETURN(GStringsCreateInstance(azh_handle,expectedItemsNumber,1,-1,NULL,
+  m_DIGGY_RETURN(GStringsCreateInstance(azh_handle,expectedItemCount,1,-1,NULL,
     (NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION)UNDEFINED))
 } // m_GStringsCreateInstance
 
@@ -296,7 +296,7 @@ typedef GENERIC_INTEGER (*P_STRING_INTRINSIC_VALUE_FUNCTION) (void *pr_handle,
 // #REF GStringsAddIndex <g-string set> <key1>
 // #SEE GreenCollectionAddIndex@c-ansi/green.h  <<g-string set>> 
 // Passed parameters for new index:
-// - keysNumber: >= 1; 1:plain index; >=2:compound index  #SKIP
+// - keyCount: >= 1; 1:plain index; >=2:compound index  #SKIP
 // - key1GStringSetElement: between [0 ; <g-string set cardinality>[ ; the g-string set's
 //   element serving as first key of the index
 // - key1GsKeysComparison: #see enum-GS_KEYS_COMPARISON
@@ -312,7 +312,7 @@ typedef GENERIC_INTEGER (*P_STRING_INTRINSIC_VALUE_FUNCTION) (void *pr_handle,
 // - cfpr_key1PStringIntrinsicValueFunctionHandle: only significant with
 //   INTRINSIC_VALUE__GS_KEYS_COMPARISON
 // - ... : g-string set(s element for second key (etc.) if any ...
-int GStringsAddIndex(G_STRINGS_HANDLE handle,  int keysNumber, int key1GStringSetElement,
+int GStringsAddIndex(G_STRINGS_HANDLE handle,  int keyCount, int key1GStringSetElement,
   int key1GsKeysComparison,  IS_CHAR_FUNCTION cn_key1IsNeutralCharFunction,
   TO_CHAR_FUNCTION cn_key1ToCharFunction,
   P_STRING_INTRINSIC_VALUE_FUNCTION c_key1PStringIntrinsicValueFunction,

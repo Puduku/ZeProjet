@@ -29,7 +29,7 @@ struct TOKEN_DEFINITION {
 
 // #SEE m_GStringsCreateInstance <named-object>
 // Note: TOKEN__G_STRING_CONVEYANCE => token id acolyt 
-int l_GTokensCreateInstance(g_G_TOKENS_HANDLE *azh_handle, int expectedItemsNumber) ;
+int l_GTokensCreateInstance(g_G_TOKENS_HANDLE *azh_handle, int expectedItemCount) ;
 
 // #SEE GStringsFetch @ c-ansi/g-string.h <g-token>
 #define g_GTokensFetch GStringsFetch

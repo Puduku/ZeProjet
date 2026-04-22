@@ -305,7 +305,7 @@ int BlotcodeFreeze(BLOTCODE_HANDLE ep_handle) {
   m_TRACK_IF(ep_handle->c_blotfuncsHandler.blotlibsCount < 0)
 
   m_TRACK_IF(GreenCollectionCreateInstance(&(ep_handle->ch_blotfuncsHandle),
-    BATEAU__EXPECTED_ITEMS_NUMBER,  sizeof(struct BLOTFUNC_ENTRY), NULL,
+    BATEAU__EXPECTED_ITEM_COUNT,  sizeof(struct BLOTFUNC_ENTRY), NULL,
     BlotfuncsHandlerCompare, NULL, &(ep_handle->c_blotfuncsHandler)) != RETURNED)
   m_ASSERT(GreenCollectionAddIndex(ep_handle->ch_blotfuncsHandle,1) == INDEX_LABEL0)  
 
@@ -565,7 +565,7 @@ int BlotcodeExecutorCreateInstance(BLOTCODE_EXECUTOR_HANDLE *azh_handle,
   } // blotlibStuff
 
   m_TRACK_IF(GreenCollectionCreateInstance(&handle->h_templatePartitionsHandle,
-    BATEAU__EXPECTED_ITEMS_NUMBER,sizeof(struct TEMPLATE_PARTITION), NULL,NULL,NULL,
+    BATEAU__EXPECTED_ITEM_COUNT,sizeof(struct TEMPLATE_PARTITION), NULL,NULL,NULL,
     (void*)UNDEFINED) != RETURNED)
 
   m_C_STACK_INIT(handle->h_flowControlStack)

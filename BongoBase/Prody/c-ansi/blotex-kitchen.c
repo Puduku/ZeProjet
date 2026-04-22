@@ -24,7 +24,7 @@
 int BlotregCreateInstance(void **azhr_handle, struct P_STRING f_name, va_list arguments){
   m_DIGGY_BOLLARD()
   g_BLOTREG_HANDLE* azh_handle = (g_BLOTREG_HANDLE*) azhr_handle;
-  m_TRACK_IF(l_GParamsCreateInstance(azh_handle,BATEAU__EXPECTED_ITEMS_NUMBER) !=
+  m_TRACK_IF(l_GParamsCreateInstance(azh_handle,BATEAU__EXPECTED_ITEM_COUNT) !=
     RETURNED) 
   g_BLOTREG_HANDLE handle = *azh_handle;
   m_ASSERT(g_GParamsAddIndex(handle,1,G_PARAM_NAME_ELEMENT,P_STRING__GS_KEYS_COMPARISON,NULL,NULL,

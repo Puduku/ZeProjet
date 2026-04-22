@@ -25,14 +25,14 @@ int GParamValueAssign(g_G_PARAM_STUFF stuff, GENERIC_INTEGER en_value,
 } // GParamValueAssign
 
 // Public function: see .h
-int l_GParamsCreateInstance(g_G_PARAMS_HANDLE *azh_handle,int expectedItemsNumber) {
+int l_GParamsCreateInstance(g_G_PARAMS_HANDLE *azh_handle,int expectedItemCount) {
   m_DIGGY_BOLLARD()
   static const int ps_gParamGStringConveyances[G_PARAM_CARDINALITY] = { 
      VALUED_STRING__G_STRING_CONVEYANCE, // "Token id." 
      VALUED_STRING__G_STRING_CONVEYANCE, 
   } ; 
 
-  m_TRACK_IF(GStringsCreateInstance(azh_handle, expectedItemsNumber,G_PARAM_CARDINALITY,-1,
+  m_TRACK_IF(GStringsCreateInstance(azh_handle, expectedItemCount,G_PARAM_CARDINALITY,-1,
     ps_gParamGStringConveyances,(NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION)UNDEFINED) != RETURNED)
   m_DIGGY_RETURN(RETURNED);
 } // l_GParamsCreateInstance

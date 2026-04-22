@@ -70,21 +70,21 @@ m_DEFINE_ENUM_ALIAS_END()
 
 // Passed:
 // - criteriaOpFlags
-static inline int m_OpenBracketsNumber(unsigned int criteriaOpFlags) {
+static inline int m_OpenBracketCount(unsigned int criteriaOpFlags) {
   if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__OPEN3)) return 3;
   else if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__OPEN2)) return 2;
   else if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__OPEN1)) return 1;
   return 0;
-} // m_OpenBracketsNumber 
+} // m_OpenBracketCount 
 
 // Passed:
 // - criteriaOpFlags
-static inline int m_CloseBracketsNumber(unsigned int criteriaOpFlags) {
+static inline int m_CloseBracketCount(unsigned int criteriaOpFlags) {
   if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE3)) return 3;
   else if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE2)) return 2;
   else if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE1)) return 1;
   return 0;
-} // m_CloseBracketsNumber 
+} // m_CloseBracketCount 
 
 
 // Index's virtual function to compare an item with a key.
@@ -162,9 +162,9 @@ struct INDEX_ENTRIES {
 //
 struct INDEX_SEQUENCE {
   // index entries "blocks":
-  int indexEntriesNumber2; // between 0 and 2 : 0 => 'disabled' ; >0 -> 'enabled' 
+  int indexEntryCount2; // between 0 and 2 : 0 => 'disabled' ; >0 -> 'enabled' 
   struct INDEX_ENTRIES indexEntries2[2];
-  // Fields below are only significant if 'enabled' (indexEntriesNumber2 > 0) :
+  // Fields below are only significant if 'enabled' (indexEntryCount2 > 0) :
   int cv_firstIndexEntry; // first index entry for ALL "blocks"  
   int cv_lastIndexEntry; // last index entry for ALL "blocks"  
   int ci_indexEntryCursor; // "current" index entry: < cv_firstIndexEntry => Ascending:"soft reset",
@@ -174,7 +174,7 @@ struct INDEX_SEQUENCE {
 } ;
 
 // Disable index sequence (disambiguation purpose...)
-#define m_DISABLE_INDEX_SEQUENCE(m_indexSequence)  (m_indexSequence).indexEntriesNumber2 = 0;
+#define m_DISABLE_INDEX_SEQUENCE(m_indexSequence)  (m_indexSequence).indexEntryCount2 = 0;
 
 struct INDEX_ITERATOR {
   int criteriaNumber5 ;
@@ -231,12 +231,12 @@ int GreenIndexesEntryEquate(GREEN_INDEXES_HANDLE handle, int indexLabel, int aEn
 // Passed:
 // - handle:
 // - itemsPhysicalNumber:
-// - keysNumber:
+// - keyCount:
 //
 // Return:
 // new index label (technically equal to entry in indexes array)
 int GreenIndexesAddIndex(GREEN_INDEXES_HANDLE handle, int itemsPhysicalNumber,
-  int keysNumber) ;
+  int keyCount) ;
 
 
 // Passed:

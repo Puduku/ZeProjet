@@ -176,7 +176,7 @@ struct INDEX_REQUEST {
 const int p_indexRequestAutomaticBufferSize = sizeof(struct INDEX_REQUEST);
 
 struct GREEN_COLLECTION {
-  int expectedItemsNumber ;
+  int expectedItemCount ;
 
   GREEN_HANDLER__DISENGAGE_FUNCTION n_greenHandlerDisengageFunction ;
   GREEN_HANDLER__COMPARE_FUNCTION greenHandlerCompareFunction;
@@ -195,7 +195,7 @@ struct GREEN_COLLECTION {
   struct INDEX_REQUEST internalIndexRequest;
   struct GAPS_STACK h_gaps; 
   // "Monitored" entries "fetched for change" (in ALIEN / ALIVE state) : 
-  int fetched4ChangeEntriesNumber;  
+  int fetched4ChangeEntryCount;  
   int fetched4ChangeEntriesPhysicalNumber;  
   int *h_fetched4ChangeEntries;  
 };
@@ -296,7 +296,7 @@ static int GreenCollectionEntryRawEquate (void *r_handle, int indexLabel, int ke
 
 
 // Public function; see description in .h
-int GreenCollectionCreateInstance(GREEN_COLLECTION_HANDLE *azh_handle,  int expectedItemsNumber,
+int GreenCollectionCreateInstance(GREEN_COLLECTION_HANDLE *azh_handle,  int expectedItemCount,
   int greenItemSize, GREEN_HANDLER__DISENGAGE_FUNCTION n_greenHandlerDisengageFunction,
   GREEN_HANDLER__COMPARE_FUNCTION n_greenHandlerCompareFunction,
   GREEN_HANDLER__EQUATE_FUNCTION n_greenHandlerEquateFunction, void *cfr_greenHandlerHandle) {
@@ -304,7 +304,7 @@ int GreenCollectionCreateInstance(GREEN_COLLECTION_HANDLE *azh_handle,  int expe
   m_MALLOC_INSTANCE(*azh_handle)
   GREEN_COLLECTION_HANDLE handle = *azh_handle ;
 
-  handle->expectedItemsNumber = expectedItemsNumber;
+  handle->expectedItemCount = expectedItemCount;
 
   handle->n_greenHandlerDisengageFunction = n_greenHandlerDisengageFunction ;
   handle->greenHandlerCompareFunction =
@@ -320,7 +320,7 @@ int GreenCollectionCreateInstance(GREEN_COLLECTION_HANDLE *azh_handle,  int expe
   handle->b_automaticIndexesRefresh = b_TRUE;
 
   handle->greenItemSize = greenItemSize;
-  handle->itemsPhysicalNumber = expectedItemsNumber;
+  handle->itemsPhysicalNumber = expectedItemCount;
 
   m_CALLOC(handle->h_greenArray,handle->itemsPhysicalNumber,handle->greenItemSize)
   m_MALLOC_ARRAY(handle->hsc_flags, handle->itemsPhysicalNumber)
@@ -333,8 +333,8 @@ int GreenCollectionCreateInstance(GREEN_COLLECTION_HANDLE *azh_handle,  int expe
   m_INIT_INDEX_REQUEST(handle->internalIndexRequest,defaultCriterion)
 
   m_MALLOC_ARRAY(handle->h_fetched4ChangeEntries,handle->fetched4ChangeEntriesPhysicalNumber =
-    expectedItemsNumber)
-  handle->fetched4ChangeEntriesNumber = 0;
+    expectedItemCount)
+  handle->fetched4ChangeEntryCount = 0;
   // MINIMONITOR: NADA
   m_DIGGY_RETURN(RETURNED)
 } // GreenCollectionCreateInstance
@@ -348,18 +348,18 @@ static int GreenCollectionResize(GREEN_COLLECTION_HANDLE handle) {
   m_DIGGY_BOLLARD_S()
   m_ASSERT(!handle->b_frozen)
 
-  int newItemsPhysicalNumber = handle->itemsPhysicalNumber + handle->expectedItemsNumber;
+  int newItemsPhysicalNumber = handle->itemsPhysicalNumber + handle->expectedItemCount;
 
   m_REALLOC(handle->h_greenArray, handle->greenItemSize*newItemsPhysicalNumber)
   memset(handle->h_greenArray + handle->greenItemSize * handle->itemsPhysicalNumber, 0,
-    handle->greenItemSize * handle->expectedItemsNumber);
+    handle->greenItemSize * handle->expectedItemCount);
 
   m_GAPS_STACK_RESIZE(handle->h_gaps, newItemsPhysicalNumber)
   m_REALLOC_ARRAY(handle->hsc_flags, newItemsPhysicalNumber)
   m_TRACK_IF(GreenIndexesResize(handle->h_indexesHandle,newItemsPhysicalNumber) != 0)
 
   handle->itemsPhysicalNumber = newItemsPhysicalNumber;
-  m_DIGGY_RETURN(handle->expectedItemsNumber)
+  m_DIGGY_RETURN(handle->expectedItemCount)
 } // GreenCollectionResize
 
 
@@ -378,7 +378,7 @@ static int GreenCollectionRefreshIndexesInternal(GREEN_COLLECTION_HANDLE handle,
 
   // MINIMONITOR: ANY
 
-  if (handle->fetched4ChangeEntriesNumber == 0) {
+  if (handle->fetched4ChangeEntryCount == 0) {
     // MINIMONITOR: NADA
     m_DIGGY_RETURN(RETURNED)
   } // if
@@ -387,7 +387,7 @@ static int GreenCollectionRefreshIndexesInternal(GREEN_COLLECTION_HANDLE handle,
 
   // MINIMONITOR: ANY+
   int *fetched4ChangeEntryPtr = handle->h_fetched4ChangeEntries; 
-  int i = 0; for (; i < handle->fetched4ChangeEntriesNumber; i++, fetched4ChangeEntryPtr++) {
+  int i = 0; for (; i < handle->fetched4ChangeEntryCount; i++, fetched4ChangeEntryPtr++) {
     // MICROMONITOR: ALIEN / ALIVE (fetched 4 change)
     m_ASSERT(b_ALL_FLAGS_OK(handle->hsc_flags[*fetched4ChangeEntryPtr],ALIEN_ALIVE__FLAGS))
 m_DIGGY_INFO("*fetched4ChangeEntryPtr=%d Before m_GREEN_INDEXES_ADD()...",*fetched4ChangeEntryPtr)
@@ -395,7 +395,7 @@ m_DIGGY_INFO("*fetched4ChangeEntryPtr=%d Before m_GREEN_INDEXES_ADD()...",*fetch
     m_SET_FLAG_OFF(handle->hsc_flags[*fetched4ChangeEntryPtr],ALIEN_FLAG)
     // MICROMONITOR: FAMED / ALIVE
   } // for
-  handle->fetched4ChangeEntriesNumber = 0; 
+  handle->fetched4ChangeEntryCount = 0; 
   // MINIMONITOR: NADA
 
   m_DIGGY_RETURN(RETURNED)
@@ -445,12 +445,12 @@ static inline int m_GreenCollectionAddFetched4ChangeEntry(GREEN_COLLECTION_HANDL
   m_DIGGY_BOLLARD_S()
 m_DIGGY_VAR_D(entry)
   m_ASSERT(!handle->b_frozen)
-  if (handle->fetched4ChangeEntriesNumber == handle->fetched4ChangeEntriesPhysicalNumber) {
+  if (handle->fetched4ChangeEntryCount == handle->fetched4ChangeEntriesPhysicalNumber) {
     m_REALLOC(handle->h_fetched4ChangeEntries,handle->fetched4ChangeEntriesPhysicalNumber +=
-      handle->expectedItemsNumber)
+      handle->expectedItemCount)
   } // if
 
-  handle->h_fetched4ChangeEntries[handle->fetched4ChangeEntriesNumber++] = entry;
+  handle->h_fetched4ChangeEntries[handle->fetched4ChangeEntryCount++] = entry;
   m_DIGGY_RETURN(RETURNED)
 } // m_GreenCollectionAddFetched4ChangeEntry
 
@@ -600,7 +600,7 @@ int GreenCollectionClear (GREEN_COLLECTION_HANDLE handle) {
   // MINIMONITOR: ANY
 
   handle->i_itemsCount = 0 ;
-  handle->fetched4ChangeEntriesNumber = 0 ;
+  handle->fetched4ChangeEntryCount = 0 ;
   m_GAPS_STACK_CLEAR(handle->h_gaps)
   m_TRACK_IF(GreenIndexesClear(handle->h_indexesHandle) != RETURNED)
 
@@ -610,7 +610,7 @@ int GreenCollectionClear (GREEN_COLLECTION_HANDLE handle) {
 
 
 // Public function; see description in .h
-int GreenCollectionAddIndex (GREEN_COLLECTION_HANDLE handle, int keysNumber) {
+int GreenCollectionAddIndex (GREEN_COLLECTION_HANDLE handle, int keyCount) {
   m_DIGGY_BOLLARD()
   m_ASSERT(!handle->b_frozen)
   // MINIMONITOR: ANY
@@ -620,10 +620,10 @@ int GreenCollectionAddIndex (GREEN_COLLECTION_HANDLE handle, int keysNumber) {
   // TODO: permettre d'ajouter des indexes ag chaud...
   m_ASSERT(handle->i_itemsCount == 0)
 
-  m_ASSERT(keysNumber > 0)
+  m_ASSERT(keyCount > 0)
 
   int newIndexLabel = GreenIndexesAddIndex(handle->h_indexesHandle, handle->itemsPhysicalNumber,
-    keysNumber);
+    keyCount);
   m_TRACK_IF(newIndexLabel < 0)
 
   m_DIGGY_RETURN(newIndexLabel)

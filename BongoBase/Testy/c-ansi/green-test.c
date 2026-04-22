@@ -223,7 +223,7 @@ int main (int argc, char **argv) {
   GREEN_COLLECTION_HANDLE handle = (GREEN_COLLECTION_HANDLE) UNDEFINED;
 
   b_diggyGreenCollectionExam = b_TRUE;   
-  m_TRACK_IF(GreenCollectionCreateInstance(&handle, BATEAU__EXPECTED_ITEMS_NUMBER/*2*/,
+  m_TRACK_IF(GreenCollectionCreateInstance(&handle, BATEAU__EXPECTED_ITEM_COUNT/*2*/,
     sizeof(struct TEST_ITEM), NULL,TestItemHandlerCompare,NULL,NULL) != RETURNED)
 
 

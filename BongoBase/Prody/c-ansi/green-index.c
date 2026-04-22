@@ -216,7 +216,7 @@ static int GreenIndexBSearch(struct GREEN_INDEX *a_index,
 static inline int m_GreenIndexCurrent(struct GREEN_INDEX* a_index,
   struct INDEX_SEQUENCE *a_indexSequence, int *an_entry) {
 
-  if (a_indexSequence->indexEntriesNumber2 > 0 && a_indexSequence->ci_indexEntryCursor >= 
+  if (a_indexSequence->indexEntryCount2 > 0 && a_indexSequence->ci_indexEntryCursor >= 
     a_indexSequence->indexEntries2[0].first && a_indexSequence->ci_indexEntryCursor <=
     a_indexSequence->cv_lastIndexEntry)
     *an_entry = a_index->hsc_array[a_indexSequence->ci_indexEntryCursor];
@@ -255,18 +255,18 @@ static int GreenIndexSeek(struct GREEN_INDEX* a_index, char b_descending,
   m_DIGGY_BOLLARD_S()
 
   if (nan_entry != NULL) { // "next item" case: seek next in existing sequence
-m_DIGGY_VAR_D(a_indexSequence->indexEntriesNumber2)
+m_DIGGY_VAR_D(a_indexSequence->indexEntryCount2)
 m_DIGGY_VAR_D(a_indexSequence->indexEntries2[0].first)
 m_DIGGY_VAR_D(a_indexSequence->indexEntries2[0].last)
     *nan_entry = -1; // "disabled" / "No more" a priori
-    if (a_indexSequence->indexEntriesNumber2 > 0) { // "enabled"
+    if (a_indexSequence->indexEntryCount2 > 0) { // "enabled"
       if (b_descending) {
         if (a_indexSequence->ci_indexEntryCursor >= a_indexSequence->indexEntries2[0].first) { 
           // NOT YET "no more"...
           if (a_indexSequence->ci_indexEntryCursor > a_indexSequence->cv_lastIndexEntry) {
             // "soft reset"
             a_indexSequence->ci_indexEntryCursor = (a_indexSequence->cv_indexEntriesPtr =
-              a_indexSequence->indexEntries2 + a_indexSequence->indexEntriesNumber2 - 1)->last;
+              a_indexSequence->indexEntries2 + a_indexSequence->indexEntryCount2 - 1)->last;
 m_DIGGY_VAR_D(a_indexSequence->ci_indexEntryCursor)
           } else if (--(a_indexSequence->ci_indexEntryCursor) <
             a_indexSequence->cv_indexEntriesPtr->first && a_indexSequence->cv_indexEntriesPtr >
@@ -290,7 +290,7 @@ m_DIGGY_VAR_D(a_indexSequence->ci_indexEntryCursor)
 m_DIGGY_VAR_D(a_indexSequence->ci_indexEntryCursor)
           } else if (++(a_indexSequence->ci_indexEntryCursor) >
             a_indexSequence->cv_indexEntriesPtr->last && a_indexSequence->cv_indexEntriesPtr <
-            a_indexSequence->indexEntries2 + a_indexSequence->indexEntriesNumber2 - 1) {
+            a_indexSequence->indexEntries2 + a_indexSequence->indexEntryCount2 - 1) {
             // Pass to next block:
             a_indexSequence->ci_indexEntryCursor = (++(a_indexSequence->cv_indexEntriesPtr))->first;
 m_DIGGY_VAR_D(a_indexSequence->ci_indexEntryCursor)
@@ -305,7 +305,7 @@ m_DIGGY_VAR_D(a_indexSequence->ci_indexEntryCursor)
 m_DIGGY_VAR_D(*nan_entry)
 
   } else { // "new sequence" case
-    a_indexSequence->indexEntriesNumber2 = 0; // Empty ("disabled") selection a priori
+    a_indexSequence->indexEntryCount2 = 0; // Empty ("disabled") selection a priori
     if (a_index->count > 0) { 
 m_DIGGY_VAR_INDEX_SEEK_FLAGS(c_indexSeekFlags)
 
@@ -353,7 +353,7 @@ m_DIGGY_VAR_D(n_firstIndexEntry)
 m_DIGGY_VAR_D(n_lastIndexEntry)
 
       if (n_firstIndexEntry >= 0 && n_lastIndexEntry >= 0 && n_firstIndexEntry > n_lastIndexEntry) {
-        a_indexSequence->indexEntriesNumber2 = 2; 
+        a_indexSequence->indexEntryCount2 = 2; 
         a_indexSequence->indexEntries2[0].first = 0;
         a_indexSequence->indexEntries2[0].last = n_lastIndexEntry;
         a_indexSequence->indexEntries2[1].first = n_firstIndexEntry;
@@ -364,7 +364,7 @@ m_DIGGY_VAR_D(a_indexSequence->indexEntries2[0].last)
 m_DIGGY_VAR_D(a_indexSequence->indexEntries2[1].first)
 m_DIGGY_VAR_D(a_indexSequence->indexEntries2[1].last)
       } else if (n_firstIndexEntry >= 0 || n_lastIndexEntry >= 0) {
-        a_indexSequence->indexEntriesNumber2 = 1; 
+        a_indexSequence->indexEntryCount2 = 1; 
         if (n_firstIndexEntry < 0) n_firstIndexEntry = 0;
         if (n_lastIndexEntry < 0) n_lastIndexEntry = a_index->count-1;
         a_indexSequence->indexEntries2[0].first = n_firstIndexEntry;
@@ -373,7 +373,7 @@ m_DIGGY_VAR_D(a_indexSequence->indexEntries2[1].last)
 m_DIGGY_VAR_D(a_indexSequence->indexEntries2[0].first)
 m_DIGGY_VAR_D(a_indexSequence->indexEntries2[0].last)
       } // if
-m_DIGGY_VAR_D(a_indexSequence->indexEntriesNumber2)
+m_DIGGY_VAR_D(a_indexSequence->indexEntryCount2)
       // Prime the pump: ("soft reset")
       a_indexSequence->ci_indexEntryCursor = (b_descending? a_indexSequence->cv_lastIndexEntry
         + 1: a_indexSequence->indexEntries2[0].first - 1);
@@ -459,7 +459,7 @@ struct GREEN_INDEXES {
   ENTRY_RAW_EQUATE_FUNCTION entryRawEquateFunction;
   void *r_entryRawFunctionsHandle;
   int indexesNumber ; // when ENABLED ; >= 0
-  int *vnhs_keysNumbers; // NULL when indexesNumber == 0
+  int *vnhs_keyCounts; // NULL when indexesNumber == 0
   struct GREEN_INDEX *vnhs_indexes ; // NULL when indexesNumber == 0
 };
 
@@ -474,7 +474,7 @@ int GreenIndexesCreateInstance(GREEN_INDEXES_HANDLE *azh_handle,
   handle->entryRawEquateFunction = entryRawEquateFunction;
   handle->r_entryRawFunctionsHandle = r_entryRawFunctionsHandle;
   handle->indexesNumber = 0;
-  handle->vnhs_keysNumbers = NULL;
+  handle->vnhs_keyCounts = NULL;
   handle->vnhs_indexes = NULL;
   m_DIGGY_RETURN(RETURNED)
 } // GreenIndexesCreateInstance
@@ -487,7 +487,7 @@ static int GreenIndexesEntryCompare (void *r_handle, int indexLabel, int aEntry,
   GREEN_INDEXES_HANDLE handle = (GREEN_INDEXES_HANDLE)r_handle;  
   int comparison = UNDEFINED;
   m_ASSERT(indexLabel < handle->indexesNumber) 
-  int j = 0; for ( ; j < handle->vnhs_keysNumbers[indexLabel] ; j++) {
+  int j = 0; for ( ; j < handle->vnhs_keyCounts[indexLabel] ; j++) {
     m_TRACK_IF((comparison = handle->entryRawCompareFunction(
       handle->r_entryRawFunctionsHandle, indexLabel, j, aEntry, n_bEntry,cpr_bKeys)) < 0)
     if (comparison != EQUAL_TO__COMPARISON) break ;
@@ -500,7 +500,7 @@ int GreenIndexesEntryEquate(GREEN_INDEXES_HANDLE handle, int indexLabel, int aEn
   const void *pr_bKeys) {
   int answer = UNDEFINED;
   m_ASSERT(indexLabel < handle->indexesNumber) 
-  int j = 0; for ( ; j < handle->vnhs_keysNumbers[indexLabel] ; j++) {
+  int j = 0; for ( ; j < handle->vnhs_keyCounts[indexLabel] ; j++) {
     m_TRACK_IF((answer = handle->entryRawEquateFunction(handle->r_entryRawFunctionsHandle,
       indexLabel, j, aEntry, pr_bKeys)) < 0)
     if (answer != ANSWER__YES) break ;
@@ -512,13 +512,13 @@ int GreenIndexesEntryEquate(GREEN_INDEXES_HANDLE handle, int indexLabel, int aEn
 
 // Public function; see .h
 int GreenIndexesAddIndex(GREEN_INDEXES_HANDLE handle, int itemsPhysicalNumber,
-  int keysNumber) {
+  int keyCount) {
   m_DIGGY_BOLLARD_S()
   m_REALLOC_ARRAY(handle->vnhs_indexes,handle->indexesNumber+1)
-  m_REALLOC_ARRAY(handle->vnhs_keysNumbers,handle->indexesNumber+1)
+  m_REALLOC_ARRAY(handle->vnhs_keyCounts,handle->indexesNumber+1)
   struct GREEN_INDEX *a_index = handle->vnhs_indexes + handle->indexesNumber ;
 
-  handle->vnhs_keysNumbers[handle->indexesNumber] = keysNumber;
+  handle->vnhs_keyCounts[handle->indexesNumber] = keyCount;
   m_GREEN_INDEX_INIT(a_index, itemsPhysicalNumber, GreenIndexesEntryCompare, handle,
     handle->indexesNumber)
   m_DIGGY_RETURN(handle->indexesNumber++)
@@ -647,7 +647,7 @@ if (m_i == 0) {\
   if (a_indexIterator->criteriaNumber5 == 1) statuses[0] = 'O' ; \
 } else { \
   int em_cn = ((m_i)+1 == a_indexIterator->criteriaNumber5)? i_stackEntry: \
-    m_CloseBracketsNumber(a_indexIterator->criteria[m_i].criteriaOpFlags);\
+    m_CloseBracketCount(a_indexIterator->criteria[m_i].criteriaOpFlags);\
   if (em_cn == 0) {\
     if (*v_knownCriteriaOpFlagsPtr == ALL_FLAGS_OFF0) *v_knownCriteriaOpFlagsPtr = \
       a_indexIterator->criteria[m_i].criteriaOpFlags;\
@@ -706,7 +706,7 @@ if (m_i == 0) {\
 // - a_indexIterator: contains criteria criteria
 // - m_i: criterion entry 
 #define m_CRITERIA_HANDLER_OPEN_BRACKETS(/*struct INDEX_ITERATOR* */a_indexIterator, /*int*/m_i) {\
-  int em_on = m_OpenBracketsNumber(a_indexIterator->criteria[m_i].criteriaOpFlags);\
+  int em_on = m_OpenBracketCount(a_indexIterator->criteria[m_i].criteriaOpFlags);\
   if (em_on == 0 && (m_i)+1 < a_indexIterator->criteriaNumber5 && b_FLAG_SET_ON(\
     *v_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__AND) && b_FLAG_SET_ON(\
     a_indexIterator->criteria[m_i+1].criteriaOpFlags, CRITERIA_OP_FLAG__OR)) em_on++;\
@@ -897,7 +897,7 @@ int GreenIndexesDestroyInstance(GREEN_INDEXES_HANDLE xh_handle) {
   } // for
   if (xh_handle->indexesNumber > 0) {
     free(xh_handle->vnhs_indexes);
-    free(xh_handle->vnhs_keysNumbers);
+    free(xh_handle->vnhs_keyCounts);
   } // if
   free(xh_handle);
   m_DIGGY_RETURN(RETURNED)

@@ -32,9 +32,9 @@ static inline int m_GTokenAssign(g_G_TOKEN_STUFF stuff, const char*pcf_litteral,
 
 
 // Public function: see .h
-int l_GTokensCreateInstance(g_G_TOKENS_HANDLE *azh_handle, int expectedItemsNumber) {
+int l_GTokensCreateInstance(g_G_TOKENS_HANDLE *azh_handle, int expectedItemCount) {
   m_DIGGY_BOLLARD()
-  m_TRACK_IF(GStringsCreateInstance(azh_handle,expectedItemsNumber,1,
+  m_TRACK_IF(GStringsCreateInstance(azh_handle,expectedItemCount,1,
     VALUED_STRING__G_STRING_CONVEYANCE,(const int *)UNDEFINED,
     (NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION)UNDEFINED) != RETURNED)
   m_DIGGY_RETURN(RETURNED)

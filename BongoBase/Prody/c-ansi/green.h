@@ -103,19 +103,19 @@ struct GREEN_COLLECTION;
 typedef struct GREEN_COLLECTION *GREEN_COLLECTION_HANDLE;
 
 
-#define BATEAU__EXPECTED_ITEMS_NUMBER 100
+#define BATEAU__EXPECTED_ITEM_COUNT 100
 
 // (Create and) initialize a green collection (aka. of green items)
 //
 // Passed:
 // - azh_handle: (pointer to) handle to be initialized
-// - expectedItemsNumber: 
-//   #REF GreenCollectionCreateInstance-expectedItemsNumber <green item>
+// - expectedItemCount: 
+//   #REF GreenCollectionCreateInstance-expectedItemCount <green item>
 //   >0 value; representative number of <green item>s present in the collection.
 //   This value helps the module to adopt better strategy regarding memory allocation...
 //   + choose value close to the expected MINIMAL to favor efficient usage of MEMORY
 //   + choose value close to the expected MAXIMAL to favor efficient usage of CPU
-//   => and if you have no idea, simply specify BATEAU__EXPECTED_ITEMS_NUMBER #ENDREF
+//   => and if you have no idea, simply specify BATEAU__EXPECTED_ITEM_COUNT #ENDREF
 // - greenItemSize: size (in bytes) of a green item
 // - n_greenHandlerDisengageFunction:
 //   + NULL special value: no need to disengage <green item>s (=> "ULTRA-green" type)
@@ -137,7 +137,7 @@ typedef struct GREEN_COLLECTION *GREEN_COLLECTION_HANDLE;
 // Returned:
 // - RETURNED: Ok,
 // - -1: unexpected problem ; anomaly is raised
-int GreenCollectionCreateInstance(GREEN_COLLECTION_HANDLE *azh_handle,  int expectedItemsNumber,
+int GreenCollectionCreateInstance(GREEN_COLLECTION_HANDLE *azh_handle,  int expectedItemCount,
   int greenItemSize,  GREEN_HANDLER__DISENGAGE_FUNCTION n_greenHandlerDisengageFunction,
   GREEN_HANDLER__COMPARE_FUNCTION n_greenHandlerCompareFunction,
   GREEN_HANDLER__EQUATE_FUNCTION n_greenHandlerEquateFunction, void *cfr_greenHandlerHandle) ;
@@ -241,12 +241,12 @@ int GreenCollectionGetCount(GREEN_COLLECTION_HANDLE cp_handle, char **navntr_gre
 //
 // Passed:
 // - handle: <green item>s collection handle 
-// - keysNumber: >= 1; 1:plain index; >=2:compound index  #SKIP
+// - keyCount: >= 1; 1:plain index; >=2:compound index  #SKIP
 //
 // Returned: 
 // - >= 0 : index label (0 for 1st index added, etc.)
 // - -1: unexpected problem ; anomaly is raised
-int GreenCollectionAddIndex(GREEN_COLLECTION_HANDLE handle,  int keysNumber) ;
+int GreenCollectionAddIndex(GREEN_COLLECTION_HANDLE handle,  int keyCount) ;
 
 // This variable is required by m_INDEX_REQUEST_AUTOMATIC_BUFFER() macro below. 
 extern const int p_indexRequestAutomaticBufferSize;

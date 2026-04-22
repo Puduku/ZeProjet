@@ -80,13 +80,13 @@ typedef struct LINE_DELIMITER* LINE_DELIMITER_STUFF;
 //
 // Passed:
 // - azh_handle:
-// - expectedItemsNumber: #SEE GreenCollectionCreateInstance-expectedItemsNumber@c-ansi/green.h <line delimiter>
+// - expectedItemCount: #SEE GreenCollectionCreateInstance-expectedItemCount@c-ansi/green.h <line delimiter>
 // - cfr_linesComparatorPrivateHandle:
 #define /*int*/ LINE_DELIMITERS_CREATE_INSTANCE(/*GREEN_COLLECTION_HANDLE* */azh_handle,\
-  /*int*/ expectedItemsNumber,\
+  /*int*/ expectedItemCount,\
   /*GREEN_HANDLER__KEYS_COMPARE_FUNCTION*/n_linesComparatorKeysCompareFunction,\
   /*void* */ cfr_linesComparatorHandle) \
-  GreenCollectionCreateInstance(azh_handle,  expectedItemsNumber,  sizeof(struct LINE_DELIMITER),\
+  GreenCollectionCreateInstance(azh_handle,  expectedItemCount,  sizeof(struct LINE_DELIMITER),\
     NULL,n_linesComparatorKeysCompareFunction,NULL, cfr_linesComparatorHandle)
 
 

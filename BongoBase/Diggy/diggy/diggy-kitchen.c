@@ -202,9 +202,9 @@ static tid_t s_tids[MAX_THREADS_NUMBER] ;
 static int s_tidsIndex[MAX_THREADS_NUMBER] ;
 
 static struct D_INSTANCE s_dInstances[MAX_THREADS_NUMBER];
-static int i_threadsNumber = 0 ; // when > 1, implies multithread display
+static int i_threadCount = 0 ; // when > 1, implies multithread display
 
-static int cvb_multithreadDisplay = 0; // multithread display ? implicit when i_threadsNumber > 1 
+static int cvb_multithreadDisplay = 0; // multithread display ? implicit when i_threadCount > 1 
 static int b_niceMonothreadDisplay = 1;
 
 
@@ -248,7 +248,7 @@ static void DiggyBrickGeoVisibleDepth (int threadEntry, int functionTracking) {
   m_SECSTR_MEMSET(1024,0,' ',totalThreadsVisibleDisplayLength)
   m_SECSTR_BYTESET(1024,totalThreadsVisibleDisplayLength,'\0') ;
 
-  for (offset = 0, i = 0 ; i < i_threadsNumber ; i++) {
+  for (offset = 0, i = 0 ; i < i_threadCount ; i++) {
     visibleCallsDepth = s_dInstances[i].visibleCallsDepth;
     m_SECSTR_MEMSET(1024,offset,(i == threadEntry? '|': ':'),visibleCallsDepth)
     if (i == threadEntry) {
@@ -342,12 +342,12 @@ static void DiggyGeoPush (int threadEntry, void *stackOrigin,
     offset += s_dInstances[i].maxVisibleDepthDisplay;
   } // for
 
-  for ( ; i < i_threadsNumber + 1 ; i++) {
-    int len = (i >= i_threadsNumber? 1: s_dInstances[i].visibleCallsDepth) ;
+  for ( ; i < i_threadCount + 1 ; i++) {
+    int len = (i >= i_threadCount? 1: s_dInstances[i].visibleCallsDepth) ;
     m_SECSTR_MEMSET(1024,offset - shift,'^',len)
     m_SECSTR_MEMSET(1024,offset - shift+len, '-', shift-len)
     m_SECSTR_MEMSET(1024,offset, 'v', len)
-    if (i < i_threadsNumber) {
+    if (i < i_threadCount) {
       offset += s_dInstances[i].maxVisibleDepthDisplay;
     } // if
   } // for
@@ -403,7 +403,7 @@ static int BSearchByTid (tid_t tid, int *a_top) {
   int i;
   int n_indexEntry = -1;
   int bottom, top;
-  top = i_threadsNumber ; bottom = -1;
+  top = i_threadCount ; bottom = -1;
   while (top - bottom > 1) {
     i =  (top + bottom) >> 1 ;
     difference = (tid - s_tids[s_tidsIndex[i]]);
@@ -433,7 +433,7 @@ static int DiggyMetaGeoGetDInstance (tid_t tid,
   int n_tidsIndexEntry = BSearchByTid(tid,&tidsIndexTop);
   char b_newThread = (n_tidsIndexEntry == -1); // Not found => new thread 
   if (b_newThread) { 
-    if (i_threadsNumber >=  MAX_THREADS_NUMBER) {
+    if (i_threadCount >=  MAX_THREADS_NUMBER) {
       DIGGY_META_LIMIT("Too many threads");
       return -1;
     } // if
@@ -441,15 +441,15 @@ static int DiggyMetaGeoGetDInstance (tid_t tid,
     n_tidsIndexEntry = tidsIndexTop;
     memmove(s_tidsIndex + n_tidsIndexEntry + 1,
             s_tidsIndex + n_tidsIndexEntry,
-            sizeof(int) * (i_threadsNumber - n_tidsIndexEntry));
-    s_tidsIndex[n_tidsIndexEntry] = i_threadsNumber;
-    s_tids[i_threadsNumber] = tid;
-    s_dInstances[i_threadsNumber].callsDepth = 0;
-    s_dInstances[i_threadsNumber].visibleCallsDepth = 0;
-    s_dInstances[i_threadsNumber].maxVisibleDepthDisplay = INIT_MAX_VISIBLE_DEPTH_DISPLAY;
-    i_threadsNumber++ ;
+            sizeof(int) * (i_threadCount - n_tidsIndexEntry));
+    s_tidsIndex[n_tidsIndexEntry] = i_threadCount;
+    s_tids[i_threadCount] = tid;
+    s_dInstances[i_threadCount].callsDepth = 0;
+    s_dInstances[i_threadCount].visibleCallsDepth = 0;
+    s_dInstances[i_threadCount].maxVisibleDepthDisplay = INIT_MAX_VISIBLE_DEPTH_DISPLAY;
+    i_threadCount++ ;
 
-    if (i_threadsNumber >= 2 && !cvb_multithreadDisplay) {
+    if (i_threadCount >= 2 && !cvb_multithreadDisplay) {
       cvb_multithreadDisplay = 1; 
       b_switchedToMultithread = 1;
     } // if
@@ -484,7 +484,7 @@ static int DiggyMetaGeoGetDInstance (tid_t tid,
     PTidDisplay10String(strBuffer32,s_tids[0],0);
     strcat(strBuffer32,"*") ;
     DiggyMetaInfo(strBuffer32);
-    lastDisplayedThreadsNumber = i_threadsNumber;
+    lastDisplayedThreadsNumber = i_threadCount;
   } else {
     if (b_switchedToMultithread) {
       m_SECSTR_MEMSET(32,0,'>',INIT_MAX_VISIBLE_DEPTH_DISPLAY + 1) 
@@ -501,7 +501,7 @@ static int DiggyMetaGeoGetDInstance (tid_t tid,
     DiggyMetaInfo(strBuffer1024);
 
     m_SECSTR_MEMSET(1024,0,' ',totalThreadsVisibleDisplayLength + 1)
-    for (i = 0, offset = 0; i < i_threadsNumber; i++) {
+    for (i = 0, offset = 0; i < i_threadCount; i++) {
       if (i == threadEntry) {
         PTidDisplay10String(strBuffer32,s_tids[i],0);
         strcat(strBuffer32,"*") ;
@@ -514,7 +514,7 @@ static int DiggyMetaGeoGetDInstance (tid_t tid,
     } // for
     m_SECSTR_BYTESET(1024,totalThreadsVisibleDisplayLength,'v')
     DiggyMetaInfo(strBuffer1024);
-    lastDisplayedThreadsNumber = i_threadsNumber;
+    lastDisplayedThreadsNumber = i_threadCount;
   } // if 
   return threadEntry; 
 } // DiggyMetaGeoGetDInstance 

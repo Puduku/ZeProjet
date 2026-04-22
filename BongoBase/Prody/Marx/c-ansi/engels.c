@@ -232,11 +232,11 @@ int EngelsCreateInstance(ENGELS_HANDLE *azh_handle) {
   ENGELS_HANDLE handle = *azh_handle;
 
   m_TRACK_IF(NamedObjectsCreateInstance(&(handle->h_pivotModelsHandle),
-    BATEAU__EXPECTED_ITEMS_NUMBER,PivotModelCreateInstance, PivotModelDestroyInstance) != RETURNED)
+    BATEAU__EXPECTED_ITEM_COUNT,PivotModelCreateInstance, PivotModelDestroyInstance) != RETURNED)
   m_TRACK_IF(NamedObjectsCreateInstance(&(handle->h_tractModelsHandle),
-    BATEAU__EXPECTED_ITEMS_NUMBER,TractModelCreateInstance, TractModelDestroyInstance) != RETURNED)
+    BATEAU__EXPECTED_ITEM_COUNT,TractModelCreateInstance, TractModelDestroyInstance) != RETURNED)
   m_TRACK_IF(NamedObjectsCreateInstance(&(handle->h_pamphletModelsHandle),
-    BATEAU__EXPECTED_ITEMS_NUMBER,PamphletModelCreateInstance, PamphletModelDestroyInstance) != RETURNED)
+    BATEAU__EXPECTED_ITEM_COUNT,PamphletModelCreateInstance, PamphletModelDestroyInstance) != RETURNED)
   m_DIGGY_RETURN(RETURNED)
 } // EngelsCreateInstance
 
@@ -458,11 +458,11 @@ int PamphletCreateInstance(PAMPHLET_HANDLE *azh_handle, ENGELS_HANDLE f_engelsHa
 
   handle->engelsHandle = f_engelsHandle;
   m_TRACK_IF(GreenCollectionCreateInstance(&handle->hcv_tractOrPivotsHandle,
-    BATEAU__EXPECTED_ITEMS_NUMBER, sizeof(struct TRACT_OR_PIVOT),
+    BATEAU__EXPECTED_ITEM_COUNT, sizeof(struct TRACT_OR_PIVOT),
     (GREEN_HANDLER__DISENGAGE_FUNCTION)NULL, (GREEN_HANDLER__COMPARE_FUNCTION)NULL,
     (GREEN_HANDLER__EQUATE_FUNCTION)NULL,(void*)UNDEFINED) != RETURNED)
   m_TRACK_IF(GreenCollectionCreateInstance(&handle->hcv_tractsHandle,
-    BATEAU__EXPECTED_ITEMS_NUMBER, sizeof(struct TRACT),
+    BATEAU__EXPECTED_ITEM_COUNT, sizeof(struct TRACT),
     DisengageTract, (GREEN_HANDLER__COMPARE_FUNCTION)NULL,
     (GREEN_HANDLER__EQUATE_FUNCTION)NULL,(void*)UNDEFINED) != RETURNED)
 

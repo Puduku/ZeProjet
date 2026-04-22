@@ -88,7 +88,7 @@ int TidGlueCreateInstance(TID_GLUE_HANDLE *azh_handle, int b_portable) {
 
   if (((*azh_handle)->b_portable = b_portable)) {
     m_TRACK_IF(GreenCollectionCreateInstance(&(*azh_handle)->ch_pthreadVsTidCollectionHandle,
-      BATEAU__EXPECTED_ITEMS_NUMBER,sizeof(struct PTHREAD_VS_TID),NULL,TidGlueCompare,NULL,
+      BATEAU__EXPECTED_ITEM_COUNT,sizeof(struct PTHREAD_VS_TID),NULL,TidGlueCompare,NULL,
       (void *)UNDEFINED) != RETURNED)
     m_ASSERT(GreenCollectionAddIndex((*azh_handle)->ch_pthreadVsTidCollectionHandle,1) == 0)
   } else {

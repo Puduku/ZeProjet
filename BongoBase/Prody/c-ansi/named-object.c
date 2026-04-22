@@ -14,13 +14,13 @@ struct NAMED_OBJECTS {
 
 
 // Public function: see .h
-int NamedObjectsCreateInstance(NAMED_OBJECTS_HANDLE *azh_handle, int expectedItemsNumber,
+int NamedObjectsCreateInstance(NAMED_OBJECTS_HANDLE *azh_handle, int expectedItemCount,
   NAMED_OBJECT_CREATE_INSTANCE_FUNCTION n_namedObjectCreateInstanceFunction,
   NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION namedObjectDestroyInstanceFunction){
   m_DIGGY_BOLLARD()
   m_MALLOC_INSTANCE(*azh_handle)
   NAMED_OBJECTS_HANDLE handle = *azh_handle;
-  m_TRACK_IF(GStringsCreateInstance(&handle->h_gStringsHandle, expectedItemsNumber,1,
+  m_TRACK_IF(GStringsCreateInstance(&handle->h_gStringsHandle, expectedItemCount,1,
     NAMED_OBJECT__G_STRING_CONVEYANCE, (const int *)UNDEFINED,namedObjectDestroyInstanceFunction)
     != RETURNED)
   m_ASSERT(m_GStringsAddPlainLexicalIndex(handle->h_gStringsHandle, NULL,NULL) == INDEX_LABEL0)

@@ -44,7 +44,7 @@ int BlottabCreateInstance(BLOTTAB_HANDLE *azh_handle, int fieldsNumber,
   BLOTTAB_HANDLE handle = *azh_handle;
   m_ASSIGN_MAGIC_FIELD(BLOTTAB_HANDLE,handle)
 
-  m_TRACK_IF(GStringsCreateInstance(&handle->h_tableHandle,BATEAU__EXPECTED_ITEMS_NUMBER,
+  m_TRACK_IF(GStringsCreateInstance(&handle->h_tableHandle,BATEAU__EXPECTED_ITEM_COUNT,
     fieldsNumber, VALUED_STRING__G_STRING_CONVEYANCE, (const int *)UNDEFINED,
     (NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION) UNDEFINED) != RETURNED)
 

@@ -184,7 +184,7 @@ struct KEY_SETTINGS {
 
 
 struct INDEX_PROPERTIES {
-  int keysNumber;
+  int keyCount;
   struct KEY_SETTINGS *hs_keysSettings;
 };
 
@@ -270,7 +270,7 @@ m_DIGGY_INFO("indexLabel=%d keyRank=%d",indexLabel,keyRank)
   struct KEY_SETTINGS *ap_keySettings = (struct KEY_SETTINGS *)UNDEFINED;
   { struct INDEX_PROPERTIES *ap_indexProperties = p_handle->vnhs_indexesProperties + indexLabel;
 
-    m_ASSERT(keyRank < ap_indexProperties->keysNumber)
+    m_ASSERT(keyRank < ap_indexProperties->keyCount)
     ap_keySettings = ap_indexProperties->hs_keysSettings + keyRank;
   } // struct INDEX_PROPERTIES
 
@@ -320,7 +320,7 @@ m_DIGGY_VAR_COMPARISON(comparison)
 
 
 // Public function : see .h
-int GStringsCreateInstance(G_STRINGS_HANDLE* azh_handle,  int expectedItemsNumber,
+int GStringsCreateInstance(G_STRINGS_HANDLE* azh_handle,  int expectedItemCount,
   int gStringSetCardinality, int n_gStringConveyance, const int *cnfps_gStringConveyances,
   NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION c_namedObjectDestroyInstanceFunction) {
   m_DIGGY_BOLLARD()
@@ -337,7 +337,7 @@ int GStringsCreateInstance(G_STRINGS_HANDLE* azh_handle,  int expectedItemsNumbe
   handle->indexesNumber = 0;
   handle->vnhs_indexesProperties = NULL;
 
-  m_TRACK_IF(GreenCollectionCreateInstance(&handle->h_greenCollectionHandle,  expectedItemsNumber,
+  m_TRACK_IF(GreenCollectionCreateInstance(&handle->h_greenCollectionHandle,  expectedItemCount,
     sizeof(struct G_STRING) * gStringSetCardinality,  GStringsDisengage,  GStringsCompare, NULL,
     handle) != RETURNED)
 
@@ -370,7 +370,7 @@ int GStringsGetCount(G_STRINGS_HANDLE cp_handle,
 
 
 // Public function : see .h
-int GStringsAddIndex (G_STRINGS_HANDLE handle,  int keysNumber,
+int GStringsAddIndex (G_STRINGS_HANDLE handle,  int keyCount,
   int key1GStringSetElement,  int key1GsKeysComparison,
   IS_CHAR_FUNCTION cn_key1IsNeutralCharFunction,  TO_CHAR_FUNCTION cn_key1ToCharFunction,
   P_STRING_INTRINSIC_VALUE_FUNCTION c_key1PStringIntrinsicValueFunction,
@@ -382,15 +382,15 @@ int GStringsAddIndex (G_STRINGS_HANDLE handle,  int keysNumber,
   struct INDEX_PROPERTIES *a_indexProperties =
     handle->vnhs_indexesProperties + handle->indexesNumber-1 ;
 
-  m_MALLOC_ARRAY(a_indexProperties->hs_keysSettings,a_indexProperties->keysNumber = keysNumber)
+  m_MALLOC_ARRAY(a_indexProperties->hs_keysSettings,a_indexProperties->keyCount = keyCount)
 
   va_list ap ;
   va_start(ap,cfpr_key1PStringIntrinsicValueFunctionHandle) ;
 
   int i = 0;
   struct KEY_SETTINGS *s_keysSettings = a_indexProperties->hs_keysSettings;
-  for ( ; i < keysNumber ; i++, s_keysSettings++) {
-m_DIGGY_INFO("i=%d, keysNumber=%d",i,keysNumber)
+  for ( ; i < keyCount ; i++, s_keysSettings++) {
+m_DIGGY_INFO("i=%d, keyCount=%d",i,keyCount)
     if (i > 0) { 
       key1GStringSetElement = va_arg(ap,int);
       key1GsKeysComparison = va_arg(ap,int);
@@ -425,7 +425,7 @@ m_DIGGY_INFO("i=%d, keysNumber=%d",i,keysNumber)
   va_end(ap) ;
 
   int indexLabel =
-  GreenCollectionAddIndex(handle->h_greenCollectionHandle, keysNumber) ;
+  GreenCollectionAddIndex(handle->h_greenCollectionHandle, keyCount) ;
   m_TRACK_IF(indexLabel < 0) ;
 
   m_DIGGY_RETURN(indexLabel)

@@ -53,7 +53,7 @@ int GParamValueAssign(g_G_PARAM_STUFF stuff, GENERIC_INTEGER en_value,
   g_G_PARAMS_HANDLE n_gParamsHandle) ;
 
 // #SEE GStringsCreateInstance@c-ansi/g-string.h  <named-object>
-int l_GParamsCreateInstance(g_G_PARAMS_HANDLE *azh_handle,int expectedItemsNumber);
+int l_GParamsCreateInstance(g_G_PARAMS_HANDLE *azh_handle,int expectedItemCount);
 
 // #SEE GStringsAddIndex @ c-ansi/g-string.h <g-param>
 #define g_GParamsAddIndex GStringsAddIndex

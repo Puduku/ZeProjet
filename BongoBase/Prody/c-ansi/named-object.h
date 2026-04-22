@@ -36,7 +36,7 @@ typedef int (*NAMED_OBJECT_CREATE_INSTANCE_FUNCTION)(void **azhr_handle, struct 
 // - n_namedObjectCreateInstanceFunction: != NULL => automatic creation of named objects
 // - namedObjectDestroyInstanceFunction:
 // #SEE GStringsCreateInstance@c-ansi/g-string.h  <named-object>
-int NamedObjectsCreateInstance(NAMED_OBJECTS_HANDLE *azh_handle,int expectedItemsNumber,
+int NamedObjectsCreateInstance(NAMED_OBJECTS_HANDLE *azh_handle,int expectedItemCount,
   NAMED_OBJECT_CREATE_INSTANCE_FUNCTION n_namedObjectCreateInstanceFunction,
   NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION namedObjectDestroyInstanceFunction);
 
