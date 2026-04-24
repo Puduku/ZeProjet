@@ -25,7 +25,6 @@ extern char b_diggyGreenCollectionExam;
 
 /////////// 1. GREEN INDEX ("proto" object......) ////////////////////
 
-
 // * Truly index-based seek flags:
 // NOT key-based seek flag: mutually exclusive with other truly index-based seek flags: 
 #define INDEX_SEEK_FLAG__ANY     0x01
@@ -58,34 +57,6 @@ m_DEFINE_ENUM_ALIAS_END()
 #if __C_ANSI_GREEN_INDEX_H_INCLUDED__ == 0
 
 ///////////// 2. GREEN INDEXES "real" object //////////////
-
-#define CRITERIA_OP_FLAG__CLOSE1      0x001 // Close one bracket before op.
-#define CRITERIA_OP_FLAG__CLOSE2      0x002 // Close two brackets before op.
-#define CRITERIA_OP_FLAG__CLOSE3      0x004 // Close three brackets before op.
-#define CRITERIA_OP_FLAG__AND         0x010 // And op.
-#define CRITERIA_OP_FLAG__OR          0x020 // Or op.
-#define CRITERIA_OP_FLAG__OPEN1       0x100 // Open one bracket after op. 
-#define CRITERIA_OP_FLAG__OPEN2       0x200 // Open two brackets after op. 
-#define CRITERIA_OP_FLAG__OPEN3       0x400 // Open three brackets after op. 
-
-// Passed:
-// - criteriaOpFlags
-static inline int m_OpenBracketCount(unsigned int criteriaOpFlags) {
-  if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__OPEN3)) return 3;
-  else if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__OPEN2)) return 2;
-  else if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__OPEN1)) return 1;
-  return 0;
-} // m_OpenBracketCount 
-
-// Passed:
-// - criteriaOpFlags
-static inline int m_CloseBracketCount(unsigned int criteriaOpFlags) {
-  if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE3)) return 3;
-  else if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE2)) return 2;
-  else if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE1)) return 1;
-  return 0;
-} // m_CloseBracketCount 
-
 
 // Index's virtual function to compare an item with a key.
 //
@@ -121,10 +92,8 @@ typedef int (*ENTRY_RAW_COMPARE_FUNCTION) (void *r_handle, int indexLabel, int k
 typedef int (*ENTRY_RAW_EQUATE_FUNCTION) (void *r_handle, int indexLabel, int keyRank,
   int aEntry, const void *pr_bKeys);
 
-
 struct GREEN_INDEXES ; // Private!
 typedef struct GREEN_INDEXES* GREEN_INDEXES_HANDLE; // Public handle
-
 
 // Passed:
 // - azh_handle:
@@ -142,6 +111,95 @@ int GreenIndexesCreateInstance(GREEN_INDEXES_HANDLE *azh_handle,
   ENTRY_RAW_COMPARE_FUNCTION entryRawCompareFunction,
   ENTRY_RAW_EQUATE_FUNCTION entryRawEquateFunction, void* r_entryRawFunctionsHandle);
 
+
+// Adequate an item with a key.
+//
+// Passed:
+// - handle:
+// - indexLabel:
+// - aEntry: entry for "A"
+// - pr_bKeys: raw key(s) for "B" 
+//
+// Ret: adequation between "A" (entry) and "B" (key) ?
+// - ANSWER__YES: 
+// - ANSWER__NO: 
+// - -1: unexpected problem; anomaly is raised
+int GreenIndexesEntryEquate(GREEN_INDEXES_HANDLE handle, int indexLabel, int aEntry,
+  const void *pr_bKeys) ;
+
+// Passed:
+// - handle:
+// - itemsPhysicalNumber:
+// - keyCount:
+//
+// Return:
+// new index label (technically equal to entry in indexes array)
+int GreenIndexesAddIndex(GREEN_INDEXES_HANDLE handle, int itemsPhysicalNumber,
+  int keyCount) ;
+
+// Passed:
+// - handle:
+// - newItemsPhysicalNumber:
+int GreenIndexesResize (GREEN_INDEXES_HANDLE handle, int newItemsPhysicalNumber) ;
+
+// Remove reference on item in all indexes (no action if not referenced in some index)
+//
+// Passed:
+// - handle:
+// - entry:
+int GreenIndexesRemove(GREEN_INDEXES_HANDLE handle, int entry) ;
+
+// Add reference on item in all indexes (no action if already referenced in some index)
+//
+// Passed:
+// - handle:
+// - entry:
+int GreenIndexesAdd(GREEN_INDEXES_HANDLE, int entry) ; 
+
+// Perform "equation" of entry with a key. 
+//
+// Passed:
+// - handle:
+// - indexLabel: 
+// - aEntry: "A" entry 
+// - indexSeekFlags: 
+// - pr_bKeys: "B" keys(s) 
+//
+// Returned:
+// - >=0: "equation" between :"A" and "B" with that key component... 
+//   + ANSWER__YES : "A" item and "B" key(s) are similar 
+//   + ANSWER__NO : "A" item and "B" key(s) are NOT similar 
+// - -1: unexpected problem; anomaly is raised
+int GreenIndexesSeekEntryEquate(GREEN_INDEXES_HANDLE handle, int indexLabel, int aEntry,
+  unsigned int indexSeekFlags, const void *pr_bKeys) ;
+
+#define CRITERIA_OP_FLAG__CLOSE1      0x001 // Close one bracket before op.
+#define CRITERIA_OP_FLAG__CLOSE2      0x002 // Close two brackets before op.
+#define CRITERIA_OP_FLAG__CLOSE3      0x004 // Close three brackets before op.
+#define CRITERIA_OP_FLAG__AND         0x010 // And op.
+#define CRITERIA_OP_FLAG__OR          0x020 // Or op.
+#define CRITERIA_OP_FLAG__OPEN1       0x100 // Open one bracket after op. 
+#define CRITERIA_OP_FLAG__OPEN2       0x200 // Open two brackets after op. 
+#define CRITERIA_OP_FLAG__OPEN3       0x400 // Open three brackets after op. 
+
+// Passed:
+// - criteriaOpFlags
+static inline int m_OpenBracketCount(unsigned int criteriaOpFlags) {
+  if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__OPEN3)) return 3;
+  else if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__OPEN2)) return 2;
+  else if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__OPEN1)) return 1;
+  return 0;
+} // m_OpenBracketCount 
+
+// Passed:
+// - criteriaOpFlags
+static inline int m_CloseBracketCount(unsigned int criteriaOpFlags) {
+  if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE3)) return 3;
+  else if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE2)) return 2;
+  else if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE1)) return 1;
+  return 0;
+} // m_CloseBracketCount 
+
 #define b_ASCENDING b_FALSE0
 #define b_DESCENDING b_TRUE
 
@@ -154,7 +212,7 @@ struct G_REQUEST_CRITERION {
 } ;
 
 // Index entries "block"
-struct INDEX_ENTRIES {
+struct INDEX_ENTRY_BLOCK {
   int first; // >= 0
   int last; // >= first
 } ;
@@ -162,19 +220,19 @@ struct INDEX_ENTRIES {
 //
 struct INDEX_SEQUENCE {
   // index entries "blocks":
-  int indexEntryCount2; // between 0 and 2 : 0 => 'disabled' ; >0 -> 'enabled' 
-  struct INDEX_ENTRIES indexEntries2[2];
-  // Fields below are only significant if 'enabled' (indexEntryCount2 > 0) :
+  int indexEntryBlockCount2; // between 0 and 2 : 0 => 'disabled' ; >0 -> 'enabled' 
+  struct INDEX_ENTRY_BLOCK indexEntryBlocks2[2];
+  // Fields below are only significant if 'enabled' (indexEntryBlockCount2 > 0) :
   int cv_firstIndexEntry; // first index entry for ALL "blocks"  
   int cv_lastIndexEntry; // last index entry for ALL "blocks"  
   int ci_indexEntryCursor; // "current" index entry: < cv_firstIndexEntry => Ascending:"soft reset",
     // DEscending:'no more' ; between [indexEntries[0].first - cv_lastIndexEntry] => 'in sequence' ;
     // > cv_lastIndexEntry => Ascending:"no more", DEscending:"soft reset" 
-  const struct INDEX_ENTRIES *cv_indexEntriesPtr; // "block" corresponding to "current" index entry 
+  const struct INDEX_ENTRY_BLOCK *cv_indexEntryBlockPtr; // "block" corresponding to "current" index entry 
 } ;
 
 // Disable index sequence (disambiguation purpose...)
-#define m_DISABLE_INDEX_SEQUENCE(m_indexSequence)  (m_indexSequence).indexEntryCount2 = 0;
+#define m_DISABLE_INDEX_SEQUENCE(m_indexSequence)  (m_indexSequence).indexEntryBlockCount2 = 0;
 
 struct INDEX_ITERATOR {
   int criteriaNumber5 ;
@@ -212,80 +270,6 @@ struct INDEX_ITERATOR {
   (m_indexIterator).b_descending = mb_descending;\
   m_DISABLE_INDEX_SEQUENCE((m_indexIterator).indexSequence)\
 }
-
-// Adequate an item with a key.
-//
-// Passed:
-// - handle:
-// - indexLabel:
-// - aEntry: entry for "A"
-// - pr_bKeys: raw key(s) for "B" 
-//
-// Ret: adequation between "A" (entry) and "B" (key) ?
-// - ANSWER__YES: 
-// - ANSWER__NO: 
-// - -1: unexpected problem; anomaly is raised
-int GreenIndexesEntryEquate(GREEN_INDEXES_HANDLE handle, int indexLabel, int aEntry,
-  const void *pr_bKeys) ;
-
-// Passed:
-// - handle:
-// - itemsPhysicalNumber:
-// - keyCount:
-//
-// Return:
-// new index label (technically equal to entry in indexes array)
-int GreenIndexesAddIndex(GREEN_INDEXES_HANDLE handle, int itemsPhysicalNumber,
-  int keyCount) ;
-
-
-// Passed:
-// - handle:
-// - newItemsPhysicalNumber:
-int GreenIndexesResize (GREEN_INDEXES_HANDLE handle, int newItemsPhysicalNumber) ;
-
-
-// Passed:
-// - xh_handle:
-// 
-// Ret:
-// - RETURNED: Ok
-// - -1: anomaly is raised
-int GreenIndexesDestroyInstance(GREEN_INDEXES_HANDLE xh_handle) ;
-
-
-// Remove reference on item in all indexes (no action if not referenced in some index)
-//
-// Passed:
-// - handle:
-// - entry:
-int GreenIndexesRemove(GREEN_INDEXES_HANDLE handle, int entry) ;
-
-// Add reference on item in all indexes (no action if already referenced in some index)
-//
-// Passed:
-// - handle:
-// - entry:
-int GreenIndexesAdd(GREEN_INDEXES_HANDLE, int entry) ; 
-
-
-// Perform "equation" of entry with a key. 
-//
-// Passed:
-// - handle:
-// - indexLabel: 
-// - aEntry: "A" entry 
-// - indexSeekFlags: 
-// - pr_bKeys: "B" keys(s) 
-//
-// Returned:
-// - >=0: "equation" between :"A" and "B" with that key component... 
-//   + ANSWER__YES : "A" item and "B" key(s) are similar 
-//   + ANSWER__NO : "A" item and "B" key(s) are NOT similar 
-// - -1: unexpected problem; anomaly is raised
-int GreenIndexesSeekEntryEquate(GREEN_INDEXES_HANDLE handle, int indexLabel, int aEntry,
-  unsigned int indexSeekFlags, const void *pr_bKeys) ;
-
 
 // Update index iterator sequence.
 //
@@ -331,7 +315,6 @@ int GreenIndexesCurrent(GREEN_INDEXES_HANDLE handle,
 // - -1: anomaly is raised
 int GreenIndexesVerifyEnabled (GREEN_INDEXES_HANDLE handle) ;
 
-
 // Passed:
 // - handle:
 //
@@ -355,7 +338,6 @@ int GreenIndexesVerify (GREEN_INDEXES_HANDLE handle) ;
 // - -1: anomaly is raised
 int GreenIndexesVerifyCount (GREEN_INDEXES_HANDLE handle,int *ac_commonCount) ;
 
-
 // 
 // Passed:
 // - handle:
@@ -369,7 +351,6 @@ int GreenIndexesVerifyCount (GREEN_INDEXES_HANDLE handle,int *ac_commonCount) ;
 // - -1: unexpected problem ; anomaly is raised
 int GreenIndexesVerifyEntry (GREEN_INDEXES_HANDLE handle, int entry, int expectedHits) ;
 
-
 // Passed:
 // - handle
 //
@@ -377,6 +358,14 @@ int GreenIndexesVerifyEntry (GREEN_INDEXES_HANDLE handle, int entry, int expecte
 // - RETURNED:
 // - -1: anomaly is raised
 int GreenIndexesClear (GREEN_INDEXES_HANDLE handle) ;
+
+// Passed:
+// - xh_handle:
+// 
+// Ret:
+// - RETURNED: Ok
+// - -1: anomaly is raised
+int GreenIndexesDestroyInstance(GREEN_INDEXES_HANDLE xh_handle) ;
 
 
 #endif // __C_ANSI_GREEN_INDEX_H_INCLUDED__ == 0
