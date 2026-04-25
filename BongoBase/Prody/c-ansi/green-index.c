@@ -57,57 +57,88 @@ struct GREEN_INDEX {
 // - m_entryCompareFunction:
 // - mr_entryFunctionsHandle:
 // - indexLabel:
-#define m_GREEN_INDEX_INIT(/*struct GREEN_INDEX* */az_index,  /*int*/itemsPhysicalNumber, \
-  /*ENTRY_COMPARE_FUNCTION*/m_entryCompareFunction, /*void* */mr_entryFunctionsHandle,\
-  /*int*/m_indexLabel) {\
-  m_MALLOC_ARRAY((az_index)->hsc_array,itemsPhysicalNumber)\
-  (az_index)->count = 0;\
-  (az_index)->entryCompareFunction = m_entryCompareFunction;\
-  (az_index)->r_entryFunctionsHandle = mr_entryFunctionsHandle;\
-  (az_index)->indexLabel = m_indexLabel;\
-}
+// 
+// Ret:
+// - RETURNED: Ok
+// - -1: anomaly is raised
+static inline int m_GreenIndexInit(struct GREEN_INDEX* az_index, int itemsPhysicalNumber,
+  ENTRY_COMPARE_FUNCTION entryCompareFunction, void* r_entryFunctionsHandle,
+  int indexLabel) {
+  m_DIGGY_BOLLARD_S()
+  m_MALLOC_ARRAY(az_index->hsc_array,itemsPhysicalNumber)
+  az_index->count = 0;
+  az_index->entryCompareFunction = entryCompareFunction;
+  az_index->r_entryFunctionsHandle = r_entryFunctionsHandle;
+  az_index->indexLabel = indexLabel;
+  m_DIGGY_RETURN(RETURNED) 
+} // m_GreenIndexInit
 
 
 // Passed:
 // - a_index:
 // - indexEntry:
-#define m_GREEN_INDEX_REMOVE(/*struct GREEN_INDEX* */a_index, /*int*/indexEntry) \
-  memmove((a_index)->hsc_array + (indexEntry),  (a_index)->hsc_array + (indexEntry) + 1,\
-  sizeof(int) * (((a_index)->count -= 1) - (indexEntry)));
+// 
+// Ret:
+// - RETURNED: Ok
+static inline int om_GreenIndexRemove(struct GREEN_INDEX* a_index, int indexEntry) {
+  m_DIGGY_BOLLARD_S()
+  memmove(a_index->hsc_array + indexEntry,  a_index->hsc_array + indexEntry + 1,
+    sizeof(int) * ((a_index->count -= 1) - indexEntry));
+  m_DIGGY_RETURN(RETURNED) 
+} // om_GreenIndexRemove
 
 
 // Passed:
 // - a_index:
 // - newIndexEntry:
 // - newEntry:
-#define m_GREEN_INDEX_ADD(/*struct GREEN_INDEX* */a_index,  /*int*/newIndexEntry,\
-  /*int*/newEntry) {\
-  memmove((a_index)->hsc_array + newIndexEntry + 1,  (a_index)->hsc_array + newIndexEntry,\
-    sizeof(int) * (s_index->count++ - newIndexEntry));\
-  (a_index)->hsc_array[newIndexEntry] = newEntry;\
-}
+// 
+// Ret:
+// - RETURNED: Ok
+static inline int om_GreenIndexAdd(struct GREEN_INDEX* a_index, int newIndexEntry,
+  int newEntry) {
+  m_DIGGY_BOLLARD_S()
+  memmove(a_index->hsc_array + newIndexEntry + 1,  a_index->hsc_array + newIndexEntry,
+    sizeof(int) * (a_index->count++ - newIndexEntry));
+  (a_index)->hsc_array[newIndexEntry] = newEntry;
+  m_DIGGY_RETURN(RETURNED) 
+} // om_GreenIndexAdd
 
 
 // Passed:
 // - a_index:
-#define m_GREEN_INDEX_CLEAR(/*struct GREEN_INDEX* */a_index) {\
-  (a_index)->count = 0 ;\
-}
+// 
+// Ret:
+// - RETURNED: Ok
+static inline int om_GreenIndexClear(struct GREEN_INDEX* a_index) {
+  m_DIGGY_BOLLARD_S()
+  (a_index)->count = 0 ;
+  m_DIGGY_RETURN(RETURNED) 
+} // om_GreenIndexClear
 
 // Passed:
 // - a_index:
 //
-// Ret
+// Ret:
 // number of "active" index entries
-#define GREEN_INDEX_GET_COUNT(/*struct GREEN_INDEX* */a_index)  ((a_index)->count)
+static inline int om_GreenIndexGetCount(struct GREEN_INDEX* a_index) {
+  m_DIGGY_BOLLARD_S()
+  m_DIGGY_RETURN((a_index)->count)
+} // om_GreenIndexGetCount
 
 
 // Passed:
 // - a_index:
 // - newItemsPhysicalNumber:
-#define m_GREEN_INDEX_RESIZE(/*struct GREEN_INDEX* */a_index,  /*int*/newItemsPhysicalNumber) {\
-  m_REALLOC_ARRAY((a_index)->hsc_array, newItemsPhysicalNumber)\
-}
+// 
+// Ret:
+// - RETURNED: Ok
+// - -1: anomaly is raised
+static inline int m_GreenIndexResize(struct GREEN_INDEX* a_index, int newItemsPhysicalNumber) {
+  m_DIGGY_BOLLARD_S()
+  m_REALLOC_ARRAY((a_index)->hsc_array, newItemsPhysicalNumber)
+  m_DIGGY_RETURN(RETURNED) 
+} // m_GreenIndexResize
 
 // Compare two items of the index
 //
@@ -117,19 +148,23 @@ struct GREEN_INDEX {
 // - n_bEntry: >= 0 => entry in index for "B"
 // - cpr_bKeys: raw key(s) for "B" when entry for "B" not provided
 //
-// Changed:
-// - *m_comparison: "A - B" comparison between key of index' entry and passed key
+// Ret:
+// - >= 0: "A - B" comparison between key of index' entry and passed key
 //   + LESS_THAN__COMPARISON : "A" 'less than' "B" 
 //   + EQUAL_TO__COMPARISON : "A" and "B" are "identical"
 //   + GREATER_THAN__COMPARISON : "A" 'greater than' "B" 
-#define m_GREEN_INDEX_COMPARE(/*struct GREEN_INDEX* */a_index, /*int*/aIndexEntry, /*int*/n_bEntry,\
-  /*const void* */cpr_bKeys, /*int*/m_comparison) {\
-  int em_aEntry = a_index->hsc_array[aIndexEntry];\
-    m_TRACK_IF((m_comparison = (a_index)->entryCompareFunction((a_index)->r_entryFunctionsHandle,\
-      (a_index)->indexLabel, em_aEntry, n_bEntry,cpr_bKeys)) < 0)\
-  if (m_comparison == EQUAL_TO__COMPARISON && n_bEntry != -1)  m_comparison = \
-    DIFFERENCE_2_COMPARISON(em_aEntry - n_bEntry) ;\
-}
+// - -1: anomaly is raised
+static int GreenIndexCompare(struct GREEN_INDEX* a_index, int aIndexEntry, int n_bEntry,
+  const void* cpr_bKeys) {
+  m_DIGGY_BOLLARD_S()
+  int comparison = UNDEFINED;
+  int aEntry = a_index->hsc_array[aIndexEntry];
+    m_TRACK_IF((comparison = a_index->entryCompareFunction(a_index->r_entryFunctionsHandle,
+      a_index->indexLabel, aEntry, n_bEntry,cpr_bKeys)) < 0)
+  if (comparison == EQUAL_TO__COMPARISON && n_bEntry != -1)  comparison = 
+    DIFFERENCE_2_COMPARISON(aEntry - n_bEntry) ;
+  m_DIGGY_RETURN(comparison)
+} // GreenIndexCompare
 
 // Binary search of "B" in index
 //
@@ -164,7 +199,7 @@ static int GreenIndexBSearch(struct GREEN_INDEX *a_index,
   while (top - bottom > 1) {
     i =  (top + bottom) >> 1 ;
 
-    m_GREEN_INDEX_COMPARE(a_index, i,n_bEntry,cpr_bKeys, comparison)
+    m_TRACK_IF((comparison = GreenIndexCompare(a_index, i,n_bEntry,cpr_bKeys)) < 0)
     switch (comparison) {
     case GREATER_THAN__COMPARISON:
       top = i ;
@@ -180,7 +215,7 @@ static int GreenIndexBSearch(struct GREEN_INDEX *a_index,
   *a_top = top;
   if (*an_indexEntry >= 0 && n_bEntry < 0) {
     for (i = *an_indexEntry-1 ; i >= 0 ; i--) {
-      m_GREEN_INDEX_COMPARE(a_index, i,-1,cpr_bKeys, comparison)
+      m_TRACK_IF((comparison = GreenIndexCompare(a_index, i,-1,cpr_bKeys)) < 0)
       if (comparison != EQUAL_TO__COMPARISON) {
         m_ASSERT(comparison == LESS_THAN__COMPARISON) 
         break; 
@@ -188,7 +223,7 @@ static int GreenIndexBSearch(struct GREEN_INDEX *a_index,
     } // for
     cac_indexEntries->first = i+1;
     for (i = *an_indexEntry+1 ; i < a_index->count ; i++) {
-      m_GREEN_INDEX_COMPARE(a_index, i,-1,cpr_bKeys, comparison)
+      m_TRACK_IF((comparison = GreenIndexCompare(a_index, i,-1,cpr_bKeys)) < 0)
       if (comparison != EQUAL_TO__COMPARISON) {
         m_ASSERT(comparison == GREATER_THAN__COMPARISON) 
         break; 
@@ -405,8 +440,8 @@ static int GreenIndexVerify(struct GREEN_INDEX *a_index) {
 #endif
 
   int j = 1; for (; j < a_index->count; j++) {
-    m_GREEN_INDEX_COMPARE(a_index, j, a_index->hsc_array[j-1],
-      (void *)(GENERIC_INTEGER) UNDEFINED, comparison)
+    m_TRACK_IF((comparison = GreenIndexCompare(a_index, j, a_index->hsc_array[j-1],
+      (void *)(GENERIC_INTEGER) UNDEFINED)) < 0)
     if (comparison != GREATER_THAN__COMPARISON) {
       m_ASSERT(comparison != EQUAL_TO__COMPARISON)
       break;
@@ -446,11 +481,17 @@ static int GreenIndexVerifyEntry(struct GREEN_INDEX *a_index, int entry, int exp
   m_DIGGY_RETURN(completed)
 } // GreenIndexVerifyEntry 
 
+
 // Passed:
 // - ax_index:
-#define m_GREEN_INDEX_FREE(/*struct GREEN_INDEX* */ax_index) {\
-  free(ax_index->hsc_array);\
-}
+// 
+// Ret:
+// - RETURNED: Ok
+static inline int om_GreenIndexFree(struct GREEN_INDEX* ax_index) {
+  m_DIGGY_BOLLARD_S()
+  free(ax_index->hsc_array);
+  m_DIGGY_RETURN(RETURNED)
+} // om_GreenIndexFree
 
 ///////////// 2. GREEN INDEXES REAL object //////////////
 
@@ -503,8 +544,8 @@ int GreenIndexesAddIndex(GREEN_INDEXES_HANDLE handle, int itemsPhysicalNumber,
   struct GREEN_INDEX *a_index = handle->vnhs_indexes + handle->indexesNumber ;
 
   handle->vnhs_keyCounts[handle->indexesNumber] = keyCount;
-  m_GREEN_INDEX_INIT(a_index, itemsPhysicalNumber, GreenIndexesEntryCompare, handle,
-    handle->indexesNumber)
+  m_TRACK_IF(m_GreenIndexInit(a_index, itemsPhysicalNumber, GreenIndexesEntryCompare, handle,
+    handle->indexesNumber) != RETURNED)
   m_DIGGY_RETURN(handle->indexesNumber++)
 } // GreenIndexesAddIndex
 
@@ -514,7 +555,7 @@ int GreenIndexesResize (GREEN_INDEXES_HANDLE handle, int newItemsPhysicalNumber)
   int i = 0;
   struct GREEN_INDEX *cs_index = handle->vnhs_indexes;
   for ( ; i < handle->indexesNumber ; i++, cs_index++) {
-    m_GREEN_INDEX_RESIZE(cs_index, newItemsPhysicalNumber)
+    m_TRACK_IF(m_GreenIndexResize(cs_index, newItemsPhysicalNumber) != RETURNED)
   } // for
 
   m_DIGGY_RETURN(RETURNED)
@@ -530,11 +571,11 @@ int GreenIndexesRemove(GREEN_INDEXES_HANDLE handle, int entry) {
     m_TRACK_IF(GreenIndexBSearch(s_index, entry,(void *)UNDEFINED,&n_indexEntry,&top,
       (struct INDEX_ENTRY_BLOCK*)UNDEFINED) != RETURNED)
     if (n_indexEntry >= 0) {
-      m_GREEN_INDEX_REMOVE(s_index,n_indexEntry)
+      om_GreenIndexRemove(s_index,n_indexEntry);
     } // if
   } // for
   m_DIGGY_RETURN(RETURNED)
- }
+ } // GreenIndexesRemove
 
 // Public function; see .h
 int GreenIndexesAdd(GREEN_INDEXES_HANDLE handle, int entry) {
@@ -546,11 +587,11 @@ int GreenIndexesAdd(GREEN_INDEXES_HANDLE handle, int entry) {
     m_TRACK_IF(GreenIndexBSearch(s_index, entry, (void*)UNDEFINED, &n_indexEntry, &top,
       (struct INDEX_ENTRY_BLOCK*)UNDEFINED) != RETURNED)
     if (n_indexEntry == -1) {
-      m_GREEN_INDEX_ADD(s_index,top,entry)
+      om_GreenIndexAdd(s_index,top,entry);
     } // if
   } // for
   m_DIGGY_RETURN(RETURNED)
-}
+} // GreenIndexesAdd
 
 
 // Adequate an item with a key.
@@ -822,7 +863,7 @@ int GreenIndexesVerifyCount (GREEN_INDEXES_HANDLE handle,int *ac_commonCount) {
   struct GREEN_INDEX *s_index = handle->vnhs_indexes ;
   int i = 0;
   for ( ; i < handle->indexesNumber ; i++, s_index++) {
-    int thatCount = GREEN_INDEX_GET_COUNT(s_index);
+    int thatCount = om_GreenIndexGetCount(s_index);
     if (n_lastCount != -1 && thatCount != n_lastCount) {
       completed = COMPLETED__BUT;
       break;
@@ -863,7 +904,7 @@ int GreenIndexesClear (GREEN_INDEXES_HANDLE handle) {
   int i = 0 ;
   struct GREEN_INDEX *s_index = handle->vnhs_indexes ;
   for ( ; i < handle->indexesNumber ; i++, s_index++) {
-    m_GREEN_INDEX_CLEAR(s_index)
+    om_GreenIndexClear(s_index);
   } // for
 
   m_DIGGY_RETURN(RETURNED)
@@ -876,7 +917,7 @@ int GreenIndexesDestroyInstance(GREEN_INDEXES_HANDLE xh_handle) {
   int i = 0;
   struct GREEN_INDEX *cs_index = xh_handle->vnhs_indexes;
   for ( ; i < xh_handle->indexesNumber ; i++, cs_index++) {
-    m_GREEN_INDEX_FREE(cs_index);
+    om_GreenIndexFree(cs_index);
   } // for
   if (xh_handle->indexesNumber > 0) {
     free(xh_handle->vnhs_indexes);
