@@ -23,41 +23,6 @@
 
 extern char b_diggyGreenCollectionExam;
 
-/////////// 1. GREEN INDEX ("proto" object......) ////////////////////
-
-// * Truly index-based seek flags:
-// NOT key-based seek flag: mutually exclusive with other truly index-based seek flags: 
-#define INDEX_SEEK_FLAG__ANY     0x01
-// Key-based seek flags: 
-#define INDEX_SEEK_FLAG__EQUAL   0x02
-#define INDEX_SEEK_FLAG__LESS    0x04
-#define INDEX_SEEK_FLAG__GREATER 0x08 
-// * NON-index based seek flag: mutually exclusive with truly index-based seek flags: 
-#define INDEX_SEEK_FLAG__LIKE    0x10 
- 
-#endif // __C_ANSI_GREEN_INDEX_H_INCLUDED__ == 0
-
-#undef __FLINT_IMAGES_H_INCLUDED__
-#define __FLINT_IMAGES_H_INCLUDED__ __C_ANSI_GREEN_INDEX_H_INCLUDED__
-#include "flint/images.h"
- 
-// #REF enum-INDEX_SEEK
-m_DEFINE_ENUM_ALIAS_BEGIN(m_IndexSeekFlagsImage)
-  // seek in collection regarding index
-  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__ANY           ,INDEX_SEEK_FLAG__ANY)
-  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__EQUAL         ,INDEX_SEEK_FLAG__EQUAL)
-  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__LESS          ,INDEX_SEEK_FLAG__LESS)
-  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__LESS_EQUAL    ,INDEX_SEEK_FLAG__EQUAL | INDEX_SEEK_FLAG__LESS)
-  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__GREATER       ,INDEX_SEEK_FLAG__GREATER)
-  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__GREATER_EQUAL ,INDEX_SEEK_FLAG__EQUAL | INDEX_SEEK_FLAG__GREATER)
-  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__NOT_EQUAL     ,INDEX_SEEK_FLAG__LESS | INDEX_SEEK_FLAG__GREATER)
-  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__LIKE          ,INDEX_SEEK_FLAG__LIKE)
-m_DEFINE_ENUM_ALIAS_END()
-
-#if __C_ANSI_GREEN_INDEX_H_INCLUDED__ == 0
-
-///////////// 2. GREEN INDEXES "real" object //////////////
-
 // Index's virtual function to compare an item with a key.
 //
 // Passed:
@@ -111,22 +76,6 @@ int GreenIndexesCreateInstance(GREEN_INDEXES_HANDLE *azh_handle,
   ENTRY_RAW_COMPARE_FUNCTION entryRawCompareFunction,
   ENTRY_RAW_EQUATE_FUNCTION entryRawEquateFunction, void* r_entryRawFunctionsHandle);
 
-
-// Adequate an item with a key.
-//
-// Passed:
-// - handle:
-// - indexLabel:
-// - aEntry: entry for "A"
-// - pr_bKeys: raw key(s) for "B" 
-//
-// Ret: adequation between "A" (entry) and "B" (key) ?
-// - ANSWER__YES: 
-// - ANSWER__NO: 
-// - -1: unexpected problem; anomaly is raised
-int GreenIndexesEntryEquate(GREEN_INDEXES_HANDLE handle, int indexLabel, int aEntry,
-  const void *pr_bKeys) ;
-
 // Passed:
 // - handle:
 // - itemsPhysicalNumber:
@@ -142,13 +91,6 @@ int GreenIndexesAddIndex(GREEN_INDEXES_HANDLE handle, int itemsPhysicalNumber,
 // - newItemsPhysicalNumber:
 int GreenIndexesResize (GREEN_INDEXES_HANDLE handle, int newItemsPhysicalNumber) ;
 
-// Remove reference on item in all indexes (no action if not referenced in some index)
-//
-// Passed:
-// - handle:
-// - entry:
-int GreenIndexesRemove(GREEN_INDEXES_HANDLE handle, int entry) ;
-
 // Add reference on item in all indexes (no action if already referenced in some index)
 //
 // Passed:
@@ -156,22 +98,13 @@ int GreenIndexesRemove(GREEN_INDEXES_HANDLE handle, int entry) ;
 // - entry:
 int GreenIndexesAdd(GREEN_INDEXES_HANDLE, int entry) ; 
 
-// Perform "equation" of entry with a key. 
+// Remove reference on item in all indexes (no action if not referenced in some index)
 //
 // Passed:
 // - handle:
-// - indexLabel: 
-// - aEntry: "A" entry 
-// - indexSeekFlags: 
-// - pr_bKeys: "B" keys(s) 
-//
-// Returned:
-// - >=0: "equation" between :"A" and "B" with that key component... 
-//   + ANSWER__YES : "A" item and "B" key(s) are similar 
-//   + ANSWER__NO : "A" item and "B" key(s) are NOT similar 
-// - -1: unexpected problem; anomaly is raised
-int GreenIndexesSeekEntryEquate(GREEN_INDEXES_HANDLE handle, int indexLabel, int aEntry,
-  unsigned int indexSeekFlags, const void *pr_bKeys) ;
+// - entry:
+int GreenIndexesRemove(GREEN_INDEXES_HANDLE handle, int entry) ;
+
 
 #define CRITERIA_OP_FLAG__CLOSE1      0x001 // Close one bracket before op.
 #define CRITERIA_OP_FLAG__CLOSE2      0x002 // Close two brackets before op.
@@ -202,6 +135,37 @@ static inline int m_CloseBracketCount(unsigned int criteriaOpFlags) {
 
 #define b_ASCENDING b_FALSE0
 #define b_DESCENDING b_TRUE
+
+// * Truly index-based seek flags:
+// NOT key-based seek flag: mutually exclusive with other truly index-based seek flags: 
+#define INDEX_SEEK_FLAG__ANY     0x01
+// Key-based seek flags: 
+#define INDEX_SEEK_FLAG__EQUAL   0x02
+#define INDEX_SEEK_FLAG__LESS    0x04
+#define INDEX_SEEK_FLAG__GREATER 0x08 
+// * NON-index based seek flag: mutually exclusive with truly index-based seek flags: 
+#define INDEX_SEEK_FLAG__LIKE    0x10 
+ 
+#endif // __C_ANSI_GREEN_INDEX_H_INCLUDED__ == 0
+
+#undef __FLINT_IMAGES_H_INCLUDED__
+#define __FLINT_IMAGES_H_INCLUDED__ __C_ANSI_GREEN_INDEX_H_INCLUDED__
+#include "flint/images.h"
+ 
+// #REF enum-INDEX_SEEK
+m_DEFINE_ENUM_ALIAS_BEGIN(m_IndexSeekFlagsImage)
+  // seek in collection regarding index
+  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__ANY           ,INDEX_SEEK_FLAG__ANY)
+  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__EQUAL         ,INDEX_SEEK_FLAG__EQUAL)
+  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__LESS          ,INDEX_SEEK_FLAG__LESS)
+  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__LESS_EQUAL    ,INDEX_SEEK_FLAG__EQUAL | INDEX_SEEK_FLAG__LESS)
+  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__GREATER       ,INDEX_SEEK_FLAG__GREATER)
+  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__GREATER_EQUAL ,INDEX_SEEK_FLAG__EQUAL | INDEX_SEEK_FLAG__GREATER)
+  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__NOT_EQUAL     ,INDEX_SEEK_FLAG__LESS | INDEX_SEEK_FLAG__GREATER)
+  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__LIKE          ,INDEX_SEEK_FLAG__LIKE)
+m_DEFINE_ENUM_ALIAS_END()
+
+#if __C_ANSI_GREEN_INDEX_H_INCLUDED__ == 0
 
 // May or may be NOT index-based selection:
 struct G_REQUEST_CRITERION {
@@ -306,8 +270,9 @@ int GreenIndexesSeek(GREEN_INDEXES_HANDLE handle, struct INDEX_ITERATOR *a_index
 // Ret:
 // - RETURNED: Ok
 // - -1: anomaly is raised
-int GreenIndexesCurrent(GREEN_INDEXES_HANDLE handle,
-  struct INDEX_ITERATOR *a_indexIterator, int *an_entry) ;
+int GreenIndexesCurrent(GREEN_INDEXES_HANDLE handle, struct INDEX_ITERATOR *a_indexIterator,
+  int *an_entry) ;
+
 
 // Ret:
 // - ANSWER__YES: indexes are enabled (i.e at least one index has been added) 

@@ -479,7 +479,6 @@ int GreenIndexesCreateInstance(GREEN_INDEXES_HANDLE *azh_handle,
   m_DIGGY_RETURN(RETURNED)
 } // GreenIndexesCreateInstance
 
-
 // ENTRY_COMPARE_FUNCTION
 static int GreenIndexesEntryCompare (void *r_handle, int indexLabel, int aEntry,
   int n_bEntry, const void *cpr_bKeys) {
@@ -495,21 +494,6 @@ static int GreenIndexesEntryCompare (void *r_handle, int indexLabel, int aEntry,
   m_DIGGY_RETURN(comparison)
 } // GreenIndexesEntryCompare
 
-// Public function: see .h
-int GreenIndexesEntryEquate(GREEN_INDEXES_HANDLE handle, int indexLabel, int aEntry,
-  const void *pr_bKeys) {
-  int answer = UNDEFINED;
-  m_ASSERT(indexLabel < handle->indexesNumber) 
-  int j = 0; for ( ; j < handle->vnhs_keyCounts[indexLabel] ; j++) {
-    m_TRACK_IF((answer = handle->entryRawEquateFunction(handle->r_entryRawFunctionsHandle,
-      indexLabel, j, aEntry, pr_bKeys)) < 0)
-    if (answer != ANSWER__YES) break ;
-  } // for
-  
-  return answer;
-} // GreenIndexesEntryEquate
-
-
 // Public function; see .h
 int GreenIndexesAddIndex(GREEN_INDEXES_HANDLE handle, int itemsPhysicalNumber,
   int keyCount) {
@@ -524,7 +508,6 @@ int GreenIndexesAddIndex(GREEN_INDEXES_HANDLE handle, int itemsPhysicalNumber,
   m_DIGGY_RETURN(handle->indexesNumber++)
 } // GreenIndexesAddIndex
 
-
 // Public function; see .h
 int GreenIndexesResize (GREEN_INDEXES_HANDLE handle, int newItemsPhysicalNumber) {
   m_DIGGY_BOLLARD_S()
@@ -537,45 +520,79 @@ int GreenIndexesResize (GREEN_INDEXES_HANDLE handle, int newItemsPhysicalNumber)
   m_DIGGY_RETURN(RETURNED)
 } // GreenIndexesResize
 
-
-// Remove reference on item in all indexes (no action if not referenced in some index)
-//
-// Passed:
-// - m_indexes:
-// - entry:
-#define m_GREEN_INDEXES_REMOVE(/*struct GREEN_INDEXES*/m_indexes, /*int*/entry) {\
-  int emn_indexEntry = UNDEFINED, em_top = UNDEFINED;\
-  int em_i = 0;\
-  struct GREEN_INDEX *s_index = (m_indexes).vnhs_indexes;\
-  for ( ; em_i < (m_indexes).indexesNumber ; em_i ++, s_index++) {\
-    m_TRACK_IF(GreenIndexBSearch(s_index, entry,(void *)UNDEFINED,&emn_indexEntry,&em_top,\
-      (struct INDEX_ENTRY_BLOCK*)UNDEFINED) != RETURNED)\
-    if (emn_indexEntry >= 0) {\
-      m_GREEN_INDEX_REMOVE(s_index,emn_indexEntry)\
-    }\
-  }\
-}
-
-// Add reference on item in all indexes (no action if already referenced in some index)
-//
-// Passed:
-// - m_indexes:
-// - entry:
-#define m_GREEN_INDEXES_ADD(/*struct GREEN_INDEXES*/ m_indexes, /*int*/ entry) {\
-  int emn_indexEntry = UNDEFINED, top = UNDEFINED;\
-  int em_i = 0;\
-  struct GREEN_INDEX *s_index = (m_indexes).vnhs_indexes;\
-  for ( ; em_i < (m_indexes).indexesNumber ; em_i ++, s_index++) {\
-    m_TRACK_IF(GreenIndexBSearch(s_index, entry, (void*)UNDEFINED, &emn_indexEntry, &top,\
-      (struct INDEX_ENTRY_BLOCK*)UNDEFINED) != RETURNED)\
-    if (emn_indexEntry == -1) {\
-      m_GREEN_INDEX_ADD(s_index,top,entry)\
-    }\
-  }\
-}
+// Public function; see .h
+int GreenIndexesRemove(GREEN_INDEXES_HANDLE handle, int entry) {
+  m_DIGGY_BOLLARD()
+  int n_indexEntry = UNDEFINED, top = UNDEFINED;
+  int i = 0;
+  struct GREEN_INDEX *s_index = handle->vnhs_indexes;
+  for ( ; i < handle->indexesNumber ; i ++, s_index++) {
+    m_TRACK_IF(GreenIndexBSearch(s_index, entry,(void *)UNDEFINED,&n_indexEntry,&top,
+      (struct INDEX_ENTRY_BLOCK*)UNDEFINED) != RETURNED)
+    if (n_indexEntry >= 0) {
+      m_GREEN_INDEX_REMOVE(s_index,n_indexEntry)
+    } // if
+  } // for
+  m_DIGGY_RETURN(RETURNED)
+ }
 
 // Public function; see .h
-int GreenIndexesSeekEntryEquate(GREEN_INDEXES_HANDLE handle, int indexLabel, int aEntry,
+int GreenIndexesAdd(GREEN_INDEXES_HANDLE handle, int entry) {
+  m_DIGGY_BOLLARD()
+  int n_indexEntry = UNDEFINED, top = UNDEFINED;
+  int i = 0;
+  struct GREEN_INDEX *s_index = handle->vnhs_indexes;
+  for ( ; i < handle->indexesNumber ; i ++, s_index++) {
+    m_TRACK_IF(GreenIndexBSearch(s_index, entry, (void*)UNDEFINED, &n_indexEntry, &top,
+      (struct INDEX_ENTRY_BLOCK*)UNDEFINED) != RETURNED)
+    if (n_indexEntry == -1) {
+      m_GREEN_INDEX_ADD(s_index,top,entry)
+    } // if
+  } // for
+  m_DIGGY_RETURN(RETURNED)
+}
+
+
+// Adequate an item with a key.
+//
+// Passed:
+// - handle:
+// - indexLabel:
+// - aEntry: entry for "A"
+// - pr_bKeys: raw key(s) for "B" 
+//
+// Ret: adequation between "A" (entry) and "B" (key) ?
+// - ANSWER__YES: 
+// - ANSWER__NO: 
+// - -1: unexpected problem; anomaly is raised
+static int GreenIndexesEntryEquate(GREEN_INDEXES_HANDLE handle, int indexLabel, int aEntry,
+  const void *pr_bKeys) {
+  int answer = UNDEFINED;
+  m_ASSERT(indexLabel < handle->indexesNumber) 
+  int j = 0; for ( ; j < handle->vnhs_keyCounts[indexLabel] ; j++) {
+    m_TRACK_IF((answer = handle->entryRawEquateFunction(handle->r_entryRawFunctionsHandle,
+      indexLabel, j, aEntry, pr_bKeys)) < 0)
+    if (answer != ANSWER__YES) break ;
+  } // for
+  
+  return answer;
+} // GreenIndexesEntryEquate
+
+// Perform "equation" of entry with a key. 
+//
+// Passed:
+// - handle:
+// - indexLabel: 
+// - aEntry: "A" entry 
+// - indexSeekFlags: 
+// - pr_bKeys: "B" keys(s) 
+//
+// Returned:
+// - >=0: "equation" between :"A" and "B" with that key component... 
+//   + ANSWER__YES : "A" item and "B" key(s) are similar 
+//   + ANSWER__NO : "A" item and "B" key(s) are NOT similar 
+// - -1: unexpected problem; anomaly is raised
+static int GreenIndexesSeekEntryEquate(GREEN_INDEXES_HANDLE handle, int indexLabel, int aEntry,
   unsigned int indexSeekFlags, const void *pr_bKeys) {
   m_DIGGY_BOLLARD_S()
   if (indexSeekFlags == INDEX_SEEK_FLAGS__ANY) return ANSWER__YES;
@@ -749,8 +766,8 @@ int GreenIndexesSeek(GREEN_INDEXES_HANDLE handle, struct INDEX_ITERATOR *a_index
     } else break; // No more entry => finished 
   } while (b_TRUE) ;
 
-if (nan_entry != NULL) m_DIGGY_VAR_D(*nan_entry)
-  m_DIGGY_RETURN(RETURNED)
+  if (nan_entry != NULL) m_DIGGY_VAR_D(*nan_entry)
+    m_DIGGY_RETURN(RETURNED)
 } // GreenIndexesSeek
 
 // Public function; see .h
@@ -765,12 +782,12 @@ int GreenIndexesCurrent(GREEN_INDEXES_HANDLE handle,
   m_DIGGY_RETURN(RETURNED)
 } // GreenIndexesCurrent
 
+
 // Public function; see .h
 int GreenIndexesVerifyEnabled (GREEN_INDEXES_HANDLE handle) {
   m_DIGGY_BOLLARD_S()
   m_DIGGY_RETURN(handle->indexesNumber > 0?  ANSWER__YES: ANSWER__NO) 
 } // GreenIndexesVerifyEnabled
-
 
 // Public function; see .h
 int GreenIndexesVerify (GREEN_INDEXES_HANDLE handle) {
@@ -793,7 +810,6 @@ m_DIGGY_VAR_D(i)
 
   m_DIGGY_RETURN(completed)
 } // GreenIndexesVerify
-
 
 // Public function; see .h
 int GreenIndexesVerifyCount (GREEN_INDEXES_HANDLE handle,int *ac_commonCount) {
@@ -818,7 +834,6 @@ int GreenIndexesVerifyCount (GREEN_INDEXES_HANDLE handle,int *ac_commonCount) {
  
   m_DIGGY_RETURN(completed)
 } // GreenIndexesVerifyCount
-
 
 // Public function; see .h
 int GreenIndexesVerifyEntry (GREEN_INDEXES_HANDLE handle, int entry, int expectedHits) {
@@ -854,38 +869,6 @@ int GreenIndexesClear (GREEN_INDEXES_HANDLE handle) {
   m_DIGGY_RETURN(RETURNED)
 } // GreenIndexesClear
 
-
-// Public function; see .h
-int GreenIndexesRemove(GREEN_INDEXES_HANDLE handle, int entry) {
-  m_DIGGY_BOLLARD()
-  int n_indexEntry = UNDEFINED, top = UNDEFINED;
-  int i = 0;
-  struct GREEN_INDEX *s_index = handle->vnhs_indexes;
-  for ( ; i < handle->indexesNumber ; i ++, s_index++) {
-    m_TRACK_IF(GreenIndexBSearch(s_index, entry,(void *)UNDEFINED,&n_indexEntry,&top,
-      (struct INDEX_ENTRY_BLOCK*)UNDEFINED) != RETURNED)
-    if (n_indexEntry >= 0) {
-      m_GREEN_INDEX_REMOVE(s_index,n_indexEntry)
-    } // if
-  } // for
-  m_DIGGY_RETURN(RETURNED)
- }
-
-// Public function; see .h
-int GreenIndexesAdd(GREEN_INDEXES_HANDLE handle, int entry) {
-  m_DIGGY_BOLLARD()
-  int n_indexEntry = UNDEFINED, top = UNDEFINED;
-  int i = 0;
-  struct GREEN_INDEX *s_index = handle->vnhs_indexes;
-  for ( ; i < handle->indexesNumber ; i ++, s_index++) {
-    m_TRACK_IF(GreenIndexBSearch(s_index, entry, (void*)UNDEFINED, &n_indexEntry, &top,
-      (struct INDEX_ENTRY_BLOCK*)UNDEFINED) != RETURNED)
-    if (n_indexEntry == -1) {
-      m_GREEN_INDEX_ADD(s_index,top,entry)
-    } // if
-  } // for
-  m_DIGGY_RETURN(RETURNED)
-}
 
 // Public function; see .h
 int GreenIndexesDestroyInstance(GREEN_INDEXES_HANDLE xh_handle) {
