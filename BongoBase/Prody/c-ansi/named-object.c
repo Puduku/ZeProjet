@@ -63,7 +63,7 @@ int NamedObjectsAddNamedObject(NAMED_OBJECTS_HANDLE handle, struct P_STRING name
   void *nhr_namedObjectHandle, g_NAMED_OBJECT_STUFF *at_namedObjectStuff, ...){ 
   m_DIGGY_BOLLARD()
   int completed = COMPLETED__OK; // a priori
-  struct GS_KEY gsKey = m_GsKey(name);
+  struct GS_KEY gsKey = om_GsKey(name);
   switch (m_GStringsIndexSingleFetch(handle->h_gStringsHandle,NULL,INDEX_LABEL0,
     INDEX_SEEK_FLAGS__EQUAL,&gsKey, INDEX_FETCH_FLAGS__FETCH,at_namedObjectStuff,NULL)) {
   case RESULT__FOUND:
@@ -87,7 +87,7 @@ int NamedObjectsGetNamedObject(NAMED_OBJECTS_HANDLE handle, struct P_STRING name
   void **acvnr_namedObjectHandle){ 
   m_DIGGY_BOLLARD()
   g_NAMED_OBJECT_STUFF ct_namedObjectStuff = (g_NAMED_OBJECT_STUFF)UNDEFINED;
-  struct GS_KEY gsKey = m_GsKey(name);
+  struct GS_KEY gsKey = om_GsKey(name);
   int result = m_GStringsIndexSingleFetch(handle->h_gStringsHandle,NULL,INDEX_LABEL0,
     INDEX_SEEK_FLAGS__EQUAL,&gsKey, INDEX_FETCH_FLAGS__SEEK_ONLY,&ct_namedObjectStuff,NULL);
   switch (result) {

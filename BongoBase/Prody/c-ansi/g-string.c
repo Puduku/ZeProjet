@@ -433,12 +433,12 @@ m_DIGGY_INFO("i=%d, keyCount=%d",i,keyCount)
 
 // Public function : see .h
 int GStringsIndexRequestR(G_STRINGS_HANDLE cp_handle,
-  INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaNumber,
+  INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaCount,
   const struct G_REQUEST_CRITERION *sp_criteria) {
   m_DIGGY_BOLLARD()
 
   m_TRACK_IF(GreenCollectionIndexRequestR(cp_handle->h_greenCollectionHandle,
-    nf_indexRequestAutomaticBuffer,criteriaNumber, sp_criteria) != RETURNED)
+    nf_indexRequestAutomaticBuffer,criteriaCount, sp_criteria) != RETURNED)
 
   m_DIGGY_RETURN(RETURNED)
 } // GStringsIndexRequestR
@@ -450,7 +450,7 @@ int GsRequestCriteriaAddCriterion(struct GS_REQUEST_CRITERIA *a_criteria52, int 
   unsigned int criteriaOpFlags) {
   m_DIGGY_BOLLARD()
   int i = a_criteria52->count5;
-  m_ASSERT(a_criteria52->count5++ < 5)
+  m_ASSERT(a_criteria52->count5++ < REQUEST_CRITERIA_MAX5)
   a_criteria52->sc_gsKeys52[i][0] = c_gsKey1; 
   a_criteria52->sc_gsKeys52[i][1] = c_gsKey2; 
   a_criteria52->sc_criteria5[i] = m_GRequestCriterion_GsKeys(indexLabel, indexSeekFlags,
@@ -471,14 +471,14 @@ int GStringsIndexRequestR52(G_STRINGS_HANDLE cp_handle,
 
 // Public function : see .h
 int GStringsIndexRequest(G_STRINGS_HANDLE cp_handle,
-  INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaNumber,
+  INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaCount,
   int indexLabel1, unsigned int indexSeekFlags1, const struct GS_KEY *cfps_keys1, ...) {
   m_DIGGY_BOLLARD()
 
   { va_list arguments;
     va_start(arguments,cfps_keys1);
     m_TRACK_IF(GreenCollectionIndexRequestV(cp_handle->h_greenCollectionHandle,
-      nf_indexRequestAutomaticBuffer, criteriaNumber, indexLabel1, indexSeekFlags1,
+      nf_indexRequestAutomaticBuffer, criteriaCount, indexLabel1, indexSeekFlags1,
       (void*)cfps_keys1, arguments) != RETURNED)
     va_end(arguments) ;
   } // arguments

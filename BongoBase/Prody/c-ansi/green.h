@@ -303,12 +303,12 @@ m_DEFINE_ENUM_ALIAS_END()
 //   NULL special address: use internal structure => NOT "thread safe" / "re-entrant"
 //   non NULL: buffer on stack => allows (thread) re-entrancy ; that buffer will be used by 
 //   GreenCollectionIndexFetch() index fetching function... 
-// - int criteriaNumber:
+// - int criteriaCount:
 // - indexLabel1: (1st criterion) >= 0: see GreenCollectionCreateInstance()
 // - indexSeekFlags1: (1st criterion)
 // - cfpr_keys1:  (1st criterion) search key(s) value(s) of item (regarding index) ;
 //   not significant without actual index seek flag (INDEX_SEEK_FLAGS__ANY)
-// - optional criteria (...) : when criteriaNumber > 1
+// - optional criteria (...) : when criteriaCount > 1
 //  + criteriaOpFlags1 : CRITERIA_OP_FLAG__OR and CRITERIA_OP_FLAG__CLOSE* are not allowed
 //  + indexLabel2:
 //  + c_indexSeekFlags2:
@@ -324,13 +324,13 @@ m_DEFINE_ENUM_ALIAS_END()
 // - COMPLETED__BUT: request rectified (missing closing brackets, etc.)
 // - -1: unexpected problem ; anomaly is raised
 int GreenCollectionIndexRequest(GREEN_COLLECTION_HANDLE cp_handle,
-  INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaNumber,
+  INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaCount,
   int indexLabel1, unsigned int indexSeekFlags1, void *cfpr_keys1, ...);
 
 
 // #SEE GreenCollectionIndexRequest <greenItem> <keys>
 int GreenCollectionIndexRequestV(GREEN_COLLECTION_HANDLE cp_handle,
-  INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaNumber,
+  INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaCount,
   int indexLabel1, unsigned int indexSeekFlags1, void *cfpr_keys1, va_list extraCriteria);
 
 
@@ -357,7 +357,7 @@ static inline struct G_REQUEST_CRITERION m_GRequestCriterion(int indexLabel,
 
 //  #SEE GreenCollectionIndexRequest <greenItem> <keys>
 int GreenCollectionIndexRequestR(GREEN_COLLECTION_HANDLE cp_handle,
-  INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaNumber,
+  INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaCount,
   const struct G_REQUEST_CRITERION *sp_criteria) ;
 
 

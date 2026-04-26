@@ -106,35 +106,8 @@ int GreenIndexesAdd(GREEN_INDEXES_HANDLE, int entry) ;
 int GreenIndexesRemove(GREEN_INDEXES_HANDLE handle, int entry) ;
 
 
-#define CRITERIA_OP_FLAG__CLOSE1      0x001 // Close one bracket before op.
-#define CRITERIA_OP_FLAG__CLOSE2      0x002 // Close two brackets before op.
-#define CRITERIA_OP_FLAG__CLOSE3      0x004 // Close three brackets before op.
-#define CRITERIA_OP_FLAG__AND         0x010 // And op.
-#define CRITERIA_OP_FLAG__OR          0x020 // Or op.
-#define CRITERIA_OP_FLAG__OPEN1       0x100 // Open one bracket after op. 
-#define CRITERIA_OP_FLAG__OPEN2       0x200 // Open two brackets after op. 
-#define CRITERIA_OP_FLAG__OPEN3       0x400 // Open three brackets after op. 
-
-// Passed:
-// - criteriaOpFlags
-static inline int m_OpenBracketCount(unsigned int criteriaOpFlags) {
-  if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__OPEN3)) return 3;
-  else if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__OPEN2)) return 2;
-  else if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__OPEN1)) return 1;
-  return 0;
-} // m_OpenBracketCount 
-
-// Passed:
-// - criteriaOpFlags
-static inline int m_CloseBracketCount(unsigned int criteriaOpFlags) {
-  if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE3)) return 3;
-  else if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE2)) return 2;
-  else if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE1)) return 1;
-  return 0;
-} // m_CloseBracketCount 
-
-#define b_ASCENDING b_FALSE0
-#define b_DESCENDING b_TRUE
+// Request criteria:
+// -----------------
 
 // * Truly index-based seek flags:
 // NOT key-based seek flag: mutually exclusive with other truly index-based seek flags: 
@@ -167,6 +140,33 @@ m_DEFINE_ENUM_ALIAS_END()
 
 #if __C_ANSI_GREEN_INDEX_H_INCLUDED__ == 0
 
+#define CRITERIA_OP_FLAG__CLOSE1      0x001 // Close one bracket before op.
+#define CRITERIA_OP_FLAG__CLOSE2      0x002 // Close two brackets before op.
+#define CRITERIA_OP_FLAG__CLOSE3      0x004 // Close three brackets before op.
+#define CRITERIA_OP_FLAG__AND         0x010 // And op.
+#define CRITERIA_OP_FLAG__OR          0x020 // Or op.
+#define CRITERIA_OP_FLAG__OPEN1       0x100 // Open one bracket after op. 
+#define CRITERIA_OP_FLAG__OPEN2       0x200 // Open two brackets after op. 
+#define CRITERIA_OP_FLAG__OPEN3       0x400 // Open three brackets after op. 
+
+// Passed:
+// - criteriaOpFlags
+static inline int m_OpenBracketCount(unsigned int criteriaOpFlags) {
+  if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__OPEN3)) return 3;
+  else if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__OPEN2)) return 2;
+  else if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__OPEN1)) return 1;
+  return 0;
+} // m_OpenBracketCount 
+
+// Passed:
+// - criteriaOpFlags
+static inline int m_CloseBracketCount(unsigned int criteriaOpFlags) {
+  if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE3)) return 3;
+  else if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE2)) return 2;
+  else if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE1)) return 1;
+  return 0;
+} // m_CloseBracketCount 
+
 // May or may be NOT index-based selection:
 struct G_REQUEST_CRITERION {
   int indexLabel;
@@ -174,6 +174,13 @@ struct G_REQUEST_CRITERION {
   const void *cfpr_keys; // Only significant with Key-based seek flag(s)
   unsigned int criteriaOpFlags;
 } ;
+
+// Suggested max is 5, but may be adapted
+#define REQUEST_CRITERIA_MAX5 5
+
+
+// Index sequence:
+// ---------------
 
 // Index entries "block"
 struct INDEX_ENTRY_BLOCK {
@@ -196,44 +203,82 @@ struct INDEX_SEQUENCE {
 } ;
 
 // Disable index sequence (disambiguation purpose...)
-#define m_DISABLE_INDEX_SEQUENCE(m_indexSequence)  (m_indexSequence).indexEntryBlockCount2 = 0;
+// 
+// Ret:
+// - RETURNED: Ok
+static inline int om_IndexSequenceDisable(struct INDEX_SEQUENCE *a_indexSequence) {
+  m_DIGGY_BOLLARD_S()
+  a_indexSequence->indexEntryBlockCount2 = 0;
+  m_DIGGY_RETURN(RETURNED);
+} // om_IndexSequenceDisable
+  
+
+// Index iterator:
+// ---------------
+
+// An index iterator:
+// - Request criteria
+// - Index sequence
+
+#define b_ASCENDING b_FALSE0
+#define b_DESCENDING b_TRUE
 
 struct INDEX_ITERATOR {
-  int criteriaNumber5 ;
-  struct G_REQUEST_CRITERION criteria[5] ;
+  int criteriaCount5 ; // see REQUEST_CRITERIA_MAX5 
+  struct G_REQUEST_CRITERION criteria[REQUEST_CRITERIA_MAX5];
   char b_descending;
   struct INDEX_SEQUENCE indexSequence;
 };
 
 // Passed:
-// - m_indexIterator:
-// - m_criterion1:
-#define m_INIT_INDEX_ITERATOR(/*struct INDEX_ITERATOR*/m_indexIterator,\
-  /*struct G_REQUEST_CRITERION */m_criterion1) {\
-  (m_indexIterator).criteriaNumber5 = 1;\
-  (m_indexIterator).criteria[0] = m_criterion1;\
-  (m_indexIterator).b_descending = b_ASCENDING;\
-  m_DISABLE_INDEX_SEQUENCE((m_indexIterator).indexSequence)\
-}
+// - criterion1:
+//
+// Ret: new indexIterator
+static inline struct INDEX_ITERATOR om_IndexIterator(struct G_REQUEST_CRITERION criterion1) {
+  struct INDEX_ITERATOR indexIterator = { .criteriaCount5 = 1};
+  indexIterator.criteria[0] = criterion1;
+  indexIterator.b_descending = b_ASCENDING;
+  om_IndexSequenceDisable(&indexIterator.indexSequence);
+  return indexIterator;
+} // om_IndexIterator
 
 // Passed:
-// - m_indexIterator:
+// - a_indexIterator:
 // - m_criterion:
-#define m_INIT_INDEX_ITERATOR__EXTRAS(/*struct INDEX_ITERATOR*/m_indexIterator,\
-  /*struct G_REQUEST_CRITERION */m_criterion) {\
-  m_ASSERT((m_indexIterator).criteriaNumber5 < 5)\
-  int em_i = (m_indexIterator).criteriaNumber5;\
-  (m_indexIterator).criteria[em_i] = m_criterion;\
-  (m_indexIterator).criteriaNumber5 ++;\
-}
+// 
+// Changed:
+// - *a_indexIterator:
+//
+// Ret:
+// - RETURNED: Ok
+// - -1: anomaly is raised
+static inline int m_IndexIteratorAddCriterion(struct INDEX_ITERATOR *a_indexIterator,
+  struct G_REQUEST_CRITERION criterion) {
+  m_DIGGY_BOLLARD_S()
+  m_ASSERT(a_indexIterator->criteriaCount5 < REQUEST_CRITERIA_MAX5)
+  int i = a_indexIterator->criteriaCount5;\
+  a_indexIterator->criteria[i] = criterion;\
+  a_indexIterator->criteriaCount5 ++;\
+  m_DIGGY_RETURN(RETURNED)
+} // m_IndexIteratorAddCriterion
+  
 
 // Passed:
-// - m_indexIterator:
-// - mb_descending:
-#define m_HARD_RESET_INDEX_ITERATOR(/*struct INDEX_ITERATOR*/m_indexIterator, mb_descending) {\
-  (m_indexIterator).b_descending = mb_descending;\
-  m_DISABLE_INDEX_SEQUENCE((m_indexIterator).indexSequence)\
-}
+// - a_indexIterator:
+// - b_descending:
+// 
+// Changed:
+// - *a_indexIterator:
+//
+// Ret:
+// - RETURNED: Ok
+static inline int om_IndexIteratorReset(struct INDEX_ITERATOR* a_indexIterator, char b_descending) {
+  m_DIGGY_BOLLARD_S()
+  a_indexIterator->b_descending = b_descending;\
+  om_IndexSequenceDisable(&a_indexIterator->indexSequence);
+  m_DIGGY_RETURN(RETURNED)
+} // om_IndexIteratorReset
+
 
 // Update index iterator sequence.
 //

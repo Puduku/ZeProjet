@@ -252,7 +252,7 @@ static int BlotcodeFindBlotkeyw (BLOTCODE_HANDLE p_handle,
   m_INDEX_REQUEST_AUTOMATIC_BUFFER(indexRequestAutomaticBuffer)
   G_STRING_STUFF t_blotkeywStuff = (G_STRING_STUFF) UNDEFINED;
 
-  struct GS_KEY gsKey = m_GsKey(*ap_litteralKeyw); 
+  struct GS_KEY gsKey = om_GsKey(*ap_litteralKeyw); 
 
   int result = gm_GTokensIndexSingleFetch(p_handle->h_blotkeywsHandle, indexRequestAutomaticBuffer,
     INDEX_LABEL0,INDEX_SEEK_FLAGS__EQUAL,&gsKey,INDEX_FETCH_FLAGS__READ_ONLY,&t_blotkeywStuff,

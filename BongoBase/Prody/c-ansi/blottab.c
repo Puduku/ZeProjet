@@ -133,7 +133,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
   m_TRACK_IF(ParseAsValue(a_sequence, acb_strValue) != RETURNED)  
   if (*acb_strValue == -1) *acb_strValue = b_INT_VALUE;
 
-  const struct GS_KEY p_fieldKey = m_GsKey(fieldName);
+  const struct GS_KEY p_fieldKey = om_GsKey(fieldName);
   int result = UNDEFINED;
   int entry = UNDEFINED;
   switch (result = m_GStringsIndexSingleFetch(fieldAttributesHandle,(INDEX_REQUEST_AUTOMATIC_BUFFER)NULL,
@@ -339,9 +339,9 @@ m_DIGGY_VAR_P_STRING(subSequence)
         b_strValue), &blotexValue, nc_abandonmentInfo))
       if (b_strValue) {
 m_DIGGY_VAR_P_STRING(blotexValue.select.c_strex.v_str)
-        c_gsKey = m_GsKey(blotexValue.select.c_strex.v_str);
+        c_gsKey = om_GsKey(blotexValue.select.c_strex.v_str);
       } else {
-        c_gsKey = m_GsKey3(blotexValue.select.c_blotval); 
+        c_gsKey = om_GsKey3(blotexValue.select.c_blotval); 
       } // if
     } // if
 m_DIGGY_VAR_INDEX_SEEK_FLAGS(n_indexSeekFlags)

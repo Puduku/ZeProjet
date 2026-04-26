@@ -666,12 +666,10 @@ static int GreenIndexesSeekEntryEquate(GREEN_INDEXES_HANDLE handle, int indexLab
   m_DIGGY_RETURN(answer)
 } // GreenIndexesSeekEntryEquate
 
-#define CRITERIA_STACK_SIZE 10
-
 // Possible statuses : 'U': Unkown 'C': Canceled 'O': Ok 'K': KO
 #define m_CRITERIA_HANDLER_CREATE() \
-  unsigned int knownCriteriaOpFlags[CRITERIA_STACK_SIZE] ;\
-  char statuses[CRITERIA_STACK_SIZE]; 
+  unsigned int knownCriteriaOpFlags[REQUEST_CRITERIA_MAX5] ;\
+  char statuses[REQUEST_CRITERIA_MAX5]; 
   
 // Re-init criteria handler.
 // 1st criterion op. flags are rectified if needed:
@@ -702,14 +700,14 @@ static int GreenIndexesSeekEntryEquate(GREEN_INDEXES_HANDLE handle, int indexLab
 #define m_CRITERIA_HANDLER_EQUATION_AND_CLOSE_BRACKETS(/*struct GREEN_INDEXES* */handle,\
   /*struct INDEX_ITERATOR* */a_indexIterator, /*int*/m_i) \
 if (m_i == 0) {\
-  if (a_indexIterator->criteriaNumber5 == 1) statuses[0] = 'O' ; \
+  if (a_indexIterator->criteriaCount5 == 1) statuses[0] = 'O' ; \
 } else { \
-  int em_cn = ((m_i)+1 == a_indexIterator->criteriaNumber5)? i_stackEntry: \
+  int em_cn = ((m_i)+1 == a_indexIterator->criteriaCount5)? i_stackEntry: \
     m_CloseBracketCount(a_indexIterator->criteria[m_i].criteriaOpFlags);\
   if (em_cn == 0) {\
     if (*v_knownCriteriaOpFlagsPtr == ALL_FLAGS_OFF0) *v_knownCriteriaOpFlagsPtr = \
       a_indexIterator->criteria[m_i].criteriaOpFlags;\
-    if ((m_i)+1 < a_indexIterator->criteriaNumber5 && b_FLAG_SET_ON(\
+    if ((m_i)+1 < a_indexIterator->criteriaCount5 && b_FLAG_SET_ON(\
       *v_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__OR) && b_FLAG_SET_ON(\
       a_indexIterator->criteria[m_i+1].criteriaOpFlags, CRITERIA_OP_FLAG__AND)) em_cn++;\
   } else if (em_cn > i_stackEntry) em_cn = i_stackEntry; \
@@ -721,10 +719,10 @@ if (m_i == 0) {\
     switch (answer) {\
     case ANSWER__YES:\
       if (b_FLAG_SET_OFF(*v_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__AND) || \
-        em_cn > 0 || (m_i)+1 == a_indexIterator->criteriaNumber5) *v_statusPtr = 'O';\
+        em_cn > 0 || (m_i)+1 == a_indexIterator->criteriaCount5) *v_statusPtr = 'O';\
     break; case ANSWER__NO: \
       if (b_FLAG_SET_OFF(*v_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__OR) || \
-        em_cn > 0 || (m_i)+1 == a_indexIterator->criteriaNumber5) *v_statusPtr = 'K'; \
+        em_cn > 0 || (m_i)+1 == a_indexIterator->criteriaCount5) *v_statusPtr = 'K'; \
     break; default:\
       m_TRACK()\
     }\
@@ -765,11 +763,11 @@ if (m_i == 0) {\
 // - m_i: criterion entry 
 #define m_CRITERIA_HANDLER_OPEN_BRACKETS(/*struct INDEX_ITERATOR* */a_indexIterator, /*int*/m_i) {\
   int em_on = m_OpenBracketCount(a_indexIterator->criteria[m_i].criteriaOpFlags);\
-  if (em_on == 0 && (m_i)+1 < a_indexIterator->criteriaNumber5 && b_FLAG_SET_ON(\
+  if (em_on == 0 && (m_i)+1 < a_indexIterator->criteriaCount5 && b_FLAG_SET_ON(\
     *v_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__AND) && b_FLAG_SET_ON(\
     a_indexIterator->criteria[m_i+1].criteriaOpFlags, CRITERIA_OP_FLAG__OR)) em_on++;\
   int em_j = 0; for (; em_j < em_on; em_j++) {\
-    m_ASSERT(++i_stackEntry < CRITERIA_STACK_SIZE);\
+    m_ASSERT(++i_stackEntry < REQUEST_CRITERIA_MAX5);\
     v_knownCriteriaOpFlagsPtr++; \
     v_statusPtr++; \
     if (statuses[i_stackEntry-1] == 'U') *v_statusPtr = 'U' ;\
@@ -799,7 +797,7 @@ int GreenIndexesSeek(GREEN_INDEXES_HANDLE handle, struct INDEX_ITERATOR *a_index
       RETURNED) 
     if (nan_entry != NULL && *nan_entry >= 0) {
       m_CRITERIA_HANDLER_RESET(a_indexIterator)
-      int i = 0; for (; i < a_indexIterator->criteriaNumber5; i++) {
+      int i = 0; for (; i < a_indexIterator->criteriaCount5; i++) {
         m_CRITERIA_HANDLER_EQUATION_AND_CLOSE_BRACKETS(handle,a_indexIterator,i)
         m_CRITERIA_HANDLER_OPEN_BRACKETS(a_indexIterator,i)
       } // for

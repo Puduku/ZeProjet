@@ -354,11 +354,11 @@ struct GS_KEY { //
 //
 // Ret:
 // - g-key
-static inline struct GS_KEY m_GsKey(const struct P_STRING p_pString) {\
+static inline struct GS_KEY om_GsKey(const struct P_STRING p_pString) {\
   struct GS_KEY gsKey = { .gsKeysComparison = P_STRING__GS_KEYS_COMPARISON,
     .bare.cp_pString = p_pString }; 
   return gsKey;
-} // m_GsKey 
+} // om_GsKey 
 
 // Establish a g-key for 'intrinsic (generic) values' comparison
 //
@@ -367,11 +367,11 @@ static inline struct GS_KEY m_GsKey(const struct P_STRING p_pString) {\
 //
 // Ret:
 // - g-key
-static inline struct GS_KEY m_GsKey2(GENERIC_INTEGER en_intrinsicValue) {\
+static inline struct GS_KEY om_GsKey2(GENERIC_INTEGER en_intrinsicValue) {\
   struct GS_KEY gsKey = { .gsKeysComparison = INTRINSIC_VALUE__GS_KEYS_COMPARISON,
     .bare.cen_intrinsicValue = en_intrinsicValue }; 
   return gsKey;
-} // m_GsKey2 
+} // om_GsKey2 
 
 
 // Establish a g-key for 'acolyt (generic) values' comparison
@@ -381,11 +381,11 @@ static inline struct GS_KEY m_GsKey2(GENERIC_INTEGER en_intrinsicValue) {\
 //
 // Ret:
 // - g-key
-static inline struct GS_KEY m_GsKey3(GENERIC_INTEGER en_acolytValue) {\
+static inline struct GS_KEY om_GsKey3(GENERIC_INTEGER en_acolytValue) {\
   struct GS_KEY gsKey = { .gsKeysComparison = ACOLYT_VALUE__GS_KEYS_COMPARISON,
     .bare.cen_acolytValue = en_acolytValue }; 
   return gsKey;
-} // m_GsKey3
+} // om_GsKey3
 
 // Establish a g-key for 'acolyt handles' comparison
 //
@@ -394,11 +394,11 @@ static inline struct GS_KEY m_GsKey3(GENERIC_INTEGER en_acolytValue) {\
 //
 // Ret:
 // - g-key
-static inline struct GS_KEY m_GsKey4(void* nr_acolytHandle) {\
+static inline struct GS_KEY om_GsKey4(void* nr_acolytHandle) {\
   struct GS_KEY gsKey = { .gsKeysComparison = ACOLYT_HANDLE__GS_KEYS_COMPARISON,
     .bare.cnr_acolytHandle = nr_acolytHandle }; 
   return gsKey;
-} // m_GsKey4
+} // om_GsKey4
 
 
 // #REF GStringsIndexRequest <gStringSet>
@@ -410,7 +410,7 @@ static inline struct GS_KEY m_GsKey4(void* nr_acolytHandle) {\
 //   (see GStringsAddIndex() above) 
 // - ... (variadic parameters) : search key(s) value(s) for other criteria...  
 int GStringsIndexRequest(G_STRINGS_HANDLE cp_handle,
-  INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaNumber,
+  INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaCount,
   int indexLabel1, unsigned int indexSeekFlags1, const struct GS_KEY *cfps_keys1, ...);
 
 
@@ -423,13 +423,13 @@ static inline struct G_REQUEST_CRITERION m_GRequestCriterion_GsKeys(int indexLab
 
 // #SEE GStringsIndexRequest <gStringSet>
 int GStringsIndexRequestR(G_STRINGS_HANDLE cp_handle,
-  INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaNumber,
+  INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaCount,
   const struct G_REQUEST_CRITERION *sp_criteria);
 
 struct GS_REQUEST_CRITERIA {
   int count5;
-  struct GS_KEY sc_gsKeys52[5][2] ;
-  struct G_REQUEST_CRITERION sc_criteria5[5] ;
+  struct GS_KEY sc_gsKeys52[REQUEST_CRITERIA_MAX5][2] ;
+  struct G_REQUEST_CRITERION sc_criteria5[REQUEST_CRITERIA_MAX5] ;
 } ;
 
 // Set-up initial criteria (0 criterion)
@@ -439,7 +439,7 @@ static inline struct GS_REQUEST_CRITERIA m_GsRequestCriteria0(void) {
 } // m_GsRequestCriteria
 
 
-// Add new criterion (5 criteria MAX) 
+// Add new criterion (REQUEST_CRITERIA_MAX5 criteria MAX) 
 //
 // Passed:
 // - *a_criteria:

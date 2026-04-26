@@ -121,7 +121,7 @@ static int TestCount(int expectedTestNumber,  GREEN_COLLECTION_HANDLE handle,  i
 // - handle:
 // - indexFetchFlags:
 // only significant if INDEX_FETCH_FLAG__RESET is ON => BEGIN
-// - c_criteriaNumber: 1 or 2
+// - c_criteriaCount: 1 or 2
 // - c_indexSeekFlags1: 
 // - cc_idKey1: only significant if INDEX_SEEK_FLAG__ANY is OFF
 // only significant if criteria number == 2 => BEGIN
@@ -137,7 +137,7 @@ static int TestCount(int expectedTestNumber,  GREEN_COLLECTION_HANDLE handle,  i
 // - cn_newId: not significant if no fetched item check ; -1 special value => NO update 
 // - cn_newName: not significant if no fetched item check (NULL => NO update)
 static int TestIndexFetch2(int expectedTestNumber,  GREEN_COLLECTION_HANDLE handle,
-  unsigned int indexFetchFlags, int c_criteriaNumber, unsigned int c_indexSeekFlags1, int cc_idKey1,
+  unsigned int indexFetchFlags, int c_criteriaCount, unsigned int c_indexSeekFlags1, int cc_idKey1,
   unsigned int cc_criteriaOpFlags1, unsigned int cc_indexSeekFlags2, const char * ccc_nameKey2,
   unsigned int cc_criteriaOpFlags2, int expectedResult, int n_expectedId, int c_expectedEntry,
   int cn_newId, const char *cn_newName) {
@@ -161,7 +161,7 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(c_indexSeekFlags1)
     b_readOnly = b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__READ); 
 m_DIGGY_VAR_D(cc_idKey1)
     m_TRACK_IF(GreenCollectionIndexRequest(handle, (INDEX_REQUEST_AUTOMATIC_BUFFER)NULL,
-      c_criteriaNumber, ID_INDEX_LABEL, c_indexSeekFlags1, (void *)(GENERIC_INTEGER)cc_idKey1,
+      c_criteriaCount, ID_INDEX_LABEL, c_indexSeekFlags1, (void *)(GENERIC_INTEGER)cc_idKey1,
       cc_criteriaOpFlags1, NAME_INDEX_LABEL,cc_indexSeekFlags2,
       (void *)(GENERIC_INTEGER)ccc_nameKey2, cc_criteriaOpFlags2) != RETURNED)
   } // if

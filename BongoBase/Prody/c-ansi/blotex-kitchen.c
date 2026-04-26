@@ -70,10 +70,10 @@ int FetchBlotvar(const struct BLOTVAR_REFERENCE *ap_blotvarReference, char b_lVa
       if (ap_blotvarReference->n_specifierFlag == NAME__SPECIFIER_FLAG) {
         indexLabel = NAME__BLOTREG_INDEX_LABEL;
 m_DIGGY_VAR_P_STRING(ap_blotvarReference->c_select.c_name)
-        gsKey = m_GsKey(ap_blotvarReference->c_select.c_name);
+        gsKey = om_GsKey(ap_blotvarReference->c_select.c_name);
       } else {
         indexLabel = TOKEN_ID__BLOTREG_INDEX_LABEL;
-        gsKey = m_GsKey3(ap_blotvarReference->c_select.c_tokenId);
+        gsKey = om_GsKey3(ap_blotvarReference->c_select.c_tokenId);
       } // if
 m_DIGGY_VAR_P(ap_blotvarReference->blotregHandle)
       switch (gm_BlotregIndexSingleFetch(ap_blotvarReference->blotregHandle,NULL,indexLabel,
@@ -401,18 +401,18 @@ m_RAISE(ANOMALY__NOT_AVAILABLE)
     switch (as) {
     case AS__VALUE_INT: // [ '#' ]
       if (nap_blotexValue->b_strValue) m_ABANDON_S(EXPECT_INTEX__ABANDONMENT_CAUSE)
-      *cac_gsKey = m_GsKey3(nap_blotexValue->select.c_blotval); 
+      *cac_gsKey = om_GsKey3(nap_blotexValue->select.c_blotval); 
     break; case AS__ENTRY: // '!#' (r-value) 
       if (nap_blotexValue->b_strValue) m_ABANDON_S(EXPECT_INTEX__ABANDONMENT_CAUSE)
 m_RAISE(ANOMALY__NOT_AVAILABLE)
     break; case AS__ID: // '!' 
-      *cac_gsKey = m_GsKey3(nap_blotexValue->select.c_blotval); 
+      *cac_gsKey = om_GsKey3(nap_blotexValue->select.c_blotval); 
     break; case AS__VALUE_STR: // '$'
       if (!nap_blotexValue->b_strValue) m_ABANDON_S(EXPECT_STREX__ABANDONMENT_CAUSE)
-      *cac_gsKey = m_GsKey(nap_blotexValue->select.c_strex.v_str);
+      *cac_gsKey = om_GsKey(nap_blotexValue->select.c_strex.v_str);
     break; case AS__NAME:  // '!$'
       if (!nap_blotexValue->b_strValue) m_ABANDON_S(EXPECT_STREX__ABANDONMENT_CAUSE)
-      *cac_gsKey = m_GsKey(nap_blotexValue->select.c_strex.v_str);
+      *cac_gsKey = om_GsKey(nap_blotexValue->select.c_strex.v_str);
     break; default: m_RAISE(ANOMALY__VALUE__D,as)
     } // switch
   } // if
