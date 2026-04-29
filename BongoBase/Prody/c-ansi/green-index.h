@@ -280,26 +280,38 @@ static inline int om_IndexIteratorReset(struct INDEX_ITERATOR* a_indexIterator, 
 } // om_IndexIteratorReset
 
 
-// Update index iterator sequence.
+// Update index iterator sequence: NEW.
 //
 // Passed:
 // - handle: 
-// - a_indexIterator-> : current index iterator
-// - nan_entry: 
-//   + == NULL: "new sequence" (aka "soft reset") case
-//   + != NULL: "next item" case
+// - a_indexIterator-> : current index iterator ; "new sequence" (aka "soft reset") case
 //
 // Changed:
 // - a_indexIterator-> : new state of index iterator 
-// - *nan_entry: (only significant whith "next item" case) item entry to retrieve : 
+//
+// Ret:
+// - RETURNED: Ok
+// - -1: anomaly is raised
+int GreenIndexesSeekNew(GREEN_INDEXES_HANDLE handle, struct INDEX_ITERATOR *a_indexIterator) ;
+
+// Update index iterator sequence: NEXT.
+//
+// Passed:
+// - handle: 
+// - a_indexIterator-> : current index iterator ; "next item" case
+//
+// Changed:
+// - a_indexIterator-> : new state of index iterator 
+// - *an_entry: tem entry to retrieve : 
 //   + -1 special value : not found, that is "disabled" or "no more"
 //   + >= 0: corresponding entry
 //
 // Ret:
 // - RETURNED: Ok
 // - -1: anomaly is raised
-int GreenIndexesSeek(GREEN_INDEXES_HANDLE handle, struct INDEX_ITERATOR *a_indexIterator,
-  int *nan_entry) ;
+int GreenIndexesSeekNext(GREEN_INDEXES_HANDLE handle, struct INDEX_ITERATOR *a_indexIterator,
+  int *an_entry);
+
 
 // Get current entry in index sequence.
 //

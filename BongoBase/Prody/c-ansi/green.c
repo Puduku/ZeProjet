@@ -673,9 +673,9 @@ int GreenCollectionIndexRequestR(GREEN_COLLECTION_HANDLE cp_handle,
   m_TRACK_IF(GreenCollectionRefreshIndexesInternal(cp_handle,b_TRUE) != RETURNED)
   // MINIMONITOR: NADA
 
-  m_TRACK_IF(GreenIndexesSeek(cp_handle->h_indexesHandle, &indexRequestPtr->iterator, NULL) !=
+  m_TRACK_IF(GreenIndexesSeekNew(cp_handle->h_indexesHandle, &indexRequestPtr->iterator) !=
     RETURNED)
-  m_DIGGY_RETURN(RETURNED)
+  m_DIGGY_RETURN(COMPLETED__OK)
 } // GreenCollectionIndexRequestR
 
 // Public function; see description in .h
@@ -741,7 +741,7 @@ m_DIGGY_VAR_INDEX_FETCH_FLAGS(indexFetchFlags)
      
     om_IndexRequestReset(indexRequestPtr,b_FLAG_SET_ON(indexFetchFlags,
       INDEX_FETCH_FLAG__DESCENDING),fetch4);
-    m_TRACK_IF(GreenIndexesSeek(cp_handle->h_indexesHandle,&indexRequestPtr->iterator,NULL) !=
+    m_TRACK_IF(GreenIndexesSeekNew(cp_handle->h_indexesHandle,&indexRequestPtr->iterator) !=
       RETURNED)
   } // if    
 
@@ -749,7 +749,7 @@ m_DIGGY_VAR_INDEX_FETCH_FLAGS(indexFetchFlags)
   int result = RESULT__NOT_FOUND;
 
   if (b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__NEXT)) {
-    m_TRACK_IF(GreenIndexesSeek(cp_handle->h_indexesHandle,&indexRequestPtr->iterator,&n_entry) !=
+    m_TRACK_IF(GreenIndexesSeekNext(cp_handle->h_indexesHandle,&indexRequestPtr->iterator,&n_entry) !=
       RETURNED)
   } else {
     m_TRACK_IF(GreenIndexesCurrent(cp_handle->h_indexesHandle,&indexRequestPtr->iterator,&n_entry)
