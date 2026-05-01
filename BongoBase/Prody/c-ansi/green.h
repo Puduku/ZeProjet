@@ -409,9 +409,9 @@ m_DEFINE_ENUM_ALIAS_BEGIN(m_IndexFetchFlagsImage)
     // actually disables indexes' synchronization and starts "read only" sequence" 
   m_ENUM_ALIAS_VAL(INDEX_FETCH_FLAGS__READ_NEXT         ,INDEX_FETCH_FLAG__NEXT) // read next
     // item of sequence
-    // (*) : breaks select sequence if any
-    // (**) : NOT ALLOWED if the collection is "frozen"
-    // - "Extended" modes:
+  // (*) : breaks select sequence if any
+  // (**) : NOT ALLOWED if the collection is "frozen"
+  // - "Extended" modes:
   m_ENUM_ALIAS_VAL(INDEX_FETCH_FLAGS__CURRENT           ,ALL_FLAGS_OFF0)
   m_ENUM_ALIAS_VAL(INDEX_FETCH_FLAGS__NEXT              ,INDEX_FETCH_FLAG__NEXT) 
     // Prepare new selection ; NO item fetched (,> always RESULT__NOT_FOUND) :  

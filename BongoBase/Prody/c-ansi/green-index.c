@@ -248,7 +248,7 @@ static int GreenIndexBSearch(struct GREEN_INDEX *a_index,
 // Ret:
 // - RETURNED: Ok
 // - -1: anomaly is raised
-static inline int m_GreenIndexCurrent(struct GREEN_INDEX* a_index,
+static inline int m_GreenIndexSequenceCurrent(struct GREEN_INDEX* a_index,
   struct INDEX_SEQUENCE *a_indexSequence, int *an_entry) {
 
   if (a_indexSequence->indexEntryBlockCount2 > 0 && a_indexSequence->ci_indexEntryCursor >= 
@@ -258,10 +258,10 @@ static inline int m_GreenIndexCurrent(struct GREEN_INDEX* a_index,
   else *an_entry = -1; // No current item 
 
   return RETURNED;  
-} // m_GreenIndexCurrent 
+} // m_GreenIndexSequenceCurrent 
 
 
-// Update index sequence (NEXT) 
+// Update index sequence (NEXT) and get entry 
 //
 // Passed:
 // - a_index:
@@ -277,7 +277,7 @@ static inline int m_GreenIndexCurrent(struct GREEN_INDEX* a_index,
 // Ret:
 // - RETURNED: Ok
 // - -1: anomaly is raised
-static inline int m_GreenIndexSeekNext(struct GREEN_INDEX* a_index, char b_descending,
+static inline int m_GreenIndexSequenceNext(struct GREEN_INDEX* a_index, char b_descending,
   struct INDEX_SEQUENCE *a_indexSequence, int *an_entry) {
   m_DIGGY_BOLLARD_S()
   *an_entry = -1; // "disabled" / "No more" a priori
@@ -320,26 +320,25 @@ static inline int m_GreenIndexSeekNext(struct GREEN_INDEX* a_index, char b_desce
   } // if
 
   m_DIGGY_RETURN(RETURNED)
-} // m_GreenIndexSeekNext 
+} // m_GreenIndexSequenceNext 
 
-// Update index sequence.
+// Set NEW index sequence (according to passed "seek params").
 //
 // Passed:
 // - a_index:
-// - b_descending: 
+// - b_descending: indicating "direction" of "soft reset" 
 // - indexSeekFlags: seek flags for sequence request ; 
 //   + INDEX_SEEK_FLAGS__ANY : NOT key-based selection 
 //   + other flags : key-based selection
 // - cpr_keys: search key(s) (significant when key-based selection) 
-// - a_indexSequence-> : current state of sequence
 //
 // Changed:
-// - a_indexSequence-> : new state of sequence
+// - a_indexSequence-> : new sequence corresponding to passed "seek values"
 //
 // Ret:
 // - RETURNED: Ok
 // - -1: anomaly is raised
-static inline int m_GreenIndexSeekNew(struct GREEN_INDEX* a_index, char b_descending,
+static inline int m_GreenIndexSequenceNew(struct GREEN_INDEX* a_index, char b_descending,
   unsigned int indexSeekFlags, const void *cpr_keys, struct INDEX_SEQUENCE *a_indexSequence) {
   m_DIGGY_BOLLARD_S()
   a_indexSequence->indexEntryBlockCount2 = 0; // Empty ("disabled") selection a priori
@@ -408,7 +407,7 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(indexSeekFlags)
   } // if
 
   m_DIGGY_RETURN(RETURNED)
-} // m_GreenIndexSeekNew
+} // m_GreenIndexSequenceNew
 
 
 // Passed:
@@ -775,27 +774,28 @@ if (m_i == 0) {\
   if (*v_statusPtr == 'O') break;
 
 // Public function; see .h
-int GreenIndexesSeekNew(GREEN_INDEXES_HANDLE handle, struct INDEX_ITERATOR *a_indexIterator) {
+int GreenIndexesIteratorSequenceReset(GREEN_INDEXES_HANDLE handle,
+  struct INDEX_ITERATOR *a_indexIterator) {
   m_DIGGY_BOLLARD_S()
   m_ASSERT(a_indexIterator->criteria[0].indexLabel < handle->indexesNumber) 
-
-  m_TRACK_IF(m_GreenIndexSeekNew(handle->vnhs_indexes + a_indexIterator->criteria[0].indexLabel,
+// TODO: la premiegre initialisation de la sequence (...RequestR()) est perdue (...Fetch()) ??? 
+  m_TRACK_IF(m_GreenIndexSequenceNew(handle->vnhs_indexes + a_indexIterator->criteria[0].indexLabel,
     a_indexIterator->b_descending, a_indexIterator->criteria[0].indexSeekFlags,
     a_indexIterator->criteria[0].cfpr_keys, &a_indexIterator->indexSequence) != RETURNED) 
 
   m_DIGGY_RETURN(RETURNED)
-} // GreenIndexesSeekNew
+} // GreenIndexesIteratorSequenceReset
 
 // Public function; see .h
-int GreenIndexesSeekNext(GREEN_INDEXES_HANDLE handle, struct INDEX_ITERATOR *a_indexIterator,
-  int *an_entry) {
+int GreenIndexesIteratorSequenceNext(GREEN_INDEXES_HANDLE handle,
+  struct INDEX_ITERATOR *a_indexIterator, int *an_entry) {
   m_DIGGY_BOLLARD_S()
   m_ASSERT(a_indexIterator->criteria[0].indexLabel < handle->indexesNumber) 
 
   m_CRITERIA_HANDLER_CREATE()
 
   do {
-    m_TRACK_IF(m_GreenIndexSeekNext(handle->vnhs_indexes + a_indexIterator->criteria[0].indexLabel,
+    m_TRACK_IF(m_GreenIndexSequenceNext(handle->vnhs_indexes + a_indexIterator->criteria[0].indexLabel,
       a_indexIterator->b_descending, &a_indexIterator->indexSequence, an_entry) !=
       RETURNED) 
     if (*an_entry >= 0) {
@@ -810,20 +810,21 @@ int GreenIndexesSeekNext(GREEN_INDEXES_HANDLE handle, struct INDEX_ITERATOR *a_i
 
   m_DIGGY_VAR_D(*an_entry)
   m_DIGGY_RETURN(RETURNED)
-} // GreenIndexesSeekNext
+} // GreenIndexesIteratorSequenceNext
 
 
 // Public function; see .h
-int GreenIndexesCurrent(GREEN_INDEXES_HANDLE handle,
+int GreenIndexesIteratorSequenceCurrent(GREEN_INDEXES_HANDLE handle,
   struct INDEX_ITERATOR *a_indexIterator, int *an_entry) {
   m_DIGGY_BOLLARD_S()
   m_ASSERT(a_indexIterator->criteria[0].indexLabel < handle->indexesNumber) 
   struct GREEN_INDEX *a_index = handle->vnhs_indexes + a_indexIterator->criteria[0].indexLabel;
   
-  m_TRACK_IF(m_GreenIndexCurrent(a_index,&a_indexIterator->indexSequence,an_entry) != RETURNED) 
+  m_TRACK_IF(m_GreenIndexSequenceCurrent(a_index,&a_indexIterator->indexSequence,an_entry) !=
+    RETURNED)
 
   m_DIGGY_RETURN(RETURNED)
-} // GreenIndexesCurrent
+} // GreenIndexesIteratorSequenceCurrent
 
 
 // Public function; see .h

@@ -180,7 +180,16 @@ static inline int m_IndexRequestAddCriterion(struct INDEX_REQUEST *a_indexReques
   m_DIGGY_RETURN(RETURNED)
 } // m_IndexRequestAddCriterion
 
-
+// Prepare reset of index request 
+// 
+// Passed:
+// - *a_indexRequest:
+// - b_descending:
+// - fetch4:
+// 
+// Changed:
+// - *a_indexRequest: the index sequence is now disabled and need to be reset with ad hoc
+//   GreenIndexesIteratorSequenceReset() call 
 //
 // Ret:
 // - RETURNED: Ok
@@ -673,8 +682,8 @@ int GreenCollectionIndexRequestR(GREEN_COLLECTION_HANDLE cp_handle,
   m_TRACK_IF(GreenCollectionRefreshIndexesInternal(cp_handle,b_TRUE) != RETURNED)
   // MINIMONITOR: NADA
 
-  m_TRACK_IF(GreenIndexesSeekNew(cp_handle->h_indexesHandle, &indexRequestPtr->iterator) !=
-    RETURNED)
+  m_TRACK_IF(GreenIndexesIteratorSequenceReset(cp_handle->h_indexesHandle,
+    &indexRequestPtr->iterator) != RETURNED)
   m_DIGGY_RETURN(COMPLETED__OK)
 } // GreenCollectionIndexRequestR
 
@@ -741,19 +750,19 @@ m_DIGGY_VAR_INDEX_FETCH_FLAGS(indexFetchFlags)
      
     om_IndexRequestReset(indexRequestPtr,b_FLAG_SET_ON(indexFetchFlags,
       INDEX_FETCH_FLAG__DESCENDING),fetch4);
-    m_TRACK_IF(GreenIndexesSeekNew(cp_handle->h_indexesHandle,&indexRequestPtr->iterator) !=
-      RETURNED)
+    m_TRACK_IF(GreenIndexesIteratorSequenceReset(cp_handle->h_indexesHandle,
+      &indexRequestPtr->iterator) != RETURNED)
   } // if    
 
   int n_entry = UNDEFINED;
   int result = RESULT__NOT_FOUND;
 
   if (b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__NEXT)) {
-    m_TRACK_IF(GreenIndexesSeekNext(cp_handle->h_indexesHandle,&indexRequestPtr->iterator,&n_entry) !=
-      RETURNED)
+    m_TRACK_IF(GreenIndexesIteratorSequenceNext(cp_handle->h_indexesHandle,
+      &indexRequestPtr->iterator, &n_entry) != RETURNED)
   } else {
-    m_TRACK_IF(GreenIndexesCurrent(cp_handle->h_indexesHandle,&indexRequestPtr->iterator,&n_entry)
-      != RETURNED)
+    m_TRACK_IF(GreenIndexesIteratorSequenceCurrent(cp_handle->h_indexesHandle,
+      &indexRequestPtr->iterator, &n_entry) != RETURNED)
   } // if
   if (n_entry != -1) result = RESULT__FOUND; 
 

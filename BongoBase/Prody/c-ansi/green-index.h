@@ -225,6 +225,7 @@ static inline int om_IndexSequenceDisable(struct INDEX_SEQUENCE *a_indexSequence
 
 struct INDEX_ITERATOR {
   int criteriaCount5 ; // see REQUEST_CRITERIA_MAX5 
+  // Only 1st criterion is used for setting the index sequence.
   struct G_REQUEST_CRITERION criteria[REQUEST_CRITERIA_MAX5];
   char b_descending;
   struct INDEX_SEQUENCE indexSequence;
@@ -263,54 +264,61 @@ static inline int m_IndexIteratorAddCriterion(struct INDEX_ITERATOR *a_indexIter
 } // m_IndexIteratorAddCriterion
   
 
+// Prepare reset of index iterator sequence
+//
 // Passed:
 // - a_indexIterator:
 // - b_descending:
 // 
 // Changed:
-// - *a_indexIterator:
+// - *a_indexIterator: the index sequence is now disabled and need to be reset with ad hoc
+//   GreenIndexesIteratorSequenceReset() call 
 //
 // Ret:
 // - RETURNED: Ok
 static inline int om_IndexIteratorReset(struct INDEX_ITERATOR* a_indexIterator, char b_descending) {
   m_DIGGY_BOLLARD_S()
-  a_indexIterator->b_descending = b_descending;\
+  a_indexIterator->b_descending = b_descending;
+  // We need to disable the sequence because the ordering (asc. desc.) changed
+  // TODO: om_IndexSequenceReset(char b_descending)
   om_IndexSequenceDisable(&a_indexIterator->indexSequence);
   m_DIGGY_RETURN(RETURNED)
 } // om_IndexIteratorReset
 
 
-// Update index iterator sequence: NEW.
+// (re-)set index iterator sequence according to the criteria (only 1st criterion is used) 
 //
 // Passed:
 // - handle: 
-// - a_indexIterator-> : current index iterator ; "new sequence" (aka "soft reset") case
+// - a_indexIterator-> : current index iterator 
 //
 // Changed:
-// - a_indexIterator-> : new state of index iterator 
+// - a_indexIterator-> : sequence is (re-)set ; call GreenIndexesIteratorSequenceNext() to (re-)play
+//  the sequence. 
 //
 // Ret:
 // - RETURNED: Ok
 // - -1: anomaly is raised
-int GreenIndexesSeekNew(GREEN_INDEXES_HANDLE handle, struct INDEX_ITERATOR *a_indexIterator) ;
+int GreenIndexesIteratorSequenceReset(GREEN_INDEXES_HANDLE handle,
+  struct INDEX_ITERATOR *a_indexIterator) ;
 
 // Update index iterator sequence: NEXT.
 //
 // Passed:
 // - handle: 
-// - a_indexIterator-> : current index iterator ; "next item" case
+// - a_indexIterator-> : current index iterator 
 //
 // Changed:
-// - a_indexIterator-> : new state of index iterator 
-// - *an_entry: tem entry to retrieve : 
+// - a_indexIterator-> : iterator sequence "next"
+// - *an_entry: item entry to retrieve : 
 //   + -1 special value : not found, that is "disabled" or "no more"
 //   + >= 0: corresponding entry
 //
 // Ret:
 // - RETURNED: Ok
 // - -1: anomaly is raised
-int GreenIndexesSeekNext(GREEN_INDEXES_HANDLE handle, struct INDEX_ITERATOR *a_indexIterator,
-  int *an_entry);
+int GreenIndexesIteratorSequenceNext(GREEN_INDEXES_HANDLE handle,
+  struct INDEX_ITERATOR *a_indexIterator, int *an_entry);
 
 
 // Get current entry in index sequence.
@@ -327,8 +335,8 @@ int GreenIndexesSeekNext(GREEN_INDEXES_HANDLE handle, struct INDEX_ITERATOR *a_i
 // Ret:
 // - RETURNED: Ok
 // - -1: anomaly is raised
-int GreenIndexesCurrent(GREEN_INDEXES_HANDLE handle, struct INDEX_ITERATOR *a_indexIterator,
-  int *an_entry) ;
+int GreenIndexesIteratorSequenceCurrent(GREEN_INDEXES_HANDLE handle,
+  struct INDEX_ITERATOR *a_indexIterator, int *an_entry) ;
 
 
 // Ret:
