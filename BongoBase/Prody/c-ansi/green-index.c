@@ -657,122 +657,6 @@ static int GreenIndexesSeekEntryEquate(GREEN_INDEXES_HANDLE handle, int indexLab
   m_DIGGY_RETURN(answer)
 } // GreenIndexesSeekEntryEquate
 
-// Possible statuses : 'U': Unkown 'C': Canceled 'O': Ok 'K': KO
-#define m_CRITERIA_HANDLER_CREATE() \
-  unsigned int knownCriteriaOpFlags[REQUEST_CRITERIA_MAX5] ;\
-  char statuses[REQUEST_CRITERIA_MAX5]; 
-  
-// Re-init criteria handler.
-// 1st criterion op. flags are rectified if needed:
-// - AND op. is set
-// - OR op. is removed
-//
-// Passed:
-// - a_indexIterator:
-#define m_CRITERIA_HANDLER_RESET(/*struct INDEX_ITERATOR* */a_indexIterator) \
-  int i_stackEntry = 0;\
-  unsigned int *v_knownCriteriaOpFlagsPtr = knownCriteriaOpFlags;\
-  char *v_statusPtr = statuses;\
-  statuses[0] = 'U' ; \
-  knownCriteriaOpFlags[0] = a_indexIterator->criteria[0].criteriaOpFlags;\
-  m_SET_FLAG_ON(knownCriteriaOpFlags[0], CRITERIA_OP_FLAG__AND)\
-  m_SET_FLAG_OFF(knownCriteriaOpFlags[0], CRITERIA_OP_FLAG__OR)\
-
-// Handle equation and then closing brackets for current criterion
-// criterion op. flags are rectified if needed:
-// - closing bracket added to ensure AND op. precedence (over OR op.)
-// - missing closing brackets (at the end of the expression) are added 
-// - superfluous closing brackets are ignored
-//
-// Passed:
-// - handle: indexes global handler
-// - a_indexIterator: contains criteria criteria
-// - m_i: criterion entry 
-#define m_CRITERIA_HANDLER_EQUATION_AND_CLOSE_BRACKETS(/*struct GREEN_INDEXES* */handle,\
-  /*struct INDEX_ITERATOR* */a_indexIterator, /*int*/m_i) \
-if (m_i == 0) {\
-  if (a_indexIterator->criteriaCount5 == 1) statuses[0] = 'O' ; \
-} else { \
-  int em_cn = ((m_i)+1 == a_indexIterator->criteriaCount5)? i_stackEntry: \
-    m_CloseBracketCount(a_indexIterator->criteria[m_i].criteriaOpFlags);\
-  if (em_cn == 0) {\
-    if (*v_knownCriteriaOpFlagsPtr == ALL_FLAGS_OFF0) *v_knownCriteriaOpFlagsPtr = \
-      a_indexIterator->criteria[m_i].criteriaOpFlags;\
-    if ((m_i)+1 < a_indexIterator->criteriaCount5 && b_FLAG_SET_ON(\
-      *v_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__OR) && b_FLAG_SET_ON(\
-      a_indexIterator->criteria[m_i+1].criteriaOpFlags, CRITERIA_OP_FLAG__AND)) em_cn++;\
-  } else if (em_cn > i_stackEntry) em_cn = i_stackEntry; \
-  if (*v_statusPtr == 'U') {\
-    int answer = GreenIndexesSeekEntryEquate(handle,\
-      a_indexIterator->criteria[m_i].indexLabel,*an_entry,\
-      a_indexIterator->criteria[m_i].indexSeekFlags,\
-      a_indexIterator->criteria[m_i].cfpr_keys);\
-    switch (answer) {\
-    case ANSWER__YES:\
-      if (b_FLAG_SET_OFF(*v_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__AND) || \
-        em_cn > 0 || (m_i)+1 == a_indexIterator->criteriaCount5) *v_statusPtr = 'O';\
-    break; case ANSWER__NO: \
-      if (b_FLAG_SET_OFF(*v_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__OR) || \
-        em_cn > 0 || (m_i)+1 == a_indexIterator->criteriaCount5) *v_statusPtr = 'K'; \
-    break; default:\
-      m_TRACK()\
-    }\
-  }\
-  int em_j = 0; for (; em_j < em_cn; em_j++) {\
-    m_ASSERT(--i_stackEntry >= 0)\
-    v_knownCriteriaOpFlagsPtr--; \
-    v_statusPtr--; \
-    if (em_j == em_cn-1 && *v_knownCriteriaOpFlagsPtr == ALL_FLAGS_OFF0) \
-      *v_knownCriteriaOpFlagsPtr = a_indexIterator->criteria[m_i].criteriaOpFlags;\
-    if (*v_statusPtr == 'U') {\
-      if (b_FLAG_SET_OFF(*v_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__OR)) {\
-        *v_statusPtr = 'O';\
-      } else { \
-        *v_statusPtr = 'K';\
-      } \
-    } \
-    if (i_stackEntry > 0 && statuses[i_stackEntry+1] != 'C') {\
-      m_ASSERT(*v_statusPtr == 'U')\
-      if (statuses[i_stackEntry+1] == 'O' && b_FLAG_SET_OFF(*v_knownCriteriaOpFlagsPtr,\
-        CRITERIA_OP_FLAG__AND)) *v_statusPtr = 'O' ; \
-      else if (*v_statusPtr == 'K' && b_FLAG_SET_OFF(*v_knownCriteriaOpFlagsPtr,\
-        CRITERIA_OP_FLAG__OR)) *v_statusPtr = 'K'; \
-    } \
-  } \
-  if (*v_knownCriteriaOpFlagsPtr == ALL_FLAGS_OFF0) *v_knownCriteriaOpFlagsPtr =\
-    a_indexIterator->criteria[m_i].criteriaOpFlags;\
-} 
-
-// Handle open brackets for current criterion
-// Note: in this implementation, opening brackets are indeed handled AFTER handling of closing
-// brackets...
-// criterion op. flags are rectified if needed:
-// - open bracket added to ensure AND op. precedence (over OR op.)
-//
-// Passed:
-// - a_indexIterator: contains criteria criteria
-// - m_i: criterion entry 
-#define m_CRITERIA_HANDLER_OPEN_BRACKETS(/*struct INDEX_ITERATOR* */a_indexIterator, /*int*/m_i) {\
-  int em_on = m_OpenBracketCount(a_indexIterator->criteria[m_i].criteriaOpFlags);\
-  if (em_on == 0 && (m_i)+1 < a_indexIterator->criteriaCount5 && b_FLAG_SET_ON(\
-    *v_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__AND) && b_FLAG_SET_ON(\
-    a_indexIterator->criteria[m_i+1].criteriaOpFlags, CRITERIA_OP_FLAG__OR)) em_on++;\
-  int em_j = 0; for (; em_j < em_on; em_j++) {\
-    m_ASSERT(++i_stackEntry < REQUEST_CRITERIA_MAX5);\
-    v_knownCriteriaOpFlagsPtr++; \
-    v_statusPtr++; \
-    if (statuses[i_stackEntry-1] == 'U') *v_statusPtr = 'U' ;\
-    else *v_statusPtr = 'C' ;\
-    *v_knownCriteriaOpFlagsPtr = ALL_FLAGS_OFF0;\
-  }\
-}
-
-// Break "criteria handling" loop if entry not rejected by extra criteria 
-#define m_CRITERIA_HANDLER_CHECK_STATUS() \
-  m_ASSERT(i_stackEntry == 0) \
-  m_ASSERT(*v_statusPtr == 'O' || *v_statusPtr == 'K') \
-  if (*v_statusPtr == 'O') break;
-
 // Public function; see .h
 int GreenIndexesIteratorSequenceReset(GREEN_INDEXES_HANDLE handle,
   struct INDEX_ITERATOR *a_indexIterator) {
@@ -786,25 +670,163 @@ int GreenIndexesIteratorSequenceReset(GREEN_INDEXES_HANDLE handle,
   m_DIGGY_RETURN(RETURNED)
 } // GreenIndexesIteratorSequenceReset
 
+struct CRITERIA_HANDLER {
+  unsigned int knownCriteriaOpFlags[REQUEST_CRITERIA_MAX5] ;\
+  // Possible statuses : 'U': Unkown 'C': Canceled 'O': Ok 'K': KO
+  char statuses[REQUEST_CRITERIA_MAX5]; 
+} ;
+
+// Re-init criteria handler.
+// 1st criterion op. flags are rectified if needed:
+// - AND op. is set
+// - OR op. is removed
+//
+// Passed:
+// - a_handler:
+// - a_indexIterator:
+//
+// changed:
+// - a_handler: 1st criterion (op. flags) initialized
+static inline int om_CriteriaHandlerReset(struct CRITERIA_HANDLER*a_handler,
+  struct INDEX_ITERATOR* a_indexIterator) {
+  m_DIGGY_BOLLARD_S()
+  a_handler->statuses[0] = 'U' ; 
+  a_handler->knownCriteriaOpFlags[0] = a_indexIterator->criteria[0].criteriaOpFlags;
+  m_SET_FLAG_ON(a_handler->knownCriteriaOpFlags[0], CRITERIA_OP_FLAG__AND)
+  m_SET_FLAG_OFF(a_handler->knownCriteriaOpFlags[0], CRITERIA_OP_FLAG__OR)
+  m_DIGGY_RETURN(RETURNED)
+} // om_CriteriaHandlerReset
+
+// Handle equation and then closing brackets for current criterion
+// criterion op. flags are rectified if needed:
+// - closing bracket added to ensure AND op. precedence (over OR op.)
+// - missing closing brackets (at the end of the expression) are added 
+// - superfluous closing brackets are ignored
+//
+// Passed:
+// - a_handler:
+// - handle: indexes global handler
+// - a_indexIterator: contains criteria criteria
+// - criterionEntry: criterion entry 
+static inline int m_CriteriaHandlerEquationAndCloseBrackets(struct CRITERIA_HANDLER*a_handler,
+  struct GREEN_INDEXES* handle, struct INDEX_ITERATOR* a_indexIterator, int criterionEntry, int *an_entry,
+  int *ai_depth, unsigned int **av_knownCriteriaOpFlagsPtr, char **av_statusPtr) {
+  m_DIGGY_BOLLARD_S()
+  if (criterionEntry == 0) {
+    if (a_indexIterator->criteriaCount5 == 1) a_handler->statuses[0] = 'O' ; 
+  } else { 
+    // Number of close brackets: 
+    int count = (criterionEntry+1 == a_indexIterator->criteriaCount5)? (*ai_depth): 
+      m_CloseBracketCount(a_indexIterator->criteria[criterionEntry].criteriaOpFlags);
+    if (count == 0) {
+      if (**av_knownCriteriaOpFlagsPtr == ALL_FLAGS_OFF0) **av_knownCriteriaOpFlagsPtr = 
+        a_indexIterator->criteria[criterionEntry].criteriaOpFlags;
+      if (criterionEntry+1 < a_indexIterator->criteriaCount5 && b_FLAG_SET_ON(
+        **av_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__OR) && b_FLAG_SET_ON(
+        a_indexIterator->criteria[criterionEntry+1].criteriaOpFlags, CRITERIA_OP_FLAG__AND)) count++;
+    } else if (count > *ai_depth) count = *ai_depth; 
+    if (*(*av_statusPtr) == 'U') {
+      int answer = GreenIndexesSeekEntryEquate(handle,
+        a_indexIterator->criteria[criterionEntry].indexLabel,*an_entry,
+        a_indexIterator->criteria[criterionEntry].indexSeekFlags,
+        a_indexIterator->criteria[criterionEntry].cfpr_keys);
+      switch (answer) {
+      case ANSWER__YES:
+        if (b_FLAG_SET_OFF(**av_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__AND) || 
+          count > 0 || criterionEntry+1 == a_indexIterator->criteriaCount5) **av_statusPtr = 'O';
+      break; case ANSWER__NO: 
+        if (b_FLAG_SET_OFF(*(*av_knownCriteriaOpFlagsPtr),CRITERIA_OP_FLAG__OR) || 
+          count > 0 || criterionEntry+1 == a_indexIterator->criteriaCount5) **av_statusPtr = 'K'; 
+      break; default:
+        m_TRACK()
+      } // switch
+    } // if
+    int j = 0; for (; j < count; j++) {
+      m_ASSERT(--(*ai_depth) >= 0)
+      (*av_knownCriteriaOpFlagsPtr)--; 
+      (*av_statusPtr)--; 
+      if (j == count-1 && **av_knownCriteriaOpFlagsPtr == ALL_FLAGS_OFF0) 
+        **av_knownCriteriaOpFlagsPtr = a_indexIterator->criteria[criterionEntry].criteriaOpFlags;
+      if (**av_statusPtr == 'U') {
+        if (b_FLAG_SET_OFF(**av_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__OR)) {
+          **av_statusPtr = 'O';
+        } else { 
+          **av_statusPtr = 'K';
+        } // if
+      } //if 
+      if (*ai_depth > 0 && a_handler->statuses[*ai_depth+1] != 'C') {
+        m_ASSERT(**av_statusPtr == 'U')
+        if (a_handler->statuses[*ai_depth+1] == 'O' && b_FLAG_SET_OFF(**av_knownCriteriaOpFlagsPtr,
+          CRITERIA_OP_FLAG__AND)) **av_statusPtr = 'O' ; 
+        else if (**av_statusPtr == 'K' && b_FLAG_SET_OFF(**av_knownCriteriaOpFlagsPtr,
+          CRITERIA_OP_FLAG__OR)) **av_statusPtr = 'K'; 
+      } // if 
+    } // for 
+    if (**av_knownCriteriaOpFlagsPtr == ALL_FLAGS_OFF0) **av_knownCriteriaOpFlagsPtr =
+      a_indexIterator->criteria[criterionEntry].criteriaOpFlags;
+  } // if 
+  m_DIGGY_RETURN(RETURNED)
+} // 
+
+// Handle open brackets for current criterion
+// Note: in this implementation, opening brackets are indeed handled AFTER handling of closing
+// brackets...
+// criterion op. flags are rectified if needed:
+// - open bracket added to ensure AND op. precedence (over OR op.)
+//
+// Passed:
+// - a_handler:
+// - a_indexIterator: contains criteria criteria
+// - criterionEntry: criterion entry 
+static inline int m_CtriteriaHandlerOpenBrackets(struct CRITERIA_HANDLER *a_handler,
+  struct INDEX_ITERATOR* a_indexIterator, int criterionEntry,
+  int *ai_depth, unsigned int **av_knownCriteriaOpFlagsPtr, char **av_statusPtr) {
+  m_DIGGY_BOLLARD_S()
+  // Number of open brackets:
+  int count = m_OpenBracketCount(a_indexIterator->criteria[criterionEntry].criteriaOpFlags);
+  if (count == 0 && criterionEntry+1 < a_indexIterator->criteriaCount5 && b_FLAG_SET_ON(
+    *(*av_knownCriteriaOpFlagsPtr),CRITERIA_OP_FLAG__AND) && b_FLAG_SET_ON(
+    a_indexIterator->criteria[criterionEntry+1].criteriaOpFlags, CRITERIA_OP_FLAG__OR)) count++;
+  int em_j = 0; for (; em_j < count; em_j++) {
+    m_ASSERT(++(*ai_depth) < REQUEST_CRITERIA_MAX5);
+    (*av_knownCriteriaOpFlagsPtr)++; 
+    (*av_statusPtr)++; 
+    if (a_handler->statuses[(*ai_depth)-1] == 'U') *(*av_statusPtr) = 'U' ;
+    else *(*av_statusPtr) = 'C' ;
+    *(*av_knownCriteriaOpFlagsPtr) = ALL_FLAGS_OFF0;
+  } // for
+  m_DIGGY_RETURN(RETURNED)
+} // 
+
 // Public function; see .h
 int GreenIndexesIteratorSequenceNext(GREEN_INDEXES_HANDLE handle,
   struct INDEX_ITERATOR *a_indexIterator, int *an_entry) {
   m_DIGGY_BOLLARD_S()
   m_ASSERT(a_indexIterator->criteria[0].indexLabel < handle->indexesNumber) 
 
-  m_CRITERIA_HANDLER_CREATE()
+  struct CRITERIA_HANDLER criteriaHandler; // UNDEFINED 
 
   do {
     m_TRACK_IF(m_GreenIndexSequenceNext(handle->vnhs_indexes + a_indexIterator->criteria[0].indexLabel,
       a_indexIterator->b_descending, &a_indexIterator->indexSequence, an_entry) !=
       RETURNED) 
     if (*an_entry >= 0) {
-      m_CRITERIA_HANDLER_RESET(a_indexIterator)
-      int i = 0; for (; i < a_indexIterator->criteriaCount5; i++) {
-        m_CRITERIA_HANDLER_EQUATION_AND_CLOSE_BRACKETS(handle,a_indexIterator,i)
-        m_CRITERIA_HANDLER_OPEN_BRACKETS(a_indexIterator,i)
+      om_CriteriaHandlerReset(&criteriaHandler,a_indexIterator);
+      int i_depth = 0;
+      unsigned int *v_knownCriteriaOpFlagsPtr = criteriaHandler.knownCriteriaOpFlags;
+      char *v_statusPtr = criteriaHandler.statuses;
+      int criterionEntry = 0; for (; criterionEntry < a_indexIterator->criteriaCount5; criterionEntry++) {
+        m_TRACK_IF(m_CriteriaHandlerEquationAndCloseBrackets(&criteriaHandler, handle,
+          a_indexIterator, criterionEntry,an_entry, &i_depth, &v_knownCriteriaOpFlagsPtr, &v_statusPtr) !=
+          RETURNED) 
+        m_TRACK_IF(m_CtriteriaHandlerOpenBrackets(&criteriaHandler,
+          a_indexIterator, criterionEntry, &i_depth, &v_knownCriteriaOpFlagsPtr, &v_statusPtr) !=
+          RETURNED) 
       } // for
-      m_CRITERIA_HANDLER_CHECK_STATUS()
+  // Break "criteria handling" loop if entry not rejected by extra criteria 
+  m_ASSERT(i_depth == 0) 
+  m_ASSERT(*v_statusPtr == 'O' || *v_statusPtr == 'K') 
+      if (*v_statusPtr == 'O') break;
     } else break; // No more entry => finished 
   } while (b_TRUE) ;
 
