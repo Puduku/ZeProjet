@@ -670,32 +670,38 @@ int GreenIndexesIteratorSequenceReset(GREEN_INDEXES_HANDLE handle,
   m_DIGGY_RETURN(RETURNED)
 } // GreenIndexesIteratorSequenceReset
 
-struct CRITERIA_HANDLER {
+struct CRITERIA_MONITOR {
+  int i_depth;
+  unsigned int *v_knownCriteriaOpFlagsPtr;
+  char *v_statusPtr;
   unsigned int knownCriteriaOpFlags[REQUEST_CRITERIA_MAX5] ;\
   // Possible statuses : 'U': Unkown 'C': Canceled 'O': Ok 'K': KO
   char statuses[REQUEST_CRITERIA_MAX5]; 
 } ;
 
-// Re-init criteria handler.
+// Re-init criteria "monitor".
 // 1st criterion op. flags are rectified if needed:
 // - AND op. is set
 // - OR op. is removed
 //
 // Passed:
-// - a_handler:
+// - a_monitor:
 // - a_indexIterator:
 //
 // changed:
-// - a_handler: 1st criterion (op. flags) initialized
-static inline int om_CriteriaHandlerReset(struct CRITERIA_HANDLER*a_handler,
+// - a_monitor: 1st criterion (op. flags) initialized
+static inline int om_CriteriaMonitorReset(struct CRITERIA_MONITOR*a_monitor,
   struct INDEX_ITERATOR* a_indexIterator) {
   m_DIGGY_BOLLARD_S()
-  a_handler->statuses[0] = 'U' ; 
-  a_handler->knownCriteriaOpFlags[0] = a_indexIterator->criteria[0].criteriaOpFlags;
-  m_SET_FLAG_ON(a_handler->knownCriteriaOpFlags[0], CRITERIA_OP_FLAG__AND)
-  m_SET_FLAG_OFF(a_handler->knownCriteriaOpFlags[0], CRITERIA_OP_FLAG__OR)
+  a_monitor->i_depth = 0;
+  a_monitor->v_knownCriteriaOpFlagsPtr = a_monitor->knownCriteriaOpFlags;
+  a_monitor->v_statusPtr = a_monitor->statuses;
+  a_monitor->statuses[0] = 'U' ; 
+  a_monitor->knownCriteriaOpFlags[0] = a_indexIterator->criteria[0].criteriaOpFlags;
+  m_SET_FLAG_ON(a_monitor->knownCriteriaOpFlags[0], CRITERIA_OP_FLAG__AND)
+  m_SET_FLAG_OFF(a_monitor->knownCriteriaOpFlags[0], CRITERIA_OP_FLAG__OR)
   m_DIGGY_RETURN(RETURNED)
-} // om_CriteriaHandlerReset
+} // om_CriteriaMonitorReset
 
 // Handle equation and then closing brackets for current criterion
 // criterion op. flags are rectified if needed:
@@ -704,65 +710,72 @@ static inline int om_CriteriaHandlerReset(struct CRITERIA_HANDLER*a_handler,
 // - superfluous closing brackets are ignored
 //
 // Passed:
-// - a_handler:
-// - handle: indexes global handler
+// - handle: indexes for equation 
+// - a_monitor:
 // - a_indexIterator: contains criteria criteria
 // - criterionEntry: criterion entry 
-static inline int m_CriteriaHandlerEquationAndCloseBrackets(struct CRITERIA_HANDLER*a_handler,
-  struct GREEN_INDEXES* handle, struct INDEX_ITERATOR* a_indexIterator, int criterionEntry, int *an_entry,
-  int *ai_depth, unsigned int **av_knownCriteriaOpFlagsPtr, char **av_statusPtr) {
+static inline int m_GreenIndexesCriteriaEquationAndCloseBrackets(GREEN_INDEXES_HANDLE handle,
+  struct CRITERIA_MONITOR*a_monitor,
+  struct INDEX_ITERATOR* a_indexIterator, int criterionEntry, int *an_entry) {
   m_DIGGY_BOLLARD_S()
   if (criterionEntry == 0) {
-    if (a_indexIterator->criteriaCount5 == 1) a_handler->statuses[0] = 'O' ; 
+    if (a_indexIterator->criteriaCount5 == 1) a_monitor->statuses[0] = 'O' ; 
   } else { 
     // Number of close brackets: 
-    int count = (criterionEntry+1 == a_indexIterator->criteriaCount5)? (*ai_depth): 
+    int count = (criterionEntry+1 == a_indexIterator->criteriaCount5)? (a_monitor->i_depth): 
       m_CloseBracketCount(a_indexIterator->criteria[criterionEntry].criteriaOpFlags);
     if (count == 0) {
-      if (**av_knownCriteriaOpFlagsPtr == ALL_FLAGS_OFF0) **av_knownCriteriaOpFlagsPtr = 
+      if (*a_monitor->v_knownCriteriaOpFlagsPtr == ALL_FLAGS_OFF0)
+        *a_monitor->v_knownCriteriaOpFlagsPtr = 
         a_indexIterator->criteria[criterionEntry].criteriaOpFlags;
       if (criterionEntry+1 < a_indexIterator->criteriaCount5 && b_FLAG_SET_ON(
-        **av_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__OR) && b_FLAG_SET_ON(
+        *a_monitor->v_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__OR) && b_FLAG_SET_ON(
         a_indexIterator->criteria[criterionEntry+1].criteriaOpFlags, CRITERIA_OP_FLAG__AND)) count++;
-    } else if (count > *ai_depth) count = *ai_depth; 
-    if (*(*av_statusPtr) == 'U') {
+    } else if (count > a_monitor->i_depth) count = a_monitor->i_depth; 
+    if (*(a_monitor->v_statusPtr) == 'U') {
       int answer = GreenIndexesSeekEntryEquate(handle,
         a_indexIterator->criteria[criterionEntry].indexLabel,*an_entry,
         a_indexIterator->criteria[criterionEntry].indexSeekFlags,
         a_indexIterator->criteria[criterionEntry].cfpr_keys);
       switch (answer) {
       case ANSWER__YES:
-        if (b_FLAG_SET_OFF(**av_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__AND) || 
-          count > 0 || criterionEntry+1 == a_indexIterator->criteriaCount5) **av_statusPtr = 'O';
+        if (b_FLAG_SET_OFF(*a_monitor->v_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__AND) || 
+          count > 0 || criterionEntry+1 == a_indexIterator->criteriaCount5) *a_monitor->v_statusPtr
+          = 'O';
       break; case ANSWER__NO: 
-        if (b_FLAG_SET_OFF(*(*av_knownCriteriaOpFlagsPtr),CRITERIA_OP_FLAG__OR) || 
-          count > 0 || criterionEntry+1 == a_indexIterator->criteriaCount5) **av_statusPtr = 'K'; 
+        if (b_FLAG_SET_OFF(*(a_monitor->v_knownCriteriaOpFlagsPtr),CRITERIA_OP_FLAG__OR) || 
+          count > 0 || criterionEntry+1 == a_indexIterator->criteriaCount5) *a_monitor->v_statusPtr
+          = 'K'; 
       break; default:
         m_TRACK()
       } // switch
     } // if
     int j = 0; for (; j < count; j++) {
-      m_ASSERT(--(*ai_depth) >= 0)
-      (*av_knownCriteriaOpFlagsPtr)--; 
-      (*av_statusPtr)--; 
-      if (j == count-1 && **av_knownCriteriaOpFlagsPtr == ALL_FLAGS_OFF0) 
-        **av_knownCriteriaOpFlagsPtr = a_indexIterator->criteria[criterionEntry].criteriaOpFlags;
-      if (**av_statusPtr == 'U') {
-        if (b_FLAG_SET_OFF(**av_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__OR)) {
-          **av_statusPtr = 'O';
+      m_ASSERT(--(a_monitor->i_depth) >= 0)
+      (a_monitor->v_knownCriteriaOpFlagsPtr)--; 
+      (a_monitor->v_statusPtr)--; 
+      if (j == count-1 && *a_monitor->v_knownCriteriaOpFlagsPtr == ALL_FLAGS_OFF0) 
+        *a_monitor->v_knownCriteriaOpFlagsPtr =
+        a_indexIterator->criteria[criterionEntry].criteriaOpFlags;
+      if (*a_monitor->v_statusPtr == 'U') {
+        if (b_FLAG_SET_OFF(*a_monitor->v_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__OR)) {
+          *a_monitor->v_statusPtr = 'O';
         } else { 
-          **av_statusPtr = 'K';
+          *a_monitor->v_statusPtr = 'K';
         } // if
       } //if 
-      if (*ai_depth > 0 && a_handler->statuses[*ai_depth+1] != 'C') {
-        m_ASSERT(**av_statusPtr == 'U')
-        if (a_handler->statuses[*ai_depth+1] == 'O' && b_FLAG_SET_OFF(**av_knownCriteriaOpFlagsPtr,
-          CRITERIA_OP_FLAG__AND)) **av_statusPtr = 'O' ; 
-        else if (**av_statusPtr == 'K' && b_FLAG_SET_OFF(**av_knownCriteriaOpFlagsPtr,
-          CRITERIA_OP_FLAG__OR)) **av_statusPtr = 'K'; 
+      if (a_monitor->i_depth > 0 && a_monitor->statuses[a_monitor->i_depth+1] != 'C') {
+        m_ASSERT(*a_monitor->v_statusPtr == 'U')
+        if (a_monitor->statuses[a_monitor->i_depth+1] == 'O' && b_FLAG_SET_OFF(
+          *a_monitor->v_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__AND)) *a_monitor->v_statusPtr =
+          'O' ; 
+        else if (*a_monitor->v_statusPtr == 'K' && b_FLAG_SET_OFF(
+          *a_monitor->v_knownCriteriaOpFlagsPtr, CRITERIA_OP_FLAG__OR)) *a_monitor->v_statusPtr =
+          'K'; 
       } // if 
     } // for 
-    if (**av_knownCriteriaOpFlagsPtr == ALL_FLAGS_OFF0) **av_knownCriteriaOpFlagsPtr =
+    if (*a_monitor->v_knownCriteriaOpFlagsPtr == ALL_FLAGS_OFF0)
+      *a_monitor->v_knownCriteriaOpFlagsPtr =
       a_indexIterator->criteria[criterionEntry].criteriaOpFlags;
   } // if 
   m_DIGGY_RETURN(RETURNED)
@@ -775,25 +788,24 @@ static inline int m_CriteriaHandlerEquationAndCloseBrackets(struct CRITERIA_HAND
 // - open bracket added to ensure AND op. precedence (over OR op.)
 //
 // Passed:
-// - a_handler:
+// - a_monitor:
 // - a_indexIterator: contains criteria criteria
 // - criterionEntry: criterion entry 
-static inline int m_CtriteriaHandlerOpenBrackets(struct CRITERIA_HANDLER *a_handler,
-  struct INDEX_ITERATOR* a_indexIterator, int criterionEntry,
-  int *ai_depth, unsigned int **av_knownCriteriaOpFlagsPtr, char **av_statusPtr) {
+static inline int m_CriteriaMonitorOpenBrackets(struct CRITERIA_MONITOR *a_monitor,
+  struct INDEX_ITERATOR* a_indexIterator, int criterionEntry) {
   m_DIGGY_BOLLARD_S()
   // Number of open brackets:
   int count = m_OpenBracketCount(a_indexIterator->criteria[criterionEntry].criteriaOpFlags);
   if (count == 0 && criterionEntry+1 < a_indexIterator->criteriaCount5 && b_FLAG_SET_ON(
-    *(*av_knownCriteriaOpFlagsPtr),CRITERIA_OP_FLAG__AND) && b_FLAG_SET_ON(
+    *(a_monitor->v_knownCriteriaOpFlagsPtr),CRITERIA_OP_FLAG__AND) && b_FLAG_SET_ON(
     a_indexIterator->criteria[criterionEntry+1].criteriaOpFlags, CRITERIA_OP_FLAG__OR)) count++;
   int em_j = 0; for (; em_j < count; em_j++) {
-    m_ASSERT(++(*ai_depth) < REQUEST_CRITERIA_MAX5);
-    (*av_knownCriteriaOpFlagsPtr)++; 
-    (*av_statusPtr)++; 
-    if (a_handler->statuses[(*ai_depth)-1] == 'U') *(*av_statusPtr) = 'U' ;
-    else *(*av_statusPtr) = 'C' ;
-    *(*av_knownCriteriaOpFlagsPtr) = ALL_FLAGS_OFF0;
+    m_ASSERT(++(a_monitor->i_depth) < REQUEST_CRITERIA_MAX5);
+    (a_monitor->v_knownCriteriaOpFlagsPtr)++; 
+    (a_monitor->v_statusPtr)++; 
+    if (a_monitor->statuses[(a_monitor->i_depth)-1] == 'U') *(a_monitor->v_statusPtr) = 'U' ;
+    else *(a_monitor->v_statusPtr) = 'C' ;
+    *(a_monitor->v_knownCriteriaOpFlagsPtr) = ALL_FLAGS_OFF0;
   } // for
   m_DIGGY_RETURN(RETURNED)
 } // 
@@ -804,29 +816,25 @@ int GreenIndexesIteratorSequenceNext(GREEN_INDEXES_HANDLE handle,
   m_DIGGY_BOLLARD_S()
   m_ASSERT(a_indexIterator->criteria[0].indexLabel < handle->indexesNumber) 
 
-  struct CRITERIA_HANDLER criteriaHandler; // UNDEFINED 
+  struct CRITERIA_MONITOR criteriaMonitor; // UNDEFINED 
 
   do {
-    m_TRACK_IF(m_GreenIndexSequenceNext(handle->vnhs_indexes + a_indexIterator->criteria[0].indexLabel,
-      a_indexIterator->b_descending, &a_indexIterator->indexSequence, an_entry) !=
-      RETURNED) 
+    m_TRACK_IF(m_GreenIndexSequenceNext(handle->vnhs_indexes +
+      a_indexIterator->criteria[0].indexLabel, a_indexIterator->b_descending,
+      &a_indexIterator->indexSequence, an_entry) != RETURNED) 
     if (*an_entry >= 0) {
-      om_CriteriaHandlerReset(&criteriaHandler,a_indexIterator);
-      int i_depth = 0;
-      unsigned int *v_knownCriteriaOpFlagsPtr = criteriaHandler.knownCriteriaOpFlags;
-      char *v_statusPtr = criteriaHandler.statuses;
-      int criterionEntry = 0; for (; criterionEntry < a_indexIterator->criteriaCount5; criterionEntry++) {
-        m_TRACK_IF(m_CriteriaHandlerEquationAndCloseBrackets(&criteriaHandler, handle,
-          a_indexIterator, criterionEntry,an_entry, &i_depth, &v_knownCriteriaOpFlagsPtr, &v_statusPtr) !=
-          RETURNED) 
-        m_TRACK_IF(m_CtriteriaHandlerOpenBrackets(&criteriaHandler,
-          a_indexIterator, criterionEntry, &i_depth, &v_knownCriteriaOpFlagsPtr, &v_statusPtr) !=
-          RETURNED) 
+      om_CriteriaMonitorReset(&criteriaMonitor,a_indexIterator);
+      int criterionEntry = 0; for (; criterionEntry < a_indexIterator->criteriaCount5;
+        criterionEntry++) {
+        m_TRACK_IF(m_GreenIndexesCriteriaEquationAndCloseBrackets(handle,&criteriaMonitor,
+          a_indexIterator, criterionEntry,an_entry) != RETURNED) 
+        m_TRACK_IF(m_CriteriaMonitorOpenBrackets(&criteriaMonitor,
+          a_indexIterator, criterionEntry) != RETURNED) 
       } // for
   // Break "criteria handling" loop if entry not rejected by extra criteria 
-  m_ASSERT(i_depth == 0) 
-  m_ASSERT(*v_statusPtr == 'O' || *v_statusPtr == 'K') 
-      if (*v_statusPtr == 'O') break;
+  m_ASSERT(criteriaMonitor.i_depth == 0) 
+  m_ASSERT(*criteriaMonitor.v_statusPtr == 'O' || *criteriaMonitor.v_statusPtr == 'K') 
+      if (*criteriaMonitor.v_statusPtr == 'O') break;
     } else break; // No more entry => finished 
   } while (b_TRUE) ;
 
