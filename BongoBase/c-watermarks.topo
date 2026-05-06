@@ -8,7 +8,7 @@
 // Simple programming notations - currently adapted to the C-language...
 // Aim: programmer's small reminders to help visual detection of bugs...
 // In C code, what we call a "watermark" is a bunch of small letters (terminated with '_') prefixing 
-// different entities names (mostly variables, but also macros and functions).
+// different entity names (mostly variables, but also macros and functions).
 // Each small letter of a watermark corresponds to an individual indicator.
 // The order of the indicators in the watermark reflects the logical dependency (if any)
 // between the indicators of the entity. That is, the "general" indicators appear on "the left"
@@ -27,18 +27,18 @@
 
 // a_ / s_ indicators - "address": the variable is a "pointer".
 //   a_ address of "single" data ; pointer variable can only be "dereferenced" with '*' operator ;
-//     typical usage : parameter modified by function
+//     typical usage: parameter modified by function
 //   s_ address of "multiple" data (i.e array) ; 
 //     pointers' arithmetic ('++', etc.) is applicable to such pointer variables (which can also
 //     be "dereferenced" with '[]' operator).
-//     typical usage : loop's control (or "accompanying") variable ; array passing in functions
+//     typical usage: loop's control (or "accompanying") variable ; array passing in functions
 //   => Example: (to understand well, see also 'n_' indicator  below)
 //     int s_tab1[10]; // s_ indicator is here not indispensable; we see well that tab1 is an
 //     array !
 //     int sn_tab2[10]; // the 'n' follows the 's'; the nullability applies on all array elements. 
 //     int *ns_tab = s_tab1; // the 'n' precedes the 's'; the nullability applies on the array
 //       // variable pointer. 
-// b_ indicator - "boolean": indicates a variable used to host a boolean value (or a function that
+// b_ indicator - 'boolean': indicates a variable used to host a boolean value (or a function that
 //   returns a boolean value) ; reminds that:
 //   - "boolean data type" does NOT exist - and HAS NOT to be artificially defined ; boolean
 //     values can be "hosted" by integer variables (and returned by functions) ; but the exact
@@ -68,17 +68,17 @@
 //   int DestroyBrol (BROL brol); 
 // g_ indicator - "give change for ..." ("surrogate", "substitute", "alias") : remove abstraction of
 //   type definition (the type definition is well a SUB TYPE definition - NOT an abstraction) 
-// h_ indicator - "head" ("representative", "delegate", "proponent", ...): indicates that the variable
-//   is the "head" handle of some allocated resource or instance. 
-//   NB: "handle" must be understood in a wide meaning: all these variables are "handles" :
+// h_ indicator - 'head' ("representative", "delegate", "proponent", ...): indicates that the variable
+//   is the 'head' handle of some allocated resource or instance. 
+//   NB: 'handle' must be understood in a wide meaning: all these variables are handles :
 //   - file descriptor: allocated resources are process's and system's "open file" entries
 //   - "malloced" memory pointer: allocated resource is part of the heap memory
 //   - formal handles (which are generally pointers to some hidden structure)
-//   The "head" indicator simply designates among the multiple "handles" that can point out   
+//   The head indicator simply designates among the multiple handles that can point out   
 //   one given instance WHICH ONE is that formally chosen to "represent" the instance. That is,    
-//   by convention, lifespan of the instance is tied to that of its "head" variable. In particular,
-//   the "handle" parameter for some instance's creation and destruction functions is necessarily a
-//   "head" handle...
+//   by convention, lifespan of the instance is tied to that of its head variable. In particular,
+//   the handle parameter for some instance's creation and destruction functions is necessarily a
+//   head handle...
 // i_ indicator: see v_ indicator
 // j_ indicator - "junk" ("debris" "detritus" "remains" "rubbish" "ruins" "refuse" "garbage" 
 //   "fragments" "crap" "trash" "bits"...) : in combination with h_ and x_ indicators, indicates
@@ -91,7 +91,7 @@
 //   A pure macro leverages all the portable features of the C preprocessor. However, pure macros,
 //   by their very nature, “break” the syntax of the C language. Typically, pure macros mangle the 
 //   ';' instruction terminators.
-//   The absence of this indicator means that the macro is a “soft” (or “functional”) macro.
+//   The absence of this indicator means that the macro is a 'soft' (or 'functional') macro.
 //   A “soft” macro is either a simple constant value, or a construction totally homogeneous to
 //   (and therefore replaceable by) a function (*). Consequently, an unexpanded "soft" macro must
 //   conform to the general syntax of C. In particular, a “soft” macro must not mangle the ';'
