@@ -296,36 +296,36 @@ typedef GENERIC_INTEGER (*P_STRING_INTRINSIC_VALUE_FUNCTION) (void *pr_handle,
 // #REF GStringsAddIndex <g-string set> <key1>
 // #SEE GreenCollectionAddIndex@c-ansi/green.h  <<g-string set>> 
 // Passed parameters for new index:
-// - keyCount: >= 1; 1:plain index; >=2:compound index  #SKIP
+// - gKeyCount: >= 1; 1:plain index; >=2:compound index  #SKIP
 // - key1GStringSetElement: between [0 ; <g-string set cardinality>[ ; the g-string set's
 //   element serving as first key of the index
 // - key1GsKeysComparison: #see enum-GS_KEYS_COMPARISON
 //   ACOLYT_VALUE__GS_KEYS_COMPARISON : only possible with VALUED_STRING__G_STRING_CONVEYANCE
 //   ACOLYT_HANDLE__GS_KEYS_COMPARISON : only possible with NAMED_OBJECT__G_STRING_CONVEYANCE
-// - cn_key1IsNeutralCharFunction: only significant with P_STRING__GS_KEYS_COMPARISON 
+// - cn_gKey1IsNeutralCharFunction: only significant with P_STRING__GS_KEYS_COMPARISON 
 //   + NULL: DO NOT eliminate neutral chars before comparison 
 //   + non NULL: eliminate neutral chars before comparison 
-// - cn_key1ToCharFunction: only significant with P_STRING__GS_KEYS_COMPARISON 
+// - cn_gKey1ToCharFunction: only significant with P_STRING__GS_KEYS_COMPARISON 
 //   + NULL: NO conversion applied before comparison 
 //   + non NULL: conversion applied before comparison 
-// - c_key1PStringIntrinsicValueFunction: only significant with INTRINSIC_VALUE__GS_KEYS_COMPARISON
-// - cfpr_key1PStringIntrinsicValueFunctionHandle: only significant with
+// - c_gKey1PStringIntrinsicValueFunction: only significant with INTRINSIC_VALUE__GS_KEYS_COMPARISON
+// - cfpr_gKey1PStringIntrinsicValueFunctionHandle: only significant with
 //   INTRINSIC_VALUE__GS_KEYS_COMPARISON
 // - ... : g-string set(s element for second key (etc.) if any ...
-int GStringsAddIndex(G_STRINGS_HANDLE handle,  int keyCount, int key1GStringSetElement,
-  int key1GsKeysComparison,  IS_CHAR_FUNCTION cn_key1IsNeutralCharFunction,
-  TO_CHAR_FUNCTION cn_key1ToCharFunction,
-  P_STRING_INTRINSIC_VALUE_FUNCTION c_key1PStringIntrinsicValueFunction,
-  void *cfpr_key1PStringIntrinsicValueFunctionHandle,  ...);
+int GStringsAddIndex(G_STRINGS_HANDLE handle,  int gKeyCount, int key1GStringSetElement,
+  int key1GsKeysComparison,  IS_CHAR_FUNCTION cn_gKey1IsNeutralCharFunction,
+  TO_CHAR_FUNCTION cn_gKey1ToCharFunction,
+  P_STRING_INTRINSIC_VALUE_FUNCTION c_gKey1PStringIntrinsicValueFunction,
+  void *cfpr_gKey1PStringIntrinsicValueFunctionHandle,  ...);
 
 // #SEE GStringsAddIndex <g-string> <key>
 // Add an index for single (aka cardinality 1) g-strings collection for LEXICAL comparison
 // Nb: Plain index => one single key
 static inline int m_GStringsAddPlainLexicalIndex(G_STRINGS_HANDLE handle,
-  IS_CHAR_FUNCTION n_keyIsNeutralCharFunction, TO_CHAR_FUNCTION n_keyToCharFunction) {
+  IS_CHAR_FUNCTION n_gKeyIsNeutralCharFunction, TO_CHAR_FUNCTION n_gKeyToCharFunction) {
   m_DIGGY_BOLLARD_S()
   m_DIGGY_RETURN(GStringsAddIndex(handle, 1, 0, P_STRING__GS_KEYS_COMPARISON,
-     n_keyIsNeutralCharFunction, n_keyToCharFunction, (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,
+     n_gKeyIsNeutralCharFunction, n_gKeyToCharFunction, (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,
      (void*)UNDEFINED))
 } // m_GStringsAddPlainLexicalIndex
 
@@ -404,65 +404,60 @@ static inline struct GS_KEY om_GsKey4(void* nr_acolytHandle) {\
 // #REF GStringsIndexRequest <gStringSet>
 // #SEE GreenCollectionIndexRequest@c-ansi/green.h  <<gStringSet>> <keys> 
 // Passed keys :
-// - cfps_keys1: (1st criterion) search key(s) value(s) of item (regarding index) ;
+// - cps_gKeys1: (1st criterion) search key(s) value(s) of item (regarding index) ;
 //   not significant without actual index seek flag (INDEX_SEEK_FLAGS__ANY)
 //   type of comparison (see enum-GS_KEYS_COMPARISON) must correspond to that assigned to index
 //   (see GStringsAddIndex() above) 
 // - ... (variadic parameters) : search key(s) value(s) for other criteria...  
 int GStringsIndexRequest(G_STRINGS_HANDLE cp_handle,
   INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaCount,
-  int indexLabel1, unsigned int indexSeekFlags1, const struct GS_KEY *cfps_keys1, ...);
+  int indexLabel1, unsigned int indexSeekFlags1, const struct GS_KEY *cps_gKeys1, ...);
 
 
 // Added value: ensure adding gs key(s) properly to criterion
 // #SEE m_GRequestCriterion  
-static inline struct G_REQUEST_CRITERION m_GRequestCriterion_GsKeys(int indexLabel,
-  unsigned int indexSeekFlags, const struct GS_KEY* cfps_keys, unsigned int u_criteriaOpFlags) {
-  return m_GRequestCriterion(indexLabel,indexSeekFlags, cfps_keys, u_criteriaOpFlags);
-} // m_GRequestCriterion_GsKeys
+static inline struct G_REQUEST_CRITERION m_GRequestCriterionGsKeys(int indexLabel,
+  unsigned int indexSeekFlags, const struct GS_KEY* cfps_gKeys, unsigned int u_criteriaOpFlags) {
+  return m_GRequestCriterion(indexLabel,indexSeekFlags,(const char *)cfps_gKeys,u_criteriaOpFlags);
+} // m_GRequestCriterionGsKeys
 
 // #SEE GStringsIndexRequest <gStringSet>
 int GStringsIndexRequestR(G_STRINGS_HANDLE cp_handle,
   INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaCount,
   const struct G_REQUEST_CRITERION *sp_criteria);
 
-struct GS_REQUEST_CRITERIA {
-  int count5;
-  struct GS_KEY sc_gsKeys52[REQUEST_CRITERIA_MAX5][2] ;
-  struct G_REQUEST_CRITERION sc_criteria5[REQUEST_CRITERIA_MAX5] ;
-} ;
+//struct GS_REQUEST_CRITERIA {
+//  int count5;
+//  struct GS_KEY sc_gsKeys52[REQUEST_CRITERIA_MAX5][2] ;
+//  struct G_REQUEST_CRITERION sc_criteria5[REQUEST_CRITERIA_MAX5] ;
+//} ;
 
-// Set-up initial criteria (0 criterion)
-static inline struct GS_REQUEST_CRITERIA m_GsRequestCriteria0(void) {
-  struct GS_REQUEST_CRITERIA gsRequestCriteria = { .count5 = 0 } ;
-  return gsRequestCriteria; 
-} // m_GsRequestCriteria
+//// Set-up initial criteria (0 criterion)
+//static inline struct GS_REQUEST_CRITERIA m_GsRequestCriteria0(void) {
+//  struct GS_REQUEST_CRITERIA gsRequestCriteria = { .count5 = 0 } ;
+//  return gsRequestCriteria; 
+//} // m_GsRequestCriteria
+
+//int GsRequestCriteriaAddCriterion(struct GS_REQUEST_CRITERIA *a_criteria52, int indexLabel,
+// unsigned int indexSeekFlags, struct GS_KEY c_gsKey1, struct GS_KEY c_gsKey2,
+// unsigned int criteriaOpFlags) ;
+
+// Added value: ensure adding gs key(s) properly to criterion
+// #SEE m_GRequestCriteria5AddCriterion @ c-ansi/green.h <GS keys>  
+static inline int m_GRequestCriteria5AddCriterionGsKeys(struct G_REQUEST_CRITERIA5 *a_criteria5,
+  int indexLabel, unsigned int indexSeekFlags, struct GS_KEY* cfps_gKeys,
+  unsigned int criteriaOpFlags) { 
+  return GRequestCriteria5AddCriterion(a_criteria5, indexLabel, indexSeekFlags,
+  (const char *)cfps_gKeys, criteriaOpFlags) 
+} // m_GRequestCriteria5AddCriterionGsKeys
 
 
-// Add new criterion (REQUEST_CRITERIA_MAX5 criteria MAX) 
-//
-// Passed:
-// - *a_criteria:
-// - indexLabel:
-// - indexSeekFlags:
-// - c_gsKey1: only significant if actual criterion
-// - c_gsKey2: only significant if actual criterion (and 2nd key is used) 
-// - criteriaOpFlags:
-// 
-// Changed:
-// - *a_criteria: new criterion added
-// Ret:
-// - >0: number of criteria
-// - -1 special value: anomaly raised
-int GsRequestCriteriaAddCriterion(struct GS_REQUEST_CRITERIA *a_criteria52, int indexLabel,
- unsigned int indexSeekFlags, struct GS_KEY c_gsKey1, struct GS_KEY c_gsKey2,
- unsigned int criteriaOpFlags) ;
 
 // Same purpose than GStringsIndexRequestR(), but allow passing criteria more easily...
 // #SEE GStringsIndexRequest <gStringSet>
-int GStringsIndexRequestR52(G_STRINGS_HANDLE cp_handle,
+int GStringsIndexRequestR5(G_STRINGS_HANDLE cp_handle,
   INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer,
-  const struct GS_REQUEST_CRITERIA *ap_criteria52) ;
+  const struct G_REQUEST_CRITERIA *ap_criteria5) ;
 
 
 // #REF GStringsIndexFetch <gStringSet>
@@ -476,11 +471,11 @@ int GStringsIndexFetch(G_STRINGS_HANDLE cp_handle,
 // #SEE GStringsIndexFetch <gStringSet>
 static inline int m_GStringsIndexSingleFetch(G_STRINGS_HANDLE cp_handle, 
   INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, 
-  int indexLabel, unsigned int indexSeekFlags, const struct GS_KEY *cfps_keys,
+  int indexLabel, unsigned int indexSeekFlags, const struct GS_KEY *cfps_gKeys,
   unsigned int indexFetchFlags, g_G_STRING_SET_STUFF *acvnt_gStringSetStuff, int *nacvn_entry) {
   m_DIGGY_BOLLARD_S() 
   m_TRACK_IF(GStringsIndexRequest(cp_handle,nf_indexRequestAutomaticBuffer,1,indexLabel,
-    indexSeekFlags, cfps_keys) != RETURNED) 
+    indexSeekFlags, cfps_gKeys) != RETURNED) 
   int result = GStringsIndexFetch(cp_handle,nf_indexRequestAutomaticBuffer,indexFetchFlags,
     acvnt_gStringSetStuff,nacvn_entry);
   m_TRACK_IF(result < 0)

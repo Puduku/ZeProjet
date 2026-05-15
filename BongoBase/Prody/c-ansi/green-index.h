@@ -23,39 +23,40 @@
 
 extern char b_diggyGreenCollectionExam;
 
+
 // Index's virtual function to compare an item with a key.
 //
 // Passed:
 // - r_handle:
 // - indexLabel:
-// - keyRank:
+// - gKeyRank:
 // - aEntry: entry for "A"
 // - n_bEntry: entry for "B"
-// - cpr_bKeys: raw key(s) for "B" 
+// - cr_bGKeys: raw key(s) for "B" 
 //
 // Ret: comparison between "A" (entry) and "B" (key)
 // - LESS_THAN__COMPARISON:
 // - EQUAL_TO__COMPARISON:
 // - GREATER_THAN__COMPARISON:
 // - -1: unexpected problem; anomaly is raised
-typedef int (*ENTRY_RAW_COMPARE_FUNCTION) (void *r_handle, int indexLabel, int keyRank,
-  int aEntry, int n_bEntry, const void *cpr_bKeys) ;
+typedef int (*ENTRY_RAW_COMPARE_FUNCTION) (void *r_handle, int indexLabel, int gKeyRank,
+  int aEntry, int n_bEntry, void *cr_bGKeys) ;
 
 // Index's virtual function to adequate an item with a key.
 //
 // Passed:
 // - r_handle:
 // - indexLabel:
-// - keyRank:
+// - gKeyRank:
 // - aEntry: entry for "A"
-// - pr_bKeys: raw key(s) for "B" 
+// - r_bGKeys: raw key(s) for "B" 
 //
 // Ret: adequation between "A" (entry) and "B" (key) ?
 // - ANSWER__YES: 
 // - ANSWER__NO: 
 // - -1: unexpected problem; anomaly is raised
-typedef int (*ENTRY_RAW_EQUATE_FUNCTION) (void *r_handle, int indexLabel, int keyRank,
-  int aEntry, const void *pr_bKeys);
+typedef int (*ENTRY_RAW_EQUATE_FUNCTION) (void *r_handle, int indexLabel, int gKeyRank,
+  int aEntry, void *r_bGKeys);
 
 struct GREEN_INDEXES ; // Private!
 typedef struct GREEN_INDEXES* GREEN_INDEXES_HANDLE; // Public handle
@@ -79,12 +80,12 @@ int GreenIndexesCreateInstance(GREEN_INDEXES_HANDLE *azh_handle,
 // Passed:
 // - handle:
 // - itemsPhysicalNumber:
-// - keyCount:
+// - gKeyCount:
 //
 // Return:
 // new index label (technically equal to entry in indexes array)
 int GreenIndexesAddIndex(GREEN_INDEXES_HANDLE handle, int itemsPhysicalNumber,
-  int keyCount) ;
+  int gKeyCount) ;
 
 // Passed:
 // - handle:
@@ -171,7 +172,7 @@ static inline int m_CloseBracketCount(unsigned int criteriaOpFlags) {
 struct G_REQUEST_CRITERION {
   int indexLabel;
   unsigned int indexSeekFlags;
-  const void *cfpr_keys; // Only significant with Key-based seek flag(s)
+  void *cr_gKeys; // Only significant with Key-based seek flag(s)
   unsigned int criteriaOpFlags;
 } ;
 

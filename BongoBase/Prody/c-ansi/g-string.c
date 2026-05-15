@@ -165,7 +165,7 @@ int GStringSetDestroyInstance(g_G_STRING_SET_STUFF xh_notNamedObjectStuff,  int 
 // =========
 
 
-struct KEY_SETTINGS {
+struct G_KEY_SETTINGS {
   int gStringSetElement;
   int gsKeysComparison;
   union {
@@ -184,8 +184,8 @@ struct KEY_SETTINGS {
 
 
 struct INDEX_PROPERTIES {
-  int keyCount;
-  struct KEY_SETTINGS *hs_keysSettings;
+  int gKeyCount;
+  struct G_KEY_SETTINGS *hs_gKeysSettings;
 };
 
 
@@ -259,51 +259,51 @@ static int GStringsDisengage(void *r_handle,  char *r_greenItemStuff) {
 
 
 // #SEE GREEN_ITEM_HANDLER__COMPARE_FUNCTION @ c-ansi/green.h
-static int GStringsCompare(void *cpr_handle,  char b_frozen, int indexLabel,  int keyRank,
-  char *pr_aGreenItemStuff,  char *npr_bGreenItemStuff,  const void *cpr_bKeys) {
+static int GStringsCompare(void *cpr_handle,  char b_frozen, int indexLabel,  int gKeyRank,
+  char *pr_aGreenItemStuff,  char *npr_bGreenItemStuff,  const char *cpr_bGKeys) {
   m_DIGGY_BOLLARD()
   G_STRINGS_HANDLE p_handle = (G_STRINGS_HANDLE) cpr_handle;
   m_CHECK_MAGIC_FIELD(G_STRINGS_HANDLE,p_handle)
   m_ASSERT(indexLabel < p_handle->indexesNumber)
-m_DIGGY_INFO("indexLabel=%d keyRank=%d",indexLabel,keyRank)
+m_DIGGY_INFO("indexLabel=%d gKeyRank=%d",indexLabel,gKeyRank)
   // Key settings:
-  struct KEY_SETTINGS *ap_keySettings = (struct KEY_SETTINGS *)UNDEFINED;
+  struct G_KEY_SETTINGS *ap_gKeySettings = (struct G_KEY_SETTINGS *)UNDEFINED;
   { struct INDEX_PROPERTIES *ap_indexProperties = p_handle->vnhs_indexesProperties + indexLabel;
 
-    m_ASSERT(keyRank < ap_indexProperties->keyCount)
-    ap_keySettings = ap_indexProperties->hs_keysSettings + keyRank;
+    m_ASSERT(gKeyRank < ap_indexProperties->gKeyCount)
+    ap_gKeySettings = ap_indexProperties->hs_gKeysSettings + gKeyRank;
   } // struct INDEX_PROPERTIES
 
   // Bare key 'a':
   union BARE_GS_KEY aBareGsKey ;
   { G_STRING_STUFF p_aGStringStuff = (G_STRING_STUFF) pr_aGreenItemStuff +
-      ap_keySettings->gStringSetElement;
-    m_BARE_GS_KEY__G_STRING(aBareGsKey,  ap_keySettings->gsKeysComparison, p_aGStringStuff,
-      ap_keySettings->select.intrinsicValueComparison.pStringIntrinsicValueFunction,
-      ap_keySettings->select.intrinsicValueComparison.pr_pStringIntrinsicValueFunctionHandle);
+      ap_gKeySettings->gStringSetElement;
+    m_BARE_GS_KEY__G_STRING(aBareGsKey,  ap_gKeySettings->gsKeysComparison, p_aGStringStuff,
+      ap_gKeySettings->select.intrinsicValueComparison.pStringIntrinsicValueFunction,
+      ap_gKeySettings->select.intrinsicValueComparison.pr_pStringIntrinsicValueFunctionHandle);
   } // G_STRING_STUFF
 
   // Bare key 'b':
   union BARE_GS_KEY bBareGsKey ;
   if (npr_bGreenItemStuff != NULL) {
     G_STRING_STUFF p_bGStringStuff = (G_STRING_STUFF) npr_bGreenItemStuff + 
-      ap_keySettings->gStringSetElement;
-    m_BARE_GS_KEY__G_STRING(bBareGsKey,  ap_keySettings->gsKeysComparison, p_bGStringStuff,
-      ap_keySettings->select.intrinsicValueComparison.pStringIntrinsicValueFunction,
-      ap_keySettings->select.intrinsicValueComparison.pr_pStringIntrinsicValueFunctionHandle);
+      ap_gKeySettings->gStringSetElement;
+    m_BARE_GS_KEY__G_STRING(bBareGsKey,  ap_gKeySettings->gsKeysComparison, p_bGStringStuff,
+      ap_gKeySettings->select.intrinsicValueComparison.pStringIntrinsicValueFunction,
+      ap_gKeySettings->select.intrinsicValueComparison.pr_pStringIntrinsicValueFunctionHandle);
   } else {
-    const struct GS_KEY *ap_bGsKey = ((const struct GS_KEY *)cpr_bKeys) + keyRank;
-    m_BARE_GS_KEY__GS_KEY(bBareGsKey,  ap_keySettings->gsKeysComparison,  ap_bGsKey)
+    const struct GS_KEY *ap_bGsKey = ((const struct GS_KEY *)cpr_bGKeys) + gKeyRank;
+    m_BARE_GS_KEY__GS_KEY(bBareGsKey,  ap_gKeySettings->gsKeysComparison,  ap_bGsKey)
   } // if
   
   // Compare bare keys:
   int comparison = UNDEFINED;
-m_DIGGY_INFO("ap_keySettings->gsKeysComparison=%d",ap_keySettings->gsKeysComparison)
-  switch (ap_keySettings->gsKeysComparison) {
+m_DIGGY_INFO("ap_gKeySettings->gsKeysComparison=%d",ap_gKeySettings->gsKeysComparison)
+  switch (ap_gKeySettings->gsKeysComparison) {
   case P_STRING__GS_KEYS_COMPARISON:
     comparison = ComparePStrings(aBareGsKey.cp_pString,  bBareGsKey.cp_pString,
-      ap_keySettings->select.pStringComparison.cn_isNeutralCharFunction,
-      ap_keySettings->select.pStringComparison.cn_toCharFunction,!b_SUB_STRING_2); 
+      ap_gKeySettings->select.pStringComparison.cn_isNeutralCharFunction,
+      ap_gKeySettings->select.pStringComparison.cn_toCharFunction,!b_SUB_STRING_2); 
   break; case INTRINSIC_VALUE__GS_KEYS_COMPARISON:
     comparison = GET_COMPARISON(aBareGsKey.cen_intrinsicValue,bBareGsKey.cen_intrinsicValue);
   break; case ACOLYT_VALUE__GS_KEYS_COMPARISON:
@@ -311,7 +311,7 @@ m_DIGGY_INFO("ap_keySettings->gsKeysComparison=%d",ap_keySettings->gsKeysCompari
   break; case ACOLYT_HANDLE__GS_KEYS_COMPARISON:
     comparison = GET_COMPARISON(aBareGsKey.cnr_acolytHandle,bBareGsKey.cnr_acolytHandle);
   break; default:
-    m_RAISE(ANOMALY__VALUE__D,ap_keySettings->gsKeysComparison)
+    m_RAISE(ANOMALY__VALUE__D,ap_gKeySettings->gsKeysComparison)
   } // switch
   
 m_DIGGY_VAR_COMPARISON(comparison)
@@ -370,11 +370,11 @@ int GStringsGetCount(G_STRINGS_HANDLE cp_handle,
 
 
 // Public function : see .h
-int GStringsAddIndex (G_STRINGS_HANDLE handle,  int keyCount,
+int GStringsAddIndex (G_STRINGS_HANDLE handle,  int gKeyCount,
   int key1GStringSetElement,  int key1GsKeysComparison,
-  IS_CHAR_FUNCTION cn_key1IsNeutralCharFunction,  TO_CHAR_FUNCTION cn_key1ToCharFunction,
-  P_STRING_INTRINSIC_VALUE_FUNCTION c_key1PStringIntrinsicValueFunction,
-  void *cfpr_key1PStringIntrinsicValueFunctionHandle,  ...) {
+  IS_CHAR_FUNCTION cn_gKey1IsNeutralCharFunction,  TO_CHAR_FUNCTION cn_gKey1ToCharFunction,
+  P_STRING_INTRINSIC_VALUE_FUNCTION c_gKey1PStringIntrinsicValueFunction,
+  void *cfpr_gKey1PStringIntrinsicValueFunctionHandle,  ...) {
   m_DIGGY_BOLLARD()
 
   m_REALLOC_ARRAY(handle->vnhs_indexesProperties,++(handle->indexesNumber))
@@ -382,38 +382,38 @@ int GStringsAddIndex (G_STRINGS_HANDLE handle,  int keyCount,
   struct INDEX_PROPERTIES *a_indexProperties =
     handle->vnhs_indexesProperties + handle->indexesNumber-1 ;
 
-  m_MALLOC_ARRAY(a_indexProperties->hs_keysSettings,a_indexProperties->keyCount = keyCount)
+  m_MALLOC_ARRAY(a_indexProperties->hs_gKeysSettings,a_indexProperties->gKeyCount = gKeyCount)
 
   va_list ap ;
-  va_start(ap,cfpr_key1PStringIntrinsicValueFunctionHandle) ;
+  va_start(ap,cfpr_gKey1PStringIntrinsicValueFunctionHandle) ;
 
   int i = 0;
-  struct KEY_SETTINGS *s_keysSettings = a_indexProperties->hs_keysSettings;
-  for ( ; i < keyCount ; i++, s_keysSettings++) {
-m_DIGGY_INFO("i=%d, keyCount=%d",i,keyCount)
+  struct G_KEY_SETTINGS *s_gKeysSettings = a_indexProperties->hs_gKeysSettings;
+  for ( ; i < gKeyCount ; i++, s_gKeysSettings++) {
+m_DIGGY_INFO("i=%d, gKeyCount=%d",i,gKeyCount)
     if (i > 0) { 
       key1GStringSetElement = va_arg(ap,int);
       key1GsKeysComparison = va_arg(ap,int);
-      cn_key1IsNeutralCharFunction = va_arg(ap,IS_CHAR_FUNCTION);
-      cn_key1ToCharFunction = va_arg(ap,TO_CHAR_FUNCTION);
-      c_key1PStringIntrinsicValueFunction = va_arg(ap,P_STRING_INTRINSIC_VALUE_FUNCTION);
-      cfpr_key1PStringIntrinsicValueFunctionHandle = va_arg(ap,void *);
+      cn_gKey1IsNeutralCharFunction = va_arg(ap,IS_CHAR_FUNCTION);
+      cn_gKey1ToCharFunction = va_arg(ap,TO_CHAR_FUNCTION);
+      c_gKey1PStringIntrinsicValueFunction = va_arg(ap,P_STRING_INTRINSIC_VALUE_FUNCTION);
+      cfpr_gKey1PStringIntrinsicValueFunctionHandle = va_arg(ap,void *);
       
     } // if
     m_ASSERT(key1GStringSetElement < handle->gStringSetCardinality)
-    s_keysSettings->gStringSetElement = key1GStringSetElement;
+    s_gKeysSettings->gStringSetElement = key1GStringSetElement;
     int gStringConveyance = (handle->n_gStringConveyance >= 0? handle->n_gStringConveyance:
       handle->cps_gStringConveyances[key1GStringSetElement]);
-    switch (s_keysSettings->gsKeysComparison = key1GsKeysComparison) {
+    switch (s_gKeysSettings->gsKeysComparison = key1GsKeysComparison) {
     case P_STRING__GS_KEYS_COMPARISON:
-      s_keysSettings->select.pStringComparison.cn_isNeutralCharFunction =
-        cn_key1IsNeutralCharFunction;
-      s_keysSettings->select.pStringComparison.cn_toCharFunction = cn_key1ToCharFunction;
+      s_gKeysSettings->select.pStringComparison.cn_isNeutralCharFunction =
+        cn_gKey1IsNeutralCharFunction;
+      s_gKeysSettings->select.pStringComparison.cn_toCharFunction = cn_gKey1ToCharFunction;
     break; case INTRINSIC_VALUE__GS_KEYS_COMPARISON:
-      s_keysSettings->select.intrinsicValueComparison.pStringIntrinsicValueFunction =
-        c_key1PStringIntrinsicValueFunction;
-      s_keysSettings->select.intrinsicValueComparison.pr_pStringIntrinsicValueFunctionHandle =
-        cfpr_key1PStringIntrinsicValueFunctionHandle;
+      s_gKeysSettings->select.intrinsicValueComparison.pStringIntrinsicValueFunction =
+        c_gKey1PStringIntrinsicValueFunction;
+      s_gKeysSettings->select.intrinsicValueComparison.pr_pStringIntrinsicValueFunctionHandle =
+        cfpr_gKey1PStringIntrinsicValueFunctionHandle;
     break; case ACOLYT_VALUE__GS_KEYS_COMPARISON:
       m_ASSERT(gStringConveyance == VALUED_STRING__G_STRING_CONVEYANCE)
     break; case ACOLYT_HANDLE__GS_KEYS_COMPARISON:
@@ -425,7 +425,7 @@ m_DIGGY_INFO("i=%d, keyCount=%d",i,keyCount)
   va_end(ap) ;
 
   int indexLabel =
-  GreenCollectionAddIndex(handle->h_greenCollectionHandle, keyCount) ;
+  GreenCollectionAddIndex(handle->h_greenCollectionHandle, gKeyCount) ;
   m_TRACK_IF(indexLabel < 0) ;
 
   m_DIGGY_RETURN(indexLabel)
@@ -436,50 +436,34 @@ int GStringsIndexRequestR(G_STRINGS_HANDLE cp_handle,
   INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaCount,
   const struct G_REQUEST_CRITERION *sp_criteria) {
   m_DIGGY_BOLLARD()
-
   m_TRACK_IF(GreenCollectionIndexRequestR(cp_handle->h_greenCollectionHandle,
     nf_indexRequestAutomaticBuffer,criteriaCount, sp_criteria) != RETURNED)
-
   m_DIGGY_RETURN(RETURNED)
 } // GStringsIndexRequestR
 
 
 // Public function : see .h
-int GsRequestCriteriaAddCriterion(struct GS_REQUEST_CRITERIA *a_criteria52, int indexLabel,
-  unsigned int indexSeekFlags, struct GS_KEY c_gsKey1, struct GS_KEY c_gsKey2,
-  unsigned int criteriaOpFlags) {
-  m_DIGGY_BOLLARD()
-  int i = a_criteria52->count5;
-  m_ASSERT(a_criteria52->count5++ < REQUEST_CRITERIA_MAX5)
-  a_criteria52->sc_gsKeys52[i][0] = c_gsKey1; 
-  a_criteria52->sc_gsKeys52[i][1] = c_gsKey2; 
-  a_criteria52->sc_criteria5[i] = m_GRequestCriterion_GsKeys(indexLabel, indexSeekFlags,
-     a_criteria52->sc_gsKeys52[i],criteriaOpFlags);
-  m_DIGGY_RETURN(a_criteria52->count5)
-} // GsRequestCriteriaAddCriterion
-
-// Public function : see .h
-int GStringsIndexRequestR52(G_STRINGS_HANDLE cp_handle,
+int GStringsIndexRequestR5(G_STRINGS_HANDLE cp_handle,
   INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer,
-  const struct GS_REQUEST_CRITERIA *ap_criteria52) {
+  const struct G_REQUEST_CRITERIA *ap_criteria5) {
   m_DIGGY_BOLLARD()
-  m_TRACK_IF(GreenCollectionIndexRequestR(cp_handle->h_greenCollectionHandle,
-    nf_indexRequestAutomaticBuffer,ap_criteria52->count5, ap_criteria52->sc_criteria5) != RETURNED)
+  m_TRACK_IF(GreenCollectionIndexRequestR5(cp_handle->h_greenCollectionHandle,
+    nf_indexRequestAutomaticBuffer,ap_criteria5) != RETURNED)
   m_DIGGY_RETURN(RETURNED)
-} // GStringsIndexRequestR52
+} // GStringsIndexRequestR5
 
 
 // Public function : see .h
 int GStringsIndexRequest(G_STRINGS_HANDLE cp_handle,
   INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaCount,
-  int indexLabel1, unsigned int indexSeekFlags1, const struct GS_KEY *cfps_keys1, ...) {
+  int indexLabel1, unsigned int indexSeekFlags1, const struct GS_KEY *cps_gKeys1, ...) {
   m_DIGGY_BOLLARD()
 
   { va_list arguments;
-    va_start(arguments,cfps_keys1);
+    va_start(arguments,cfps_gKeys1);
     m_TRACK_IF(GreenCollectionIndexRequestV(cp_handle->h_greenCollectionHandle,
       nf_indexRequestAutomaticBuffer, criteriaCount, indexLabel1, indexSeekFlags1,
-      (void*)cfps_keys1, arguments) != RETURNED)
+      (const char*)cps_gKeys1, arguments) != RETURNED)
     va_end(arguments) ;
   } // arguments
   m_DIGGY_RETURN(RETURNED)
