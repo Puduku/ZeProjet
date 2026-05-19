@@ -34,3 +34,12 @@ si on renverse
 1. objeclif : amesliorer le moral des indivius
 2. dedcision : peindre les routes en roses.
 On voit que 1. est foireux et 2. inepte
+
+clarification: qu'appelle-t-on object ag la fin? La vision holiste "tout est objet" est-elle pertinetente ?
+Il faut distinguer 
+- l'objet constitutif (seul "vrai" objet) : caractérisé par structure encapsulede . instance privée +  handle public
+- l'objet de fait (faux objets) : data peut-être simple ou structurée ; data pas encpasulée. C'est une simple convention de nommage pour toute fonction qui manipule le faux objet. l'idée est que toute
+  fonction :
+  + premiere paramatre: la data du faux objet.
+  + nom de la fonction : nom de l'"objet" + nom de la "méthode"
+=> Donc : l'assertion "tout est objet" est vraie pourvu que l'on précise "Tout est soit objet constitutif soit objet de fait"
