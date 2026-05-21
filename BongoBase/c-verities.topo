@@ -4,7 +4,8 @@
 // Handling verities in C programs (and other programming languages)...
 
 // First, a few simple (and arbitrary) definitions...
-// Dualism: reduction of a reality to two aspects (or principles)
+// Dualism: principle of reduction of a reality to two aspects
+// Duality: particular reduction of a reality to two values
 // Falsity: any 'false' proposition
 // Holism: any doctrine of the Greater Whole
 // Monism: reduction of a reality to a single aspect (or principle)
@@ -24,18 +25,19 @@
 // 'white'/'black' or 'attractive'/'repulsive' can be trivially reduced to a 'true'/'false' opposition (
 // e.g., the duality 'day'/'night' can be simply restated with "it's day" is 'true' / "it's day" is
 // 'false').
-// Yet, those logical dualities will be genuinely equivalent once we have determined a rule that
-// uniquely associates each single verity value between two given dualities.
-// So, for example, when comparing the two dualities 'yes'/'no' and 'day'/'night', why assimilate
-// 'yes' with 'day' (and 'no' with 'night')? and not the opposite ('yes' with 'night'...)?
-// The answer is: in order to establish such rule of univocal association, it is sufficient that the
-// association between any duality with a "fundamental" duality to be univocal. So here's the point:
-// the associations between dualities with the 'true'/'false' duality are, all in all, arbitrary.
-// For instance, the association of 'attractive' with 'true' is arbitrary.
-// On the other hand, any association of logical duality with the 'positive'/'negative' (or 'good'/
-// 'bad') pair of values is self-evident. So, 'attractive', 'yes', 'true', 'win', etc. are
-// spontaneously associated with 'positive' (or 'good') value - whereas 'repulsive', 'no', 'false',
-// 'lose' counterparts are assimilated to 'negative' (or 'bad') value.
+// However, these logical dualities will be genuinely equated if, and only if, we can establish
+// a one-to-one correspondence between the truth values of these dualities.
+// For example, if we consider the two pairs 'yes'/'no' and 'day'/'night' why associate 'yes'
+// with 'day' (and 'no' with 'night')? Why not the other way around ('yes' with 'night'...)?
+// Now, to ensure that any association between verity values is unambiguous, it would suffice to 
+// know a 'fundamental' duality for which the value associationb with any other duality would be 
+// unambiguous. 
+// So here's the point. Value associations with the 'true'/'false' value verity pair are, all in all,
+// arbitrary. For instance, the association of 'attractive' with 'true' is arbitrary.
+// On the other hand, any association with the 'positive'/'negative' (or 'good'/'bad') dual verity
+// is self-evident. So, 'attractive', 'yes', 'true', 'win', etc. are spontaneously associated with
+// 'positive' (or 'good') value - whereas 'repulsive', 'no', 'false', 'lose' counterparts are
+// assimilated to 'negative' (or 'bad') value.
 // Let's simply admit this bias typical of our Manichean brains: our mental capacity to operate
 // binary separations is deeply founded on our so-called AFFECT, which can only measure moral (or 
 // emotional) values.
@@ -43,7 +45,7 @@
 // "neutral" verity values as 'true'/'false'. To the contrary, our "fundamental" logical values of
 // truth are unevitably oriented according to a MORAL partition between the 'Good' and the 'Evil'.
 // 
-// Are dual verities PRACTICALLY interchangeable ? Answer with counterexample...
+// Are dual verities, in practice, readily interchangeable ? Answer with counterexample...
 // Let's try a comparison between 'yes'/'no' and 'win'/'lose' dualities...
 // Why do guys so often harass girls?
 // A guy who's kind of a pain in the neck is hit on a girl. The girl blows him off. Guy insists.
