@@ -128,8 +128,8 @@
 // s_ indicator: see a_ indicator
 // t_ indicator: "transitory" ("passing", "ephemeral", "fleeting", "fugacious", "fugitive", 
 //   "momentary", "transient", "evanescent", "volatile"...) => indicates a POSSIBILITY of reallocation
-//   indicates that the validity of the variable's value is more limited than that of variable's  
-//   lifespan. Typical usage: fetching items in collections (see c-ansi/green.h) 
+//   Indicates that the scope of the variable is more restricted than its lifespan. Typical usage:
+//   fetching items in collections (see c-ansi/green.h) 
 // u_ "unicity" indicator (for macro parameters) : warrants that parameter is expanded once and
 //   only once in macro; hence, the macro can be used safely with params with side effects (++,
 //   function calls, etc.)
