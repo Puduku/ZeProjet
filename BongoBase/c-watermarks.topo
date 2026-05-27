@@ -67,7 +67,7 @@
 //   // After "Brol" destruction, fp_name is not necessary anymore...
 //   int DestroyBrol (BROL brol); 
 // g_ indicator - "give change for ..." ("surrogate", "substitute", "alias") : remove abstraction of
-//   type definition (the type definition is well a SUB TYPE definition - NOT an abstraction) 
+//   type definition (the type definition is well a SUB TYPE definition or an ALIAS - NOT an abstraction) 
 // h_ indicator - 'head' ("representative", "delegate", "proponent", ...): indicates that the variable
 //   is the 'head' handle of some allocated resource or instance. 
 //   NB: 'handle' must be understood in a wide meaning: all these variables are handles :
