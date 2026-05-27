@@ -82,7 +82,7 @@
 // i_ indicator: see v_ indicator
 // j_ indicator - "junk" ("debris" "detritus" "remains" "rubbish" "ruins" "refuse" "garbage" 
 //   "fragments" "crap" "trash" "bits"...) : in combination with h_ and x_ indicators, indicates
-//   uncomplete deallocation (i.e potential memory leak) ; "junk" is supposedly cleared with the 
+//   uncompleted disallocation (i.e potential memory leak) ; "junk" is supposedly cleared with the 
 //   death of the process. 
 // l_ indicator - "lately extension" : indicates a new method that is not "native" to the object passed
 //   as handle.   
