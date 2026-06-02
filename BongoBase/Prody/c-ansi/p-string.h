@@ -38,7 +38,7 @@ struct P_STRING { // #REF struct-P_STRING
 // #REF Stop-means-stop
 // stop pointer indicates 1st unsafe position ; depointing such address may provoke segmentation
 // violation. 
-// That restriction is particulary important with empty string (stop == start) because is that case,
+// That restriction is particulary important with empty string (stop == start) because in that case,
 // even the start address may not be depointed.
 // Of course, when the string portion is '\0'-terminated (C-string), we can "safely" depoint stop 
 // position (which must correspond to good old '\0' char...)  
