@@ -327,7 +327,9 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
 
   m_CHECK_ABANDON(DelimitBlotregRequest(a_sequence,NULL,&subSequence,nc_abandonmentInfo))
   struct BLOTEX_VALUE blotexValue = UNDEFINED_BLOTEX_VALUE ; 
-  struct GS_REQUEST_CRITERIA criteria52 = m_GsRequestCriteria0();
+  struct G_REQUEST_CRITERION c_criterion = { UNDEFINED } ; // Only significant if parsing OK
+  struct GS_KEY c_gsKey = { UNDEFINED } ;
+  m_TRACK_IF(g_BlotregIndexRequestRNew(blotregHandle,NULL) != RETURNED) 
   do {
     int as = UNDEFINED;  
     int indexSeekFlags = UNDEFINED;
@@ -339,17 +341,22 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
         nc_abandonmentInfo))
 
 m_DIGGY_VAR_INDEX_SEEK_FLAGS(indexSeekFlags)
-     m_CHECK_ABANDON(ParseBlotregRequestAtomEnd(&subSequence,as,indexSeekFlags,&criteria52,
-       blotexValue, nc_abandonmentInfo))
+      m_CHECK_ABANDON(ParseBlotregRequestAtomEnd(&subSequence,as,indexSeekFlags,
+        &c_criterion, &c_gsKey, blotexValue, nc_abandonmentInfo))
+    switch (g_BlotregIndexRequestRAddCriterion(blotregHandle,NULL,c_criterion)) {
+    case COMPLETED__OK:
+    break ; case COMPLETED__BUT: // Request rectified
+      m_RAISE(ANOMALY__UNEXPECTED_CASE)
+    break; default: m_TRACK() } // switch 
   } while (!ob_EmptySequence(&subSequence)) ; 
 
-  switch (g_BlotregIndexRequestR52(blotregHandle,NULL,&criteria52)) {
-  case COMPLETED__OK:
-  break ; case COMPLETED__BUT: // Request rectified
-    m_RAISE(ANOMALY__UNEXPECTED_CASE)
-  break; default:
-    m_TRACK()
-  } // switch
+//  switch (g_BlotregIndexRequestR52(blotregHandle,NULL,&criteria52)) {
+//  case COMPLETED__OK:
+//  break ; case COMPLETED__BUT: // Request rectified
+//    m_RAISE(ANOMALY__UNEXPECTED_CASE)
+//  break; default:
+//    m_TRACK()
+//  } // switch
 
   m_DIGGY_RETURN(ANSWER__YES)
 } // m_BlotexlibExecutorParseBlotregRequest

@@ -23,7 +23,8 @@ int NamedObjectsCreateInstance(NAMED_OBJECTS_HANDLE *azh_handle, int expectedIte
   m_TRACK_IF(GStringsCreateInstance(&handle->h_gStringsHandle, expectedItemCount,1,
     NAMED_OBJECT__G_STRING_CONVEYANCE, (const int *)UNDEFINED,namedObjectDestroyInstanceFunction)
     != RETURNED)
-  m_ASSERT(m_GStringsAddPlainLexicalIndex(handle->h_gStringsHandle, NULL,NULL) == INDEX_LABEL0)
+  m_ASSERT(m_GStringsAddPlainLexicalIndex(handle->h_gStringsHandle,(int*)NULL, NULL,NULL) ==
+    INDEX_LABEL0)
   handle->n_namedObjectCreateInstanceFunction = n_namedObjectCreateInstanceFunction;
   m_DIGGY_RETURN(RETURNED)
 } // NamedObjectsCreateInstance

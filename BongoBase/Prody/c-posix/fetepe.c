@@ -197,7 +197,7 @@ int FetepeCreateInstance (FETEPE_HANDLE *azh_handle, ALARM_SYSTEM_HANDLE nf_alar
   } // if
   m_TRACK_IF(m_GStringCreateInstance(&handle->command.status.h_line) != RETURNED)
   m_TRACK_IF(LINE_DELIMITERS_CREATE_INSTANCE(&handle->command.status.h_lineDelimitersHandle,10,
-    NULL,(void *)UNDEFINED) != RETURNED)
+    NULL,-1,(void *)UNDEFINED) != RETURNED)
   handle->command.socket.nh_connectedDescriptor = -1;
   m_TRACK_IF(ErwCreateInstance(&handle->command.socket.h_erwHandle, f_brokenPipeFixHandle,
     nf_alarmSystemHandle, 256,NULL, CheckReadFtpCommandStatus,
@@ -215,7 +215,7 @@ int FetepeCreateInstance (FETEPE_HANDLE *azh_handle, ALARM_SYSTEM_HANDLE nf_alar
   handle->data.nonPosixOpenFlags = 0;
   m_TRACK_IF(PdCreateInstance(&handle->data.h_listeningSocketPdHandle,nf_alarmSystemHandle) != RETURNED)
   m_TRACK_IF(SuckerCreateInstance(&handle->data.h_suckerHandle, transferSizeLimit) != RETURNED)
-  m_TRACK_IF(LINE_DELIMITERS_CREATE_INSTANCE(&handle->data.h_lsLines,100, NULL,(void *)UNDEFINED)
+  m_TRACK_IF(LINE_DELIMITERS_CREATE_INSTANCE(&handle->data.h_lsLines,100,NULL,-1,(void *)UNDEFINED)
     != RETURNED)
   m_TRACK_IF(m_GStringCreateInstance(&handle->data.h_lsOutput) != RETURNED)
   m_TRACK_IF(GStringButtAdeptCreateInstance(&handle->data.h_lsOutputButtAdeptHandle,

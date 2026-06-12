@@ -141,10 +141,10 @@ typedef struct GREEN_COLLECTION *GREEN_COLLECTION_HANDLE;
 // Returned:
 // - RETURNED: Ok,
 // - -1: unexpected problem ; anomaly is raised
-int GreenCollectionCreateInstance(GREEN_COLLECTION_HANDLE *azh_handle,  int expectedItemCount,
+int GreenCollectionCreateInstance(GREEN_COLLECTION_HANDLE *azh_handle, int expectedItemCount,
   int greenItemSize, GREEN_HANDLER__DISENGAGE_FUNCTION n_greenHandlerDisengageFunction,
   GREEN_HANDLER__COMPARE_FUNCTION n_greenHandlerCompareFunction, 
-  GREEN_HANDLER__EQUATE_FUNCTION n_greenHandlerEquateFunction, int c_gKeySize,
+  GREEN_HANDLER__EQUATE_FUNCTION n_greenHandlerEquateFunction, int cn_gKeySize,
   void *cfr_greenHandlerHandle) ;
 
 
@@ -248,29 +248,18 @@ int GreenCollectionGetCount(GREEN_COLLECTION_HANDLE cp_handle, char **navntr_gre
 // - handle: <green item>s collection handle 
 // - gKeyCount: >= 1; 1:plain index; >=2:compound index  #SKIP
 //   NOTICE: compound index ONLY possible if explicit key structure size is provided (see cn_gKeySize
-//   param above) 
+//   param above)  
+// - na_indexRequestBufferSize: NULL if not used
+//
+// Changed:
+// - *na_indexRequestBufferSize: (when significant) >0
 //
 // Returned: 
 // - >= 0 : index label (0 for 1st index added, etc.)
 // - -1: unexpected problem ; anomaly is raised
-int GreenCollectionAddIndex(GREEN_COLLECTION_HANDLE handle,  int gKeyCount) ;
+int GreenCollectionAddIndex(GREEN_COLLECTION_HANDLE handle, int gKeyCount,
+  int *na_indexRequestBufferSize) ;
 
-//// This variable is required by m_INDEX_REQUEST_AUTOMATIC_BUFFER() macro below. 
-//extern const int p_indexRequestAutomaticBufferSize;
-// Passed:
-// - cp_handle:
-// NOTE: g-keys count corresponds to max passed to GreenColletionAddIndex()
-// - requestCriteriaMax: TODO: replace REQUEST_CRITERIA_MAX5
-int GreenCollectionGetIndexRequestAutomaticBufferSize(GREEN_COLLECTION_HANDLE cp_handle,
-  int requestCriteriaMax);
-
-//typedef char *INDEX_REQUEST_AUTOMATIC_BUFFER ;
-
-// This macro is useful when the collection is "frozen" (after a call to GreenCollectionFreeze()).
-// Put (in stack) the needed "index request buffer" set-up by GreenCollectionIndexRequest() and used
-// by GreenCollectionIndexFetch().
-#define m_INDEX_REQUEST_AUTOMATIC_BUFFER(m_indexRequestAutomaticBuffer) \
-char m_indexRequestAutomaticBuffer[p_indexRequestAutomaticBufferSize] ; 
 
 #endif // __C_ANSI_GREEN_H_INCLUDED__ == 0
 
@@ -315,7 +304,7 @@ m_DEFINE_ENUM_ALIAS_END()
 //
 // Passed:
 // - handle:
-// - nf_indexRequestAutomaticBuffer:
+// - nf_indexRequest5AutomaticBuffer:
 //   This buffer is mandatory when then collection is "frozen" (See GreenCollectionFreeze()) 
 //   NULL special address: use internal structure => NOT "thread safe" / "re-entrant"
 //   non NULL: buffer on stack => allows (thread) re-entrancy ; that buffer will be used by 
@@ -334,86 +323,36 @@ m_DEFINE_ENUM_ALIAS_END()
 //  (etc.)
 // 
 // Changed:
-// - nf_indexRequestAutomaticBuffer : (if used) initialized 
+// - nf_indexRequest5AutomaticBuffer : (if used) initialized 
 //
 // Ret: 
 // - COMPLETED__OK: Ok
 // - COMPLETED__BUT: request rectified (missing closing brackets, etc.)
 // - -1: unexpected problem ; anomaly is raised
 int GreenCollectionIndexRequest(GREEN_COLLECTION_HANDLE cp_handle,
-  char* nf_indexRequestAutomaticBuffer, int criteriaCount, int indexLabel1,
+  char* nf_indexRequest5AutomaticBuffer, int criteriaCount, int indexLabel1,
   unsigned int indexSeekFlags1, void *cr_gKeys1, ...);
 
 
 // #SEE GreenCollectionIndexRequest <greenItem> <keys>
 int GreenCollectionIndexRequestV(GREEN_COLLECTION_HANDLE cp_handle,
-  char* nf_indexRequestAutomaticBuffer, int criteriaCount, int indexLabel1,
+  char* nf_indexRequest5AutomaticBuffer, int criteriaCount, int indexLabel1,
   unsigned int indexSeekFlags1, void *cr_gKeys1, va_list extraCriteria);
 
 
-// #REF m_GRequestCriterion <keys>
-// Establish request criterion
-//
-// Passed:
-// - indexLabel:
-// - indexSeekFlags:
-// - cr_gKeys: only significant with Key-based seek flag(s) 
-// - criteriaOpFlags:
-//
-// Returned:
-// - request criterion
-static inline struct G_REQUEST_CRITERION m_GRequestCriterion(int indexLabel,
-   unsigned int indexSeekFlags, void* cr_gKeys, unsigned int criteriaOpFlags) {
-  struct G_REQUEST_CRITERION requestCriterion = { .indexLabel = indexLabel,
-    .indexSeekFlags = indexSeekFlags, .cr_gKeys = cr_gKeys, .criteriaOpFlags = criteriaOpFlags };
-  return requestCriterion;
-} // m_GRequestCriterion
+int GreenCollectionIndexRequestRNew(GREEN_COLLECTION_HANDLE cp_handle,
+  char* nf_indexRequest5AutomaticBuffer);
+
+int GreenCollectionIndexRequestRAddCriterion(GREEN_COLLECTION_HANDLE cp_handle,
+  char* nf_indexRequest5AutomaticBuffer,
+  struct G_REQUEST_CRITERION criterion);
 
 
-
-// #SEE GreenCollectionIndexRequest <greenItem> <keys>
-int GreenCollectionIndexRequestR(GREEN_COLLECTION_HANDLE cp_handle,
-  char* nf_indexRequestAutomaticBuffer, int criteriaCount,
-  const struct G_REQUEST_CRITERION *sp_criteria);
-
-
-
-// =================>
-struct G_REQUEST_CRITERIA5 {
-  int count;
-//  struct GS_KEY sc_gsKeys52[REQUEST_CRITERIA_MAX5][2] ;
-  struct G_REQUEST_CRITERION sc_criteria[REQUEST_CRITERIA_MAX5] ;
-} ;
-
-// Set-up initial criteria (0 criterion)
-static inline struct G_REQUEST_CRITERIA5 m_GRequestCriteria5(void) {
-  struct G_REQUEST_CRITERIA5 criteria5 = { .count = 0 } ;
-  return criteria5;
-} // m_GRequestCriteria50
-
-// Add new criterion (REQUEST_CRITERIA_MAX5 criteria MAX) 
-//
-// Passed:
-// - *a_criteria5:
-// - indexLabel:
-// - indexSeekFlags:
-// - cfpr_gsKeys: only significant if actual criterion
-// - criteriaOpFlags:
-// 
-// Changed:
-// - *a_criteria: new criterion added
-// Ret:
-// - >0: number of criteria
-// - -1 special value: anomaly raised
-int GRequestCriteria5AddCriterion(struct G_REQUEST_CRITERIA5 *a_criteria5, int indexLabel,
-  unsigned int indexSeekFlags, const char *cfpr_gKeys, unsigned int criteriaOpFlags) ;
-
-// Same purpose than GreenCollectionIndexRequestR(), but allow passing criteria more easily...
-// #SEE GStringsIndexRequest <gStringSet>
-int GreenCollectionIndexRequestR5(GREEN_COLLECTION_HANDLE cp_handle,
-  char* nf_indexRequestAutomaticBuffer, const struct G_REQUEST_CRITERIA5 *ap_criteria5) ;
-
-
+#define m_ADD_ITEM(max,m_count,m_array,item) { \
+  m_ASSERT(m_count < max)\
+  m_array[(m_count)++] = item;\
+}
+  
 
 // Indicates whether key value parameter is significant with index request... 
 //
@@ -489,7 +428,7 @@ m_DEFINE_ENUM_ALIAS_END()
 // Passed:
 // - cp_handle: collection handle - see GreenCollectionCreateInstance() ; "protected instance" if 
 //   the collection is frozen.
-// - nf_indexRequestAutomaticBuffer:
+// - nf_indexRequest5AutomaticBuffer:
 //   This buffer is mandatory when the collection is "frozen" (See GreenCollectionFreeze()) 
 //   NULL special address: use internal structure => NOT "thread safe" / "re-entrant"
 //   non NULL: buffer on stack => allows (thread) re-entrancy ; that buffer must correspond to that 
@@ -522,7 +461,7 @@ m_DEFINE_ENUM_ALIAS_END()
 // - -1: unexpected problem ; anomaly is raised
 // TODO: FETCH new: mechanism to check that the inserted item matches with the search key 
 int GreenCollectionIndexFetch(GREEN_COLLECTION_HANDLE cp_handle, 
-  char* nf_indexRequestAutomaticBuffer, unsigned int indexFetchFlags, char **acvntr_greenItemStuff,
+  char* nf_indexRequest5AutomaticBuffer, unsigned int indexFetchFlags, char **acvntr_greenItemStuff,
   int *nacvn_entry);
 // TODO : prevoir mechanisme optionel qui verifie qu'une fois insere, le NOUVEL item
 //        est bien vu par l'index...

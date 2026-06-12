@@ -24,7 +24,7 @@ static int testNumber = 0;
 
 // #SEE GREEN_HANDLER__COMPARE_FUNCTION @ c-ansi/green.h
 static int TestItemHandlerCompare(void *cpr_handle,  char b_frozen,  int indexLabel,
-  int keyRank, char *pr_aGreenItemStuff,  char *npr_bGreenItemStuff, const void *cpr_bKeys) {
+  int keyRank, char *pr_aGreenItemStuff,  char *npr_bGreenItemStuff, void *cr_bGKeys) {
   m_DIGGY_BOLLARD()
   m_ASSERT(keyRank == 0)
 
@@ -34,13 +34,13 @@ static int TestItemHandlerCompare(void *cpr_handle,  char b_frozen,  int indexLa
   switch (indexLabel) {
   case ID_INDEX_LABEL: { 
     int aId = aTestItemStuff->id ;
-    int bId = (int)(GENERIC_INTEGER)cpr_bKeys;
+    int bId = (int)(GENERIC_INTEGER)cr_bGKeys;
     if (n_bTestItemStuff != NULL) bId = n_bTestItemStuff->id;
 // m_DIGGY_INFO("aId=%d, bId=%d",aId,bId)
     comparison = GET_COMPARISON(aId,bId);
   } break; case NAME_INDEX_LABEL: {
     const char *n_aName = aTestItemStuff->n_name ;
-    const char *n_bName = (const char *)cpr_bKeys;
+    const char *n_bName = (const char *)cr_bGKeys;
     if (n_bTestItemStuff != NULL) n_bName = n_bTestItemStuff->n_name;
 m_DIGGY_INFO("n_aName=%s, n_bName=%s aTestItemStuff->id=%d",n_aName,n_bName,aTestItemStuff->id)
     comparison = (n_aName==NULL? (n_bName==NULL? EQUAL_TO__COMPARISON: LESS_THAN__COMPARISON) :
@@ -160,12 +160,12 @@ m_DIGGY_VAR_INDEX_FETCH_FLAGS(indexFetchFlags)
 m_DIGGY_VAR_INDEX_SEEK_FLAGS(c_indexSeekFlags1)
     b_readOnly = b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__READ); 
 m_DIGGY_VAR_D(cc_idKey1)
-    m_TRACK_IF(GreenCollectionIndexRequest(handle, (INDEX_REQUEST_AUTOMATIC_BUFFER)NULL,
+    m_TRACK_IF(GreenCollectionIndexRequest(handle, (char*)NULL,
       c_criteriaCount, ID_INDEX_LABEL, c_indexSeekFlags1, (void *)(GENERIC_INTEGER)cc_idKey1,
       cc_criteriaOpFlags1, NAME_INDEX_LABEL,cc_indexSeekFlags2,
       (void *)(GENERIC_INTEGER)ccc_nameKey2, cc_criteriaOpFlags2) != RETURNED)
   } // if
-  int result = GreenCollectionIndexFetch(handle, (INDEX_REQUEST_AUTOMATIC_BUFFER)NULL,
+  int result = GreenCollectionIndexFetch(handle, (char*)NULL,
     indexFetchFlags, (char **)&nt_testItemStuff, &n_entry);
   m_ASSERT(result == expectedResult)
   if (n_expectedId >= 0) {
@@ -224,12 +224,12 @@ int main (int argc, char **argv) {
 
   b_diggyGreenCollectionExam = b_TRUE;   
   m_TRACK_IF(GreenCollectionCreateInstance(&handle, BATEAU__EXPECTED_ITEM_COUNT/*2*/,
-    sizeof(struct TEST_ITEM), NULL,TestItemHandlerCompare,NULL,NULL) != RETURNED)
+    sizeof(struct TEST_ITEM), NULL,TestItemHandlerCompare,NULL,-1,NULL) != RETURNED)
 
 
-  m_TRACK_IF((ret = GreenCollectionAddIndex(handle,1)) < 0) 
+  m_TRACK_IF((ret = GreenCollectionAddIndex(handle,1,(int*)NULL)) < 0) 
   m_ASSERT(ret == ID_INDEX_LABEL) 
-  m_TRACK_IF((ret = GreenCollectionAddIndex(handle,1)) < 0) 
+  m_TRACK_IF((ret = GreenCollectionAddIndex(handle,1,(int*)NULL)) < 0) 
   m_ASSERT(ret == NAME_INDEX_LABEL) 
 
   m_TRACK_IF(TestFetch(1, handle,-1,0,0,1969,"Julie") < 0)

@@ -27,8 +27,8 @@ m_DEFINE_UNARY_ENUM(ReturnedImage,
 
 // "Natural" dual verity values of the gals:
 m_DEFINE_BINARY_ENUM(AnswerImage,
-  ANSWER__YES,,// the answer is "YES !!"
-  ANSWER__NO,) // the answer is "NO (WAY)!!"
+  ANSWER__YES,,// procedure completed ...and the answer is "YES !!"
+  ANSWER__NO,) // procedure completed ...and the answer is "NO (WAY)!!"
 
 // "Natural" dual verity values of the guys:
 m_DEFINE_BINARY_ENUM(AttemptImage,
@@ -36,7 +36,7 @@ m_DEFINE_BINARY_ENUM(AttemptImage,
   ATTEMPT__TRY_AGAIN,) // this try is just not lucky
 
 // Dual verity values allowing the "glass half full" case to be expressed. (and easily transformed
-// into positive unary verity by European Institutions)
+// into unary verity by European Institutions)
 m_DEFINE_BINARY_ENUM(CompletedImage,
   COMPLETED__OK,, // procedure completed,
   COMPLETED__BUT,)// procedure completed, but we want to point something (like "we all agree..." 

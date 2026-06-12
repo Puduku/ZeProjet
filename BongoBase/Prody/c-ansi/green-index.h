@@ -176,8 +176,23 @@ struct G_REQUEST_CRITERION {
   unsigned int criteriaOpFlags;
 } ;
 
-// Suggested max is 5, but may be adapted
-#define REQUEST_CRITERIA_MAX5 5
+// #REF om_GRequestCriterion <keys>
+// Establish request criterion
+//
+// Passed:
+// - indexLabel:
+// - indexSeekFlags:
+// - cr_gKeys: only significant with Key-based seek flag(s) 
+// - criteriaOpFlags:
+//
+// Returned:
+// - request criterion
+static inline struct G_REQUEST_CRITERION om_GRequestCriterion(int indexLabel,
+  unsigned int indexSeekFlags, void* cr_gKeys, unsigned int criteriaOpFlags) {
+  struct G_REQUEST_CRITERION me = { .indexLabel = indexLabel,
+    .indexSeekFlags = indexSeekFlags, .cr_gKeys = cr_gKeys, .criteriaOpFlags = criteriaOpFlags };
+  return me;
+} // om_GRequestCriterion
 
 
 // Index sequence:
@@ -207,15 +222,18 @@ struct INDEX_SEQUENCE {
 // 
 // Ret:
 // - RETURNED: Ok
-static inline int om_IndexSequenceDisable(struct INDEX_SEQUENCE *a_indexSequence) {
+static inline int om_IndexSequenceDisable(struct INDEX_SEQUENCE *a_me) {
   m_DIGGY_BOLLARD_S()
-  a_indexSequence->indexEntryBlockCount2 = 0;
+  a_me->indexEntryBlockCount2 = 0;
   m_DIGGY_RETURN(RETURNED);
 } // om_IndexSequenceDisable
   
 
 // Index iterator:
 // ---------------
+
+// Suggested max is 5, but may be adapted
+#define G_REQUEST_CRITERION_COUNT_MAX5 5
 
 // An index iterator:
 // - Request criteria
@@ -224,10 +242,10 @@ static inline int om_IndexSequenceDisable(struct INDEX_SEQUENCE *a_indexSequence
 #define b_ASCENDING b_FALSE0
 #define b_DESCENDING b_TRUE
 
-struct INDEX_ITERATOR {
-  int criteriaCount5 ; // see REQUEST_CRITERIA_MAX5 
+struct INDEX_ITERATOR5 {
+  int criteriaCount ; // see G_REQUEST_CRITERION_COUNT_MAX5 
   // Only 1st criterion is used for setting the index sequence.
-  struct G_REQUEST_CRITERION criteria[REQUEST_CRITERIA_MAX5];
+  struct G_REQUEST_CRITERION criteria[G_REQUEST_CRITERION_COUNT_MAX5];
   char b_descending;
   struct INDEX_SEQUENCE indexSequence;
 };
@@ -236,81 +254,79 @@ struct INDEX_ITERATOR {
 // - criterion1:
 //
 // Ret: new indexIterator
-static inline struct INDEX_ITERATOR om_IndexIterator(struct G_REQUEST_CRITERION criterion1) {
-  struct INDEX_ITERATOR indexIterator = { .criteriaCount5 = 1};
-  indexIterator.criteria[0] = criterion1;
-  indexIterator.b_descending = b_ASCENDING;
-  om_IndexSequenceDisable(&indexIterator.indexSequence);
-  return indexIterator;
-} // om_IndexIterator
+static inline struct INDEX_ITERATOR5 om_IndexIterator5(void) {
+  struct INDEX_ITERATOR5 me = { .criteriaCount = 0 , .b_descending = b_ASCENDING };
+  om_IndexSequenceDisable(&me.indexSequence);
+  return me;
+} // om_IndexIterator5
 
 // Passed:
-// - a_indexIterator:
+// - a_indexIterator5:
 // - m_criterion:
 // 
 // Changed:
-// - *a_indexIterator:
+// - *a_indexIterator5:
 //
 // Ret:
 // - RETURNED: Ok
 // - -1: anomaly is raised
-static inline int m_IndexIteratorAddCriterion(struct INDEX_ITERATOR *a_indexIterator,
+static inline int m_IndexIterator5AddCriterion(struct INDEX_ITERATOR5 *a_me,
   struct G_REQUEST_CRITERION criterion) {
   m_DIGGY_BOLLARD_S()
-  m_ASSERT(a_indexIterator->criteriaCount5 < REQUEST_CRITERIA_MAX5)
-  int i = a_indexIterator->criteriaCount5;\
-  a_indexIterator->criteria[i] = criterion;\
-  a_indexIterator->criteriaCount5 ++;\
+  m_ASSERT(a_me->criteriaCount < G_REQUEST_CRITERION_COUNT_MAX5)
+  int i = a_me->criteriaCount;\
+  a_me->criteria[i] = criterion;\
+  a_me->criteriaCount ++;\
   m_DIGGY_RETURN(RETURNED)
-} // m_IndexIteratorAddCriterion
+} // m_IndexIterator5AddCriterion
   
 
 // Prepare reset of index iterator sequence
 //
 // Passed:
-// - a_indexIterator:
+// - a_indexIterator5:
 // - b_descending:
 // 
 // Changed:
-// - *a_indexIterator: the index sequence is now disabled and need to be reset with ad hoc
+// - *a_indexIterator5: the index sequence is now disabled and need to be reset with ad hoc
 //   GreenIndexesIteratorSequenceReset() call 
 //
 // Ret:
 // - RETURNED: Ok
-static inline int om_IndexIteratorReset(struct INDEX_ITERATOR* a_indexIterator, char b_descending) {
+static inline int om_IndexIterator5Reset(struct INDEX_ITERATOR5* a_me, char b_descending) {
   m_DIGGY_BOLLARD_S()
-  a_indexIterator->b_descending = b_descending;
+  a_me->b_descending = b_descending;
   // We need to disable the sequence because the ordering (asc. desc.) changed
   // TODO: om_IndexSequenceReset(char b_descending)
-  om_IndexSequenceDisable(&a_indexIterator->indexSequence);
+  om_IndexSequenceDisable(&a_me->indexSequence);
   m_DIGGY_RETURN(RETURNED)
-} // om_IndexIteratorReset
+} // om_IndexIterator5Reset
 
 
 // (re-)set index iterator sequence according to the criteria (only 1st criterion is used) 
 //
 // Passed:
 // - handle: 
-// - a_indexIterator-> : current index iterator 
+// - a_indexIterator5-> : current index iterator 
 //
 // Changed:
-// - a_indexIterator-> : sequence is (re-)set ; call GreenIndexesIteratorSequenceNext() to (re-)play
-//  the sequence. 
+// - a_indexIterator5-> : sequence is (re-)set ; call GreenIndexesIteratorSequenceNext() to
+//   (re-)play the sequence. 
 //
 // Ret:
 // - RETURNED: Ok
 // - -1: anomaly is raised
 int GreenIndexesIteratorSequenceReset(GREEN_INDEXES_HANDLE handle,
-  struct INDEX_ITERATOR *a_indexIterator) ;
+  struct INDEX_ITERATOR5 *a_indexIterator5) ;
 
 // Update index iterator sequence: NEXT.
 //
 // Passed:
 // - handle: 
-// - a_indexIterator-> : current index iterator 
+// - a_indexIterator5-> : current index iterator 
 //
 // Changed:
-// - a_indexIterator-> : iterator sequence "next"
+// - a_indexIterator5-> : iterator sequence "next"
 // - *an_entry: item entry to retrieve : 
 //   + -1 special value : not found, that is "disabled" or "no more"
 //   + >= 0: corresponding entry
@@ -319,14 +335,14 @@ int GreenIndexesIteratorSequenceReset(GREEN_INDEXES_HANDLE handle,
 // - RETURNED: Ok
 // - -1: anomaly is raised
 int GreenIndexesIteratorSequenceNext(GREEN_INDEXES_HANDLE handle,
-  struct INDEX_ITERATOR *a_indexIterator, int *an_entry);
+  struct INDEX_ITERATOR5 *a_indexIterator5, int *an_entry);
 
 
 // Get current entry in index sequence.
 //
 // Passed:
 // - handle:
-// - a_indexIterator:
+// - a_indexIterator5:
 //
 // Changed:
 // - *an_entry: 
@@ -337,7 +353,7 @@ int GreenIndexesIteratorSequenceNext(GREEN_INDEXES_HANDLE handle,
 // - RETURNED: Ok
 // - -1: anomaly is raised
 int GreenIndexesIteratorSequenceCurrent(GREEN_INDEXES_HANDLE handle,
-  struct INDEX_ITERATOR *a_indexIterator, int *an_entry) ;
+  struct INDEX_ITERATOR5 *a_indexIterator5, int *an_entry) ;
 
 
 // Ret:

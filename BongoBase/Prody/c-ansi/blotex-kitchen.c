@@ -27,17 +27,18 @@ int BlotregCreateInstance(void **azhr_handle, struct P_STRING f_name, va_list ar
   m_TRACK_IF(l_GParamsCreateInstance(azh_handle,BATEAU__EXPECTED_ITEM_COUNT) !=
     RETURNED) 
   g_BLOTREG_HANDLE handle = *azh_handle;
-  m_ASSERT(g_GParamsAddIndex(handle,1,G_PARAM_NAME_ELEMENT,P_STRING__GS_KEYS_COMPARISON,NULL,NULL,
-    (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) == NAME__BLOTREG_INDEX_LABEL)
-  m_ASSERT(g_GParamsAddIndex(handle,1,G_PARAM_NAME_ELEMENT,ACOLYT_VALUE__GS_KEYS_COMPARISON,
+  m_ASSERT(g_GParamsAddIndex(handle,1,NULL,G_PARAM_NAME_ELEMENT,P_STRING__GS_KEYS_COMPARISON,NULL,
+    NULL, (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) ==
+    NAME__BLOTREG_INDEX_LABEL)
+  m_ASSERT(g_GParamsAddIndex(handle,1,NULL,G_PARAM_NAME_ELEMENT,ACOLYT_VALUE__GS_KEYS_COMPARISON,
     (IS_CHAR_FUNCTION)UNDEFINED,(TO_CHAR_FUNCTION)UNDEFINED,
     (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) == TOKEN_ID__BLOTREG_INDEX_LABEL)
-  m_ASSERT(g_GParamsAddIndex(handle,1,G_PARAM_VALUE_ELEMENT,ACOLYT_VALUE__GS_KEYS_COMPARISON,
+  m_ASSERT(g_GParamsAddIndex(handle,1,NULL,G_PARAM_VALUE_ELEMENT,ACOLYT_VALUE__GS_KEYS_COMPARISON,
     (IS_CHAR_FUNCTION)UNDEFINED,(TO_CHAR_FUNCTION)UNDEFINED,
     (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) ==
     INT_VALUE__BLOTREG_INDEX_LABEL)
-  m_ASSERT(g_GParamsAddIndex(handle,1,G_PARAM_VALUE_ELEMENT, P_STRING__GS_KEYS_COMPARISON,NULL,NULL,
-    (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) ==
+  m_ASSERT(g_GParamsAddIndex(handle,1,NULL,G_PARAM_VALUE_ELEMENT, P_STRING__GS_KEYS_COMPARISON,NULL,
+    NULL, (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) ==
     STR_VALUE__BLOTREG_INDEX_LABEL)
  m_DIGGY_RETURN(RETURNED)
 } // BlotregCreateInstance 
@@ -422,21 +423,19 @@ m_RAISE(ANOMALY__NOT_AVAILABLE)
 
 // See .h 
 int ParseBlotregRequestAtomEnd(struct P_STRING *a_sequence, int as, int indexSeekFlags,
-  struct GS_REQUEST_CRITERIA *a_criteria52, 
+  struct G_REQUEST_CRITERION *ac_criterion, struct GS_KEY *acf_gsKey,
   struct BLOTEX_VALUE c_blotexValue, G_STRING_STUFF nc_abandonmentInfo) { 
   m_DIGGY_BOLLARD()
   int blotregIndexLabel = UNDEFINED;
 
-struct GS_KEY c_gsKey = UNDEFINED_GS_KEY; // only significant if actual criterion 
-
   m_CHECK_ABANDON(m_AsBlotregIndex(as,indexSeekFlags != INDEX_SEEK_FLAGS__ANY?
-    &c_blotexValue: NULL,&blotregIndexLabel,&c_gsKey, nc_abandonmentInfo))
+    &c_blotexValue: NULL,&blotregIndexLabel,acf_gsKey, nc_abandonmentInfo))
 
   int criteriaOpFlags = UNDEFINED;
   m_TRACK_IF(ParseLogical2Op(a_sequence, &criteriaOpFlags) != RETURNED)
 
-  m_TRACK_IF(GsRequestCriteriaAddCriterion(a_criteria52, blotregIndexLabel,
-indexSeekFlags, c_gsKey,UNDEFINED_GS_KEY_PAR,criteriaOpFlags) < 0) 
+  *ac_criterion = om_GRequestCriterionGsKeys(blotregIndexLabel,indexSeekFlags,acf_gsKey,
+    criteriaOpFlags);
 
   m_DIGGY_RETURN(ANSWER__YES)
 } // ParseBlotregRequestAtomEnd

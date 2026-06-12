@@ -32,16 +32,16 @@ extern char b_diggyGreenCollectionExam ;
 // TODO: use c-ansi/stack.h
 
 struct GAPS_STACK {
-  int *hsc_stack ; // - Physical size given by itemsPhysicalNumber
+  int *hsc_stack ; // - Physical size given by itemPhysicalCount
                    // - 'count' first items are significant
   int count ;
 } ;
 
 // Passed:
 // - mz_gaps:
-// - itemsPhysicalNumber:
-#define m_GAPS_STACK_INIT(/*struct GAPS_STACK*/mz_gaps,  /*int*/itemsPhysicalNumber) {\
-  m_MALLOC_ARRAY((mz_gaps).hsc_stack,itemsPhysicalNumber)\
+// - itemPhysicalCount:
+#define m_GAPS_STACK_INIT(/*struct GAPS_STACK*/mz_gaps,  /*int*/itemPhysicalCount) {\
+  m_MALLOC_ARRAY((mz_gaps).hsc_stack,itemPhysicalCount)\
   (mz_gaps).count = 0;\
 }
 
@@ -73,10 +73,10 @@ struct GAPS_STACK {
 // Passed:
 // - m_gaps:
 // - pushedEntry:
-// - itemsPhysicalNumber:
+// - itemPhysicalCount:
 #define m_GAPS_STACK_PUSH(/*struct GAPS_STACK*/m_gaps,  /*int*/pushedEntry,\
-  /*int*/itemsPhysicalNumber) {\
-  m_ASSERT((m_gaps).count < itemsPhysicalNumber)\
+  /*int*/itemPhysicalCount) {\
+  m_ASSERT((m_gaps).count < itemPhysicalCount)\
   (m_gaps).hsc_stack[((m_gaps).count)++] = pushedEntry;\
 }
 
@@ -147,24 +147,24 @@ enum {
   FETCH_4__REMOVE
 } ;
 
-struct INDEX_REQUEST {
-  struct INDEX_ITERATOR iterator;
+struct INDEX_REQUEST5 {
+  struct INDEX_ITERATOR5 iterator;
   int fetch4; 
 } ;
  
 // Passed:
-// - m_indexRequest:
+// - m_indexRequest5:
 // - m_criterion1:
 //
 // Ret: new index request
-static inline struct INDEX_REQUEST om_IndexRequest(struct G_REQUEST_CRITERION criterion1) {
-  struct INDEX_REQUEST indexRequest = { .fetch4 = FETCH_4__CHANGE };
-  indexRequest.iterator = om_IndexIterator(criterion1); 
-  return indexRequest;
-} // om_IndexRequest
+static inline struct INDEX_REQUEST5 om_IndexRequest5(void) {
+  struct INDEX_REQUEST5 me = { .fetch4 = FETCH_4__CHANGE };
+  me.iterator = om_IndexIterator5(); 
+  return me;
+} // om_IndexRequest5
 
 // Passed:
-// - m_indexRequest:
+// - m_indexRequest5:
 // - m_criterion:
 // 
 // Changed:
@@ -173,35 +173,35 @@ static inline struct INDEX_REQUEST om_IndexRequest(struct G_REQUEST_CRITERION cr
 // Ret:
 // - RETURNED: Ok
 // - -1: anomaly is raised
-static inline int m_IndexRequestAddCriterion(struct INDEX_REQUEST *a_indexRequest,
+static inline int m_IndexRequest5AddCriterion(struct INDEX_REQUEST5 *a_me ,
   struct G_REQUEST_CRITERION criterion) {
   m_DIGGY_BOLLARD_S()
-  m_TRACK_IF(m_IndexIteratorAddCriterion(&a_indexRequest->iterator,criterion) != RETURNED)
+  m_TRACK_IF(m_IndexIterator5AddCriterion(&a_me->iterator,criterion) != RETURNED)
   m_DIGGY_RETURN(RETURNED)
-} // m_IndexRequestAddCriterion
+} // m_IndexRequest5AddCriterion
 
 // Prepare reset of index request 
 // 
 // Passed:
-// - *a_indexRequest:
+// - *a_indexRequest5:
 // - b_descending:
 // - fetch4:
 // 
 // Changed:
-// - *a_indexRequest: the index sequence is now disabled and need to be reset with ad hoc
+// - *a_indexRequest5: the index sequence is now disabled and need to be reset with ad hoc
 //   GreenIndexesIteratorSequenceReset() call 
 //
 // Ret:
 // - RETURNED: Ok
-static inline int om_IndexRequestReset(struct INDEX_REQUEST *a_indexRequest, char b_descending,
+static inline int om_IndexRequest5Reset(struct INDEX_REQUEST5 *a_me, char b_descending,
   int fetch4) {
   m_DIGGY_BOLLARD_S()
-  om_IndexIteratorReset(&a_indexRequest->iterator, b_descending);
-  a_indexRequest->fetch4 = fetch4;
+  om_IndexIterator5Reset(&a_me->iterator, b_descending);
+  a_me->fetch4 = fetch4;
   m_DIGGY_RETURN(RETURNED)
-} // om_IndexRequestReset
+} // om_IndexRequest5Reset
 
-const int p_indexRequestAutomaticBufferSize = sizeof(struct INDEX_REQUEST);
+//const int p_indexRequest5AutomaticBufferSize = sizeof(struct INDEX_REQUEST5);
 
 struct GREEN_COLLECTION {
   int expectedItemCount ;
@@ -209,20 +209,22 @@ struct GREEN_COLLECTION {
   GREEN_HANDLER__DISENGAGE_FUNCTION n_greenHandlerDisengageFunction ;
   GREEN_HANDLER__COMPARE_FUNCTION greenHandlerCompareFunction;
   GREEN_HANDLER__EQUATE_FUNCTION greenHandlerEquateFunction;
-  int cn_gKeySize;
-  void *cr_greenHandlerHandle;
+  int n_gKeySize;
+  int gKeyCountMax;
+  void *r_greenHandlerHandle;
 
   char b_automaticIndexesRefresh;
   char b_frozen ;
   int greenItemSize;
   char *h_greenArray ;
   unsigned char *hsc_flags ; // only "logically" referenced items' flags are significant
-  int itemsPhysicalNumber ; // number of items that are physically initialized
-  int i_itemsCount; // number of items "logically" referenced
-  int v_maxItemsCount; // max number of items "logically" referenced
+  int itemPhysicalCount ; // number of items that are physically initialized
+  int i_itemCount; // number of items "logically" referenced
+  int v_maxItemCount; // max number of items "logically" referenced
   GREEN_INDEXES_HANDLE h_indexesHandle;
-//  struct INDEX_REQUEST internalIndexRequest;
-  char *nh_indexRequestInternalBuffer;
+//  struct INDEX_REQUEST5 internalIndexRequest5;
+  char *nh_indexRequest5InternalBuffer;
+  int c_indexRequest5InternalBufferSize;
   struct GAPS_STACK h_gaps; 
   // "Monitored" entries "fetched for change" (in ALIEN / ALIVE state) : 
   int fetched4ChangeEntryCount;  
@@ -232,13 +234,13 @@ struct GREEN_COLLECTION {
 
 // typedef GREEN_HANDLER__COMPARE_FUNCTION
 static int NotEnabledCompare(void *cpr_handle, char b_frozen, int indexLabel, int gKeyRank,
-  char *pr_aGreenItemStuff, char *npr_bGreenItemStuff, const char *cpr_bGKeys) {
+  char *pr_aGreenItemStuff, char *npr_bGreenItemStuff, void *cr_bGKeys) {
   m_RAISE(ANOMALY__SHOULD_NOT_BE_HERE)
 } // NotEnabledCompare
 
 // typedef GREEN_HANDLER__EQUATE_FUNCTION
 static int  NotEnabledEquate(void *cpr_handle,  char b_frozen,
-  int indexLabel, int gKeyRank,  char *pr_aGreenItemStuff, const char *pr_bGKeys) {
+  int indexLabel, int gKeyRank,  char *pr_aGreenItemStuff, void *r_bGKeys) {
   m_RAISE(ANOMALY__SHOULD_NOT_BE_HERE)
 } // NotEnabledEquate
 
@@ -254,7 +256,7 @@ static int  NotEnabledEquate(void *cpr_handle,  char b_frozen,
 
 // ENTRY_RAW_COMPARE_FUNCTION
 static int GreenCollectionEntryRawCompare (void *r_handle, int indexLabel, int gKeyRank, int aEntry,
-  int n_bEntry, const char *cpr_bGKeys) {
+  int n_bEntry, void *cr_bGKeys) {
   m_DIGGY_BOLLARD_S()
   GREEN_COLLECTION_HANDLE handle = (GREEN_COLLECTION_HANDLE) r_handle;
 
@@ -262,8 +264,8 @@ static int GreenCollectionEntryRawCompare (void *r_handle, int indexLabel, int g
   char *nr_bGreenItemStuff =
   (n_bEntry == -1? NULL: r_GREEN_COLLECTION_GET_GREEN_ITEM_STUFF(handle,n_bEntry));
 
-  int comparison = handle->greenHandlerCompareFunction(handle->cr_greenHandlerHandle,
-    handle->b_frozen, indexLabel,gKeyRank, r_aGreenItemStuff, nr_bGreenItemStuff, cpr_bGKeys);
+  int comparison = handle->greenHandlerCompareFunction(handle->r_greenHandlerHandle,
+    handle->b_frozen, indexLabel,gKeyRank, r_aGreenItemStuff, nr_bGreenItemStuff, cr_bGKeys);
   m_TRACK_IF(comparison < 0)
 
   m_DIGGY_RETURN(comparison)
@@ -271,14 +273,14 @@ static int GreenCollectionEntryRawCompare (void *r_handle, int indexLabel, int g
 
 // ENTRY_RAW_EQUATE_FUNCTION
 static int GreenCollectionEntryRawEquate (void *r_handle, int indexLabel, int gKeyRank, int aEntry,
-  const char *pr_bGKeys) {
+  void *r_bGKeys) {
   m_DIGGY_BOLLARD_S()
   GREEN_COLLECTION_HANDLE handle = (GREEN_COLLECTION_HANDLE) r_handle;
 
   char *r_aGreenItemStuff = r_GREEN_COLLECTION_GET_GREEN_ITEM_STUFF(handle,aEntry);
 
-  int answer = handle->greenHandlerEquateFunction(handle->cr_greenHandlerHandle,
-    handle->b_frozen, indexLabel,gKeyRank, r_aGreenItemStuff, pr_bGKeys);
+  int answer = handle->greenHandlerEquateFunction(handle->r_greenHandlerHandle,
+    handle->b_frozen, indexLabel,gKeyRank, r_aGreenItemStuff, r_bGKeys);
   m_TRACK_IF(answer < 0)
 
   m_DIGGY_RETURN(answer)
@@ -344,26 +346,26 @@ int GreenCollectionCreateInstance(GREEN_COLLECTION_HANDLE *azh_handle,  int expe
   handle->greenHandlerEquateFunction =
   (n_greenHandlerEquateFunction != NULL? n_greenHandlerEquateFunction:
    NotEnabledEquate);
-  handle->cn_gKeySize = cn_gkeySize;
-  handle->cr_greenHandlerHandle = cfr_greenHandlerHandle;
+  handle->n_gKeySize = (n_greenHandlerCompareFunction != NULL || n_greenHandlerEquateFunction?
+    cn_gKeySize: -1);
+  handle->gKeyCountMax = 1; // a priori
+  handle->r_greenHandlerHandle = cfr_greenHandlerHandle;
 
   handle->b_frozen = b_FALSE0;
   // TODO: add b_automaticIndexesRefresh parameter
   handle->b_automaticIndexesRefresh = b_TRUE;
 
   handle->greenItemSize = greenItemSize;
-  handle->itemsPhysicalNumber = expectedItemCount;
+  handle->itemPhysicalCount = expectedItemCount;
 
-  m_CALLOC(handle->h_greenArray,handle->itemsPhysicalNumber,handle->greenItemSize)
-  m_MALLOC_ARRAY(handle->hsc_flags, handle->itemsPhysicalNumber)
-  handle->v_maxItemsCount = handle->i_itemsCount = 0 ;
+  m_CALLOC(handle->h_greenArray,handle->itemPhysicalCount,handle->greenItemSize)
+  m_MALLOC_ARRAY(handle->hsc_flags, handle->itemPhysicalCount)
+  handle->v_maxItemCount = handle->i_itemCount = 0 ;
   m_TRACK_IF(GreenIndexesCreateInstance(&handle->h_indexesHandle,GreenCollectionEntryRawCompare,
     GreenCollectionEntryRawEquate, (void *) handle) != RETURNED)
-  m_GAPS_STACK_INIT(handle->h_gaps,handle->itemsPhysicalNumber)
-//  struct G_REQUEST_CRITERION defaultCriterion = m_GRequestCriterion(INDEX_LABEL0,ALL_FLAGS_OFF0,
-//    (void*)UNDEFINED, ALL_FLAGS_OFF0) ;
-//  handle->internalIndexRequest = om_IndexRequest(defaultCriterion);
-  handle->nh_indexRequestInternalBuffer = NULL;
+  m_GAPS_STACK_INIT(handle->h_gaps,handle->itemPhysicalCount)
+  handle->nh_indexRequest5InternalBuffer = NULL;
+  handle->c_indexRequest5InternalBufferSize = UNDEFINED;
 
   m_MALLOC_ARRAY(handle->h_fetched4ChangeEntries,handle->fetched4ChangeEntriesPhysicalNumber =
     expectedItemCount)
@@ -381,17 +383,17 @@ static int GreenCollectionResize(GREEN_COLLECTION_HANDLE handle) {
   m_DIGGY_BOLLARD_S()
   m_ASSERT(!handle->b_frozen)
 
-  int newItemsPhysicalNumber = handle->itemsPhysicalNumber + handle->expectedItemCount;
+  int newItemsPhysicalNumber = handle->itemPhysicalCount + handle->expectedItemCount;
 
   m_REALLOC(handle->h_greenArray, handle->greenItemSize*newItemsPhysicalNumber)
-  memset(handle->h_greenArray + handle->greenItemSize * handle->itemsPhysicalNumber, 0,
+  memset(handle->h_greenArray + handle->greenItemSize * handle->itemPhysicalCount, 0,
     handle->greenItemSize * handle->expectedItemCount);
 
   m_GAPS_STACK_RESIZE(handle->h_gaps, newItemsPhysicalNumber)
   m_REALLOC_ARRAY(handle->hsc_flags, newItemsPhysicalNumber)
   m_TRACK_IF(GreenIndexesResize(handle->h_indexesHandle,newItemsPhysicalNumber) != 0)
 
-  handle->itemsPhysicalNumber = newItemsPhysicalNumber;
+  handle->itemPhysicalCount = newItemsPhysicalNumber;
   m_DIGGY_RETURN(handle->expectedItemCount)
 } // GreenCollectionResize
 
@@ -453,7 +455,7 @@ int GreenCollectionPullOut (GREEN_COLLECTION_HANDLE handle, char **at_greenArray
 
   *at_greenArray  = handle->h_greenArray;
 
-  m_DIGGY_RETURN(handle->itemsPhysicalNumber)
+  m_DIGGY_RETURN(handle->itemPhysicalCount)
 } // GreenCollectionPullOut
 
 
@@ -470,7 +472,7 @@ int GreenCollectionFreeze(GREEN_COLLECTION_HANDLE handle,  char **nap_greenArray
     *nap_greenArray  = handle->h_greenArray;
   } // if
 
-  m_DIGGY_RETURN(handle->itemsPhysicalNumber)
+  m_DIGGY_RETURN(handle->itemPhysicalCount)
 } // GreenCollectionFreeze
 
 static inline int m_GreenCollectionAddFetched4ChangeEntry(GREEN_COLLECTION_HANDLE handle,
@@ -520,20 +522,20 @@ m_DIGGY_VAR_D(n_entry)
     m_ASSERT(!cp_handle->b_frozen) 
     m_ASSERT(fetch4 == FETCH_4__CHANGE)
     if ((n_entry = n_GAPS_STACK_GET_FIRST(cp_handle->h_gaps)) < 0) { // No gap
-      n_entry = cp_handle->i_itemsCount ;
+      n_entry = cp_handle->i_itemCount ;
       // Ensure physical arrays are large enough vis-a-vis fetched entry
-      if (n_entry >= cp_handle->itemsPhysicalNumber) {
-        m_ASSERT(n_entry <= cp_handle->itemsPhysicalNumber)
+      if (n_entry >= cp_handle->itemPhysicalCount) {
+        m_ASSERT(n_entry <= cp_handle->itemPhysicalCount)
         m_TRACK_IF(GreenCollectionResize(cp_handle) < 0)
-        m_ASSERT(n_entry < cp_handle->itemsPhysicalNumber)
+        m_ASSERT(n_entry < cp_handle->itemPhysicalCount)
       } // if
       // New item
       m_SET_ALL_FLAGS(cp_handle->hsc_flags[n_entry],ALIEN_ALIVE__FLAGS)
-      if (++(cp_handle->i_itemsCount) > cp_handle->v_maxItemsCount) cp_handle->v_maxItemsCount = 
-        cp_handle->i_itemsCount;
+      if (++(cp_handle->i_itemCount) > cp_handle->v_maxItemCount) cp_handle->v_maxItemCount = 
+        cp_handle->i_itemCount;
       // MICROMONITOR: ALIEN / ALIVE 
     } else { // Use existing gap 
-      m_ASSERT(n_entry < cp_handle->i_itemsCount)
+      m_ASSERT(n_entry < cp_handle->i_itemCount)
       m_ASSERT(b_ALL_FLAGS_OK(cp_handle->hsc_flags[n_entry],ALIEN_DEAD__FLAGS))
       // MICROMONITOR: ALIEN / DEAD 
       m_GAPS_STACK_POP(cp_handle->h_gaps,n_entry)
@@ -549,7 +551,7 @@ m_DIGGY_VAR_D(n_entry)
 m_DIGGY_VAR_P(*acntr_greenItemStuff) 
 
   } else { // Direct fetch
-    if (n_entry < cp_handle->i_itemsCount &&  // Existing item
+    if (n_entry < cp_handle->i_itemCount &&  // Existing item
       !b_FLAG_SET_ON(cp_handle->hsc_flags[n_entry],DEAD_FLAG)) { // It's NOT a gap
       m_ASSERT(b_ALL_FLAGS_OK(cp_handle->hsc_flags[n_entry],FAMED_ALIVE__FLAGS))
       // MICROMONITOR: FAMED / ALIVE 
@@ -564,7 +566,7 @@ m_DIGGY_VAR_P(*acntr_greenItemStuff)
           // MINIMONITOR: ANY+
         } else { // FETCH_4__REMOVE
           // MICROMONITOR: ALIEN / ALIVE
-          m_GAPS_STACK_PUSH(cp_handle->h_gaps, n_entry, cp_handle->itemsPhysicalNumber)
+          m_GAPS_STACK_PUSH(cp_handle->h_gaps, n_entry, cp_handle->itemPhysicalCount)
           m_SET_FLAG_ON(cp_handle->hsc_flags[n_entry],DEAD_FLAG)
           // MICROMONITOR: ALIEN / DEAD
         } // if
@@ -591,21 +593,21 @@ int GreenCollectionGetCount (GREEN_COLLECTION_HANDLE cp_handle, char **navntr_gr
   // MINIMONITOR: NADA
 
   if (navntr_greenItemStuff != NULL) {
-    if (cp_handle->i_itemsCount > 0) {
+    if (cp_handle->i_itemCount > 0) {
 
-      int ret = GreenCollectionFetchInternal(cp_handle, cp_handle->i_itemsCount - 1,
+      int ret = GreenCollectionFetchInternal(cp_handle, cp_handle->i_itemCount - 1,
         cp_handle->b_frozen? FETCH_4__READ: FETCH_4__CHANGE,  navntr_greenItemStuff); 
       m_TRACK_IF(ret < 0) 
-      m_ASSERT(ret == cp_handle->i_itemsCount - 1)
+      m_ASSERT(ret == cp_handle->i_itemCount - 1)
       // MINIMONITOR: ANY (0 or 1 item) 
     } else *navntr_greenItemStuff = NULL;
   } // if
 
   // TODO:
-  // if (na_actualItemsCount != NULL) { 
+  // if (na_actualItemCount != NULL) { 
   // TODO: macro m_GAPS_GET_COUNT()
-  // *na_actualItemsCount =  cp_handle->i_itemsCount - cp_handle->h_gaps.count
-  m_DIGGY_RETURN(cp_handle->i_itemsCount)
+  // *na_actualItemCount =  cp_handle->i_itemCount - cp_handle->h_gaps.count
+  m_DIGGY_RETURN(cp_handle->i_itemCount)
 } // GreenCollectionGetCount
 
 
@@ -632,7 +634,7 @@ int GreenCollectionClear (GREEN_COLLECTION_HANDLE handle) {
   m_ASSERT(!handle->b_frozen)
   // MINIMONITOR: ANY
 
-  handle->i_itemsCount = 0 ;
+  handle->i_itemCount = 0 ;
   handle->fetched4ChangeEntryCount = 0 ;
   m_GAPS_STACK_CLEAR(handle->h_gaps)
   m_TRACK_IF(GreenIndexesClear(handle->h_indexesHandle) != RETURNED)
@@ -643,7 +645,8 @@ int GreenCollectionClear (GREEN_COLLECTION_HANDLE handle) {
 
 
 // Public function; see description in .h
-int GreenCollectionAddIndex (GREEN_COLLECTION_HANDLE handle, int gKeyCount) {
+int GreenCollectionAddIndex (GREEN_COLLECTION_HANDLE handle, int gKeyCount,
+  int *na_indexRequestBufferSize) {
   m_DIGGY_BOLLARD()
   m_ASSERT(!handle->b_frozen)
   // MINIMONITOR: ANY
@@ -651,152 +654,162 @@ int GreenCollectionAddIndex (GREEN_COLLECTION_HANDLE handle, int gKeyCount) {
   // MINIMONITOR: NADA
 
   // TODO: permettre d'ajouter des indexes ag chaud...
-  m_ASSERT(handle->i_itemsCount == 0)
+  m_ASSERT(handle->i_itemCount == 0)
 
   m_ASSERT(gKeyCount > 0)
 
-  int newIndexLabel = GreenIndexesAddIndex(handle->h_indexesHandle, handle->itemsPhysicalNumber,
+  int newIndexLabel = GreenIndexesAddIndex(handle->h_indexesHandle, handle->itemPhysicalCount,
     gKeyCount);
   m_TRACK_IF(newIndexLabel < 0)
+  if (handle->gKeyCountMax < gKeyCount) handle->gKeyCountMax = gKeyCount;
+  if (na_indexRequestBufferSize != NULL) *na_indexRequestBufferSize =
+    sizeof(struct INDEX_REQUEST5) + (handle->n_gKeySize >= 0? handle->n_gKeySize*
+    handle->gKeyCountMax* G_REQUEST_CRITERION_COUNT_MAX5 : 0);
 
   m_DIGGY_RETURN(newIndexLabel)
 } // GreenCollectionAddIndex
 
-  
 // Public function; see description in .h
-int GreenCollectionIndexRequestR(GREEN_COLLECTION_HANDLE cp_handle,
-  char* nf_indexRequestAutomaticBuffer, int criteriaCount,
-  const struct G_REQUEST_CRITERION *sp_criteria) {
+int GreenCollectionIndexRequestRNew(GREEN_COLLECTION_HANDLE cp_handle,
+  char* nf_indexRequest5AutomaticBuffer) {
   m_DIGGY_BOLLARD()
-  m_ASSERT(criteriaCount > 0)
-  m_ASSERT(sp_criteria->indexSeekFlags != ALL_FLAGS_OFF0) 
-  m_ASSERT(nf_indexRequestAutomaticBuffer != NULL || !cp_handle->b_frozen) 
+  m_ASSERT(nf_indexRequest5AutomaticBuffer != NULL || !cp_handle->b_frozen) 
 
-  struct INDEX_REQUEST *c_indexRequestPtr = nf_indexRequestAutomaticBuffer; // a priori
-  char *c_gKeysBuffer = nf_indexRequestAutomaticBuffer + sizeof(struct INDEX_REQUEST); // a priori;
-    // only significant if explicit key struct size is specified
+  struct INDEX_REQUEST5 *indexRequest5Ptr =
+    (struct INDEX_REQUEST5*) nf_indexRequest5AutomaticBuffer; // a priori
 
-  if (nf_indexRequestAutomaticBuffer == NULL) {
-    int extraBufferSize = (cp_handle->cn_gKeySize >= 0? cp_handle->cn_gKeySize*
-      cp_handle->c_gKeyCountMax: 0);
-    } // if
-    if (cp_handle->nh_indexRequestInternalBuffer == NULL) {
-      cp_handle->ch_indexRequestInternalBufferSize = sizeof(struct INDEX_REQUEST) +
-        extraBufferSize;
-      m_MALLOC(cp_handle->nh_indexRequestInternalBuffer,
-        cp_handle->ch_indexRequestInternalBufferSize);
-    } else {
-      if (cp_handle->ch_indexRequestInternalBufferSize < sizeof(struct INDEX_REQUEST) +
-        extraBufferSize) {
-        cp_handle->ch_indexRequestInternalBufferSize = sizeof(struct INDEX_REQUEST) +
-          extraBufferSize;
-        m_REALLOC(cp_handle->nh_indexRequestInternalBuffer,
-          cp_handle->ch_indexRequestInternalBufferSize);
-    } // if   
-    indexRequestPtr = cp_handle->nh_indexRequestInternalBuffer;
-    if (cp_handle->cn_gKeySize >= 0) c_gKeysBuffer = cp_handle->nh_indexRequestInternalBuffer +
-       sizeof(struct INDEX_REQUEST);
+  if (nf_indexRequest5AutomaticBuffer == NULL) {
+    int bufferSize = sizeof(struct INDEX_REQUEST5) + (cp_handle->n_gKeySize >= 0?
+      cp_handle->n_gKeySize* cp_handle->gKeyCountMax: 0);
+    if (cp_handle->nh_indexRequest5InternalBuffer == NULL) m_MALLOC(
+      cp_handle->nh_indexRequest5InternalBuffer, cp_handle->c_indexRequest5InternalBufferSize =
+      bufferSize)
+// TODO: should NOT occur ?
+    else if (cp_handle->c_indexRequest5InternalBufferSize < bufferSize) m_REALLOC(
+      cp_handle->nh_indexRequest5InternalBuffer, cp_handle->c_indexRequest5InternalBufferSize =
+      bufferSize)
+    indexRequest5Ptr = (struct INDEX_REQUEST5*) cp_handle->nh_indexRequest5InternalBuffer;
   } // if   
 
-  *indexRequestPtr = om_IndexRequest(*sp_criteria);
-  if (cp_handle->cn_gKeySize >= 0) memcpy(c_gKeysBuffer,sp_criteria->cfpr_gKeys,
-    cp_handle->c_gKeySize*cp_handle->c_gKeyCountMax);
-
-  int i = 1; for (; i < criteriaCount;  i++) {
-    sp_criteria++; 
-    m_TRACK_IF(m_IndexRequestAddCriterion(indexRequestPtr,*sp_criteria) != RETURNED)
-    if (cp_handle->cn_gKeySize >= 0) { // explicit key struct size is specified
-      c_gKeysBuffer += cp_handle->c_gKeySize * cp_handle->c_gKeyCountMax; 
-      memcpy(c_gKeysBuffer,sp_criteria->cfpr_gKeys, cp_handle->c_gKeySize*cp_handle->c_gKeyCountMax);
-    } // if
-  } // for 
+  *indexRequest5Ptr = om_IndexRequest5();
 
   // MINIMONITOR: ANY
   m_TRACK_IF(GreenCollectionRefreshIndexesInternal(cp_handle,b_TRUE) != RETURNED)
   // MINIMONITOR: NADA
 
   m_TRACK_IF(GreenIndexesIteratorSequenceReset(cp_handle->h_indexesHandle,
-    &indexRequestPtr->iterator) != RETURNED)
+    &indexRequest5Ptr->iterator) != RETURNED)
   m_DIGGY_RETURN(COMPLETED__OK)
-} // GreenCollectionIndexRequestR
+} // GreenCollectionIndexRequestRNew
+
+// Public function; see description in .h
+int GreenCollectionIndexRequestRAddCriterion(GREEN_COLLECTION_HANDLE cp_handle,
+  char* nf_indexRequest5AutomaticBuffer, struct G_REQUEST_CRITERION criterion) {
+  m_DIGGY_BOLLARD()
+//  m_ASSERT(indexSeekFlags != ALL_FLAGS_OFF0) 
+// TODO: Ensure GreenCollectionIndexRequestRNew() was called properly
+  // MINIMONITOR: NADA
+  m_ASSERT(nf_indexRequest5AutomaticBuffer != NULL || !cp_handle->b_frozen) 
+
+  struct INDEX_REQUEST5 *indexRequest5Ptr =
+    (struct INDEX_REQUEST5*) nf_indexRequest5AutomaticBuffer; // a priori
+  char *c_gKeysBuffer = nf_indexRequest5AutomaticBuffer + sizeof(struct INDEX_REQUEST5); // a priori;
+    // only significant if cp_handle->n_gKeySize >= 0 
+
+  if (nf_indexRequest5AutomaticBuffer == NULL) {
+    int bufferSize = sizeof(struct INDEX_REQUEST5) + (cp_handle->n_gKeySize >= 0?
+      cp_handle->n_gKeySize* cp_handle->gKeyCountMax: 0);
+    m_ASSERT(cp_handle->nh_indexRequest5InternalBuffer != NULL && 
+      cp_handle->c_indexRequest5InternalBufferSize >= bufferSize)
+    indexRequest5Ptr = (struct INDEX_REQUEST5*) cp_handle->nh_indexRequest5InternalBuffer;
+    if (cp_handle->n_gKeySize >= 0) c_gKeysBuffer = cp_handle->nh_indexRequest5InternalBuffer +
+       sizeof(struct INDEX_REQUEST5);
+  } // if   
+
+  m_ASSERT(indexRequest5Ptr->iterator.criteriaCount < G_REQUEST_CRITERION_COUNT_MAX5)
+  if (cp_handle->n_gKeySize >= 0) {
+    c_gKeysBuffer += cp_handle->n_gKeySize * cp_handle->gKeyCountMax *
+      indexRequest5Ptr->iterator.criteriaCount ; // value BEFORE increment 
+    memcpy(c_gKeysBuffer,(const char*)criterion.cr_gKeys,
+      cp_handle->n_gKeySize*cp_handle->gKeyCountMax);
+  } // if
+  m_TRACK_IF(m_IndexRequest5AddCriterion(indexRequest5Ptr,criterion) != RETURNED)
+
+  m_DIGGY_RETURN(COMPLETED__OK)
+} // GreenCollectionIndexRequestRAddCriterion
 
 // Public function; see description in .h
 int GreenCollectionIndexRequestV(GREEN_COLLECTION_HANDLE cp_handle,
-  char* nf_indexRequestAutomaticBuffer, int criteriaCount,
-  int indexLabel1, unsigned int indexSeekFlags1, char *cpr_gKeys1, va_list extraCriteria) {
+  char* nf_indexRequest5AutomaticBuffer, int criteriaCount, int indexLabel1,
+  unsigned int indexSeekFlags1, void *cr_gKeys1, va_list extraCriteria) {
   m_DIGGY_BOLLARD()
 
   m_ASSERT(criteriaCount > 0)
-  struct G_REQUEST_CRITERION s_criteria[criteriaCount] ;
-  struct G_REQUEST_CRITERION *criterionPtr = s_criteria;
+
+  int completed = GreenCollectionIndexRequestRNew(cp_handle,nf_indexRequest5AutomaticBuffer);
+  switch (completed) {
+  case COMPLETED__OK:
+  break; case COMPLETED__BUT:
+  break; default: m_TRACK() } // switch
 
   unsigned int criteriaOpFlags = ALL_FLAGS_OFF0;
   if (criteriaCount > 1) criteriaOpFlags = va_arg(extraCriteria,unsigned int);
-  *criterionPtr = m_GRequestCriterion(indexLabel1,indexSeekFlags1,cpr_gKeys1,criteriaOpFlags);
+  switch (GreenCollectionIndexRequestRAddCriterion(cp_handle,nf_indexRequest5AutomaticBuffer,
+    om_GRequestCriterion(indexLabel1,indexSeekFlags1,cr_gKeys1, criteriaOpFlags))) {
+  case COMPLETED__OK:
+  break; case COMPLETED__BUT:
+    completed = COMPLETED__BUT;
+  break; default: m_TRACK() } // switch
 
-  int i = 1; for (; i < criteriaCount;  i++) *(++criterionPtr) = m_GRequestCriterion(va_arg(
-    extraCriteria,int), va_arg(extraCriteria,unsigned int),va_arg(extraCriteria,char *),
-    va_arg(extraCriteria,unsigned int));
-
-  m_TRACK_IF(GreenCollectionIndexRequestR(cp_handle,nf_indexRequestAutomaticBuffer,
-    criteriaCount,s_criteria) != RETURNED) 
+  int i = 1; for (; i < criteriaCount;  i++) {
+    switch (GreenCollectionIndexRequestRAddCriterion(cp_handle,nf_indexRequest5AutomaticBuffer,
+      om_GRequestCriterion(va_arg(extraCriteria,int), va_arg(extraCriteria,unsigned int),
+    va_arg(extraCriteria,char *), va_arg(extraCriteria,unsigned int)))) {
+    case COMPLETED__OK:
+    break; case COMPLETED__BUT:
+      completed = COMPLETED__BUT;
+    break; default: m_TRACK() } // switch
+  } // for
   
-  m_DIGGY_RETURN(RETURNED)
+  m_DIGGY_RETURN(completed)
 } // GreenCollectionIndexRequestV
 
 // Public function; see description in .h
 int GreenCollectionIndexRequest(GREEN_COLLECTION_HANDLE cp_handle,
-  char* nf_indexRequestAutomaticBuffer, int criteriaCount,
-  int indexLabel1, unsigned int indexSeekFlags1, char *cpr_gKeys1, ...) {
+  char* nf_indexRequest5AutomaticBuffer, int criteriaCount, int indexLabel1,
+  unsigned int indexSeekFlags1, void *cr_gKeys1, ...) {
   m_DIGGY_BOLLARD()
-
+m_DIGGY_VAR_INDEX_SEEK_FLAGS(indexSeekFlags1)
   va_list extraCriteria;
-  va_start(extraCriteria,cpr_gKeys1);
+  va_start(extraCriteria,cr_gKeys1);
 
-  m_TRACK_IF(GreenCollectionIndexRequestV(cp_handle,nf_indexRequestAutomaticBuffer,
-    criteriaCount,indexLabel1,indexSeekFlags1,cpr_gKeys1,extraCriteria) != RETURNED) 
+  int completed = GreenCollectionIndexRequestV(cp_handle,nf_indexRequest5AutomaticBuffer,
+    criteriaCount,indexLabel1,indexSeekFlags1,cr_gKeys1,extraCriteria);
+  switch (completed) {
+  case COMPLETED__OK:
+  break; case COMPLETED__BUT:
+  break; default: m_TRACK() } // switch
 
   va_end(extraCriteria);
 
-  m_DIGGY_RETURN(RETURNED)
+  m_DIGGY_RETURN(completed)
 } // GreenCollectionIndexRequest
-
-
-// =============>
-// Public function : see .h
-int GRequestCriteria5AddCriterion(struct G_REQUEST_CRITERIA5 *a_criteria5, int indexLabel,
-  unsigned int indexSeekFlags, const char *cfpr_gKeys, unsigned int criteriaOpFlags) {
-  m_DIGGY_BOLLARD()
-  int i = a_gRequestCcriteria5->count;
-  m_ASSERT(a_criteria5->count++ < REQUEST_CRITERIA_MAX5)
-  a_criteria5->sc_criteria[i] = m_GRequestCriterion(indexLabel, indexSeekFlags,
-    cfpr_gKeys,criteriaOpFlags);
-  m_DIGGY_RETURN(a_criteria52->count5)
-} // GRequestCriteria5AddCriterion
-
-// Public function : see .h
-int GreenCollectionIndexRequestR5(GREEN_COLLECTION_HANDLE cp_handle,
-  char* nf_indexRequestAutomaticBuffer, const struct G_REQUEST_CRITERIA5 *ap_criteria5) {
-  m_DIGGY_BOLLARD()
-  m_TRACK_IF(GreenCollectionIndexRequestR(cp_handle->h_greenCollectionHandle,
-    nf_indexRequestAutomaticBuffer,ap_criteria5->count, ap_criteria5->sc_criteria)
-    != RETURNED)
-  m_DIGGY_RETURN(RETURNED)
-} // GreenCollectionIndexRequestR5
 
 
 // Public function; see description in .h
 int GreenCollectionIndexFetch(GREEN_COLLECTION_HANDLE cp_handle,
-  char* nf_indexRequestAutomaticBuffer, unsigned int indexFetchFlags,
+  char* nf_indexRequest5AutomaticBuffer, unsigned int indexFetchFlags,
   char **acvntr_greenItemStuff, int *nacvn_entry) {
   m_DIGGY_BOLLARD()
   // MINIMONITOR: ANY
   //m_TRACK_IF(GreenCollectionRefreshIndexesInternal(cp_handle,b_TRUE) != RETURNED)
 m_DIGGY_VAR_INDEX_FETCH_FLAGS(indexFetchFlags)
 
-  struct INDEX_REQUEST *indexRequestPtr = (struct INDEX_REQUEST *)(nf_indexRequestAutomaticBuffer
-    != NULL? nf_indexRequestAutomaticBuffer: cp_handle->indexRequestInternalBuffer);
-//    (struct INDEX_REQUEST *)nf_indexRequestAutomaticBuffer: &(cp_handle->internalIndexRequest));
+  struct INDEX_REQUEST5 *indexRequest5Ptr =
+    (struct INDEX_REQUEST5 *)(nf_indexRequest5AutomaticBuffer != NULL?
+    nf_indexRequest5AutomaticBuffer: cp_handle->nh_indexRequest5InternalBuffer);
+m_ASSERT(indexRequest5Ptr != NULL)
+//    (struct INDEX_REQUEST5 *)nf_indexRequest5AutomaticBuffer: &(cp_handle->internalIndexRequest5));
 
   if (b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__RESET)) {
     m_TRACK_IF(GreenCollectionRefreshIndexesInternal(cp_handle,b_TRUE) != RETURNED)
@@ -805,10 +818,10 @@ m_DIGGY_VAR_INDEX_FETCH_FLAGS(indexFetchFlags)
     if (b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__READ)) fetch4 = FETCH_4__READ;
     else if (b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__REMOVE)) fetch4 = FETCH_4__REMOVE;
      
-    om_IndexRequestReset(indexRequestPtr,b_FLAG_SET_ON(indexFetchFlags,
+    om_IndexRequest5Reset(indexRequest5Ptr,b_FLAG_SET_ON(indexFetchFlags,
       INDEX_FETCH_FLAG__DESCENDING),fetch4);
     m_TRACK_IF(GreenIndexesIteratorSequenceReset(cp_handle->h_indexesHandle,
-      &indexRequestPtr->iterator) != RETURNED)
+      &indexRequest5Ptr->iterator) != RETURNED)
   } // if    
 
   int n_entry = UNDEFINED;
@@ -816,10 +829,10 @@ m_DIGGY_VAR_INDEX_FETCH_FLAGS(indexFetchFlags)
 
   if (b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__NEXT)) {
     m_TRACK_IF(GreenIndexesIteratorSequenceNext(cp_handle->h_indexesHandle,
-      &indexRequestPtr->iterator, &n_entry) != RETURNED)
+      &indexRequest5Ptr->iterator, &n_entry) != RETURNED)
   } else {
     m_TRACK_IF(GreenIndexesIteratorSequenceCurrent(cp_handle->h_indexesHandle,
-      &indexRequestPtr->iterator, &n_entry) != RETURNED)
+      &indexRequest5Ptr->iterator, &n_entry) != RETURNED)
   } // if
   if (n_entry != -1) result = RESULT__FOUND; 
 
@@ -827,7 +840,7 @@ m_DIGGY_VAR_INDEX_FETCH_FLAGS(indexFetchFlags)
   if ((n_entry != -1) || (b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__NEXT) &&
     b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__RESET) &&
     b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__CHANGE) &&
-    b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__SMART))) n_fetch4 = indexRequestPtr->fetch4 ;
+    b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__SMART))) n_fetch4 = indexRequest5Ptr->fetch4 ;
 
   // MINIMONITOR: ANY 
   
@@ -855,9 +868,9 @@ int GreenCollectionVerifyIndexes (GREEN_COLLECTION_HANDLE handle) {
 
 #ifdef DIGGY
   if (b_diggyGreenCollectionExam) {
-    m_DIGGY_INFO("Exam: handle->(h_greenArray=%p itemsPhysicalNumber=%d i_itemsCount=%d)",
-      handle->h_greenArray,handle->itemsPhysicalNumber,handle->i_itemsCount)
-    int i = 0 ; for (; i < handle->i_itemsCount; i++) {
+    m_DIGGY_INFO("Exam: handle->(h_greenArray=%p itemPhysicalCount=%d i_itemCount=%d)",
+      handle->h_greenArray,handle->itemPhysicalCount,handle->i_itemCount)
+    int i = 0 ; for (; i < handle->i_itemCount; i++) {
       m_DIGGY_INFO("  handle->hsc_flags[%d]=%02x",i,handle->hsc_flags[i])
     } // for
   } // if 
@@ -879,20 +892,20 @@ int GreenCollectionVerifyIndexes (GREEN_COLLECTION_HANDLE handle) {
 
   // 2. Verify the "global" counts 
   if (completed == COMPLETED__OK) {
-    int c_indexedItemsCount = UNDEFINED;
-    completed = GreenIndexesVerifyCount(handle->h_indexesHandle,&c_indexedItemsCount);
+    int c_indexedItemCount = UNDEFINED;
+    completed = GreenIndexesVerifyCount(handle->h_indexesHandle,&c_indexedItemCount);
     m_TRACK_IF(completed < 0)
 m_DIGGY_VAR_D(completed)
-m_DIGGY_INFO("handle->i_itemsCount=%d c_indexedItemsCount=%d gapsCount=%d",handle->i_itemsCount,c_indexedItemsCount,gapsCount)
+m_DIGGY_INFO("handle->i_itemCount=%d c_indexedItemCount=%d gapsCount=%d",handle->i_itemCount,c_indexedItemCount,gapsCount)
     if (completed == COMPLETED__OK) {
-      if (handle->i_itemsCount != c_indexedItemsCount + gapsCount) completed = COMPLETED__BUT;
+      if (handle->i_itemCount != c_indexedItemCount + gapsCount) completed = COMPLETED__BUT;
     } // if
   } // if 
 m_DIGGY_VAR_D(completed)
   // 3. Verify  presence/absence of entries in indexes and gaps stack
   if (completed == COMPLETED__OK) {
 m_DIGGY_VAR_D(completed)
-    int i = 0; for (; i < handle->i_itemsCount; i++) {
+    int i = 0; for (; i < handle->i_itemCount; i++) {
       int expectedHits = 0;
       if (b_FLAG_SET_ON(handle->hsc_flags[i],DEAD_FLAG))  expectedHits = 1; 
       m_TRACK_IF((completed = GapsStackVerifyEntry(&handle->h_gaps,i,expectedHits)) < 0)
@@ -922,8 +935,8 @@ int GreenCollectionDestroyInstance (GREEN_COLLECTION_HANDLE xh_handle) {
 
   if (xh_handle->n_greenHandlerDisengageFunction != NULL) {
     char *r_greenItemStuff = xh_handle->h_greenArray;
-    int i = 0; for (; i < xh_handle->v_maxItemsCount ; i++, r_greenItemStuff += xh_handle->greenItemSize) {
-      m_TRACK_IF(xh_handle->n_greenHandlerDisengageFunction(xh_handle->cr_greenHandlerHandle,
+    int i = 0; for (; i < xh_handle->v_maxItemCount ; i++, r_greenItemStuff += xh_handle->greenItemSize) {
+      m_TRACK_IF(xh_handle->n_greenHandlerDisengageFunction(xh_handle->r_greenHandlerHandle,
         r_greenItemStuff) != RETURNED)
     } // for
   } // if

@@ -52,7 +52,7 @@ struct GREEN_INDEX {
 };
 
 // Passed:
-// - az_index:
+// - az_me:
 // - itemsPhysicalNumber:
 // - m_entryCompareFunction:
 // - mr_entryFunctionsHandle:
@@ -61,89 +61,89 @@ struct GREEN_INDEX {
 // Ret:
 // - RETURNED: Ok
 // - -1: anomaly is raised
-static inline int m_GreenIndexInit(struct GREEN_INDEX* az_index, int itemsPhysicalNumber,
+static inline int m_GreenIndexInit(struct GREEN_INDEX* az_me, int itemsPhysicalNumber,
   ENTRY_COMPARE_FUNCTION entryCompareFunction, void* r_entryFunctionsHandle,
   int indexLabel) {
   m_DIGGY_BOLLARD_S()
-  m_MALLOC_ARRAY(az_index->hsc_array,itemsPhysicalNumber)
-  az_index->count = 0;
-  az_index->entryCompareFunction = entryCompareFunction;
-  az_index->r_entryFunctionsHandle = r_entryFunctionsHandle;
-  az_index->indexLabel = indexLabel;
+  m_MALLOC_ARRAY(az_me->hsc_array,itemsPhysicalNumber)
+  az_me->count = 0;
+  az_me->entryCompareFunction = entryCompareFunction;
+  az_me->r_entryFunctionsHandle = r_entryFunctionsHandle;
+  az_me->indexLabel = indexLabel;
   m_DIGGY_RETURN(RETURNED) 
 } // m_GreenIndexInit
 
 
 // Passed:
-// - a_index:
+// - a_me:
 // - indexEntry:
 // 
 // Ret:
 // - RETURNED: Ok
-static inline int om_GreenIndexRemove(struct GREEN_INDEX* a_index, int indexEntry) {
+static inline int om_GreenIndexRemove(struct GREEN_INDEX* a_me, int indexEntry) {
   m_DIGGY_BOLLARD_S()
-  memmove(a_index->hsc_array + indexEntry,  a_index->hsc_array + indexEntry + 1,
-    sizeof(int) * ((a_index->count -= 1) - indexEntry));
+  memmove(a_me->hsc_array + indexEntry,  a_me->hsc_array + indexEntry + 1,
+    sizeof(int) * ((a_me->count -= 1) - indexEntry));
   m_DIGGY_RETURN(RETURNED) 
 } // om_GreenIndexRemove
 
 
 // Passed:
-// - a_index:
+// - a_me:
 // - newIndexEntry:
 // - newEntry:
 // 
 // Ret:
 // - RETURNED: Ok
-static inline int om_GreenIndexAdd(struct GREEN_INDEX* a_index, int newIndexEntry,
+static inline int om_GreenIndexAdd(struct GREEN_INDEX* a_me, int newIndexEntry,
   int newEntry) {
   m_DIGGY_BOLLARD_S()
-  memmove(a_index->hsc_array + newIndexEntry + 1,  a_index->hsc_array + newIndexEntry,
-    sizeof(int) * (a_index->count++ - newIndexEntry));
-  (a_index)->hsc_array[newIndexEntry] = newEntry;
+  memmove(a_me->hsc_array + newIndexEntry + 1,  a_me->hsc_array + newIndexEntry,
+    sizeof(int) * (a_me->count++ - newIndexEntry));
+  (a_me)->hsc_array[newIndexEntry] = newEntry;
   m_DIGGY_RETURN(RETURNED) 
 } // om_GreenIndexAdd
 
 
 // Passed:
-// - a_index:
+// - a_me:
 // 
 // Ret:
 // - RETURNED: Ok
-static inline int om_GreenIndexClear(struct GREEN_INDEX* a_index) {
+static inline int om_GreenIndexClear(struct GREEN_INDEX* a_me) {
   m_DIGGY_BOLLARD_S()
-  (a_index)->count = 0 ;
+  (a_me)->count = 0 ;
   m_DIGGY_RETURN(RETURNED) 
 } // om_GreenIndexClear
 
 // Passed:
-// - a_index:
+// - a_me:
 //
 // Ret:
 // number of "active" index entries
-static inline int om_GreenIndexGetCount(struct GREEN_INDEX* a_index) {
+static inline int om_GreenIndexGetCount(struct GREEN_INDEX* a_me) {
   m_DIGGY_BOLLARD_S()
-  m_DIGGY_RETURN((a_index)->count)
+  m_DIGGY_RETURN((a_me)->count)
 } // om_GreenIndexGetCount
 
 
 // Passed:
-// - a_index:
+// - a_me:
 // - newItemsPhysicalNumber:
 // 
 // Ret:
 // - RETURNED: Ok
 // - -1: anomaly is raised
-static inline int m_GreenIndexResize(struct GREEN_INDEX* a_index, int newItemsPhysicalNumber) {
+static inline int m_GreenIndexResize(struct GREEN_INDEX* a_me, int newItemsPhysicalNumber) {
   m_DIGGY_BOLLARD_S()
-  m_REALLOC_ARRAY((a_index)->hsc_array, newItemsPhysicalNumber)
+  m_REALLOC_ARRAY((a_me)->hsc_array, newItemsPhysicalNumber)
   m_DIGGY_RETURN(RETURNED) 
 } // m_GreenIndexResize
 
 // Compare two items of the index
 //
 // Passed:
-// - a_index:
+// - a_me:
 // - aIndexEntry: entry in index for "A"
 // - n_bEntry: >= 0 => entry in index for "B"
 // - cr_bGKeys: raw key(s) for "B" when entry for "B" not provided
@@ -154,13 +154,13 @@ static inline int m_GreenIndexResize(struct GREEN_INDEX* a_index, int newItemsPh
 //   + EQUAL_TO__COMPARISON : "A" and "B" are "identical"
 //   + GREATER_THAN__COMPARISON : "A" 'greater than' "B" 
 // - -1: anomaly is raised
-static int GreenIndexCompare(struct GREEN_INDEX* a_index, int aIndexEntry, int n_bEntry,
+static int GreenIndexCompare(struct GREEN_INDEX* a_me, int aIndexEntry, int n_bEntry,
   void* cr_bGKeys) {
   m_DIGGY_BOLLARD_S()
   int comparison = UNDEFINED;
-  int aEntry = a_index->hsc_array[aIndexEntry];
-    m_TRACK_IF((comparison = a_index->entryCompareFunction(a_index->r_entryFunctionsHandle,
-      a_index->indexLabel, aEntry, n_bEntry,cr_bGKeys)) < 0)
+  int aEntry = a_me->hsc_array[aIndexEntry];
+    m_TRACK_IF((comparison = a_me->entryCompareFunction(a_me->r_entryFunctionsHandle,
+      a_me->indexLabel, aEntry, n_bEntry,cr_bGKeys)) < 0)
   if (comparison == EQUAL_TO__COMPARISON && n_bEntry != -1)  comparison = 
     DIFFERENCE_2_COMPARISON(aEntry - n_bEntry) ;
   m_DIGGY_RETURN(comparison)
@@ -169,7 +169,7 @@ static int GreenIndexCompare(struct GREEN_INDEX* a_index, int aIndexEntry, int n
 // Binary search of "B" in index
 //
 // Passed:
-// - a_index: index to use
+// - a_me: index to use
 // - n_bEntry: >= 0 => entry in index for "B"
 // - cr_bGKeys: raw key(s) for "B" when entry for "B" not provided
 // - cac_indexEntries: only significant if entry in index is specified for "B". 
@@ -185,20 +185,20 @@ static int GreenIndexCompare(struct GREEN_INDEX* a_index, int aIndexEntry, int n
 // Ret:
 // - RETURNED
 // - -1: anomaly is raised
-static int GreenIndexBSearch(struct GREEN_INDEX *a_index, int n_bEntry, void *cr_bGKeys,
+static int GreenIndexBSearch(struct GREEN_INDEX *a_me, int n_bEntry, void *cr_bGKeys,
   int *an_indexEntry, int *a_top, struct INDEX_ENTRY_BLOCK *cac_indexEntries) {
   m_DIGGY_BOLLARD_S()
   int comparison = UNDEFINED;
   int i = UNDEFINED;
 
   int bottom = -1, // Best index entry "before"
-    top = a_index->count; // Best index entry "after"
+    top = a_me->count; // Best index entry "after"
 
   *an_indexEntry = -1;
   while (top - bottom > 1) {
     i =  (top + bottom) >> 1 ;
 
-    m_TRACK_IF((comparison = GreenIndexCompare(a_index, i,n_bEntry,cr_bGKeys)) < 0)
+    m_TRACK_IF((comparison = GreenIndexCompare(a_me, i,n_bEntry,cr_bGKeys)) < 0)
     switch (comparison) {
     case GREATER_THAN__COMPARISON:
       top = i ;
@@ -214,15 +214,15 @@ static int GreenIndexBSearch(struct GREEN_INDEX *a_index, int n_bEntry, void *cr
   *a_top = top;
   if (*an_indexEntry >= 0 && n_bEntry < 0) {
     for (i = *an_indexEntry-1 ; i >= 0 ; i--) {
-      m_TRACK_IF((comparison = GreenIndexCompare(a_index, i,-1,cr_bGKeys)) < 0)
+      m_TRACK_IF((comparison = GreenIndexCompare(a_me, i,-1,cr_bGKeys)) < 0)
       if (comparison != EQUAL_TO__COMPARISON) {
         m_ASSERT(comparison == LESS_THAN__COMPARISON) 
         break; 
       } // if
     } // for
     cac_indexEntries->first = i+1;
-    for (i = *an_indexEntry+1 ; i < a_index->count ; i++) {
-      m_TRACK_IF((comparison = GreenIndexCompare(a_index, i,-1,cr_bGKeys)) < 0)
+    for (i = *an_indexEntry+1 ; i < a_me->count ; i++) {
+      m_TRACK_IF((comparison = GreenIndexCompare(a_me, i,-1,cr_bGKeys)) < 0)
       if (comparison != EQUAL_TO__COMPARISON) {
         m_ASSERT(comparison == GREATER_THAN__COMPARISON) 
         break; 
@@ -236,7 +236,7 @@ static int GreenIndexBSearch(struct GREEN_INDEX *a_index, int n_bEntry, void *cr
 // Get current entry in index sequence.
 //
 // Passed:
-// - a_index:
+// - a_me:
 // - a_indexSequence-> : current state of sequence
 //
 // Changed:
@@ -247,13 +247,13 @@ static int GreenIndexBSearch(struct GREEN_INDEX *a_index, int n_bEntry, void *cr
 // Ret:
 // - RETURNED: Ok
 // - -1: anomaly is raised
-static inline int m_GreenIndexSequenceCurrent(struct GREEN_INDEX* a_index,
+static inline int m_GreenIndexSequenceCurrent(struct GREEN_INDEX* a_me,
   struct INDEX_SEQUENCE *a_indexSequence, int *an_entry) {
 
   if (a_indexSequence->indexEntryBlockCount2 > 0 && a_indexSequence->ci_indexEntryCursor >= 
     a_indexSequence->indexEntryBlocks2[0].first && a_indexSequence->ci_indexEntryCursor <=
     a_indexSequence->cv_lastIndexEntry)
-    *an_entry = a_index->hsc_array[a_indexSequence->ci_indexEntryCursor];
+    *an_entry = a_me->hsc_array[a_indexSequence->ci_indexEntryCursor];
   else *an_entry = -1; // No current item 
 
   return RETURNED;  
@@ -263,7 +263,7 @@ static inline int m_GreenIndexSequenceCurrent(struct GREEN_INDEX* a_index,
 // Update index sequence (NEXT) and get entry 
 //
 // Passed:
-// - a_index:
+// - a_me:
 // - b_descending: 
 // - a_indexSequence-> : current state of sequence
 //
@@ -276,7 +276,7 @@ static inline int m_GreenIndexSequenceCurrent(struct GREEN_INDEX* a_index,
 // Ret:
 // - RETURNED: Ok
 // - -1: anomaly is raised
-static inline int m_GreenIndexSequenceNext(struct GREEN_INDEX* a_index, char b_descending,
+static inline int m_GreenIndexSequenceNext(struct GREEN_INDEX* a_me, char b_descending,
   struct INDEX_SEQUENCE *a_indexSequence, int *an_entry) {
   m_DIGGY_BOLLARD_S()
   *an_entry = -1; // "disabled" / "No more" a priori
@@ -296,7 +296,7 @@ static inline int m_GreenIndexSequenceNext(struct GREEN_INDEX* a_index, char b_d
         } // if
         if (a_indexSequence->ci_indexEntryCursor >= a_indexSequence->indexEntryBlocks2[0].first) 
           // STILL NOT YET "no more"
-          *an_entry = a_index->hsc_array[a_indexSequence->ci_indexEntryCursor];
+          *an_entry = a_me->hsc_array[a_indexSequence->ci_indexEntryCursor];
       } // if
     } else { // Ascending...
       if (a_indexSequence->ci_indexEntryCursor <= a_indexSequence->cv_lastIndexEntry) { 
@@ -313,7 +313,7 @@ static inline int m_GreenIndexSequenceNext(struct GREEN_INDEX* a_index, char b_d
         } // if
         if (a_indexSequence->ci_indexEntryCursor <= a_indexSequence->cv_lastIndexEntry) 
           // STILL NOT YET "no more"
-          *an_entry = a_index->hsc_array[a_indexSequence->ci_indexEntryCursor];
+          *an_entry = a_me->hsc_array[a_indexSequence->ci_indexEntryCursor];
       } // if
     } // if
   } // if
@@ -324,7 +324,7 @@ static inline int m_GreenIndexSequenceNext(struct GREEN_INDEX* a_index, char b_d
 // Set NEW index sequence (according to passed "seek params").
 //
 // Passed:
-// - a_index:
+// - a_me:
 // - b_descending: indicating "direction" of "soft reset" 
 // - indexSeekFlags: seek flags for sequence request ; 
 //   + INDEX_SEEK_FLAGS__ANY : NOT key-based selection 
@@ -337,11 +337,11 @@ static inline int m_GreenIndexSequenceNext(struct GREEN_INDEX* a_index, char b_d
 // Ret:
 // - RETURNED: Ok
 // - -1: anomaly is raised
-static inline int m_GreenIndexSequenceNew(struct GREEN_INDEX* a_index, char b_descending,
+static inline int m_GreenIndexSequenceNew(struct GREEN_INDEX* a_me, char b_descending,
   unsigned int indexSeekFlags, void *cr_gKeys, struct INDEX_SEQUENCE *a_indexSequence) {
   m_DIGGY_BOLLARD_S()
   a_indexSequence->indexEntryBlockCount2 = 0; // Empty ("disabled") selection a priori
-  if (a_index->count > 0) { 
+  if (a_me->count > 0) { 
 m_DIGGY_VAR_INDEX_SEEK_FLAGS(indexSeekFlags)
 
     int n_firstIndexEntry = -1; // Not set a priori
@@ -352,7 +352,7 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(indexSeekFlags)
       int top = UNDEFINED;
       int n_indexEntry = UNDEFINED;
       struct INDEX_ENTRY_BLOCK c_indexEntries; // UNDEFINED
-      m_TRACK_IF(GreenIndexBSearch(a_index, -1,cr_gKeys, &n_indexEntry,&top,
+      m_TRACK_IF(GreenIndexBSearch(a_me, -1,cr_gKeys, &n_indexEntry,&top,
         &c_indexEntries) != RETURNED);
       switch (indexSeekFlags) {
       case INDEX_SEEK_FLAGS__EQUAL:
@@ -362,11 +362,11 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(indexSeekFlags)
         } // if
       break; case INDEX_SEEK_FLAGS__GREATER_EQUAL:
         if (n_indexEntry != -1) n_firstIndexEntry = c_indexEntries.first; 
-        else if (top < a_index->count) n_firstIndexEntry = top;
+        else if (top < a_me->count) n_firstIndexEntry = top;
       break; case INDEX_SEEK_FLAGS__GREATER:
-        if (n_indexEntry != -1 && c_indexEntries.last+1 < a_index->count) n_firstIndexEntry =
+        if (n_indexEntry != -1 && c_indexEntries.last+1 < a_me->count) n_firstIndexEntry =
           c_indexEntries.last+1;
-        else if (n_indexEntry == -1 && top < a_index->count) n_firstIndexEntry = top;
+        else if (n_indexEntry == -1 && top < a_me->count) n_firstIndexEntry = top;
       break; case INDEX_SEEK_FLAGS__LESS_EQUAL: 
         if (n_indexEntry != -1) n_lastIndexEntry = n_indexEntry;
         else if (n_indexEntry == -1 && top-1 >= 0) n_lastIndexEntry = top-1;
@@ -377,7 +377,7 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(indexSeekFlags)
       break; case INDEX_SEEK_FLAGS__NOT_EQUAL:
         if (n_indexEntry != -1) {
           if (c_indexEntries.first-1 >= 0) n_lastIndexEntry = c_indexEntries.first;
-          if (c_indexEntries.last+1 < a_index->count) n_firstIndexEntry = c_indexEntries.last+1;
+          if (c_indexEntries.last+1 < a_me->count) n_firstIndexEntry = c_indexEntries.last+1;
         } else n_firstIndexEntry = 0; 
       break; default: // INDEX_SEEK_FLAGS__LIKE case 
         m_RAISE(ANOMALY__VALUE__D,indexSeekFlags)
@@ -390,11 +390,11 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(indexSeekFlags)
       a_indexSequence->indexEntryBlocks2[0].last = n_lastIndexEntry;
       a_indexSequence->indexEntryBlocks2[1].first = n_firstIndexEntry;
       a_indexSequence->cv_lastIndexEntry = a_indexSequence->indexEntryBlocks2[1].last =
-        a_index->count-1;
+        a_me->count-1;
     } else if (n_firstIndexEntry >= 0 || n_lastIndexEntry >= 0) {
       a_indexSequence->indexEntryBlockCount2 = 1; 
       if (n_firstIndexEntry < 0) n_firstIndexEntry = 0;
-      if (n_lastIndexEntry < 0) n_lastIndexEntry = a_index->count-1;
+      if (n_lastIndexEntry < 0) n_lastIndexEntry = a_me->count-1;
       a_indexSequence->indexEntryBlocks2[0].first = n_firstIndexEntry;
       a_indexSequence->cv_lastIndexEntry =
         a_indexSequence->indexEntryBlocks2[0].last = n_lastIndexEntry;
@@ -410,27 +410,27 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(indexSeekFlags)
 
 
 // Passed:
-// -a_index:
+// -a_me:
 //
 // Ret:
 // - COMPLETED__OK:
 // - COMPLETED__BUT: index is corrupted
 // - -1: anomaly is raised
-static int GreenIndexVerify(struct GREEN_INDEX *a_index) {
+static int GreenIndexVerify(struct GREEN_INDEX *a_me) {
   m_DIGGY_BOLLARD_S()
   int comparison = UNDEFINED;
 
 #ifdef DIGGY
   if (b_diggyGreenCollectionExam) {
-    m_DIGGY_INFO("Exam: a_index->count=%d (indexLabel=%d)",a_index->count,a_index->indexLabel)
-    int i = 0 ; for (; i < a_index->count; i++) {
-      m_DIGGY_INFO("  a_index->hsc_array[%d]=%d",i,a_index->hsc_array[i])
+    m_DIGGY_INFO("Exam: a_me->count=%d (indexLabel=%d)",a_me->count,a_me->indexLabel)
+    int i = 0 ; for (; i < a_me->count; i++) {
+      m_DIGGY_INFO("  a_me->hsc_array[%d]=%d",i,a_me->hsc_array[i])
     } // for
   } // if 
 #endif
 
-  int j = 1; for (; j < a_index->count; j++) {
-    m_TRACK_IF((comparison = GreenIndexCompare(a_index, j, a_index->hsc_array[j-1],
+  int j = 1; for (; j < a_me->count; j++) {
+    m_TRACK_IF((comparison = GreenIndexCompare(a_me, j, a_me->hsc_array[j-1],
       (void *)(GENERIC_INTEGER) UNDEFINED)) < 0)
     if (comparison != GREATER_THAN__COMPARISON) {
       m_ASSERT(comparison != EQUAL_TO__COMPARISON)
@@ -438,7 +438,7 @@ static int GreenIndexVerify(struct GREEN_INDEX *a_index) {
     } // if
   } // for
 
-  if (j < a_index->count) {
+  if (j < a_me->count) {
     m_DIGGY_RETURN(COMPLETED__BUT)
   } // if
 
@@ -446,7 +446,7 @@ static int GreenIndexVerify(struct GREEN_INDEX *a_index) {
 } // GreenIndexVerify
 
 // Passed:
-// - a_index:
+// - a_me:
 // - entry:
 // - expectedHits:
 //
@@ -455,14 +455,14 @@ static int GreenIndexVerify(struct GREEN_INDEX *a_index) {
 //                  is as expected
 // - COMPLETED__BUT: number of "hits" NOT as expected
 // - -1: unexpected problem ; anomaly is raised
-static int GreenIndexVerifyEntry(struct GREEN_INDEX *a_index, int entry, int expectedHits) {
+static int GreenIndexVerifyEntry(struct GREEN_INDEX *a_me, int entry, int expectedHits) {
   m_DIGGY_BOLLARD_S()
 
   int completed = COMPLETED__OK;
   
   int hits = 0;
-  int *s_indexArrayPtr = a_index->hsc_array;
-  int i = 0; for (; i < a_index->count ; i++, s_indexArrayPtr++) {
+  int *s_indexArrayPtr = a_me->hsc_array;
+  int i = 0; for (; i < a_me->count ; i++, s_indexArrayPtr++) {
     if (*s_indexArrayPtr == entry) hits++ ;
   } // for
 
@@ -473,13 +473,13 @@ static int GreenIndexVerifyEntry(struct GREEN_INDEX *a_index, int entry, int exp
 
 
 // Passed:
-// - ax_index:
+// - ax_me:
 // 
 // Ret:
 // - RETURNED: Ok
-static inline int om_GreenIndexFree(struct GREEN_INDEX* ax_index) {
+static inline int om_GreenIndexFree(struct GREEN_INDEX* ax_me) {
   m_DIGGY_BOLLARD_S()
-  free(ax_index->hsc_array);
+  free(ax_me->hsc_array);
   m_DIGGY_RETURN(RETURNED)
 } // om_GreenIndexFree
 
@@ -658,13 +658,14 @@ static int GreenIndexesSeekEntryEquate(GREEN_INDEXES_HANDLE handle, int indexLab
 
 // Public function; see .h
 int GreenIndexesIteratorSequenceReset(GREEN_INDEXES_HANDLE handle,
-  struct INDEX_ITERATOR *a_indexIterator) {
+  struct INDEX_ITERATOR5 *a_indexIterator5) {
   m_DIGGY_BOLLARD_S()
-  m_ASSERT(a_indexIterator->criteria[0].indexLabel < handle->indexesNumber) 
+  m_ASSERT(a_indexIterator5->criteria[0].indexLabel < handle->indexesNumber) 
+m_DIGGY_VAR_INDEX_SEEK_FLAGS(a_indexIterator5->criteria[0].indexSeekFlags)
 // TODO: la premiegre initialisation de la sequence (...RequestR()) est perdue (...Fetch()) ??? 
-  m_TRACK_IF(m_GreenIndexSequenceNew(handle->vnhs_indexes + a_indexIterator->criteria[0].indexLabel,
-    a_indexIterator->b_descending, a_indexIterator->criteria[0].indexSeekFlags,
-    a_indexIterator->criteria[0].cr_gKeys, &a_indexIterator->indexSequence) != RETURNED) 
+  m_TRACK_IF(m_GreenIndexSequenceNew(handle->vnhs_indexes + a_indexIterator5->criteria[0].indexLabel,
+    a_indexIterator5->b_descending, a_indexIterator5->criteria[0].indexSeekFlags,
+    a_indexIterator5->criteria[0].cr_gKeys, &a_indexIterator5->indexSequence) != RETURNED) 
 
   m_DIGGY_RETURN(RETURNED)
 } // GreenIndexesIteratorSequenceReset
@@ -673,9 +674,9 @@ struct CRITERIA_MONITOR {
   int i_depth;
   unsigned int *v_knownCriteriaOpFlagsPtr;
   char *v_statusPtr;
-  unsigned int knownCriteriaOpFlags[REQUEST_CRITERIA_MAX5] ;\
+  unsigned int knownCriteriaOpFlags[G_REQUEST_CRITERION_COUNT_MAX5] ;\
   // Possible statuses : 'U': Unkown 'C': Canceled 'O': Ok 'K': KO
-  char statuses[REQUEST_CRITERIA_MAX5]; 
+  char statuses[G_REQUEST_CRITERION_COUNT_MAX5]; 
 } ;
 
 // Re-init criteria "monitor".
@@ -684,21 +685,21 @@ struct CRITERIA_MONITOR {
 // - OR op. is removed
 //
 // Passed:
-// - a_monitor:
-// - a_indexIterator:
+// - a_me:
+// - a_indexIterator5:
 //
 // changed:
-// - a_monitor: 1st criterion (op. flags) initialized
-static inline int om_CriteriaMonitorReset(struct CRITERIA_MONITOR*a_monitor,
-  struct INDEX_ITERATOR* a_indexIterator) {
+// - a_me: 1st criterion (op. flags) initialized
+static inline int om_CriteriaMonitorReset(struct CRITERIA_MONITOR* a_me,
+  struct INDEX_ITERATOR5* a_indexIterator5) {
   m_DIGGY_BOLLARD_S()
-  a_monitor->i_depth = 0;
-  a_monitor->v_knownCriteriaOpFlagsPtr = a_monitor->knownCriteriaOpFlags;
-  a_monitor->v_statusPtr = a_monitor->statuses;
-  a_monitor->statuses[0] = 'U' ; 
-  a_monitor->knownCriteriaOpFlags[0] = a_indexIterator->criteria[0].criteriaOpFlags;
-  m_SET_FLAG_ON(a_monitor->knownCriteriaOpFlags[0], CRITERIA_OP_FLAG__AND)
-  m_SET_FLAG_OFF(a_monitor->knownCriteriaOpFlags[0], CRITERIA_OP_FLAG__OR)
+  a_me->i_depth = 0;
+  a_me->v_knownCriteriaOpFlagsPtr = a_me->knownCriteriaOpFlags;
+  a_me->v_statusPtr = a_me->statuses;
+  a_me->statuses[0] = 'U' ; 
+  a_me->knownCriteriaOpFlags[0] = a_indexIterator5->criteria[0].criteriaOpFlags;
+  m_SET_FLAG_ON(a_me->knownCriteriaOpFlags[0], CRITERIA_OP_FLAG__AND)
+  m_SET_FLAG_OFF(a_me->knownCriteriaOpFlags[0], CRITERIA_OP_FLAG__OR)
   m_DIGGY_RETURN(RETURNED)
 } // om_CriteriaMonitorReset
 
@@ -712,43 +713,43 @@ static inline int om_CriteriaMonitorReset(struct CRITERIA_MONITOR*a_monitor,
 // - handle: indexes for equation 
 // - entry: entry to equate 
 // - a_monitor: current state
-// - a_indexIterator: contains criteria criteria
+// - a_indexIterator5: contains criteria criteria
 // - criterionEntry: criterion entry 
 //
 // Changed:
 // - a_monitor: updated state
 static inline int m_GreenIndexesCriteriaEquationAndCloseBrackets(GREEN_INDEXES_HANDLE handle,
-  int entry, struct CRITERIA_MONITOR* a_monitor, struct INDEX_ITERATOR* a_indexIterator,
+  int entry, struct CRITERIA_MONITOR* a_monitor, struct INDEX_ITERATOR5* a_indexIterator5,
   int criterionEntry) {
   m_DIGGY_BOLLARD_S()
   if (criterionEntry == 0) {
-    if (a_indexIterator->criteriaCount5 == 1) a_monitor->statuses[0] = 'O' ; 
+    if (a_indexIterator5->criteriaCount == 1) a_monitor->statuses[0] = 'O' ; 
   } else { 
     // Number of close brackets: 
-    int count = (criterionEntry+1 == a_indexIterator->criteriaCount5)? (a_monitor->i_depth): 
-      m_CloseBracketCount(a_indexIterator->criteria[criterionEntry].criteriaOpFlags);
+    int count = (criterionEntry+1 == a_indexIterator5->criteriaCount)? (a_monitor->i_depth): 
+      m_CloseBracketCount(a_indexIterator5->criteria[criterionEntry].criteriaOpFlags);
     if (count == 0) {
       if (*a_monitor->v_knownCriteriaOpFlagsPtr == ALL_FLAGS_OFF0)
         *a_monitor->v_knownCriteriaOpFlagsPtr = 
-        a_indexIterator->criteria[criterionEntry].criteriaOpFlags;
-      if (criterionEntry+1 < a_indexIterator->criteriaCount5 && b_FLAG_SET_ON(
+        a_indexIterator5->criteria[criterionEntry].criteriaOpFlags;
+      if (criterionEntry+1 < a_indexIterator5->criteriaCount && b_FLAG_SET_ON(
         *a_monitor->v_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__OR) && b_FLAG_SET_ON(
-        a_indexIterator->criteria[criterionEntry+1].criteriaOpFlags, CRITERIA_OP_FLAG__AND))
+        a_indexIterator5->criteria[criterionEntry+1].criteriaOpFlags, CRITERIA_OP_FLAG__AND))
         count++;
     } else if (count > a_monitor->i_depth) count = a_monitor->i_depth; 
     if (*(a_monitor->v_statusPtr) == 'U') {
       int answer = GreenIndexesSeekEntryEquate(handle,
-        a_indexIterator->criteria[criterionEntry].indexLabel,entry,
-        a_indexIterator->criteria[criterionEntry].indexSeekFlags,
-        a_indexIterator->criteria[criterionEntry].cr_gKeys);
+        a_indexIterator5->criteria[criterionEntry].indexLabel,entry,
+        a_indexIterator5->criteria[criterionEntry].indexSeekFlags,
+        a_indexIterator5->criteria[criterionEntry].cr_gKeys);
       switch (answer) {
       case ANSWER__YES:
         if (b_FLAG_SET_OFF(*a_monitor->v_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__AND) || 
-          count > 0 || criterionEntry+1 == a_indexIterator->criteriaCount5) *a_monitor->v_statusPtr
+          count > 0 || criterionEntry+1 == a_indexIterator5->criteriaCount) *a_monitor->v_statusPtr
           = 'O';
       break; case ANSWER__NO: 
         if (b_FLAG_SET_OFF(*(a_monitor->v_knownCriteriaOpFlagsPtr),CRITERIA_OP_FLAG__OR) || 
-          count > 0 || criterionEntry+1 == a_indexIterator->criteriaCount5) *a_monitor->v_statusPtr
+          count > 0 || criterionEntry+1 == a_indexIterator5->criteriaCount) *a_monitor->v_statusPtr
           = 'K'; 
       break; default:
         m_TRACK()
@@ -760,7 +761,7 @@ static inline int m_GreenIndexesCriteriaEquationAndCloseBrackets(GREEN_INDEXES_H
       (a_monitor->v_statusPtr)--; 
       if (j == count-1 && *a_monitor->v_knownCriteriaOpFlagsPtr == ALL_FLAGS_OFF0) 
         *a_monitor->v_knownCriteriaOpFlagsPtr =
-        a_indexIterator->criteria[criterionEntry].criteriaOpFlags;
+        a_indexIterator5->criteria[criterionEntry].criteriaOpFlags;
       if (*a_monitor->v_statusPtr == 'U') {
         if (b_FLAG_SET_OFF(*a_monitor->v_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__OR)) {
           *a_monitor->v_statusPtr = 'O';
@@ -780,7 +781,7 @@ static inline int m_GreenIndexesCriteriaEquationAndCloseBrackets(GREEN_INDEXES_H
     } // for 
     if (*a_monitor->v_knownCriteriaOpFlagsPtr == ALL_FLAGS_OFF0)
       *a_monitor->v_knownCriteriaOpFlagsPtr =
-      a_indexIterator->criteria[criterionEntry].criteriaOpFlags;
+      a_indexIterator5->criteria[criterionEntry].criteriaOpFlags;
   } // if 
   m_DIGGY_RETURN(RETURNED)
 } // 
@@ -792,51 +793,51 @@ static inline int m_GreenIndexesCriteriaEquationAndCloseBrackets(GREEN_INDEXES_H
 // - open bracket added to ensure AND op. precedence (over OR op.)
 //
 // Passed:
-// - a_monitor: current state
-// - a_indexIterator: passed criteria
+// - a_me: current state
+// - a_indexIterator5: passed criteria
 // - criterionEntry: current criterion entry 
 // 
 // Changed:
-// - a_monitor: updated state 
-static inline int m_CriteriaMonitorOpenBrackets(struct CRITERIA_MONITOR *a_monitor,
-  struct INDEX_ITERATOR* a_indexIterator, int criterionEntry) {
+// - a_me: updated state 
+static inline int m_CriteriaMonitorOpenBrackets(struct CRITERIA_MONITOR *a_me,
+  struct INDEX_ITERATOR5* a_indexIterator5, int criterionEntry) {
   m_DIGGY_BOLLARD_S()
   // Number of open brackets:
-  int count = m_OpenBracketCount(a_indexIterator->criteria[criterionEntry].criteriaOpFlags);
-  if (count == 0 && criterionEntry+1 < a_indexIterator->criteriaCount5 && b_FLAG_SET_ON(
-    *(a_monitor->v_knownCriteriaOpFlagsPtr),CRITERIA_OP_FLAG__AND) && b_FLAG_SET_ON(
-    a_indexIterator->criteria[criterionEntry+1].criteriaOpFlags, CRITERIA_OP_FLAG__OR)) count++;
+  int count = m_OpenBracketCount(a_indexIterator5->criteria[criterionEntry].criteriaOpFlags);
+  if (count == 0 && criterionEntry+1 < a_indexIterator5->criteriaCount && b_FLAG_SET_ON(
+    *(a_me->v_knownCriteriaOpFlagsPtr),CRITERIA_OP_FLAG__AND) && b_FLAG_SET_ON(
+    a_indexIterator5->criteria[criterionEntry+1].criteriaOpFlags, CRITERIA_OP_FLAG__OR)) count++;
   int i = 0; for (; i < count; i++) {
-    m_ASSERT(++(a_monitor->i_depth) < REQUEST_CRITERIA_MAX5);
-    (a_monitor->v_knownCriteriaOpFlagsPtr)++; 
-    (a_monitor->v_statusPtr)++; 
-    if (a_monitor->statuses[(a_monitor->i_depth)-1] == 'U') *(a_monitor->v_statusPtr) = 'U' ;
-    else *(a_monitor->v_statusPtr) = 'C' ;
-    *(a_monitor->v_knownCriteriaOpFlagsPtr) = ALL_FLAGS_OFF0;
+    m_ASSERT(++(a_me->i_depth) < G_REQUEST_CRITERION_COUNT_MAX5);
+    (a_me->v_knownCriteriaOpFlagsPtr)++; 
+    (a_me->v_statusPtr)++; 
+    if (a_me->statuses[(a_me->i_depth)-1] == 'U') *(a_me->v_statusPtr) = 'U' ;
+    else *(a_me->v_statusPtr) = 'C' ;
+    *(a_me->v_knownCriteriaOpFlagsPtr) = ALL_FLAGS_OFF0;
   } // for
   m_DIGGY_RETURN(RETURNED)
 } // 
 
 // Public function; see .h
 int GreenIndexesIteratorSequenceNext(GREEN_INDEXES_HANDLE handle,
-  struct INDEX_ITERATOR *a_indexIterator, int *an_entry) {
+  struct INDEX_ITERATOR5 *a_indexIterator5, int *an_entry) {
   m_DIGGY_BOLLARD_S()
-  m_ASSERT(a_indexIterator->criteria[0].indexLabel < handle->indexesNumber) 
+  m_ASSERT(a_indexIterator5->criteria[0].indexLabel < handle->indexesNumber) 
 
   struct CRITERIA_MONITOR criteriaMonitor; // UNDEFINED 
 
   do {
     m_TRACK_IF(m_GreenIndexSequenceNext(handle->vnhs_indexes +
-      a_indexIterator->criteria[0].indexLabel, a_indexIterator->b_descending,
-      &a_indexIterator->indexSequence, an_entry) != RETURNED) 
+      a_indexIterator5->criteria[0].indexLabel, a_indexIterator5->b_descending,
+      &a_indexIterator5->indexSequence, an_entry) != RETURNED) 
     if (*an_entry >= 0) {
-      om_CriteriaMonitorReset(&criteriaMonitor,a_indexIterator);
-      int criterionEntry = 0; for (; criterionEntry < a_indexIterator->criteriaCount5;
+      om_CriteriaMonitorReset(&criteriaMonitor,a_indexIterator5);
+      int criterionEntry = 0; for (; criterionEntry < a_indexIterator5->criteriaCount;
         criterionEntry++) {
         m_TRACK_IF(m_GreenIndexesCriteriaEquationAndCloseBrackets(handle,*an_entry,&criteriaMonitor,
-          a_indexIterator, criterionEntry) != RETURNED) 
+          a_indexIterator5, criterionEntry) != RETURNED) 
         m_TRACK_IF(m_CriteriaMonitorOpenBrackets(&criteriaMonitor,
-          a_indexIterator, criterionEntry) != RETURNED) 
+          a_indexIterator5, criterionEntry) != RETURNED) 
       } // for
   // Break "criteria handling" loop if entry not rejected by extra criteria 
   m_ASSERT(criteriaMonitor.i_depth == 0) 
@@ -852,12 +853,12 @@ int GreenIndexesIteratorSequenceNext(GREEN_INDEXES_HANDLE handle,
 
 // Public function; see .h
 int GreenIndexesIteratorSequenceCurrent(GREEN_INDEXES_HANDLE handle,
-  struct INDEX_ITERATOR *a_indexIterator, int *an_entry) {
+  struct INDEX_ITERATOR5 *a_indexIterator5, int *an_entry) {
   m_DIGGY_BOLLARD_S()
-  m_ASSERT(a_indexIterator->criteria[0].indexLabel < handle->indexesNumber) 
-  struct GREEN_INDEX *a_index = handle->vnhs_indexes + a_indexIterator->criteria[0].indexLabel;
+  m_ASSERT(a_indexIterator5->criteria[0].indexLabel < handle->indexesNumber) 
+  struct GREEN_INDEX *a_index = handle->vnhs_indexes + a_indexIterator5->criteria[0].indexLabel;
   
-  m_TRACK_IF(m_GreenIndexSequenceCurrent(a_index,&a_indexIterator->indexSequence,an_entry) !=
+  m_TRACK_IF(m_GreenIndexSequenceCurrent(a_index,&a_indexIterator5->indexSequence,an_entry) !=
     RETURNED)
 
   m_DIGGY_RETURN(RETURNED)

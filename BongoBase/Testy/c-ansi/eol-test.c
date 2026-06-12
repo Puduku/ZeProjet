@@ -19,7 +19,7 @@ int main (int argc, char **argv) {
   const char *p_s2 = "PIM  \n PAM \r\n POUM" ;
   
   
-  m_TRACK_IF(LINE_DELIMITERS_CREATE_INSTANCE(&lineDelimiters,10, NULL, (void *) UNDEFINED) !=
+  m_TRACK_IF(LINE_DELIMITERS_CREATE_INSTANCE(&lineDelimiters,10,NULL,-1,(void *)UNDEFINED) !=
     RETURNED)
 
   LINE_DELIMITER_STUFF lineDelimitor;

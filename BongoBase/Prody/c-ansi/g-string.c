@@ -258,9 +258,9 @@ static int GStringsDisengage(void *r_handle,  char *r_greenItemStuff) {
 }
 
 
-// #SEE GREEN_ITEM_HANDLER__COMPARE_FUNCTION @ c-ansi/green.h
+// #SEE GREEN_HANDLER__COMPARE_FUNCTION @ c-ansi/green.h
 static int GStringsCompare(void *cpr_handle,  char b_frozen, int indexLabel,  int gKeyRank,
-  char *pr_aGreenItemStuff,  char *npr_bGreenItemStuff,  const char *cpr_bGKeys) {
+  char *pr_aGreenItemStuff,  char *npr_bGreenItemStuff,  void *cr_bGKeys) {
   m_DIGGY_BOLLARD()
   G_STRINGS_HANDLE p_handle = (G_STRINGS_HANDLE) cpr_handle;
   m_CHECK_MAGIC_FIELD(G_STRINGS_HANDLE,p_handle)
@@ -292,7 +292,7 @@ m_DIGGY_INFO("indexLabel=%d gKeyRank=%d",indexLabel,gKeyRank)
       ap_gKeySettings->select.intrinsicValueComparison.pStringIntrinsicValueFunction,
       ap_gKeySettings->select.intrinsicValueComparison.pr_pStringIntrinsicValueFunctionHandle);
   } else {
-    const struct GS_KEY *ap_bGsKey = ((const struct GS_KEY *)cpr_bGKeys) + gKeyRank;
+    const struct GS_KEY *ap_bGsKey = ((const struct GS_KEY *)cr_bGKeys) + gKeyRank;
     m_BARE_GS_KEY__GS_KEY(bBareGsKey,  ap_gKeySettings->gsKeysComparison,  ap_bGsKey)
   } // if
   
@@ -339,7 +339,7 @@ int GStringsCreateInstance(G_STRINGS_HANDLE* azh_handle,  int expectedItemCount,
 
   m_TRACK_IF(GreenCollectionCreateInstance(&handle->h_greenCollectionHandle,  expectedItemCount,
     sizeof(struct G_STRING) * gStringSetCardinality,  GStringsDisengage,  GStringsCompare, NULL,
-    handle) != RETURNED)
+    sizeof(struct GS_KEY),handle) != RETURNED)
 
   m_ASSIGN_MAGIC_FIELD(G_STRINGS_HANDLE,handle)
 
@@ -370,11 +370,11 @@ int GStringsGetCount(G_STRINGS_HANDLE cp_handle,
 
 
 // Public function : see .h
-int GStringsAddIndex (G_STRINGS_HANDLE handle,  int gKeyCount,
-  int key1GStringSetElement,  int key1GsKeysComparison,
-  IS_CHAR_FUNCTION cn_gKey1IsNeutralCharFunction,  TO_CHAR_FUNCTION cn_gKey1ToCharFunction,
+int GStringsAddIndex(G_STRINGS_HANDLE handle, int gKeyCount,
+  int *na_indexRequestBufferSize, int key1GStringSetElement, int key1GsKeysComparison,
+  IS_CHAR_FUNCTION cn_gKey1IsNeutralCharFunction, TO_CHAR_FUNCTION cn_gKey1ToCharFunction,
   P_STRING_INTRINSIC_VALUE_FUNCTION c_gKey1PStringIntrinsicValueFunction,
-  void *cfpr_gKey1PStringIntrinsicValueFunctionHandle,  ...) {
+  void *cfpr_gKey1PStringIntrinsicValueFunctionHandle, ...) {
   m_DIGGY_BOLLARD()
 
   m_REALLOC_ARRAY(handle->vnhs_indexesProperties,++(handle->indexesNumber))
@@ -425,45 +425,50 @@ m_DIGGY_INFO("i=%d, gKeyCount=%d",i,gKeyCount)
   va_end(ap) ;
 
   int indexLabel =
-  GreenCollectionAddIndex(handle->h_greenCollectionHandle, gKeyCount) ;
+  GreenCollectionAddIndex(handle->h_greenCollectionHandle, gKeyCount, na_indexRequestBufferSize);
   m_TRACK_IF(indexLabel < 0) ;
 
   m_DIGGY_RETURN(indexLabel)
 } // GStringsAddIndex
 
-// Public function : see .h
-int GStringsIndexRequestR(G_STRINGS_HANDLE cp_handle,
-  INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaCount,
-  const struct G_REQUEST_CRITERION *sp_criteria) {
-  m_DIGGY_BOLLARD()
-  m_TRACK_IF(GreenCollectionIndexRequestR(cp_handle->h_greenCollectionHandle,
-    nf_indexRequestAutomaticBuffer,criteriaCount, sp_criteria) != RETURNED)
-  m_DIGGY_RETURN(RETURNED)
-} // GStringsIndexRequestR
-
 
 // Public function : see .h
-int GStringsIndexRequestR5(G_STRINGS_HANDLE cp_handle,
-  INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer,
-  const struct G_REQUEST_CRITERIA *ap_criteria5) {
+int GStringsIndexRequestRNew(G_STRINGS_HANDLE cp_handle, char* nf_indexRequestAutomaticBuffer) {
   m_DIGGY_BOLLARD()
-  m_TRACK_IF(GreenCollectionIndexRequestR5(cp_handle->h_greenCollectionHandle,
-    nf_indexRequestAutomaticBuffer,ap_criteria5) != RETURNED)
-  m_DIGGY_RETURN(RETURNED)
-} // GStringsIndexRequestR5
+  int completed = GreenCollectionIndexRequestRNew(cp_handle->h_greenCollectionHandle,
+    nf_indexRequestAutomaticBuffer); 
+  switch (completed) {
+  case COMPLETED__OK:
+  break; case COMPLETED__BUT:
+  break; default: m_TRACK() } // switch
+  m_DIGGY_RETURN(completed)
+} // GStringsIndexRequestRNew
+  
+// Public function : see .h
+int GStringsIndexRequestRAddCriterion(G_STRINGS_HANDLE cp_handle,
+  char* nf_indexRequestAutomaticBuffer, struct G_REQUEST_CRITERION criterion) {
+  m_DIGGY_BOLLARD()
+  int completed = GreenCollectionIndexRequestRAddCriterion(cp_handle->h_greenCollectionHandle,
+    nf_indexRequestAutomaticBuffer,criterion); 
+  switch (completed) {
+  case COMPLETED__OK:
+  break; case COMPLETED__BUT:
+  break; default: m_TRACK() } // switch
+  m_DIGGY_RETURN(completed)
+} // GStringsIndexRequestRAddCriterion
 
 
 // Public function : see .h
 int GStringsIndexRequest(G_STRINGS_HANDLE cp_handle,
-  INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, int criteriaCount,
-  int indexLabel1, unsigned int indexSeekFlags1, const struct GS_KEY *cps_gKeys1, ...) {
+  char* nf_indexRequestAutomaticBuffer, int criteriaCount, int indexLabel1,
+  unsigned int indexSeekFlags1, const struct GS_KEY *cps_gKeys1, ...) {
   m_DIGGY_BOLLARD()
 
   { va_list arguments;
-    va_start(arguments,cfps_gKeys1);
+    va_start(arguments,cps_gKeys1);
     m_TRACK_IF(GreenCollectionIndexRequestV(cp_handle->h_greenCollectionHandle,
       nf_indexRequestAutomaticBuffer, criteriaCount, indexLabel1, indexSeekFlags1,
-      (const char*)cps_gKeys1, arguments) != RETURNED)
+      (void*)cps_gKeys1, arguments) != RETURNED)
     va_end(arguments) ;
   } // arguments
   m_DIGGY_RETURN(RETURNED)
@@ -472,7 +477,7 @@ int GStringsIndexRequest(G_STRINGS_HANDLE cp_handle,
 
 // Public function : see .h
 int GStringsIndexFetch(G_STRINGS_HANDLE cp_handle,
-  INDEX_REQUEST_AUTOMATIC_BUFFER nf_indexRequestAutomaticBuffer, unsigned int indexFetchFlags,
+  char* nf_indexRequestAutomaticBuffer, unsigned int indexFetchFlags,
   g_G_STRING_SET_STUFF *acvnt_gStringSetStuff, int *nacvn_entry) {
   m_DIGGY_BOLLARD()
 

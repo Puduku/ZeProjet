@@ -160,7 +160,7 @@ static void o_BlotfuncKeyName(struct BLOTFUNC_KEY_NAME *a_blotfuncKeyName, const
 
 // GREEN_HANDLER__COMPARE_FUNCTION
 static int BlotfuncsHandlerCompare (void *cpr_handle,  char b_frozen, int indexLabel,  int keyRank,
-  char *pr_aGreenItemStuff,  char *npr_bGreenItemStuff, const void *cpr_bKeys) {
+  char *pr_aGreenItemStuff,  char *npr_bGreenItemStuff, void *cr_bGKeys) {
   //m_DIGGY_BOLLARD_S()
   struct BLOTFUNCS_HANDLER *p_handle = (struct BLOTFUNCS_HANDLER *)cpr_handle; // protected
     // instance (safe for freeze) 
@@ -183,7 +183,7 @@ static int BlotfuncsHandlerCompare (void *cpr_handle,  char b_frozen, int indexL
     m_ASSERT(p_blotfuncEntryStuff->localBlotfuncNameEntry < blotlibStuff->localBlotfuncNamesNumber)
     o_BlotfuncKeyName(&bBlotfuncKeyName, blotlibStuff->np_prefix,
       blotlibStuff->cp_localBlotfuncNames[p_blotfuncEntryStuff->localBlotfuncNameEntry]);
-  } else bBlotfuncKeyName = *((struct BLOTFUNC_KEY_NAME*)cpr_bKeys); 
+  } else bBlotfuncKeyName = *((struct BLOTFUNC_KEY_NAME*)cr_bGKeys); 
 
   int comparison = ComparePStrings(aBlotfuncKeyName.prefix, bBlotfuncKeyName.prefix,
     (IS_CHAR_FUNCTION)NULL,  (TO_CHAR_FUNCTION)NULL,!b_SUB_STRING_2);
@@ -204,12 +204,14 @@ static int BlotfuncsHandlerCompare (void *cpr_handle,  char b_frozen, int indexL
 
 struct BLOTCODE {
   g_G_TOKENS_HANDLE h_blotkeywsHandle; // Directly frozen
+  int blotkeywsIndexRequestBufferSize;
   GREEN_COLLECTION_HANDLE h_blotlibsHandle; // blotlibs collection
   char b_frozen ; // TRUE => blotlibs collection is frozen
-  // two fields below are only significant when blotlibs collection is frozen
+  // fields below are only significant when blotlibs collection is frozen
   struct BLOTFUNCS_HANDLER c_blotfuncsHandler; // pseudo instance 
   GREEN_COLLECTION_HANDLE ch_blotfuncsHandle; // blotfuncs collection (actually, a simple index on
     // blotlibs collection) - directly frozen
+  int c_blotfuncsIndexRequestBufferSize;
 } ;
 
 // Public function ; see .h 
@@ -219,13 +221,14 @@ int BlotcodeCreateInstance (BLOTCODE_HANDLE *azh_handle) {
   BLOTCODE_HANDLE handle = *azh_handle;
 
   m_TRACK_IF(l_GTokensCreateInstance(&handle->h_blotkeywsHandle, BLOTKEYW_IDS_NUMBER) != RETURNED)
-  m_ASSERT(gm_GTokensAddPlainLexicalIndex(handle->h_blotkeywsHandle, NULL, NULL) == INDEX_LABEL0)
+  m_ASSERT(gm_GTokensAddPlainLexicalIndex(handle->h_blotkeywsHandle,
+  &(handle->blotkeywsIndexRequestBufferSize),NULL, NULL) == INDEX_LABEL0)
   m_TRACK_IF(l_GTokensImport(handle->h_blotkeywsHandle, p_blotkeywsTokenDefinitions,
     BLOTKEYW_IDS_NUMBER) != RETURNED)
   m_ASSERT(g_GTokensFreeze(handle->h_blotkeywsHandle, NULL) >= BLOTKEYW_IDS_NUMBER)
 
-  m_TRACK_IF(GreenCollectionCreateInstance(&(handle->h_blotlibsHandle),  10,
-    sizeof(struct BLOTLIB),  NULL, NULL,NULL, (void *)UNDEFINED) != RETURNED)
+  m_TRACK_IF(GreenCollectionCreateInstance(&(handle->h_blotlibsHandle), 10,
+    sizeof(struct BLOTLIB),  NULL, NULL,NULL, -1, (void *)UNDEFINED) != RETURNED)
   handle->b_frozen = b_FALSE0;
 
   m_DIGGY_RETURN(RETURNED)
@@ -249,12 +252,12 @@ int BlotcodeCreateInstance (BLOTCODE_HANDLE *azh_handle) {
 static int BlotcodeFindBlotkeyw (BLOTCODE_HANDLE p_handle,
   const struct P_STRING*  ap_litteralKeyw,  int *ac_blotkeywId) {
   m_DIGGY_BOLLARD_S()
-  m_INDEX_REQUEST_AUTOMATIC_BUFFER(indexRequestAutomaticBuffer)
+  char blotkeywsIndexRequestBuffer[p_handle->blotkeywsIndexRequestBufferSize];
   G_STRING_STUFF t_blotkeywStuff = (G_STRING_STUFF) UNDEFINED;
 
   struct GS_KEY gsKey = om_GsKey(*ap_litteralKeyw); 
 
-  int result = gm_GTokensIndexSingleFetch(p_handle->h_blotkeywsHandle, indexRequestAutomaticBuffer,
+  int result = gm_GTokensIndexSingleFetch(p_handle->h_blotkeywsHandle, blotkeywsIndexRequestBuffer,
     INDEX_LABEL0,INDEX_SEEK_FLAGS__EQUAL,&gsKey,INDEX_FETCH_FLAGS__READ_ONLY,&t_blotkeywStuff,
     NULL); 
   switch(result) { 
@@ -299,15 +302,19 @@ int BlotcodeFreeze(BLOTCODE_HANDLE ep_handle) {
   m_ASSERT(!ep_handle->b_frozen)
 
   ep_handle->c_blotfuncsHandler.blotlibsPhysicalCount = 
-  GreenCollectionFreeze(ep_handle->h_blotlibsHandle,(char**)&ep_handle->c_blotfuncsHandler.blotlibsArray);
+  GreenCollectionFreeze(ep_handle->h_blotlibsHandle,
+    (char**)&ep_handle->c_blotfuncsHandler.blotlibsArray);
   m_TRACK_IF(ep_handle->c_blotfuncsHandler.blotlibsPhysicalCount < 0)  
-  ep_handle->c_blotfuncsHandler.blotlibsCount = GreenCollectionGetCount(ep_handle->h_blotlibsHandle,NULL);
+  ep_handle->c_blotfuncsHandler.blotlibsCount = GreenCollectionGetCount(ep_handle->h_blotlibsHandle,
+    NULL);
   m_TRACK_IF(ep_handle->c_blotfuncsHandler.blotlibsCount < 0)
 
   m_TRACK_IF(GreenCollectionCreateInstance(&(ep_handle->ch_blotfuncsHandle),
-    BATEAU__EXPECTED_ITEM_COUNT,  sizeof(struct BLOTFUNC_ENTRY), NULL,
-    BlotfuncsHandlerCompare, NULL, &(ep_handle->c_blotfuncsHandler)) != RETURNED)
-  m_ASSERT(GreenCollectionAddIndex(ep_handle->ch_blotfuncsHandle,1) == INDEX_LABEL0)  
+    BATEAU__EXPECTED_ITEM_COUNT, sizeof(struct BLOTFUNC_ENTRY), NULL,
+    BlotfuncsHandlerCompare, NULL,sizeof(struct BLOTFUNC_KEY_NAME),
+    &(ep_handle->c_blotfuncsHandler)) != RETURNED)
+  m_ASSERT(GreenCollectionAddIndex(ep_handle->ch_blotfuncsHandle,1,
+    &ep_handle->c_blotfuncsIndexRequestBufferSize) == INDEX_LABEL0)  
 
   BLOTFUNC_ENTRY_STUFF blotfuncEntryStuff = (BLOTFUNC_ENTRY_STUFF)UNDEFINED;
   int i = 0, j = UNDEFINED;
@@ -372,7 +379,7 @@ static int BlotcodeFindBlotfunc(BLOTCODE_HANDLE p_handle, struct P_STRING referr
   m_DIGGY_BOLLARD_S()
   struct BLOTFUNC_KEY_NAME blotfuncKeyName;
   m_ASSERT(p_handle->b_frozen) 
-  m_INDEX_REQUEST_AUTOMATIC_BUFFER(indexRequestAutomaticBuffer)
+  char blotfuncsIndexRequestBuffer[p_handle->c_blotfuncsIndexRequestBufferSize];
 m_DIGGY_VAR_P_STRING(referral)
   o_PParsePassChars(&referral,PASS_CHARS_TILL__SCAN_FLAGS,NULL,'.',&(blotfuncKeyName.prefix));
   if (b_EMPTY_P_STRING(referral)) {
@@ -387,10 +394,10 @@ m_DIGGY_VAR_P_STRING(blotfuncKeyName.name)
      
   BLOTFUNC_ENTRY_STUFF blotfuncEntryStuff = (BLOTFUNC_ENTRY_STUFF)UNDEFINED;
   m_TRACK_IF(GreenCollectionIndexRequest(p_handle->ch_blotfuncsHandle,
-    indexRequestAutomaticBuffer, 1, INDEX_LABEL0, INDEX_SEEK_FLAGS__EQUAL,
+    blotfuncsIndexRequestBuffer, 1, INDEX_LABEL0, INDEX_SEEK_FLAGS__EQUAL,
     (void *) &blotfuncKeyName) != RETURNED)
   int result = GreenCollectionIndexFetch(p_handle->ch_blotfuncsHandle,
-    indexRequestAutomaticBuffer, INDEX_FETCH_FLAGS__READ_ONLY, (char **)&blotfuncEntryStuff, NULL);
+    blotfuncsIndexRequestBuffer, INDEX_FETCH_FLAGS__READ_ONLY, (char **)&blotfuncEntryStuff, NULL);
   switch(result) {
   case RESULT__FOUND:
     *ac_blotfuncEntry = *blotfuncEntryStuff ;
@@ -565,7 +572,7 @@ int BlotcodeExecutorCreateInstance(BLOTCODE_EXECUTOR_HANDLE *azh_handle,
   } // blotlibStuff
 
   m_TRACK_IF(GreenCollectionCreateInstance(&handle->h_templatePartitionsHandle,
-    BATEAU__EXPECTED_ITEM_COUNT,sizeof(struct TEMPLATE_PARTITION), NULL,NULL,NULL,
+    BATEAU__EXPECTED_ITEM_COUNT,sizeof(struct TEMPLATE_PARTITION), NULL,NULL,NULL,UNDEFINED,
     (void*)UNDEFINED) != RETURNED)
 
   m_C_STACK_INIT(handle->h_flowControlStack)

@@ -33,7 +33,7 @@ struct ALARM_TIMETABLE {
 
 // #see GREEN_HANDLER__COMPARE_FUNCTION @ c-ansi/green.h
 static int AlarmTimetableCompare (void *nr_privateHandle, char b_frozen, int indexLabel,
-  int keyRank, char *pr_aGreenItemStuff, char *npr_bGreenItemStuff, const void *cpr_bKeys) {
+  int keyRank, char *pr_aGreenItemStuff, char *npr_bGreenItemStuff, void *cr_bKeys) {
   m_DIGGY_BOLLARD_S()
 m_DIGGY_INFO("indexLabel=%d",indexLabel)
   ALARM_TIMETABLE_HANDLE handle = (ALARM_TIMETABLE_HANDLE) nr_privateHandle;
@@ -46,14 +46,14 @@ m_DIGGY_INFO("indexLabel=%d",indexLabel)
   int comparison = UNDEFINED;
   switch (indexLabel) {
   case ID_INDEX_LABEL:
-    { g_ATT_ID_unsigned_int bAttId = (g_ATT_ID_unsigned_int)(GENERIC_INTEGER)cpr_bKeys; // a priori
+    { g_ATT_ID_unsigned_int bAttId = (g_ATT_ID_unsigned_int)(GENERIC_INTEGER)cr_bKeys; // a priori
       if (np_bTimelineStuff != NULL) {
         bAttId = np_bTimelineStuff->attId;
       } // if
       comparison = GET_COMPARISON(p_aTimelineStuff->attId,bAttId);
     } // bAttId
   break; case TIME_INDEX_LABEL:
-    { gen_ATT_TIME_long bAttTime = (gen_ATT_TIME_long)(GENERIC_INTEGER)cpr_bKeys; // a priori
+    { gen_ATT_TIME_long bAttTime = (gen_ATT_TIME_long)(GENERIC_INTEGER)cr_bKeys; // a priori
       if (np_bTimelineStuff != NULL) {
         bAttTime = np_bTimelineStuff->attTime;
       } // if
@@ -77,10 +77,10 @@ int AlarmTimetableCreateInstance(ALARM_TIMETABLE_HANDLE *azh_handle) {
   m_ASSIGN_MAGIC_FIELD(ALARM_TIMETABLE_HANDLE,handle)
 
   m_TRACK_IF(GreenCollectionCreateInstance(&handle->h_timelinesHandle, 50, sizeof(struct TIMELINE),
-    NULL, AlarmTimetableCompare, NULL, handle) != RETURNED)
+    NULL, AlarmTimetableCompare, NULL, -1, handle) != RETURNED)
 
-  m_ASSERT(GreenCollectionAddIndex(handle->h_timelinesHandle,1) == ID_INDEX_LABEL)
-  m_ASSERT(GreenCollectionAddIndex(handle->h_timelinesHandle,1) == TIME_INDEX_LABEL)
+  m_ASSERT(GreenCollectionAddIndex(handle->h_timelinesHandle,1,NULL) == ID_INDEX_LABEL)
+  m_ASSERT(GreenCollectionAddIndex(handle->h_timelinesHandle,1,NULL) == TIME_INDEX_LABEL)
   
   m_DIGGY_RETURN(RETURNED)
 } // AlarmTimetableCreateInstance

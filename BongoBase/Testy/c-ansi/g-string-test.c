@@ -73,9 +73,9 @@ static int GStringsTest (const char *p_vers3) {
   
   m_TRACK_IF(m_GStringsCreateInstance(&h_gStrings,100) != RETURNED)
 
-  m_ASSERT(m_GStringsAddPlainLexicalIndex(h_gStrings, NULL, NULL) == NON_CASE__INDEX_LABEL)
+  m_ASSERT(m_GStringsAddPlainLexicalIndex(h_gStrings,(int*)NULL, NULL, NULL) == NON_CASE__INDEX_LABEL)
 
-  m_ASSERT(m_GStringsAddPlainLexicalIndex(h_gStrings, NULL, toupper) == CASE__INDEX_LABEL)
+  m_ASSERT(m_GStringsAddPlainLexicalIndex(h_gStrings,(int*)NULL, NULL, toupper) == CASE__INDEX_LABEL)
 
   G_STRING_STUFF gStringStuff = (G_STRING_STUFF)UNDEFINED;
 
@@ -113,36 +113,36 @@ static int GStringsTest (const char *p_vers3) {
   m_TRACK_IF(completed < 0)
   m_RAISE_IF(completed != COMPLETED__OK, ANOMALY__CORRUPTED_INDEXES)
 
-  m_TRACK_IF(m_GStringsIndexSingleFetch(h_gStrings, (INDEX_REQUEST_AUTOMATIC_BUFFER)NULL,
+  m_TRACK_IF(m_GStringsIndexSingleFetch(h_gStrings, (char*)NULL,
     NON_CASE__INDEX_LABEL, INDEX_SEEK_FLAGS__ANY, (const struct GS_KEY*)UNDEFINED,
     INDEX_FETCH_FLAGS__READ_ONLY, &gStringStuff, NULL) != RESULT__FOUND)
   m_ASSERT(strcmp(gStringStuff->nhi_string,p_vers3) == 0)
 
-  m_TRACK_IF(GStringsIndexFetch(h_gStrings, (INDEX_REQUEST_AUTOMATIC_BUFFER)NULL,
+  m_TRACK_IF(GStringsIndexFetch(h_gStrings, (char*)NULL,
     INDEX_FETCH_FLAGS__READ_NEXT, &gStringStuff, NULL) != RESULT__FOUND)
   m_ASSERT(strcmp(gStringStuff->nhi_string,VERS1) == 0)
   
-  m_TRACK_IF(GStringsIndexFetch(h_gStrings, (INDEX_REQUEST_AUTOMATIC_BUFFER)NULL,
+  m_TRACK_IF(GStringsIndexFetch(h_gStrings, (char*)NULL,
     INDEX_FETCH_FLAGS__READ_NEXT, &gStringStuff, NULL) != RESULT__FOUND)
   m_ASSERT(strcmp(gStringStuff->nhi_string,VERS2) == 0)
 
-  m_TRACK_IF(GStringsIndexFetch(h_gStrings, (INDEX_REQUEST_AUTOMATIC_BUFFER)NULL,
+  m_TRACK_IF(GStringsIndexFetch(h_gStrings, (char*)NULL,
     INDEX_FETCH_FLAGS__READ_NEXT, &gStringStuff, NULL) != RESULT__FOUND)
   m_ASSERT(strcmp(gStringStuff->nhi_string,LOWER_FOOTER) == 0)
 
-  m_TRACK_IF(GStringsIndexFetch(h_gStrings, (INDEX_REQUEST_AUTOMATIC_BUFFER)NULL,
+  m_TRACK_IF(GStringsIndexFetch(h_gStrings, (char*)NULL,
     INDEX_FETCH_FLAGS__READ_NEXT, &gStringStuff, NULL) != RESULT__NOT_FOUND)
 
-  m_TRACK_IF(m_GStringsIndexSingleFetch(h_gStrings, (INDEX_REQUEST_AUTOMATIC_BUFFER)NULL,
+  m_TRACK_IF(m_GStringsIndexSingleFetch(h_gStrings, (char*)NULL,
     CASE__INDEX_LABEL, INDEX_SEEK_FLAGS__ANY, (const struct GS_KEY*)UNDEFINED,
     INDEX_FETCH_FLAGS__READ_ONLY, &gStringStuff, NULL) != RESULT__FOUND)
   m_ASSERT(strcmp(gStringStuff->nhi_string,LOWER_FOOTER) == 0)
 
-  m_TRACK_IF(GStringsIndexFetch(h_gStrings, (INDEX_REQUEST_AUTOMATIC_BUFFER)NULL,
+  m_TRACK_IF(GStringsIndexFetch(h_gStrings, (char*)NULL,
     INDEX_FETCH_FLAGS__READ_NEXT, &gStringStuff, NULL) != RESULT__FOUND)
   m_ASSERT(strcmp(gStringStuff->nhi_string,p_vers3) == 0)
 
-  m_TRACK_IF(GStringsIndexFetch(h_gStrings, (INDEX_REQUEST_AUTOMATIC_BUFFER)NULL,
+  m_TRACK_IF(GStringsIndexFetch(h_gStrings, (char*)NULL,
     INDEX_FETCH_FLAGS__READ_NEXT, &gStringStuff, NULL) != RESULT__FOUND)
   m_ASSERT(strcmp(gStringStuff->nhi_string,VERS1) == 0)
 

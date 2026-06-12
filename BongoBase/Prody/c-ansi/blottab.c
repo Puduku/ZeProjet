@@ -51,7 +51,7 @@ int BlottabCreateInstance(BLOTTAB_HANDLE *azh_handle, int fieldsNumber,
   m_TRACK_IF(GStringsCreateInstance(&handle->hp_fieldAttributesHandle,fieldsNumber,
     BLOTTAB_FIELD_ATTRIBUTE_ELEMENTS_NUMBER, VALUED_STRING__G_STRING_CONVEYANCE,
     (const int *)UNDEFINED, (NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION)UNDEFINED) != RETURNED)
-  m_ASSERT(GStringsAddIndex(handle->hp_fieldAttributesHandle,1,
+  m_ASSERT(GStringsAddIndex(handle->hp_fieldAttributesHandle,1,(int*)NULL,
     0,P_STRING__GS_KEYS_COMPARISON,(IS_CHAR_FUNCTION)NULL,(TO_CHAR_FUNCTION)NULL,
     (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED) == INDEX_LABEL0)
 
@@ -63,12 +63,12 @@ int BlottabCreateInstance(BLOTTAB_HANDLE *azh_handle, int fieldsNumber,
     m_TRACK_IF(GStringCopy(fieldAttributeStuff,0, s_names[i]) < 0) 
     fieldAttributeStuff->acolyt.cen_value = s_blottabIndexFlags[i] ; 
     if (b_FLAG_SET_ON(s_blottabIndexFlags[i],STR__BLOTTAB_INDEX_FLAG)) m_TRACK_IF((c_indexLabel =
-      GStringsAddIndex(handle->h_tableHandle,1,i, P_STRING__GS_KEYS_COMPARISON,NULL,NULL,
+      GStringsAddIndex(handle->h_tableHandle,1,(int*)NULL,i, P_STRING__GS_KEYS_COMPARISON,NULL,NULL,
       (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED, (void*)UNDEFINED)) < 0)
     fieldAttributeStuff[BLOTTAB_FIELD_ATTRIBUTE_STR_INDEX_ELEMENT].acolyt.cen_value = c_indexLabel ;
     if (b_FLAG_SET_ON(s_blottabIndexFlags[i],INT__BLOTTAB_INDEX_FLAG)) m_TRACK_IF((c_indexLabel =
-      GStringsAddIndex(handle->h_tableHandle,1,i,ACOLYT_VALUE__GS_KEYS_COMPARISON ,NULL,NULL,
-      (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED)) < 0)
+      GStringsAddIndex(handle->h_tableHandle,1,(int*)NULL,i,ACOLYT_VALUE__GS_KEYS_COMPARISON ,NULL,
+        NULL,(P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED)) < 0)
     fieldAttributeStuff[BLOTTAB_FIELD_ATTRIBUTE_INT_INDEX_ELEMENT].acolyt.cen_value = c_indexLabel ;
   } // for
 
@@ -136,7 +136,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
   const struct GS_KEY p_fieldKey = om_GsKey(fieldName);
   int result = UNDEFINED;
   int entry = UNDEFINED;
-  switch (result = m_GStringsIndexSingleFetch(fieldAttributesHandle,(INDEX_REQUEST_AUTOMATIC_BUFFER)NULL,
+  switch (result = m_GStringsIndexSingleFetch(fieldAttributesHandle,(char *)NULL,
     INDEX_LABEL0, INDEX_SEEK_FLAGS__EQUAL, &p_fieldKey, INDEX_FETCH_FLAGS__READ_ONLY, 
     &fieldAttributeStuff, &entry)) {
   case RESULT__FOUND:
@@ -317,7 +317,11 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
 
   m_PRECISE_ABANDON(&subSequence, "<blottab request atom>") 
   struct BLOTEX_VALUE blotexValue = UNDEFINED_BLOTEX_VALUE; 
-  struct GS_REQUEST_CRITERIA criteria52 = m_GsRequestCriteria0();
+  switch (GStringsIndexRequestRNew(blottabHandle->h_tableHandle,(char*)NULL)) {
+  case COMPLETED__OK:
+  break ; case COMPLETED__BUT: // Request rectified
+    m_RAISE(ANOMALY__UNEXPECTED_CASE)
+  break; default: m_TRACK() } // switch
   do {
     signed char b_strValue = (char)UNDEFINED;  
     struct GS_KEY c_gsKey = UNDEFINED_GS_KEY; // Only significant with actual criterion
@@ -350,17 +354,17 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(n_indexSeekFlags)
     m_TRACK_IF(ParseLogical2Op(&subSequence, &criteriaOpFlags) != RETURNED)
 m_DIGGY_VAR_P_STRING(subSequence)
 
-    m_TRACK_IF(GsRequestCriteriaAddCriterion(&criteria52,tableIndexLabel,
-      n_indexSeekFlags,c_gsKey, UNDEFINED_GS_KEY_PAR, criteriaOpFlags) < 0) 
+//    m_TRACK_IF(GsRequestCriteriaAddCriterion(&criteria52,tableIndexLabel,
+//      n_indexSeekFlags,c_gsKey, UNDEFINED_GS_KEY_PAR, criteriaOpFlags) < 0) 
+    switch (GStringsIndexRequestRAddCriterion(blottabHandle->h_tableHandle,(char*)NULL,
+      om_GRequestCriterionGsKeys(tableIndexLabel,n_indexSeekFlags,&c_gsKey,
+      criteriaOpFlags))) {
+    case COMPLETED__OK:
+    break ; case COMPLETED__BUT: // Request rectified
+      m_RAISE(ANOMALY__UNEXPECTED_CASE)
+    break; default: m_TRACK() } // switch
   } while (!ob_EmptySequence(&subSequence)) ; 
 
-  switch (GStringsIndexRequestR52(blottabHandle->h_tableHandle,NULL,&criteria52)) {
-  case COMPLETED__OK:
-  break ; case COMPLETED__BUT: // Request rectified
-    m_RAISE(ANOMALY__UNEXPECTED_CASE)
-  break; default:
-    m_TRACK()
-  } // switch
 
   m_DIGGY_RETURN(ANSWER__YES)
 } // ml_BlotexlibExecutorParseBlottabRequest
