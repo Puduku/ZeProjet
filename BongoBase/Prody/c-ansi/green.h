@@ -249,16 +249,18 @@ int GreenCollectionGetCount(GREEN_COLLECTION_HANDLE cp_handle, char **navntr_gre
 // - gKeyCount: >= 1; 1:plain index; >=2:compound index  #SKIP
 //   NOTICE: compound index ONLY possible if explicit key structure size is provided (see cn_gKeySize
 //   param above)  
-// - na_indexRequestBufferSize: NULL if not used
+// - na_indexFetchBufferSize: NULL if not used
+//   when not NULL: ask for (technical) index fetch buffer size; this is the last index added to 
+//   the collection; it is then no more possible to add an index... 
 //
 // Changed:
-// - *na_indexRequestBufferSize: (when significant) >0
+// - *na_indexFetchBufferSize: (when significant) >0
 //
 // Returned: 
 // - >= 0 : index label (0 for 1st index added, etc.)
 // - -1: unexpected problem ; anomaly is raised
 int GreenCollectionAddIndex(GREEN_COLLECTION_HANDLE handle, int gKeyCount,
-  int *na_indexRequestBufferSize) ;
+  int *na_indexFetchBufferSize) ;
 
 
 #endif // __C_ANSI_GREEN_H_INCLUDED__ == 0
@@ -304,7 +306,7 @@ m_DEFINE_ENUM_ALIAS_END()
 //
 // Passed:
 // - handle:
-// - nf_indexRequest5AutomaticBuffer:
+// - nf_indexFetch5AutomaticBuffer:
 //   This buffer is mandatory when then collection is "frozen" (See GreenCollectionFreeze()) 
 //   NULL special address: use internal structure => NOT "thread safe" / "re-entrant"
 //   non NULL: buffer on stack => allows (thread) re-entrancy ; that buffer will be used by 
@@ -323,28 +325,28 @@ m_DEFINE_ENUM_ALIAS_END()
 //  (etc.)
 // 
 // Changed:
-// - nf_indexRequest5AutomaticBuffer : (if used) initialized 
+// - nf_indexFetch5AutomaticBuffer : (if used) initialized 
 //
 // Ret: 
 // - COMPLETED__OK: Ok
 // - COMPLETED__BUT: request rectified (missing closing brackets, etc.)
 // - -1: unexpected problem ; anomaly is raised
 int GreenCollectionIndexRequest(GREEN_COLLECTION_HANDLE cp_handle,
-  char* nf_indexRequest5AutomaticBuffer, int criteriaCount, int indexLabel1,
+  char* nf_indexFetch5AutomaticBuffer, int criteriaCount, int indexLabel1,
   unsigned int indexSeekFlags1, void *cr_gKeys1, ...);
 
 
 // #SEE GreenCollectionIndexRequest <greenItem> <keys>
 int GreenCollectionIndexRequestV(GREEN_COLLECTION_HANDLE cp_handle,
-  char* nf_indexRequest5AutomaticBuffer, int criteriaCount, int indexLabel1,
+  char* nf_indexFetch5AutomaticBuffer, int criteriaCount, int indexLabel1,
   unsigned int indexSeekFlags1, void *cr_gKeys1, va_list extraCriteria);
 
 
 int GreenCollectionIndexRequestRNew(GREEN_COLLECTION_HANDLE cp_handle,
-  char* nf_indexRequest5AutomaticBuffer);
+  char* nf_indexFetch5AutomaticBuffer);
 
 int GreenCollectionIndexRequestRAddCriterion(GREEN_COLLECTION_HANDLE cp_handle,
-  char* nf_indexRequest5AutomaticBuffer,
+  char* nf_indexFetch5AutomaticBuffer,
   struct G_REQUEST_CRITERION criterion);
 
 
@@ -428,7 +430,7 @@ m_DEFINE_ENUM_ALIAS_END()
 // Passed:
 // - cp_handle: collection handle - see GreenCollectionCreateInstance() ; "protected instance" if 
 //   the collection is frozen.
-// - nf_indexRequest5AutomaticBuffer:
+// - nf_indexFetch5AutomaticBuffer:
 //   This buffer is mandatory when the collection is "frozen" (See GreenCollectionFreeze()) 
 //   NULL special address: use internal structure => NOT "thread safe" / "re-entrant"
 //   non NULL: buffer on stack => allows (thread) re-entrancy ; that buffer must correspond to that 
@@ -461,7 +463,7 @@ m_DEFINE_ENUM_ALIAS_END()
 // - -1: unexpected problem ; anomaly is raised
 // TODO: FETCH new: mechanism to check that the inserted item matches with the search key 
 int GreenCollectionIndexFetch(GREEN_COLLECTION_HANDLE cp_handle, 
-  char* nf_indexRequest5AutomaticBuffer, unsigned int indexFetchFlags, char **acvntr_greenItemStuff,
+  char* nf_indexFetch5AutomaticBuffer, unsigned int indexFetchFlags, char **acvntr_greenItemStuff,
   int *nacvn_entry);
 // TODO : prevoir mechanisme optionel qui verifie qu'une fois insere, le NOUVEL item
 //        est bien vu par l'index...

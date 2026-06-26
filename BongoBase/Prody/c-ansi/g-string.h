@@ -297,7 +297,7 @@ typedef GENERIC_INTEGER (*P_STRING_INTRINSIC_VALUE_FUNCTION) (void *pr_handle,
 // #SEE GreenCollectionAddIndex@c-ansi/green.h  <<g-string set>> 
 // Passed parameters for new index:
 // - gKeyCount: >= 1; 1:plain index; >=2:compound index  #SKIP
-// - na_indexRequestBufferSize:
+// - na_indexFetchBufferSize:
 // - key1GStringSetElement: between [0 ; <g-string set cardinality>[ ; the g-string set's
 //   element serving as first key of the index
 // - key1GsKeysComparison: #see enum-GS_KEYS_COMPARISON
@@ -314,7 +314,7 @@ typedef GENERIC_INTEGER (*P_STRING_INTRINSIC_VALUE_FUNCTION) (void *pr_handle,
 //   INTRINSIC_VALUE__GS_KEYS_COMPARISON
 // - ... : g-string set(s element for second key (etc.) if any ...
 int GStringsAddIndex(G_STRINGS_HANDLE handle, int gKeyCount,
-  int *na_indexRequestBufferSize, int key1GStringSetElement, int key1GsKeysComparison,
+  int *na_indexFetchBufferSize, int key1GStringSetElement, int key1GsKeysComparison,
   IS_CHAR_FUNCTION cn_gKey1IsNeutralCharFunction, TO_CHAR_FUNCTION cn_gKey1ToCharFunction,
   P_STRING_INTRINSIC_VALUE_FUNCTION c_gKey1PStringIntrinsicValueFunction,
   void *cfpr_gKey1PStringIntrinsicValueFunctionHandle, ...);
@@ -325,10 +325,10 @@ int GStringsAddIndex(G_STRINGS_HANDLE handle, int gKeyCount,
 // Add an index for single (aka cardinality 1) g-strings collection for LEXICAL comparison
 // Nb: Plain index => one single key
 static inline int m_GStringsAddPlainLexicalIndex(G_STRINGS_HANDLE handle,
-  int *na_indexRequestBufferSize, IS_CHAR_FUNCTION n_gKeyIsNeutralCharFunction,
+  int *na_indexFetchBufferSize, IS_CHAR_FUNCTION n_gKeyIsNeutralCharFunction,
   TO_CHAR_FUNCTION n_gKeyToCharFunction) {
   m_DIGGY_BOLLARD_S()
-  m_DIGGY_RETURN(GStringsAddIndex(handle,1,na_indexRequestBufferSize,0,P_STRING__GS_KEYS_COMPARISON,
+  m_DIGGY_RETURN(GStringsAddIndex(handle,1,na_indexFetchBufferSize,0,P_STRING__GS_KEYS_COMPARISON,
      n_gKeyIsNeutralCharFunction, n_gKeyToCharFunction, (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,
      (void*)UNDEFINED))
 } // m_GStringsAddPlainLexicalIndex

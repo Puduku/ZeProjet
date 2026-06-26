@@ -371,7 +371,7 @@ int GStringsGetCount(G_STRINGS_HANDLE cp_handle,
 
 // Public function : see .h
 int GStringsAddIndex(G_STRINGS_HANDLE handle, int gKeyCount,
-  int *na_indexRequestBufferSize, int key1GStringSetElement, int key1GsKeysComparison,
+  int *na_indexFetchBufferSize, int key1GStringSetElement, int key1GsKeysComparison,
   IS_CHAR_FUNCTION cn_gKey1IsNeutralCharFunction, TO_CHAR_FUNCTION cn_gKey1ToCharFunction,
   P_STRING_INTRINSIC_VALUE_FUNCTION c_gKey1PStringIntrinsicValueFunction,
   void *cfpr_gKey1PStringIntrinsicValueFunctionHandle, ...) {
@@ -425,7 +425,7 @@ m_DIGGY_INFO("i=%d, gKeyCount=%d",i,gKeyCount)
   va_end(ap) ;
 
   int indexLabel =
-  GreenCollectionAddIndex(handle->h_greenCollectionHandle, gKeyCount, na_indexRequestBufferSize);
+  GreenCollectionAddIndex(handle->h_greenCollectionHandle, gKeyCount, na_indexFetchBufferSize);
   m_TRACK_IF(indexLabel < 0) ;
 
   m_DIGGY_RETURN(indexLabel)

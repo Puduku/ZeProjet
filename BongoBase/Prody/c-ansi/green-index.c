@@ -237,7 +237,7 @@ static int GreenIndexBSearch(struct GREEN_INDEX *a_me, int n_bEntry, void *cr_bG
 //
 // Passed:
 // - a_me:
-// - a_indexSequence-> : current state of sequence
+// - ap_indexSequence-> : current state of sequence
 //
 // Changed:
 // - *an_entry: 
@@ -248,12 +248,12 @@ static int GreenIndexBSearch(struct GREEN_INDEX *a_me, int n_bEntry, void *cr_bG
 // - RETURNED: Ok
 // - -1: anomaly is raised
 static inline int m_GreenIndexSequenceCurrent(struct GREEN_INDEX* a_me,
-  struct INDEX_SEQUENCE *a_indexSequence, int *an_entry) {
+  const struct INDEX_SEQUENCE *ap_indexSequence, int *an_entry) {
 
-  if (a_indexSequence->indexEntryBlockCount2 > 0 && a_indexSequence->ci_indexEntryCursor >= 
-    a_indexSequence->indexEntryBlocks2[0].first && a_indexSequence->ci_indexEntryCursor <=
-    a_indexSequence->cv_lastIndexEntry)
-    *an_entry = a_me->hsc_array[a_indexSequence->ci_indexEntryCursor];
+  if (ap_indexSequence->indexEntryBlockCount2 > 0 && ap_indexSequence->ci_indexEntryCursor >= 
+    ap_indexSequence->indexEntryBlocks2[0].first && ap_indexSequence->ci_indexEntryCursor <=
+    ap_indexSequence->cv_lastIndexEntry)
+    *an_entry = a_me->hsc_array[ap_indexSequence->ci_indexEntryCursor];
   else *an_entry = -1; // No current item 
 
   return RETURNED;  
@@ -657,18 +657,20 @@ static int GreenIndexesSeekEntryEquate(GREEN_INDEXES_HANDLE handle, int indexLab
 } // GreenIndexesSeekEntryEquate
 
 // Public function; see .h
-int GreenIndexesIteratorSequenceReset(GREEN_INDEXES_HANDLE handle,
-  struct INDEX_ITERATOR5 *a_indexIterator5) {
+int GreenIndexesSequenceReset(GREEN_INDEXES_HANDLE handle,
+   const struct G_REQUEST_CRITERIA5 *ap_gRequestCriteria5, char b_descending,
+   struct INDEX_SEQUENCE *a_indexSequence) {
   m_DIGGY_BOLLARD_S()
-  m_ASSERT(a_indexIterator5->criteria[0].indexLabel < handle->indexesNumber) 
-m_DIGGY_VAR_INDEX_SEEK_FLAGS(a_indexIterator5->criteria[0].indexSeekFlags)
+  m_ASSERT(ap_gRequestCriteria5->criteria[0].indexLabel < handle->indexesNumber) 
+m_DIGGY_VAR_INDEX_SEEK_FLAGS(ap_gRequestCriteria5->criteria[0].indexSeekFlags)
 // TODO: la premiegre initialisation de la sequence (...RequestR()) est perdue (...Fetch()) ??? 
-  m_TRACK_IF(m_GreenIndexSequenceNew(handle->vnhs_indexes + a_indexIterator5->criteria[0].indexLabel,
-    a_indexIterator5->b_descending, a_indexIterator5->criteria[0].indexSeekFlags,
-    a_indexIterator5->criteria[0].cr_gKeys, &a_indexIterator5->indexSequence) != RETURNED) 
+  m_TRACK_IF(m_GreenIndexSequenceNew(handle->vnhs_indexes +
+    ap_gRequestCriteria5->criteria[0].indexLabel,
+    b_descending, ap_gRequestCriteria5->criteria[0].indexSeekFlags,
+    ap_gRequestCriteria5->criteria[0].cr_gKeys, a_indexSequence) != RETURNED) 
 
   m_DIGGY_RETURN(RETURNED)
-} // GreenIndexesIteratorSequenceReset
+} // GreenIndexesSequenceReset
 
 struct CRITERIA_MONITOR {
   int i_depth;
@@ -686,18 +688,18 @@ struct CRITERIA_MONITOR {
 //
 // Passed:
 // - a_me:
-// - a_indexIterator5:
+// - ap_gRequestCriteria5:
 //
 // changed:
 // - a_me: 1st criterion (op. flags) initialized
 static inline int om_CriteriaMonitorReset(struct CRITERIA_MONITOR* a_me,
-  struct INDEX_ITERATOR5* a_indexIterator5) {
+  const struct G_REQUEST_CRITERIA5* ap_gRequestCriteria5) {
   m_DIGGY_BOLLARD_S()
   a_me->i_depth = 0;
   a_me->v_knownCriteriaOpFlagsPtr = a_me->knownCriteriaOpFlags;
   a_me->v_statusPtr = a_me->statuses;
   a_me->statuses[0] = 'U' ; 
-  a_me->knownCriteriaOpFlags[0] = a_indexIterator5->criteria[0].criteriaOpFlags;
+  a_me->knownCriteriaOpFlags[0] = ap_gRequestCriteria5->criteria[0].criteriaOpFlags;
   m_SET_FLAG_ON(a_me->knownCriteriaOpFlags[0], CRITERIA_OP_FLAG__AND)
   m_SET_FLAG_OFF(a_me->knownCriteriaOpFlags[0], CRITERIA_OP_FLAG__OR)
   m_DIGGY_RETURN(RETURNED)
@@ -713,43 +715,43 @@ static inline int om_CriteriaMonitorReset(struct CRITERIA_MONITOR* a_me,
 // - handle: indexes for equation 
 // - entry: entry to equate 
 // - a_monitor: current state
-// - a_indexIterator5: contains criteria criteria
+// - ap_gRequestCriteria5: contains criteria criteria
 // - criterionEntry: criterion entry 
 //
 // Changed:
 // - a_monitor: updated state
 static inline int m_GreenIndexesCriteriaEquationAndCloseBrackets(GREEN_INDEXES_HANDLE handle,
-  int entry, struct CRITERIA_MONITOR* a_monitor, struct INDEX_ITERATOR5* a_indexIterator5,
-  int criterionEntry) {
+  int entry, struct CRITERIA_MONITOR* a_monitor,
+  const struct G_REQUEST_CRITERIA5* ap_gRequestCriteria, int criterionEntry) {
   m_DIGGY_BOLLARD_S()
   if (criterionEntry == 0) {
-    if (a_indexIterator5->criteriaCount == 1) a_monitor->statuses[0] = 'O' ; 
+    if (ap_gRequestCriteria->criteriaCount == 1) a_monitor->statuses[0] = 'O' ; 
   } else { 
     // Number of close brackets: 
-    int count = (criterionEntry+1 == a_indexIterator5->criteriaCount)? (a_monitor->i_depth): 
-      m_CloseBracketCount(a_indexIterator5->criteria[criterionEntry].criteriaOpFlags);
+    int count = (criterionEntry+1 == ap_gRequestCriteria->criteriaCount)? (a_monitor->i_depth): 
+      m_CloseBracketCount(ap_gRequestCriteria->criteria[criterionEntry].criteriaOpFlags);
     if (count == 0) {
       if (*a_monitor->v_knownCriteriaOpFlagsPtr == ALL_FLAGS_OFF0)
         *a_monitor->v_knownCriteriaOpFlagsPtr = 
-        a_indexIterator5->criteria[criterionEntry].criteriaOpFlags;
-      if (criterionEntry+1 < a_indexIterator5->criteriaCount && b_FLAG_SET_ON(
+        ap_gRequestCriteria->criteria[criterionEntry].criteriaOpFlags;
+      if (criterionEntry+1 < ap_gRequestCriteria->criteriaCount && b_FLAG_SET_ON(
         *a_monitor->v_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__OR) && b_FLAG_SET_ON(
-        a_indexIterator5->criteria[criterionEntry+1].criteriaOpFlags, CRITERIA_OP_FLAG__AND))
+        ap_gRequestCriteria->criteria[criterionEntry+1].criteriaOpFlags, CRITERIA_OP_FLAG__AND))
         count++;
     } else if (count > a_monitor->i_depth) count = a_monitor->i_depth; 
     if (*(a_monitor->v_statusPtr) == 'U') {
       int answer = GreenIndexesSeekEntryEquate(handle,
-        a_indexIterator5->criteria[criterionEntry].indexLabel,entry,
-        a_indexIterator5->criteria[criterionEntry].indexSeekFlags,
-        a_indexIterator5->criteria[criterionEntry].cr_gKeys);
+        ap_gRequestCriteria->criteria[criterionEntry].indexLabel,entry,
+        ap_gRequestCriteria->criteria[criterionEntry].indexSeekFlags,
+        ap_gRequestCriteria->criteria[criterionEntry].cr_gKeys);
       switch (answer) {
       case ANSWER__YES:
         if (b_FLAG_SET_OFF(*a_monitor->v_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__AND) || 
-          count > 0 || criterionEntry+1 == a_indexIterator5->criteriaCount) *a_monitor->v_statusPtr
+          count > 0 || criterionEntry+1 == ap_gRequestCriteria->criteriaCount) *a_monitor->v_statusPtr
           = 'O';
       break; case ANSWER__NO: 
         if (b_FLAG_SET_OFF(*(a_monitor->v_knownCriteriaOpFlagsPtr),CRITERIA_OP_FLAG__OR) || 
-          count > 0 || criterionEntry+1 == a_indexIterator5->criteriaCount) *a_monitor->v_statusPtr
+          count > 0 || criterionEntry+1 == ap_gRequestCriteria->criteriaCount) *a_monitor->v_statusPtr
           = 'K'; 
       break; default:
         m_TRACK()
@@ -761,7 +763,7 @@ static inline int m_GreenIndexesCriteriaEquationAndCloseBrackets(GREEN_INDEXES_H
       (a_monitor->v_statusPtr)--; 
       if (j == count-1 && *a_monitor->v_knownCriteriaOpFlagsPtr == ALL_FLAGS_OFF0) 
         *a_monitor->v_knownCriteriaOpFlagsPtr =
-        a_indexIterator5->criteria[criterionEntry].criteriaOpFlags;
+        ap_gRequestCriteria->criteria[criterionEntry].criteriaOpFlags;
       if (*a_monitor->v_statusPtr == 'U') {
         if (b_FLAG_SET_OFF(*a_monitor->v_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__OR)) {
           *a_monitor->v_statusPtr = 'O';
@@ -781,7 +783,7 @@ static inline int m_GreenIndexesCriteriaEquationAndCloseBrackets(GREEN_INDEXES_H
     } // for 
     if (*a_monitor->v_knownCriteriaOpFlagsPtr == ALL_FLAGS_OFF0)
       *a_monitor->v_knownCriteriaOpFlagsPtr =
-      a_indexIterator5->criteria[criterionEntry].criteriaOpFlags;
+      ap_gRequestCriteria->criteria[criterionEntry].criteriaOpFlags;
   } // if 
   m_DIGGY_RETURN(RETURNED)
 } // 
@@ -794,19 +796,19 @@ static inline int m_GreenIndexesCriteriaEquationAndCloseBrackets(GREEN_INDEXES_H
 //
 // Passed:
 // - a_me: current state
-// - a_indexIterator5: passed criteria
+// - ap_gRequestCriteria: passed criteria
 // - criterionEntry: current criterion entry 
 // 
 // Changed:
 // - a_me: updated state 
 static inline int m_CriteriaMonitorOpenBrackets(struct CRITERIA_MONITOR *a_me,
-  struct INDEX_ITERATOR5* a_indexIterator5, int criterionEntry) {
+  const struct G_REQUEST_CRITERIA5* ap_gRequestCriteria, int criterionEntry) {
   m_DIGGY_BOLLARD_S()
   // Number of open brackets:
-  int count = m_OpenBracketCount(a_indexIterator5->criteria[criterionEntry].criteriaOpFlags);
-  if (count == 0 && criterionEntry+1 < a_indexIterator5->criteriaCount && b_FLAG_SET_ON(
+  int count = m_OpenBracketCount(ap_gRequestCriteria->criteria[criterionEntry].criteriaOpFlags);
+  if (count == 0 && criterionEntry+1 < ap_gRequestCriteria->criteriaCount && b_FLAG_SET_ON(
     *(a_me->v_knownCriteriaOpFlagsPtr),CRITERIA_OP_FLAG__AND) && b_FLAG_SET_ON(
-    a_indexIterator5->criteria[criterionEntry+1].criteriaOpFlags, CRITERIA_OP_FLAG__OR)) count++;
+    ap_gRequestCriteria->criteria[criterionEntry+1].criteriaOpFlags, CRITERIA_OP_FLAG__OR)) count++;
   int i = 0; for (; i < count; i++) {
     m_ASSERT(++(a_me->i_depth) < G_REQUEST_CRITERION_COUNT_MAX5);
     (a_me->v_knownCriteriaOpFlagsPtr)++; 
@@ -819,25 +821,26 @@ static inline int m_CriteriaMonitorOpenBrackets(struct CRITERIA_MONITOR *a_me,
 } // 
 
 // Public function; see .h
-int GreenIndexesIteratorSequenceNext(GREEN_INDEXES_HANDLE handle,
-  struct INDEX_ITERATOR5 *a_indexIterator5, int *an_entry) {
+int GreenIndexesSequenceNext(GREEN_INDEXES_HANDLE handle,
+  const struct G_REQUEST_CRITERIA5 *ap_gRequestCriteria5, char b_descending,
+  struct INDEX_SEQUENCE *a_indexSequence, int *an_entry) {
   m_DIGGY_BOLLARD_S()
-  m_ASSERT(a_indexIterator5->criteria[0].indexLabel < handle->indexesNumber) 
+  m_ASSERT(ap_gRequestCriteria5->criteria[0].indexLabel < handle->indexesNumber) 
 
   struct CRITERIA_MONITOR criteriaMonitor; // UNDEFINED 
 
   do {
     m_TRACK_IF(m_GreenIndexSequenceNext(handle->vnhs_indexes +
-      a_indexIterator5->criteria[0].indexLabel, a_indexIterator5->b_descending,
-      &a_indexIterator5->indexSequence, an_entry) != RETURNED) 
+      ap_gRequestCriteria5->criteria[0].indexLabel, b_descending,
+      a_indexSequence, an_entry) != RETURNED) 
     if (*an_entry >= 0) {
-      om_CriteriaMonitorReset(&criteriaMonitor,a_indexIterator5);
-      int criterionEntry = 0; for (; criterionEntry < a_indexIterator5->criteriaCount;
+      om_CriteriaMonitorReset(&criteriaMonitor,ap_gRequestCriteria5);
+      int criterionEntry = 0; for (; criterionEntry < ap_gRequestCriteria5->criteriaCount;
         criterionEntry++) {
         m_TRACK_IF(m_GreenIndexesCriteriaEquationAndCloseBrackets(handle,*an_entry,&criteriaMonitor,
-          a_indexIterator5, criterionEntry) != RETURNED) 
+          ap_gRequestCriteria5, criterionEntry) != RETURNED) 
         m_TRACK_IF(m_CriteriaMonitorOpenBrackets(&criteriaMonitor,
-          a_indexIterator5, criterionEntry) != RETURNED) 
+          ap_gRequestCriteria5, criterionEntry) != RETURNED) 
       } // for
   // Break "criteria handling" loop if entry not rejected by extra criteria 
   m_ASSERT(criteriaMonitor.i_depth == 0) 
@@ -848,21 +851,22 @@ int GreenIndexesIteratorSequenceNext(GREEN_INDEXES_HANDLE handle,
 
   m_DIGGY_VAR_D(*an_entry)
   m_DIGGY_RETURN(RETURNED)
-} // GreenIndexesIteratorSequenceNext
+} // GreenIndexesSequenceNext
 
 
 // Public function; see .h
-int GreenIndexesIteratorSequenceCurrent(GREEN_INDEXES_HANDLE handle,
-  struct INDEX_ITERATOR5 *a_indexIterator5, int *an_entry) {
+int GreenIndexesSequenceCurrent(GREEN_INDEXES_HANDLE handle,
+  const struct G_REQUEST_CRITERIA5 *ap_gRequestCriteria5,
+  const struct INDEX_SEQUENCE *ap_indexSequence, int *an_entry) {
   m_DIGGY_BOLLARD_S()
-  m_ASSERT(a_indexIterator5->criteria[0].indexLabel < handle->indexesNumber) 
-  struct GREEN_INDEX *a_index = handle->vnhs_indexes + a_indexIterator5->criteria[0].indexLabel;
+  m_ASSERT(ap_gRequestCriteria5->criteria[0].indexLabel < handle->indexesNumber) 
+  struct GREEN_INDEX *a_index = handle->vnhs_indexes + ap_gRequestCriteria5->criteria[0].indexLabel;
   
-  m_TRACK_IF(m_GreenIndexSequenceCurrent(a_index,&a_indexIterator5->indexSequence,an_entry) !=
+  m_TRACK_IF(m_GreenIndexSequenceCurrent(a_index,ap_indexSequence,an_entry) !=
     RETURNED)
 
   m_DIGGY_RETURN(RETURNED)
-} // GreenIndexesIteratorSequenceCurrent
+} // GreenIndexesSequenceCurrent
 
 
 // Public function; see .h

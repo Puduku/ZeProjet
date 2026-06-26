@@ -147,25 +147,25 @@ enum {
   FETCH_4__REMOVE
 } ;
 
-struct INDEX_REQUEST5 {
-  struct INDEX_ITERATOR5 iterator;
+struct INDEX_FETCH5 {
+  //struct INDEX_ITERATOR5 iterator;
+  struct G_REQUEST_CRITERIA5 criteria;
+  struct INDEX_SEQUENCE sequence; 
+  char b_descending;
   int fetch4; 
 } ;
  
-// Passed:
-// - m_indexRequest5:
-// - m_criterion1:
-//
-// Ret: new index request
-static inline struct INDEX_REQUEST5 om_IndexRequest5(void) {
-  struct INDEX_REQUEST5 me = { .fetch4 = FETCH_4__CHANGE };
-  me.iterator = om_IndexIterator5(); 
+// Ret: new index sequence (0 criteria - disabled)
+static inline struct INDEX_FETCH5 om_IndexFetch5New(void) {
+  struct INDEX_FETCH5 me = { .fetch4 = FETCH_4__CHANGE, .b_descending = b_ASCENDING };
+  me.criteria = om_GRequestCriteria5New(); // 0 criteria 
+  me.sequence = om_IndexSequenceNew(); // "disabled" state  
   return me;
-} // om_IndexRequest5
+} // om_IndexFetch5New
 
 // Passed:
-// - m_indexRequest5:
-// - m_criterion:
+// - *a_me:
+// - criterion:
 // 
 // Changed:
 // - *a_indexIterator:
@@ -173,35 +173,12 @@ static inline struct INDEX_REQUEST5 om_IndexRequest5(void) {
 // Ret:
 // - RETURNED: Ok
 // - -1: anomaly is raised
-static inline int m_IndexRequest5AddCriterion(struct INDEX_REQUEST5 *a_me ,
+static inline int m_IndexFetch5AddCriterion(struct INDEX_FETCH5 *a_me ,
   struct G_REQUEST_CRITERION criterion) {
   m_DIGGY_BOLLARD_S()
-  m_TRACK_IF(m_IndexIterator5AddCriterion(&a_me->iterator,criterion) != RETURNED)
+  m_TRACK_IF(m_GRequestCriteria5AddCriterion(&a_me->criteria,criterion) != RETURNED)
   m_DIGGY_RETURN(RETURNED)
-} // m_IndexRequest5AddCriterion
-
-// Prepare reset of index request 
-// 
-// Passed:
-// - *a_indexRequest5:
-// - b_descending:
-// - fetch4:
-// 
-// Changed:
-// - *a_indexRequest5: the index sequence is now disabled and need to be reset with ad hoc
-//   GreenIndexesIteratorSequenceReset() call 
-//
-// Ret:
-// - RETURNED: Ok
-static inline int om_IndexRequest5Reset(struct INDEX_REQUEST5 *a_me, char b_descending,
-  int fetch4) {
-  m_DIGGY_BOLLARD_S()
-  om_IndexIterator5Reset(&a_me->iterator, b_descending);
-  a_me->fetch4 = fetch4;
-  m_DIGGY_RETURN(RETURNED)
-} // om_IndexRequest5Reset
-
-//const int p_indexRequest5AutomaticBufferSize = sizeof(struct INDEX_REQUEST5);
+} // m_IndexFetch5AddCriterion
 
 struct GREEN_COLLECTION {
   int expectedItemCount ;
@@ -222,9 +199,9 @@ struct GREEN_COLLECTION {
   int i_itemCount; // number of items "logically" referenced
   int v_maxItemCount; // max number of items "logically" referenced
   GREEN_INDEXES_HANDLE h_indexesHandle;
-//  struct INDEX_REQUEST5 internalIndexRequest5;
-  char *nh_indexRequest5InternalBuffer;
-  int c_indexRequest5InternalBufferSize;
+  char *nh_indexFetch5InternalBuffer;
+  int c_indexFetch5InternalBufferSize;
+  char b_lastIndex;
   struct GAPS_STACK h_gaps; 
   // "Monitored" entries "fetched for change" (in ALIEN / ALIVE state) : 
   int fetched4ChangeEntryCount;  
@@ -364,8 +341,9 @@ int GreenCollectionCreateInstance(GREEN_COLLECTION_HANDLE *azh_handle,  int expe
   m_TRACK_IF(GreenIndexesCreateInstance(&handle->h_indexesHandle,GreenCollectionEntryRawCompare,
     GreenCollectionEntryRawEquate, (void *) handle) != RETURNED)
   m_GAPS_STACK_INIT(handle->h_gaps,handle->itemPhysicalCount)
-  handle->nh_indexRequest5InternalBuffer = NULL;
-  handle->c_indexRequest5InternalBufferSize = UNDEFINED;
+  handle->nh_indexFetch5InternalBuffer = NULL;
+  handle->c_indexFetch5InternalBufferSize = UNDEFINED;
+  handle->b_lastIndex = b_FALSE0;
 
   m_MALLOC_ARRAY(handle->h_fetched4ChangeEntries,handle->fetched4ChangeEntriesPhysicalNumber =
     expectedItemCount)
@@ -646,7 +624,7 @@ int GreenCollectionClear (GREEN_COLLECTION_HANDLE handle) {
 
 // Public function; see description in .h
 int GreenCollectionAddIndex (GREEN_COLLECTION_HANDLE handle, int gKeyCount,
-  int *na_indexRequestBufferSize) {
+  int *na_indexFetchBufferSize) {
   m_DIGGY_BOLLARD()
   m_ASSERT(!handle->b_frozen)
   // MINIMONITOR: ANY
@@ -662,91 +640,94 @@ int GreenCollectionAddIndex (GREEN_COLLECTION_HANDLE handle, int gKeyCount,
     gKeyCount);
   m_TRACK_IF(newIndexLabel < 0)
   if (handle->gKeyCountMax < gKeyCount) handle->gKeyCountMax = gKeyCount;
-  if (na_indexRequestBufferSize != NULL) *na_indexRequestBufferSize =
-    sizeof(struct INDEX_REQUEST5) + (handle->n_gKeySize >= 0? handle->n_gKeySize*
-    handle->gKeyCountMax* G_REQUEST_CRITERION_COUNT_MAX5 : 0);
+  if (na_indexFetchBufferSize != NULL) {
+    m_ASSERT(!handle->b_lastIndex)
+    *na_indexFetchBufferSize =
+      sizeof(struct INDEX_FETCH5) + (handle->n_gKeySize >= 0? handle->n_gKeySize*
+      handle->gKeyCountMax* G_REQUEST_CRITERION_COUNT_MAX5 : 0);
+    handle->b_lastIndex = b_TRUE;
+  } // if
 
   m_DIGGY_RETURN(newIndexLabel)
 } // GreenCollectionAddIndex
 
 // Public function; see description in .h
 int GreenCollectionIndexRequestRNew(GREEN_COLLECTION_HANDLE cp_handle,
-  char* nf_indexRequest5AutomaticBuffer) {
+  char* nf_indexFetch5AutomaticBuffer) {
   m_DIGGY_BOLLARD()
-  m_ASSERT(nf_indexRequest5AutomaticBuffer != NULL || !cp_handle->b_frozen) 
+  m_ASSERT(nf_indexFetch5AutomaticBuffer != NULL || !cp_handle->b_frozen) 
 
-  struct INDEX_REQUEST5 *indexRequest5Ptr =
-    (struct INDEX_REQUEST5*) nf_indexRequest5AutomaticBuffer; // a priori
+  struct INDEX_FETCH5 *indexFetch5Ptr =
+    (struct INDEX_FETCH5*) nf_indexFetch5AutomaticBuffer; // a priori
 
-  if (nf_indexRequest5AutomaticBuffer == NULL) {
-    int bufferSize = sizeof(struct INDEX_REQUEST5) + (cp_handle->n_gKeySize >= 0?
+  if (nf_indexFetch5AutomaticBuffer == NULL) {
+    int bufferSize = sizeof(struct INDEX_FETCH5) + (cp_handle->n_gKeySize >= 0?
       cp_handle->n_gKeySize* cp_handle->gKeyCountMax: 0);
-    if (cp_handle->nh_indexRequest5InternalBuffer == NULL) m_MALLOC(
-      cp_handle->nh_indexRequest5InternalBuffer, cp_handle->c_indexRequest5InternalBufferSize =
+    if (cp_handle->nh_indexFetch5InternalBuffer == NULL) m_MALLOC(
+      cp_handle->nh_indexFetch5InternalBuffer, cp_handle->c_indexFetch5InternalBufferSize =
       bufferSize)
 // TODO: should NOT occur ?
-    else if (cp_handle->c_indexRequest5InternalBufferSize < bufferSize) m_REALLOC(
-      cp_handle->nh_indexRequest5InternalBuffer, cp_handle->c_indexRequest5InternalBufferSize =
+    else if (cp_handle->c_indexFetch5InternalBufferSize < bufferSize) m_REALLOC(
+      cp_handle->nh_indexFetch5InternalBuffer, cp_handle->c_indexFetch5InternalBufferSize =
       bufferSize)
-    indexRequest5Ptr = (struct INDEX_REQUEST5*) cp_handle->nh_indexRequest5InternalBuffer;
+    indexFetch5Ptr = (struct INDEX_FETCH5*) cp_handle->nh_indexFetch5InternalBuffer;
   } // if   
 
-  *indexRequest5Ptr = om_IndexRequest5();
+  *indexFetch5Ptr = om_IndexFetch5New();
 
   // MINIMONITOR: ANY
   m_TRACK_IF(GreenCollectionRefreshIndexesInternal(cp_handle,b_TRUE) != RETURNED)
   // MINIMONITOR: NADA
-
-  m_TRACK_IF(GreenIndexesIteratorSequenceReset(cp_handle->h_indexesHandle,
-    &indexRequest5Ptr->iterator) != RETURNED)
+//  m_TRACK_IF(GreenIndexesSequenceReset(cp_handle->h_indexesHandle,
+//    &indexFetch5Ptr->criteria,indexFetch5Ptr->b_descending,&indexFetch5Ptr->sequence) != RETURNED)
   m_DIGGY_RETURN(COMPLETED__OK)
 } // GreenCollectionIndexRequestRNew
 
 // Public function; see description in .h
 int GreenCollectionIndexRequestRAddCriterion(GREEN_COLLECTION_HANDLE cp_handle,
-  char* nf_indexRequest5AutomaticBuffer, struct G_REQUEST_CRITERION criterion) {
+  char* nf_indexFetch5AutomaticBuffer, struct G_REQUEST_CRITERION criterion) {
   m_DIGGY_BOLLARD()
 //  m_ASSERT(indexSeekFlags != ALL_FLAGS_OFF0) 
 // TODO: Ensure GreenCollectionIndexRequestRNew() was called properly
   // MINIMONITOR: NADA
-  m_ASSERT(nf_indexRequest5AutomaticBuffer != NULL || !cp_handle->b_frozen) 
+  m_ASSERT(nf_indexFetch5AutomaticBuffer != NULL || !cp_handle->b_frozen) 
 
-  struct INDEX_REQUEST5 *indexRequest5Ptr =
-    (struct INDEX_REQUEST5*) nf_indexRequest5AutomaticBuffer; // a priori
-  char *c_gKeysBuffer = nf_indexRequest5AutomaticBuffer + sizeof(struct INDEX_REQUEST5); // a priori;
+  struct INDEX_FETCH5 *indexFetch5Ptr =
+    (struct INDEX_FETCH5*) nf_indexFetch5AutomaticBuffer; // a priori
+  char *c_gKeysBuffer = nf_indexFetch5AutomaticBuffer + sizeof(struct INDEX_FETCH5); // a priori;
     // only significant if cp_handle->n_gKeySize >= 0 
 
-  if (nf_indexRequest5AutomaticBuffer == NULL) {
-    int bufferSize = sizeof(struct INDEX_REQUEST5) + (cp_handle->n_gKeySize >= 0?
+  if (nf_indexFetch5AutomaticBuffer == NULL) {
+    int bufferSize = sizeof(struct INDEX_FETCH5) + (cp_handle->n_gKeySize >= 0?
       cp_handle->n_gKeySize* cp_handle->gKeyCountMax: 0);
-    m_ASSERT(cp_handle->nh_indexRequest5InternalBuffer != NULL && 
-      cp_handle->c_indexRequest5InternalBufferSize >= bufferSize)
-    indexRequest5Ptr = (struct INDEX_REQUEST5*) cp_handle->nh_indexRequest5InternalBuffer;
-    if (cp_handle->n_gKeySize >= 0) c_gKeysBuffer = cp_handle->nh_indexRequest5InternalBuffer +
-       sizeof(struct INDEX_REQUEST5);
+    m_ASSERT(cp_handle->nh_indexFetch5InternalBuffer != NULL && 
+      cp_handle->c_indexFetch5InternalBufferSize >= bufferSize)
+    indexFetch5Ptr = (struct INDEX_FETCH5*) cp_handle->nh_indexFetch5InternalBuffer;
+    if (cp_handle->n_gKeySize >= 0) c_gKeysBuffer = cp_handle->nh_indexFetch5InternalBuffer +
+       sizeof(struct INDEX_FETCH5);
   } // if   
 
-  m_ASSERT(indexRequest5Ptr->iterator.criteriaCount < G_REQUEST_CRITERION_COUNT_MAX5)
+  m_ASSERT(indexFetch5Ptr->criteria.criteriaCount < G_REQUEST_CRITERION_COUNT_MAX5)
   if (cp_handle->n_gKeySize >= 0) {
     c_gKeysBuffer += cp_handle->n_gKeySize * cp_handle->gKeyCountMax *
-      indexRequest5Ptr->iterator.criteriaCount ; // value BEFORE increment 
+      indexFetch5Ptr->criteria.criteriaCount ; // value BEFORE increment 
     memcpy(c_gKeysBuffer,(const char*)criterion.cr_gKeys,
       cp_handle->n_gKeySize*cp_handle->gKeyCountMax);
   } // if
-  m_TRACK_IF(m_IndexRequest5AddCriterion(indexRequest5Ptr,criterion) != RETURNED)
+  m_TRACK_IF(m_IndexFetch5AddCriterion(indexFetch5Ptr,criterion) != RETURNED)
 
   m_DIGGY_RETURN(COMPLETED__OK)
 } // GreenCollectionIndexRequestRAddCriterion
 
 // Public function; see description in .h
 int GreenCollectionIndexRequestV(GREEN_COLLECTION_HANDLE cp_handle,
-  char* nf_indexRequest5AutomaticBuffer, int criteriaCount, int indexLabel1,
+  char* nf_indexFetch5AutomaticBuffer, int criteriaCount, int indexLabel1,
   unsigned int indexSeekFlags1, void *cr_gKeys1, va_list extraCriteria) {
   m_DIGGY_BOLLARD()
 
   m_ASSERT(criteriaCount > 0)
 
-  int completed = GreenCollectionIndexRequestRNew(cp_handle,nf_indexRequest5AutomaticBuffer);
+  int completed = GreenCollectionIndexRequestRNew(cp_handle,nf_indexFetch5AutomaticBuffer);
   switch (completed) {
   case COMPLETED__OK:
   break; case COMPLETED__BUT:
@@ -754,7 +735,7 @@ int GreenCollectionIndexRequestV(GREEN_COLLECTION_HANDLE cp_handle,
 
   unsigned int criteriaOpFlags = ALL_FLAGS_OFF0;
   if (criteriaCount > 1) criteriaOpFlags = va_arg(extraCriteria,unsigned int);
-  switch (GreenCollectionIndexRequestRAddCriterion(cp_handle,nf_indexRequest5AutomaticBuffer,
+  switch (GreenCollectionIndexRequestRAddCriterion(cp_handle,nf_indexFetch5AutomaticBuffer,
     om_GRequestCriterion(indexLabel1,indexSeekFlags1,cr_gKeys1, criteriaOpFlags))) {
   case COMPLETED__OK:
   break; case COMPLETED__BUT:
@@ -762,7 +743,7 @@ int GreenCollectionIndexRequestV(GREEN_COLLECTION_HANDLE cp_handle,
   break; default: m_TRACK() } // switch
 
   int i = 1; for (; i < criteriaCount;  i++) {
-    switch (GreenCollectionIndexRequestRAddCriterion(cp_handle,nf_indexRequest5AutomaticBuffer,
+    switch (GreenCollectionIndexRequestRAddCriterion(cp_handle,nf_indexFetch5AutomaticBuffer,
       om_GRequestCriterion(va_arg(extraCriteria,int), va_arg(extraCriteria,unsigned int),
     va_arg(extraCriteria,char *), va_arg(extraCriteria,unsigned int)))) {
     case COMPLETED__OK:
@@ -776,14 +757,14 @@ int GreenCollectionIndexRequestV(GREEN_COLLECTION_HANDLE cp_handle,
 
 // Public function; see description in .h
 int GreenCollectionIndexRequest(GREEN_COLLECTION_HANDLE cp_handle,
-  char* nf_indexRequest5AutomaticBuffer, int criteriaCount, int indexLabel1,
+  char* nf_indexFetch5AutomaticBuffer, int criteriaCount, int indexLabel1,
   unsigned int indexSeekFlags1, void *cr_gKeys1, ...) {
   m_DIGGY_BOLLARD()
 m_DIGGY_VAR_INDEX_SEEK_FLAGS(indexSeekFlags1)
   va_list extraCriteria;
   va_start(extraCriteria,cr_gKeys1);
 
-  int completed = GreenCollectionIndexRequestV(cp_handle,nf_indexRequest5AutomaticBuffer,
+  int completed = GreenCollectionIndexRequestV(cp_handle,nf_indexFetch5AutomaticBuffer,
     criteriaCount,indexLabel1,indexSeekFlags1,cr_gKeys1,extraCriteria);
   switch (completed) {
   case COMPLETED__OK:
@@ -798,18 +779,18 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(indexSeekFlags1)
 
 // Public function; see description in .h
 int GreenCollectionIndexFetch(GREEN_COLLECTION_HANDLE cp_handle,
-  char* nf_indexRequest5AutomaticBuffer, unsigned int indexFetchFlags,
+  char* nf_indexFetch5AutomaticBuffer, unsigned int indexFetchFlags,
   char **acvntr_greenItemStuff, int *nacvn_entry) {
   m_DIGGY_BOLLARD()
   // MINIMONITOR: ANY
   //m_TRACK_IF(GreenCollectionRefreshIndexesInternal(cp_handle,b_TRUE) != RETURNED)
 m_DIGGY_VAR_INDEX_FETCH_FLAGS(indexFetchFlags)
 
-  struct INDEX_REQUEST5 *indexRequest5Ptr =
-    (struct INDEX_REQUEST5 *)(nf_indexRequest5AutomaticBuffer != NULL?
-    nf_indexRequest5AutomaticBuffer: cp_handle->nh_indexRequest5InternalBuffer);
-m_ASSERT(indexRequest5Ptr != NULL)
-//    (struct INDEX_REQUEST5 *)nf_indexRequest5AutomaticBuffer: &(cp_handle->internalIndexRequest5));
+  struct INDEX_FETCH5 *indexFetch5Ptr =
+    (struct INDEX_FETCH5 *)(nf_indexFetch5AutomaticBuffer != NULL?
+    nf_indexFetch5AutomaticBuffer: cp_handle->nh_indexFetch5InternalBuffer);
+m_ASSERT(indexFetch5Ptr != NULL)
+//    (struct INDEX_FETCH5 *)nf_indexFetch5AutomaticBuffer: &(cp_handle->internalIndexFetch5));
 
   if (b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__RESET)) {
     m_TRACK_IF(GreenCollectionRefreshIndexesInternal(cp_handle,b_TRUE) != RETURNED)
@@ -818,21 +799,22 @@ m_ASSERT(indexRequest5Ptr != NULL)
     if (b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__READ)) fetch4 = FETCH_4__READ;
     else if (b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__REMOVE)) fetch4 = FETCH_4__REMOVE;
      
-    om_IndexRequest5Reset(indexRequest5Ptr,b_FLAG_SET_ON(indexFetchFlags,
-      INDEX_FETCH_FLAG__DESCENDING),fetch4);
-    m_TRACK_IF(GreenIndexesIteratorSequenceReset(cp_handle->h_indexesHandle,
-      &indexRequest5Ptr->iterator) != RETURNED)
+    indexFetch5Ptr->b_descending = b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__DESCENDING);
+    indexFetch5Ptr->fetch4 = fetch4;
+    m_TRACK_IF(GreenIndexesSequenceReset(cp_handle->h_indexesHandle,
+      &indexFetch5Ptr->criteria,indexFetch5Ptr->b_descending,&indexFetch5Ptr->sequence) != RETURNED)
   } // if    
 
   int n_entry = UNDEFINED;
   int result = RESULT__NOT_FOUND;
 
   if (b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__NEXT)) {
-    m_TRACK_IF(GreenIndexesIteratorSequenceNext(cp_handle->h_indexesHandle,
-      &indexRequest5Ptr->iterator, &n_entry) != RETURNED)
+    m_TRACK_IF(GreenIndexesSequenceNext(cp_handle->h_indexesHandle,
+      &indexFetch5Ptr->criteria, indexFetch5Ptr->b_descending, &indexFetch5Ptr->sequence, &n_entry)
+      != RETURNED)
   } else {
-    m_TRACK_IF(GreenIndexesIteratorSequenceCurrent(cp_handle->h_indexesHandle,
-      &indexRequest5Ptr->iterator, &n_entry) != RETURNED)
+    m_TRACK_IF(GreenIndexesSequenceCurrent(cp_handle->h_indexesHandle,
+      &indexFetch5Ptr->criteria,&indexFetch5Ptr->sequence,&n_entry) != RETURNED)
   } // if
   if (n_entry != -1) result = RESULT__FOUND; 
 
@@ -840,7 +822,7 @@ m_ASSERT(indexRequest5Ptr != NULL)
   if ((n_entry != -1) || (b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__NEXT) &&
     b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__RESET) &&
     b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__CHANGE) &&
-    b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__SMART))) n_fetch4 = indexRequest5Ptr->fetch4 ;
+    b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__SMART))) n_fetch4 = indexFetch5Ptr->fetch4 ;
 
   // MINIMONITOR: ANY 
   
