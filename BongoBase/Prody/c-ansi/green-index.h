@@ -111,27 +111,6 @@ int GreenIndexesRemove(GREEN_INDEXES_HANDLE handle, int entry) ;
 // Index sequence:
 // ---------------
 
-// Index entries "block"
-struct INDEX_ENTRY_BLOCK {
-  int first; // >= 0
-  int last; // >= first
-} ;
-
-//struct INDEX_SEQUENCE {
-//  // index entries "blocks":
-//  int indexEntryBlockCount2; // between 0 and 2 : 0 => 'disabled' ; >0 -> 'enabled' 
-//  struct INDEX_ENTRY_BLOCK indexEntryBlocks2[2];
-//  // Fields below are only significant if 'enabled' (indexEntryBlockCount2 > 0) :
-//  int cv_firstIndexEntry; // first index entry for ALL "blocks"  
-//  int cv_lastIndexEntry; // last index entry for ALL "blocks"  
-//  int ci_indexEntryCursor; // "current" index entry:
-//    // - < cv_firstIndexEntry => Ascending:"soft reset", Descending:'no more' 
-//    // - between [indexEntries[0].first - cv_lastIndexEntry] => 'in sequence' 
-//    // - cv_lastIndexEntry => Ascending:"no more", Descending:"soft reset" 
-//  const struct INDEX_ENTRY_BLOCK *cv_indexEntryBlockPtr; // "block" corresponding to "current" index entry 
-//} ;
-
-
 
 //// Create new index sequence ("disabled" state - disambiguation purpose...)
 //// 
