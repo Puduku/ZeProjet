@@ -233,6 +233,27 @@ static int GreenIndexBSearch(struct GREEN_INDEX *a_me, int n_bEntry, void *cr_bG
   m_DIGGY_RETURN(RETURNED)
 } // GreenIndexBSearch
 
+
+// Index entries "block"
+struct INDEX_ENTRY_BLOCK {
+  int first; // >= 0
+  int last; // >= first
+} ;
+
+struct INDEX_SEQUENCE {
+  // index entries "blocks":
+  int indexEntryBlockCount2; // between 0 and 2 : 0 => 'disabled' ; >0 -> 'enabled' 
+  struct INDEX_ENTRY_BLOCK indexEntryBlocks2[2];
+  // Fields below are only significant if 'enabled' (indexEntryBlockCount2 > 0) :
+  int cv_firstIndexEntry; // first index entry for ALL "blocks"  
+  int cv_lastIndexEntry; // last index entry for ALL "blocks"  
+  int ci_indexEntryCursor; // "current" index entry:
+    // - < cv_firstIndexEntry => Ascending:"soft reset", Descending:'no more' 
+    // - between [indexEntries[0].first - cv_lastIndexEntry] => 'in sequence' 
+    // - cv_lastIndexEntry => Ascending:"no more", Descending:"soft reset" 
+  const struct INDEX_ENTRY_BLOCK *cv_indexEntryBlockPtr; // "block" corresponding to "current" index entry 
+} ;
+
 // Get current entry in index sequence.
 //
 // Passed:
@@ -659,7 +680,7 @@ static int GreenIndexesSeekEntryEquate(GREEN_INDEXES_HANDLE handle, int indexLab
 // Public function; see .h
 int GreenIndexesSequenceReset(GREEN_INDEXES_HANDLE handle,
    const struct G_REQUEST_CRITERIA5 *ap_gRequestCriteria5, char b_descending,
-   struct INDEX_SEQUENCE *a_indexSequence) {
+   /*struct INDEX_SEQUENCE*/char *a_indexSequence) {
   m_DIGGY_BOLLARD_S()
   m_ASSERT(ap_gRequestCriteria5->criteria[0].indexLabel < handle->indexesNumber) 
 m_DIGGY_VAR_INDEX_SEEK_FLAGS(ap_gRequestCriteria5->criteria[0].indexSeekFlags)
@@ -667,7 +688,7 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(ap_gRequestCriteria5->criteria[0].indexSeekFlags)
   m_TRACK_IF(m_GreenIndexSequenceNew(handle->vnhs_indexes +
     ap_gRequestCriteria5->criteria[0].indexLabel,
     b_descending, ap_gRequestCriteria5->criteria[0].indexSeekFlags,
-    ap_gRequestCriteria5->criteria[0].cr_gKeys, a_indexSequence) != RETURNED) 
+    ap_gRequestCriteria5->criteria[0].cr_gKeys, (struct INDEX_SEQUENCE*)a_indexSequence) != RETURNED) 
 
   m_DIGGY_RETURN(RETURNED)
 } // GreenIndexesSequenceReset
@@ -823,10 +844,10 @@ static inline int m_CriteriaMonitorOpenBrackets(struct CRITERIA_MONITOR *a_me,
 // Public function; see .h
 int GreenIndexesSequenceNext(GREEN_INDEXES_HANDLE handle,
   const struct G_REQUEST_CRITERIA5 *ap_gRequestCriteria5, char b_descending,
-  struct INDEX_SEQUENCE *a_indexSequence, int *an_entry) {
+  struct INDEX_SEQUENCE *a_indexSequenceBuffer, int *an_entry) {
   m_DIGGY_BOLLARD_S()
   m_ASSERT(ap_gRequestCriteria5->criteria[0].indexLabel < handle->indexesNumber) 
-
+  struct INDEX_SEQUENCE *a_indexSequence = (struct INDEX_SEQUENCE)a_indexSequenceBuffer;
   struct CRITERIA_MONITOR criteriaMonitor; // UNDEFINED 
 
   do {
@@ -857,8 +878,9 @@ int GreenIndexesSequenceNext(GREEN_INDEXES_HANDLE handle,
 // Public function; see .h
 int GreenIndexesSequenceCurrent(GREEN_INDEXES_HANDLE handle,
   const struct G_REQUEST_CRITERIA5 *ap_gRequestCriteria5,
-  const struct INDEX_SEQUENCE *ap_indexSequence, int *an_entry) {
+  const /*struct INDEX_SEQUENCE*/char *ap_indexSequenceBuffer, int *an_entry) {
   m_DIGGY_BOLLARD_S()
+  struct INDEX_SEQUENCE ap_indexSequence = (struct INDEX_SEQUENCE*)ap_indexSequenceBuffer;
   m_ASSERT(ap_gRequestCriteria5->criteria[0].indexLabel < handle->indexesNumber) 
   struct GREEN_INDEX *a_index = handle->vnhs_indexes + ap_gRequestCriteria5->criteria[0].indexLabel;
   
