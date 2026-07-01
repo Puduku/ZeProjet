@@ -117,30 +117,31 @@ struct INDEX_ENTRY_BLOCK {
   int last; // >= first
 } ;
 
-//
-struct INDEX_SEQUENCE {
-  // index entries "blocks":
-  int indexEntryBlockCount2; // between 0 and 2 : 0 => 'disabled' ; >0 -> 'enabled' 
-  struct INDEX_ENTRY_BLOCK indexEntryBlocks2[2];
-  // Fields below are only significant if 'enabled' (indexEntryBlockCount2 > 0) :
-  int cv_firstIndexEntry; // first index entry for ALL "blocks"  
-  int cv_lastIndexEntry; // last index entry for ALL "blocks"  
-  int ci_indexEntryCursor; // "current" index entry:
-    // - < cv_firstIndexEntry => Ascending:"soft reset", Descending:'no more' 
-    // - between [indexEntries[0].first - cv_lastIndexEntry] => 'in sequence' 
-    // - cv_lastIndexEntry => Ascending:"no more", Descending:"soft reset" 
-  const struct INDEX_ENTRY_BLOCK *cv_indexEntryBlockPtr; // "block" corresponding to "current" index entry 
-} ;
+//struct INDEX_SEQUENCE {
+//  // index entries "blocks":
+//  int indexEntryBlockCount2; // between 0 and 2 : 0 => 'disabled' ; >0 -> 'enabled' 
+//  struct INDEX_ENTRY_BLOCK indexEntryBlocks2[2];
+//  // Fields below are only significant if 'enabled' (indexEntryBlockCount2 > 0) :
+//  int cv_firstIndexEntry; // first index entry for ALL "blocks"  
+//  int cv_lastIndexEntry; // last index entry for ALL "blocks"  
+//  int ci_indexEntryCursor; // "current" index entry:
+//    // - < cv_firstIndexEntry => Ascending:"soft reset", Descending:'no more' 
+//    // - between [indexEntries[0].first - cv_lastIndexEntry] => 'in sequence' 
+//    // - cv_lastIndexEntry => Ascending:"no more", Descending:"soft reset" 
+//  const struct INDEX_ENTRY_BLOCK *cv_indexEntryBlockPtr; // "block" corresponding to "current" index entry 
+//} ;
 
-// Create new index sequence ("disabled" state - disambiguation purpose...)
-// 
-// Ret:
-// - RETURNED: Ok
-static inline struct INDEX_SEQUENCE om_IndexSequenceNew(void) {
-  struct INDEX_SEQUENCE me = { .indexEntryBlockCount2 = 0 } ;
-  return me;
-} // om_IndexSequenceNew
-  
+
+
+//// Create new index sequence ("disabled" state - disambiguation purpose...)
+//// 
+//// Ret:
+//// - RETURNED: Ok
+//static inline struct INDEX_SEQUENCE om_IndexSequenceNew(void) {
+//  struct INDEX_SEQUENCE me = { .indexEntryBlockCount2 = 0 } ;
+//  return me;
+//} // om_IndexSequenceNew
+int o_IndexSequenceSize(void);   
 
 // Request criteria:
 // -----------------
@@ -293,7 +294,8 @@ static inline int m_GRequestCriteria5AddCriterion(struct G_REQUEST_CRITERIA5 *a_
 // - -1: anomaly is raised
 int GreenIndexesSequenceReset(GREEN_INDEXES_HANDLE handle,
   const struct G_REQUEST_CRITERIA5 *ap_gRequestCriteria5, char b_descending,
-  struct INDEX_SEQUENCE *a_indexSequence) ; 
+  char *a_indexSequence);
+  /*struct INDEX_SEQUENCE*/char *a_indexSequence) ; 
 
 // Update index iterator sequence: NEXT.
 //
@@ -313,7 +315,7 @@ int GreenIndexesSequenceReset(GREEN_INDEXES_HANDLE handle,
 // - -1: anomaly is raised
 int GreenIndexesSequenceNext(GREEN_INDEXES_HANDLE handle,
   const struct G_REQUEST_CRITERIA5 *ap_gRequestCriteria5, char b_descending,
-  struct INDEX_SEQUENCE *a_indexSequence, int *an_entry);
+  /*struct INDEX_SEQUENCE*/char *a_indexSequence, int *an_entry);
 
 
 // Get current entry in index sequence.
@@ -333,7 +335,7 @@ int GreenIndexesSequenceNext(GREEN_INDEXES_HANDLE handle,
 // - -1: anomaly is raised
 int GreenIndexesSequenceCurrent(GREEN_INDEXES_HANDLE handle,
   const struct G_REQUEST_CRITERIA5 *ap_gRequestCriteria5, 
-  const struct INDEX_SEQUENCE *ap_indexSequence, int *an_entry);
+  const /*struct INDEX_SEQUENCE*/char *ap_indexSequence, int *an_entry);
 
 
 // Ret:
