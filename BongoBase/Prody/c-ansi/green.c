@@ -150,7 +150,7 @@ enum {
 struct INDEX_FETCH5 {
   //struct INDEX_ITERATOR5 iterator;
   struct G_REQUEST_CRITERIA5 criteria;
-  struct INDEX_SEQUENCE sequence; 
+//  struct INDEX_SEQUENCE sequence; 
   char b_descending;
   int fetch4; 
 } ;
@@ -159,7 +159,7 @@ struct INDEX_FETCH5 {
 static inline struct INDEX_FETCH5 om_IndexFetch5New(void) {
   struct INDEX_FETCH5 me = { .fetch4 = FETCH_4__CHANGE, .b_descending = b_ASCENDING };
   me.criteria = om_GRequestCriteria5New(); // 0 criteria 
-  me.sequence = om_IndexSequenceNew(); // "disabled" state  
+//  me.sequence = om_IndexSequenceNew(); // "disabled" state  
   return me;
 } // om_IndexFetch5New
 
