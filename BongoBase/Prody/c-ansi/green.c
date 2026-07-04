@@ -199,9 +199,8 @@ struct GREEN_COLLECTION {
   int i_itemCount; // number of items "logically" referenced
   int v_maxItemCount; // max number of items "logically" referenced
   GREEN_INDEXES_HANDLE h_indexesHandle;
-  char *nh_indexFetch5InternalBuffer;
-  int n_indexFetch5BufferSize;
-  char b_lastIndex;
+  char *nh_indexFetchInternalBuffer;
+  int n_indexFetchBufferSize;
   struct GAPS_STACK h_gaps; 
   // "Monitored" entries "fetched for change" (in ALIEN / ALIVE state) : 
   int fetched4ChangeEntryCount;  
@@ -341,8 +340,8 @@ int GreenCollectionCreateInstance(GREEN_COLLECTION_HANDLE *azh_handle,  int expe
   m_TRACK_IF(GreenIndexesCreateInstance(&handle->h_indexesHandle,GreenCollectionEntryRawCompare,
     GreenCollectionEntryRawEquate, (void *) handle) != RETURNED)
   m_GAPS_STACK_INIT(handle->h_gaps,handle->itemPhysicalCount)
-  handle->nh_indexFetch5InternalBuffer = NULL;
-  handle->n_indexFetch5BufferSize = -1;
+  handle->nh_indexFetchInternalBuffer = NULL;
+  handle->n_indexFetchBufferSize = -1;
   handle->b_lastIndex = b_FALSE0;
 
   m_MALLOC_ARRAY(handle->h_fetched4ChangeEntries,handle->fetched4ChangeEntriesPhysicalNumber =
@@ -621,7 +620,18 @@ int GreenCollectionClear (GREEN_COLLECTION_HANDLE handle) {
   m_DIGGY_RETURN(RETURNED)
 } // GreenCollectionClear
 
+// Ret:
+// - COMPLETED__OK:
+// - COMPLETED__BUT:
+static int o_GreenCollectionSetIndexFetchBufferSize(GREEN_COLLECTION_HANDLE *cp_handle) {
+  m_DIGGY_BOLLARD()
+  if (n_indexFetchBufferSize >= 0) m_DIGGY_RETURN(COMPLETED__BUT)
+  handle->n_indexFetchBufferSize = sizeof(struct INDEX_FETCH5) +  o_IndexSequenceSize() + cp_handle->n_gKeySize >= 0?
+    cp_handle->n_gKeySize* cp_handle->gKeyCountMax* G_REQUEST_CRITERION_COUNT_MAX5 : 0);
+  m_DIGGY_RETURN(COMPLETED__OK)
+} // o_GreenCollectionSetIndexFetchBufferSize
 
+  
 // Public function; see description in .h
 int GreenCollectionAddIndex (GREEN_COLLECTION_HANDLE handle, int gKeyCount,
   int *na_indexFetchBufferSize) {
@@ -640,39 +650,37 @@ int GreenCollectionAddIndex (GREEN_COLLECTION_HANDLE handle, int gKeyCount,
     gKeyCount);
   m_TRACK_IF(newIndexLabel < 0)
   if (handle->gKeyCountMax < gKeyCount) handle->gKeyCountMax = gKeyCount;
-  int indexFetchBufferSize = sizeof(struct INDEX_FETCH5) +  o_IndexSequenceSize() + cp_handle->n_gKeySize >= 0?
-      cp_handle->n_gKeySize* cp_handle->gKeyCountMax*  G_REQUEST_CRITERION_COUNT_MAX5 : 0);
   if (na_indexFetchBufferSize != NULL) {
+    switch (o_GreenCollectionSetIndexFetchBufferSize(cp_handle)) {
+    case COMPLETED__OK:
+    break; case COMPLETED__BUT:
+    break; default:  
+    } // switch 
     m_ASSERT(!handle->b_lastIndex)
-    *na_indexFetchBufferSize =
-      sizeof(struct INDEX_FETCH5) + o_IndexSequenceSize() + (handle->n_gKeySize >= 0? handle->n_gKeySize*
-      handle->gKeyCountMax* G_REQUEST_CRITERION_COUNT_MAX5 : 0);
+    *na_indexFetchBufferSize = handle->n_indexFetchBufferSize;
     handle->b_lastIndex = b_TRUE;
   } // if
 
   m_DIGGY_RETURN(newIndexLabel)
 } // GreenCollectionAddIndex
 
+
+ 
 // Public function; see description in .h
 int GreenCollectionIndexRequestRNew(GREEN_COLLECTION_HANDLE cp_handle,
-  char* nf_indexFetch5AutomaticBuffer) {
+  char* nf_indexFetchAutomaticBuffer) {
   m_DIGGY_BOLLARD()
-  m_ASSERT(nf_indexFetch5AutomaticBuffer != NULL || !cp_handle->b_frozen) 
+  m_ASSERT(nf_indexFetchAutomaticBuffer != NULL || !cp_handle->b_frozen) 
 
   struct INDEX_FETCH5 *indexFetch5Ptr =
-    (struct INDEX_FETCH5*) nf_indexFetch5AutomaticBuffer; // a priori
-  char indexSequenceBuffer = nf_indexFetch5AutomaticBuffer + sizeof(struct INDEX_FETCH5); // a priori
-  if (nf_indexFetch5AutomaticBuffer == NULL) {
-    int bufferSize = sizeof(struct INDEX_FETCH5) +  o_IndexSequenceSize() + cp_handle->n_gKeySize >= 0?
-      cp_handle->n_gKeySize* cp_handle->gKeyCountMax: 0);
-    if (cp_handle->nh_indexFetch5InternalBuffer == NULL) m_MALLOC(
-      cp_handle->nh_indexFetch5InternalBuffer, cp_handle->c_indexFetch5InternalBufferSize =
-      bufferSize)
-// TODO: should NOT occur ?
-    else if (cp_handle->c_indexFetch5InternalBufferSize < bufferSize) m_REALLOC(
-      cp_handle->nh_indexFetch5InternalBuffer, cp_handle->c_indexFetch5InternalBufferSize =
-      bufferSize)
-    indexFetch5Ptr = (struct INDEX_FETCH5*) cp_handle->nh_indexFetch5InternalBuffer;
+    (struct INDEX_FETCH5*) nf_indexFetchAutomaticBuffer; // a priori
+  char indexSequenceBuffer = nf_indexFetchAutomaticBuffer + sizeof(struct INDEX_FETCH5); // a priori
+  if (nf_indexFetchAutomaticBuffer == NULL) {
+    if (cp_handle->nh_indexFetchInternalBuffer == NULL) {
+      if (cp_handle->n_indexFetchBufferSize == -1) GreenCollectionSetLastIndex(cp_handle)
+      m_MALLOC(cp_handle->nh_indexFetchInternalBuffer, cp_handle->n_indexFetchBufferSize)
+    } // if 
+    indexFetch5Ptr = (struct INDEX_FETCH5*) cp_handle->nh_indexFetchInternalBuffer;
   } // if   
 
   *indexFetch5Ptr = om_IndexFetch5New();
