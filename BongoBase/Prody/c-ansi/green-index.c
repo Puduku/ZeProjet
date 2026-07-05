@@ -680,7 +680,7 @@ static int GreenIndexesSeekEntryEquate(GREEN_INDEXES_HANDLE handle, int indexLab
 // Public function; see .h
 int GreenIndexesSequenceReset(GREEN_INDEXES_HANDLE handle,
    const struct G_REQUEST_CRITERIA5 *ap_gRequestCriteria5, char b_descending,
-   /*struct INDEX_SEQUENCE*/char *a_indexSequence) {
+   /*struct INDEX_SEQUENCE*/char *indexSequenceBuffer) {
   m_DIGGY_BOLLARD_S()
   m_ASSERT(ap_gRequestCriteria5->criteria[0].indexLabel < handle->indexesNumber) 
 m_DIGGY_VAR_INDEX_SEEK_FLAGS(ap_gRequestCriteria5->criteria[0].indexSeekFlags)
@@ -688,7 +688,7 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(ap_gRequestCriteria5->criteria[0].indexSeekFlags)
   m_TRACK_IF(m_GreenIndexSequenceNew(handle->vnhs_indexes +
     ap_gRequestCriteria5->criteria[0].indexLabel,
     b_descending, ap_gRequestCriteria5->criteria[0].indexSeekFlags,
-    ap_gRequestCriteria5->criteria[0].cr_gKeys, (struct INDEX_SEQUENCE*)a_indexSequence) != RETURNED) 
+    ap_gRequestCriteria5->criteria[0].cr_gKeys, (struct INDEX_SEQUENCE*)indexSequenceBuffer) != RETURNED) 
 
   m_DIGGY_RETURN(RETURNED)
 } // GreenIndexesSequenceReset
@@ -844,10 +844,10 @@ static inline int m_CriteriaMonitorOpenBrackets(struct CRITERIA_MONITOR *a_me,
 // Public function; see .h
 int GreenIndexesSequenceNext(GREEN_INDEXES_HANDLE handle,
   const struct G_REQUEST_CRITERIA5 *ap_gRequestCriteria5, char b_descending,
-  struct INDEX_SEQUENCE *a_indexSequenceBuffer, int *an_entry) {
+  char indexSequenceBuffer, int *an_entry) {
   m_DIGGY_BOLLARD_S()
   m_ASSERT(ap_gRequestCriteria5->criteria[0].indexLabel < handle->indexesNumber) 
-  struct INDEX_SEQUENCE *a_indexSequence = (struct INDEX_SEQUENCE)a_indexSequenceBuffer;
+  struct INDEX_SEQUENCE *a_indexSequence = (struct INDEX_SEQUENCE)indexSequenceBuffer;
   struct CRITERIA_MONITOR criteriaMonitor; // UNDEFINED 
 
   do {
@@ -878,9 +878,9 @@ int GreenIndexesSequenceNext(GREEN_INDEXES_HANDLE handle,
 // Public function; see .h
 int GreenIndexesSequenceCurrent(GREEN_INDEXES_HANDLE handle,
   const struct G_REQUEST_CRITERIA5 *ap_gRequestCriteria5,
-  const /*struct INDEX_SEQUENCE*/char *ap_indexSequenceBuffer, int *an_entry) {
+  const /*struct INDEX_SEQUENCE*/char *p_indexSequenceBuffer, int *an_entry) {
   m_DIGGY_BOLLARD_S()
-  struct INDEX_SEQUENCE ap_indexSequence = (struct INDEX_SEQUENCE*)ap_indexSequenceBuffer;
+  struct INDEX_SEQUENCE ap_indexSequence = (struct INDEX_SEQUENCE*)p_indexSequenceBuffer;
   m_ASSERT(ap_gRequestCriteria5->criteria[0].indexLabel < handle->indexesNumber) 
   struct GREEN_INDEX *a_index = handle->vnhs_indexes + ap_gRequestCriteria5->criteria[0].indexLabel;
   
