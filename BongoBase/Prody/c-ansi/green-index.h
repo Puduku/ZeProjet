@@ -116,7 +116,7 @@ int GreenIndexesRemove(GREEN_INDEXES_HANDLE handle, int entry) ;
 // 
 // Ret:
 // - RETURNED: Ok
-int om_IndexSequenceDisable(char *buffer) ;
+int o_IndexSequenceDisable(char *buffer) ;
 //  struct INDEX_SEQUENCE me = { .indexEntryBlockCount2 = 0 } ;
 //  return me;
 //} // om_IndexSequenceDisable
