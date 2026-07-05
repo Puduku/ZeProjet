@@ -212,26 +212,26 @@ static inline struct G_REQUEST_CRITERION om_GRequestCriterion(int indexLabel,
 } // om_GRequestCriterion
 
 // Suggested max is 5, but may be adapted
-#define G_REQUEST_CRITERION_COUNT_MAX5 5
+//#define G_REQUEST_CRITERION_COUNT_MAX5 5
 
 // An index iterator:
 // - Request criteria
 // - Index sequence
 
-struct G_REQUEST_CRITERIA5 {
-//struct INDEX_ITERATOR5 {
-  int criteriaCount ; // see G_REQUEST_CRITERION_COUNT_MAX5 
-//  // Only 1st criterion is used for setting the index sequence.
-  struct G_REQUEST_CRITERION criteria[G_REQUEST_CRITERION_COUNT_MAX5];
-//  struct INDEX_SEQUENCE indexSequence;
-};
+//struct G_REQUEST_CRITERIA5 {
+////struct INDEX_ITERATOR5 {
+//  int criteriaCount ; // see G_REQUEST_CRITERION_COUNT_MAX5 
+////  // Only 1st criterion is used for setting the index sequence.
+//  struct G_REQUEST_CRITERION criteria[G_REQUEST_CRITERION_COUNT_MAX5];
+////  struct INDEX_SEQUENCE indexSequence;
+//};
 
 // Ret: new criteria
-static inline struct G_REQUEST_CRITERIA5 om_GRequestCriteria5New(void) {
-//static inline struct INDEX_ITERATOR5 om_IndexIterator5(void) {
-  struct G_REQUEST_CRITERIA5 me = { .criteriaCount = 0  };
-  return me;
-} // om_GRequestCriteria5New
+//static inline struct G_REQUEST_CRITERIA5 om_GRequestCriteria5New(void) {
+////static inline struct INDEX_ITERATOR5 om_IndexIterator5(void) {
+//  struct G_REQUEST_CRITERIA5 me = { .criteriaCount = 0  };
+//  return me;
+//} // om_GRequestCriteria5New
 
 // Passed:
 // - a_me:
@@ -244,15 +244,13 @@ static inline struct G_REQUEST_CRITERIA5 om_GRequestCriteria5New(void) {
 // - RETURNED: Ok
 // - -1: anomaly is raised
 //static inline int m_IndexIterator5AddCriterion(struct INDEX_ITERATOR5 *a_me,
-static inline int m_GRequestCriteria5AddCriterion(struct G_REQUEST_CRITERIA5 *a_me,
-  struct G_REQUEST_CRITERION criterion) {
-  m_DIGGY_BOLLARD_S()
-  m_ASSERT(a_me->criteriaCount < G_REQUEST_CRITERION_COUNT_MAX5)
-  int i = a_me->criteriaCount;\
-  a_me->criteria[i] = criterion;\
-  a_me->criteriaCount ++;\
-  m_DIGGY_RETURN(RETURNED)
-} // m_GRequestCriteria5AddCriterion
+//static inline int m_GRequestCriteria5AddCriterion(struct G_REQUEST_CRITERIA5 *a_me,
+#define m_ARRAY_ADD_ITEM(m_array, /*int*/ countMax, /*int*/ m_count, m_item) { \ 
+  m_ASSERT((m_count) < (countMax))\
+  int e_i = (m_count);\
+  (m_array)[e_i] = (m_item);\
+  (m_count)++;\
+}
   
 
 #define b_ASCENDING b_FALSE0
