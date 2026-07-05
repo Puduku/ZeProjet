@@ -342,7 +342,6 @@ int GreenCollectionCreateInstance(GREEN_COLLECTION_HANDLE *azh_handle,  int expe
   m_GAPS_STACK_INIT(handle->h_gaps,handle->itemPhysicalCount)
   handle->nh_indexFetchInternalBuffer = NULL;
   handle->n_indexFetchBufferSize = -1;
-  handle->b_lastIndex = b_FALSE0;
 
   m_MALLOC_ARRAY(handle->h_fetched4ChangeEntries,handle->fetched4ChangeEntriesPhysicalNumber =
     expectedItemCount)
@@ -637,6 +636,7 @@ int GreenCollectionAddIndex (GREEN_COLLECTION_HANDLE handle, int gKeyCount,
   int *na_indexFetchBufferSize) {
   m_DIGGY_BOLLARD()
   m_ASSERT(!handle->b_frozen)
+  m_ASSERT(n_indexFetchBufferSize == -1)
   // MINIMONITOR: ANY
   m_TRACK_IF(GreenCollectionRefreshIndexesInternal(handle,b_TRUE) != RETURNED)
   // MINIMONITOR: NADA
@@ -651,39 +651,47 @@ int GreenCollectionAddIndex (GREEN_COLLECTION_HANDLE handle, int gKeyCount,
   m_TRACK_IF(newIndexLabel < 0)
   if (handle->gKeyCountMax < gKeyCount) handle->gKeyCountMax = gKeyCount;
   if (na_indexFetchBufferSize != NULL) {
-    switch (o_GreenCollectionSetIndexFetchBufferSize(cp_handle)) {
-    case COMPLETED__OK:
-    break; case COMPLETED__BUT:
-    break; default:  
-    } // switch 
-    m_ASSERT(!handle->b_lastIndex)
+    o_GreenCollectionSetIndexFetchBufferSize(cp_handle);
     *na_indexFetchBufferSize = handle->n_indexFetchBufferSize;
-    handle->b_lastIndex = b_TRUE;
   } // if
 
   m_DIGGY_RETURN(newIndexLabel)
 } // GreenCollectionAddIndex
 
+//
+static struct INDEX_FETCH5* o_IndexFetchGetIndexFetch5Ptr(const char *p_buffer) {
+  return (struct INDEX_FETCH5*) p_buffer;
+} // IndexFetchBufferGetIndexFetch5Ptr
 
- 
+//
+static char* o_IndexFetchGetIndexSequenceBuffer(const char *p_buffer) {
+  return p_buffer + sizeof(struct INDEX_FETCH5);
+} // o_IndexFetchGetIndexSequenceBuffer
+
+//
+static char* o_IndexFetchGetGKeysBuffer(const char *p_buffer) {
+  return p_buffer + sizeof(struct INDEX_FETCH5) + o_IndexSequenceSize();
+} // o_IndexFetchGetGKeysBuffer
+  
 // Public function; see description in .h
 int GreenCollectionIndexRequestRNew(GREEN_COLLECTION_HANDLE cp_handle,
   char* nf_indexFetchAutomaticBuffer) {
   m_DIGGY_BOLLARD()
   m_ASSERT(nf_indexFetchAutomaticBuffer != NULL || !cp_handle->b_frozen) 
 
-  struct INDEX_FETCH5 *indexFetch5Ptr =
-    (struct INDEX_FETCH5*) nf_indexFetchAutomaticBuffer; // a priori
-  char indexSequenceBuffer = nf_indexFetchAutomaticBuffer + sizeof(struct INDEX_FETCH5); // a priori
+  struct INDEX_FETCH5 *indexFetch5Ptr = o_IndexFetchGetIndexFetch5Ptr(nf_indexFetchAutomaticBuffer); // a priori
+  char indexSequenceBuffer = o_IndexFetchGetIndexSequencePtr(nf_indexFetchAutomaticBuffer); // a priori
   if (nf_indexFetchAutomaticBuffer == NULL) {
     if (cp_handle->nh_indexFetchInternalBuffer == NULL) {
-      if (cp_handle->n_indexFetchBufferSize == -1) GreenCollectionSetLastIndex(cp_handle)
+      o_GreenCollectionSetIndexFetchBufferSize(cp_handle)
       m_MALLOC(cp_handle->nh_indexFetchInternalBuffer, cp_handle->n_indexFetchBufferSize)
     } // if 
-    indexFetch5Ptr = (struct INDEX_FETCH5*) cp_handle->nh_indexFetchInternalBuffer;
+    indexFetch5Ptr = o_IndexFetchGetIndexFetch5Ptr(cp_handle->nh_indexFetchInternalBuffer);
+    indexSequenceBuffer = o_IndexFetchGetIndexSequenceBuffer(cp_handle->nh_indexFetchInternalBuffer);
   } // if   
 
   *indexFetch5Ptr = om_IndexFetch5New();
+  o_IndexSequenceDisable(indexSequenceBuffer);
 
   // MINIMONITOR: ANY
   m_TRACK_IF(GreenCollectionRefreshIndexesInternal(cp_handle,b_TRUE) != RETURNED)
@@ -695,27 +703,24 @@ int GreenCollectionIndexRequestRNew(GREEN_COLLECTION_HANDLE cp_handle,
 
 // Public function; see description in .h
 int GreenCollectionIndexRequestRAddCriterion(GREEN_COLLECTION_HANDLE cp_handle,
-  char* nf_indexFetch5AutomaticBuffer, struct G_REQUEST_CRITERION criterion) {
+  char* nf_indexFetchAutomaticBuffer, struct G_REQUEST_CRITERION criterion) {
   m_DIGGY_BOLLARD()
 //  m_ASSERT(indexSeekFlags != ALL_FLAGS_OFF0) 
 // TODO: Ensure GreenCollectionIndexRequestRNew() was called properly
   // MINIMONITOR: NADA
-  m_ASSERT(nf_indexFetch5AutomaticBuffer != NULL || !cp_handle->b_frozen) 
+  m_ASSERT(nf_indexFetchAutomaticBuffer != NULL || !cp_handle->b_frozen) 
 
-  struct INDEX_FETCH5 *indexFetch5Ptr =
-    (struct INDEX_FETCH5*) nf_indexFetch5AutomaticBuffer; // a priori
-  char indexSequenceBuffer = nf_indexFetch5AutomaticBuffer + sizeof(struct INDEX_FETCH5); // a priori
-  char *c_gKeysBuffer = nf_indexFetch5AutomaticBuffer + sizeof(struct INDEX_FETCH5); // a priori;
+
+  struct INDEX_FETCH5 *indexFetch5Ptr = o_IndexFetchGetIndexFetch5Ptr(nf_indexFetchAutomaticBuffer); // a priori
+  char indexSequenceBuffer = o_IndexFetchGetIndexSequencePtr(nf_indexFetchAutomaticBuffer); // a priori
+  char *c_gKeysBuffer = o_IndexFetchGetGKeysBuffer(nf_indexFetchAutomaticBuffer) ; // a priori;
     // only significant if cp_handle->n_gKeySize >= 0 
 
-  if (nf_indexFetch5AutomaticBuffer == NULL) {
-    int bufferSize = sizeof(struct INDEX_FETCH5) + o_IndexSequenceSize() + cp_handle->n_gKeySize >= 0?
-      cp_handle->n_gKeySize* cp_handle->gKeyCountMax: 0);
-    m_ASSERT(cp_handle->nh_indexFetch5InternalBuffer != NULL && 
-      cp_handle->c_indexFetch5InternalBufferSize >= bufferSize)
-    indexFetch5Ptr = (struct INDEX_FETCH5*) cp_handle->nh_indexFetch5InternalBuffer;
-    if (cp_handle->n_gKeySize >= 0) c_gKeysBuffer = cp_handle->nh_indexFetch5InternalBuffer +
-       sizeof(struct INDEX_FETCH5);
+  if (nf_indexFetchAutomaticBuffer == NULL) {
+    m_ASSERT(cp_handle->nh_indexFetchInternalBuffer != NULL)
+    indexFetch5Ptr = o_IndexFetchGetIndexFetch5Ptr(cp_handle->nh_indexFetchInternalBuffer);
+    indexSequenceBuffer = o_IndexFetchGetIndexSequenceBuffer(cp_handle->nh_indexFetchInternalBuffer);
+    if (cp_handle->n_gKeySize >= 0) c_gKeysBuffer =  o_IndexFetchGetGKeysBuffer(cp_handle->nh_indexFetchInternalBuffer);
   } // if   
 
   m_ASSERT(indexFetch5Ptr->criteria.criteriaCount < G_REQUEST_CRITERION_COUNT_MAX5)
@@ -732,7 +737,7 @@ int GreenCollectionIndexRequestRAddCriterion(GREEN_COLLECTION_HANDLE cp_handle,
 
 // Public function; see description in .h
 int GreenCollectionIndexRequestV(GREEN_COLLECTION_HANDLE cp_handle,
-  char* nf_indexFetch5AutomaticBuffer, int criteriaCount, int indexLabel1,
+  char* nf_indexFetchAutomaticBuffer, int criteriaCount, int indexLabel1,
   unsigned int indexSeekFlags1, void *cr_gKeys1, va_list extraCriteria) {
   m_DIGGY_BOLLARD()
 
@@ -790,18 +795,18 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(indexSeekFlags1)
 
 // Public function; see description in .h
 int GreenCollectionIndexFetch(GREEN_COLLECTION_HANDLE cp_handle,
-  char* nf_indexFetch5AutomaticBuffer, unsigned int indexFetchFlags,
+  char* nf_indexFetchAutomaticBuffer, unsigned int indexFetchFlags,
   char **acvntr_greenItemStuff, int *nacvn_entry) {
   m_DIGGY_BOLLARD()
   // MINIMONITOR: ANY
   //m_TRACK_IF(GreenCollectionRefreshIndexesInternal(cp_handle,b_TRUE) != RETURNED)
 m_DIGGY_VAR_INDEX_FETCH_FLAGS(indexFetchFlags)
 
-  struct INDEX_FETCH5 *indexFetch5Ptr =
-    (struct INDEX_FETCH5 *)(nf_indexFetch5AutomaticBuffer != NULL?
-    nf_indexFetch5AutomaticBuffer: cp_handle->nh_indexFetch5InternalBuffer);
+  struct INDEX_FETCH5 *indexFetch5Ptr = o_IndexFetchGetIndexFetch5Ptr(nf_indexFetchAutomaticBuffer
+    != NULL? nf_indexFetchAutomaticBuffer: cp_handle->nh_indexFetchInternalBuffer);
 m_ASSERT(indexFetch5Ptr != NULL)
-//    (struct INDEX_FETCH5 *)nf_indexFetch5AutomaticBuffer: &(cp_handle->internalIndexFetch5));
+  char indexSequenceBuffer = o_IndexFetchGetIndexSequencePtr(nf_indexFetchAutomaticBuffer != NULL?
+    nf_indexFetchAutomaticBuffer: cp_handle->nh_indexFetchInternalBuffer);
 
   if (b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__RESET)) {
     m_TRACK_IF(GreenCollectionRefreshIndexesInternal(cp_handle,b_TRUE) != RETURNED)
@@ -812,8 +817,8 @@ m_ASSERT(indexFetch5Ptr != NULL)
      
     indexFetch5Ptr->b_descending = b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__DESCENDING);
     indexFetch5Ptr->fetch4 = fetch4;
-    m_TRACK_IF(GreenIndexesSequenceReset(cp_handle->h_indexesHandle,
-      &indexFetch5Ptr->criteria,indexFetch5Ptr->b_descending,&indexFetch5Ptr->sequence) != RETURNED)
+    m_TRACK_IF(GreenIndexesSequenceReset(cp_handle->h_indexesHandle, &indexFetch5Ptr->criteria,
+      indexFetch5Ptr->b_descending,indexSequenceBuffer) != RETURNED)
   } // if    
 
   int n_entry = UNDEFINED;
@@ -821,11 +826,11 @@ m_ASSERT(indexFetch5Ptr != NULL)
 
   if (b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__NEXT)) {
     m_TRACK_IF(GreenIndexesSequenceNext(cp_handle->h_indexesHandle,
-      &indexFetch5Ptr->criteria, indexFetch5Ptr->b_descending, &indexFetch5Ptr->sequence, &n_entry)
+      &indexFetch5Ptr->criteria, indexFetch5Ptr->b_descending, indexSequenceBuffer, &n_entry)
       != RETURNED)
   } else {
     m_TRACK_IF(GreenIndexesSequenceCurrent(cp_handle->h_indexesHandle,
-      &indexFetch5Ptr->criteria,&indexFetch5Ptr->sequence,&n_entry) != RETURNED)
+      &indexFetch5Ptr->criteria,indexSequenceBuffer,&n_entry) != RETURNED)
   } // if
   if (n_entry != -1) result = RESULT__FOUND; 
 
