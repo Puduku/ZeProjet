@@ -112,15 +112,17 @@ int GreenIndexesRemove(GREEN_INDEXES_HANDLE handle, int entry) ;
 // ---------------
 
 
-//// Create new index sequence ("disabled" state - disambiguation purpose...)
-//// 
-//// Ret:
-//// - RETURNED: Ok
-//static inline struct INDEX_SEQUENCE om_IndexSequenceNew(void) {
+// Set new index sequence ("disabled" state - disambiguation purpose...)
+// 
+// Ret:
+// - RETURNED: Ok
+int om_IndexSequenceDisable(char *buffer) ;
 //  struct INDEX_SEQUENCE me = { .indexEntryBlockCount2 = 0 } ;
 //  return me;
-//} // om_IndexSequenceNew
+//} // om_IndexSequenceDisable
 int o_IndexSequenceSize(void);   
+
+
 
 // Request criteria:
 // -----------------
