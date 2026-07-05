@@ -267,7 +267,7 @@ static inline int m_GRequestCriteria5AddCriterion(struct G_REQUEST_CRITERIA5 *a_
 // - b_descending:
 //
 // Changed:
-// - *a_indexSequence: sequence is (re-)set ; call GreenIndexesSequenceNext() to
+// - *indexSequenceBuffer: sequence is (re-)set ; call GreenIndexesSequenceNext() to
 //   (re-)play the sequence. 
 //
 // Ret:
@@ -275,8 +275,7 @@ static inline int m_GRequestCriteria5AddCriterion(struct G_REQUEST_CRITERIA5 *a_
 // - -1: anomaly is raised
 int GreenIndexesSequenceReset(GREEN_INDEXES_HANDLE handle,
   const struct G_REQUEST_CRITERIA5 *ap_gRequestCriteria5, char b_descending,
-  char *a_indexSequence);
-  /*struct INDEX_SEQUENCE*/char *a_indexSequence) ; 
+  /*struct INDEX_SEQUENCE*/char *indexSequenceBuffer) ; 
 
 // Update index iterator sequence: NEXT.
 //
@@ -296,7 +295,7 @@ int GreenIndexesSequenceReset(GREEN_INDEXES_HANDLE handle,
 // - -1: anomaly is raised
 int GreenIndexesSequenceNext(GREEN_INDEXES_HANDLE handle,
   const struct G_REQUEST_CRITERIA5 *ap_gRequestCriteria5, char b_descending,
-  /*struct INDEX_SEQUENCE*/char *a_indexSequence, int *an_entry);
+  /*struct INDEX_SEQUENCE*/char *indexSequenceBuffer, int *an_entry);
 
 
 // Get current entry in index sequence.
@@ -304,7 +303,7 @@ int GreenIndexesSequenceNext(GREEN_INDEXES_HANDLE handle,
 // Passed:
 // - handle:
 // - *ap_gRequestCriteria5:
-// - *ap_indexSequence:
+// - *p_indexSequenceBuffer:
 //
 // Changed:
 // - *an_entry: 
@@ -316,7 +315,7 @@ int GreenIndexesSequenceNext(GREEN_INDEXES_HANDLE handle,
 // - -1: anomaly is raised
 int GreenIndexesSequenceCurrent(GREEN_INDEXES_HANDLE handle,
   const struct G_REQUEST_CRITERIA5 *ap_gRequestCriteria5, 
-  const /*struct INDEX_SEQUENCE*/char *ap_indexSequence, int *an_entry);
+  const /*struct INDEX_SEQUENCE*/char *p_indexSequenceBuffer, int *an_entry);
 
 
 // Ret:
