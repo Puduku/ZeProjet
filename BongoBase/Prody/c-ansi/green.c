@@ -621,7 +621,32 @@ int GreenCollectionClear (GREEN_COLLECTION_HANDLE handle) {
   // MINIMONITOR: NADA
   m_DIGGY_RETURN(RETURNED)
 } // GreenCollectionClear
+//
+static struct INDEX_FETCH5* o_IndexFetchGetIndexFetch5Ptr(const char *p_buffer) {
+  return (struct INDEX_FETCH5*) p_buffer;
+} // IndexFetchBufferGetIndexFetch5Ptr
 
+//
+static char* o_IndexFetchGetIndexSequenceBuffer(const char *p_buffer) {
+  return p_buffer + sizeof(struct INDEX_FETCH5);
+} // o_IndexFetchGetIndexSequenceBuffer
+
+//
+static char* o_IndexFetchGetGRequestCriteriaBuffer(const char *p_buffer) {
+  return p_buffer + sizeof(struct INDEX_FETCH5) + o_IndexSequenceSize();
+} // o_IndexFetchGetIndexSequenceBuffer
+
+//
+static char* o_IndexFetchGetGKeysBuffer(const char *p_buffer, int gRequestCriterionCountMax) {
+  return p_buffer + sizeof(struct INDEX_FETCH5) + o_IndexSequenceSize() +
+    sizeof(struct G_REQUEST_CRITERION)*gRequestCriterionCountMax + 
+} // o_IndexFetchGetGKeysBuffer
+
+//
+static int o_IndexFetchGetBufferSize( int gRequestCriterionCountMax) {
+} // o_IndexFetchGetBufferSize
+
+  
 // Ret:
 // - COMPLETED__OK:
 // - COMPLETED__BUT:
@@ -662,26 +687,6 @@ int GreenCollectionAddIndex (GREEN_COLLECTION_HANDLE handle, int gKeyCount,
   m_DIGGY_RETURN(newIndexLabel)
 } // GreenCollectionAddIndex
 
-//
-static struct INDEX_FETCH5* o_IndexFetchGetIndexFetch5Ptr(const char *p_buffer) {
-  return (struct INDEX_FETCH5*) p_buffer;
-} // IndexFetchBufferGetIndexFetch5Ptr
-
-//
-static char* o_IndexFetchGetIndexSequenceBuffer(const char *p_buffer) {
-  return p_buffer + sizeof(struct INDEX_FETCH5);
-} // o_IndexFetchGetIndexSequenceBuffer
-
-//
-static char* o_IndexFetchGetGRequestCriteriaBuffer(const char *p_buffer) {
-  return p_buffer + sizeof(struct INDEX_FETCH5) + o_IndexSequenceSize();
-} // o_IndexFetchGetIndexSequenceBuffer
-
-//
-static char* o_IndexFetchGetGKeysBuffer(const char *p_buffer, int gRequestCriterionCountMax) {
-  return p_buffer + sizeof(struct INDEX_FETCH5) + o_IndexSequenceSize() +
-    sizeof(struct G_REQUEST_CRITERION)*gRequestCriterionCountMax + 
-} // o_IndexFetchGetGKeysBuffer
   
 // Public function; see description in .h
 int GreenCollectionIndexRequestRNew(GREEN_COLLECTION_HANDLE cp_handle,
