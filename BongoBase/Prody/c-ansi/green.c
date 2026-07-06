@@ -11,7 +11,6 @@
 #include <string.h>
 #include <stdarg.h>
 
-
 #include "c-ansi/diggy.h"
 #include "c-ansi/testy-diggy.h"
 
@@ -149,7 +148,8 @@ enum {
 
 struct INDEX_FETCH5 {
   //struct INDEX_ITERATOR5 iterator;
-  struct G_REQUEST_CRITERIA5 criteria;
+//  struct G_REQUEST_CRITERIA5 criteria;
+  int gRequestCriterionCount;
 //  struct INDEX_SEQUENCE sequence; 
   char b_descending;
   int fetch4; 
@@ -158,7 +158,8 @@ struct INDEX_FETCH5 {
 // Ret: new index sequence (0 criteria - disabled)
 static inline struct INDEX_FETCH5 om_IndexFetch5New(void) {
   struct INDEX_FETCH5 me = { .fetch4 = FETCH_4__CHANGE, .b_descending = b_ASCENDING };
-  me.criteria = om_GRequestCriteria5New(); // 0 criteria 
+//  me.criteria = om_GRequestCriteria5New(); // 0 criteria
+  me.gRequestCriteriaCount = 0;
 //  me.sequence = om_IndexSequenceNew(); // "disabled" state  
   return me;
 } // om_IndexFetch5New
