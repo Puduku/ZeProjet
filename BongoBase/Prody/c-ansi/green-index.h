@@ -245,23 +245,20 @@ static inline struct G_REQUEST_CRITERION om_GRequestCriterion(int indexLabel,
 // - -1: anomaly is raised
 //static inline int m_IndexIterator5AddCriterion(struct INDEX_ITERATOR5 *a_me,
 //static inline int m_GRequestCriteria5AddCriterion(struct G_REQUEST_CRITERIA5 *a_me,
-#define m_ARRAY_ADD_ITEM(m_array, /*int*/ countMax, /*int*/ m_count, m_item) { \ 
-  m_ASSERT((m_count) < (countMax))\
-  int e_i = (m_count);\
-  (m_array)[e_i] = (m_item);\
-  (m_count)++;\
+#define m_ARRAY_ADD_ITEM(m_array, /*int*/ u_countMax, /*int*/ m_count, m_item) { \ 
+  m_ASSERT((m_count) < (u_countMax))\
+  (m_array)[(m_count)++] = (m_item);\
 }
   
-
 #define b_ASCENDING b_FALSE0
 #define b_DESCENDING b_TRUE
-
 
 // (re-)set index iterator sequence according to the criteria (only 1st criterion is used) 
 //
 // Passed:
 // - handle: 
-// - *ap_gRequestCriteria5:
+// - sp_gRequestCriteria:
+// - gRequestCriterionCount:
 // - b_descending:
 //
 // Changed:
@@ -272,14 +269,16 @@ static inline struct G_REQUEST_CRITERION om_GRequestCriterion(int indexLabel,
 // - RETURNED: Ok
 // - -1: anomaly is raised
 int GreenIndexesSequenceReset(GREEN_INDEXES_HANDLE handle,
-  const struct G_REQUEST_CRITERIA5 *ap_gRequestCriteria5, char b_descending,
+//  const struct G_REQUEST_CRITERIA5 *ap_gRequestCriteria5, char b_descending,
+  const struct G_REQUEST_CRITERION *sp_gRequestCriteria, int gRequestCriterionCount, char b_descending,
   /*struct INDEX_SEQUENCE*/char *indexSequenceBuffer) ; 
 
 // Update index iterator sequence: NEXT.
 //
 // Passed:
 // - handle: 
-// - *ap_gRequestCriteria5:
+// - sp_gRequestCriteria5:
+// - gRequestCriterionCount
 // - b_descending:
 //
 // Changed:
@@ -292,7 +291,8 @@ int GreenIndexesSequenceReset(GREEN_INDEXES_HANDLE handle,
 // - RETURNED: Ok
 // - -1: anomaly is raised
 int GreenIndexesSequenceNext(GREEN_INDEXES_HANDLE handle,
-  const struct G_REQUEST_CRITERIA5 *ap_gRequestCriteria5, char b_descending,
+//  const struct G_REQUEST_CRITERIA5 *ap_gRequestCriteria5, char b_descending,
+  const struct G_REQUEST_CRITERION *sp_gRequestCriteria, int gRequestCriterionCount, char b_descending,
   /*struct INDEX_SEQUENCE*/char *indexSequenceBuffer, int *an_entry);
 
 
@@ -300,7 +300,8 @@ int GreenIndexesSequenceNext(GREEN_INDEXES_HANDLE handle,
 //
 // Passed:
 // - handle:
-// - *ap_gRequestCriteria5:
+// - sp_gRequestCriteria5:
+// - gRequestCritetionCount
 // - *p_indexSequenceBuffer:
 //
 // Changed:
@@ -312,7 +313,8 @@ int GreenIndexesSequenceNext(GREEN_INDEXES_HANDLE handle,
 // - RETURNED: Ok
 // - -1: anomaly is raised
 int GreenIndexesSequenceCurrent(GREEN_INDEXES_HANDLE handle,
-  const struct G_REQUEST_CRITERIA5 *ap_gRequestCriteria5, 
+//  const struct G_REQUEST_CRITERIA5 *ap_gRequestCriteria5, 
+  const struct G_REQUEST_CRITERION *sp_gRequestCriteria5, int gRequestCritetionCount, 
   const /*struct INDEX_SEQUENCE*/char *p_indexSequenceBuffer, int *an_entry);
 
 
