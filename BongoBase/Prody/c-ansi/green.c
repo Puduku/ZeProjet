@@ -149,7 +149,7 @@ enum {
 struct INDEX_FETCH5 {
   //struct INDEX_ITERATOR5 iterator;
 //  struct G_REQUEST_CRITERIA5 criteria;
-  int gRequestCriterionCount;
+  int i_gRequestCriterionCount;
 //  struct INDEX_SEQUENCE sequence; 
   char b_descending;
   int fetch4; 
@@ -159,7 +159,7 @@ struct INDEX_FETCH5 {
 static inline struct INDEX_FETCH5 om_IndexFetch5New(void) {
   struct INDEX_FETCH5 me = { .fetch4 = FETCH_4__CHANGE, .b_descending = b_ASCENDING };
 //  me.criteria = om_GRequestCriteria5New(); // 0 criteria
-  me.gRequestCriteriaCount = 0;
+  me.i_gRequestCriteriaCount = 0;
 //  me.sequence = om_IndexSequenceNew(); // "disabled" state  
   return me;
 } // om_IndexFetch5New
@@ -174,11 +174,11 @@ static inline struct INDEX_FETCH5 om_IndexFetch5New(void) {
 // Ret:
 // - RETURNED: Ok
 // - -1: anomaly is raised
-static inline int m_IndexFetch5AddCriterion(struct INDEX_FETCH5 *a_me ,
-  struct G_REQUEST_CRITERION criterion) {
+static inline int m_IndexFetch5AddCriterion(struct INDEX_FETCH5 *a_me , struct G_REQUEST_CRITERION* vs_gRequestCriteria,
+  int gRequestCriterionCountMax, struct G_REQUEST_CRITERION gRequestCriterion) {
   m_DIGGY_BOLLARD_S()
-  m_TRACK_IF(m_GRequestCriteria5AddCriterion(&a_me->criteria,criterion) != RETURNED)
-  m_DIGGY_RETURN(RETURNED)
+//  m_TRACK_IF(m_GRequestCriteria5AddCriterion(&a_me->criteria,criterion) != RETURNED)
+  m_ARRAY_ADD_ITEM(vs_gRequestCriteria, gRequestCriterionCountMax, a_me->i_gRequestCriterionCount, gRequestCriterion) 
 } // m_IndexFetch5AddCriterion
 
 struct GREEN_COLLECTION {
@@ -189,6 +189,7 @@ struct GREEN_COLLECTION {
   GREEN_HANDLER__EQUATE_FUNCTION greenHandlerEquateFunction;
   int n_gKeySize;
   int gKeyCountMax;
+  int gRequestCriterionCountMax;
   void *r_greenHandlerHandle;
 
   char b_automaticIndexesRefresh;
@@ -326,6 +327,7 @@ int GreenCollectionCreateInstance(GREEN_COLLECTION_HANDLE *azh_handle,  int expe
   handle->n_gKeySize = (n_greenHandlerCompareFunction != NULL || n_greenHandlerEquateFunction?
     cn_gKeySize: -1);
   handle->gKeyCountMax = 1; // a priori
+  handle->gRequestCriteriaCountMax = 5; // TODO: ad hoc parameter
   handle->r_greenHandlerHandle = cfr_greenHandlerHandle;
 
   handle->b_frozen = b_FALSE0;
@@ -626,7 +628,8 @@ int GreenCollectionClear (GREEN_COLLECTION_HANDLE handle) {
 static int o_GreenCollectionSetIndexFetchBufferSize(GREEN_COLLECTION_HANDLE *cp_handle) {
   m_DIGGY_BOLLARD()
   if (n_indexFetchBufferSize >= 0) m_DIGGY_RETURN(COMPLETED__BUT)
-  handle->n_indexFetchBufferSize = sizeof(struct INDEX_FETCH5) +  o_IndexSequenceSize() + cp_handle->n_gKeySize >= 0?
+  handle->n_indexFetchBufferSize = sizeof(struct INDEX_FETCH5) +  o_IndexSequenceSize() +
+    sizeof(G_REQUEST_CRITERION)*cp_handle->gRequestCriterionCountMax + cp_handle->n_gKeySize >= 0?
     cp_handle->n_gKeySize* cp_handle->gKeyCountMax* G_REQUEST_CRITERION_COUNT_MAX5 : 0);
   m_DIGGY_RETURN(COMPLETED__OK)
 } // o_GreenCollectionSetIndexFetchBufferSize
@@ -670,8 +673,14 @@ static char* o_IndexFetchGetIndexSequenceBuffer(const char *p_buffer) {
 } // o_IndexFetchGetIndexSequenceBuffer
 
 //
-static char* o_IndexFetchGetGKeysBuffer(const char *p_buffer) {
+static char* o_IndexFetchGetGRequestCriteriaBuffer(const char *p_buffer) {
   return p_buffer + sizeof(struct INDEX_FETCH5) + o_IndexSequenceSize();
+} // o_IndexFetchGetIndexSequenceBuffer
+
+//
+static char* o_IndexFetchGetGKeysBuffer(const char *p_buffer, int gRequestCriterionCountMax) {
+  return p_buffer + sizeof(struct INDEX_FETCH5) + o_IndexSequenceSize() +
+    sizeof(struct G_REQUEST_CRITERION)*gRequestCriterionCountMax + 
 } // o_IndexFetchGetGKeysBuffer
   
 // Public function; see description in .h
