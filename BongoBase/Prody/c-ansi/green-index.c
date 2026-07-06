@@ -679,19 +679,21 @@ static int GreenIndexesSeekEntryEquate(GREEN_INDEXES_HANDLE handle, int indexLab
 
 // Public function; see .h
 int GreenIndexesSequenceReset(GREEN_INDEXES_HANDLE handle,
-   const struct G_REQUEST_CRITERIA5 *ap_gRequestCriteria5, char b_descending,
+   const struct G_REQUEST_CRITERION *sp_gRequestCriteria, int gRequestCriterionCount, char b_descending,
    /*struct INDEX_SEQUENCE*/char *indexSequenceBuffer) {
   m_DIGGY_BOLLARD_S()
-  m_ASSERT(ap_gRequestCriteria5->criteria[0].indexLabel < handle->indexesNumber) 
-m_DIGGY_VAR_INDEX_SEEK_FLAGS(ap_gRequestCriteria5->criteria[0].indexSeekFlags)
+  m_ASSERT(sp_gRequestCriteria[0].indexLabel < handle->indexesNumber) 
+m_DIGGY_VAR_INDEX_SEEK_FLAGS(sp_gRequestCriteria[0].indexSeekFlags)
 // TODO: la premiegre initialisation de la sequence (...RequestR()) est perdue (...Fetch()) ??? 
   m_TRACK_IF(m_GreenIndexSequenceNew(handle->vnhs_indexes +
-    ap_gRequestCriteria5->criteria[0].indexLabel,
-    b_descending, ap_gRequestCriteria5->criteria[0].indexSeekFlags,
-    ap_gRequestCriteria5->criteria[0].cr_gKeys, (struct INDEX_SEQUENCE*)indexSequenceBuffer) != RETURNED) 
+    sp_gRequestCriteria[0].indexLabel,
+    b_descending, sp_gRequestCriteria[0].indexSeekFlags,
+    sp_gRequestCriteria[0].cr_gKeys, (struct INDEX_SEQUENCE*)indexSequenceBuffer) != RETURNED) 
 
   m_DIGGY_RETURN(RETURNED)
 } // GreenIndexesSequenceReset
+
+#define G_REQUEST_CRITERION_COUNT_MAX5 5
 
 struct CRITERIA_MONITOR {
   int i_depth;
@@ -714,13 +716,13 @@ struct CRITERIA_MONITOR {
 // changed:
 // - a_me: 1st criterion (op. flags) initialized
 static inline int om_CriteriaMonitorReset(struct CRITERIA_MONITOR* a_me,
-  const struct G_REQUEST_CRITERIA5* ap_gRequestCriteria5) {
+  const struct G_REQUEST_CRITERION* sp_gRequestCriteria, int gRequestCriterionCount) {
   m_DIGGY_BOLLARD_S()
   a_me->i_depth = 0;
   a_me->v_knownCriteriaOpFlagsPtr = a_me->knownCriteriaOpFlags;
   a_me->v_statusPtr = a_me->statuses;
   a_me->statuses[0] = 'U' ; 
-  a_me->knownCriteriaOpFlags[0] = ap_gRequestCriteria5->criteria[0].criteriaOpFlags;
+  a_me->knownCriteriaOpFlags[0] = sp_gRequestCriteria[0].criteriaOpFlags;
   m_SET_FLAG_ON(a_me->knownCriteriaOpFlags[0], CRITERIA_OP_FLAG__AND)
   m_SET_FLAG_OFF(a_me->knownCriteriaOpFlags[0], CRITERIA_OP_FLAG__OR)
   m_DIGGY_RETURN(RETURNED)
@@ -743,19 +745,19 @@ static inline int om_CriteriaMonitorReset(struct CRITERIA_MONITOR* a_me,
 // - a_monitor: updated state
 static inline int m_GreenIndexesCriteriaEquationAndCloseBrackets(GREEN_INDEXES_HANDLE handle,
   int entry, struct CRITERIA_MONITOR* a_monitor,
-  const struct G_REQUEST_CRITERIA5* ap_gRequestCriteria, int criterionEntry) {
+  const struct G_REQUEST_CRITERION* sp_gRequestCriteria, int gRequestCriterionCount, int criterionEntry) {
   m_DIGGY_BOLLARD_S()
   if (criterionEntry == 0) {
-    if (ap_gRequestCriteria->criteriaCount == 1) a_monitor->statuses[0] = 'O' ; 
+    if (gRequestCriterionCount == 1) a_monitor->statuses[0] = 'O' ; 
   } else { 
     // Number of close brackets: 
-    int count = (criterionEntry+1 == ap_gRequestCriteria->criteriaCount)? (a_monitor->i_depth): 
+    int count = (criterionEntry+1 == gRequestCriterionCount)? (a_monitor->i_depth): 
       m_CloseBracketCount(ap_gRequestCriteria->criteria[criterionEntry].criteriaOpFlags);
     if (count == 0) {
       if (*a_monitor->v_knownCriteriaOpFlagsPtr == ALL_FLAGS_OFF0)
         *a_monitor->v_knownCriteriaOpFlagsPtr = 
         ap_gRequestCriteria->criteria[criterionEntry].criteriaOpFlags;
-      if (criterionEntry+1 < ap_gRequestCriteria->criteriaCount && b_FLAG_SET_ON(
+      if (criterionEntry+1 < gRequestCriterionCount && b_FLAG_SET_ON(
         *a_monitor->v_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__OR) && b_FLAG_SET_ON(
         ap_gRequestCriteria->criteria[criterionEntry+1].criteriaOpFlags, CRITERIA_OP_FLAG__AND))
         count++;
@@ -768,11 +770,11 @@ static inline int m_GreenIndexesCriteriaEquationAndCloseBrackets(GREEN_INDEXES_H
       switch (answer) {
       case ANSWER__YES:
         if (b_FLAG_SET_OFF(*a_monitor->v_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__AND) || 
-          count > 0 || criterionEntry+1 == ap_gRequestCriteria->criteriaCount) *a_monitor->v_statusPtr
+          count > 0 || criterionEntry+1 == gRequestCriterionCount) *a_monitor->v_statusPtr
           = 'O';
       break; case ANSWER__NO: 
         if (b_FLAG_SET_OFF(*(a_monitor->v_knownCriteriaOpFlagsPtr),CRITERIA_OP_FLAG__OR) || 
-          count > 0 || criterionEntry+1 == ap_gRequestCriteria->criteriaCount) *a_monitor->v_statusPtr
+          count > 0 || criterionEntry+1 == gRequestCriterionCount) *a_monitor->v_statusPtr
           = 'K'; 
       break; default:
         m_TRACK()
@@ -823,11 +825,11 @@ static inline int m_GreenIndexesCriteriaEquationAndCloseBrackets(GREEN_INDEXES_H
 // Changed:
 // - a_me: updated state 
 static inline int m_CriteriaMonitorOpenBrackets(struct CRITERIA_MONITOR *a_me,
-  const struct G_REQUEST_CRITERIA5* ap_gRequestCriteria, int criterionEntry) {
+  const struct G_REQUEST_CRITERION* sp_gRequestCriteria, int gRequestCriterionCount, int criterionEntry) {
   m_DIGGY_BOLLARD_S()
   // Number of open brackets:
   int count = m_OpenBracketCount(ap_gRequestCriteria->criteria[criterionEntry].criteriaOpFlags);
-  if (count == 0 && criterionEntry+1 < ap_gRequestCriteria->criteriaCount && b_FLAG_SET_ON(
+  if (count == 0 && criterionEntry+1 < gRequestCriterionCount && b_FLAG_SET_ON(
     *(a_me->v_knownCriteriaOpFlagsPtr),CRITERIA_OP_FLAG__AND) && b_FLAG_SET_ON(
     ap_gRequestCriteria->criteria[criterionEntry+1].criteriaOpFlags, CRITERIA_OP_FLAG__OR)) count++;
   int i = 0; for (; i < count; i++) {
@@ -843,16 +845,16 @@ static inline int m_CriteriaMonitorOpenBrackets(struct CRITERIA_MONITOR *a_me,
 
 // Public function; see .h
 int GreenIndexesSequenceNext(GREEN_INDEXES_HANDLE handle,
-  const struct G_REQUEST_CRITERIA5 *ap_gRequestCriteria5, char b_descending,
+  const struct G_REQUEST_CRITERION *sp_gRequestCriteria5, int gRequestCriterionCount, char b_descending,
   char indexSequenceBuffer, int *an_entry) {
   m_DIGGY_BOLLARD_S()
-  m_ASSERT(ap_gRequestCriteria5->criteria[0].indexLabel < handle->indexesNumber) 
+  m_ASSERT(sp_gRequestCriteria[0].indexLabel < handle->indexesNumber) 
   struct INDEX_SEQUENCE *a_indexSequence = (struct INDEX_SEQUENCE)indexSequenceBuffer;
   struct CRITERIA_MONITOR criteriaMonitor; // UNDEFINED 
 
   do {
     m_TRACK_IF(m_GreenIndexSequenceNext(handle->vnhs_indexes +
-      ap_gRequestCriteria5->criteria[0].indexLabel, b_descending,
+      sp_gRequestCriteria[0].indexLabel, b_descending,
       a_indexSequence, an_entry) != RETURNED) 
     if (*an_entry >= 0) {
       om_CriteriaMonitorReset(&criteriaMonitor,ap_gRequestCriteria5);
@@ -877,12 +879,12 @@ int GreenIndexesSequenceNext(GREEN_INDEXES_HANDLE handle,
 
 // Public function; see .h
 int GreenIndexesSequenceCurrent(GREEN_INDEXES_HANDLE handle,
-  const struct G_REQUEST_CRITERIA5 *ap_gRequestCriteria5,
+  const struct G_REQUEST_CRITERION *sp_gRequestCriteria5, int gRequestCriterionCount,
   const /*struct INDEX_SEQUENCE*/char *p_indexSequenceBuffer, int *an_entry) {
   m_DIGGY_BOLLARD_S()
   struct INDEX_SEQUENCE ap_indexSequence = (struct INDEX_SEQUENCE*)p_indexSequenceBuffer;
-  m_ASSERT(ap_gRequestCriteria5->criteria[0].indexLabel < handle->indexesNumber) 
-  struct GREEN_INDEX *a_index = handle->vnhs_indexes + ap_gRequestCriteria5->criteria[0].indexLabel;
+  m_ASSERT(sp_gRequestCriteria[0].indexLabel < handle->indexesNumber) 
+  struct GREEN_INDEX *a_index = handle->vnhs_indexes + sp_gRequestCriteria[0].indexLabel;
   
   m_TRACK_IF(m_GreenIndexSequenceCurrent(a_index,ap_indexSequence,an_entry) !=
     RETURNED)
