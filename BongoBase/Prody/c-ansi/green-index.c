@@ -617,7 +617,7 @@ int GreenIndexesAdd(GREEN_INDEXES_HANDLE handle, int entry) {
 // - ANSWER__YES: 
 // - ANSWER__NO: 
 // - -1: unexpected problem; anomaly is raised
-static int GreenIndexesEntryEquate(GREEN_INDEXES_HANDLE handle, int indexLabel, int aEntry,
+static inline int m_GreenIndexesEntryEquate(GREEN_INDEXES_HANDLE handle, int indexLabel, int aEntry,
   void *r_bGKeys) {
   int answer = UNDEFINED;
   m_ASSERT(indexLabel < handle->indexesNumber) 
@@ -628,7 +628,7 @@ static int GreenIndexesEntryEquate(GREEN_INDEXES_HANDLE handle, int indexLabel, 
   } // for
   
   return answer;
-} // GreenIndexesEntryEquate
+} // m_GreenIndexesEntryEquate
 
 // Perform "equation" of entry with a key. 
 //
@@ -672,7 +672,7 @@ static int GreenIndexesSeekEntryEquate(GREEN_INDEXES_HANDLE handle, int indexLab
       m_RAISE(ANOMALY__VALUE__D,indexSeekFlags)
     } // switch
   } else { // INDEX_SEEK_FLAGS__LIKE
-    m_TRACK_IF((answer = GreenIndexesEntryEquate(handle,indexLabel, aEntry, r_bGKeys)) < 0)
+    m_TRACK_IF((answer = m_GreenIndexesEntryEquate(handle,indexLabel, aEntry, r_bGKeys)) < 0)
   } // if 
   m_DIGGY_RETURN(answer)
 } // GreenIndexesSeekEntryEquate
@@ -711,7 +711,7 @@ struct CRITERIA_MONITOR {
 //
 // Passed:
 // - a_me:
-// - ap_gRequestCriteria5:
+// - ap_gRequestCriteria:
 //
 // changed:
 // - a_me: 1st criterion (op. flags) initialized
@@ -738,7 +738,7 @@ static inline int om_CriteriaMonitorReset(struct CRITERIA_MONITOR* a_me,
 // - handle: indexes for equation 
 // - entry: entry to equate 
 // - a_monitor: current state
-// - ap_gRequestCriteria5: contains criteria criteria
+// - ap_gRequestCriteria: contains criteria criteria
 // - criterionEntry: criterion entry 
 //
 // Changed:
@@ -845,7 +845,7 @@ static inline int m_CriteriaMonitorOpenBrackets(struct CRITERIA_MONITOR *a_me,
 
 // Public function; see .h
 int GreenIndexesSequenceNext(GREEN_INDEXES_HANDLE handle,
-  const struct G_REQUEST_CRITERION *sp_gRequestCriteria5, int gRequestCriterionCount, char b_descending,
+  const struct G_REQUEST_CRITERION *sp_gRequestCriteria, int gRequestCriterionCount, char b_descending,
   char indexSequenceBuffer, int *an_entry) {
   m_DIGGY_BOLLARD_S()
   m_ASSERT(sp_gRequestCriteria[0].indexLabel < handle->indexesNumber) 
@@ -857,13 +857,13 @@ int GreenIndexesSequenceNext(GREEN_INDEXES_HANDLE handle,
       sp_gRequestCriteria[0].indexLabel, b_descending,
       a_indexSequence, an_entry) != RETURNED) 
     if (*an_entry >= 0) {
-      om_CriteriaMonitorReset(&criteriaMonitor,ap_gRequestCriteria5);
-      int criterionEntry = 0; for (; criterionEntry < ap_gRequestCriteria5->criteriaCount;
+      om_CriteriaMonitorReset(&criteriaMonitor,ap_gRequestCriteria);
+      int criterionEntry = 0; for (; criterionEntry < ap_gRequestCriteria->criteriaCount;
         criterionEntry++) {
         m_TRACK_IF(m_GreenIndexesCriteriaEquationAndCloseBrackets(handle,*an_entry,&criteriaMonitor,
-          ap_gRequestCriteria5, criterionEntry) != RETURNED) 
+          ap_gRequestCriteria, criterionEntry) != RETURNED) 
         m_TRACK_IF(m_CriteriaMonitorOpenBrackets(&criteriaMonitor,
-          ap_gRequestCriteria5, criterionEntry) != RETURNED) 
+          ap_gRequestCriteria, criterionEntry) != RETURNED) 
       } // for
   // Break "criteria handling" loop if entry not rejected by extra criteria 
   m_ASSERT(criteriaMonitor.i_depth == 0) 
@@ -879,7 +879,7 @@ int GreenIndexesSequenceNext(GREEN_INDEXES_HANDLE handle,
 
 // Public function; see .h
 int GreenIndexesSequenceCurrent(GREEN_INDEXES_HANDLE handle,
-  const struct G_REQUEST_CRITERION *sp_gRequestCriteria5, int gRequestCriterionCount,
+  const struct G_REQUEST_CRITERION *sp_gRequestCriteria, int gRequestCriterionCount,
   const /*struct INDEX_SEQUENCE*/char *p_indexSequenceBuffer, int *an_entry) {
   m_DIGGY_BOLLARD_S()
   struct INDEX_SEQUENCE ap_indexSequence = (struct INDEX_SEQUENCE*)p_indexSequenceBuffer;
