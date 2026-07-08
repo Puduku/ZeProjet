@@ -762,7 +762,7 @@ int GreenCollectionIndexRequestRAddCriterion(GREEN_COLLECTION_HANDLE cp_handle,
     memcpy(c_gKeysBuffer,(const char*)criterion.cr_gKeys,
       cp_handle->n_gKeySize*cp_handle->gKeyCountMax);
   } // if
-  m_TRACK_IF(m_IndexFetchHeaderAddCriterion(indexFetchHeaderPtr,criterion) != RETURNED)
+  m_TRACK_IF(m_IndexFetchHeaderAddCriterion(indexFetchHeaderPtr,cp_handle->gRequestCriterionCountMax,criterion) != RETURNED)
 
   m_DIGGY_RETURN(COMPLETED__OK)
 } // GreenCollectionIndexRequestRAddCriterion
