@@ -678,25 +678,33 @@ static int GreenIndexesSeekEntryEquate(GREEN_INDEXES_HANDLE handle, int indexLab
 } // GreenIndexesSeekEntryEquate
 
 static int GRequestCriteriaPrepare(struct G_REQUEST_CRITERION *s_me, int count) {
-  char b_rectified = b_FALSE0; // a priori
-  for (i = 0; i < count; i++) {
-     int initialCriteriaOpFlags = s_me[i].criteriaOpFlags;
-     if (i == 0) {
-        m_SET_FLAG_OFF(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE1)
-        m_SET_FLAG_OFF(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE2)
-        m_SET_FLAG_OFF(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE3)
-        if (count > 1) {
-          m_SET_FLAG_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__AND)
-          m_SET_FLAG_OFF(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__OR)
-          // Ensure following OR op. would precedence over that AND op. 
-          int openBracketCount = m_OpenBracketCount(s_me[i].criteriaOpFlags);
-    if (openBracketCount == 0 && i+1 < count && b_FLAG_SET_ON(s_me[i].criteriaOpFlags,
-       CRITERIA_OP_FLAG__AND) && b_FLAG_SET_ON(s_me[i+1].criteriaOpFlags, CRITERIA_OP_FLAG__OR))
-       openBracketCount++;
+  m_DIGGY_BOLLARD()
+  int completed = COMPLETED__OK; // Not rectified a priori
+  int initialCriteriaOpFlags = s_me[0].criteriaOpFlags;
+  if (count > 1) {
+    m_SET_FLAG_OFF(s_me[0].criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE1)
+    m_SET_FLAG_OFF(s_me[0].criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE2)
+    m_SET_FLAG_OFF(s_me[0].criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE3)
+    m_SET_FLAG_ON(s_me[0].criteriaOpFlags,CRITERIA_OP_FLAG__AND)
+    m_SET_FLAG_OFF(s_me[0].criteriaOpFlags,CRITERIA_OP_FLAG__OR)
+    // Ensure following OR op. would have precedence over that AND op. 
+    int openBracketCount = m_OpenBracketCount(s_me[1].criteriaOpFlags);
+    if (openBracketCount == 0) m_SET_FLAG_ON(s_me[1].criteriaOpFlags,CRITERIA_OP_FLAG__OPEN1)
+  } else s_me[i].criteriaOpFlags = ALL_FLAGS_OFF0;
+  if (s_me[0].criteriaOpFlags != initialCriteriaOpFlags) completed = COMPLETED__BUT;
+  for (i = 1; i < count; i++) {
+    int initialCriteriaOpFlags = s_me[i].criteriaOpFlags;
+    if ( b_FLAG_SET_ON
+    // Ensure AND op. have precedence over that OR op. 
+    int openBracketCount = m_OpenBracketCount(s_me[1].criteriaOpFlags);
+    if (openBracketCount == 0) m_SET_FLAG_ON(s_me[1].criteriaOpFlags,CRITERIA_OP_FLAG__OPEN1)
+    
+     if (s_me[i].criteriaOpFlags != initialCriteriaOpFlags) completed = COMPLETED__BUT;
+
          if (openBracketCount == 0 && i+1 < count && b_FLAG_SET_ON(s_me[i].criteriaOpFlags,
        CRITERIA_OP_FLAG__AND) && b_FLAG_SET_ON(s_me[i+1].criteriaOpFlags, CRITERIA_OP_FLAG__OR))
        openBracketCount++;
-        } else s_me[i].criteriaOpFlags = ALL_FLAGS_OFF0;
+        
      } // if
 
      // Ensure AND op. precedence 
