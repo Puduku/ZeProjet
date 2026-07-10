@@ -728,21 +728,82 @@ static inline int om_CriteriaMonitorReset(struct CRITERIA_MONITOR* a_me,
   m_DIGGY_RETURN(RETURNED)
 } // om_CriteriaMonitorReset
 
-// Handle equation and then closing brackets for current criterion
+// Handle closing brackets for current criterion after equation
 // criterion op. flags are rectified if needed:
 // - closing bracket added to ensure AND op. precedence (over OR op.)
 // - missing closing brackets (at the end of the expression) are added 
 // - superfluous closing brackets are ignored
 //
 // Passed:
-// - handle: indexes for equation 
-// - entry: entry to equate 
-// - a_monitor: current state
+// - a_me: current state
 // - ap_gRequestCriteria: contains criteria criteria
 // - criterionEntry: criterion entry 
 //
 // Changed:
-// - a_monitor: updated state
+// - a_me: updated state
+static inline int m_CriteriaMonitorCloseBrackets(struct CRITERIA_MONITOR* a_me, int answer,
+  const struct G_REQUEST_CRITERION* sp_gRequestCriteria, int gRequestCriterionCount, int criterionEntry) {
+  m_DIGGY_BOLLARD_S()
+  if (criterionEntry == 0) {
+    if (gRequestCriterionCount == 1) a_me->statuses[0] = 'O' ; 
+  } else { 
+    // Number of close brackets: 
+    int count = (criterionEntry+1 == gRequestCriterionCount)? (a_me->i_depth): 
+      m_CloseBracketCount(ap_gRequestCriteria->criteria[criterionEntry].criteriaOpFlags);
+    if (count == 0) {
+      if (*a_me->v_knownCriteriaOpFlagsPtr == ALL_FLAGS_OFF0)
+        *a_me->v_knownCriteriaOpFlagsPtr = 
+        ap_gRequestCriteria->criteria[criterionEntry].criteriaOpFlags;
+      if (criterionEntry+1 < gRequestCriterionCount && b_FLAG_SET_ON(
+        *a_me->v_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__OR) && b_FLAG_SET_ON(
+        ap_gRequestCriteria->criteria[criterionEntry+1].criteriaOpFlags, CRITERIA_OP_FLAG__AND))
+        count++;
+    } else if (count > a_me->i_depth) count = a_me->i_depth; 
+    if (*(a_me->v_statusPtr) == 'U') {
+      switch (answer) {
+      case ANSWER__YES:
+        if (b_FLAG_SET_OFF(*a_me->v_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__AND) || 
+          count > 0 || criterionEntry+1 == gRequestCriterionCount) *a_me->v_statusPtr
+          = 'O';
+      break; case ANSWER__NO: 
+        if (b_FLAG_SET_OFF(*(a_me->v_knownCriteriaOpFlagsPtr),CRITERIA_OP_FLAG__OR) || 
+          count > 0 || criterionEntry+1 == gRequestCriterionCount) *a_me->v_statusPtr
+          = 'K'; 
+      break; default:
+        m_TRACK()
+      } // switch
+    } // if
+    int j = 0; for (; j < count; j++) {
+      m_ASSERT(--(a_me->i_depth) >= 0)
+      (a_me->v_knownCriteriaOpFlagsPtr)--; 
+      (a_me->v_statusPtr)--; 
+      if (j == count-1 && *a_me->v_knownCriteriaOpFlagsPtr == ALL_FLAGS_OFF0) 
+        *a_me->v_knownCriteriaOpFlagsPtr =
+        ap_gRequestCriteria->criteria[criterionEntry].criteriaOpFlags;
+      if (*a_me->v_statusPtr == 'U') {
+        if (b_FLAG_SET_OFF(*a_me->v_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__OR)) {
+          *a_me->v_statusPtr = 'O';
+        } else { 
+          *a_me->v_statusPtr = 'K';
+        } // if
+      } //if 
+      if (a_me->i_depth > 0 && a_me->statuses[a_me->i_depth+1] != 'C') {
+        m_ASSERT(*a_me->v_statusPtr == 'U')
+        if (a_me->statuses[a_me->i_depth+1] == 'O' && b_FLAG_SET_OFF(
+          *a_me->v_knownCriteriaOpFlagsPtr,CRITERIA_OP_FLAG__AND)) *a_me->v_statusPtr =
+          'O' ; 
+        else if (*a_me->v_statusPtr == 'K' && b_FLAG_SET_OFF(
+          *a_me->v_knownCriteriaOpFlagsPtr, CRITERIA_OP_FLAG__OR)) *a_me->v_statusPtr =
+          'K'; 
+      } // if 
+    } // for   
+    if (*a_me->v_knownCriteriaOpFlagsPtr == ALL_FLAGS_OFF0)
+      *a_me->v_knownCriteriaOpFlagsPtr =
+      ap_gRequestCriteria->criteria[criterionEntry].criteriaOpFlags;
+  } // if 
+  m_DIGGY_RETURN(RETURNED)
+} // m_CriteriaMonitorCloseBrackets
+
 static inline int m_GreenIndexesCriteriaEquationAndCloseBrackets(GREEN_INDEXES_HANDLE handle,
   int entry, struct CRITERIA_MONITOR* a_monitor,
   const struct G_REQUEST_CRITERION* sp_gRequestCriteria, int gRequestCriterionCount, int criterionEntry) {
@@ -810,6 +871,7 @@ static inline int m_GreenIndexesCriteriaEquationAndCloseBrackets(GREEN_INDEXES_H
   } // if 
   m_DIGGY_RETURN(RETURNED)
 } // 
+
 
 // Handle open brackets for current criterion
 // Note: in this implementation, opening brackets are indeed handled AFTER handling of closing
