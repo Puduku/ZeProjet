@@ -678,7 +678,29 @@ static int GreenIndexesSeekEntryEquate(GREEN_INDEXES_HANDLE handle, int indexLab
 } // GreenIndexesSeekEntryEquate
 
 static int GRequestCriteriaPrepare(struct G_REQUEST_CRITERION *s_me, int count) {
+  char b_rectified = b_FALSE0; // a priori
+  for (i = 0; i < count; i++) {
+     int initialCriteriaOpFlags = s_me[i].criteriaOpFlags;
+     if (i == 0) {
+        m_SET_FLAG_OFF(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE1)
+        m_SET_FLAG_OFF(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE2)
+        m_SET_FLAG_OFF(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE3)
+        if (count > 1) {
+          m_SET_FLAG_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__AND)
+          m_SET_FLAG_OFF(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__OR)
+          // Ensure following OR op. would precedence over that AND op. 
+          int openBracketCount = m_OpenBracketCount(s_me[i].criteriaOpFlags);
+    if (openBracketCount == 0 && i+1 < count && b_FLAG_SET_ON(s_me[i].criteriaOpFlags,
+       CRITERIA_OP_FLAG__AND) && b_FLAG_SET_ON(s_me[i+1].criteriaOpFlags, CRITERIA_OP_FLAG__OR))
+       openBracketCount++;
+         if (openBracketCount == 0 && i+1 < count && b_FLAG_SET_ON(s_me[i].criteriaOpFlags,
+       CRITERIA_OP_FLAG__AND) && b_FLAG_SET_ON(s_me[i+1].criteriaOpFlags, CRITERIA_OP_FLAG__OR))
+       openBracketCount++;
+        } else s_me[i].criteriaOpFlags = ALL_FLAGS_OFF0;
+     } // if
 
+     // Ensure AND op. precedence 
+    
 // criterion op. flags are rectified if needed:
 // - closing bracket added to ensure AND op. precedence (over OR op.)
 // - missing closing brackets (at the end of the expression) are added 
@@ -750,7 +772,7 @@ static int GRequestCriteriaPrepare(struct G_REQUEST_CRITERION *s_me, int count) 
 // - open bracket added to ensure AND op. precedence (over OR op.)
 
   // Number of open brackets:
-  for (i = 0; i < count; i++) {
+
     int openBracketCount = m_OpenBracketCount(s_me[i].criteriaOpFlags);
     if (openBracketCount == 0 && i+1 < count && b_FLAG_SET_ON(s_me[i].criteriaOpFlags,
        CRITERIA_OP_FLAG__AND) && b_FLAG_SET_ON(s_me[i+1].criteriaOpFlags, CRITERIA_OP_FLAG__OR))
