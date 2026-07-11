@@ -680,23 +680,23 @@ static int GreenIndexesSeekEntryEquate(GREEN_INDEXES_HANDLE handle, int indexLab
 // Ret:
 // - COMPLETED__OK:
 // - COMPLETED__BUT: rectification was necessary
-static int GRequestCriteriaPrepare(struct G_REQUEST_CRITERION *s_me, int count) {
+static int GRequestCriteriaPrepare(struct G_REQUEST_CRITERION *s_me, int meCount) {
   m_DIGGY_BOLLARD()
   int completed = COMPLETED__OK; // Not rectified a priori
   int depth = 0;
   int initialCriteriaOpFlags = s_me[0].criteriaOpFlags;
-  if (count > 1) {
+  if (meCount > 1) {
     s_me[0].criteriaOpFlags = CRITERIA_OP_FLAG__AND;
     // Ensure following OR op. would have precedence over that AND op. 
     if (m_OpenBracketCount(s_me[1].criteriaOpFlags) == 0) m_SET_FLAG_ON(s_me[1].criteriaOpFlags,
       CRITERIA_OP_FLAG__OPEN1)
   } else s_me[0].criteriaOpFlags = ALL_FLAGS_OFF0;
   if (s_me[0].criteriaOpFlags != initialCriteriaOpFlags) completed = COMPLETED__BUT;
-  for (i = 1; i < count; i++) {
+  for (i = 1; i < meCount; i++) {
     int initialCriteriaOpFlags = s_me[i].criteriaOpFlags;      
     if (b_FLAG_SET_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__OR) {
       m_SET_FLAG_OFF(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__AND)
-      if (i+1 < count) {
+      if (i+1 < meCount) {
         // Ensure AND op. have precedence over that OR op. 
         if (m_OpenBracketCount(s_me[i+1].criteriaOpFlags) == 0) m_SET_FLAG_ON(
           s_me[i+1].criteriaOpFlags,CRITERIA_OP_FLAG__OPEN1)
@@ -751,7 +751,7 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(sp_gRequestCriteria[0].indexSeekFlags)
   m_DIGGY_RETURN(RETURNED)
 } // GreenIndexesSequenceReset
 
-#define G_REQUEST_CRITERION_COUNT_MAX5 5
+//#define G_REQUEST_CRITERION_COUNT_MAX5 5
 
 //struct CRITERIA_MONITOR {
 //  int depth;
