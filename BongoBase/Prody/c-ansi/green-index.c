@@ -849,16 +849,14 @@ int GreenIndexesSequenceNext(GREEN_INDEXES_HANDLE handle,
       om_CriteriaMonitorReset(&criteriaMonitorDepth,s_criteriaMonitorStatuses,gRequestCriterionCount);
       const struct G_REQUEST_CRITERION* p_gRequestCriterionPtr = sp_gRequestCriteria;
 
-m_TRACK_IF(m_GRequestCriterionEval(&p_gRequestCriterionPtr, b_FALSE0,&criteriaMonitorDepth,s_criteriaMonitorStatuses) != RETURNED)
-
-
-      int i = 1; for (; i < gRequestCriterionCount;
+      int i = 0; for (; i < gRequestCriterionCount;
         i++, p_gRequestCriterionPtr) {
 
-        int answer = GreenIndexesSeekEntryEquate(handle,
+        int answer = ANSWER__YES; // a priori
+        if (i > 0) m_TRACK_IF((answer = GreenIndexesSeekEntryEquate(handle,
           p_gRequestCriterionPtr->indexLabel,entry,
           p_gRequestCriterionPtr->indexSeekFlags,
-          p_gRequestCriterionPtr->cr_gKeys);
+          p_gRequestCriterionPtr->cr_gKeys)) < 0)
 
         m_TRACK_IF(m_GRequestCriterionEval(&p_gRequestCriterionPtr, answer == ANSWER__YES,
           &criteriaMonitorDepth,s_criteriaMonitorStatuses) != RETURNED)
