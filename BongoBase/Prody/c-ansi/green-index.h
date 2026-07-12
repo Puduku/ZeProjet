@@ -111,17 +111,15 @@ int GreenIndexesRemove(GREEN_INDEXES_HANDLE handle, int entry) ;
 // Index sequence:
 // ---------------
 
-
 // Set new index sequence ("disabled" state - disambiguation purpose...)
 // 
 // Ret:
 // - RETURNED: Ok
 int o_IndexSequenceDisable(char *buffer) ;
-//  struct INDEX_SEQUENCE me = { .indexEntryBlockCount2 = 0 } ;
-//  return me;
-//} // om_IndexSequenceDisable
-int o_IndexSequenceSize(void);   
 
+// 
+// Ret: index sequence buffer size
+int o_IndexSequenceSize(void);   
 
 
 // Request criteria:
@@ -169,21 +167,21 @@ m_DEFINE_ENUM_ALIAS_END()
 
 // Passed:
 // - criteriaOpFlags
-static inline int m_OpenBracketCount(unsigned int criteriaOpFlags) {
-  if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__OPEN3)) return 3;
-  else if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__OPEN2)) return 2;
-  else if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__OPEN1)) return 1;
+static inline int om_CriteriaOpFlagsOpenBracketCount(unsigned int me) {
+  if (b_FLAG_SET_ON(me,CRITERIA_OP_FLAG__OPEN3)) return 3;
+  else if (b_FLAG_SET_ON(me,CRITERIA_OP_FLAG__OPEN2)) return 2;
+  else if (b_FLAG_SET_ON(me,CRITERIA_OP_FLAG__OPEN1)) return 1;
   return 0;
-} // m_OpenBracketCount 
+} // om_CriteriaOpFlagsOpenBracketCount 
 
 // Passed:
 // - criteriaOpFlags
-static inline int m_CloseBracketCount(unsigned int criteriaOpFlags) {
-  if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE3)) return 3;
-  else if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE2)) return 2;
-  else if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE1)) return 1;
+static inline int om_CriteriaOpFlagsCloseBracketCount(unsigned int me) {
+  if (b_FLAG_SET_ON(me,CRITERIA_OP_FLAG__CLOSE3)) return 3;
+  else if (b_FLAG_SET_ON(me,CRITERIA_OP_FLAG__CLOSE2)) return 2;
+  else if (b_FLAG_SET_ON(me,CRITERIA_OP_FLAG__CLOSE1)) return 1;
   return 0;
-} // m_CloseBracketCount 
+} // om_CriteriaOpFlagsCloseBracketCount 
 
 // May or may be NOT index-based selection:
 struct G_REQUEST_CRITERION {
@@ -211,41 +209,22 @@ static inline struct G_REQUEST_CRITERION om_GRequestCriterion(int indexLabel,
   return me;
 } // om_GRequestCriterion
 
-// Suggested max is 5, but may be adapted
-//#define G_REQUEST_CRITERION_COUNT_MAX5 5
 
-// An index iterator:
-// - Request criteria
-// - Index sequence
+//// An index iterator:
+//// - Request criteria
+//// - Index sequence
 
-//struct G_REQUEST_CRITERIA5 {
-////struct INDEX_ITERATOR5 {
-//  int criteriaCount ; // see G_REQUEST_CRITERION_COUNT_MAX5 
-////  // Only 1st criterion is used for setting the index sequence.
-//  struct G_REQUEST_CRITERION criteria[G_REQUEST_CRITERION_COUNT_MAX5];
-////  struct INDEX_SEQUENCE indexSequence;
-//};
-
-// Ret: new criteria
-//static inline struct G_REQUEST_CRITERIA5 om_GRequestCriteria5New(void) {
-////static inline struct INDEX_ITERATOR5 om_IndexIterator5(void) {
-//  struct G_REQUEST_CRITERIA5 me = { .criteriaCount = 0  };
-//  return me;
-//} // om_GRequestCriteria5New
-
+// TODO: cette macro est tregs gednedrale...
 // Passed:
-// - a_me:
-// - m_criterion:
+// - m_me:
+// - u_countMax:
+// - m_count:
+// - m_item
 // 
 // Changed:
-// - *a_me:
-//
-// Ret:
-// - RETURNED: Ok
-// - -1: anomaly is raised
-//static inline int m_IndexIterator5AddCriterion(struct INDEX_ITERATOR5 *a_me,
-//static inline int m_GRequestCriteria5AddCriterion(struct G_REQUEST_CRITERIA5 *a_me,
-#define m_ARRAY_ADD_ITEM(m_array, /*int*/ u_countMax, /*int*/ m_count, m_item) { \ 
+// - m_me:
+// - m_count:
+#define m_ARRAY_ADD_ITEM(m_me, /*int*/ u_countMax, /*int*/ m_count, m_item) { \ 
   m_ASSERT((m_count) < (u_countMax))\
   (m_array)[(m_count)++] = (m_item);\
 }
@@ -269,7 +248,6 @@ static inline struct G_REQUEST_CRITERION om_GRequestCriterion(int indexLabel,
 // - RETURNED: Ok
 // - -1: anomaly is raised
 int GreenIndexesSequenceReset(GREEN_INDEXES_HANDLE handle,
-//  const struct G_REQUEST_CRITERIA5 *ap_gRequestCriteria5, char b_descending,
   const struct G_REQUEST_CRITERION *sp_gRequestCriteria, int gRequestCriterionCount, char b_descending,
   /*struct INDEX_SEQUENCE*/char *indexSequenceBuffer) ; 
 
@@ -277,12 +255,13 @@ int GreenIndexesSequenceReset(GREEN_INDEXES_HANDLE handle,
 //
 // Passed:
 // - handle: 
-// - sp_gRequestCriteria5:
+// - sp_gRequestCriteria:
 // - gRequestCriterionCount
 // - b_descending:
+// - *indexSequenceBuffer : iterator sequence "current"
 //
 // Changed:
-// - a_indexIterator5-> : iterator sequence "next"
+// - *indexSequenceBuffer : iterator sequence "next"
 // - *an_entry: item entry to retrieve : 
 //   + -1 special value : not found, that is "disabled" or "no more"
 //   + >= 0: corresponding entry
@@ -291,16 +270,15 @@ int GreenIndexesSequenceReset(GREEN_INDEXES_HANDLE handle,
 // - RETURNED: Ok
 // - -1: anomaly is raised
 int GreenIndexesSequenceNext(GREEN_INDEXES_HANDLE handle,
-//  const struct G_REQUEST_CRITERIA5 *ap_gRequestCriteria5, char b_descending,
   const struct G_REQUEST_CRITERION *sp_gRequestCriteria, int gRequestCriterionCount, char b_descending,
-  /*struct INDEX_SEQUENCE*/char *indexSequenceBuffer, int *an_entry);
+  char *indexSequenceBuffer, int *an_entry);
 
 
 // Get current entry in index sequence.
 //
 // Passed:
 // - handle:
-// - sp_gRequestCriteria5:
+// - sp_gRequestCriteria:
 // - gRequestCritetionCount
 // - *p_indexSequenceBuffer:
 //
@@ -313,9 +291,8 @@ int GreenIndexesSequenceNext(GREEN_INDEXES_HANDLE handle,
 // - RETURNED: Ok
 // - -1: anomaly is raised
 int GreenIndexesSequenceCurrent(GREEN_INDEXES_HANDLE handle,
-//  const struct G_REQUEST_CRITERIA5 *ap_gRequestCriteria5, 
-  const struct G_REQUEST_CRITERION *sp_gRequestCriteria5, int gRequestCritetionCount, 
-  const /*struct INDEX_SEQUENCE*/char *p_indexSequenceBuffer, int *an_entry);
+  const struct G_REQUEST_CRITERION *sp_gRequestCriteria, int gRequestCritetionCount, 
+  const char *p_indexSequenceBuffer, int *an_entry);
 
 
 // Ret:
