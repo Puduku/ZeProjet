@@ -702,8 +702,8 @@ static int GRequestCriteriaPrepare(struct G_REQUEST_CRITERION *s_me, int meCount
   if (meCount > 1) {
     s_me[0].criteriaOpFlags = CRITERIA_OP_FLAG__AND;
     // Ensure following OR op. would have precedence over that AND op. 
-    if (m_OpenBracketCount(s_me[1].criteriaOpFlags) == 0) m_SET_FLAG_ON(s_me[1].criteriaOpFlags,
-      CRITERIA_OP_FLAG__OPEN1)
+    if (om_CriteriaOpFlagsOpenBracketCount(s_me[1].criteriaOpFlags) == 0) m_SET_FLAG_ON(
+      s_me[1].criteriaOpFlags,CRITERIA_OP_FLAG__OPEN1)
   } else s_me[0].criteriaOpFlags = ALL_FLAGS_OFF0;
   if (s_me[0].criteriaOpFlags != initialCriteriaOpFlags) completed = COMPLETED__BUT;
   for (i = 1; i < meCount; i++) {
@@ -712,13 +712,13 @@ static int GRequestCriteriaPrepare(struct G_REQUEST_CRITERION *s_me, int meCount
       m_SET_FLAG_OFF(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__AND)
       if (i+1 < meCount) {
         // Ensure AND op. have precedence over that OR op. 
-        if (m_OpenBracketCount(s_me[i+1].criteriaOpFlags) == 0) m_SET_FLAG_ON(
+        if (om_CriteriaOpFlagsOpenBracketCount(s_me[i+1].criteriaOpFlags) == 0) m_SET_FLAG_ON(
           s_me[i+1].criteriaOpFlags,CRITERIA_OP_FLAG__OPEN1)
         } // if
     } else if (b_FLAG_SET_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__AND)  m_SET_FLAG_OFF(
       s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__OR)
-    depth += m_OpenBracketCount(s_me[i].criteriaOpFlags);
-    if (depth - m_CloseBracketCount(s_me[i].criteriaOpFlags) < 0) {
+    depth += om_CriteriaOpFlagsOpenBracketCount(s_me[i].criteriaOpFlags);
+    if (depth - om_CriteriaOpFlagsCloseBracketCount(s_me[i].criteriaOpFlags) < 0) {
       m_SET_FLAG_OFF(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE1)
       m_SET_FLAG_OFF(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE2)
       m_SET_FLAG_OFF(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE3) 
@@ -728,9 +728,9 @@ static int GRequestCriteriaPrepare(struct G_REQUEST_CRITERION *s_me, int meCount
       break; case 2: m_SET_FLAG_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE2)
       break; default: m_SET_FLAG_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE3) } // switch
     } // if
-    m_ASSERT((depth -= m_CloseBracketCount(s_me[i].criteriaOpFlags)) >= 0) 
+    m_ASSERT((depth -= om_CriteriaOpFlagsCloseBracketCount(s_me[i].criteriaOpFlags)) >= 0) 
     if (i == 1) {
-      if (depth - m_CloseBracketCount(s_me[i].criteriaOpFlags) > 0) {
+      if (depth - om_CriteriaOpFlagsCloseBracketCount(s_me[i].criteriaOpFlags) > 0) {
         m_SET_FLAG_OFF(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE1)
         m_SET_FLAG_OFF(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE2)
         m_SET_FLAG_OFF(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE3) 
@@ -740,7 +740,7 @@ static int GRequestCriteriaPrepare(struct G_REQUEST_CRITERION *s_me, int meCount
         break; case 2: m_SET_FLAG_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE2)
         break; default: m_SET_FLAG_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE3) } // switch
       } // if  
-      m_ASSERT((depth -= m_CloseBracketCount(s_me[i].criteriaOpFlags)) == 0) 
+      m_ASSERT((depth -= om_CriteriaOpFlagsCloseBracketCount(s_me[i].criteriaOpFlags)) == 0) 
     } // if
     if (s_me[i].criteriaOpFlags != initialCriteriaOpFlags) completed = COMPLETED__BUT;
   } // for
@@ -800,7 +800,7 @@ static inline int om_CriteriaMonitorReset(int* az_meDepth, int* sz_meStatuses) {
 static inline int m_GRequestCriterionEval(struct G_REQUEST_CRITIRION* me, b_passed,
   int* a_criteriaMonitorDepth, int* s_criteriaMonitorStatuses) {
 m_DIGGY_BOLLARD_S()
-  int bracketCount = m_OpenBracketCount(me.criteriaOpFlags);
+  int bracketCount = om_CriteriaOpFlagsOpenBracketCount(me.criteriaOpFlags);
   int i; for (; i < bracketCount; i++) {
     s_criteriaMonitorStatuses[*a_criteriaMonitorDepth+i+1] = 'U';
   } // for
@@ -822,7 +822,7 @@ m_DIGGY_BOLLARD_S()
     break; default: m_RAISE(ANOMALY__VALUE__D,s_criteriaMonitorStatuses[*a_criteriaMonitorDepth]
   } // switch 
 
-  int bracketCount = m_CloseBracketCount(me.criteriaOpFlags);
+  int bracketCount = om_CriteriaOpFlagsCloseBracketCount(me.criteriaOpFlags);
   int i; for (; i < bracketCount; i++) {
     s_criteriaMonitorStatuses[*a_criteriaMonitorDepth+i+1] = 'U';
   } // for
