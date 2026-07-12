@@ -87,7 +87,6 @@ static inline int om_GreenIndexRemove(struct GREEN_INDEX* a_me, int indexEntry) 
   m_DIGGY_RETURN(RETURNED) 
 } // om_GreenIndexRemove
 
-
 // Passed:
 // - a_me:
 // - newIndexEntry:
@@ -849,7 +848,11 @@ int GreenIndexesSequenceNext(GREEN_INDEXES_HANDLE handle,
     if (*an_entry >= 0) {
       om_CriteriaMonitorReset(&criteriaMonitorDepth,s_criteriaMonitorStatuses,gRequestCriterionCount);
       const struct G_REQUEST_CRITERION* p_gRequestCriterionPtr = sp_gRequestCriteria;
-      int i = 0; for (; i < gRequestCriterionCount;
+
+m_TRACK_IF(m_GRequestCriterionEval(&p_gRequestCriterionPtr, b_FALSE0,&criteriaMonitorDepth,s_criteriaMonitorStatuses) != RETURNED)
+
+
+      int i = 1; for (; i < gRequestCriterionCount;
         i++, p_gRequestCriterionPtr) {
 
         int answer = GreenIndexesSeekEntryEquate(handle,
