@@ -800,7 +800,7 @@ static inline int m_GRequestCriterionEval(struct G_REQUEST_CRITIRION* me, b_pass
   int* a_criteriaMonitorDepth, int* s_criteriaMonitorStatuses) {
 m_DIGGY_BOLLARD_S()
   int bracketCount = om_CriteriaOpFlagsOpenBracketCount(me.criteriaOpFlags);
-  int i; for (; i < bracketCount; i++) {
+  int i = 0; for (; i < bracketCount; i++) {
     s_criteriaMonitorStatuses[*a_criteriaMonitorDepth+i+1] = 'U';
   } // for
   (*a_criteriaMonitorDepth) += bracketCount;
@@ -818,18 +818,29 @@ m_DIGGY_BOLLARD_S()
       s_criteriaMonitorStatuses[*a_criteriaMonitorDepth] = b_passed? 'A': 'X'; 
     break; case 'V':
     break; case 'X':
-    break; default: m_RAISE(ANOMALY__VALUE__D,s_criteriaMonitorStatuses[*a_criteriaMonitorDepth]
+    break; default: m_RAISE(ANOMALY__VALUE__D,s_criteriaMonitorStatuses[*a_criteriaMonitorDepth])
   } // switch 
 
   int bracketCount = om_CriteriaOpFlagsCloseBracketCount(me.criteriaOpFlags);
-  int i; for (; i < bracketCount; i++) {
-    s_criteriaMonitorStatuses[*a_criteriaMonitorDepth+i+1] = 'U';
+  m_ASSERT(*a_criteriaMonitorDepth >= bracketCount)
+  for (i = 0; i < bracketCount; i++) {
+    m_ASSERT(s_criteriaMonitorStatuses[*a_criteriaMonitorDepth-i] == 'V' || s_criteriaMonitorStatuses[*a_criteriaMonitorDepth-i] == 'X')
+    char b_passed2 = (s_criteriaMonitorStatuses[*a_criteriaMonitorDepth-i] == 'V');
+    switch (s_criteriaMonitorStatuses[*a_criteriaMonitorDepth-i-1]) {
+    case 'U':
+    break; case 'O':
+      s_criteriaMonitorStatuses[*a_criteriaMonitorDepth-i-1] = b_passed2? 'V': 'X';
+    break; case 'A':
+      s_criteriaMonitorStatuses[*a_criteriaMonitorDepth-i-1] = b_passed2? 'V': 'X';
+    break; case 'V':
+    break: case 'X':
+    break; default: m_RAISE(ANOMALY__VALUE__D,s_criteriaMonitorStatuses[*a_criteriaMonitorDepth])
   } // for
   (*a_criteriaMonitorDepth) -= bracketCount;
   m_ASSERT(*a_criteriaMonitorDepth >= 0)
 
   m_DIGGY_RETURN(RETURNED)
-} // m_GRequestCriteriaEvalCriterion
+} // m_GRequestCriterionEval
 
 // Public function; see .h
 int GreenIndexesSequenceNext(GREEN_INDEXES_HANDLE handle,
