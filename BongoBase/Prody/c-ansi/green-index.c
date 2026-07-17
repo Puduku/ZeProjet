@@ -755,13 +755,14 @@ int GreenIndexesSequenceReset(GREEN_INDEXES_HANDLE handle,
   m_ASSERT(sp_gRequestCriteria[0].indexLabel < handle->indexesNumber) 
 m_DIGGY_VAR_INDEX_SEEK_FLAGS(sp_gRequestCriteria[0].indexSeekFlags)
   int completed = GRequestCriteriaPrepare(p_gRequestCriteria,gRequestCriterionCount);
+  m_TRACK_IF(completed < 0)
 // TODO: la premiegre initialisation de la sequence (...RequestR()) est perdue (...Fetch()) ??? 
   m_TRACK_IF(m_GreenIndexSequenceNew(handle->vnhs_indexes +
     sp_gRequestCriteria[0].indexLabel,
     b_descending, sp_gRequestCriteria[0].indexSeekFlags,
     sp_gRequestCriteria[0].cr_gKeys, (struct INDEX_SEQUENCE*)indexSequenceBuffer) != RETURNED) 
 
-  m_DIGGY_RETURN(RETURNED)
+  m_DIGGY_RETURN(completed)
 } // GreenIndexesSequenceReset
 
 // Re-init criteria "monitor".
