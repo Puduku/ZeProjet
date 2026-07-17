@@ -245,7 +245,8 @@ static inline struct G_REQUEST_CRITERION om_GRequestCriterion(int indexLabel,
 //   (re-)play the sequence. 
 //
 // Ret:
-// - RETURNED: Ok
+// - COMPLETED__OK: Ok
+// - COMPLETED__BUT: Criteria rectification was necessary
 // - -1: anomaly is raised
 int GreenIndexesSequenceReset(GREEN_INDEXES_HANDLE handle,
   const struct G_REQUEST_CRITERION *sp_gRequestCriteria, int gRequestCriterionCount, char b_descending,
