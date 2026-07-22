@@ -44,7 +44,7 @@ int BlotregCreateInstance(void **azhr_handle, struct P_STRING f_name, va_list ar
 #define g_BlotregIndexRequestRNew g_GParamsIndexRequestRNew
 #define g_BlotregIndexRequestRAddCriterion g_GParamsIndexRequestRAddCriterion
 
-#define g_BlotregIndexRequestR52 g_GParamsIndexRequestR52
+#define g_BlotregIndexRequestR g_GParamsIndexRequestR
 
 // #SEE NAMED_OBJECT_DESTROY_INSTANCE_FUNCTION @ c-ansi/g-string.h <blotreg>
 int BlotregDestroyInstance(void *xhr_handle) ;

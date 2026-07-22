@@ -359,9 +359,9 @@ struct GS_KEY { //
 // Ret:
 // - g-key
 static inline struct GS_KEY om_GsKey(const struct P_STRING p_pString) {\
-  struct GS_KEY gsKey = { .gsKeysComparison = P_STRING__GS_KEYS_COMPARISON,
+  struct GS_KEY me = { .gsKeysComparison = P_STRING__GS_KEYS_COMPARISON,
     .bare.cp_pString = p_pString }; 
-  return gsKey;
+  return me;
 } // om_GsKey 
 
 // Establish a g-key for 'intrinsic (generic) values' comparison
@@ -372,9 +372,9 @@ static inline struct GS_KEY om_GsKey(const struct P_STRING p_pString) {\
 // Ret:
 // - g-key
 static inline struct GS_KEY om_GsKey2(GENERIC_INTEGER en_intrinsicValue) {\
-  struct GS_KEY gsKey = { .gsKeysComparison = INTRINSIC_VALUE__GS_KEYS_COMPARISON,
+  struct GS_KEY me = { .gsKeysComparison = INTRINSIC_VALUE__GS_KEYS_COMPARISON,
     .bare.cen_intrinsicValue = en_intrinsicValue }; 
-  return gsKey;
+  return me;
 } // om_GsKey2 
 
 
@@ -386,9 +386,9 @@ static inline struct GS_KEY om_GsKey2(GENERIC_INTEGER en_intrinsicValue) {\
 // Ret:
 // - g-key
 static inline struct GS_KEY om_GsKey3(GENERIC_INTEGER en_acolytValue) {\
-  struct GS_KEY gsKey = { .gsKeysComparison = ACOLYT_VALUE__GS_KEYS_COMPARISON,
+  struct GS_KEY me = { .gsKeysComparison = ACOLYT_VALUE__GS_KEYS_COMPARISON,
     .bare.cen_acolytValue = en_acolytValue }; 
-  return gsKey;
+  return me;
 } // om_GsKey3
 
 // Establish a g-key for 'acolyt handles' comparison
@@ -399,9 +399,9 @@ static inline struct GS_KEY om_GsKey3(GENERIC_INTEGER en_acolytValue) {\
 // Ret:
 // - g-key
 static inline struct GS_KEY om_GsKey4(void* nr_acolytHandle) {\
-  struct GS_KEY gsKey = { .gsKeysComparison = ACOLYT_HANDLE__GS_KEYS_COMPARISON,
+  struct GS_KEY me = { .gsKeysComparison = ACOLYT_HANDLE__GS_KEYS_COMPARISON,
     .bare.cnr_acolytHandle = nr_acolytHandle }; 
-  return gsKey;
+  return me;
 } // om_GsKey4
 
 
@@ -431,14 +431,23 @@ static inline struct G_REQUEST_CRITERION om_GRequestCriterionGsKeys(int indexLab
 } // om_GRequestCriterionGsKeys
 
 
+//
+// Returned:
+// - RETURNED: Ok,
+// - -1: unexpected problem ; anomaly is raised
 int GStringsIndexRequestRNew(G_STRINGS_HANDLE cp_handle, char* nf_indexRequestAutomaticBuffer);
 
+// Ret:
+// - COMPLETED__OK: Ok
+// - COMPLETED__BUT: (only possible when last criterion) criteria needed rectification(s)...
+// - -1: unexpected problem ; anomaly is raised
 int GStringsIndexRequestRAddCriterion(G_STRINGS_HANDLE cp_handle,
-   char* nf_indexRequestAutomaticBuffer, struct G_REQUEST_CRITERION criterion) ;
+   char* nf_indexRequestAutomaticBuffer, struct G_REQUEST_CRITERION criterion,
+   char b_lastCriterion) ;
 
 
 // #REF GStringsIndexFetch <gStringSet>
-// #SEE GreenCollectionIndexRequest@c-ansi/green.h  <<gStringSet>> 
+// #SEE GreenCollectionIndexFetch@c-ansi/green.h  <<gStringSet>> 
 int GStringsIndexFetch(G_STRINGS_HANDLE cp_handle,
   char* nf_indexRequestAutomaticBuffer, unsigned int indexFetchFlags,
   g_G_STRING_SET_STUFF *acvnt_gStringSetStuff, int *nacvn_entry);
@@ -451,8 +460,8 @@ static inline int m_GStringsIndexSingleFetch(G_STRINGS_HANDLE cp_handle,
   const struct GS_KEY *cfps_gKeys, unsigned int indexFetchFlags,
   g_G_STRING_SET_STUFF *acvnt_gStringSetStuff, int *nacvn_entry) {
   m_DIGGY_BOLLARD_S() 
-  m_TRACK_IF(GStringsIndexRequest(cp_handle,nf_indexRequestAutomaticBuffer,1,indexLabel,
-    indexSeekFlags, cfps_gKeys) != RETURNED) 
+  m_ASSERT(GStringsIndexRequest(cp_handle,nf_indexRequestAutomaticBuffer,1,indexLabel,
+    indexSeekFlags, cfps_gKeys) == COMPLETED__OK)
   int result = GStringsIndexFetch(cp_handle,nf_indexRequestAutomaticBuffer,indexFetchFlags,
     acvnt_gStringSetStuff,nacvn_entry);
   m_TRACK_IF(result < 0)

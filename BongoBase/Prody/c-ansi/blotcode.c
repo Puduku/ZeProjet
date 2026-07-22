@@ -393,9 +393,14 @@ m_DIGGY_VAR_P_STRING(blotfuncKeyName.prefix)
 m_DIGGY_VAR_P_STRING(blotfuncKeyName.name)
      
   BLOTFUNC_ENTRY_STUFF blotfuncEntryStuff = (BLOTFUNC_ENTRY_STUFF)UNDEFINED;
-  m_TRACK_IF(GreenCollectionIndexRequest(p_handle->ch_blotfuncsHandle,
+  switch(GreenCollectionIndexRequest(p_handle->ch_blotfuncsHandle,
     blotfuncsIndexRequestBuffer, 1, INDEX_LABEL0, INDEX_SEEK_FLAGS__EQUAL,
-    (void *) &blotfuncKeyName) != RETURNED)
+    (void *) &blotfuncKeyName)) {
+  case COMPLETED__OK:
+  break; case COMPLETED__BUT:
+    m_RAISE(ANOMALY__UNEXPECTED_CASE)
+  break; default: m_TRACK()
+  } // switch
   int result = GreenCollectionIndexFetch(p_handle->ch_blotfuncsHandle,
     blotfuncsIndexRequestBuffer, INDEX_FETCH_FLAGS__READ_ONLY, (char **)&blotfuncEntryStuff, NULL);
   switch(result) {

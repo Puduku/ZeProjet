@@ -253,6 +253,22 @@ struct INDEX_SEQUENCE {
   const struct INDEX_ENTRY_BLOCK *cv_indexEntryBlockPtr; // "block" corresponding to "current" index entry 
 } ;
 
+// Public function; see .h
+o_IndexSequenceNew(char *meBuffer) {
+  m_DIGGY_BOLLARD()
+  struct INDEX_SEQUENCE mePtr = (struct INDEX_SEQUENCE) meBuffer;
+  mePtr->indexEntryBlockCount2 = 0;
+  m_DIGGY_RETURN(RETURNED)
+} // o_IndexSequenceNew
+
+
+// Public function; see .h
+int o_IndexSequenceSize(void);
+  m_DIGGY_BOLLARD()
+  m_DIGGY_RETURN(sizeof(struct INDEX_SEQUENCE))
+} // o_IndexSequenceSize
+
+
 // Get current entry in index sequence.
 //
 // Passed:
@@ -357,7 +373,7 @@ static inline int m_GreenIndexSequenceNext(struct GREEN_INDEX* a_me, char b_desc
 // Ret:
 // - RETURNED: Ok
 // - -1: anomaly is raised
-static inline int m_GreenIndexSequenceNew(struct GREEN_INDEX* a_me, char b_descending,
+static inline int m_GreenIndexSequenceReset(struct GREEN_INDEX* a_me, char b_descending,
   unsigned int indexSeekFlags, void *cr_gKeys, struct INDEX_SEQUENCE *a_indexSequence) {
   m_DIGGY_BOLLARD_S()
   a_indexSequence->indexEntryBlockCount2 = 0; // Empty ("disabled") selection a priori
@@ -426,7 +442,7 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(indexSeekFlags)
   } // if
 
   m_DIGGY_RETURN(RETURNED)
-} // m_GreenIndexSequenceNew
+} // m_GreenIndexSequenceReset
 
 
 // Passed:
@@ -676,24 +692,8 @@ static int GreenIndexesSeekEntryEquate(GREEN_INDEXES_HANDLE handle, int indexLab
   m_DIGGY_RETURN(answer)
 } // GreenIndexesSeekEntryEquate
 
-// Prepare criteria. Ensure the flags are set properly:
-// - first criterion:
-//   + no flag set if unique criterion
-//   + AND (<other criteria) otherwise
-// - other criteria:
-//   + AND op. always wrapped by brackets to ensure precedence over OR op.
-//   + last criterion terninated properly with closing brackets
-//
-// - s_me:
-// - meCount: number of criteria (>= 1)
-//
-// Changed:
-// - *s_me: possibly rectifed
-//
-// Ret:
-// - COMPLETED__OK:
-// - COMPLETED__BUT: rectification was necessary
-static int GRequestCriteriaPrepare(struct G_REQUEST_CRITERION *s_me, int meCount) {
+// Public function; see .h
+int GRequestCriteriaValidate(struct G_REQUEST_CRITERION *s_me, int meCount) {
   m_DIGGY_BOLLARD()
   int completed = COMPLETED__OK; // Not rectified a priori
   int depth = 0;
@@ -707,14 +707,14 @@ static int GRequestCriteriaPrepare(struct G_REQUEST_CRITERION *s_me, int meCount
   if (s_me[0].criteriaOpFlags != initialCriteriaOpFlags) completed = COMPLETED__BUT;
   for (i = 1; i < meCount; i++) {
     int initialCriteriaOpFlags = s_me[i].criteriaOpFlags;      
-    if (b_FLAG_SET_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__OR) {
+    if (b_FLAG_SET_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__OR)) {
       m_SET_FLAG_OFF(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__AND)
       if (i+1 < meCount) {
         // Ensure AND op. have precedence over that OR op. 
         if (om_CriteriaOpFlagsOpenBracketCount(s_me[i+1].criteriaOpFlags) == 0) m_SET_FLAG_ON(
           s_me[i+1].criteriaOpFlags,CRITERIA_OP_FLAG__OPEN1)
-        } // if
-    } else if (b_FLAG_SET_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__AND)  m_SET_FLAG_OFF(
+      } // if
+    } else if (b_FLAG_SET_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__AND)) m_SET_FLAG_OFF(
       s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__OR)
     depth += om_CriteriaOpFlagsOpenBracketCount(s_me[i].criteriaOpFlags);
     if (depth - om_CriteriaOpFlagsCloseBracketCount(s_me[i].criteriaOpFlags) < 0) {
@@ -745,19 +745,16 @@ static int GRequestCriteriaPrepare(struct G_REQUEST_CRITERION *s_me, int meCount
   } // for
 
   m_DIGGY_RETURN(completed)
-} // GRequestCriteriaPrepare
+} // GRequestCriteriaValidate
 
 // Public function; see .h
 int GreenIndexesSequenceReset(GREEN_INDEXES_HANDLE handle,
    struct G_REQUEST_CRITERION *p_gRequestCriteria, int gRequestCriterionCount, char b_descending,
-   /*struct INDEX_SEQUENCE*/char *indexSequenceBuffer) {
+   char *indexSequenceBuffer) {
   m_DIGGY_BOLLARD_S()
   m_ASSERT(sp_gRequestCriteria[0].indexLabel < handle->indexesNumber) 
 m_DIGGY_VAR_INDEX_SEEK_FLAGS(sp_gRequestCriteria[0].indexSeekFlags)
-  int completed = GRequestCriteriaPrepare(p_gRequestCriteria,gRequestCriterionCount);
-  m_TRACK_IF(completed < 0)
-// TODO: la premiegre initialisation de la sequence (...RequestR()) est perdue (...Fetch()) ??? 
-  m_TRACK_IF(m_GreenIndexSequenceNew(handle->vnhs_indexes +
+  m_TRACK_IF(m_GreenIndexSequenceReset(handle->vnhs_indexes +
     sp_gRequestCriteria[0].indexLabel,
     b_descending, sp_gRequestCriteria[0].indexSeekFlags,
     sp_gRequestCriteria[0].cr_gKeys, (struct INDEX_SEQUENCE*)indexSequenceBuffer) != RETURNED) 
@@ -845,8 +842,8 @@ m_DIGGY_BOLLARD_S()
 
 // Public function; see .h
 int GreenIndexesSequenceNext(GREEN_INDEXES_HANDLE handle,
-  const struct G_REQUEST_CRITERION *sp_gRequestCriteria, int gRequestCriterionCount, char b_descending,
-  char indexSequenceBuffer, int *an_entry) {
+  const struct G_REQUEST_CRITERION *sp_gRequestCriteria, int gRequestCriterionCount,
+  char b_descending, char indexSequenceBuffer, int *an_entry) {
   m_DIGGY_BOLLARD_S()
   m_ASSERT(sp_gRequestCriteria[0].indexLabel < handle->indexesNumber) 
   struct INDEX_SEQUENCE *a_indexSequence = (struct INDEX_SEQUENCE)indexSequenceBuffer;
@@ -889,10 +886,10 @@ int GreenIndexesSequenceNext(GREEN_INDEXES_HANDLE handle,
 
 // Public function; see .h
 int GreenIndexesSequenceCurrent(GREEN_INDEXES_HANDLE handle,
-  const struct G_REQUEST_CRITERION *sp_gRequestCriteria, int gRequestCriterionCount,
-  const /*struct INDEX_SEQUENCE*/char *p_indexSequenceBuffer, int *an_entry) {
+  const struct G_REQUEST_CRITERION *sp_gRequestCriteria, const char *p_indexSequenceBuffer,
+  int *an_entry) {
   m_DIGGY_BOLLARD_S()
-  struct INDEX_SEQUENCE ap_indexSequence = (struct INDEX_SEQUENCE*)p_indexSequenceBuffer;
+  const struct INDEX_SEQUENCE ap_indexSequence = (struct INDEX_SEQUENCE*)p_indexSequenceBuffer;
   m_ASSERT(sp_gRequestCriteria[0].indexLabel < handle->indexesNumber) 
   struct GREEN_INDEX *a_index = handle->vnhs_indexes + sp_gRequestCriteria[0].indexLabel;
   

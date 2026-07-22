@@ -116,8 +116,8 @@ int TidGlueSelfPthread2Tid (TID_GLUE_HANDLE handle, tid_t *a_tid) {
     PTHREAD_VS_TID_STUFF t_pthreadVsTidStuff = (PTHREAD_VS_TID_STUFF) UNDEFINED;
 
     *a_tid = gettid() ;
-    m_TRACK_IF(GreenCollectionIndexRequest(handle->ch_pthreadVsTidCollectionHandle,NULL,1,
-      INDEX_LABEL0, INDEX_SEEK_FLAGS__EQUAL, (void *)(GENERIC_INTEGER)*a_tid) != RETURNED)
+    m_ASSERT(GreenCollectionIndexRequest(handle->ch_pthreadVsTidCollectionHandle,NULL,1,
+      INDEX_LABEL0, INDEX_SEEK_FLAGS__EQUAL, (void *)(GENERIC_INTEGER)*a_tid) == COMPLETED__OK)
     switch (GreenCollectionIndexFetch(handle->ch_pthreadVsTidCollectionHandle, NULL,
       INDEX_FETCH_FLAGS__FETCH, (char **)&t_pthreadVsTidStuff, NULL)) {
     case RESULT__FOUND:
@@ -148,8 +148,8 @@ int TidGlueTid2Pthread (TID_GLUE_HANDLE handle, tid_t tid, pthread_t *ac_pthread
 
   if (handle->b_portable) {
     PTHREAD_VS_TID_STUFF t_pthreadVsTidStuff = (PTHREAD_VS_TID_STUFF) UNDEFINED;
-    m_TRACK_IF(GreenCollectionIndexRequest(handle->ch_pthreadVsTidCollectionHandle,NULL,1,
-      INDEX_LABEL0,INDEX_SEEK_FLAGS__EQUAL, (void *)(GENERIC_INTEGER)tid) != RETURNED)
+    m_ASSERT(GreenCollectionIndexRequest(handle->ch_pthreadVsTidCollectionHandle,NULL,1,
+      INDEX_LABEL0,INDEX_SEEK_FLAGS__EQUAL, (void *)(GENERIC_INTEGER)tid) == COMPLETED__OK)
     result = GreenCollectionIndexFetch(handle->ch_pthreadVsTidCollectionHandle, NULL,
       INDEX_FETCH_FLAGS__READ_ONLY,(char**)&t_pthreadVsTidStuff, NULL);
     switch (result) {

@@ -317,11 +317,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
 
   m_PRECISE_ABANDON(&subSequence, "<blottab request atom>") 
   struct BLOTEX_VALUE blotexValue = UNDEFINED_BLOTEX_VALUE; 
-  switch (GStringsIndexRequestRNew(blottabHandle->h_tableHandle,(char*)NULL)) {
-  case COMPLETED__OK:
-  break ; case COMPLETED__BUT: // Request rectified
-    m_RAISE(ANOMALY__UNEXPECTED_CASE)
-  break; default: m_TRACK() } // switch
+  m_TRACK_IF(GStringsIndexRequestRNew(blottabHandle->h_tableHandle,(char*)NULL) != RETURNED)
   do {
     signed char b_strValue = (char)UNDEFINED;  
     struct GS_KEY c_gsKey = UNDEFINED_GS_KEY; // Only significant with actual criterion
@@ -356,14 +352,15 @@ m_DIGGY_VAR_P_STRING(subSequence)
 
 //    m_TRACK_IF(GsRequestCriteriaAddCriterion(&criteria52,tableIndexLabel,
 //      n_indexSeekFlags,c_gsKey, UNDEFINED_GS_KEY_PAR, criteriaOpFlags) < 0) 
+    char b_emptySubSequence = ob_EmptySequence(&subSequence);
     switch (GStringsIndexRequestRAddCriterion(blottabHandle->h_tableHandle,(char*)NULL,
       om_GRequestCriterionGsKeys(tableIndexLabel,n_indexSeekFlags,&c_gsKey,
-      criteriaOpFlags))) {
+      criteriaOpFlags),b_emptySubSequence)) {
     case COMPLETED__OK:
     break ; case COMPLETED__BUT: // Request rectified
       m_RAISE(ANOMALY__UNEXPECTED_CASE)
     break; default: m_TRACK() } // switch
-  } while (!ob_EmptySequence(&subSequence)) ; 
+  } while (!b_emptySubSequence) ; 
 
 
   m_DIGGY_RETURN(ANSWER__YES)

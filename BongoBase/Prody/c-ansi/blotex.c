@@ -343,12 +343,14 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
 m_DIGGY_VAR_INDEX_SEEK_FLAGS(indexSeekFlags)
       m_CHECK_ABANDON(ParseBlotregRequestAtomEnd(&subSequence,as,indexSeekFlags,
         &c_criterion, &c_gsKey, blotexValue, nc_abandonmentInfo))
-    switch (g_BlotregIndexRequestRAddCriterion(blotregHandle,NULL,c_criterion)) {
+    char b_emptySubSequence = ob_EmptySequence(&subSequence);
+    switch (g_BlotregIndexRequestRAddCriterion(blotregHandle,NULL,c_criterion,
+      b_emptySubSequence)) {
     case COMPLETED__OK:
     break ; case COMPLETED__BUT: // Request rectified
       m_RAISE(ANOMALY__UNEXPECTED_CASE)
     break; default: m_TRACK() } // switch 
-  } while (!ob_EmptySequence(&subSequence)) ; 
+  } while (!b_emptySubSequence) ; 
 
 //  switch (g_BlotregIndexRequestR52(blotregHandle,NULL,&criteria52)) {
 //  case COMPLETED__OK:

@@ -113,9 +113,15 @@ int GreenIndexesRemove(GREEN_INDEXES_HANDLE handle, int entry) ;
 
 // Set new index sequence ("disabled" state - disambiguation purpose...)
 // 
+// Passed:
+// - meBuffer:
+//
+// Changed:
+// - *meBuffer:
+// 
 // Ret:
 // - RETURNED: Ok
-int o_IndexSequenceDisable(char *buffer) ;
+int o_IndexSequenceNew(char *meBuffer) ;
 
 // 
 // Ret: index sequence buffer size
@@ -167,7 +173,7 @@ m_DEFINE_ENUM_ALIAS_END()
 
 // Passed:
 // - criteriaOpFlags
-static inline int om_CriteriaOpFlagsOpenBracketCount(unsigned int me) {
+static inline int om_CriteriaOpFlagsOpenBracketCount(int me) {
   if (b_FLAG_SET_ON(me,CRITERIA_OP_FLAG__OPEN3)) return 3;
   else if (b_FLAG_SET_ON(me,CRITERIA_OP_FLAG__OPEN2)) return 2;
   else if (b_FLAG_SET_ON(me,CRITERIA_OP_FLAG__OPEN1)) return 1;
@@ -176,7 +182,7 @@ static inline int om_CriteriaOpFlagsOpenBracketCount(unsigned int me) {
 
 // Passed:
 // - criteriaOpFlags
-static inline int om_CriteriaOpFlagsCloseBracketCount(unsigned int me) {
+static inline int om_CriteriaOpFlagsCloseBracketCount(int me) {
   if (b_FLAG_SET_ON(me,CRITERIA_OP_FLAG__CLOSE3)) return 3;
   else if (b_FLAG_SET_ON(me,CRITERIA_OP_FLAG__CLOSE2)) return 2;
   else if (b_FLAG_SET_ON(me,CRITERIA_OP_FLAG__CLOSE1)) return 1;
@@ -210,10 +216,6 @@ static inline struct G_REQUEST_CRITERION om_GRequestCriterion(int indexLabel,
 } // om_GRequestCriterion
 
 
-//// An index iterator:
-//// - Request criteria
-//// - Index sequence
-
 // TODO: cette macro est tregs gednedrale...
 // Passed:
 // - m_me:
@@ -229,6 +231,26 @@ static inline struct G_REQUEST_CRITERION om_GRequestCriterion(int indexLabel,
   (m_array)[(m_count)++] = (m_item);\
 }
   
+// Prepare criteria. Ensure the flags are set properly:
+// - first criterion:
+//   + no flag set if unique criterion
+//   + AND (<other criteria) otherwise
+// - other criteria:
+//   + AND op. always wrapped by brackets to ensure precedence over OR op.
+//   + last criterion terninated properly with closing brackets
+//
+// - s_me: before (potential) rectification...
+// - meCount: number of criteria (>= 1)
+//
+// Changed:
+// - *s_me: possibly rectifed
+//
+// Ret:
+// - COMPLETED__OK:
+// - COMPLETED__BUT: rectification was necessary
+int GRequestCriteriaValidate(struct G_REQUEST_CRITERION *s_me, int meCount);
+
+
 #define b_ASCENDING b_FALSE0
 #define b_DESCENDING b_TRUE
 
@@ -236,7 +258,7 @@ static inline struct G_REQUEST_CRITERION om_GRequestCriterion(int indexLabel,
 //
 // Passed:
 // - handle: 
-// - sp_gRequestCriteria:
+// - sp_gRequestCriteria: "rectified" criteria (see GRequestCriteriaValidate() above)
 // - gRequestCriterionCount:
 // - b_descending:
 //
@@ -245,18 +267,17 @@ static inline struct G_REQUEST_CRITERION om_GRequestCriterion(int indexLabel,
 //   (re-)play the sequence. 
 //
 // Ret:
-// - COMPLETED__OK: Ok
-// - COMPLETED__BUT: Criteria rectification was necessary
+// - RETURNED: Ok
 // - -1: anomaly is raised
 int GreenIndexesSequenceReset(GREEN_INDEXES_HANDLE handle,
-  const struct G_REQUEST_CRITERION *sp_gRequestCriteria, int gRequestCriterionCount, char b_descending,
-  /*struct INDEX_SEQUENCE*/char *indexSequenceBuffer) ; 
+  const struct G_REQUEST_CRITERION *sp_gRequestCriteria, int gRequestCriterionCount,
+  char b_descending, char *indexSequenceBuffer) ; 
 
 // Update index iterator sequence: NEXT.
 //
 // Passed:
 // - handle: 
-// - sp_gRequestCriteria:
+// - sp_gRequestCriteria: "rectified" criteria (see GRequestCriteriaValidate() above)
 // - gRequestCriterionCount
 // - b_descending:
 // - *indexSequenceBuffer : iterator sequence "current"
@@ -271,16 +292,15 @@ int GreenIndexesSequenceReset(GREEN_INDEXES_HANDLE handle,
 // - RETURNED: Ok
 // - -1: anomaly is raised
 int GreenIndexesSequenceNext(GREEN_INDEXES_HANDLE handle,
-  const struct G_REQUEST_CRITERION *sp_gRequestCriteria, int gRequestCriterionCount, char b_descending,
-  char *indexSequenceBuffer, int *an_entry);
+  const struct G_REQUEST_CRITERION *sp_gRequestCriteria, int gRequestCriterionCount,
+  char b_descending, char *indexSequenceBuffer, int *an_entry);
 
 
 // Get current entry in index sequence.
 //
 // Passed:
 // - handle:
-// - sp_gRequestCriteria:
-// - gRequestCritetionCount
+// - sp_gRequestCriteria: "rectified" criteria (see GRequestCriteriaValidate() above)
 // - *p_indexSequenceBuffer:
 //
 // Changed:
@@ -292,8 +312,8 @@ int GreenIndexesSequenceNext(GREEN_INDEXES_HANDLE handle,
 // - RETURNED: Ok
 // - -1: anomaly is raised
 int GreenIndexesSequenceCurrent(GREEN_INDEXES_HANDLE handle,
-  const struct G_REQUEST_CRITERION *sp_gRequestCriteria, int gRequestCritetionCount, 
-  const char *p_indexSequenceBuffer, int *an_entry);
+  const struct G_REQUEST_CRITERION *sp_gRequestCriteria, const char *p_indexSequenceBuffer,
+  int *an_entry);
 
 
 // Ret:

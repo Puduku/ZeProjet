@@ -435,25 +435,19 @@ m_DIGGY_INFO("i=%d, gKeyCount=%d",i,gKeyCount)
 // Public function : see .h
 int GStringsIndexRequestRNew(G_STRINGS_HANDLE cp_handle, char* nf_indexRequestAutomaticBuffer) {
   m_DIGGY_BOLLARD()
-  int completed = GreenCollectionIndexRequestRNew(cp_handle->h_greenCollectionHandle,
-    nf_indexRequestAutomaticBuffer); 
-  switch (completed) {
-  case COMPLETED__OK:
-  break; case COMPLETED__BUT:
-  break; default: m_TRACK() } // switch
-  m_DIGGY_RETURN(completed)
+  m_TRACK_IF(GreenCollectionIndexRequestRNew(cp_handle->h_greenCollectionHandle,
+    nf_indexRequestAutomaticBuffer) != RETURNED)
+  m_DIGGY_RETURN(RETURNED)
 } // GStringsIndexRequestRNew
   
 // Public function : see .h
 int GStringsIndexRequestRAddCriterion(G_STRINGS_HANDLE cp_handle,
-  char* nf_indexRequestAutomaticBuffer, struct G_REQUEST_CRITERION criterion) {
+  char* nf_indexRequestAutomaticBuffer, struct G_REQUEST_CRITERION criterion,
+  char b_lastCriterion) {
   m_DIGGY_BOLLARD()
   int completed = GreenCollectionIndexRequestRAddCriterion(cp_handle->h_greenCollectionHandle,
-    nf_indexRequestAutomaticBuffer,criterion); 
-  switch (completed) {
-  case COMPLETED__OK:
-  break; case COMPLETED__BUT:
-  break; default: m_TRACK() } // switch
+    nf_indexRequestAutomaticBuffer,criterion,b_lastCriterion); 
+  m_TRACK_IF(completed < 0)
   m_DIGGY_RETURN(completed)
 } // GStringsIndexRequestRAddCriterion
 
@@ -463,15 +457,15 @@ int GStringsIndexRequest(G_STRINGS_HANDLE cp_handle,
   char* nf_indexRequestAutomaticBuffer, int criteriaCount, int indexLabel1,
   unsigned int indexSeekFlags1, const struct GS_KEY *cps_gKeys1, ...) {
   m_DIGGY_BOLLARD()
-
+  int completed = UNDEFINED;
   { va_list arguments;
     va_start(arguments,cps_gKeys1);
-    m_TRACK_IF(GreenCollectionIndexRequestV(cp_handle->h_greenCollectionHandle,
+    m_TRACK_IF((completed = GreenCollectionIndexRequestV(cp_handle->h_greenCollectionHandle,
       nf_indexRequestAutomaticBuffer, criteriaCount, indexLabel1, indexSeekFlags1,
-      (void*)cps_gKeys1, arguments) != RETURNED)
+      (void*)cps_gKeys1, arguments)) < 0)
     va_end(arguments) ;
   } // arguments
-  m_DIGGY_RETURN(RETURNED)
+  m_DIGGY_RETURN(completed)
 } // GStringsIndexRequest
 
 

@@ -342,19 +342,20 @@ int GreenCollectionIndexRequestV(GREEN_COLLECTION_HANDLE cp_handle,
   unsigned int indexSeekFlags1, void *cr_gKeys1, va_list extraCriteria);
 
 
+//
+// Returned:
+// - RETURNED: Ok,
+// - -1: unexpected problem ; anomaly is raised
 int GreenCollectionIndexRequestRNew(GREEN_COLLECTION_HANDLE cp_handle,
   char* nf_indexFetch5AutomaticBuffer);
 
+// Ret:
+// - COMPLETED__OK: Ok
+// - COMPLETED__BUT: (only possible when last criterion) criteria needed rectification(s)...
+// - -1: unexpected problem ; anomaly is raised
 int GreenCollectionIndexRequestRAddCriterion(GREEN_COLLECTION_HANDLE cp_handle,
-  char* nf_indexFetch5AutomaticBuffer,
-  struct G_REQUEST_CRITERION criterion);
+  char* nf_indexFetch5AutomaticBuffer, struct G_REQUEST_CRITERION criterion, char b_lastCriterion);
 
-
-#define m_ADD_ITEM(max,m_count,m_array,item) { \
-  m_ASSERT(m_count < max)\
-  m_array[(m_count)++] = item;\
-}
-  
 
 // Indicates whether key value parameter is significant with index request... 
 //

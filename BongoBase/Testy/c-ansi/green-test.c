@@ -160,10 +160,10 @@ m_DIGGY_VAR_INDEX_FETCH_FLAGS(indexFetchFlags)
 m_DIGGY_VAR_INDEX_SEEK_FLAGS(c_indexSeekFlags1)
     b_readOnly = b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__READ); 
 m_DIGGY_VAR_D(cc_idKey1)
-    m_TRACK_IF(GreenCollectionIndexRequest(handle, (char*)NULL,
+    m_ASSERT(GreenCollectionIndexRequest(handle, (char*)NULL,
       c_criteriaCount, ID_INDEX_LABEL, c_indexSeekFlags1, (void *)(GENERIC_INTEGER)cc_idKey1,
       cc_criteriaOpFlags1, NAME_INDEX_LABEL,cc_indexSeekFlags2,
-      (void *)(GENERIC_INTEGER)ccc_nameKey2, cc_criteriaOpFlags2) != RETURNED)
+      (void *)(GENERIC_INTEGER)ccc_nameKey2, cc_criteriaOpFlags2) == COMPLETED__OK)
   } // if
   int result = GreenCollectionIndexFetch(handle, (char*)NULL,
     indexFetchFlags, (char **)&nt_testItemStuff, &n_entry);
