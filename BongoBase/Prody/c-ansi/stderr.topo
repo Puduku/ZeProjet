@@ -3,21 +3,23 @@
 // (c) Puduku - 2023
 
 
-// We define an "Anomaly" as any UNEXPECTED problem or condition encountered during program execution.
+// We define an "Anomaly" as any UNEXPECTED problem or condition encountered during program
+// execution.
 // PRINCIPLE: 
 // - UNEXPECTED (by the program) implies NEITHER manageable NOR recoverable (by the same program).
 //   (=> TINA: There Is No Alternative <=)
 //   => The ONLY allowed action for a program regarding an anomaly is to RAISE (and TRACK) that
 //      anomaly. Then, the program must promptly ABORT execution...
-// - TECHNICALLY, raising an anomaly consists entirely of reporting a problem to stderr. From an external
-//   perspective, a process that begins writing to stderr must be understood as an unequivocal 
-//   announcement of its abortion. Applications must NOT be allowed to pollute stderr and then
-//   continue processing as if nothing happened...
+// - TECHNICALLY, raising an anomaly consists entirely of reporting a problem to stderr. From an
+//   external perspective, a process that begins writing to stderr must be understood as an
+//   unequivocal announcement of its abortion. Applications must NOT be allowed to pollute stderr
+//   and then continue processing as if nothing happened...
 //  
 // PRACTICAL anomaly tracking: (see also c-ansi/types.topo for the concept of "procedures" and
 // "pure functions") 
 // The practical technique chosen for tracking anomalies consists of breaking the "normal"
-// CONTROL FLOW and returning a "sentinel" value (typically: -1) recursively up to the application's main function. 
+// CONTROL FLOW and returning a "sentinel" value (typically: -1) recursively up to the application's
+// main function. 
 // This technique of anomaly escalation is easily implemented within "procedures".
-// Escalating anomalies is also possible within "pure functions" with minor adaptations - see
-// the '_o' indicator in watermark.topo (NEVER tested...).
+// Escalating anomalies is also possible within "pure functions" with minor adaptations - see the
+// '_o' indicator in watermark.topo (NEVER tested...).

@@ -1,13 +1,13 @@
-// c-ansi/green-index.h, version 1.93 (ANSI)
+// c-ansi/g-index.h, version 1.93 (ANSI)
 // (c) Atos-Euronext Belgium - 2001, 2002, 2003
 
-// #SEE double-inclusion-4-generic-imaged-enums @ flint/images.h <__C_ANSI_GREEN_INDEX_H_INCLUDED__>
-#ifndef __C_ANSI_GREEN_INDEX_H_INCLUDED__
-#define __C_ANSI_GREEN_INDEX_H_INCLUDED__ 0
+// #SEE double-inclusion-4-generic-imaged-enums @ flint/images.h <__C_ANSI_G_INDEX_H_INCLUDED__>
+#ifndef __C_ANSI_G_INDEX_H_INCLUDED__
+#define __C_ANSI_G_INDEX_H_INCLUDED__ 0
 #endif
 
-#if __C_ANSI_GREEN_INDEX_H_INCLUDED__ == 0 || __C_ANSI_GREEN_INDEX_H_INCLUDED__ == 2 
-#if __C_ANSI_GREEN_INDEX_H_INCLUDED__ == 0
+#if __C_ANSI_G_INDEX_H_INCLUDED__ == 0 || __C_ANSI_G_INDEX_H_INCLUDED__ == 2 
+#if __C_ANSI_G_INDEX_H_INCLUDED__ == 0
 
 #include "c-ansi/stderr.h"
 #include "c-ansi/alloc.h"
@@ -58,8 +58,8 @@ typedef int (*ENTRY_RAW_COMPARE_FUNCTION) (void *r_handle, int indexLabel, int g
 typedef int (*ENTRY_RAW_EQUATE_FUNCTION) (void *r_handle, int indexLabel, int gKeyRank,
   int aEntry, void *r_bGKeys);
 
-struct GREEN_INDEXES ; // Private!
-typedef struct GREEN_INDEXES* GREEN_INDEXES_HANDLE; // Public handle
+struct G_INDEXES ; // Private!
+typedef struct G_INDEXES* G_INDEXES_HANDLE; // Public handle
 
 // Passed:
 // - azh_handle:
@@ -73,7 +73,7 @@ typedef struct GREEN_INDEXES* GREEN_INDEXES_HANDLE; // Public handle
 // Ret:
 // - RETURNED: Ok
 // - -1: anomaly is raised
-int GreenIndexesCreateInstance(GREEN_INDEXES_HANDLE *azh_handle,
+int GIndexesCreateInstance(G_INDEXES_HANDLE *azh_handle,
   ENTRY_RAW_COMPARE_FUNCTION entryRawCompareFunction,
   ENTRY_RAW_EQUATE_FUNCTION entryRawEquateFunction, void* r_entryRawFunctionsHandle);
 
@@ -84,27 +84,27 @@ int GreenIndexesCreateInstance(GREEN_INDEXES_HANDLE *azh_handle,
 //
 // Return:
 // new index label (technically equal to entry in indexes array)
-int GreenIndexesAddIndex(GREEN_INDEXES_HANDLE handle, int itemsPhysicalNumber,
+int GIndexesAddIndex(G_INDEXES_HANDLE handle, int itemsPhysicalNumber,
   int gKeyCount) ;
 
 // Passed:
 // - handle:
 // - newItemsPhysicalNumber:
-int GreenIndexesResize (GREEN_INDEXES_HANDLE handle, int newItemsPhysicalNumber) ;
+int GIndexesResize (G_INDEXES_HANDLE handle, int newItemsPhysicalNumber) ;
 
 // Add reference on item in all indexes (no action if already referenced in some index)
 //
 // Passed:
 // - handle:
 // - entry:
-int GreenIndexesAdd(GREEN_INDEXES_HANDLE, int entry) ; 
+int GIndexesAdd(G_INDEXES_HANDLE, int entry) ; 
 
 // Remove reference on item in all indexes (no action if not referenced in some index)
 //
 // Passed:
 // - handle:
 // - entry:
-int GreenIndexesRemove(GREEN_INDEXES_HANDLE handle, int entry) ;
+int GIndexesRemove(G_INDEXES_HANDLE handle, int entry) ;
 
 
 
@@ -141,10 +141,10 @@ int o_IndexSequenceSize(void);
 // * NON-index based seek flag: mutually exclusive with truly index-based seek flags: 
 #define INDEX_SEEK_FLAG__LIKE    0x10 
  
-#endif // __C_ANSI_GREEN_INDEX_H_INCLUDED__ == 0
+#endif // __C_ANSI_G_INDEX_H_INCLUDED__ == 0
 
 #undef __FLINT_IMAGES_H_INCLUDED__
-#define __FLINT_IMAGES_H_INCLUDED__ __C_ANSI_GREEN_INDEX_H_INCLUDED__
+#define __FLINT_IMAGES_H_INCLUDED__ __C_ANSI_G_INDEX_H_INCLUDED__
 #include "flint/images.h"
  
 // #REF enum-INDEX_SEEK
@@ -160,7 +160,7 @@ m_DEFINE_ENUM_ALIAS_BEGIN(m_IndexSeekFlagsImage)
   m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__LIKE          ,INDEX_SEEK_FLAG__LIKE)
 m_DEFINE_ENUM_ALIAS_END()
 
-#if __C_ANSI_GREEN_INDEX_H_INCLUDED__ == 0
+#if __C_ANSI_G_INDEX_H_INCLUDED__ == 0
 
 #define CRITERIA_OP_FLAG__CLOSE1      0x001 // Close one bracket before op.
 #define CRITERIA_OP_FLAG__CLOSE2      0x002 // Close two brackets before op.
@@ -262,13 +262,13 @@ int GRequestCriteriaValidate(struct G_REQUEST_CRITERION *s_me, int meCount);
 // - b_descending:
 //
 // Changed:
-// - *indexSequenceBuffer: sequence is (re-)set ; call GreenIndexesSequenceNext() to
+// - *indexSequenceBuffer: sequence is (re-)set ; call GIndexesSequenceNext() to
 //   (re-)play the sequence. 
 //
 // Ret:
 // - RETURNED: Ok
 // - -1: anomaly is raised
-int GreenIndexesSequenceReset(GREEN_INDEXES_HANDLE handle,
+int GIndexesSequenceReset(G_INDEXES_HANDLE handle,
   const struct G_REQUEST_CRITERION *sp_gRequestCriteria, char b_descending,
   char *indexSequenceBuffer) ; 
 
@@ -290,7 +290,7 @@ int GreenIndexesSequenceReset(GREEN_INDEXES_HANDLE handle,
 // Ret:
 // - RETURNED: Ok
 // - -1: anomaly is raised
-int GreenIndexesSequenceNext(GREEN_INDEXES_HANDLE handle,
+int GIndexesSequenceNext(G_INDEXES_HANDLE handle,
   const struct G_REQUEST_CRITERION *sp_gRequestCriteria, int gRequestCriterionCount,
   char b_descending, char *indexSequenceBuffer, int *an_entry);
 
@@ -310,7 +310,7 @@ int GreenIndexesSequenceNext(GREEN_INDEXES_HANDLE handle,
 // Ret:
 // - RETURNED: Ok
 // - -1: anomaly is raised
-int GreenIndexesSequenceCurrent(GREEN_INDEXES_HANDLE handle,
+int GIndexesSequenceCurrent(G_INDEXES_HANDLE handle,
   const struct G_REQUEST_CRITERION *sp_gRequestCriteria, const char *p_indexSequenceBuffer,
   int *an_entry);
 
@@ -319,7 +319,7 @@ int GreenIndexesSequenceCurrent(GREEN_INDEXES_HANDLE handle,
 // - ANSWER__YES: indexes are enabled (i.e at least one index has been added) 
 // - ANSWER__NO: indexes are NOT enabled
 // - -1: anomaly is raised
-int GreenIndexesVerifyEnabled (GREEN_INDEXES_HANDLE handle) ;
+int GIndexesVerifyEnabled (G_INDEXES_HANDLE handle) ;
 
 // Passed:
 // - handle:
@@ -328,7 +328,7 @@ int GreenIndexesVerifyEnabled (GREEN_INDEXES_HANDLE handle) ;
 // - COMPLETED__OK:
 // - COMPLETED__BUT: some index is corrupted
 // - -1: anomaly is raised
-int GreenIndexesVerify (GREEN_INDEXES_HANDLE handle) ;
+int GIndexesVerify (G_INDEXES_HANDLE handle) ;
 
 // NOT callable if indexes are not enabled 
 // 
@@ -342,7 +342,7 @@ int GreenIndexesVerify (GREEN_INDEXES_HANDLE handle) ;
 // - COMPLETED__OK: all indexes have the same number of entries
 // - COMPLETED__BUT: at least two indexes have different numbers of entries
 // - -1: anomaly is raised
-int GreenIndexesVerifyCount (GREEN_INDEXES_HANDLE handle,int *ac_commonCount) ;
+int GIndexesVerifyCount (G_INDEXES_HANDLE handle,int *ac_commonCount) ;
 
 // 
 // Passed:
@@ -355,7 +355,7 @@ int GreenIndexesVerifyCount (GREEN_INDEXES_HANDLE handle,int *ac_commonCount) ;
 //                  is as expected is as expected in EACH index
 // - COMPLETED__BUT: number of "hits" NOT as expected in 
 // - -1: unexpected problem ; anomaly is raised
-int GreenIndexesVerifyEntry (GREEN_INDEXES_HANDLE handle, int entry, int expectedHits) ;
+int GIndexesVerifyEntry (G_INDEXES_HANDLE handle, int entry, int expectedHits) ;
 
 // Passed:
 // - handle
@@ -363,7 +363,7 @@ int GreenIndexesVerifyEntry (GREEN_INDEXES_HANDLE handle, int entry, int expecte
 // Ret:
 // - RETURNED:
 // - -1: anomaly is raised
-int GreenIndexesClear (GREEN_INDEXES_HANDLE handle) ;
+int GIndexesClear (G_INDEXES_HANDLE handle) ;
 
 // Passed:
 // - xh_handle:
@@ -371,21 +371,21 @@ int GreenIndexesClear (GREEN_INDEXES_HANDLE handle) ;
 // Ret:
 // - RETURNED: Ok
 // - -1: anomaly is raised
-int GreenIndexesDestroyInstance(GREEN_INDEXES_HANDLE xh_handle) ;
+int GIndexesDestroyInstance(G_INDEXES_HANDLE xh_handle) ;
 
 
-#endif // __C_ANSI_GREEN_INDEX_H_INCLUDED__ == 0
+#endif // __C_ANSI_G_INDEX_H_INCLUDED__ == 0
 
 // Manage double inclusion: update inclusion state:
-#if __C_ANSI_GREEN_INDEX_H_INCLUDED__ == 0
-#undef __C_ANSI_GREEN_INDEX_H_INCLUDED__
+#if __C_ANSI_G_INDEX_H_INCLUDED__ == 0
+#undef __C_ANSI_G_INDEX_H_INCLUDED__
 // Manage double inclusion: provoke 2nd inclusion:
-#define __C_ANSI_GREEN_INDEX_H_INCLUDED__ 2
-#include "c-ansi/green-index.h"
+#define __C_ANSI_G_INDEX_H_INCLUDED__ 2
+#include "c-ansi/g-index.h"
 #else
-#undef __C_ANSI_GREEN_INDEX_H_INCLUDED__
-#define __C_ANSI_GREEN_INDEX_H_INCLUDED__ 3
+#undef __C_ANSI_G_INDEX_H_INCLUDED__
+#define __C_ANSI_G_INDEX_H_INCLUDED__ 3
 #endif
 
-#endif // __C_ANSI_GREEN_INDEX_H_INCLUDED__ == 0 || __C_ANSI_GREEN_INDEX_H_INCLUDED__ == 2
+#endif // __C_ANSI_G_INDEX_H_INCLUDED__ == 0 || __C_ANSI_G_INDEX_H_INCLUDED__ == 2
 

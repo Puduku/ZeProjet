@@ -2,7 +2,7 @@
 // (c) Atos-Euronext Belgium - 2001, 2002, 2003
 
 #include "c-ansi/green.h"
-#include "c-ansi/green-index.h"
+#include "c-ansi/g-index.h"
 #include "c-ansi/stderr.h"
 #include "c-ansi/alloc.h"
 #include "c-ansi/c-stack.h"
@@ -190,13 +190,13 @@ static inline int m_IndexFetchAddCriterion(char *me, int criterionCountMax,
 // Ret:
 // - RETURNED
 static inline int m_IndexFetchSequenceReset(char *me, char b_descending, int fetch4,
-  GREEN_INDEXES_HANDLE indexesHandle) {
+  G_INDEXES_HANDLE GIndexesHandle) {
   m_DIGGY_BOLLARD_S()
   struct INDEX_FETCH_HEADER *headerPtr = o_IndexFetchGetHeaderPtr(me); 
 
   headerPtr->b_descending = b_descending;
   headerPtr->fetch4 = fetch4;
-  m_TRACK_IF(GreenIndexesSequenceReset(indexesHandle, o_IndexFetchGetGRequestCriteriaPtr(me),
+  m_TRACK_IF(GIndexesSequenceReset(GIndexesHandle, o_IndexFetchGetGRequestCriteriaPtr(me),
     headerPtr->b_descending,o_IndexFetchGetIndexSequenceBuffer(me)) != RETURNED)
   m_DIGGY_RETURN(RETURNED)
 } // m_IndexFetchSequenceReset
@@ -206,11 +206,11 @@ static inline int m_IndexFetchSequenceReset(char *me, char b_descending, int fet
 // 
 // Ret:
 // - RETURNED
-static inline int m_IndexFetchSequenceNext(char *me, GREEN_INDEXES_HANDLE indexesHandle,
+static inline int m_IndexFetchSequenceNext(char *me, G_INDEXES_HANDLE GIndexesHandle,
   int *an_entry) {
   m_DIGGY_BOLLARD_S()
   struct INDEX_FETCH_HEADER *headerPtr = o_IndexFetchGetHeaderPtr(me); 
-    m_TRACK_IF(GreenIndexesSequenceNext(indexesHandle, o_IndexFetchGetGRequestCriteriaPtr(me),
+    m_TRACK_IF(GIndexesSequenceNext(GIndexesHandle, o_IndexFetchGetGRequestCriteriaPtr(me),
       headerPtr->i_criterionCount, headerPtr->b_descending, o_IndexFetchGetIndexSequenceBuffer(me),
       an_entry) != RETURNED)
   m_DIGGY_RETURN(RETURNED)
@@ -221,10 +221,10 @@ static inline int m_IndexFetchSequenceNext(char *me, GREEN_INDEXES_HANDLE indexe
 // 
 // Ret:
 // - RETURNED
-static inline int m_IndexFetchSequenceCurrent(char *me, GREEN_INDEXES_HANDLE indexesHandle,
+static inline int m_IndexFetchSequenceCurrent(char *me, G_INDEXES_HANDLE GIndexesHandle,
   int *an_entry) {
   m_DIGGY_BOLLARD_S()
-    m_TRACK_IF(GreenIndexesSequenceCurrent(indexesHandle, o_IndexFetchGetGRequestCriteriaPtr(me),
+    m_TRACK_IF(GIndexesSequenceCurrent(GIndexesHandle, o_IndexFetchGetGRequestCriteriaPtr(me),
       o_IndexFetchGetIndexSequenceBuffer(me),an_entry) != RETURNED)
   m_DIGGY_RETURN(RETURNED)
 } // m_IndexFetchSequenceCurrent
@@ -304,7 +304,7 @@ struct GREEN_COLLECTION {
   int itemPhysicalCount ; // number of items that are physically initialized
   int i_itemCount; // number of items "logically" referenced
   int v_maxItemCount; // max number of items "logically" referenced
-  GREEN_INDEXES_HANDLE h_indexesHandle;
+  G_INDEXES_HANDLE h_GIndexesHandle;
   char *nh_indexFetchInternalBuffer;
   int n_indexFetchBufferSize;
   struct ENTRIES_STACK h_gaps; 
@@ -402,7 +402,7 @@ int GreenCollectionCreateInstance(GREEN_COLLECTION_HANDLE *azh_handle,  int expe
   m_CALLOC(handle->h_greenArray,handle->itemPhysicalCount,handle->greenItemSize)
   m_MALLOC_ARRAY(handle->hsc_flags, handle->itemPhysicalCount)
   handle->v_maxItemCount = handle->i_itemCount = 0 ;
-  m_TRACK_IF(GreenIndexesCreateInstance(&handle->h_indexesHandle,GreenCollectionEntryRawCompare,
+  m_TRACK_IF(GIndexesCreateInstance(&handle->h_GIndexesHandle,GreenCollectionEntryRawCompare,
     GreenCollectionEntryRawEquate, (void *) handle) != RETURNED)
   m_C_STACK_INIT(handle->h_gaps,BATEAU__C_STACK_BASE_PHYSICAL_COUNT)
   handle->nh_indexFetchInternalBuffer = NULL;
@@ -429,7 +429,7 @@ static int GreenCollectionResize(GREEN_COLLECTION_HANDLE handle) {
     handle->greenItemSize * handle->expectedItemCount);
 
   m_REALLOC_ARRAY(handle->hsc_flags, newItemsPhysicalNumber)
-  m_TRACK_IF(GreenIndexesResize(handle->h_indexesHandle,newItemsPhysicalNumber) != 0)
+  m_TRACK_IF(GIndexesResize(handle->h_GIndexesHandle,newItemsPhysicalNumber) != 0)
 
   handle->itemPhysicalCount = newItemsPhysicalNumber;
   m_DIGGY_RETURN(handle->expectedItemCount)
@@ -464,8 +464,8 @@ static int GreenCollectionRefreshIndexesInternal(GREEN_COLLECTION_HANDLE handle,
   int i = 0; for (; i < o_C_STACK_GET_COUNT(handle->h_fetched4ChangeStack); i++,
     fetched4ChangeEntryPtr++) {
     m_ASSERT(b_ALL_FLAGS_OK(handle->hsc_flags[*fetched4ChangeEntryPtr],ALIEN_ALIVE__FLAGS))
-m_DIGGY_INFO("*fetched4ChangeEntryPtr=%d Before m_GREEN_INDEXES_ADD()...",*fetched4ChangeEntryPtr)
-    m_TRACK_IF(GreenIndexesAdd(handle->h_indexesHandle,*fetched4ChangeEntryPtr) != RETURNED)
+m_DIGGY_INFO("*fetched4ChangeEntryPtr=%d Before m_G_INDEXES_ADD()...",*fetched4ChangeEntryPtr)
+    m_TRACK_IF(GIndexesAdd(handle->h_GIndexesHandle,*fetched4ChangeEntryPtr) != RETURNED)
     m_SET_FLAG_OFF(handle->hsc_flags[*fetched4ChangeEntryPtr],ALIEN_FLAG)
   } // for
   m_ASSERT(o_C_STACK_GET_COUNT(handle->h_fetched4ChangeStack) == 0)
@@ -486,7 +486,7 @@ int GreenCollectionRefreshIndexes (GREEN_COLLECTION_HANDLE handle) {
 // Public function; see description in .h
 int GreenCollectionPullOut (GREEN_COLLECTION_HANDLE handle, char **at_greenArray) {
   m_DIGGY_BOLLARD()
-  m_ASSERT(GreenIndexesVerifyEnabled(handle->h_indexesHandle) == ANSWER__NO)
+  m_ASSERT(GIndexesVerifyEnabled(handle->h_GIndexesHandle) == ANSWER__NO)
 
   // MINIMONITOR: ANY
   m_TRACK_IF(GreenCollectionRefreshIndexesInternal(handle,b_TRUE) != RETURNED)
@@ -577,7 +577,7 @@ m_DIGGY_VAR_P(*acntr_greenItemStuff)
       // MICROMONITOR: FAMED / ALIVE 
       if (fetch4 != FETCH_4__READ) { 
         m_ASSERT(!cp_handle->b_frozen) 
-        m_TRACK_IF(GreenIndexesRemove(cp_handle->h_indexesHandle,n_entry) != RETURNED)
+        m_TRACK_IF(GIndexesRemove(cp_handle->h_GIndexesHandle,n_entry) != RETURNED)
         m_SET_FLAG_ON(cp_handle->hsc_flags[n_entry],ALIEN_FLAG)
         // MICROMONITOR: ALIEN / ALIVE
         if (fetch4 == FETCH_4__CHANGE) { 
@@ -653,7 +653,7 @@ int GreenCollectionClear (GREEN_COLLECTION_HANDLE handle) {
   handle->i_itemCount = 0 ;
   m_C_STACK_CLEAR(handle->h_fetched4ChangeStack)
   m_C_STACK_CLEAR(handle->h_gaps)
-  m_TRACK_IF(GreenIndexesClear(handle->h_indexesHandle) != RETURNED)
+  m_TRACK_IF(GIndexesClear(handle->h_GIndexesHandle) != RETURNED)
 
   // MINIMONITOR: CLEAN
   m_DIGGY_RETURN(RETURNED)
@@ -688,7 +688,7 @@ int GreenCollectionAddIndex (GREEN_COLLECTION_HANDLE handle, int gKeyCount,
 
   m_ASSERT(gKeyCount > 0)
 
-  int newIndexLabel = GreenIndexesAddIndex(handle->h_indexesHandle, handle->itemPhysicalCount,
+  int newIndexLabel = GIndexesAddIndex(handle->h_GIndexesHandle, handle->itemPhysicalCount,
     gKeyCount);
   m_TRACK_IF(newIndexLabel < 0)
   if (handle->gKeyCountMax < gKeyCount) handle->gKeyCountMax = gKeyCount;
@@ -827,17 +827,17 @@ m_DIGGY_VAR_INDEX_FETCH_FLAGS(indexFetchFlags)
     else if (b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__REMOVE)) fetch4 = FETCH_4__REMOVE;
      
     m_TRACK_IF(m_IndexFetchSequenceReset(indexFetchBuffer,b_FLAG_SET_ON(indexFetchFlags,
-      INDEX_FETCH_FLAG__DESCENDING), fetch4, cp_handle->h_indexesHandle) != RETURNED) 
+      INDEX_FETCH_FLAG__DESCENDING), fetch4, cp_handle->h_GIndexesHandle) != RETURNED) 
   } // if    
 
   int n_entry = UNDEFINED;
   int result = RESULT__NOT_FOUND;
 
   if (b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__NEXT)) {
-    m_TRACK_IF(m_IndexFetchSequenceNext(indexFetchBuffer,cp_handle->h_indexesHandle,&n_entry) !=
+    m_TRACK_IF(m_IndexFetchSequenceNext(indexFetchBuffer,cp_handle->h_GIndexesHandle,&n_entry) !=
       RETURNED)
   } else {
-    m_TRACK_IF(m_IndexFetchSequenceCurrent(indexFetchBuffer,cp_handle->h_indexesHandle,&n_entry) !=
+    m_TRACK_IF(m_IndexFetchSequenceCurrent(indexFetchBuffer,cp_handle->h_GIndexesHandle,&n_entry) !=
       RETURNED)
   } // if
   if (n_entry != -1) result = RESULT__FOUND; 
@@ -887,7 +887,7 @@ int GreenCollectionVerifyIndexes (GREEN_COLLECTION_HANDLE handle) {
   m_TRACK_IF(gapsCount < 0)
 
   // 1. Are indexes enabled ? (if not, just verify there's no gap 
-  switch (GreenIndexesVerifyEnabled(handle->h_indexesHandle)) {
+  switch (GIndexesVerifyEnabled(handle->h_GIndexesHandle)) {
   case ANSWER__YES:
   break; case ANSWER__NO:
     if (gapsCount != 0) completed = COMPLETED__BUT;
@@ -900,7 +900,7 @@ int GreenCollectionVerifyIndexes (GREEN_COLLECTION_HANDLE handle) {
   // 2. Verify the "global" counts 
   if (completed == COMPLETED__OK) {
     int c_indexedItemCount = UNDEFINED;
-    completed = GreenIndexesVerifyCount(handle->h_indexesHandle,&c_indexedItemCount);
+    completed = GIndexesVerifyCount(handle->h_GIndexesHandle,&c_indexedItemCount);
     m_TRACK_IF(completed < 0)
 m_DIGGY_VAR_D(completed)
 m_DIGGY_INFO("handle->i_itemCount=%d c_indexedItemCount=%d gapsCount=%d",handle->i_itemCount,c_indexedItemCount,gapsCount)
@@ -919,7 +919,7 @@ m_DIGGY_VAR_D(completed)
       if (completed == COMPLETED__BUT) break;
       expectedHits = 0;
       if (!b_FLAG_SET_ON(handle->hsc_flags[i],ALIEN_FLAG))  expectedHits = 1;
-      m_TRACK_IF((completed = GreenIndexesVerifyEntry(handle->h_indexesHandle,i,expectedHits)) < 0)
+      m_TRACK_IF((completed = GIndexesVerifyEntry(handle->h_GIndexesHandle,i,expectedHits)) < 0)
       if (completed == COMPLETED__BUT) break;
     } // for
   } // if 
@@ -927,7 +927,7 @@ m_DIGGY_VAR_D(completed)
 m_DIGGY_VAR_D(completed)
   // 4. Verify index(es) good ordering 
   if (completed == COMPLETED__OK) {
-    completed = GreenIndexesVerify(handle->h_indexesHandle);
+    completed = GIndexesVerify(handle->h_GIndexesHandle);
     m_TRACK_IF(completed < 0)
   } // if
 
@@ -950,7 +950,7 @@ int GreenCollectionDestroyInstance (GREEN_COLLECTION_HANDLE xh_handle) {
   } // if
   free(xh_handle->h_greenArray) ;
 
-  m_TRACK_IF(GreenIndexesDestroyInstance(xh_handle->h_indexesHandle) != RETURNED)
+  m_TRACK_IF(GIndexesDestroyInstance(xh_handle->h_GIndexesHandle) != RETURNED)
 
   m_C_STACK_FREE(xh_handle->h_gaps)
   m_C_STACK_FREE(xh_handle->h_fetched4ChangeStack)

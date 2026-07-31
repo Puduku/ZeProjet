@@ -14,7 +14,7 @@
 #include "c-ansi/types.h"
 #include "c-ansi/magic.h"
 #include "flint/flags.h"
-#include "c-ansi/green-index.h"
+#include "c-ansi/g-index.h"
 #include "c-ansi/diggy.h"
 
 ////////////////////////////
@@ -247,8 +247,8 @@ int GreenCollectionGetCount(GREEN_COLLECTION_HANDLE cp_handle, char **navntr_gre
 // Passed:
 // - handle: <green item>s collection handle 
 // - gKeyCount: >= 1; 1:plain index; >=2:compound index  #SKIP
-//   NOTICE: compound index ONLY possible if explicit key structure size is provided (see cn_gKeySize
-//   param above)  
+//   NOTICE: compound index ONLY possible if explicit key structure size is provided (see
+//   cn_gKeySize param above)  
 // - na_indexFetchBufferSize: NULL if not used
 //   when not NULL: ask for (technical) index fetch buffer size; this is the last index added to 
 //   the collection; it is then no more possible to add an index... 
