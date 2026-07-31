@@ -218,7 +218,7 @@ static inline struct G_REQUEST_CRITERION om_GRequestCriterion(int indexLabel,
 
 // TODO: cette macro est tregs gednedrale...
 // Passed:
-// - m_me:
+// - u_me: array 
 // - u_countMax:
 // - m_count:
 // - m_item
@@ -226,9 +226,9 @@ static inline struct G_REQUEST_CRITERION om_GRequestCriterion(int indexLabel,
 // Changed:
 // - m_me:
 // - m_count:
-#define m_ARRAY_ADD_ITEM(m_me, /*int*/ u_countMax, /*int*/ m_count, m_item) { \ 
+#define m_ARRAY_ADD_ITEM(u_me, /*int*/u_countMax, /*int*/m_count, m_item) { \
   m_ASSERT((m_count) < (u_countMax))\
-  (m_array)[(m_count)++] = (m_item);\
+  (u_me)[(m_count)++] = (m_item);\
 }
   
 // Prepare criteria. Ensure the flags are set properly:
@@ -259,7 +259,6 @@ int GRequestCriteriaValidate(struct G_REQUEST_CRITERION *s_me, int meCount);
 // Passed:
 // - handle: 
 // - sp_gRequestCriteria: "rectified" criteria (see GRequestCriteriaValidate() above)
-// - gRequestCriterionCount:
 // - b_descending:
 //
 // Changed:
@@ -270,8 +269,8 @@ int GRequestCriteriaValidate(struct G_REQUEST_CRITERION *s_me, int meCount);
 // - RETURNED: Ok
 // - -1: anomaly is raised
 int GreenIndexesSequenceReset(GREEN_INDEXES_HANDLE handle,
-  const struct G_REQUEST_CRITERION *sp_gRequestCriteria, int gRequestCriterionCount,
-  char b_descending, char *indexSequenceBuffer) ; 
+  const struct G_REQUEST_CRITERION *sp_gRequestCriteria, char b_descending,
+  char *indexSequenceBuffer) ; 
 
 // Update index iterator sequence: NEXT.
 //

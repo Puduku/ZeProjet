@@ -165,6 +165,12 @@ static int GreenIndexCompare(struct GREEN_INDEX* a_me, int aIndexEntry, int n_bE
   m_DIGGY_RETURN(comparison)
 } // GreenIndexCompare
 
+// Index entries "block"
+struct INDEX_ENTRY_BLOCK {
+  int first; // >= 0
+  int last; // >= first
+} ;
+
 // Binary search of "B" in index
 //
 // Passed:
@@ -232,13 +238,6 @@ static int GreenIndexBSearch(struct GREEN_INDEX *a_me, int n_bEntry, void *cr_bG
   m_DIGGY_RETURN(RETURNED)
 } // GreenIndexBSearch
 
-
-// Index entries "block"
-struct INDEX_ENTRY_BLOCK {
-  int first; // >= 0
-  int last; // >= first
-} ;
-
 struct INDEX_SEQUENCE {
   // index entries "blocks":
   int indexEntryBlockCount2; // between 0 and 2 : 0 => 'disabled' ; >0 -> 'enabled' 
@@ -254,16 +253,16 @@ struct INDEX_SEQUENCE {
 } ;
 
 // Public function; see .h
-o_IndexSequenceNew(char *meBuffer) {
+int o_IndexSequenceNew(char *meBuffer) {
   m_DIGGY_BOLLARD()
-  struct INDEX_SEQUENCE mePtr = (struct INDEX_SEQUENCE) meBuffer;
+  struct INDEX_SEQUENCE* mePtr = (struct INDEX_SEQUENCE*) meBuffer;
   mePtr->indexEntryBlockCount2 = 0;
   m_DIGGY_RETURN(RETURNED)
 } // o_IndexSequenceNew
 
 
 // Public function; see .h
-int o_IndexSequenceSize(void);
+int o_IndexSequenceSize(void) {
   m_DIGGY_BOLLARD()
   m_DIGGY_RETURN(sizeof(struct INDEX_SEQUENCE))
 } // o_IndexSequenceSize
@@ -705,7 +704,7 @@ int GRequestCriteriaValidate(struct G_REQUEST_CRITERION *s_me, int meCount) {
       s_me[1].criteriaOpFlags,CRITERIA_OP_FLAG__OPEN1)
   } else s_me[0].criteriaOpFlags = ALL_FLAGS_OFF0;
   if (s_me[0].criteriaOpFlags != initialCriteriaOpFlags) completed = COMPLETED__BUT;
-  for (i = 1; i < meCount; i++) {
+  int i = 1; for (; i < meCount; i++) {
     int initialCriteriaOpFlags = s_me[i].criteriaOpFlags;      
     if (b_FLAG_SET_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__OR)) {
       m_SET_FLAG_OFF(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__AND)
@@ -749,8 +748,8 @@ int GRequestCriteriaValidate(struct G_REQUEST_CRITERION *s_me, int meCount) {
 
 // Public function; see .h
 int GreenIndexesSequenceReset(GREEN_INDEXES_HANDLE handle,
-   struct G_REQUEST_CRITERION *p_gRequestCriteria, int gRequestCriterionCount, char b_descending,
-   char *indexSequenceBuffer) {
+  const struct G_REQUEST_CRITERION *sp_gRequestCriteria, char b_descending,
+  char *indexSequenceBuffer) {
   m_DIGGY_BOLLARD_S()
   m_ASSERT(sp_gRequestCriteria[0].indexLabel < handle->indexesNumber) 
 m_DIGGY_VAR_INDEX_SEEK_FLAGS(sp_gRequestCriteria[0].indexSeekFlags)
@@ -759,17 +758,17 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(sp_gRequestCriteria[0].indexSeekFlags)
     b_descending, sp_gRequestCriteria[0].indexSeekFlags,
     sp_gRequestCriteria[0].cr_gKeys, (struct INDEX_SEQUENCE*)indexSequenceBuffer) != RETURNED) 
 
-  m_DIGGY_RETURN(completed)
+  m_DIGGY_RETURN(RETURNED)
 } // GreenIndexesSequenceReset
 
 // Re-init criteria "monitor".
 //
 // Passed:
-// - *az_Depth: undefined 
+// - *az_meDepth: undefined 
 // - *sz_meStatuses: undefined (at least one item)
 //
 // Changed:
-// - *az_Depth: initialized
+// - *az_meDepth: initialized
 // - *sz_meStatuses: initialized
 //
 // Ret:
@@ -782,7 +781,7 @@ static inline int om_CriteriaMonitorReset(int* az_meDepth, int* sz_meStatuses) {
 } // om_CriteriaMonitorReset
 
 // Passed:
-// - gRequestCriterion:
+// - a_me:
 // - b_passed:
 // - *a_criteriaMonitorDepth: current criterion depth
 // - *s_criteriaMonitorStatuses: criterion statuses - significant till current criterion depth
@@ -794,10 +793,10 @@ static inline int om_CriteriaMonitorReset(int* az_meDepth, int* sz_meStatuses) {
 // Ret:
 // - RETURNED: Ok
 // - -1: unexpected problem; anomaly is raised
-static inline int m_GRequestCriterionEval(struct G_REQUEST_CRITIRION* me, b_passed,
+static inline int m_GRequestCriterionEval(const struct G_REQUEST_CRITERION* ap_me, char b_passed,
   int* a_criteriaMonitorDepth, int* s_criteriaMonitorStatuses) {
 m_DIGGY_BOLLARD_S()
-  int bracketCount = om_CriteriaOpFlagsOpenBracketCount(me.criteriaOpFlags);
+  int bracketCount = om_CriteriaOpFlagsOpenBracketCount(ap_me->criteriaOpFlags);
   int i = 0; for (; i < bracketCount; i++) {
     s_criteriaMonitorStatuses[*a_criteriaMonitorDepth+i+1] = 'U';
   } // for
@@ -805,9 +804,9 @@ m_DIGGY_BOLLARD_S()
 
   switch (s_criteriaMonitorStatuses[*a_criteriaMonitorDepth]) {
     case 'U':
-      if (b_FLAG_SET_ON(me.criteriaOpFlags,CRITERIA_OP_FLAG__OR)) 
+      if (b_FLAG_SET_ON(ap_me->criteriaOpFlags,CRITERIA_OP_FLAG__OR)) 
         s_criteriaMonitorStatuses[*a_criteriaMonitorDepth] = b_passed? 'V': 'O'; 
-      else if (b_FLAG_SET_ON(me.criteriaOpFlags,CRITERIA_OP_FLAG__AND)) 
+      else if (b_FLAG_SET_ON(ap_me->criteriaOpFlags,CRITERIA_OP_FLAG__AND)) 
         s_criteriaMonitorStatuses[*a_criteriaMonitorDepth] = b_passed? 'A': 'X'; 
       else s_criteriaMonitorStatuses[*a_criteriaMonitorDepth] = b_passed? 'V': 'X'; 
     break; case 'O':
@@ -819,7 +818,7 @@ m_DIGGY_BOLLARD_S()
     break; default: m_RAISE(ANOMALY__VALUE__D,s_criteriaMonitorStatuses[*a_criteriaMonitorDepth])
   } // switch 
 
-  int bracketCount = om_CriteriaOpFlagsCloseBracketCount(me.criteriaOpFlags);
+  bracketCount = om_CriteriaOpFlagsCloseBracketCount(ap_me->criteriaOpFlags);
   m_ASSERT(*a_criteriaMonitorDepth >= bracketCount)
   for (i = 0; i < bracketCount; i++) {
     m_ASSERT(s_criteriaMonitorStatuses[*a_criteriaMonitorDepth-i] == 'V' || s_criteriaMonitorStatuses[*a_criteriaMonitorDepth-i] == 'X')
@@ -831,8 +830,9 @@ m_DIGGY_BOLLARD_S()
     break; case 'A':
       s_criteriaMonitorStatuses[*a_criteriaMonitorDepth-i-1] = b_passed2? 'V': 'X';
     break; case 'V':
-    break: case 'X':
+    break; case 'X':
     break; default: m_RAISE(ANOMALY__VALUE__D,s_criteriaMonitorStatuses[*a_criteriaMonitorDepth])
+    } // switch
   } // for
   (*a_criteriaMonitorDepth) -= bracketCount;
   m_ASSERT(*a_criteriaMonitorDepth >= 0)
@@ -843,38 +843,38 @@ m_DIGGY_BOLLARD_S()
 // Public function; see .h
 int GreenIndexesSequenceNext(GREEN_INDEXES_HANDLE handle,
   const struct G_REQUEST_CRITERION *sp_gRequestCriteria, int gRequestCriterionCount,
-  char b_descending, char indexSequenceBuffer, int *an_entry) {
+  char b_descending, char *indexSequenceBuffer, int *an_entry) {
   m_DIGGY_BOLLARD_S()
   m_ASSERT(sp_gRequestCriteria[0].indexLabel < handle->indexesNumber) 
-  struct INDEX_SEQUENCE *a_indexSequence = (struct INDEX_SEQUENCE)indexSequenceBuffer;
+  struct INDEX_SEQUENCE *a_indexSequence = (struct INDEX_SEQUENCE*)indexSequenceBuffer;
   int criteriaMonitorDepth = UNDEFINED;
-  int s_criteriaMonitorStatuses[gRequestCriterionCount] = { UNDEFINED };
+  int s_criteriaMonitorStatuses[gRequestCriterionCount] ; // UNDEFINED
 
   do {
     m_TRACK_IF(m_GreenIndexSequenceNext(handle->vnhs_indexes +
       sp_gRequestCriteria[0].indexLabel, b_descending,
       a_indexSequence, an_entry) != RETURNED) 
     if (*an_entry >= 0) {
-      om_CriteriaMonitorReset(&criteriaMonitorDepth,s_criteriaMonitorStatuses,gRequestCriterionCount);
+      om_CriteriaMonitorReset(&criteriaMonitorDepth,s_criteriaMonitorStatuses);
       const struct G_REQUEST_CRITERION* p_gRequestCriterionPtr = sp_gRequestCriteria;
 
       int i = 0; for (; i < gRequestCriterionCount;
-        i++, p_gRequestCriterionPtr) {
+        i++, p_gRequestCriterionPtr++) {
 
         int answer = ANSWER__YES; // a priori
         if (i > 0) m_TRACK_IF((answer = GreenIndexesSeekEntryEquate(handle,
-          p_gRequestCriterionPtr->indexLabel,entry,
+          p_gRequestCriterionPtr->indexLabel,*an_entry,
           p_gRequestCriterionPtr->indexSeekFlags,
           p_gRequestCriterionPtr->cr_gKeys)) < 0)
 
-        m_TRACK_IF(m_GRequestCriterionEval(&p_gRequestCriterionPtr, answer == ANSWER__YES,
+        m_TRACK_IF(m_GRequestCriterionEval(p_gRequestCriterionPtr, answer == ANSWER__YES,
           &criteriaMonitorDepth,s_criteriaMonitorStatuses) != RETURNED)
 
-        if (s_criteriaMonitorStatuses[0] == 'O' || s_criteriaMonitorStatuses[0] == 'K') break 
+        if (s_criteriaMonitorStatuses[0] == 'O' || s_criteriaMonitorStatuses[0] == 'K') break; 
       } // for
   // Break "criteria handling" loop if entry not rejected by extra criteria 
-  m_ASSERT(criteriaMonitorDepth == 0) 
-  m_ASSERTs_criteriaMonitorStatuses[0] == 'O' || s_criteriaMonitorStatuses[0] == 'K') 
+m_ASSERT(criteriaMonitorDepth == 0) 
+m_ASSERT(s_criteriaMonitorStatuses[0] == 'O' || s_criteriaMonitorStatuses[0] == 'K') 
       if (s_criteriaMonitorStatuses[0] == 'O') break;
     } else break; // No more entry => finished 
   } while (b_TRUE) ;
@@ -889,7 +889,7 @@ int GreenIndexesSequenceCurrent(GREEN_INDEXES_HANDLE handle,
   const struct G_REQUEST_CRITERION *sp_gRequestCriteria, const char *p_indexSequenceBuffer,
   int *an_entry) {
   m_DIGGY_BOLLARD_S()
-  const struct INDEX_SEQUENCE ap_indexSequence = (struct INDEX_SEQUENCE*)p_indexSequenceBuffer;
+  const struct INDEX_SEQUENCE* ap_indexSequence = (struct INDEX_SEQUENCE*)p_indexSequenceBuffer;
   m_ASSERT(sp_gRequestCriteria[0].indexLabel < handle->indexesNumber) 
   struct GREEN_INDEX *a_index = handle->vnhs_indexes + sp_gRequestCriteria[0].indexLabel;
   

@@ -330,6 +330,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
   struct G_REQUEST_CRITERION c_criterion = { UNDEFINED } ; // Only significant if parsing OK
   struct GS_KEY c_gsKey = { UNDEFINED } ;
   m_TRACK_IF(g_BlotregIndexRequestRNew(blotregHandle,NULL) != RETURNED) 
+  char b_emptySubSequence = (char)UNDEFINED;
   do {
     int as = UNDEFINED;  
     int indexSeekFlags = UNDEFINED;
@@ -343,7 +344,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
 m_DIGGY_VAR_INDEX_SEEK_FLAGS(indexSeekFlags)
       m_CHECK_ABANDON(ParseBlotregRequestAtomEnd(&subSequence,as,indexSeekFlags,
         &c_criterion, &c_gsKey, blotexValue, nc_abandonmentInfo))
-    char b_emptySubSequence = ob_EmptySequence(&subSequence);
+    b_emptySubSequence = ob_EmptySequence(&subSequence);
     switch (g_BlotregIndexRequestRAddCriterion(blotregHandle,NULL,c_criterion,
       b_emptySubSequence)) {
     case COMPLETED__OK:

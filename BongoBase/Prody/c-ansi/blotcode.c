@@ -541,6 +541,8 @@ static void o_DefautlBlotinstTemplatePartition(struct TEMPLATE_PARTITION *a_temp
 // BLOTCODE executors
 // ------------------
 
+m_STRUCT_C_STACK(FLOW_CONTROL_STACK, int)
+
 struct BLOTCODE_EXECUTOR {
   BLOTCODE_HANDLE frozenBlotcodeHandle ;
   int blotlibsCount ; 
@@ -548,7 +550,7 @@ struct BLOTCODE_EXECUTOR {
   
   GREEN_COLLECTION_HANDLE h_templatePartitionsHandle;  
   // Only used by BlotcodeExecutorParseTemplate() :
-  struct C_STACK h_flowControlStack;
+  struct FLOW_CONTROL_STACK h_flowControlStack;
   // Only used by BlotcodeExecutorConstructPage() : 
   G_STRING_STUFF h_blotfuncSurrogate ;
 } ;
@@ -580,7 +582,7 @@ int BlotcodeExecutorCreateInstance(BLOTCODE_EXECUTOR_HANDLE *azh_handle,
     BATEAU__EXPECTED_ITEM_COUNT,sizeof(struct TEMPLATE_PARTITION), NULL,NULL,NULL,UNDEFINED,
     (void*)UNDEFINED) != RETURNED)
 
-  m_C_STACK_INIT(handle->h_flowControlStack)
+  m_C_STACK_INIT(handle->h_flowControlStack,BATEAU__C_STACK_BASE_PHYSICAL_COUNT)
 
   m_TRACK_IF(m_GStringCreateInstance(&handle->h_blotfuncSurrogate) != RETURNED) 
   m_DIGGY_RETURN(RETURNED)
@@ -834,7 +836,7 @@ m_DIGGY_VAR_P_STRING(blotinstSequence)
     case DEFAULT_CASE__BLOTKEYW_ID:                  
     case END_LOOP__BLOTKEYW_ID:
     case END_SWITCH__BLOTKEYW_ID:
-      if (C_STACK_GET_COUNT(handle->h_flowControlStack) == 0) {
+      if (o_C_STACK_GET_COUNT(handle->h_flowControlStack) == 0) {
         m_REPORT_ERROR(litteralKeyw,"Orphan control statement (NO prior control statement)")
 
       } else { 
@@ -891,7 +893,7 @@ m_DIGGY_VAR_P_STRING(blotinstSequence)
     } // switch
   } // while
 
-  int trailingBlotkeywsNumber = C_STACK_GET_COUNT(handle->h_flowControlStack);
+  int trailingBlotkeywsNumber = o_C_STACK_GET_COUNT(handle->h_flowControlStack);
   if (trailingBlotkeywsNumber > 0) {
     m_REPORT_ERROR(dummy, "Trailing %d loop or switch control statement(s)", trailingBlotkeywsNumber)
   } // if
