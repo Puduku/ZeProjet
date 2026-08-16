@@ -14,8 +14,8 @@
 
 #define m_STRUCT_C_STACK(m_NAME, m_itemType) \
 struct m_NAME {\
-  m_itemType *hsc_stack ;\
   int physicalCount;\
+  m_itemType *hsc_stack ;\
   int count ;\
 } ;
 
@@ -35,41 +35,53 @@ struct m_NAME {\
 // - m_me:
 //
 // changed:
-// - m_poppedItem:
-#define m_C_STACK_POP(m_me,m_poppedItem) {\
+// - mu_pop:
+#define m_C_STACK_POP(m_me,mu_pop) {\
   m_ASSERT((m_me).count >= 1)\
-  m_poppedItem = (m_me).hsc_stack[--((m_me).count)];\
+  (mu_pop) = (m_me).hsc_stack[--((m_me).count)];\
 }
-
-// Passed:
-// - m_me:
-//
-// Ret: >= 0: number of items in stack 
-#define o_C_STACK_GET_COUNT(m_me) ((m_me).count)
 
 // Passed:
 // - m_me:
 //
 // changed:
-// - um_item:
-#define o_C_STACK_GET_STACK(m_me) ((m_me).hsc_stack) 
+// - mu_peek:
+#define m_C_STACK_PEEK(m_me,mu_peek) {\
+  m_ASSERT((m_me).count >= 1)\
+  (mu_peek) = (m_me).hsc_stack[(m_me).count-1];\
+}
 
 // Passed:
 // - m_me:
-// - pushedItem:
-#define m_C_STACK_PUSH(m_me, pushedItem) {\
+// - mu_poke:
+#define m_C_STACK_POKE(m_me,mu_poke) {\
+  m_ASSERT((m_me).count >= 1)\
+  (m_me).hsc_stack[(m_me).count-1] = (mu_poke) ;\
+}
+
+// Passed:
+// - m_me:
+//
+// Ret: empty stack ? (true/false) 
+#define ob_C_STACK_EMPTY(m_me) ((m_me).count == 0)
+
+
+// Passed:
+// - m_me:
+// - mu_push:
+#define m_C_STACK_PUSH(m_me, mu_push) {\
   if ((m_me).count + 1 > (m_me).physicalCount) {\
     (m_me).physicalCount *= 2;\
     m_REALLOC_ARRAY((m_me).hsc_stack, (m_me).physicalCount)\
   }\
   m_ASSERT((m_me).count < (m_me).physicalCount)\
-  (m_me).hsc_stack[((m_me).count)++] = pushedItem;\
+  (m_me).hsc_stack[((m_me).count)++] = (mu_push);\
 }
 
 // Passed:
 // - m_me:
 #define m_C_STACK_CLEAR(m_me) {\
-  m_me.count = 0;\
+  (m_me).count = 0;\
 }
 
 // Passed:

@@ -128,8 +128,7 @@ typedef struct GREEN_COLLECTION *GREEN_COLLECTION_HANDLE;
 //   + NULL special value: "non-indexed" requests not used in the <green collection>
 //   + non NULL pointer: allows to combine "non-indexed" search in requests 
 // - cn_gKeySize: only significant if index function is provided  :
-//   + -1: special value: generic integer key for plain index; see NOTICE of cn_gKeyCount
-//     param below...
+//   + -1: special value: generic integer key for plain index
 //   + >0: size of elementary key structure passed in requests
 // - cfr_greenHandlerHandle: not significant if no "hook" function is provided ; handler's
 //   private handle 
@@ -175,17 +174,16 @@ int GreenCollectionCreateInstance(GREEN_COLLECTION_HANDLE *azh_handle, int expec
 
 // #REF GreenCollectionFetch <greenItem> 
 // Obtain an emplacement for a <greenItem> (in the collection).
-// This function expects (and manage) presence of "gaps" in the collection. Gaps can only appear
-// when index(es) is (are) enabled  (see GreenCollectionCreateInstance() below). If you do not use
-// indexes, you are ensured to hold a "contiguous" collection (in which all items are simply added
-// one after the other)...
+// This function checks presence of "gaps" in the collection. Gaps can only appear if index(es) is
+// (are) enabled (see GreenCollectionCreateInstance() below). Otherwise, your are ensured to hold a  
+// "contiguous" collection (in which the items are simply added one after the other)...
 //
 // Passed:
-// - cp_handle: collection handle - see GreenCollectionCreateInstance() ; "protected instance" if 
-//   the collection is frozen.
+// - cp_handle: collection handle - see GreenCollectionCreateInstance() ("protected instance" if 
+//   the collection is frozen)
 // - n_entry: entry in the collection 
-//   + -1 special value: "smart fetch" ; find free emplacement in the collection ; either use next
-//     gap (if available) otherwise, add an emplacement at the end of the collection (this will
+//   + -1 special value: "smart fetch" ; find free emplacement in the collection; use next gap if
+//     available; otherwise, add an emplacement at the end of the collection (this will
 //     automatically increment the formal number of items in the collection (by 1)
 //     #SEE smart-fetch-notices
 //   + >= 0: entry for the item in the collection (0 == 1st entry) supposedly directly "fetchable" ;
@@ -247,8 +245,6 @@ int GreenCollectionGetCount(GREEN_COLLECTION_HANDLE cp_handle, char **navntr_gre
 // Passed:
 // - handle: <green item>s collection handle 
 // - gKeyCount: >= 1; 1:plain index; >=2:compound index  #SKIP
-//   NOTICE: compound index ONLY possible if explicit key structure size is provided (see
-//   cn_gKeySize param above)  
 // - na_indexFetchBufferSize: NULL if not used
 //   when not NULL: ask for (technical) index fetch buffer size; this is the last index added to 
 //   the collection; it is then no more possible to add an index... 

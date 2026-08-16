@@ -15,6 +15,8 @@
 // OFF  <----> 0    
 // ON   <----> 1    
 
+// TODO: general renaming e.g: m_SET_FLAG_OFF(m_flags) => om_FLAGS_OFF(m_me)
+
 // 1. Simple flags set
 // -------------------
 
@@ -22,7 +24,7 @@
 //
 // Passed:
 // - m_flags: 
-// - flag: flag to set
+// - flag: flag to set ON
 //
 // Modified:
 // - m_flags: flag is set
@@ -32,11 +34,27 @@
 //
 // Passed:
 // - m_flags:
-// - flag: flag to set
+// - flag: flag to set OFF
 //
 // Modified:
 // - m_flags: flag is set
 #define m_SET_FLAG_OFF(m_flags,flag) (m_flags) &= ~(flag);
+
+//
+#define o_FLAGS2(u_flag1,u_flag2) ((u_flag1)|(u_flag2))
+
+//
+#define o_FLAGS3(u_flag1,u_flag2,u_flag3) ((u_flag1)|(u_flag2)|(u_flag3))
+
+// Set state to "OFF" for several flags at the same time
+//
+// Passed:
+// - mu_me:
+// - u_flags:
+//
+// Modified:
+// - mu_me: flags are OFF 
+#define om_FLAGS_SET_OFF(mu_me,u_flags) (mu_me) &= ~(u_flags);
 
 // Set flag state
 //
@@ -107,6 +125,7 @@
 // Ret:
 // - TRUE: all flags is in the expected state
 // - FALSE: at least one flag is in the "opposite" state
+//TODO: ag virer...
 #define b_ALL_FLAGS_OK(flags,allExpectedFlags) ((flags) == (allExpectedFlags))
 
 // Set all flags

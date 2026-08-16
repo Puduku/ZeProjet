@@ -216,22 +216,7 @@ static inline struct G_REQUEST_CRITERION om_GRequestCriterion(int indexLabel,
 } // om_GRequestCriterion
 
 
-// TODO: cette macro est tregs gednedrale...
-// Passed:
-// - u_me: array 
-// - u_countMax:
-// - m_count:
-// - m_item
-// 
-// Changed:
-// - m_me:
-// - m_count:
-#define m_ARRAY_ADD_ITEM(u_me, /*int*/u_countMax, /*int*/m_count, m_item) { \
-  m_ASSERT((m_count) < (u_countMax))\
-  (u_me)[(m_count)++] = (m_item);\
-}
-  
-// Prepare criteria. Ensure the flags are set properly:
+// Add criterion. When last criterion, ensure the flags are set properly:
 // - first criterion:
 //   + no flag set if unique criterion
 //   + AND (<other criteria) otherwise
@@ -239,26 +224,32 @@ static inline struct G_REQUEST_CRITERION om_GRequestCriterion(int indexLabel,
 //   + AND op. always wrapped by brackets to ensure precedence over OR op.
 //   + last criterion terninated properly with closing brackets
 //
+// Passed:
 // - s_me: before (potential) rectification...
-// - meCount: number of criteria (>= 1)
+// - meCountMax: MAX number of criteria (>= 1)
+// - *a_meCount: number of criteria (>= 1)
+// - criterion:
+// - b_lastCriterion:
 //
 // Changed:
 // - *s_me: possibly rectifed
+// - *a_meCount: number of criteria (>= 1)
 //
 // Ret:
 // - COMPLETED__OK:
-// - COMPLETED__BUT: rectification was necessary
-int GRequestCriteriaValidate(struct G_REQUEST_CRITERION *s_me, int meCount);
+// - COMPLETED__BUT: (only possible when last criterion) rectification was necessary
+int GRequestCriteriaAdd(struct G_REQUEST_CRITERION *s_me, int meCountMax, int *a_meCount,
+  struct G_REQUEST_CRITERION criterion, char b_lastCriterion) ;
 
 
 #define b_ASCENDING b_FALSE0
 #define b_DESCENDING b_TRUE
 
-// (re-)set index iterator sequence according to the criteria (only 1st criterion is used) 
+// (re-)set index iterator sequence according to the 1st criterion 
 //
 // Passed:
 // - handle: 
-// - sp_gRequestCriteria: "rectified" criteria (see GRequestCriteriaValidate() above)
+// - ap_1stGRequestCriterion: "rectified" criteria (see GRequestCriteriaAdd() above)
 // - b_descending:
 //
 // Changed:
@@ -269,14 +260,14 @@ int GRequestCriteriaValidate(struct G_REQUEST_CRITERION *s_me, int meCount);
 // - RETURNED: Ok
 // - -1: anomaly is raised
 int GIndexesSequenceReset(G_INDEXES_HANDLE handle,
-  const struct G_REQUEST_CRITERION *sp_gRequestCriteria, char b_descending,
+  const struct G_REQUEST_CRITERION *ap_1stGRequestCriterion, char b_descending,
   char *indexSequenceBuffer) ; 
 
 // Update index iterator sequence: NEXT.
 //
 // Passed:
 // - handle: 
-// - sp_gRequestCriteria: "rectified" criteria (see GRequestCriteriaValidate() above)
+// - sp_gRequestCriteria: "rectified" criteria op. flags (see GRequestCriteriaAdd() above)
 // - gRequestCriterionCount
 // - b_descending:
 // - *indexSequenceBuffer : iterator sequence "current"
@@ -299,7 +290,7 @@ int GIndexesSequenceNext(G_INDEXES_HANDLE handle,
 //
 // Passed:
 // - handle:
-// - sp_gRequestCriteria: "rectified" criteria (see GRequestCriteriaValidate() above)
+// - sp_gRequestCriteria: "rectified" criteria op. flags (see GRequestCriteriaAdd() above)
 // - *p_indexSequenceBuffer:
 //
 // Changed:

@@ -94,8 +94,7 @@ static inline int om_GIndexRemove(struct G_INDEX* a_me, int indexEntry) {
 // 
 // Ret:
 // - RETURNED: Ok
-static inline int om_GIndexAdd(struct G_INDEX* a_me, int newIndexEntry,
-  int newEntry) {
+static inline int om_GIndexAdd(struct G_INDEX* a_me, int newIndexEntry, int newEntry) {
   m_DIGGY_BOLLARD_S()
   memmove(a_me->hsc_array + newIndexEntry + 1,  a_me->hsc_array + newIndexEntry,
     sizeof(int) * (a_me->count++ - newIndexEntry));
@@ -153,8 +152,7 @@ static inline int m_GIndexResize(struct G_INDEX* a_me, int newItemsPhysicalNumbe
 //   + EQUAL_TO__COMPARISON : "A" and "B" are "identical"
 //   + GREATER_THAN__COMPARISON : "A" 'greater than' "B" 
 // - -1: anomaly is raised
-static int GIndexCompare(struct G_INDEX* a_me, int aIndexEntry, int n_bEntry,
-  void* cr_bGKeys) {
+static int GIndexCompare(struct G_INDEX* a_me, int aIndexEntry, int n_bEntry, void* cr_bGKeys) {
   m_DIGGY_BOLLARD_S()
   int comparison = UNDEFINED;
   int aEntry = a_me->hsc_array[aIndexEntry];
@@ -190,8 +188,8 @@ struct INDEX_ENTRY_BLOCK {
 // Ret:
 // - RETURNED
 // - -1: anomaly is raised
-static int GIndexBSearch(struct G_INDEX *a_me, int n_bEntry, void *cr_bGKeys,
-  int *an_indexEntry, int *a_top, struct INDEX_ENTRY_BLOCK *cac_indexEntries) {
+static int GIndexBSearch(struct G_INDEX *a_me, int n_bEntry, void *cr_bGKeys, int *an_indexEntry,
+  int *a_top, struct INDEX_ENTRY_BLOCK *cac_indexEntries) {
   m_DIGGY_BOLLARD_S()
   int comparison = UNDEFINED;
   int i = UNDEFINED;
@@ -387,8 +385,7 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(indexSeekFlags)
       int top = UNDEFINED;
       int n_indexEntry = UNDEFINED;
       struct INDEX_ENTRY_BLOCK c_indexEntries; // UNDEFINED
-      m_TRACK_IF(GIndexBSearch(a_me, -1,cr_gKeys, &n_indexEntry,&top,
-        &c_indexEntries) != RETURNED);
+      m_TRACK_IF(GIndexBSearch(a_me, -1,cr_gKeys, &n_indexEntry,&top, &c_indexEntries) != RETURNED);
       switch (indexSeekFlags) {
       case INDEX_SEEK_FLAGS__EQUAL:
         if (n_indexEntry != -1) {
@@ -546,8 +543,8 @@ int GIndexesCreateInstance(G_INDEXES_HANDLE *azh_handle,
 } // GIndexesCreateInstance
 
 // ENTRY_COMPARE_FUNCTION
-static int GIndexesEntryCompare (void *r_handle, int indexLabel, int aEntry,
-  int n_bEntry, void *cr_bGKeys) {
+static int GIndexesEntryCompare (void *r_handle, int indexLabel, int aEntry, int n_bEntry,
+  void *cr_bGKeys) {
   m_DIGGY_BOLLARD_S()
   G_INDEXES_HANDLE handle = (G_INDEXES_HANDLE)r_handle;  
   int comparison = UNDEFINED;
@@ -561,8 +558,7 @@ static int GIndexesEntryCompare (void *r_handle, int indexLabel, int aEntry,
 } // GIndexesEntryCompare
 
 // Public function; see .h
-int GIndexesAddIndex(G_INDEXES_HANDLE handle, int itemsPhysicalNumber,
-  int gKeyCount) {
+int GIndexesAddIndex(G_INDEXES_HANDLE handle, int itemsPhysicalNumber, int gKeyCount) {
   m_DIGGY_BOLLARD_S()
   m_REALLOC_ARRAY(handle->vnhs_indexes,handle->indexesNumber+1)
   m_REALLOC_ARRAY(handle->vnhs_gKeyCounts,handle->indexesNumber+1)
@@ -691,24 +687,44 @@ static int GIndexesSeekEntryEquate(G_INDEXES_HANDLE handle, int indexLabel, int 
   m_DIGGY_RETURN(answer)
 } // GIndexesSeekEntryEquate
 
+// TODO: cette macro est tregs gednedrale...
+// Passed:
+// - u_me: array 
+// - u_countMax:
+// - m_count:
+// - m_item
+// 
+// Changed:
+// - m_me:
+// - m_count:
+#define m_ARRAY_ADD_ITEM(u_me, /*int*/u_countMax, /*int*/m_count, m_item) { \
+  m_ASSERT((m_count) < (u_countMax))\
+  (u_me)[(m_count)++] = (m_item);\
+}
+  
 // Public function; see .h
-int GRequestCriteriaValidate(struct G_REQUEST_CRITERION *s_me, int meCount) {
+int GRequestCriteriaAdd(struct G_REQUEST_CRITERION *s_me, int meCountMax, int *a_meCount,
+  struct G_REQUEST_CRITERION criterion, char b_lastCriterion) {
   m_DIGGY_BOLLARD()
+
+  m_ARRAY_ADD_ITEM(s_me, meCountMax, *a_meCount, criterion)
+
+  if (!b_lastCriterion) m_DIGGY_RETURN(COMPLETED__OK) 
   int completed = COMPLETED__OK; // Not rectified a priori
   int depth = 0;
   int initialCriteriaOpFlags = s_me[0].criteriaOpFlags;
-  if (meCount > 1) {
+  if (*a_meCount > 1) {
     s_me[0].criteriaOpFlags = CRITERIA_OP_FLAG__AND;
     // Ensure following OR op. would have precedence over that AND op. 
     if (om_CriteriaOpFlagsOpenBracketCount(s_me[1].criteriaOpFlags) == 0) m_SET_FLAG_ON(
       s_me[1].criteriaOpFlags,CRITERIA_OP_FLAG__OPEN1)
   } else s_me[0].criteriaOpFlags = ALL_FLAGS_OFF0;
   if (s_me[0].criteriaOpFlags != initialCriteriaOpFlags) completed = COMPLETED__BUT;
-  int i = 1; for (; i < meCount; i++) {
+  int i = 1; for (; i < *a_meCount; i++) {
     int initialCriteriaOpFlags = s_me[i].criteriaOpFlags;      
     if (b_FLAG_SET_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__OR)) {
       m_SET_FLAG_OFF(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__AND)
-      if (i+1 < meCount) {
+      if (i+1 < *a_meCount) {
         // Ensure AND op. have precedence over that OR op. 
         if (om_CriteriaOpFlagsOpenBracketCount(s_me[i+1].criteriaOpFlags) == 0) m_SET_FLAG_ON(
           s_me[i+1].criteriaOpFlags,CRITERIA_OP_FLAG__OPEN1)
@@ -717,9 +733,8 @@ int GRequestCriteriaValidate(struct G_REQUEST_CRITERION *s_me, int meCount) {
       s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__OR)
     depth += om_CriteriaOpFlagsOpenBracketCount(s_me[i].criteriaOpFlags);
     if (depth - om_CriteriaOpFlagsCloseBracketCount(s_me[i].criteriaOpFlags) < 0) {
-      m_SET_FLAG_OFF(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE1)
-      m_SET_FLAG_OFF(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE2)
-      m_SET_FLAG_OFF(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE3) 
+      om_FLAGS_SET_OFF(s_me[i].criteriaOpFlags,o_FLAGS3(CRITERIA_OP_FLAG__CLOSE1,
+        CRITERIA_OP_FLAG__CLOSE2, CRITERIA_OP_FLAG__CLOSE3)) 
       switch (depth) {
       case 0: 
       break; case 1: m_SET_FLAG_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE1)
@@ -744,101 +759,109 @@ int GRequestCriteriaValidate(struct G_REQUEST_CRITERION *s_me, int meCount) {
   } // for
 
   m_DIGGY_RETURN(completed)
-} // GRequestCriteriaValidate
+} // GRequestCriteriaAdd
 
 // Public function; see .h
 int GIndexesSequenceReset(G_INDEXES_HANDLE handle,
-  const struct G_REQUEST_CRITERION *sp_gRequestCriteria, char b_descending,
+  const struct G_REQUEST_CRITERION *ap_1stGRequestCriterion, char b_descending,
   char *indexSequenceBuffer) {
   m_DIGGY_BOLLARD_S()
-  m_ASSERT(sp_gRequestCriteria[0].indexLabel < handle->indexesNumber) 
-m_DIGGY_VAR_INDEX_SEEK_FLAGS(sp_gRequestCriteria[0].indexSeekFlags)
-  m_TRACK_IF(m_GIndexSequenceReset(handle->vnhs_indexes +
-    sp_gRequestCriteria[0].indexLabel,
-    b_descending, sp_gRequestCriteria[0].indexSeekFlags,
-    sp_gRequestCriteria[0].cr_gKeys, (struct INDEX_SEQUENCE*)indexSequenceBuffer) != RETURNED) 
+  m_ASSERT(ap_1stGRequestCriterion->indexLabel < handle->indexesNumber) 
+m_DIGGY_VAR_INDEX_SEEK_FLAGS(ap_1stGRequestCriterion->indexSeekFlags)
+  m_TRACK_IF(m_GIndexSequenceReset(handle->vnhs_indexes + ap_1stGRequestCriterion->indexLabel,
+    b_descending, ap_1stGRequestCriterion->indexSeekFlags,
+    ap_1stGRequestCriterion->cr_gKeys, (struct INDEX_SEQUENCE*)indexSequenceBuffer) != RETURNED) 
 
   m_DIGGY_RETURN(RETURNED)
 } // GIndexesSequenceReset
 
-// Re-init criteria "monitor".
+// depth >= 0 
+// depth == count - 1 => count always >= 1
+m_STRUCT_C_STACK(COF_MONITOR,char)
+
+// Re-init criteria op. flags "monitor".
 //
 // Passed:
-// - *az_meDepth: undefined 
-// - *sz_meStatuses: undefined (at least one item)
+// - *az_me: undefined 
 //
 // Changed:
-// - *az_meDepth: initialized
-// - *sz_meStatuses: initialized
+// - *az_me: initialized: depth == 0 ; 'U' 
 //
 // Ret:
 // - RETURNED
-static inline int om_CriteriaMonitorReset(int* az_meDepth, int* sz_meStatuses) {
+static inline int m_CofMonitorReset(struct COF_MONITOR* az_me) {
   m_DIGGY_BOLLARD_S()
-  *az_meDepth = 0;
-  sz_meStatuses[0] = 'U';
+  m_C_STACK_CLEAR(*az_me)
+  m_C_STACK_PUSH(*az_me,'U'); 
   m_DIGGY_RETURN(RETURNED)
-} // om_CriteriaMonitorReset
+} // m_CofMonitorReset
 
 // Passed:
 // - a_me:
+//
+// Ret: monitor's depth (>=0)
+static inline int om_CofMonitorDepth(const struct COF_MONITOR* ap_me) {
+  return ap_me->count - 1;
+} // om_CofMonitorDepth 
+
+// Passed:
+// - me: criteria op. flags
 // - b_passed:
-// - *a_criteriaMonitorDepth: current criterion depth
-// - *s_criteriaMonitorStatuses: criterion statuses - significant till current criterion depth
+// - *a_cofMonitor: current status of criteria (op. flags) monitor 
 //
 // Changed:
-// - *a_criteriaMonitorDepth: next criterion depth
-// - *s_criteriaMonitorStatuses: criterion statuses - significant till next criterion depth
+// - *a_cofMonitor: updated status of criteria (op. flags) monitor 
 //
 // Ret:
 // - RETURNED: Ok
 // - -1: unexpected problem; anomaly is raised
-static inline int m_GRequestCriterionEval(const struct G_REQUEST_CRITERION* ap_me, char b_passed,
-  int* a_criteriaMonitorDepth, int* s_criteriaMonitorStatuses) {
+static inline int m_CriteriaOpFlagsEval(int me, char b_passed,
+  struct COF_MONITOR* a_cofMonitor) {
 m_DIGGY_BOLLARD_S()
-  int bracketCount = om_CriteriaOpFlagsOpenBracketCount(ap_me->criteriaOpFlags);
+  int bracketCount = om_CriteriaOpFlagsOpenBracketCount(me);
   int i = 0; for (; i < bracketCount; i++) {
-    s_criteriaMonitorStatuses[*a_criteriaMonitorDepth+i+1] = 'U';
+    m_C_STACK_PUSH(*a_cofMonitor,'U')
   } // for
-  (*a_criteriaMonitorDepth) += bracketCount;
 
-  switch (s_criteriaMonitorStatuses[*a_criteriaMonitorDepth]) {
-    case 'U':
-      if (b_FLAG_SET_ON(ap_me->criteriaOpFlags,CRITERIA_OP_FLAG__OR)) 
-        s_criteriaMonitorStatuses[*a_criteriaMonitorDepth] = b_passed? 'V': 'O'; 
-      else if (b_FLAG_SET_ON(ap_me->criteriaOpFlags,CRITERIA_OP_FLAG__AND)) 
-        s_criteriaMonitorStatuses[*a_criteriaMonitorDepth] = b_passed? 'A': 'X'; 
-      else s_criteriaMonitorStatuses[*a_criteriaMonitorDepth] = b_passed? 'V': 'X'; 
-    break; case 'O':
-      s_criteriaMonitorStatuses[*a_criteriaMonitorDepth] = b_passed? 'V': 'O'; 
-    break; case 'A':
-      s_criteriaMonitorStatuses[*a_criteriaMonitorDepth] = b_passed? 'A': 'X'; 
-    break; case 'V':
-    break; case 'X':
-    break; default: m_RAISE(ANOMALY__VALUE__D,s_criteriaMonitorStatuses[*a_criteriaMonitorDepth])
+  char status; m_C_STACK_PEEK(*a_cofMonitor,status);
+  switch (status) {
+  case 'U':
+    if (b_FLAG_SET_ON(me,CRITERIA_OP_FLAG__OR)) 
+      m_C_STACK_POKE(*a_cofMonitor,b_passed? 'V': 'O') 
+    else if (b_FLAG_SET_ON(me,CRITERIA_OP_FLAG__AND)) 
+      m_C_STACK_POKE(*a_cofMonitor,b_passed? 'A': 'X') 
+    else m_C_STACK_POKE(*a_cofMonitor,b_passed? 'V': 'X')
+  break; case 'O':
+    m_C_STACK_POKE(*a_cofMonitor,b_passed? 'V': 'O')
+  break; case 'A':
+    m_C_STACK_POKE(*a_cofMonitor,b_passed? 'A': 'X')
+  break; case 'V':
+  break; case 'X':
+  break; default: m_RAISE(ANOMALY__VALUE__D,status)
   } // switch 
 
-  bracketCount = om_CriteriaOpFlagsCloseBracketCount(ap_me->criteriaOpFlags);
-  m_ASSERT(*a_criteriaMonitorDepth >= bracketCount)
+  bracketCount = om_CriteriaOpFlagsCloseBracketCount(me);
+  m_ASSERT(om_CofMonitorDepth(a_cofMonitor) >= bracketCount)
   for (i = 0; i < bracketCount; i++) {
-    m_ASSERT(s_criteriaMonitorStatuses[*a_criteriaMonitorDepth-i] == 'V' || s_criteriaMonitorStatuses[*a_criteriaMonitorDepth-i] == 'X')
-    char b_passed2 = (s_criteriaMonitorStatuses[*a_criteriaMonitorDepth-i] == 'V');
-    switch (s_criteriaMonitorStatuses[*a_criteriaMonitorDepth-i-1]) {
+    char status;  m_C_STACK_POP(*a_cofMonitor,status);
+    m_ASSERT(status == 'V' || status == 'X')
+    char b_passed2 = (status == 'V');
+    m_C_STACK_PEEK(*a_cofMonitor,status);
+    switch (status) {
     case 'U':
     break; case 'O':
-      s_criteriaMonitorStatuses[*a_criteriaMonitorDepth-i-1] = b_passed2? 'V': 'X';
+      m_C_STACK_POKE(*a_cofMonitor,b_passed2? 'V': 'X')
     break; case 'A':
-      s_criteriaMonitorStatuses[*a_criteriaMonitorDepth-i-1] = b_passed2? 'V': 'X';
+      m_C_STACK_POKE(*a_cofMonitor,b_passed2? 'V': 'X')
     break; case 'V':
     break; case 'X':
-    break; default: m_RAISE(ANOMALY__VALUE__D,s_criteriaMonitorStatuses[*a_criteriaMonitorDepth])
+    break; default: m_RAISE(ANOMALY__VALUE__D,status)
     } // switch
   } // for
-  (*a_criteriaMonitorDepth) -= bracketCount;
-  m_ASSERT(*a_criteriaMonitorDepth >= 0)
+  m_ASSERT(om_CofMonitorDepth(a_cofMonitor) >= 0)
 
   m_DIGGY_RETURN(RETURNED)
-} // m_GRequestCriterionEval
+} // m_CriteriaOpFlagsEval
 
 // Public function; see .h
 int GIndexesSequenceNext(G_INDEXES_HANDLE handle,
@@ -847,15 +870,15 @@ int GIndexesSequenceNext(G_INDEXES_HANDLE handle,
   m_DIGGY_BOLLARD_S()
   m_ASSERT(sp_gRequestCriteria[0].indexLabel < handle->indexesNumber) 
   struct INDEX_SEQUENCE *a_indexSequence = (struct INDEX_SEQUENCE*)indexSequenceBuffer;
-  int criteriaMonitorDepth = UNDEFINED;
-  int s_criteriaMonitorStatuses[gRequestCriterionCount] ; // UNDEFINED
+  struct COF_MONITOR cofMonitor = { UNDEFINED } ;
+  m_C_STACK_INIT(cofMonitor,5)
 
+  char status = (char)UNDEFINED;
   do {
-    m_TRACK_IF(m_GIndexSequenceNext(handle->vnhs_indexes +
-      sp_gRequestCriteria[0].indexLabel, b_descending,
-      a_indexSequence, an_entry) != RETURNED) 
+    m_TRACK_IF(m_GIndexSequenceNext(handle->vnhs_indexes + sp_gRequestCriteria[0].indexLabel,
+      b_descending, a_indexSequence, an_entry) != RETURNED) 
     if (*an_entry >= 0) {
-      om_CriteriaMonitorReset(&criteriaMonitorDepth,s_criteriaMonitorStatuses);
+      m_TRACK_IF(m_CofMonitorReset(&cofMonitor) != RETURNED)
       const struct G_REQUEST_CRITERION* p_gRequestCriterionPtr = sp_gRequestCriteria;
 
       int i = 0; for (; i < gRequestCriterionCount;
@@ -864,20 +887,22 @@ int GIndexesSequenceNext(G_INDEXES_HANDLE handle,
         int answer = ANSWER__YES; // a priori
         if (i > 0) m_TRACK_IF((answer = GIndexesSeekEntryEquate(handle,
           p_gRequestCriterionPtr->indexLabel,*an_entry,
-          p_gRequestCriterionPtr->indexSeekFlags,
-          p_gRequestCriterionPtr->cr_gKeys)) < 0)
+          p_gRequestCriterionPtr->indexSeekFlags, p_gRequestCriterionPtr->cr_gKeys)) < 0)
 
-        m_TRACK_IF(m_GRequestCriterionEval(p_gRequestCriterionPtr, answer == ANSWER__YES,
-          &criteriaMonitorDepth,s_criteriaMonitorStatuses) != RETURNED)
+        m_TRACK_IF(m_CriteriaOpFlagsEval(p_gRequestCriterionPtr->criteriaOpFlags,
+          answer == ANSWER__YES, &cofMonitor) != RETURNED)
 
-        if (s_criteriaMonitorStatuses[0] == 'O' || s_criteriaMonitorStatuses[0] == 'K') break; 
+        m_C_STACK_PEEK(cofMonitor,status) 
+        if (status == 'O' || status == 'K') break; 
       } // for
   // Break "criteria handling" loop if entry not rejected by extra criteria 
-m_ASSERT(criteriaMonitorDepth == 0) 
-m_ASSERT(s_criteriaMonitorStatuses[0] == 'O' || s_criteriaMonitorStatuses[0] == 'K') 
-      if (s_criteriaMonitorStatuses[0] == 'O') break;
+m_ASSERT(om_CofMonitorDepth(&cofMonitor) == 0) 
+      m_C_STACK_PEEK(cofMonitor,status)
+m_ASSERT(status == 'O' || status == 'K') 
+      if (status == 'O') break;
     } else break; // No more entry => finished 
   } while (b_TRUE) ;
+  m_C_STACK_FREE(cofMonitor)
 
   m_DIGGY_VAR_D(*an_entry)
   m_DIGGY_RETURN(RETURNED)
@@ -893,8 +918,7 @@ int GIndexesSequenceCurrent(G_INDEXES_HANDLE handle,
   m_ASSERT(sp_gRequestCriteria[0].indexLabel < handle->indexesNumber) 
   struct G_INDEX *a_index = handle->vnhs_indexes + sp_gRequestCriteria[0].indexLabel;
   
-  m_TRACK_IF(m_GIndexSequenceCurrent(a_index,ap_indexSequence,an_entry) !=
-    RETURNED)
+  m_TRACK_IF(m_GIndexSequenceCurrent(a_index,ap_indexSequence,an_entry) != RETURNED)
 
   m_DIGGY_RETURN(RETURNED)
 } // GIndexesSequenceCurrent

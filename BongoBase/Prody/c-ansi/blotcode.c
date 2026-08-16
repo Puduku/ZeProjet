@@ -836,7 +836,7 @@ m_DIGGY_VAR_P_STRING(blotinstSequence)
     case DEFAULT_CASE__BLOTKEYW_ID:                  
     case END_LOOP__BLOTKEYW_ID:
     case END_SWITCH__BLOTKEYW_ID:
-      if (o_C_STACK_GET_COUNT(handle->h_flowControlStack) == 0) {
+      if (ob_C_STACK_EMPTY(handle->h_flowControlStack)) {
         m_REPORT_ERROR(litteralKeyw,"Orphan control statement (NO prior control statement)")
 
       } else { 
@@ -893,9 +893,9 @@ m_DIGGY_VAR_P_STRING(blotinstSequence)
     } // switch
   } // while
 
-  int trailingBlotkeywsNumber = o_C_STACK_GET_COUNT(handle->h_flowControlStack);
-  if (trailingBlotkeywsNumber > 0) {
-    m_REPORT_ERROR(dummy, "Trailing %d loop or switch control statement(s)", trailingBlotkeywsNumber)
+  int trailingBlotkeywCount = handle->h_flowControlStack.count;
+  if (trailingBlotkeywCount > 0) {
+    m_REPORT_ERROR(dummy, "Trailing %d loop or switch control statement(s)", trailingBlotkeywCount)
   } // if
 
 #undef DELIMITOR__S
