@@ -38,6 +38,7 @@
 //     int sn_tab2[10]; // the 'n' follows the 's'; the nullability applies on all array elements. 
 //     int *ns_tab = s_tab1; // the 'n' precedes the 's'; the nullability applies on the array
 //       // variable pointer. 
+
 // b_ indicator - 'boolean': indicates a variable used to host a boolean value (or a function that
 //   returns a boolean value) ; reminds that:
 //   - "boolean data type" does NOT exist - and HAS NOT to be artificially defined ; boolean
@@ -48,12 +49,16 @@
 //   Furthermore, b_ indicator facilitates concise naming of boolean variables. Indeed, b_  
 //   indicator allows not having to express literally the meaning of boolean variables with long 
 //   interrogative clauses. 
+
 // c_ indicator: see n_ indicator
+
 // d_ indicator: singleton ; one unique object instance can be created for the process. (see also 
 //   p_ indicator about "thread-safety")
+
 // e_ indicator - "exclusion": ("anti indicator") ; "negates" the next indicator in the watermark.
 //   In particular, when followed with 'n', indicates that the variable (or variable of that type)
 //   cannot be "nullable".
+
 // f_ indicator - "foreign" / "further": indicates that lifespan of variable exceeds that normally
 //   expected.   
 //   When used in function parameter, indicates that the function "expects" that the lifespan 
@@ -66,8 +71,21 @@
 //   int UseBrol (BROL brol, ....) ; 
 //   // After "Brol" destruction, fp_name is not necessary anymore...
 //   int DestroyBrol (BROL brol); 
+
 // g_ indicator - "give change for ..." ("surrogate", "substitute", "alias") : remove abstraction of
-//   type definition (the type definition is well a SUB TYPE definition or an ALIAS - NOT an abstraction) 
+//   type definition (stresses that the type definition is well a SUB TYPE definition or an ALIAS - NOT
+//   an abstraction).
+//   Special case: macro used as pure function name alias. 
+//   Example 1. This definition is a pure abstraction: the buffer size may be changed without requiring other
+//   change in the code.
+//     #define BUFFER_SIZE 512
+//   Example 2. This definition is a specialization of the origin 'int' type: it's a base design choice;
+//   changing to another type would imply massive redesign of the code.
+//     typedef int g_PROUT_ID;
+//   Example 3. 'g_Display' is just an alias of 'Print' function name: 
+//     int Print(const char *text); 
+//     #define g_Display Print 
+
 // h_ indicator - 'head' ("representative", "delegate", "proponent", ...): indicates that the variable
 //   is the 'head' handle of some allocated resource or instance. 
 //   NB: 'handle' must be understood in a wide meaning: all these variables are handles :
@@ -79,13 +97,17 @@
 //   by convention, lifespan of the instance is tied to that of its head variable. In particular,
 //   the handle parameter for some instance's creation and destruction functions is necessarily a
 //   head handle...
+
 // i_ indicator: see v_ indicator
+
 // j_ indicator - "junk" ("debris" "detritus" "remains" "rubbish" "ruins" "refuse" "garbage" 
 //   "fragments" "crap" "trash" "bits"...) : in combination with h_ and x_ indicators, indicates
 //   uncompleted disallocation (i.e potential memory leak) ; "junk" is supposedly cleared with the 
 //   death of the process. 
+
 // l_ indicator - "lately extension" : indicates a new method that is not "native" to the object passed
-//   as handle.   
+//   as handle. 
+
 // m_ 1. (original meaning) : "pure macro" indicator. Indicates that the macro is a "pure" macro of
 //   the pre-processor.
 //   A pure macro leverages all the portable features of the C preprocessor. However, pure macros,
@@ -98,6 +120,7 @@
 //   instruction terminators.
 //   (*) excepted side effects due to parameters expansion ; see u_ indicator
 //   2. (extended meaning) : inline function (simple discriminant with "regular" functions...)   
+
 // n_ / c_ indicators
 //   n_ indicator - "nullability" : the variable may take a "special value" (generally -1 or NULL)
 //     to convey the "nullability" of the value.  
@@ -106,14 +129,17 @@
 //   => Example:
 //     char *n_user; // NULL special address - user name not provided: anonymous connection
 //     char *c_password; // NOT significant in anonymous connection 
+
 // o_ indicator:
 //   - as function parameter: indicates that validity of parameter is explicitly checked (?)
-//   - as function: certifies function as a "pure" function or procedure that never raises anomalies... ; 
+//   - as function: certifies function or macro never raises anomalies... ; 
+
 // p_ indicator - "protected": in basic cases, warrants protection against modification ; 
 //   in such case, that indicator is often added in coordination with "const" type qualifier... 
 //   In specific cases (POSIX code) "protected" just means "thread safe" (either the instance data
 //   is not changed or is protected by ad hoc mechanism like a mutex)
 //   Note: thread safety is required with singletons (see d_ indicator).  
+
 // r_ indicator "raw" : in generic programming context - virtual functions, etc., that flag designs
 //   a generic parameter. 'r' indicator acts as "barrier" between generic and specific indicators.
 //   - indicators placed at the left of the raw indicator are "generic" to the parameter 
@@ -125,21 +151,27 @@
 //     + r indicator disappears in the specific parameter
 //     + specific indicators may be placed at the right of the generic indicators in the specific
 //       parameter
+
 // s_ indicator: see a_ indicator
+
 // t_ indicator: "transitory" ("passing", "ephemeral", "fleeting", "fugacious", "fugitive", 
 //   "momentary", "transient", "evanescent", "volatile"...) => indicates a POSSIBILITY of reallocation
 //   Indicates that the scope of the variable is more restricted than its lifespan. Typical usage:
 //   fetching items in collections (see c-ansi/green.h) 
+
 // u_ "unicity" indicator (for macro parameters) : warrants that parameter is expanded once and
 //   only once in macro; hence, the macro can be used safely with params with side effects (++,
 //   function calls, etc.)
+
 // v_ / i_ indicators
 //   i_ "inductor": indicates that this variable's value "inducts" that of other 'v_' variables.
 //   v_ "variant" indicator : indicates an information of the variable repeats that contained
 //     somewhere else (see i_ "inductor")
 //   => Practical usage: each time i_ value is changed, v_ value must be updated accordingly ;
 //     v_ value cannot be changed directly...
+
 // x_ indicator: see z_ indicator
+
 // z_ / x_ indicators: "creation" / "destruction" (go along with the 'h_' indicator)
 //   z_ : "ex nihilo" ("zero") creation indicator ; used by "instance creation" functions ;
 //     recalls that the passed handle must be uninitialized (i.e "undefined" value)
