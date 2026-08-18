@@ -305,7 +305,7 @@ struct GREEN_COLLECTION {
   unsigned char *hsc_flags ; // only "logically" referenced items' flags are significant
   int itemPhysicalCount ; // number of items that are physically initialized
   int i_itemCount; // number of items "logically" referenced
-  int v_maxItemCount; // max number of items "logically" referenced
+  int v_itemCountMax; // max number of items "logically" referenced
   G_INDEXES_HANDLE h_GIndexesHandle;
   char *nh_indexFetchInternalBuffer;
   int n_indexFetchBufferSize;
@@ -403,7 +403,7 @@ int GreenCollectionCreateInstance(GREEN_COLLECTION_HANDLE *azh_handle,  int expe
 
   m_CALLOC(handle->h_greenArray,handle->itemPhysicalCount,handle->greenItemSize)
   m_MALLOC_ARRAY(handle->hsc_flags, handle->itemPhysicalCount)
-  handle->v_maxItemCount = handle->i_itemCount = 0 ;
+  handle->v_itemCountMax = handle->i_itemCount = 0 ;
   m_TRACK_IF(GIndexesCreateInstance(&handle->h_GIndexesHandle,GreenCollectionEntryRawCompare,
     GreenCollectionEntryRawEquate, (void *) handle) != RETURNED)
   m_C_STACK_INIT(handle->h_gaps,BATEAU__C_STACK_BASE_PHYSICAL_COUNT)
@@ -463,12 +463,11 @@ static int GreenCollectionRefreshIndexesInternal(GREEN_COLLECTION_HANDLE handle,
 
 // TODO: toujours ag revoiri ????
   while (!ob_C_STACK_EMPTY(handle->h_fetched4ChangeStack)) {
-    int fetched4ChangeEntry = UNDEFINED;
-    m_C_STACK_POP(handle->h_fetched4ChangeStack,fetched4ChangeEntry)
+    int fetched4ChangeEntry; m_C_STACK_POP(handle->h_fetched4ChangeStack,fetched4ChangeEntry)
     m_ASSERT(handle->hsc_flags[fetched4ChangeEntry] == ALIEN_ALIVE__FLAGS)
 m_DIGGY_INFO("fetched4ChangeEntry=%d Before m_G_INDEXES_ADD()...",fetched4ChangeEntry)
     m_TRACK_IF(GIndexesAdd(handle->h_GIndexesHandle,fetched4ChangeEntry) != RETURNED)
-    m_SET_FLAG_OFF(handle->hsc_flags[fetched4ChangeEntry],ALIEN_FLAG)
+    om_FLAGS_SET_OFF(handle->hsc_flags[fetched4ChangeEntry],ALIEN_FLAG)
   } // while
   m_C_STACK_CLEAR(handle->h_fetched4ChangeStack)
   // MINIMONITOR: CLEAN
@@ -558,11 +557,11 @@ m_DIGGY_VAR_D(n_entry)
       } // if
       // New item
       m_SET_ALL_FLAGS(cp_handle->hsc_flags[n_entry],ALIEN_ALIVE__FLAGS)
-      if (++(cp_handle->i_itemCount) > cp_handle->v_maxItemCount) cp_handle->v_maxItemCount = 
+      if (++(cp_handle->i_itemCount) > cp_handle->v_itemCountMax) cp_handle->v_itemCountMax = 
         cp_handle->i_itemCount;
     } else { // Use existing gap 
       m_C_STACK_POP(cp_handle->h_gaps,n_entry)
-      m_SET_FLAG_OFF(cp_handle->hsc_flags[n_entry],DEAD_FLAG)
+      om_FLAGS_SET_OFF(cp_handle->hsc_flags[n_entry],DEAD_FLAG)
     } // if
 
     m_C_STACK_PUSH(cp_handle->h_fetched4ChangeStack,n_entry);
@@ -579,14 +578,14 @@ m_DIGGY_VAR_P(*acntr_greenItemStuff)
       if (fetch4 != FETCH_4__READ) { 
         m_ASSERT(!cp_handle->b_frozen) 
         m_TRACK_IF(GIndexesRemove(cp_handle->h_GIndexesHandle,n_entry) != RETURNED)
-        m_SET_FLAG_ON(cp_handle->hsc_flags[n_entry],ALIEN_FLAG)
+        om_FLAGS_SET_ON(cp_handle->hsc_flags[n_entry],ALIEN_FLAG)
         // MICROMONITOR: ALIEN / ALIVE
         if (fetch4 == FETCH_4__CHANGE) { 
           m_C_STACK_PUSH(cp_handle->h_fetched4ChangeStack,n_entry);
           // MINIMONITOR: FETCHED 4 CHANGE
         } else { // FETCH_4__REMOVE
           m_C_STACK_PUSH(cp_handle->h_gaps, n_entry)
-          m_SET_FLAG_ON(cp_handle->hsc_flags[n_entry],DEAD_FLAG)
+          om_FLAGS_SET_ON(cp_handle->hsc_flags[n_entry],DEAD_FLAG)
           // MICROMONITOR: ALIEN / DEAD
         } // if
       } // if
@@ -735,7 +734,7 @@ int GreenCollectionIndexRequestRAddCriterion(GREEN_COLLECTION_HANDLE cp_handle,
   m_ASSERT(nf_indexFetchAutomaticBuffer != NULL || !cp_handle->b_frozen) 
 
   char *indexFetchBuffer = nf_indexFetchAutomaticBuffer; // a priori
-  if (nf_indexFetchAutomaticBuffer == NULL) {
+  if (indexFetchBuffer == NULL) {
     indexFetchBuffer = cp_handle->nh_indexFetchInternalBuffer;
   } // if   
   m_ASSERT(indexFetchBuffer != NULL)
@@ -767,7 +766,6 @@ int GreenCollectionIndexRequestV(GREEN_COLLECTION_HANDLE cp_handle,
   switch (completed) { 
   case COMPLETED__OK:
   break; case COMPLETED__BUT:
-    m_ASSERT(criteriaCount == 1)
     completed = COMPLETED__BUT;
   break; default: m_TRACK() } // switch
 
@@ -777,7 +775,6 @@ int GreenCollectionIndexRequestV(GREEN_COLLECTION_HANDLE cp_handle,
     va_arg(extraCriteria,char *), va_arg(extraCriteria,unsigned int)),criteriaCount == i+1)) {
     case COMPLETED__OK:
     break; case COMPLETED__BUT:
-      m_ASSERT(criteriaCount == i+1)
       completed = COMPLETED__BUT;
     break; default: m_TRACK() } // switch
   } // for
@@ -943,7 +940,7 @@ int GreenCollectionDestroyInstance (GREEN_COLLECTION_HANDLE xh_handle) {
 
   if (xh_handle->n_greenHandlerDisengageFunction != NULL) {
     char *r_greenItemStuff = xh_handle->h_greenArray;
-    int i = 0; for (; i < xh_handle->v_maxItemCount ; i++, r_greenItemStuff +=
+    int i = 0; for (; i < xh_handle->v_itemCountMax ; i++, r_greenItemStuff +=
       xh_handle->greenItemSize) {
       m_TRACK_IF(xh_handle->n_greenHandlerDisengageFunction(xh_handle->r_greenHandlerHandle,
         r_greenItemStuff) != RETURNED)

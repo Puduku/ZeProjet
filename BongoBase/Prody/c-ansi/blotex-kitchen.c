@@ -470,7 +470,7 @@ char ob_ParseOpNext(struct P_STRING *a_sequence, int *an_indexFetchFlags) {
   o_PParsePassSingleChar(a_sequence,NULL,'+',&lexeme); 
   if (!b_EMPTY_P_STRING(lexeme)) {
     if (*an_indexFetchFlags < 0) *an_indexFetchFlags = ALL_FLAGS_OFF0;
-    m_SET_FLAG_ON(*an_indexFetchFlags,INDEX_FETCH_FLAG__NEXT)
+    om_FLAGS_SET_ON(*an_indexFetchFlags,INDEX_FETCH_FLAG__NEXT)
     m_DIGGY_RETURN(b_TRUE)
   } // if
   m_DIGGY_RETURN(b_FALSE0)
@@ -493,7 +493,7 @@ char ob_ParseOpReset(struct P_STRING *a_sequence, int *an_indexFetchFlags) {
   o_PParsePassSingleChar(a_sequence,NULL,'^',&lexeme); 
   if (!b_EMPTY_P_STRING(lexeme)) {
     if (*an_indexFetchFlags < 0) *an_indexFetchFlags = ALL_FLAGS_OFF0;
-    m_SET_FLAG_ON(*an_indexFetchFlags,INDEX_FETCH_FLAG__RESET)
+    om_FLAGS_SET_ON(*an_indexFetchFlags,INDEX_FETCH_FLAG__RESET)
     m_DIGGY_RETURN(b_TRUE)
   } // if
   m_DIGGY_RETURN(b_FALSE0)

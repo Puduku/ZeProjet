@@ -347,7 +347,8 @@ int GreenCollectionIndexRequestRNew(GREEN_COLLECTION_HANDLE cp_handle,
 
 // Ret:
 // - COMPLETED__OK: Ok
-// - COMPLETED__BUT: (only possible when last criterion) criteria needed rectification(s)...
+// - COMPLETED__BUT: (normally, only possible when last criterion) criteria needed
+//   rectification(s)...
 // - -1: unexpected problem ; anomaly is raised
 int GreenCollectionIndexRequestRAddCriterion(GREEN_COLLECTION_HANDLE cp_handle,
   char* nf_indexFetch5AutomaticBuffer, struct G_REQUEST_CRITERION criterion, char b_lastCriterion);
