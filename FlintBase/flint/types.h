@@ -37,9 +37,7 @@
 // - b_mars:
 //
 // Ret: TRUE/FALSE
-static inline char mb_Accord(char b_venus, char b_mars) {
-  return (b_venus? b_mars: !b_mars);
-} // mb_Accord
+#define ob_HARMONY(b_venus,b_mars) (!!(b_venus) == !!(b_mars))
 
 // 2. Generic integers
 // ------------------- 

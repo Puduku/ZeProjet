@@ -379,7 +379,7 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(indexSeekFlags)
 
     int n_firstIndexEntry = -1; // Not set a priori
     int n_lastIndexEntry = -1; // Not set a priori
-    if (b_FLAG_SET_ON(indexSeekFlags,INDEX_SEEK_FLAG__ANY)) { // NOT key-based selection
+    if (ob_FLAGS_ON(indexSeekFlags,INDEX_SEEK_FLAG__ANY)) { // NOT key-based selection
       n_firstIndexEntry = 0; 
     } else { // key-based selection
       int top = UNDEFINED;
@@ -724,14 +724,14 @@ static inline int g_GRequestCriteriaRectifyOpFlags(struct G_REQUEST_CRITERION *s
   if (s_me[0].criteriaOpFlags != initialCriteriaOpFlags) completed = COMPLETED__BUT;
   int i = 1; for (; i < *a_meCount; i++) {
     int initialCriteriaOpFlags = s_me[i].criteriaOpFlags;      
-    if (b_FLAG_SET_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__OR)) {
+    if (ob_FLAGS_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__OR)) {
       om_FLAGS_SET_OFF(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__AND)
       if (i+1 < *a_meCount) {
         // Ensure AND op. have precedence over that OR op. 
         if (om_CriteriaOpFlagsOpenBracketCount(s_me[i+1].criteriaOpFlags) == 0) om_FLAGS_SET_ON(
           s_me[i+1].criteriaOpFlags,CRITERIA_OP_FLAG__OPEN1)
       } // if
-    } else if (b_FLAG_SET_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__AND)) om_FLAGS_SET_OFF(
+    } else if (ob_FLAGS_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__AND)) om_FLAGS_SET_OFF(
       s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__OR)
     depth += om_CriteriaOpFlagsOpenBracketCount(s_me[i].criteriaOpFlags);
     if (depth - om_CriteriaOpFlagsCloseBracketCount(s_me[i].criteriaOpFlags) < 0) {
@@ -844,9 +844,9 @@ static inline int m_GcEvaluatorIterate(struct GC_EVALUATOR* a_me, char b_passed,
   char status; m_C_STACK_PEEK(*a_me,status);
   switch (status) {
   case 'U':
-    if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__OR)) 
+    if (ob_FLAGS_ON(criteriaOpFlags,CRITERIA_OP_FLAG__OR)) 
       m_C_STACK_POKE(*a_me,b_passed? 'V': 'O') 
-    else if (b_FLAG_SET_ON(criteriaOpFlags,CRITERIA_OP_FLAG__AND)) 
+    else if (ob_FLAGS_ON(criteriaOpFlags,CRITERIA_OP_FLAG__AND)) 
       m_C_STACK_POKE(*a_me,b_passed? 'A': 'X') 
     else m_C_STACK_POKE(*a_me,b_passed? 'V': 'X')
   break; case 'O':

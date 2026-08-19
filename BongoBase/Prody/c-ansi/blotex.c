@@ -783,16 +783,16 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
     nc_abandonmentInfo))
 
   if (ac_blotexValue->b_strValue) {
-    if (b_FLAG_SET_ON(blotexCheckFlags,BLOTEX_CHECK_FLAG__INT_ONLY)) m_ABANDON(
+    if (ob_FLAGS_ON(blotexCheckFlags,BLOTEX_CHECK_FLAG__INT_ONLY)) m_ABANDON(
       EXPECT_INTEX__ABANDONMENT_CAUSE)
     m_CHECK_ABANDON(m_BlotexlibExecutorParseFullStrex(handle,a_sequence,ac_blotexValue,
       nc_abandonmentInfo))
   } else { 
-    if (b_FLAG_SET_ON(blotexCheckFlags,BLOTEX_CHECK_FLAG__STR_ONLY)) m_ABANDON(
+    if (ob_FLAGS_ON(blotexCheckFlags,BLOTEX_CHECK_FLAG__STR_ONLY)) m_ABANDON(
       EXPECT_STREX__ABANDONMENT_CAUSE)
     m_CHECK_ABANDON(m_BlotexlibExecutorParseFullIntex(handle,a_sequence,ac_blotexValue,
       nc_abandonmentInfo))
-    if (b_FLAG_SET_ON(blotexCheckFlags,BLOTEX_CHECK_FLAGS__POSITIVE_INT_ONLY) &&
+    if (ob_FLAGS_ON(blotexCheckFlags,BLOTEX_CHECK_FLAGS__POSITIVE_INT_ONLY) &&
        ac_blotexValue->select.c_blotval < 0) m_ABANDON(EXPECT_POSITIVE__ABANDONMENT_CAUSE)
   } // if
 

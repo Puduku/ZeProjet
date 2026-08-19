@@ -264,15 +264,15 @@ int ParseSpecifier(struct P_STRING *a_sequence, int *a_specifierFlags,
   if (b_EMPTY_P_STRING(lexeme)) m_ABANDON_S(SYNTAX_ERROR__ABANDONMENT_CAUSE)
   switch (lexeme.string[0]) {
   case '.' : // <name specifier> : 
-    if (b_FLAG_SET_OFF(*a_specifierFlags,NAME__SPECIFIER_FLAG)) m_ABANDON_S(
+    if (ob_FLAGS_OFF(*a_specifierFlags,NAME__SPECIFIER_FLAG)) m_ABANDON_S(
       SYNTAX_ERROR__ABANDONMENT_CAUSE)
     *a_specifierFlags = NAME__SPECIFIER_FLAG;
   break; case '[' : // <entry specifier>  :
-    if (b_FLAG_SET_OFF(*a_specifierFlags,ENTRY__SPECIFIER_FLAG)) m_ABANDON_S(
+    if (ob_FLAGS_OFF(*a_specifierFlags,ENTRY__SPECIFIER_FLAG)) m_ABANDON_S(
       SYNTAX_ERROR__ABANDONMENT_CAUSE)
     *a_specifierFlags = ENTRY__SPECIFIER_FLAG;
   break; case '{' : // <token id specifier> : 
-    if (b_FLAG_SET_OFF(*a_specifierFlags,TOKEN_ID__SPECIFIER_FLAG)) m_ABANDON_S(
+    if (ob_FLAGS_OFF(*a_specifierFlags,TOKEN_ID__SPECIFIER_FLAG)) m_ABANDON_S(
       SYNTAX_ERROR__ABANDONMENT_CAUSE)
     *a_specifierFlags = TOKEN_ID__SPECIFIER_FLAG;
   break; default:

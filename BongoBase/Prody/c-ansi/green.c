@@ -556,7 +556,7 @@ m_DIGGY_VAR_D(n_entry)
         m_ASSERT(n_entry < cp_handle->itemPhysicalCount)
       } // if
       // New item
-      m_SET_ALL_FLAGS(cp_handle->hsc_flags[n_entry],ALIEN_ALIVE__FLAGS)
+      cp_handle->hsc_flags[n_entry] = ALIEN_ALIVE__FLAGS;
       if (++(cp_handle->i_itemCount) > cp_handle->v_itemCountMax) cp_handle->v_itemCountMax = 
         cp_handle->i_itemCount;
     } else { // Use existing gap 
@@ -572,8 +572,8 @@ m_DIGGY_VAR_P(*acntr_greenItemStuff)
 
   } else { // Direct fetch
     if (n_entry < cp_handle->i_itemCount &&  // Existing item (FAMED / ALIVE)
-      !b_FLAG_SET_ON(cp_handle->hsc_flags[n_entry],DEAD_FLAG)) { // It's NOT a gap
-      m_ASSERT(b_ALL_FLAGS_OK(cp_handle->hsc_flags[n_entry],FAMED_ALIVE__FLAGS))
+      !ob_FLAGS_ON(cp_handle->hsc_flags[n_entry],DEAD_FLAG)) { // It's NOT a gap
+      m_ASSERT(cp_handle->hsc_flags[n_entry] == FAMED_ALIVE__FLAGS)
       // MICROMONITOR: FAMED / ALIVE 
       if (fetch4 != FETCH_4__READ) { 
         m_ASSERT(!cp_handle->b_frozen) 
@@ -666,9 +666,8 @@ int GreenCollectionClear (GREEN_COLLECTION_HANDLE handle) {
 static int o_GreenCollectionSetIndexFetchBufferSize(GREEN_COLLECTION_HANDLE cp_handle) {
   m_DIGGY_BOLLARD()
   if (cp_handle->n_indexFetchBufferSize >= 0) m_DIGGY_RETURN(COMPLETED__BUT)
-  cp_handle->n_indexFetchBufferSize = sizeof(struct INDEX_FETCH_HEADER) +  o_IndexSequenceSize() +
-    o_IndexFetchBufferSize(cp_handle->gRequestCriterionCountMax,cp_handle->n_gKeySize,
-    cp_handle->gKeyCountMax);
+  cp_handle->n_indexFetchBufferSize = o_IndexFetchBufferSize(cp_handle->gRequestCriterionCountMax,
+    cp_handle->n_gKeySize, cp_handle->gKeyCountMax);
   m_DIGGY_RETURN(COMPLETED__OK)
 } // o_GreenCollectionSetIndexFetchBufferSize
 
@@ -817,21 +816,21 @@ m_DIGGY_VAR_INDEX_FETCH_FLAGS(indexFetchFlags)
     cp_handle->nh_indexFetchInternalBuffer;
   m_ASSERT(indexFetchBuffer != NULL)
 
-  if (b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__RESET)) {
+  if (ob_FLAGS_ON(indexFetchFlags,INDEX_FETCH_FLAG__RESET)) {
     m_TRACK_IF(GreenCollectionRefreshIndexesInternal(cp_handle,b_TRUE) != RETURNED)
     // MINIMONITOR: CLEAN
     int fetch4 = FETCH_4__CHANGE; // a priori
-    if (b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__READ)) fetch4 = FETCH_4__READ;
-    else if (b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__REMOVE)) fetch4 = FETCH_4__REMOVE;
+    if (ob_FLAGS_ON(indexFetchFlags,INDEX_FETCH_FLAG__READ)) fetch4 = FETCH_4__READ;
+    else if (ob_FLAGS_ON(indexFetchFlags,INDEX_FETCH_FLAG__REMOVE)) fetch4 = FETCH_4__REMOVE;
      
-    m_TRACK_IF(m_IndexFetchSequenceReset(indexFetchBuffer,b_FLAG_SET_ON(indexFetchFlags,
+    m_TRACK_IF(m_IndexFetchSequenceReset(indexFetchBuffer,ob_FLAGS_ON(indexFetchFlags,
       INDEX_FETCH_FLAG__DESCENDING), fetch4, cp_handle->h_GIndexesHandle) != RETURNED) 
   } // if    
 
   int n_entry = UNDEFINED;
   int result = RESULT__NOT_FOUND;
 
-  if (b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__NEXT)) {
+  if (ob_FLAGS_ON(indexFetchFlags,INDEX_FETCH_FLAG__NEXT)) {
     m_TRACK_IF(m_IndexFetchSequenceNext(indexFetchBuffer,cp_handle->h_GIndexesHandle,&n_entry) !=
       RETURNED)
   } else {
@@ -841,10 +840,10 @@ m_DIGGY_VAR_INDEX_FETCH_FLAGS(indexFetchFlags)
   if (n_entry != -1) result = RESULT__FOUND; // a priori 
 
   int n_fetch4 = -1 ; // No fetch a priori
-  if ((n_entry != -1) || (b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__NEXT) &&
-    b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__RESET) &&
-    b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__CHANGE) &&
-    b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__SMART))) n_fetch4 = o_IndexFetchGetHeaderPtr(
+  if ((n_entry != -1) || (ob_FLAGS_ON(indexFetchFlags,INDEX_FETCH_FLAG__NEXT) &&
+    ob_FLAGS_ON(indexFetchFlags,INDEX_FETCH_FLAG__RESET) &&
+    ob_FLAGS_ON(indexFetchFlags,INDEX_FETCH_FLAG__CHANGE) &&
+    ob_FLAGS_ON(indexFetchFlags,INDEX_FETCH_FLAG__SMART))) n_fetch4 = o_IndexFetchGetHeaderPtr(
       indexFetchBuffer)->fetch4 ;
 
   // MINIMONITOR: ANY 
@@ -912,11 +911,11 @@ m_DIGGY_VAR_D(completed)
 m_DIGGY_VAR_D(completed)
     int i = 0; for (; i < handle->i_itemCount; i++) {
       int expectedHits = 0;
-      if (b_FLAG_SET_ON(handle->hsc_flags[i],DEAD_FLAG))  expectedHits = 1; 
+      if (ob_FLAGS_ON(handle->hsc_flags[i],DEAD_FLAG))  expectedHits = 1; 
       m_TRACK_IF((completed = EntriesStackVerifyEntry(&handle->h_gaps,i,expectedHits)) < 0)
       if (completed == COMPLETED__BUT) break;
       expectedHits = 0;
-      if (!b_FLAG_SET_ON(handle->hsc_flags[i],ALIEN_FLAG))  expectedHits = 1;
+      if (!ob_FLAGS_ON(handle->hsc_flags[i],ALIEN_FLAG))  expectedHits = 1;
       m_TRACK_IF((completed = GIndexesVerifyEntry(handle->h_GIndexesHandle,i,expectedHits)) < 0)
       if (completed == COMPLETED__BUT) break;
     } // for

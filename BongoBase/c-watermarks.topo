@@ -73,21 +73,21 @@
 //   int DestroyBrol (BROL brol); 
 
 // g_ indicator - "give change for ..." ("surrogate", "substitute", "alias") : remove abstraction of
-//   type definition (stresses that the type definition is well a SUB TYPE definition or an ALIAS - NOT
-//   an abstraction).
+//   type definition (stresses that the type definition is well a SUB TYPE definition or an ALIAS -
+//   NOT an abstraction).
 //   Special case: macro used as pure function name alias. 
-//   Example 1. This definition is a pure abstraction: the buffer size may be changed without requiring other
-//   change in the code.
+//   Example 1. This definition is a pure abstraction: the buffer size may be changed without
+//   requiring other change in the code.
 //     #define BUFFER_SIZE 512
-//   Example 2. This definition is a specialization of the origin 'int' type: it's a base design choice;
-//   changing to another type would imply massive redesign of the code.
+//   Example 2. This definition is a specialization of the origin 'int' type: it's a base design
+//   choice; changing to another type would imply massive redesign of the code.
 //     typedef int g_PROUT_ID;
 //   Example 3. 'g_Display' is just an alias of 'Print' function name: 
 //     int Print(const char *text); 
 //     #define g_Display Print 
 
-// h_ indicator - 'head' ("representative", "delegate", "proponent", ...): indicates that the variable
-//   is the 'head' handle of some allocated resource or instance. 
+// h_ indicator - 'head' ("representative", "delegate", "proponent", ...): indicates that the
+//   variable is the 'head' handle of some allocated resource or instance. 
 //   NB: 'handle' must be understood in a wide meaning: all these variables are handles :
 //   - file descriptor: allocated resources are process's and system's "open file" entries
 //   - "malloced" memory pointer: allocated resource is part of the heap memory
@@ -178,3 +178,6 @@
 //   x_ : destruction indicator ; used by "instance destruction" functions ; recalls that the 
 //     handle is no more "usable" after "instance destruction" function return - the handle
 //     must "vanish" synchronously with the resource.
+
+// Arbitrary indicator precedence:
+// bu_ mu_ ob_ xh_ zh_

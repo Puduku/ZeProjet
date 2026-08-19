@@ -364,7 +364,7 @@ int GreenCollectionIndexRequestRAddCriterion(GREEN_COLLECTION_HANDLE cp_handle,
 // - False : search key(s) value(s) is(are) not significant with index request 
 static inline char mb_SignificantGreenCollectionIndexKeys(unsigned int indexSeekFlags) {
   m_DIGGY_BOLLARD_S()
-  m_DIGGY_RETURN (b_FLAG_SET_OFF(indexSeekFlags,INDEX_SEEK_FLAG__ANY));
+  m_DIGGY_RETURN (ob_FLAGS_OFF(indexSeekFlags,INDEX_SEEK_FLAG__ANY));
 } // mb_SignificantGreenCollectionIndexKeys
 
      

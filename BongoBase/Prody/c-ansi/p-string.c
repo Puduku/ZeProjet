@@ -239,21 +239,21 @@ const char *o_ScanPString(struct P_STRING pString, int scanFlags, IS_CHAR_FUNCTI
 // - isCharFunction:
 // - u_char:
 #define b_PASS_CHAR(scanFlags, /*IS_CHAR_FUNCTION*/ isCharFunction, /*char*/ u_char) \
-( b_FLAG_SET_OFF(scanFlags,PASS_CHARS_WHILE__SCAN_FLAG) ? !isCharFunction(u_char) : isCharFunction(u_char) )
+( ob_FLAGS_OFF(scanFlags,PASS_CHARS_WHILE__SCAN_FLAG) ? !isCharFunction(u_char) : isCharFunction(u_char) )
 
 // Passed:
 // - scanFlags:
 // - isCharFunction:
 // - u_char:
 #define b_PASS_CHAR2(scanFlags, /*const char* */char, /*char*/ u_char) \
-( b_FLAG_SET_OFF(scanFlags,PASS_CHARS_WHILE__SCAN_FLAG) ? ((char) != (u_char)) : ((char) == u_char) )
+( ob_FLAGS_OFF(scanFlags,PASS_CHARS_WHILE__SCAN_FLAG) ? ((char) != (u_char)) : ((char) == u_char) )
 
-  if (b_FLAG_SET_OFF(scanFlags,REVERTED__SCAN_FLAG)) {
+  if (ob_FLAGS_OFF(scanFlags,REVERTED__SCAN_FLAG)) {
     ptr = pString.string - 1;
 
 // loop invariant: No match in portion [pString.string:ptr[ 
 #define m_SCAN_REGULAR(b_passChar) {\
-  if (b_FLAG_SET_ON(scanFlags,QUOTED__SCAN_FLAG)) {\
+  if (ob_FLAGS_ON(scanFlags,QUOTED__SCAN_FLAG)) {\
     char b_inside = b_FALSE0;\
     while (++ptr < pString.stop) {\
       if (b_inside) b_inside = (*ptr != '"' || (ptr > pString.string && *(ptr-1) == '\\'));\
@@ -278,7 +278,7 @@ const char *o_ScanPString(struct P_STRING pString, int scanFlags, IS_CHAR_FUNCTI
 
 // loop invariant: No match in portion [ptr:pString.stop[ 
 #define m_SCAN_REVERTED(b_passChar) {\
-  if (b_FLAG_SET_ON(scanFlags,QUOTED__SCAN_FLAG)) {\
+  if (ob_FLAGS_ON(scanFlags,QUOTED__SCAN_FLAG)) {\
     char b_inside = b_FALSE0;\
     while (--ptr >= pString.string) {\
       if (b_inside) b_inside = (*ptr != '"' || (ptr > pString.string && *(ptr-1) == '\\'));\
@@ -316,7 +316,7 @@ const char *ScanPStringTillMatch(struct P_STRING pString, int scanFlags,
   int subLength = m_PStringLength(subPString);
   const char *ptr = pString.string - 1;
 
-  if (b_FLAG_SET_ON(scanFlags,QUOTED__SCAN_FLAG)) {
+  if (ob_FLAGS_ON(scanFlags,QUOTED__SCAN_FLAG)) {
     char b_inside = b_FALSE0;
     // invariant: No match in portion [pString.string:ptr[ 
     while (++ptr < pString.stop) {
@@ -358,7 +358,7 @@ const char *ScanPStringTillFirstMatchR(struct P_STRING pString, int scanFlags,
   if (navn_matchedEntry != NULL) *navn_matchedEntry = -1; // a priori
   if (nsn_ids != NULL && cnavn_matchedId != NULL) *cnavn_matchedId = -1; // a priori
 
-  if (b_FLAG_SET_ON(scanFlags,QUOTED__SCAN_FLAG)) {
+  if (ob_FLAGS_ON(scanFlags,QUOTED__SCAN_FLAG)) {
     char b_inside = b_FALSE0;
     char cb_escape = (char)UNDEFINED;
     while (!b_EMPTY_P_STRING(pString)) {

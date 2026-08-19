@@ -20,95 +20,99 @@
 // 1. Simple flags set
 // -------------------
 
-// Set flag state to "ON"
+// Combine two flags together
 //
 // Passed:
-// - m_flags: 
-// - flag: flag to set ON
+// - u_flag1:
+// - u_flag2:
 //
-// Modified:
-// - m_flags: flag is set
-#define m_SET_FLAG_ON(m_flags,flag) (m_flags) |= (flag);
-
-// Set flag state to "OFF"
-//
-// Passed:
-// - m_flags:
-// - flag: flag to set OFF
-//
-// Modified:
-// - m_flags: flag is set
-#define m_SET_FLAG_OFF(m_flags,flag) (m_flags) &= ~(flag);
-
-//
+// Ret: flag combination
 #define o_FLAGS2(u_flag1,u_flag2) ((u_flag1)|(u_flag2))
 
+// Combine three flags together
 //
+// Passed:
+// - u_flag1:
+// - u_flag2:
+// - u_flag3:
+//
+// Ret: flag combination
 #define o_FLAGS3(u_flag1,u_flag2,u_flag3) ((u_flag1)|(u_flag2)|(u_flag3))
 
-// Set state to "OFF" for several flags at the same time
+// Set state to "ON" for (several) flags 
+//
+// Passed:
+// - mu_me: 
+// - u_flags: single flag / flag combination to set "ON""
+//
+// Modified:
+// - mu_me: flags are ON
+#define om_FLAGS_SET_ON(mu_me,u_flags) (mu_me) |= (u_flags);
+
+// Set state to "OFF" for (several) flags
 //
 // Passed:
 // - mu_me:
-// - u_flags:
+// - u_flags: single flag / flag combination to set "OFF""
 //
 // Modified:
 // - mu_me: flags are OFF 
 #define om_FLAGS_SET_OFF(mu_me,u_flags) (mu_me) &= ~(u_flags);
 
-// Set flag state
+// Set state (ON/OFF) for (several) flags
 //
 // Passed:
-// - m_flags:
-// - flag: flag to set
-// - b_on: TRUE => set flag ON ; FALSE => set flag OFF
+// - mu_me:
+// - u_flags: single flag / flag combination to set
+// - bu_on: TRUE => set flag ON ; FALSE => set flag OFF
 //
 // Modified:
-// - m_flags: flag is set
-#define m_SET_FLAG(m_flags,flag,b_on) {\
-  if (b_on) m_SET_FLAG_ON(m_flags,flag) else m_SET_FLAG_OFF(m_flags,flag)\
+// - mu_me: flag is set
+#define om_FLAGS_SET(mu_me,u_flags,bu_on) {\
+  if (bu_on) om_FLAGS_SET_ON(mu_me,u_flags) else om_FLAGS_SET_OFF(mu_me,u_flags)\
 }
 
-// Check whether flag is ON 
+// Check whether flag(s) is(are) ON 
 //
 // Passed:
-// - flags:
-// - flag: flag to check 
+// - mu_me:
+// - u_flags: flag(s) to check 
 //
-// Ret: TRUE: flag is ON ; FALSE: flag is OFF
-#define b_FLAG_SET_ON(flags,flag) ((flags) & (flag))
+// Ret: TRUE: (all) flag(s) is(are) ON ; FALSE: flag(s) is(are) OFF
+#define ob_FLAGS_ON(mu_me,u_flags) ((mu_me) & (u_flags))
 
-// Check whether flag is OFF 
+// Check whether flag(s) is(are) OFF 
 //
 // Passed:
-// - flags:
-// - flag: flag to check 
+// - mu_me:
+// - u_flags: flag(s) to check 
 //
-// Ret: TRUE: flag is OFF ; FALSE: flag is ON
-#define b_FLAG_SET_OFF(flags,flag) (!b_FLAG_SET_ON(flags,flag)) 
+// Ret: TRUE: (all) flag(s) is(are) OFF ; FALSE: flag(s) is(are) ON
+#define ob_FLAGS_OFF(mu_me,u_flags) (!ob_FLAGS_ON(mu_me,u_flags)) 
 
-// Check flag state 
+// Check flag(s) state 
 //
 // Passed:
-// - flags:
-// - flag: flag to check 
-// - b_on: TRUE => check whether flag is ON ; FALSE => check whether flag is OFF
+// - mu_me:
+// - u_flags: flag(s) to check 
+// - bu_on: TRUE => check whether flag(s) is(are) ON ; FALSE => check whether flag(s) is(are) OFF
 //
 // Ret:
-// -  TRUE: the flag is in the expected state
-// -  FALSE: the flag is in the "opposite" state
-#define b_FLAG_SET(flags,flag,b_on) ((b_on)? b_FLAG_SET_ON(flags,flag): b_FLAG_SET_OFF(flags,flag))
+// -  TRUE: (all) flag(s) is(are) in the expected state
+// -  FALSE: (all) flag(s) is(are) in the "opposite" state
+#define ob_FLAGS_ARE(mu_me,u_flags,bu_on) ((bu_on)? ob_FLAGS_ON(mu_me,u_flags): ob_FLAGS_OFF(mu_me,\
+  u_flags))
 
-// Switch flag state (OFF/ON) 
+// Switch flag(s) state (OFF/ON) 
 //
 // Passed:
-// - m_flags:
-// - flag: flag to switch
+// - m_me:
+// - flag: flag SINGLE flag to switch
 //
 // Modified:
-// - m_flags: flag has been switched 
-#define m_SWITCH_FLAG(m_flags,flag) if (b_FLAG_SET_ON(m_flags,flag)) m_SET_FLAG_OFF(m_flags,flag)\
-  else m_SET_FLAG_ON(m_flags,flag) 
+// - m_me: flag has been switched 
+#define m_FLAGS_SWITCH(m_me,flag) if (ob_FLAGS_ON(m_me,flag)) om_FLAGS_SET_OFF(m_me,flag)\
+  else om_FLAGS_SET_ON(m_me,flag) 
 
 // Pseudo-flag (when off)
 #define FLAG_OFF0 0
@@ -116,22 +120,7 @@
 // "No flag"
 #define ALL_FLAGS_OFF0 0
 
-// Check whether ALL flags are in expected state...
-//
-// Passed:
-// - flags:
-// - allExpectedFlags: all expected flags (constructed by bitwise "or-ization" of "ON" flags)
-//
-// Ret:
-// - TRUE: all flags is in the expected state
-// - FALSE: at least one flag is in the "opposite" state
-//TODO: ag virer...
-#define b_ALL_FLAGS_OK(flags,allExpectedFlags) ((flags) == (allExpectedFlags))
 
-// Set all flags
-// - m_flags:
-// - allFlags: all flags (constructed by bitwise "or-ization" of "ON" flags)
-#define m_SET_ALL_FLAGS(m_flags,allFlags) m_flags = (allFlags); \
 
 // 2. Flags "arrays"
 // -----------------
@@ -142,7 +131,7 @@
 // - flagEntry:
 //
 // Ret: actual entry in flags array
-#define FLAGS_ARRAY_ENTRY(flagEntry) (flagEntry >> 3) 
+#define FLAGS_ARRAY_ENTRY(flagEntry) (flagEntry >> 3)
 
 // Passed
 // - flagEntry:
@@ -162,85 +151,85 @@
 // Set flag state to "ON"
 //
 // Passed:
-// - m_flagsArray: declared with FLAGS_ARRAY_SIZE() macro  
+// - m_me: declared with FLAGS_ARRAY_SIZE() macro  
 // - flagEntry: flag's entry to set
 //
 // Modified:
-// - m_flagsArray: flag is set
-#define m_SET_ENTRY_FLAG_ON(m_flagsArray,flagEntry) \
-  m_SET_FLAG_ON(m_flagsArray[FLAGS_ARRAY_ENTRY(flagEntry)], FLAGS_ARRAY_FLAG(flagEntry))
+// - m_me: flag is set
+#define m_FLAGS_ARRAY_SET_ON(m_me,flagEntry) \
+  om_FLAGS_SET_ON(m_me[FLAGS_ARRAY_ENTRY(flagEntry)], FLAGS_ARRAY_FLAG(flagEntry))
 
 // Set flag state to "OFF"
 //
 // Passed:
-// - m_flagsArray: declared with FLAGS_ARRAY_SIZE() macro  
+// - m_me: declared with FLAGS_ARRAY_SIZE() macro  
 // - flagEntry: flag's entry to set
 //
 // Modified:
-// - m_flagsArray: flag is set
-#define m_SET_ENTRY_FLAG_OFF(m_flagsArray,flagEntry) \
-  m_SET_FLAG_OFF(m_flagsArray[FLAGS_ARRAY_ENTRY(flagEntry)], FLAGS_ARRAY_FLAG(flagEntry))
+// - m_me: flag is set
+#define m_FLAGS_ARRAY_SET_OFF(m_me,flagEntry) \
+  om_FLAGS_SET_OFF(m_me[FLAGS_ARRAY_ENTRY(flagEntry)], FLAGS_ARRAY_FLAG(flagEntry))
 
 // Set flag state
 //
 // Passed:
-// - m_flagsArray: declared with FLAGS_ARRAY_SIZE() macro  
+// - m_me: declared with FLAGS_ARRAY_SIZE() macro  
 // - flagEntry: flag to set
 // - b_on: TRUE => set flag ON ; FALSE => set flag OFF
 //
 // Modified:
-#define m_SET_ENTRY_FLAG(m_flagsArray,flagEntry,b_on) if (b_on) m_SET_ENTRY_FLAG_ON(\
-  m_flagsArray,flagEntry) else  m_SET_ENTRY_FLAG_OFF(m_flagsArray,flagEntry) 
+#define m_FLAGS_ARRAY_SET(m_me,flagEntry,b_on) if (b_on) m_FLAGS_ARRAY_SET_ON(\
+  m_me,flagEntry) else  m_FLAGS_ARRAY_SET_OFF(m_me,flagEntry) 
 
 // Check whether flag is ON 
 //
 // Passed:
-// - flagsArray:
+// - me:
 // - flagEntry: flag to check 
 //
 // Ret: TRUE: flag is ON ; FALSE: flag is OFF
-#define b_ENTRY_FLAG_SET_ON(flagsArray,flagEntry) ((flagsArray[FLAGS_ARRAY_ENTRY(flagEntry)]) & \
+#define b_ENTRY_FLAG_SET_ON(me,flagEntry) ((me[FLAGS_ARRAY_ENTRY(flagEntry)]) & \
   FLAGS_ARRAY_FLAG(flagEntry))
 
 // Check whether flag is OFF 
 //
 // Passed:
-// - flagsArray:
+// - me:
 // - flagEntry: flag to check 
 //
 // Ret: TRUE: flag is OFF ; FALSE: flag is ON
-#define b_ENTRY_FLAG_SET_OFF(flagsArray,flagEntry) (!b_ENTRY_FLAG_SET_ON(flagsArray,flagEntry)) 
+#define b_ENTRY_FLAG_SET_OFF(me,flagEntry) (!b_ENTRY_FLAG_SET_ON(me,flagEntry)) 
 
 // Check flag state 
 //
 // Passed:
-// - flagsArray:
+// - me:
 // - flagEntry: flag to check 
 // - b_on: TRUE => check whether flag is ON ; FALSE => check whether flag is OFF
 //
 // Ret:
 // -  TRUE: the flag is in the expected state
 // -  FALSE: the flag is in the "opposite" state
-#define b_ENTRY_FLAG_SET(flagsArray,flagEntry,b_on) ((b_on)? b_ENTRY_FLAG_SET_ON(flagsArray,\
-  flagEntry): b_ENTRY_FLAG_SET_OFF(flagsArray,flag))
+#define b_ENTRY_FLAG_SET(me,flagEntry,b_on) ((b_on)? b_ENTRY_FLAG_SET_ON(me,\
+  flagEntry): b_ENTRY_FLAG_SET_OFF(me,flag))
 
 // Switch flag state (OFF/ON) 
 //
 // Passed:
-// - m_flagsArray:
+// - m_me:
 // - flagEntry: flag to switch
 //
 // Modified:
-// - m_flagsArray: flag has been switched 
-#define m_SWITCH_ENTRY_FLAG(m_flagsArray,flagEntry) if (b_ENTRY_FLAG_SET_ON(m_flagsArray,\
-  flagEntry)) m_SET_ENTRY_FLAG_OFF(m_flagsArray,flagEntry) else m_SET_ENTRY_FLAG_ON(m_flagsArray,\
+// - m_me: flag has been switched 
+#define m_SWITCH_ENTRY_FLAG(m_me,flagEntry) if (b_ENTRY_FLAG_SET_ON(m_me,\
+  flagEntry)) m_FLAGS_ARRAY_SET_OFF(m_me,flagEntry) else m_FLAGS_ARRAY_SET_ON(m_me,\
   flagEntry) 
 
 
 // Set all flags to OFF
-// - m_flagsArray:
+// - m_me:
 // - entriesNumber:
-#define m_RESET_FLAGS_ARRAY(m_flagsArray,entriesNumber) memset(m_flagsArray,0,FLAGS_ARRAY_SIZE(\
+#define m_RESET_FLAGS_ARRAY(m_me,entriesNumber) memset(m_me,0,FLAGS_ARRAY_SIZE(\
   entriesNumber);
 
 #endif //  __FLINT_FLAGS_H_INCLUDED__

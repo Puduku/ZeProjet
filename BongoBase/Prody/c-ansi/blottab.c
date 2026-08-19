@@ -62,11 +62,11 @@ int BlottabCreateInstance(BLOTTAB_HANDLE *azh_handle, int fieldsNumber,
     m_ASSERT(fieldAttributeStuff != NULL)
     m_TRACK_IF(GStringCopy(fieldAttributeStuff,0, s_names[i]) < 0) 
     fieldAttributeStuff->acolyt.cen_value = s_blottabIndexFlags[i] ; 
-    if (b_FLAG_SET_ON(s_blottabIndexFlags[i],STR__BLOTTAB_INDEX_FLAG)) m_TRACK_IF((c_indexLabel =
+    if (ob_FLAGS_ON(s_blottabIndexFlags[i],STR__BLOTTAB_INDEX_FLAG)) m_TRACK_IF((c_indexLabel =
       GStringsAddIndex(handle->h_tableHandle,1,(int*)NULL,i, P_STRING__GS_KEYS_COMPARISON,NULL,NULL,
       (P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED, (void*)UNDEFINED)) < 0)
     fieldAttributeStuff[BLOTTAB_FIELD_ATTRIBUTE_STR_INDEX_ELEMENT].acolyt.cen_value = c_indexLabel ;
-    if (b_FLAG_SET_ON(s_blottabIndexFlags[i],INT__BLOTTAB_INDEX_FLAG)) m_TRACK_IF((c_indexLabel =
+    if (ob_FLAGS_ON(s_blottabIndexFlags[i],INT__BLOTTAB_INDEX_FLAG)) m_TRACK_IF((c_indexLabel =
       GStringsAddIndex(handle->h_tableHandle,1,(int*)NULL,i,ACOLYT_VALUE__GS_KEYS_COMPARISON ,NULL,
         NULL,(P_STRING_INTRINSIC_VALUE_FUNCTION)UNDEFINED,(void*)UNDEFINED)) < 0)
     fieldAttributeStuff[BLOTTAB_FIELD_ATTRIBUTE_INT_INDEX_ELEMENT].acolyt.cen_value = c_indexLabel ;
@@ -149,12 +149,12 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
 
   if (nac_tableIndexLabel != NULL) { 
     if (*acb_strValue) { // blottabIndexSingleFlag
-      if (!b_FLAG_SET_ON(fieldAttributeStuff->acolyt.cen_value,STR__BLOTTAB_INDEX_FLAG)) m_ABANDON(
+      if (!ob_FLAGS_ON(fieldAttributeStuff->acolyt.cen_value,STR__BLOTTAB_INDEX_FLAG)) m_ABANDON(
         MISSING_INT_BLOTTAB_INDEX__ABANDONMENT_CAUSE) 
       *nac_tableIndexLabel =
         fieldAttributeStuff[BLOTTAB_FIELD_ATTRIBUTE_INT_INDEX_ELEMENT].acolyt.cen_value;
     } else {
-      if (!b_FLAG_SET_ON(fieldAttributeStuff->acolyt.cen_value,INT__BLOTTAB_INDEX_FLAG)) m_ABANDON(
+      if (!ob_FLAGS_ON(fieldAttributeStuff->acolyt.cen_value,INT__BLOTTAB_INDEX_FLAG)) m_ABANDON(
         MISSING_STR_BLOTTAB_INDEX__ABANDONMENT_CAUSE)
       *nac_tableIndexLabel =
         fieldAttributeStuff[BLOTTAB_FIELD_ATTRIBUTE_STR_INDEX_ELEMENT].acolyt.cen_value;
@@ -439,9 +439,9 @@ m_DIGGY_VAR_P_STRING(s_names10[i])
 m_DIGGY_VAR_D(nb_strValue)
     m_TRACK_IF(ParseAsValue(a_sequence, &nb_strValue2) != RETURNED)  
 m_DIGGY_VAR_D(nb_strValue2)
-    if (nb_strValue != -1) m_SET_FLAG(s_blottabIndexFlags10[i],STR__BLOTTAB_INDEX_FLAG,nb_strValue)
+    if (nb_strValue != -1) om_FLAGS_SET(s_blottabIndexFlags10[i],STR__BLOTTAB_INDEX_FLAG,nb_strValue)
 
-    if (nb_strValue2 != -1) m_SET_FLAG(s_blottabIndexFlags10[i],STR__BLOTTAB_INDEX_FLAG,
+    if (nb_strValue2 != -1) om_FLAGS_SET(s_blottabIndexFlags10[i],STR__BLOTTAB_INDEX_FLAG,
       nb_strValue2)
   } while (!ob_EmptySequence(&subSequence)) ; 
 
@@ -622,7 +622,7 @@ m_ASSERT(vnt_blotsetStuff == NULL)
 int UpdateBlottabSpot(struct BLOTTAB_SPOT_REFERENCE blottabSpotReference,
   struct BLOTEX_VALUE blotexValue) {
   m_DIGGY_BOLLARD()
-  m_ASSERT(mb_Accord(blottabSpotReference.b_strValue,blotexValue.b_strValue))
+  m_ASSERT(ob_HARMONY(blottabSpotReference.b_strValue,blotexValue.b_strValue))
   int result = BlottabUpdateSpot(blottabSpotReference.r_blottabHandle,
     (int)(GENERIC_INTEGER)blottabSpotReference.r_spot, blotexValue); 
   m_TRACK_IF(result < 0) 
