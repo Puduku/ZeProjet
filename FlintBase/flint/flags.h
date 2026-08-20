@@ -103,7 +103,7 @@
 #define ob_FLAGS_ARE(mu_me,u_flags,bu_on) ((bu_on)? ob_FLAGS_ON(mu_me,u_flags): ob_FLAGS_OFF(mu_me,\
   u_flags))
 
-// Switch flag(s) state (OFF/ON) 
+// Toggle flag(s) state (OFF/ON) 
 //
 // Passed:
 // - m_me:
@@ -111,8 +111,9 @@
 //
 // Modified:
 // - m_me: flag has been switched 
-#define m_FLAGS_SWITCH(m_me,flag) if (ob_FLAGS_ON(m_me,flag)) om_FLAGS_SET_OFF(m_me,flag)\
-  else om_FLAGS_SET_ON(m_me,flag) 
+//#define m_FLAGS_SWITCH(m_me,flag) if (ob_FLAGS_ON(m_me,flag)) om_FLAGS_SET_OFF(m_me,flag)\
+//  else om_FLAGS_SET_ON(m_me,flag) 
+m_FLAGS_FLIP(m_me,flag)  (mu_me) ^= (u_flags);
 
 // Pseudo-flag (when off)
 #define FLAG_OFF0 0
