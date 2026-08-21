@@ -101,9 +101,9 @@
 //   - single <mod>.c source file if and only if it implements main() function.
 //   (*) "Preliminary" does not just mean "draft" - immediatly forgotten when the "real"
 //       developement starts. "Preliminary" really means "fundamental"...
-//   (**) I actually think that classes are a complete aberration in software design. It has to
-//        do with the confusion between analytical and synthetic thinking (judgement). TODO:
-//        cca a l'air passionnant... ag developper!!!... 
+//   (**) Actually, I feel that classes represent an incidental concept - or even an irrelevant
+//        one - in software design. It has to do with the confusion between analytical and
+//        synthetic thinking (judgement). TODO: cca a l'air passionnant... ag developper!!!... 
 //
 // - C-Ansi / C-Posix split: the sources are splitted between "c-posix" and "c-ansi"
 //   sub-directories.
