@@ -20,7 +20,7 @@
 extern char b_diggyGreenCollectionExam ;
 #endif
 
-// ENTRIES_STACK 
+// ENTRIES_STACK: 
 // -------------
 
 m_STRUCT_C_STACK(ENTRIES_STACK,int) 
@@ -71,7 +71,7 @@ static int EntriesStackVerifyCount (const struct ENTRIES_STACK *ap_me) {
   m_DIGGY_RETURN(ap_me->count)  
 } // EntriesStackVerifyCount 
 
-// Index fetch
+// INDEX_FETCH: 
 // -----------
 
 enum {
@@ -231,7 +231,7 @@ static inline int m_IndexFetchSequenceCurrent(char *me, G_INDEXES_HANDLE GIndexe
   m_DIGGY_RETURN(RETURNED)
 } // m_IndexFetchSequenceCurrent
 
-// Status flags
+// Status flags:
 // ------------
 
 // Possible status flags

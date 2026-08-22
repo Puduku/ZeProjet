@@ -10,6 +10,7 @@
 #include "c-ansi/g-param.h"
 #include "c-ansi/named-object.h"
 #include "c-ansi/stderr.h"
+#include "c-ansi/magic.h"
 
 #include "c-ansi/testy-diggy.h"
 

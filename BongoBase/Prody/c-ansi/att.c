@@ -9,6 +9,7 @@
 #include "c-ansi/types.h"
 #include "c-ansi/green.h"
 #include "c-ansi/alloc.h"
+#include "c-ansi/magic.h"
 
 #include "c-ansi/diggy.h"
 #include "c-ansi/testy-diggy.h"

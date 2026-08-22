@@ -93,4 +93,26 @@ struct m_NAME {\
   free((mx_me).hsc_stack);\
 }
 
+// ARRAYS (TODO: put in more ad hoc header) 
+// ------
+
+// Add an item to an array
+//
+// Passed:
+// - u_me: array 
+// - u_countMax:
+// - m_count:
+// - m_item
+// 
+// Changed:
+// - m_me:
+// - m_count:
+#define m_ARRAY_ADD_ITEM(u_me, /*int*/u_countMax, /*int*/m_count, m_item) { \
+  m_ASSERT((m_count) < (u_countMax))\
+  (u_me)[(m_count)++] = (m_item);\
+}
+
+
+
+
 #endif // __C_ANSI_C_STACK_H_INCLUDED

@@ -21,91 +21,7 @@
 #include "c-ansi/testy-diggy.h"
 
 
-extern char b_diggyGreenCollectionExam;
-
-
-// Index's virtual function to compare an item with a key.
-//
-// Passed:
-// - r_handle:
-// - indexLabel:
-// - gKeyRank:
-// - aEntry: entry for "A"
-// - n_bEntry: entry for "B"
-// - cr_bGKeys: raw key(s) for "B" 
-//
-// Ret: comparison between "A" (entry) and "B" (key)
-// - LESS_THAN__COMPARISON:
-// - EQUAL_TO__COMPARISON:
-// - GREATER_THAN__COMPARISON:
-// - -1: unexpected problem; anomaly is raised
-typedef int (*ENTRY_RAW_COMPARE_FUNCTION) (void *r_handle, int indexLabel, int gKeyRank,
-  int aEntry, int n_bEntry, void *cr_bGKeys) ;
-
-// Index's virtual function to adequate an item with a key.
-//
-// Passed:
-// - r_handle:
-// - indexLabel:
-// - gKeyRank:
-// - aEntry: entry for "A"
-// - r_bGKeys: raw key(s) for "B" 
-//
-// Ret: adequation between "A" (entry) and "B" (key) ?
-// - ANSWER__YES: 
-// - ANSWER__NO: 
-// - -1: unexpected problem; anomaly is raised
-typedef int (*ENTRY_RAW_EQUATE_FUNCTION) (void *r_handle, int indexLabel, int gKeyRank,
-  int aEntry, void *r_bGKeys);
-
-struct G_INDEXES ; // Private!
-typedef struct G_INDEXES* G_INDEXES_HANDLE; // Public handle
-
-// Passed:
-// - azh_handle:
-// - entryRawCompareFunction:
-// - entryRawEquateFunction:
-// - r_entryRawFunctionsHandle:
-// 
-// Changed:
-// - *azh_handle:
-// 
-// Ret:
-// - RETURNED: Ok
-// - -1: anomaly is raised
-int GIndexesCreateInstance(G_INDEXES_HANDLE *azh_handle,
-  ENTRY_RAW_COMPARE_FUNCTION entryRawCompareFunction,
-  ENTRY_RAW_EQUATE_FUNCTION entryRawEquateFunction, void* r_entryRawFunctionsHandle);
-
-// Passed:
-// - handle:
-// - itemsPhysicalNumber:
-// - gKeyCount:
-//
-// Return:
-// new index label (technically equal to entry in indexes array)
-int GIndexesAddIndex(G_INDEXES_HANDLE handle, int itemsPhysicalNumber,
-  int gKeyCount) ;
-
-// Passed:
-// - handle:
-// - newItemsPhysicalNumber:
-int GIndexesResize (G_INDEXES_HANDLE handle, int newItemsPhysicalNumber) ;
-
-// Add reference on item in all indexes (no action if already referenced in some index)
-//
-// Passed:
-// - handle:
-// - entry:
-int GIndexesAdd(G_INDEXES_HANDLE, int entry) ; 
-
-// Remove reference on item in all indexes (no action if not referenced in some index)
-//
-// Passed:
-// - handle:
-// - entry:
-int GIndexesRemove(G_INDEXES_HANDLE handle, int entry) ;
-
+extern char b_diggyGreenCollectionExam; // TODO: ag virer
 
 
 // Index sequence:
@@ -128,8 +44,8 @@ int o_IndexSequenceNew(char *meBuffer) ;
 int o_IndexSequenceSize(void);   
 
 
-// Request criteria:
-// -----------------
+// G-Request criteria:
+// ------------------
 
 // * Truly index-based seek flags:
 // NOT key-based seek flag: mutually exclusive with other truly index-based seek flags: 
@@ -240,6 +156,91 @@ static inline struct G_REQUEST_CRITERION om_GRequestCriterion(int indexLabel,
 // - COMPLETED__BUT: (only possible when last criterion) rectification was necessary
 int GRequestCriteriaAdd(struct G_REQUEST_CRITERION *s_me, int meCountMax, int *a_meCount,
   struct G_REQUEST_CRITERION criterion, char b_lastCriterion) ;
+
+// G-Indexes:
+// ---------
+
+// Index's virtual function to compare an item with a key.
+//
+// Passed:
+// - r_handle:
+// - indexLabel:
+// - gKeyRank:
+// - aEntry: entry for "A"
+// - n_bEntry: entry for "B"
+// - cr_bGKeys: raw key(s) for "B" 
+//
+// Ret: comparison between "A" (entry) and "B" (key)
+// - LESS_THAN__COMPARISON:
+// - EQUAL_TO__COMPARISON:
+// - GREATER_THAN__COMPARISON:
+// - -1: unexpected problem; anomaly is raised
+typedef int (*ENTRY_RAW_COMPARE_FUNCTION) (void *r_handle, int indexLabel, int gKeyRank,
+  int aEntry, int n_bEntry, void *cr_bGKeys) ;
+
+// Index's virtual function to adequate an item with a key.
+//
+// Passed:
+// - r_handle:
+// - indexLabel:
+// - gKeyRank:
+// - aEntry: entry for "A"
+// - r_bGKeys: raw key(s) for "B" 
+//
+// Ret: adequation between "A" (entry) and "B" (key) ?
+// - ANSWER__YES: 
+// - ANSWER__NO: 
+// - -1: unexpected problem; anomaly is raised
+typedef int (*ENTRY_RAW_EQUATE_FUNCTION) (void *r_handle, int indexLabel, int gKeyRank,
+  int aEntry, void *r_bGKeys);
+
+struct G_INDEXES ; // Private!
+typedef struct G_INDEXES* G_INDEXES_HANDLE; // Public handle
+
+// Passed:
+// - azh_handle:
+// - entryRawCompareFunction:
+// - entryRawEquateFunction:
+// - r_entryRawFunctionsHandle:
+// 
+// Changed:
+// - *azh_handle:
+// 
+// Ret:
+// - RETURNED: Ok
+// - -1: anomaly is raised
+int GIndexesCreateInstance(G_INDEXES_HANDLE *azh_handle,
+  ENTRY_RAW_COMPARE_FUNCTION entryRawCompareFunction,
+  ENTRY_RAW_EQUATE_FUNCTION entryRawEquateFunction, void* r_entryRawFunctionsHandle);
+
+// Passed:
+// - handle:
+// - itemsPhysicalNumber:
+// - gKeyCount:
+//
+// Return:
+// new index label (technically equal to entry in indexes array)
+int GIndexesAddIndex(G_INDEXES_HANDLE handle, int itemsPhysicalNumber,
+  int gKeyCount) ;
+
+// Passed:
+// - handle:
+// - newItemsPhysicalNumber:
+int GIndexesResize (G_INDEXES_HANDLE handle, int newItemsPhysicalNumber) ;
+
+// Add reference on item in all indexes (no action if already referenced in some index)
+//
+// Passed:
+// - handle:
+// - entry:
+int GIndexesAdd(G_INDEXES_HANDLE, int entry) ; 
+
+// Remove reference on item in all indexes (no action if not referenced in some index)
+//
+// Passed:
+// - handle:
+// - entry:
+int GIndexesRemove(G_INDEXES_HANDLE handle, int entry) ;
 
 
 #define b_ASCENDING b_FALSE0

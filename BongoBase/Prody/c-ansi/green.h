@@ -12,7 +12,6 @@
 
 #include "c-ansi/stderr.h"
 #include "c-ansi/types.h"
-#include "c-ansi/magic.h"
 #include "flint/flags.h"
 #include "c-ansi/g-index.h"
 #include "c-ansi/diggy.h"
@@ -286,9 +285,6 @@ m_DEFINE_ENUM_ALIAS_END()
 
 #if __C_ANSI_GREEN_H_INCLUDED__ == 0
 
-//#define GENERIC_KEY__G_KEY_SIZE sizeof(GENERIC_INTEGER) 
-
-//static inline char * GKeyGenericInteger(GENERIC_INTEGER keyValue) {
 
 // Ex.
 // x AND (( y OR u OR z) AND ( w OR t))  <== request
@@ -354,18 +350,11 @@ int GreenCollectionIndexRequestRAddCriterion(GREEN_COLLECTION_HANDLE cp_handle,
   char* nf_indexFetch5AutomaticBuffer, struct G_REQUEST_CRITERION criterion, char b_lastCriterion);
 
 
-// Indicates whether key value parameter is significant with index request... 
-//
-// Passed:
-// - indexSeekFlags: SEE enum-INDEX_SEEK
-//
-// Return:
-// - True : search key(s) value(s) is(are) significant with index request 
-// - False : search key(s) value(s) is(are) not significant with index request 
-static inline char mb_SignificantGreenCollectionIndexKeys(unsigned int indexSeekFlags) {
-  m_DIGGY_BOLLARD_S()
-  m_DIGGY_RETURN (ob_FLAGS_OFF(indexSeekFlags,INDEX_SEEK_FLAG__ANY));
-} // mb_SignificantGreenCollectionIndexKeys
+//// Indicates whether key value parameter is significant with index request... 
+//static inline char mb_SignificantGreenCollectionIndexKeys(unsigned int indexSeekFlags) {
+//  m_DIGGY_BOLLARD_S()
+//  m_DIGGY_RETURN (ob_FLAGS_OFF(indexSeekFlags,INDEX_SEEK_FLAG__ANY));
+//} // mb_SignificantGreenCollectionIndexKeys
 
      
 enum {

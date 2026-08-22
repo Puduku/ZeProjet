@@ -9,6 +9,7 @@
 #include "c-ansi/p-string.h"
 #include "c-ansi/g-string.h"
 #include "c-ansi/alloc.h"
+#include "c-ansi/magic.h"
 
 #include "c-ansi/diggy.h"
 #include "c-ansi/testy-diggy.h"
