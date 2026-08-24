@@ -264,15 +264,15 @@ int ParseSpecifier(struct P_STRING *a_sequence, int *a_specifierFlags,
   if (b_EMPTY_P_STRING(lexeme)) m_ABANDON_S(SYNTAX_ERROR__ABANDONMENT_CAUSE)
   switch (lexeme.string[0]) {
   case '.' : // <name specifier> : 
-    if (ob_FLAGS_OFF(*a_specifierFlags,NAME__SPECIFIER_FLAG)) m_ABANDON_S(
+    if (b_FLAGS_OFF(*a_specifierFlags,NAME__SPECIFIER_FLAG)) m_ABANDON_S(
       SYNTAX_ERROR__ABANDONMENT_CAUSE)
     *a_specifierFlags = NAME__SPECIFIER_FLAG;
   break; case '[' : // <entry specifier>  :
-    if (ob_FLAGS_OFF(*a_specifierFlags,ENTRY__SPECIFIER_FLAG)) m_ABANDON_S(
+    if (b_FLAGS_OFF(*a_specifierFlags,ENTRY__SPECIFIER_FLAG)) m_ABANDON_S(
       SYNTAX_ERROR__ABANDONMENT_CAUSE)
     *a_specifierFlags = ENTRY__SPECIFIER_FLAG;
   break; case '{' : // <token id specifier> : 
-    if (ob_FLAGS_OFF(*a_specifierFlags,TOKEN_ID__SPECIFIER_FLAG)) m_ABANDON_S(
+    if (b_FLAGS_OFF(*a_specifierFlags,TOKEN_ID__SPECIFIER_FLAG)) m_ABANDON_S(
       SYNTAX_ERROR__ABANDONMENT_CAUSE)
     *a_specifierFlags = TOKEN_ID__SPECIFIER_FLAG;
   break; default:
@@ -470,7 +470,7 @@ char ob_ParseOpNext(struct P_STRING *a_sequence, int *an_indexFetchFlags) {
   o_PParsePassSingleChar(a_sequence,NULL,'+',&lexeme); 
   if (!b_EMPTY_P_STRING(lexeme)) {
     if (*an_indexFetchFlags < 0) *an_indexFetchFlags = ALL_FLAGS_OFF0;
-    om_FLAGS_SET_ON(*an_indexFetchFlags,INDEX_FETCH_FLAG__NEXT)
+    m_FLAGS_SET_ON(*an_indexFetchFlags,INDEX_FETCH_FLAG__NEXT)
     m_DIGGY_RETURN(b_TRUE)
   } // if
   m_DIGGY_RETURN(b_FALSE0)
@@ -493,7 +493,7 @@ char ob_ParseOpReset(struct P_STRING *a_sequence, int *an_indexFetchFlags) {
   o_PParsePassSingleChar(a_sequence,NULL,'^',&lexeme); 
   if (!b_EMPTY_P_STRING(lexeme)) {
     if (*an_indexFetchFlags < 0) *an_indexFetchFlags = ALL_FLAGS_OFF0;
-    om_FLAGS_SET_ON(*an_indexFetchFlags,INDEX_FETCH_FLAG__RESET)
+    m_FLAGS_SET_ON(*an_indexFetchFlags,INDEX_FETCH_FLAG__RESET)
     m_DIGGY_RETURN(b_TRUE)
   } // if
   m_DIGGY_RETURN(b_FALSE0)

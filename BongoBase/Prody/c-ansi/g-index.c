@@ -289,7 +289,7 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(indexSeekFlags)
 
     int n_firstIndexEntry = -1; // Not set a priori
     int n_lastIndexEntry = -1; // Not set a priori
-    if (ob_FLAGS_ON(indexSeekFlags,INDEX_SEEK_FLAG__ANY)) { // NOT key-based selection
+    if (b_FLAGS_ON(indexSeekFlags,INDEX_SEEK_FLAG__ANY)) { // NOT key-based selection
       n_firstIndexEntry = 0; 
     } else { // key-based selection
       int top = UNDEFINED;
@@ -531,41 +531,41 @@ static inline int g_GRequestCriteriaRectifyOpFlags(struct G_REQUEST_CRITERION *s
   if (*a_meCount > 1) {
     s_me[0].criteriaOpFlags = CRITERIA_OP_FLAG__AND;
     // Ensure following OR op. would have precedence over that AND op. 
-    if (om_CriteriaOpFlagsOpenBracketCount(s_me[1].criteriaOpFlags) == 0) om_FLAGS_SET_ON(
+    if (om_CriteriaOpFlagsOpenBracketCount(s_me[1].criteriaOpFlags) == 0) m_FLAGS_SET_ON(
       s_me[1].criteriaOpFlags,CRITERIA_OP_FLAG__OPEN1)
   } else s_me[0].criteriaOpFlags = ALL_FLAGS_OFF0;
   if (s_me[0].criteriaOpFlags != initialCriteriaOpFlags) completed = COMPLETED__BUT;
   int i = 1; for (; i < *a_meCount; i++) {
     int initialCriteriaOpFlags = s_me[i].criteriaOpFlags;      
-    if (ob_FLAGS_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__OR)) {
-      om_FLAGS_SET_OFF(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__AND)
+    if (b_FLAGS_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__OR)) {
+      m_FLAGS_SET_OFF(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__AND)
       if (i+1 < *a_meCount) {
         // Ensure AND op. have precedence over that OR op. 
-        if (om_CriteriaOpFlagsOpenBracketCount(s_me[i+1].criteriaOpFlags) == 0) om_FLAGS_SET_ON(
+        if (om_CriteriaOpFlagsOpenBracketCount(s_me[i+1].criteriaOpFlags) == 0) m_FLAGS_SET_ON(
           s_me[i+1].criteriaOpFlags,CRITERIA_OP_FLAG__OPEN1)
       } // if
-    } else if (ob_FLAGS_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__AND)) om_FLAGS_SET_OFF(
+    } else if (b_FLAGS_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__AND)) m_FLAGS_SET_OFF(
       s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__OR)
     depth += om_CriteriaOpFlagsOpenBracketCount(s_me[i].criteriaOpFlags);
     if (depth - om_CriteriaOpFlagsCloseBracketCount(s_me[i].criteriaOpFlags) < 0) {
-      om_FLAGS_SET_OFF(s_me[i].criteriaOpFlags,o_FLAGS3(CRITERIA_OP_FLAG__CLOSE1,
+      m_FLAGS_SET_OFF(s_me[i].criteriaOpFlags,o_FLAGS3(CRITERIA_OP_FLAG__CLOSE1,
         CRITERIA_OP_FLAG__CLOSE2, CRITERIA_OP_FLAG__CLOSE3)) 
       switch (depth) {
       case 0: 
-      break; case 1: om_FLAGS_SET_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE1)
-      break; case 2: om_FLAGS_SET_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE2)
-      break; default: om_FLAGS_SET_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE3) } // switch
+      break; case 1: m_FLAGS_SET_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE1)
+      break; case 2: m_FLAGS_SET_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE2)
+      break; default: m_FLAGS_SET_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE3) } // switch
     } // if
     m_ASSERT((depth -= om_CriteriaOpFlagsCloseBracketCount(s_me[i].criteriaOpFlags)) >= 0) 
     if (i == 1) {
       if (depth - om_CriteriaOpFlagsCloseBracketCount(s_me[i].criteriaOpFlags) > 0) {
-        om_FLAGS_SET_OFF(s_me[i].criteriaOpFlags,o_FLAGS3(CRITERIA_OP_FLAG__CLOSE1,
+        m_FLAGS_SET_OFF(s_me[i].criteriaOpFlags,o_FLAGS3(CRITERIA_OP_FLAG__CLOSE1,
           CRITERIA_OP_FLAG__CLOSE2,CRITERIA_OP_FLAG__CLOSE3))
         switch (depth) {
         case 0:
-        break; case 1: om_FLAGS_SET_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE1)
-        break; case 2: om_FLAGS_SET_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE2)
-        break; default: om_FLAGS_SET_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE3) } // switch
+        break; case 1: m_FLAGS_SET_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE1)
+        break; case 2: m_FLAGS_SET_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE2)
+        break; default: m_FLAGS_SET_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE3) } // switch
       } // if  
       m_ASSERT((depth -= om_CriteriaOpFlagsCloseBracketCount(s_me[i].criteriaOpFlags)) == 0) 
     } // if
@@ -616,11 +616,16 @@ static inline int m_GcEvaluatorReset(struct GC_EVALUATOR* a_me) {
 
 // Passed:
 // - a_me:
+// - minDepth: >= 0
 //
-// Ret: evualator's depth (>=0)
-static inline int om_GcEvaluatorDepth(const struct GC_EVALUATOR* ap_me) {
+// Ret:
+// - >=0:  evualator's depth
+// - 1: unexpected problem; anomaly is raised
+static inline int m_GcEvaluatorDepth(const struct GC_EVALUATOR* ap_me, int minDepth) {
+  m_DIGGY_BOLLARD_S()
+  m_ASSERT(ap_me->count > minDepth)
   return ap_me->count - 1;
-} // om_GcEvaluatorDepth 
+} // m_GcEvaluatorDepth 
 
 // Iterate next criterion evaluation
 //
@@ -639,47 +644,63 @@ static inline int om_GcEvaluatorDepth(const struct GC_EVALUATOR* ap_me) {
 static inline int m_GcEvaluatorIterate(struct GC_EVALUATOR* a_me, char b_passed,
   int criteriaOpFlags) {
   m_DIGGY_BOLLARD_S()
-  int bracketCount = om_CriteriaOpFlagsOpenBracketCount(criteriaOpFlags);
-  int i = 0; for (; i < bracketCount; i++) {
+  int openBracketCount = om_CriteriaOpFlagsOpenBracketCount(criteriaOpFlags);
+  int i = 0; for (; i < openBracketCount; i++) {
     m_C_STACK_PUSH(*a_me,'U')
   } // for
 
   char status; m_C_STACK_PEEK(*a_me,status);
-  switch (status) {
-  case 'U':
-    if (ob_FLAGS_ON(criteriaOpFlags,CRITERIA_OP_FLAG__OR)) 
-      m_C_STACK_POKE(*a_me,b_passed? 'V': 'O') 
-    else if (ob_FLAGS_ON(criteriaOpFlags,CRITERIA_OP_FLAG__AND)) 
-      m_C_STACK_POKE(*a_me,b_passed? 'A': 'X') 
-    else m_C_STACK_POKE(*a_me,b_passed? 'V': 'X')
-  break; case 'O':
-    m_C_STACK_POKE(*a_me,b_passed? 'V': 'O')
-  break; case 'A':
-    m_C_STACK_POKE(*a_me,b_passed? 'A': 'X')
-  break; case 'V':
-  break; case 'X':
-  break; default: m_RAISE(ANOMALY__VALUE__D,status)
-  } // switch 
+  int closeBracketCount = om_CriteriaOpFlagsCloseBracketCount(criteriaOpFlags);
 
-  bracketCount = om_CriteriaOpFlagsCloseBracketCount(criteriaOpFlags);
-  m_ASSERT(om_GcEvaluatorDepth(a_me) >= bracketCount)
-  for (i = 0; i < bracketCount; i++) {
-    char status;  m_C_STACK_POP(*a_me,status);
+  if (b_FLAGS_OFF(criteriaOpFlags,o_FLAGS2(CRITERIA_OP_FLAG__AND,CRITERIA_OP_FLAG__OR))) {
+    // NO logical op. => last operand 
+    m_TRACK_IF(m_GcEvaluatorDepth(a_me,closeBracketCount) < 0)
+    // Finalize status (of that depth):
+    switch (status) {
+    case 'O':
+    case 'A':
+      status = 'X';
+    break; default: m_RAISE(ANOMALY__VALUE__D,status)
+    } // switch 
     m_ASSERT(status == 'V' || status == 'X')
-    char b_passed2 = (status == 'V');
-    m_C_STACK_PEEK(*a_me,status);
+    char termStatus  = status;
+    for (i = 0; i < closeBracketCount; i++) {
+      m_C_STACK_POP(*a_me,status);
+      m_TRACK_IF(m_GcEvaluatorDepth(a_me,0) < 0)
+      switch (status) {
+      case 'U':
+      break; case 'O':
+        termStatus = (termStatus == 'V'? 'V': 'X');
+      break; case 'A':
+        termStatus = (termStatus == 'V'? 'V': 'X');
+      break; case 'V':
+      break; case 'X':
+      break; default: m_RAISE(ANOMALY__VALUE__D,status)
+      } // switch 
+      m_ASSERT(termStatus == 'V' || termStatus == 'X')
+      m_C_STACK_POKE(*a_me,termStatus)
+    } // for
+
+  } else { // OR / AND logical op. 
+    m_ASSERT(closeBracketCount == 0)
+
     switch (status) {
     case 'U':
+      if (b_FLAGS_ON(criteriaOpFlags,CRITERIA_OP_FLAG__OR)) 
+        status = (b_passed? 'V': 'O');
+      else if (b_FLAGS_ON(criteriaOpFlags,CRITERIA_OP_FLAG__AND)) 
+        status = (b_passed? 'A': 'X');
+      else status = (b_passed? 'V': 'X');
     break; case 'O':
-      m_C_STACK_POKE(*a_me,b_passed2? 'V': 'X')
+      status = (b_passed? 'V': 'O');
     break; case 'A':
-      m_C_STACK_POKE(*a_me,b_passed2? 'V': 'X')
+      status = (b_passed? 'A': 'X');
     break; case 'V':
     break; case 'X':
     break; default: m_RAISE(ANOMALY__VALUE__D,status)
-    } // switch
-  } // for
-  m_ASSERT(om_GcEvaluatorDepth(a_me) >= 0)
+    } // switch 
+    m_C_STACK_POKE(*a_me,status)
+  } // if
 
   m_DIGGY_RETURN(RETURNED)
 } // m_GcEvaluatorIterate
@@ -906,7 +927,7 @@ int GIndexesSequenceNext(G_INDEXES_HANDLE handle,
         if (status == 'O' || status == 'K') break; 
       } // for
   // Break "criteria handling" loop if entry not rejected by extra criteria 
-m_ASSERT(om_GcEvaluatorDepth(&gcEvaluator) == 0) 
+m_ASSERT(m_GcEvaluatorDepth(&gcEvaluator,0) == 0) 
       m_C_STACK_PEEK(gcEvaluator,status)
 m_ASSERT(status == 'O' || status == 'K') 
       if (status == 'O') break;

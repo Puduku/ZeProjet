@@ -90,18 +90,18 @@ m_DEFINE_ENUM_ALIAS_END()
 // Passed:
 // - criteriaOpFlags
 static inline int om_CriteriaOpFlagsOpenBracketCount(int me) {
-  if (ob_FLAGS_ON(me,CRITERIA_OP_FLAG__OPEN3)) return 3;
-  else if (ob_FLAGS_ON(me,CRITERIA_OP_FLAG__OPEN2)) return 2;
-  else if (ob_FLAGS_ON(me,CRITERIA_OP_FLAG__OPEN1)) return 1;
+  if (b_FLAGS_ON(me,CRITERIA_OP_FLAG__OPEN3)) return 3;
+  else if (b_FLAGS_ON(me,CRITERIA_OP_FLAG__OPEN2)) return 2;
+  else if (b_FLAGS_ON(me,CRITERIA_OP_FLAG__OPEN1)) return 1;
   return 0;
 } // om_CriteriaOpFlagsOpenBracketCount 
 
 // Passed:
 // - criteriaOpFlags
 static inline int om_CriteriaOpFlagsCloseBracketCount(int me) {
-  if (ob_FLAGS_ON(me,CRITERIA_OP_FLAG__CLOSE3)) return 3;
-  else if (ob_FLAGS_ON(me,CRITERIA_OP_FLAG__CLOSE2)) return 2;
-  else if (ob_FLAGS_ON(me,CRITERIA_OP_FLAG__CLOSE1)) return 1;
+  if (b_FLAGS_ON(me,CRITERIA_OP_FLAG__CLOSE3)) return 3;
+  else if (b_FLAGS_ON(me,CRITERIA_OP_FLAG__CLOSE2)) return 2;
+  else if (b_FLAGS_ON(me,CRITERIA_OP_FLAG__CLOSE1)) return 1;
   return 0;
 } // om_CriteriaOpFlagsCloseBracketCount 
 

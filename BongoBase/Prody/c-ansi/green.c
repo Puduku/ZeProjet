@@ -467,7 +467,7 @@ static int GreenCollectionRefreshIndexesInternal(GREEN_COLLECTION_HANDLE handle,
     m_ASSERT(handle->hsc_flags[fetched4ChangeEntry] == ALIEN_ALIVE__FLAGS)
 m_DIGGY_INFO("fetched4ChangeEntry=%d Before m_G_INDEXES_ADD()...",fetched4ChangeEntry)
     m_TRACK_IF(GIndexesAdd(handle->h_GIndexesHandle,fetched4ChangeEntry) != RETURNED)
-    om_FLAGS_SET_OFF(handle->hsc_flags[fetched4ChangeEntry],ALIEN_FLAG)
+    m_FLAGS_SET_OFF(handle->hsc_flags[fetched4ChangeEntry],ALIEN_FLAG)
   } // while
   m_C_STACK_CLEAR(handle->h_fetched4ChangeStack)
   // MINIMONITOR: CLEAN
@@ -561,7 +561,7 @@ m_DIGGY_VAR_D(n_entry)
         cp_handle->i_itemCount;
     } else { // Use existing gap 
       m_C_STACK_POP(cp_handle->h_gaps,n_entry)
-      om_FLAGS_SET_OFF(cp_handle->hsc_flags[n_entry],DEAD_FLAG)
+      m_FLAGS_SET_OFF(cp_handle->hsc_flags[n_entry],DEAD_FLAG)
     } // if
 
     m_C_STACK_PUSH(cp_handle->h_fetched4ChangeStack,n_entry);
@@ -572,20 +572,20 @@ m_DIGGY_VAR_P(*acntr_greenItemStuff)
 
   } else { // Direct fetch
     if (n_entry < cp_handle->i_itemCount &&  // Existing item (FAMED / ALIVE)
-      !ob_FLAGS_ON(cp_handle->hsc_flags[n_entry],DEAD_FLAG)) { // It's NOT a gap
+      !b_FLAGS_ON(cp_handle->hsc_flags[n_entry],DEAD_FLAG)) { // It's NOT a gap
       m_ASSERT(cp_handle->hsc_flags[n_entry] == FAMED_ALIVE__FLAGS)
       // MICROMONITOR: FAMED / ALIVE 
       if (fetch4 != FETCH_4__READ) { 
         m_ASSERT(!cp_handle->b_frozen) 
         m_TRACK_IF(GIndexesRemove(cp_handle->h_GIndexesHandle,n_entry) != RETURNED)
-        om_FLAGS_SET_ON(cp_handle->hsc_flags[n_entry],ALIEN_FLAG)
+        m_FLAGS_SET_ON(cp_handle->hsc_flags[n_entry],ALIEN_FLAG)
         // MICROMONITOR: ALIEN / ALIVE
         if (fetch4 == FETCH_4__CHANGE) { 
           m_C_STACK_PUSH(cp_handle->h_fetched4ChangeStack,n_entry);
           // MINIMONITOR: FETCHED 4 CHANGE
         } else { // FETCH_4__REMOVE
           m_C_STACK_PUSH(cp_handle->h_gaps, n_entry)
-          om_FLAGS_SET_ON(cp_handle->hsc_flags[n_entry],DEAD_FLAG)
+          m_FLAGS_SET_ON(cp_handle->hsc_flags[n_entry],DEAD_FLAG)
           // MICROMONITOR: ALIEN / DEAD
         } // if
       } // if
@@ -816,21 +816,21 @@ m_DIGGY_VAR_INDEX_FETCH_FLAGS(indexFetchFlags)
     cp_handle->nh_indexFetchInternalBuffer;
   m_ASSERT(indexFetchBuffer != NULL)
 
-  if (ob_FLAGS_ON(indexFetchFlags,INDEX_FETCH_FLAG__RESET)) {
+  if (b_FLAGS_ON(indexFetchFlags,INDEX_FETCH_FLAG__RESET)) {
     m_TRACK_IF(GreenCollectionRefreshIndexesInternal(cp_handle,b_TRUE) != RETURNED)
     // MINIMONITOR: CLEAN
     int fetch4 = FETCH_4__CHANGE; // a priori
-    if (ob_FLAGS_ON(indexFetchFlags,INDEX_FETCH_FLAG__READ)) fetch4 = FETCH_4__READ;
-    else if (ob_FLAGS_ON(indexFetchFlags,INDEX_FETCH_FLAG__REMOVE)) fetch4 = FETCH_4__REMOVE;
+    if (b_FLAGS_ON(indexFetchFlags,INDEX_FETCH_FLAG__READ)) fetch4 = FETCH_4__READ;
+    else if (b_FLAGS_ON(indexFetchFlags,INDEX_FETCH_FLAG__REMOVE)) fetch4 = FETCH_4__REMOVE;
      
-    m_TRACK_IF(m_IndexFetchSequenceReset(indexFetchBuffer,ob_FLAGS_ON(indexFetchFlags,
+    m_TRACK_IF(m_IndexFetchSequenceReset(indexFetchBuffer,b_FLAGS_ON(indexFetchFlags,
       INDEX_FETCH_FLAG__DESCENDING), fetch4, cp_handle->h_GIndexesHandle) != RETURNED) 
   } // if    
 
   int n_entry = UNDEFINED;
   int result = RESULT__NOT_FOUND;
 
-  if (ob_FLAGS_ON(indexFetchFlags,INDEX_FETCH_FLAG__NEXT)) {
+  if (b_FLAGS_ON(indexFetchFlags,INDEX_FETCH_FLAG__NEXT)) {
     m_TRACK_IF(m_IndexFetchSequenceNext(indexFetchBuffer,cp_handle->h_GIndexesHandle,&n_entry) !=
       RETURNED)
   } else {
@@ -840,10 +840,10 @@ m_DIGGY_VAR_INDEX_FETCH_FLAGS(indexFetchFlags)
   if (n_entry != -1) result = RESULT__FOUND; // a priori 
 
   int n_fetch4 = -1 ; // No fetch a priori
-  if ((n_entry != -1) || (ob_FLAGS_ON(indexFetchFlags,INDEX_FETCH_FLAG__NEXT) &&
-    ob_FLAGS_ON(indexFetchFlags,INDEX_FETCH_FLAG__RESET) &&
-    ob_FLAGS_ON(indexFetchFlags,INDEX_FETCH_FLAG__CHANGE) &&
-    ob_FLAGS_ON(indexFetchFlags,INDEX_FETCH_FLAG__SMART))) n_fetch4 = o_IndexFetchGetHeaderPtr(
+  if ((n_entry != -1) || (b_FLAGS_ON(indexFetchFlags,INDEX_FETCH_FLAG__NEXT) &&
+    b_FLAGS_ON(indexFetchFlags,INDEX_FETCH_FLAG__RESET) &&
+    b_FLAGS_ON(indexFetchFlags,INDEX_FETCH_FLAG__CHANGE) &&
+    b_FLAGS_ON(indexFetchFlags,INDEX_FETCH_FLAG__SMART))) n_fetch4 = o_IndexFetchGetHeaderPtr(
       indexFetchBuffer)->fetch4 ;
 
   // MINIMONITOR: ANY 
@@ -911,11 +911,11 @@ m_DIGGY_VAR_D(completed)
 m_DIGGY_VAR_D(completed)
     int i = 0; for (; i < handle->i_itemCount; i++) {
       int expectedHits = 0;
-      if (ob_FLAGS_ON(handle->hsc_flags[i],DEAD_FLAG))  expectedHits = 1; 
+      if (b_FLAGS_ON(handle->hsc_flags[i],DEAD_FLAG))  expectedHits = 1; 
       m_TRACK_IF((completed = EntriesStackVerifyEntry(&handle->h_gaps,i,expectedHits)) < 0)
       if (completed == COMPLETED__BUT) break;
       expectedHits = 0;
-      if (!ob_FLAGS_ON(handle->hsc_flags[i],ALIEN_FLAG))  expectedHits = 1;
+      if (!b_FLAGS_ON(handle->hsc_flags[i],ALIEN_FLAG))  expectedHits = 1;
       m_TRACK_IF((completed = GIndexesVerifyEntry(handle->h_GIndexesHandle,i,expectedHits)) < 0)
       if (completed == COMPLETED__BUT) break;
     } // for
