@@ -517,37 +517,45 @@ static inline int om_GIndexFree(struct G_INDEX* ax_me) {
 
 // Ensure criteria op flags all set properly for actual criteria evaluation
 //
+// Passed:
+// - s_me:
+// - meCount: >= 1 
+//
 // Ret:
 // - COMPLETED__OK: Ok (no rectification)
 // - COMPLETED__BUT: criteria op. flags needed rectification
 // - -1: unexpected problem; anomaly is raised
-static inline int g_GRequestCriteriaRectifyOpFlags(struct G_REQUEST_CRITERION *s_me, int meCountMax,
-  int *a_meCount) {
+static inline int g_GRequestCriteriaRectifyOpFlags(struct G_REQUEST_CRITERION *s_me, int meCount) {
   m_DIGGY_BOLLARD()
 
   int completed = COMPLETED__OK; // Not rectified a priori
   int depth = 0;
-  int initialCriteriaOpFlags = s_me[0].criteriaOpFlags;
-  if (*a_meCount > 1) {
-    s_me[0].criteriaOpFlags = CRITERIA_OP_FLAG__AND;
-    // Ensure following OR op. would have precedence over that AND op. 
-    if (om_CriteriaOpFlagsOpenBracketCount(s_me[1].criteriaOpFlags) == 0) m_FLAGS_SET_ON(
-      s_me[1].criteriaOpFlags,CRITERIA_OP_FLAG__OPEN1)
-  } else s_me[0].criteriaOpFlags = ALL_FLAGS_OFF0;
-  if (s_me[0].criteriaOpFlags != initialCriteriaOpFlags) completed = COMPLETED__BUT;
-  int i = 1; for (; i < *a_meCount; i++) {
+  if (meCount == 1) {
+    if (s_me[0].criteriaOpFlags != ALL_FLAGS_OFF0) completed = COMPLETED__BUT;
+    s_me[0].criteriaOpFlags = ALL_FLAGS_OFF0;
+    m_DIGGY_RETURN(completed)
+  } // if 
+
+  if (b_FLAGS_OFF(s_me[0].criteriaOpFlags,CRITERIA_OP_FLAG__AND)) {
+    completed = COMPLETED__BUT;
+    m_FLAGS_SET_ON(s_me[0].criteriaOpFlags,CRITERIA_OP_FLAG__AND)
+  } // if
+  int i = 0; for (; i < meCount; i++) {
     int initialCriteriaOpFlags = s_me[i].criteriaOpFlags;      
     if (b_FLAGS_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__OR)) {
+      // Ensure AND and OR ops are not enabled simultaneously
       m_FLAGS_SET_OFF(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__AND)
-      if (i+1 < *a_meCount) {
-        // Ensure AND op. have precedence over that OR op. 
-        if (om_CriteriaOpFlagsOpenBracketCount(s_me[i+1].criteriaOpFlags) == 0) m_FLAGS_SET_ON(
-          s_me[i+1].criteriaOpFlags,CRITERIA_OP_FLAG__OPEN1)
-      } // if
-    } else if (b_FLAGS_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__AND)) m_FLAGS_SET_OFF(
-      s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__OR)
+      // Put needed bracket to clarify precedence between AND / OR ops. :
+      if (i > 0 && b_FLAGS_ON(s_me[i-1].criteriaOpFlags,CRITERIA_OP_FLAG__AND) &&
+        om_CriteriaOpFlagsOpenBracketCount(s_me[i].criteriaOpFlags) == 0) m_FLAGS_SET_ON(
+          s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__OPEN1)
+    } else if (b_FLAGS_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__AND) && i > 0 &&
+      b_FLAGS_ON(s_me[i-1].criteriaOpFlags,CRITERIA_OP_FLAG__OR) &&
+        om_CriteriaOpFlagsOpenBracketCount(s_me[i].criteriaOpFlags) == 0) m_FLAGS_SET_ON(
+          s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__OPEN1)
     depth += om_CriteriaOpFlagsOpenBracketCount(s_me[i].criteriaOpFlags);
-    if (depth - om_CriteriaOpFlagsCloseBracketCount(s_me[i].criteriaOpFlags) < 0) {
+    if (depth < om_CriteriaOpFlagsCloseBracketCount(s_me[i].criteriaOpFlags)) {
+      // Remove excessive closing brackets
       m_FLAGS_SET_OFF(s_me[i].criteriaOpFlags,o_FLAGS3(CRITERIA_OP_FLAG__CLOSE1,
         CRITERIA_OP_FLAG__CLOSE2, CRITERIA_OP_FLAG__CLOSE3)) 
       switch (depth) {
@@ -557,8 +565,9 @@ static inline int g_GRequestCriteriaRectifyOpFlags(struct G_REQUEST_CRITERION *s
       break; default: m_FLAGS_SET_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__CLOSE3) } // switch
     } // if
     m_ASSERT((depth -= om_CriteriaOpFlagsCloseBracketCount(s_me[i].criteriaOpFlags)) >= 0) 
-    if (i == 1) {
+    if (i == meCount - 1) {
       if (depth - om_CriteriaOpFlagsCloseBracketCount(s_me[i].criteriaOpFlags) > 0) {
+        // Complete missing last closing brackets
         m_FLAGS_SET_OFF(s_me[i].criteriaOpFlags,o_FLAGS3(CRITERIA_OP_FLAG__CLOSE1,
           CRITERIA_OP_FLAG__CLOSE2,CRITERIA_OP_FLAG__CLOSE3))
         switch (depth) {
@@ -583,8 +592,8 @@ int GRequestCriteriaAdd(struct G_REQUEST_CRITERION *s_me, int meCountMax, int *a
   m_ARRAY_ADD_ITEM(s_me, meCountMax, *a_meCount, criterion)
 
   int completed = COMPLETED__OK; // a priori
-  if (b_lastCriterion) m_TRACK_IF((completed = g_GRequestCriteriaRectifyOpFlags(s_me,meCountMax,
-    a_meCount)) < 0)
+  if (b_lastCriterion) m_TRACK_IF((completed = g_GRequestCriteriaRectifyOpFlags(s_me, *a_meCount))
+    < 0)
   m_DIGGY_RETURN(completed)
 } // GRequestCriteriaAdd
 
@@ -596,6 +605,13 @@ int GRequestCriteriaAdd(struct G_REQUEST_CRITERION *s_me, int meCountMax, int *a
 // depth >= 0 
 // depth == count - 1 => count always >= 1
 m_STRUCT_C_STACK(GC_EVALUATOR,char)
+
+// Possible "status":
+// 'U' -> Unknown (initial)
+// 'O' -> ORed evaluation
+// 'A' -> ANDed evaluation
+// 'V' -> Valid (OK) 
+// 'X' -> Rejected (KO) 
 
 // Re-init g-criteria "evaluator".
 //
@@ -631,18 +647,21 @@ static inline int m_GcEvaluatorDepth(const struct GC_EVALUATOR* ap_me, int minDe
 //
 // Passed:
 // - *a_me: current status of g-criteria evaluator 
-// - b_passed: current criterion adequation ? (true/false)
+// - nb_passed: 
+//   + -1 special value: criterion not evualuated (boost mode)
+//   + >= 0: current criterion adequation ? (true/false)
 // - criteriaOpFlags: current criterion's op. flags (must have been prepared properly: see
 //   g_GRequestCriteriaRectifyOpFlags() above)
 //
 // Changed:
 // - *a_me: updated status of g-criteria evaluator 
+// - *ab_boost: need to evaluate next criterion ? (TRUE/FALSE)
 //
 // Ret:
 // - RETURNED: Ok
 // - -1: unexpected problem; anomaly is raised
-static inline int m_GcEvaluatorIterate(struct GC_EVALUATOR* a_me, char b_passed,
-  int criteriaOpFlags) {
+static inline int m_GcEvaluatorIterate(struct GC_EVALUATOR* a_me, signed char nb_passed,
+  int criteriaOpFlags, char *ab_boost) {
   m_DIGGY_BOLLARD_S()
   int openBracketCount = om_CriteriaOpFlagsOpenBracketCount(criteriaOpFlags);
   int i = 0; for (; i < openBracketCount; i++) {
@@ -651,30 +670,36 @@ static inline int m_GcEvaluatorIterate(struct GC_EVALUATOR* a_me, char b_passed,
 
   char status; m_C_STACK_PEEK(*a_me,status);
   int closeBracketCount = om_CriteriaOpFlagsCloseBracketCount(criteriaOpFlags);
+  *ab_boost = b_FALSE0; // No boost a priori
 
   if (b_FLAGS_OFF(criteriaOpFlags,o_FLAGS2(CRITERIA_OP_FLAG__AND,CRITERIA_OP_FLAG__OR))) {
     // NO logical op. => last operand 
     m_TRACK_IF(m_GcEvaluatorDepth(a_me,closeBracketCount) < 0)
-    // Finalize status (of that depth):
+    // Finalize status (on that depth):
+    char termStatus  = status; // a priori
     switch (status) {
-    case 'O':
-    case 'A':
-      status = 'X';
+    case 'U':
+    case 'V':
+    case 'X':
+    break; case 'O': // OR expression
+      termStatus = 'X';
+    break; case 'A': // AND expression
+      termStatus = 'V';
     break; default: m_RAISE(ANOMALY__VALUE__D,status)
     } // switch 
-    m_ASSERT(status == 'V' || status == 'X')
-    char termStatus  = status;
+    m_ASSERT(termStatus == 'V' || termStatus == 'X')
     for (i = 0; i < closeBracketCount; i++) {
       m_C_STACK_POP(*a_me,status);
       m_TRACK_IF(m_GcEvaluatorDepth(a_me,0) < 0)
+      // Finalize status (on that depth):
       switch (status) {
       case 'U':
-      break; case 'O':
+      case 'V':
+      case 'X':
+        termStatus  = status;
+      break; case 'O': // OR expression
+      case 'A': // AND expression
         termStatus = (termStatus == 'V'? 'V': 'X');
-      break; case 'A':
-        termStatus = (termStatus == 'V'? 'V': 'X');
-      break; case 'V':
-      break; case 'X':
       break; default: m_RAISE(ANOMALY__VALUE__D,status)
       } // switch 
       m_ASSERT(termStatus == 'V' || termStatus == 'X')
@@ -684,19 +709,22 @@ static inline int m_GcEvaluatorIterate(struct GC_EVALUATOR* a_me, char b_passed,
   } else { // OR / AND logical op. 
     m_ASSERT(closeBracketCount == 0)
 
+    m_ASSERT(nb_passed >= 0)
     switch (status) {
     case 'U':
       if (b_FLAGS_ON(criteriaOpFlags,CRITERIA_OP_FLAG__OR)) 
-        status = (b_passed? 'V': 'O');
+        status = (nb_passed? 'V': 'O');
       else if (b_FLAGS_ON(criteriaOpFlags,CRITERIA_OP_FLAG__AND)) 
-        status = (b_passed? 'A': 'X');
-      else status = (b_passed? 'V': 'X');
+        status = (nb_passed? 'A': 'X');
+      else status = (nb_passed? 'V': 'X');
     break; case 'O':
-      status = (b_passed? 'V': 'O');
+      m_ASSERT(b_FLAGS_ON(criteriaOpFlags,CRITERIA_OP_FLAG__OR))
+      if ((*ab_boost = nb_passed)) status = 'V';
     break; case 'A':
-      status = (b_passed? 'A': 'X');
+      m_ASSERT(b_FLAGS_ON(criteriaOpFlags,CRITERIA_OP_FLAG__AND))
+      if ((*ab_boost = !nb_passed)) status = 'X';
     break; case 'V':
-    break; case 'X':
+    case 'X':
     break; default: m_RAISE(ANOMALY__VALUE__D,status)
     } // switch 
     m_C_STACK_POKE(*a_me,status)
@@ -909,28 +937,28 @@ int GIndexesSequenceNext(G_INDEXES_HANDLE handle,
     m_TRACK_IF(m_GIndexSequenceNext(handle->vnhs_indexes + sp_gRequestCriteria[0].indexLabel,
       b_descending, a_indexSequence, an_entry) != RETURNED) 
     if (*an_entry >= 0) {
-      m_TRACK_IF(m_GcEvaluatorReset(&gcEvaluator) != RETURNED)
       const struct G_REQUEST_CRITERION* p_gRequestCriterionPtr = sp_gRequestCriteria;
-
-      int i = 0; for (; i < gRequestCriterionCount;
-        i++, p_gRequestCriterionPtr++) {
-
-        int answer = ANSWER__YES; // a priori
-        if (i > 0) m_TRACK_IF((answer = GIndexesSeekEntryEquate(handle,
-          p_gRequestCriterionPtr->indexLabel,*an_entry,
-          p_gRequestCriterionPtr->indexSeekFlags, p_gRequestCriterionPtr->cr_gKeys)) < 0)
-
-        m_TRACK_IF(m_GcEvaluatorIterate(&gcEvaluator, answer == ANSWER__YES,
-          p_gRequestCriterionPtr->criteriaOpFlags) != RETURNED)
-
-        m_C_STACK_PEEK(gcEvaluator,status) 
-        if (status == 'O' || status == 'K') break; 
+// m_ASSERT(1st criterion op flags == AND , at least one '('
+      m_TRACK_IF(m_GcEvaluatorReset(&gcEvaluator) != RETURNED)
+      signed char nb_passed = b_TRUE; // 1st iteration  
+      char cb_boost = b_FALSE0; // Not significant for 1st iteration 
+      int i = 0; for (; i < gRequestCriterionCount; i++, p_gRequestCriterionPtr++) {
+        if (i > 0) {
+          if (cb_boost) nb_passed = -1; else {
+            int answer = UNDEFINED;
+            m_TRACK_IF((answer = GIndexesSeekEntryEquate(handle,
+              p_gRequestCriterionPtr->indexLabel,*an_entry,
+              p_gRequestCriterionPtr->indexSeekFlags, p_gRequestCriterionPtr->cr_gKeys)) < 0)
+            nb_passed = (answer == ANSWER__YES);
+          } // if
+        } // if
+        m_TRACK_IF(m_GcEvaluatorIterate(&gcEvaluator, nb_passed,
+          p_gRequestCriterionPtr->criteriaOpFlags, &cb_boost) != RETURNED)
       } // for
-  // Break "criteria handling" loop if entry not rejected by extra criteria 
-m_ASSERT(m_GcEvaluatorDepth(&gcEvaluator,0) == 0) 
+      m_ASSERT(m_GcEvaluatorDepth(&gcEvaluator,0) == 0) 
       m_C_STACK_PEEK(gcEvaluator,status)
-m_ASSERT(status == 'O' || status == 'K') 
-      if (status == 'O') break;
+      m_ASSERT(status == 'V' || status == 'X') 
+      if (status == 'V') break; // entry matches criteria
     } else break; // No more entry => finished 
   } while (b_TRUE) ;
   m_C_STACK_FREE(gcEvaluator)
