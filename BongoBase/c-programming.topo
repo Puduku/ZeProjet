@@ -138,7 +138,9 @@
 //     in unique and specific place (the main module in general) of application.
 //     NB: example of freeloader can be found in "Flint" project...
 //
-// - instances and handles ; data encapsulation
+//  "Object oriented" programming in C
+//  ----------------------------------
+// - instances and handles ; data encapsulation ("pure" objects)
 //   + Should only exist object instances !!! (*) (**) that "fundamental" programming
 //     concept - i.e association principle of code and data (so-called "methods" and "attributes")
 //     can be easily implemented in C by means of "instances" and "handles".
@@ -182,6 +184,105 @@
 //     used for the creation of product instances...
 //     Our strong recommandation is to resort to the factory paradigm only when necessary...
 //
+
+//
+// - Green items and collections:
+//   The green item is an intermediate concept of compound data between the bare struct-based data
+//   and the encapsulated data (in "object instance") (*)
+//   See also c-ansi/green.topo
+//   (*) : as amendment of "everything is object" holistic vision...
+//
+// - Subjectification: Reducing Everything to "me"
+We have already established the two most "noble" archetypes in our architecture: the pure object
+(driven by absolute encapsulation via handles) and the green item (relying on open structural
+definitions via stuff pointers). But what about the remaining, ordinary data structures? Do they
+not deserve structural intent? While these common structures cannot claim the formal status of an
+object, we can—and should—consider them as subjects.
+┌────────────────────────────────────────────────────────┐
+│                   Data Structure Paradigms             │
+├───────────────────┬───────────────────┬────────────────┤
+│ Pure Object       │ Green Item        │ Subject        │
+│ (Encapsulated)    │ (Public Struct)   │ (Contextual)   │
+│ Handle-driven     │ Stuff-driven      │ Me-driven      │
+└───────────────────┴───────────────────┴────────────────┘
+The Shift from Anonymous Functions to Contextual Design
+Traditionally, functions that manipulate multiple unrelated structures are designed anonymously.
+For instance, a function operating on both a TITI and a TUTU structure might be written without a
+clear anchor:
+/* Anonymous approach: No clear owner or central context */
+int DoSomethingWithTitiAndTutu(Params p, struct TITI *titi, struct TUTU *tutu);
+While functional, this approach lacks syntactic intent. Subjectification is the process of choosing
+a "major" parameter to serve as the conceptual anchor of the function, treating it as though it
+were a pure object or green item for the duration of that operation.
+The "Me" Principle
+By promoting one structure (e.g., TITI) to the role of the subject, we refactor the function to
+enforce a strict, predictable interface pattern: The subject becomes the first parameter of the
+function. The parameter is systematically named me (passed by value or by pointer depending on
+intent). The function name reflects this ownership.
+/* Subjectified approach: TITI becomes the subject ('me') */
+int TitiDoSomethingWithTutu(struct TITI *me, Params p, struct TUTU *tutu);
+Why Subjectify?
+Subjectification brings strict readability and conceptual uniformity to the entire codebase. It
+bridges the gap between raw data structures and formal objects, ensuring that almost every
+multi-parameter function across your application shares a familiar, predictable, and clean entry pattern.
+
+Using "Subject" and "Subjectification" is an excellent and highly original choice.
+In language and grammar, the "Subject" is the entity performing the action, which perfectly matches
+your code design where me acts as the primary actor executing the method.It neatly avoids
+overlapping with crowded OOP terms like "Traits", "Mixins", or "Extensions", making your architectural
+documentation distinct and intuitive.
+
+
+// Subjectification: Reducing Every Operation to "Me"
+We have already discussed the two most structured forms of data–function association:
+
+the pure object, whose representation is hidden behind an opaque handle and can be accessed only through
+its methods; and nthe green item, whose structure is publicly defined but is nevertheless manipulated
+through a coherent family of functions.
+What about the remaining data structures—ordinary structures that do not belong to either category? At
+first sight, they may appear to be merely anonymous collections of data, passed as parameters to unrelated
+functions.
+
+However, these structures can still be given a clearer conceptual role. Whenever a function primarily
+operates on one of its parameters, that parameter may be designated as the function’s subject.
+
+For example, instead of writing:
+int DoSomethingWithTitiAndTutu(
+    struct TITI *titi,
+    struct TUTU *tutu,
+    /* other parameters */
+);
+we may designate titi as the central parameter and write:
+
+int TitiDoSomethingWithTutu(
+    struct TITI *me,
+    struct TUTU *tutu,
+    /* other parameters */
+);
+The technical difference is minimal: the subject is placed first in the parameter list, following the
+convention already used for object handles and green-item pointers. The more important difference is
+conceptual. The function is presented as an operation performed by or on TITI, rather than as a completely
+general operation involving two unrelated structures.
+
+This practice may be called subjectification: treating an otherwise ordinary data structure as the explicit
+subject of the operations that primarily concern it.
+
+Subjectification does not make the structure an object. It does not imply data encapsulation, private state,
+dynamic dispatch, or any other specifically object-oriented property. It is simply a naming and organization convention that gives the data structure a recognizable relationship with the functions that operate on it.
+
+Thus, the general pattern becomes:
+
+ReturnType TypeDoSomething(
+    struct TYPE *me,
+    /* other parameters */
+);
+The name 'me' emphasizes that the first parameter is the principal participant in the operation. It provides
+a lightweight, object-like organization for ordinary C data without claiming that the data structure is a
+formal object or a green item.
+
+In this sense, subjectification extends the "everything revolves around me" principle to structures that
+do not qualify for the more distinguished status of object or green item.
+
 // - Proto-objects: allow to split complex objects into formal objects within one module.
 //   Let's reason on plain example. Suppose that when designing CO "complex object" within eponymous
 //   module, we identify SO "simple object" as an independent "sub-responsibility" within CO...
@@ -199,57 +300,6 @@
 //       instance is not encapsulated; all SO's internals are accessible to CO. However, the point
 //       is that formally, we do have encapsulation - the responsibilities of CO and SO are clearly
 //       separated in the code...
-//
-// - Green items and collections:
-//   The green item is an intermediate concept of compound data between the bare struct-based data
-//   and the encapsulated data (in "object instance") (*)
-//   See also c-ansi/green.topo
-//   (*) : as amendment of "everything is object" holistic vision...
-//
-// - Subjectification. Reducing everything to "me". We have just discussed the most "noble"
-//   structures - namely, "object instances" and "green items". What about the other structures? Do
-//   they not deserve any special attention? Since they cannot claim the status of an "object" let’s
-//   at least consider them as subjects.
-
-
-3. Subjectification: Reducing Everything to "me"We have already established the two most "noble"
-archetypes in our architecture: the pure object (driven by absolute encapsulation via handles) and
-the green item (relying on open structural definitions via stuff pointers). But what about the
-remaining, ordinary data structures? Do they not deserve structural intent?While these common
-structures cannot claim the formal status of an object, we can—and should—consider them as subjects.
-┌────────────────────────────────────────────────────────┐
-│                   Data Structure Paradigms             │
-├───────────────────┬───────────────────┬────────────────┤
-│ Pure Object       │ Green Item        │ Subject        │
-│ (Encapsulated)    │ (Public Struct)   │ (Contextual)   │
-│ Handle-driven     │ Stuff-driven      │ Me-driven      │
-└───────────────────┴───────────────────┴────────────────┘
-The Shift from Anonymous Functions to Contextual DesignTraditionally, functions that manipulate
-multiple unrelated structures are designed anonymously. For instance, a function operating on both
-a TITI and a TUTU structure might be written without a clear anchor:
-/* Anonymous approach: No clear owner or central context */
-int DoSomethingWithTitiAndTutu(Params p, struct TITI *titi, struct TUTU *tutu);
-While functional, this approach lacks syntactic intent. Subjectification is the process of choosing
-a "major" parameter to serve as the conceptual anchor of the function, treating it as though it
-were a pure object or green item for the duration of that operation.
-The "Me" Principle
-By promoting one structure (e.g., TITI) to the role of the subject, we refactor the function to
-enforce a strict, predictable interface pattern:The subject becomes the first parameter of the
-function.The parameter is systematically named me (passed by value or by pointer depending on
-intent).The function name reflects this ownership.
-/* Subjectified approach: TITI becomes the subject ('me') */
-int TitiDoSomethingWithTutu(struct TITI *me, Params p, struct TUTU *tutu);
-Why Subjectify?
-Subjectification brings strict readability and conceptual uniformity to the entire codebase. It
-bridges the gap between raw data structures and formal objects, ensuring that almost every
-multi-parameter function across your application shares a familiar, predictable, and clean entry pattern.
-
-Using "Subject" and "Subjectification" is an excellent and highly original choice.
-In language and grammar, the "Subject" is the entity performing the action, which perfectly matches
-your code design where me acts as the primary actor executing the method.It neatly avoids
-overlapping with crowded OOP terms like "Traits", "Mixins", or "Extensions", making your architectural documentation distinct and intuitive.
-
-
 
 //
 // - Data logical value type vs. data physical content type
