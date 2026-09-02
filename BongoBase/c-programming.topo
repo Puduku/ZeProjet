@@ -301,6 +301,123 @@ do not qualify for the more distinguished status of object or green item.
 //       is that formally, we do have encapsulation - the responsibilities of CO and SO are clearly
 //       separated in the code...
 
+// - Proto-objects: a way to decompose a complex object into internally
+//   structured, object-like responsibilities within the same module.
+//
+//   Consider a complex object, CO, implemented by the corresponding CO module.
+//   During its design, we may identify a simpler component, SO, responsible for
+//   a distinct sub-part of CO's behaviour or state.
+//
+//   If SO has a sufficiently general purpose and could reasonably be reused by
+//   other objects or modules, the appropriate solution is straightforward:
+//   extract it from the CO module and implement it as a proper, independent SO
+//   object in its own module.
+//
+//   The more interesting case is when SO is meaningful only as part of CO. Its
+//   responsibilities are real and distinct, but it has no useful existence
+//   outside CO. In that case, keeping SO inside the CO module is usually the
+//   right design. SO may then be treated as a proto-object.
+//
+//   A proto-object is an internal, object-like component: it has its own data
+//   structure and its own set of operations, but it is not intended to provide
+//   an independently usable public abstraction.
+//
+//   Two implementation styles are possible:
+//
+//   + Strict internal-object style
+//
+//     SO may be designed exactly as a proper object, with an opaque instance
+//     representation and a family of SO operations. This can still improve the
+//     local organization of the module.
+//
+//     However, encapsulation is only partial in practice. Since CO and SO are
+//     implemented in the same module, the CO implementation necessarily has
+//     access to SO's private representation. The module boundary protects SO
+//     from external users, but it cannot protect SO from its containing object.
+//
+//   + Lightweight, subjectified style
+//
+//     Alternatively, SO may be represented by an ordinary visible structure,
+//     with operations conventionally organized around it. For example:
+//
+//         int SoInitialize(struct SO *me, ...);
+//         int SoDoSomething(struct SO *me, ...);
+//
+//     In this form, SO is not a pure object: its data need not be hidden behind
+//     a handle, and its operations may even be implemented as macros or inline
+//     helpers rather than ordinary functions.
+//
+//     Nevertheless, SO remains formally separated from CO. Its state belongs
+//     to the SO structure, and the code manipulating that state is expressed as
+//     operations whose principal subject is SO -- conventionally the first
+//     parameter, named `me`.
+//
+//   Proto-objects can therefore be understood as subjectified internal data
+//   structures. They do not necessarily provide strict encapsulation, nor do
+//   they claim the status of independent objects. Their purpose is instead to
+//   make internal responsibilities explicit: CO remains the public object,
+//   while SO is a clearly identified internal subject with its own data and
+//   operations.
+//
+//   The benefit is primarily architectural clarity. Even where strict data
+//   hiding is neither possible nor useful, separating CO and SO responsibilities
+//   prevents the implementation of a complex object from becoming a single
+//   undifferentiated body of data and procedures.
+
+
+Proto-Objects: Intra-Module SubjectificationBefore formalizing the concept of subjectification,
+early architectural iterations relied on proto-objects. A proto-object acts as a stepping stone,
+allowing a developer to break down a single, monolithic Complex Object (CO) into smaller,
+manageable sub-responsibilities within the exact same module.Let’s reason through a concrete example.
+Suppose that while designing a Complex Object (CO) within its eponymous module, we identify a
+distinct sub-responsibility. We want to isolate this as a Simple Object (SO). We face a tactical
+choice:The External Route: If the functionality of SO is generic and reusable by other parts of the
+application, we extract it completely from the CO module. We then design it as a standalone pure
+object or green item in its own dedicated module.The Internal Route (Proto-Object): If SO is highly
+specific to CO and has no utility outside of it, we keep it tucked inside the CO module.Imperfect
+Encapsulation vs. Formal SubjectificationIf we choose the internal route, enforcing absolute data
+encapsulation is a technical illusion. Because both CO and SO reside in the same translation unit
+(.c file), they inevitably share access to each other's raw internals.Instead of forcing artificial
+encapsulation via handles, we treat SO as a proto-object by applying the rule of subjectification:
+The Structural Subject: 
+We define the SO data structure inside the module. It is not hidden behind a handle; its fields are
+openly visible to CO.The "Me" Context: We write formal "methods" for SO where the first parameter is 
+always the SO structure instance, systematically named me.Macro Optimization: Because these methods
+are strictly internal to the module, they do not always require real function call overhead. They
+can be implemented directly as optimized preprocessor macros, while still maintaining the me
+signature pattern.c/* Inside the CO module (co_module.c) */
+
+/* The Proto-Object Structure (Subject) */
+struct SO {
+    int internal_counter;
+    /* ... other SO specific fields ... */
+};
+
+/* Subjectified Method via Macro: Explicit responsibility, zero overhead */
+#define SoReset(me)  ((me)->internal_counter = 0)
+
+/* Subjectified Method via Static Function */
+static int SoIncrement(struct SO *me, int value) {
+    me->internal_counter += value;
+    return me->internal_counter;
+}
+Use code with caution.The VerdictTechnically, a proto-object is not encapsulated; all of its internals
+are accessible to CO. However, conceptually and structurally, we achieve clean separation of concerns.
+By subjectifying the internal data structure into a proto-object, the responsibilities of CO and SO
+remain clearly separated in the source code without the architectural overhead of separate files and handles.
+
+
+
+
+How the four paradigms map to memory:
+ParadigmPrimary Memory DomainStructural VisibilityImpact of Stack Allocation
+Pure ObjectHeap (Traditional)Hiddent / HandleHigh friction: Speeds up execution, but risks stack corruption if internal structure size changes.
+Green ItemHeap (By nature)Public / StuffUnnecessary: Designed to be dynamic, long-lived global or shared items.
+SubjectTransparent (Stack Preferred)Public / MePerfect harmony: Cleanest way to write object-like C code natively on the stack without encapsulation headaches.
+Proto-ObjectInherited (Matches Parent)Public to Module / MeTransparent: Moves seamlessly with the parent Complex Object.
+
+
+
 //
 // - Data logical value type vs. data physical content type
 //   Idea: The very simple concept of "data type" is not always an accurate concept...
