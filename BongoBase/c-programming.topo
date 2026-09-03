@@ -87,7 +87,8 @@
 //     let us NOT having to deal with such philosophical (and somewhat vain) questions...
 
 
-// Programming patterns and conventions:
+// Programming main patterns and conventions:
+// ------------------------------------------
 // - "Modular design" : THE (inalienable) principle...
 //   Modules (as designation of "code containers" that are source files) remain the FUNDAMENTAL
 //   conceptual "units" of software development. That "modular design", although "ancestral", is
@@ -140,7 +141,7 @@
 //
 //  "Object oriented" programming in C
 //  ----------------------------------
-// - instances and handles ; data encapsulation ("pure" objects)
+// - instances and handles ; data encapsulation (aka the "pure" objects)
 //   + Should only exist object instances !!! (*) (**) that "fundamental" programming
 //     concept - i.e association principle of code and data (so-called "methods" and "attributes")
 //     can be easily implemented in C by means of "instances" and "handles".
@@ -151,8 +152,8 @@
 //       The fundamental, and natural, property of "handles" is that multiple "handles" can be
 //       "attached" to one instance (exactly like a luggage may have several handles...)
 //     (*) As usual, that idealistic and holistic vision is a good basic principle, but, the
-//     assumption must sometimes be nuanced if we want to avoid nightmarish pitfalls and
-//     complications...
+//     assumption must sometimes be nuanced if we want to avoid nightmarish confusions and
+//     complications (see below).
 //     (**) Hands (and fingers), for instance, would be a better metaphor than objects (and
 //     methods) to figurate those associations between data and code; but ok, let's not worsen the
 //     existing confusion ; hence we stick with "objects and methods" denominations and we just
@@ -184,27 +185,31 @@
 //     used for the creation of product instances...
 //     Our strong recommandation is to resort to the factory paradigm only when necessary...
 //
-
-//
 // - Green items and collections:
 //   The green item is an intermediate concept of compound data between the bare struct-based data
-//   and the encapsulated data (in "object instance") (*)
+//   (see subjectication and proto-object concepts below) and the encapsulated data (in "object
+//   instance"). Green item concept is thus the first amendment of "everything is object" holistic
+//   vision...
 //   See also c-ansi/green.topo
-//   (*) : as amendment of "everything is object" holistic vision...
-//
+//   
 // - Subjectification: Reducing Everything to "me"
 We have already established the two most "noble" archetypes in our architecture: the pure object
 (driven by absolute encapsulation via handles) and the green item (relying on open structural
 definitions via stuff pointers). But what about the remaining, ordinary data structures? Do they
 not deserve structural intent? While these common structures cannot claim the formal status of an
-object, we can—and should—consider them as subjects.
-┌────────────────────────────────────────────────────────┐
-│                   Data Structure Paradigms             │
-├───────────────────┬───────────────────┬────────────────┤
-│ Pure Object       │ Green Item        │ Subject        │
-│ (Encapsulated)    │ (Public Struct)   │ (Contextual)   │
-│ Handle-driven     │ Stuff-driven      │ Me-driven      │
-└───────────────────┴───────────────────┴────────────────┘
+object, we can - and should - consider them as subjects.
+
+
+We have already discussed the two most structured forms of data–function association:
+
+the pure object, whose representation is hidden behind an opaque handle and can be accessed only through
+its methods; and nthe green item, whose structure is publicly defined but is nevertheless manipulated
+through a coherent family of functions.
+What about the remaining data structures - ordinary structures that do not belong to either category? At
+first sight, they may appear to be merely anonymous collections of data, passed as parameters to unrelated
+functions.
+
+
 The Shift from Anonymous Functions to Contextual Design
 Traditionally, functions that manipulate multiple unrelated structures are designed anonymously.
 For instance, a function operating on both a TITI and a TUTU structure might be written without a
@@ -244,7 +249,7 @@ first sight, they may appear to be merely anonymous collections of data, passed 
 functions.
 
 However, these structures can still be given a clearer conceptual role. Whenever a function primarily
-operates on one of its parameters, that parameter may be designated as the function’s subject.
+operates on one of its parameters, that parameter may be designated as the function's subject.
 
 For example, instead of writing:
 int DoSomethingWithTitiAndTutu(
@@ -282,6 +287,9 @@ formal object or a green item.
 
 In this sense, subjectification extends the "everything revolves around me" principle to structures that
 do not qualify for the more distinguished status of object or green item.
+
+
+
 
 // - Proto-objects: allow to split complex objects into formal objects within one module.
 //   Let's reason on plain example. Suppose that when designing CO "complex object" within eponymous
@@ -408,7 +416,14 @@ remain clearly separated in the source code without the architectural overhead o
 
 
 
-
+Recap:
++--------------------------------------------------------+
+│                   Data Structure Paradigms             │
++-------------------+-------------------+----------------+
+│ Pure Object       │ Green Item        │ Subject        |
+│ (Encapsulated)    │ (Public Struct)   │ (Contextual)   │
+│ Handle-driven     │ Stuff-driven      │ Me-driven      │
++-------------------+-------------------+----------------+
 How the four paradigms map to memory:
 ParadigmPrimary Memory DomainStructural VisibilityImpact of Stack Allocation
 Pure ObjectHeap (Traditional)Hiddent / HandleHigh friction: Speeds up execution, but risks stack corruption if internal structure size changes.
