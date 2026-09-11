@@ -154,10 +154,25 @@
 //     (*) As usual, that idealistic and holistic vision is a good basic principle, but, the
 //     assumption must sometimes be nuanced if we want to avoid nightmarish confusions and
 //     complications (see below).
-//     (**) Hands (and fingers), for instance, would be a better metaphor than objects (and
-//     methods) to figurate those associations between data and code; but ok, let's not worsen the
-//     existing confusion ; hence we stick with "objects and methods" denominations and we just
-//     forget our "hands and fingers"...
+
+
+// - Instances and Handles (aka the "pure" objects)
+// The foundational programming concept—the close association of code and data (methods and
+//attributes) - can be easily implemented in C using instances and handles, driven by the philosophy that:
+//   "Should only exist object instances !!!"
+//  - Instance: This is simply an allocation of a data structure in memory (typically on the heap).
+Instances are defined strictly within the private section of a module to ensure encapsulation.
+- Handle: This is nothing more than a pointer variable that references the instance. The handle is the
+only public definition exposed to the outside world.A natural and essential property of handles is
+that multiple handles can be attached to a single instance (much like how a single piece of luggage
+can have multiple physical handles).
+// (*): As usual, that purist vision - the tendency to view absolutely everything as an object
+// — is a good basic principle. However, the assumption must sometimes be nuanced if we want to
+// avoid nightmarish confusions and complications.
+
+//     (**) While a metaphor like hands and fingers might explain the connection between data and
+//     code more intuitively, let's not overcomplicate things. To keep it simple and avoid further
+//     confusion, we will stick to the standard terms: 'objects' and 'methods'."
 //   + Object virtualization. This principle replaces the METHOD virtualization of "classes-based"
 //     programming languages. Advantages:
 //     . easily implementable in simple C
