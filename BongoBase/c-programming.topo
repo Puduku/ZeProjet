@@ -1,391 +1,302 @@
 // c-programming.topo, version 1.93
 // (c) Atos-Euronext Belgium - 2001, 2002, 2003
 // (c) Puduku - 2023
-//
-// INTRO: question of perspective...
-// Programming perspective (P-level)
-// >Versus<
-// C-Language perspective (L-level)
+#if 0
+INTRO: question of perspective...
+Programming perspective (P-level)
+>Versus<
+C-Language perspective (L-level)
  
-// 'P'rogramming perspective is a tiny but necessary "abstraction" built just above the 'L'anguage
-// ("grass roots") perspective.
-// Our idea is to NOT "reason" directly with C language features, but with more "ad hoc" 
-// programming abstractions...
+'P'rogramming perspective is a tiny but necessary "abstraction" built just above the 'L'anguage
+("grass roots") perspective.
+Our idea is to NOT "reason" directly with C language features, but with more "ad hoc" 
+programming abstractions...
 
-// This 'P' layer follows very classical "procedural programming" orientation (*) on which we
-// elaborate actual programming patterns...
-//
-// (*) "Structured programming" is obviously C's most natural programming orientation. Yet, the
-// language is quite versatile (some people would rather say "poor" or "lax" ...) to support other
-// paradigms (like "functional" paradigm)
+This 'P' layer follows very classical "procedural programming" orientation (*) on which we
+elaborate actual programming patterns...
 
-// This table shows main cases of correspondence between 'L' and 'P' concepts.
-// What must be understood is that the 'P' concepts derived from a given 'L' concept are usually
-// very different 'P' concepts. For example, from the point of view of 'P', 'functional macros' have
-// little to do with 'pure macros' - and yet both are just ordinary macros of the C preprocessor...
-// +----------------------------------------------+----------------------------------------------+
-// | 'L': preprocessor / compiler                 | 'P': programming layer ("procedural          |
-// |                                              | programming" orientation)                    |
-// +----------------------------------------------+----------------------------------------------+
-// | preprocessor macros                          | - constants & functional macros              |
-// |                                              | - pure macros                                |
-// +----------------------------------------------+----------------------------------------------+
-// | c-values (basic types)                       | - values (integers & floating points)        |
-// |                                              | - statuses (int C type)                      |
-// |                                              | - sentinel values                            |
-// +----------------------------------------------+----------------------------------------------+
-// | non void returning c-functions               | - (pure) functions                           |
-// |                                              | - procedures                                 |
-// +----------------------------------------------+----------------------------------------------+
-// | void returning c-functions                   | technical routines (1)                       |
-// +----------------------------------------------+----------------------------------------------+
-// | typedef                                      | used as simple alias definition for:         |
-// | (2)                                          | - custom function types                      |
-// |                                              | - handle types                               |
-// |                                              | - basic types aliasing (2)                   |
-// +----------------------------------------------+----------------------------------------------+
-// | enum                                         | - statuses (unary, binary,...)               |
-// |                                              | - states representations                     |
-// |                                              | - standard values                            |
-// +----------------------------------------------+----------------------------------------------+
-// | struct (union)                               | - private instances                          |
-// |                                              | - compound parameters                        |
-// |                                              | - description of data formats (3)            |
-// +----------------------------------------------+----------------------------------------------+
-// | pointer (entity on which * operator is       | - address variables                          |
-// | applicable) (4)                              |   + single entity address (a_ indicator)     |
-// |                                              |   + array address: (s_ indicator)            |
-// |                                              | - generic (r_ indicator) parameter           |
-// |                                              | - handles                                    |
-// +----------------------------------------------+----------------------------------------------+
-// | logical expressions                          | only boolean typeless VALUES exist - boolean |
-// |                                              | "type" MUST NOT be artificially "defined"    |
-// +----------------------------------------------+----------------------------------------------+
-// (1) Like 'P' procedures and functions, 'P' technical routines are code CONTAINERS. But
-//     contrary to procedures and functions, technical routines are NOT (directly) CALLABLE.
-// (2) Thus, from 'P'rogramming perspective, types abstractions are somewhat more subtle than
-//     rudimentary "typedef" constructions - that are actually simple names aliasing (*).
-//     By the way, we question the (in)famous "<type name>_t" types naming convention (like size_t,
-//     pthread_t, bool_t, etc.) which confines in fact the principle of data abstraction to a
-//     simple renomination of type.
-//     Extra comment: The motivation at that time was probably a vain attempt to "modernize" C
-//     framework vis-a-vis the new programming languages (those offering full-fledged type systems)
-//     of the epoch. Hence, the "initiative" was totally clumsy, and by the way largely
-//     counter-productive...
-//     (*) to emphasize our point of view, 'typedef' is a CARICATURE of type definition ; the point
-//     is just to understand and keep in mind the limitations (from 'P' perspective) of that
-//     'L'-level mechanism.
-// (3) that is representation of "shared" data structures (protocol messages, EDI, etc.).
-//     The method imposes STRICT control of data alignment, structure padding and packing in memory.
-//     The techniques "of course" exist (#pragma) in C, but generally have very bad impact on
-//     process performance, and, above all, are not portable - what is quite paradoxical when your
-//     purpose is to represent open specifications...
-//     Morality: from our point of view, this technique of data format representation is a "good"
-//     example of "false good idea"...  Finally, it's less complicated to rely on "grassroots"
-//     methods - those based on explicit offset and data length definitions and manipulations...
-// (4) That pointer definition given at L-level is disputable. Fortunately, our P-abstraction
-//     let us NOT having to deal with such philosophical (and somewhat vain) questions...
+(*) "Structured programming" is obviously C's most natural programming orientation. Yet, the
+language is quite versatile (some people would rather say "poor" or "lax" ...) to support other
+paradigms (like "functional" paradigm)
 
-
-// Programming main patterns and conventions:
-// ------------------------------------------
-// - "Modular design" : THE (inalienable) principle...
-//   Modules (as designation of "code containers" that are source files) remain the FUNDAMENTAL
-//   conceptual "units" of software development. That "modular design", although "ancestral", is
-/    not obsolete with respect to more recent concepts, such as "class models" developed in
-//   so-called "object-oriented" programming... Modules remain the "essence" of preliminary
-//   software design (*).
-//   "Classes" may only make sense far later, during the "detailed" design process... (**)
-//   => Practical convention: one module <mod> exactly corresponds to:
-//   - single <mod>.h header file OR
-//   - <mod>.h header and <mod>.c source files (most common case) OR
-//   - single <mod>.c source file if and only if it implements main() function.
-//   (*) "Preliminary" does not just mean "draft" - immediatly forgotten when the "real"
-//       developement starts. "Preliminary" really means "fundamental"...
-//   (**) Actually, I feel that classes represent an incidental concept - or even an irrelevant
-//        one - in software design. It has to do with the confusion between analytical and
-//        synthetic thinking (judgement). TODO: cca a l'air passionnant... ag developper!!!... 
-//
-// - C-Ansi / C-Posix split: the sources are splitted between "c-posix" and "c-ansi"
-//   sub-directories.
-//   Initially, the motivation was practical: such split eases recuperation of modules usable to
-//   write stand-alone C-Ansi programs (reminder: pure C-Ansi programs have limitations but offer
-//   the great advantage to run almost "anywhere")
-//   And even if now C-Ansi programs are less in our "focus", we realized that such a split
-//   "inducts" a good separation between pure business logic (code that can be written in Ansi-C)
-//   with "technical", low level code (that is "by essence" Posix-C). 
-//   NB: final extra, empiric, but real, advantage : this separation lets us directly identifying 
-//   our own headers (#include "c-ansi/xxx" and "c-posix/xxx")
-//
-// - particular APIs:
-//   + "kitchen" paradigm: allows to maintain primal simplicity of "enriched" API.
-//     Analogy with some (contemporary) restaurants in which clients have an open view inside the
-//     kitchen...
-//     The public API is split in two levels :
-//     . the "lower" level is the "kitchen view" : define the complete API. Like the kitchen of the
-//       restaurant, the decoration and the beauty of the place does not really matter; but the
-//       neatness of that place must be irreproachable.
-//     . the "upper" level is like the "menu of the diner room" : is a simplification of the API,
-//       and is focused on most common usages.
-//     Example: conditional declarations (#if / #ifdef) quickly make public interfaces difficult to
-//     read and should be placed in the "ad hoc" kitchen interface.
-//   + "glue" paradigm: dedicated API meant to fix the approximations and inconsistencies of
-//     "standards" - that we MUST get along with...
-//     Notice: "universal glue" is an ANTI-PATTERN! (we are deeply engaged against "catchall" design
-//     syndrom)
-//   + "freeloader": a free-loader is a simple "technique" suitable for very light "singleton"
-//     modules. It consists to define the functions directly in the header (.h) file so that we
-//     formally get rid of the implementation (.c) file. Such modules are of course to be included
-//     in unique and specific place (the main module in general) of application.
-//     NB: example of freeloader can be found in "Flint" project...
-//
-//  "Object oriented" programming in C
-//  ----------------------------------
-// - instances and handles ; data encapsulation (aka the "pure" objects)
-//   + Should only exist object instances !!! (*) (**) that "fundamental" programming
-//     concept - i.e association principle of code and data (so-called "methods" and "attributes")
-//     can be easily implemented in C by means of "instances" and "handles".
-//     . An "instance" is simply an allocation in memory (generally heap) of some data structure.
-//       "Instance" are defined in the private part of modules.   
-//     . A "handle" is nothing but a pointer variable pointing to the "instance". A "handle" is the
-//       only public definition related to data instance. 
-//       The fundamental, and natural, property of "handles" is that multiple "handles" can be
-//       "attached" to one instance (exactly like a luggage may have several handles...)
-//     (*) As usual, that idealistic and holistic vision is a good basic principle, but, the
-//     assumption must sometimes be nuanced if we want to avoid nightmarish confusions and
-//     complications (see below).
+This table shows main cases of correspondence between 'L' and 'P' concepts.
+What must be understood is that the 'P' concepts derived from a given 'L' concept are usually
+very different 'P' concepts. For example, from the point of view of 'P', 'functional macros' have
+little to do with 'pure macros' - and yet both are just ordinary macros of the C preprocessor...
++----------------------------------------------+----------------------------------------------+
+| 'L': preprocessor / compiler                 | 'P': programming layer ("procedural          |
+|                                              | programming" orientation)                    |
++----------------------------------------------+----------------------------------------------+
+| preprocessor macros                          | - constants & functional macros              |
+|                                              | - pure macros                                |
++----------------------------------------------+----------------------------------------------+
+| c-values (basic types)                       | - values (integers & floating points)        |
+|                                              | - statuses (int C type)                      |
+|                                              | - sentinel values                            |
++----------------------------------------------+----------------------------------------------+
+| non void returning c-functions               | - (pure) functions                           |
+|                                              | - procedures                                 |
++----------------------------------------------+----------------------------------------------+
+| void returning c-functions                   | technical routines (1)                       |
++----------------------------------------------+----------------------------------------------+
+| typedef                                      | used as simple alias definition for:         |
+| (2)                                          | - custom function types                      |
+|                                              | - handle types                               |
+|                                              | - basic types aliasing (2)                   |
++----------------------------------------------+----------------------------------------------+
+| enum                                         | - statuses (unary, binary,...)               |
+|                                              | - states representations                     |
+|                                              | - standard values                            |
++----------------------------------------------+----------------------------------------------+
+| struct (union)                               | - private instances                          |
+|                                              | - compound parameters                        |
+|                                              | - description of data formats (3)            |
++----------------------------------------------+----------------------------------------------+
+| pointer (entity on which * operator is       | - address variables                          |
+| applicable) (4)                              |   + single entity address (a_ indicator)     |
+|                                              |   + array address: (s_ indicator)            |
+|                                              | - generic (r_ indicator) parameter           |
+|                                              | - handles                                    |
++----------------------------------------------+----------------------------------------------+
+| logical expressions                          | only boolean typeless VALUES exist - boolean |
+|                                              | "type" MUST NOT be artificially "defined"    |
++----------------------------------------------+----------------------------------------------+
+(1) Like 'P' procedures and functions, 'P' technical routines are code CONTAINERS. But
+    contrary to procedures and functions, technical routines are NOT (directly) CALLABLE.
+(2) Thus, from 'P'rogramming perspective, types abstractions are somewhat more subtle than
+    rudimentary "typedef" constructions - that are actually simple names aliasing (*).
+    By the way, we question the (in)famous "<type name>_t" types naming convention (like size_t,
+    pthread_t, bool_t, etc.) which confines in fact the principle of data abstraction to a
+    simple renomination of type.
+    Extra comment: The motivation at that time was probably a vain attempt to "modernize" C
+    framework vis-a-vis the new programming languages (those offering full-fledged type systems)
+    of the epoch. Hence, the "initiative" was totally clumsy, and by the way largely
+    counter-productive...
+    (*) to emphasize our point of view, 'typedef' is a CARICATURE of type definition ; the point
+    is just to understand and keep in mind the limitations (from 'P' perspective) of that
+    'L'-level mechanism.
+(3) that is representation of "shared" data structures (protocol messages, EDI, etc.).
+    The method imposes STRICT control of data alignment, structure padding and packing in memory.
+    The techniques "of course" exist (#pragma) in C, but generally have very bad impact on
+    process performance, and, above all, are not portable - what is quite paradoxical when your
+    purpose is to represent open specifications...
+    Morality: from our point of view, this technique of data format representation is a "good"
+    example of "false good idea"...  Finally, it's less complicated to rely on "grassroots"
+    methods - those based on explicit offset and data length definitions and manipulations...
+(4) That pointer definition given at L-level is disputable. Fortunately, our P-abstraction
+    let us NOT having to deal with such philosophical (and somewhat vain) questions...
 
 
-// - Instances and Handles (aka the "pure" objects)
-// The foundational programming concept—the close association of code and data (methods and
-//attributes) - can be easily implemented in C using instances and handles, driven by the philosophy that:
-//   "Should only exist object instances !!!"
-//  - Instance: This is simply an allocation of a data structure in memory (typically on the heap).
-Instances are defined strictly within the private section of a module to ensure encapsulation.
-- Handle: This is nothing more than a pointer variable that references the instance. The handle is the
-only public definition exposed to the outside world.A natural and essential property of handles is
-that multiple handles can be attached to a single instance (much like how a single piece of luggage
-can have multiple physical handles).
-// (*): As usual, that purist vision - the tendency to view absolutely everything as an object
-// — is a good basic principle. However, the assumption must sometimes be nuanced if we want to
-// avoid nightmarish confusions and complications.
+Programming main patterns and conventions:
+------------------------------------------
+- "Modular design" : THE (inalienable) principle...
+  Modules (as designation of "code containers" that are source files) remain the FUNDAMENTAL
+  conceptual "units" of software development. That "modular design", although "ancestral", is
+   not obsolete with respect to more recent concepts, such as "class models" developed in
+  so-called "object-oriented" programming... Modules remain the "essence" of preliminary
+  software design (*).
+  "Classes" may only make sense far later, during the "detailed" design process... (**)
+  => Practical convention: one module <mod> exactly corresponds to:
+  - single <mod>.h header file OR
+  - <mod>.h header and <mod>.c source files (most common case) OR
+  - single <mod>.c source file if and only if it implements main() function.
+  (*) "Preliminary" does not just mean "draft" - immediatly forgotten when the "real"
+      developement starts. "Preliminary" really means "fundamental"...
+  (**) Actually, I feel that classes represent an incidental concept - or even an irrelevant
+       one - in software design. It has to do with the confusion between analytical and
+       synthetic thinking (judgement). TODO: cca a l'air passionnant... ag developper!!!... 
 
-//     (**) While a metaphor like hands and fingers might explain the connection between data and
-//     code more intuitively, let's not overcomplicate things. To keep it simple and avoid further
-//     confusion, we will stick to the standard terms: 'objects' and 'methods'."
-//   + Object virtualization. This principle replaces the METHOD virtualization of "classes-based"
-//     programming languages. Advantages:
-//     . easily implementable in simple C
-//     . NO compilation/execution overhead
-//     . does NOT undermine the encapsulation principle
-//     . more accurate "objects" modelling (NO NEED for hazy "inheritance" principle(s)...)
-//     (Drawbacks: NONE)
-//   + Unique instance: also known as "singleton" principle... Emphases that even "global"
-//     instances (that are unique per process) MUST be formalized as regular instances.
-//     (that is referenced via explicit handle)
-//     This ensures respect of clear (instanciation and) initialization / execution / destruction
-//     cycle.
-//   + Pure constructors and destructors. Constructors and destructors are two "special" methods of
-//     our objects; their role is purely "technical" and must be clearly distinguished from
-//     other "functional" methods... Therefore, from a functional point of view, such methods may
-//     not fail. In practice, this means that the C functions which implement constructors and
-//     destructors always return the unary status "RETURNED"; any "technical" problem would give
-//     rise of an ANOMALY...
-//   + Factories: a "factory" instance is meant to create "product" instances.
-//     In most cases, we do not distinguish "factory" with "product" instances as objects; the
-//     "product" instance constructor remains a method of the "product" object. With the factory
-//     paradigm, the "product" constructor just becomes a "functional" method of the "factory"
-//     object. The factory paradigm is usefull to make easier arbitrary objects instance creation
-//     by other objects. That is, the factory mainly provides an "abstraction" of the paramaters
-//     used for the creation of product instances...
-//     Our strong recommandation is to resort to the factory paradigm only when necessary...
-//
-// - Green items and collections:
-//   The green item is an intermediate concept of compound data between the bare struct-based data
-//   (see subjectication and proto-object concepts below) and the encapsulated data (in "object
-//   instance"). Green item concept is thus the first amendment of "everything is object" holistic
-//   vision...
-//   See also c-ansi/green.topo
-//   
-// - Subjectification: Reducing Everything to "me"
-We have already established the two most "noble" archetypes in our architecture: the pure object
-(driven by absolute encapsulation via handles) and the green item (relying on open structural
-definitions via stuff pointers). But what about the remaining, ordinary data structures? Do they
-not deserve structural intent? While these common structures cannot claim the formal status of an
-object, we can - and should - consider them as subjects.
+- C-Ansi / C-Posix split: the sources are splitted between "c-posix" and "c-ansi"
+  sub-directories.
+  Initially, the motivation was practical: such split eases recuperation of modules usable to
+  write stand-alone C-Ansi programs (reminder: pure C-Ansi programs have limitations but offer
+  the great advantage to run almost "anywhere")
+  And even if now C-Ansi programs are less in our "focus", we realized that such a split
+  "inducts" a good separation between pure business logic (code that can be written in Ansi-C)
+  with "technical", low level code (that is "by essence" Posix-C). 
+  NB: final extra, empiric, but real, advantage : this separation lets us directly identifying 
+  our own headers (#include "c-ansi/xxx" and "c-posix/xxx")
 
+- particular APIs:
+  + "kitchen" paradigm: allows to maintain primal simplicity of "enriched" API.
+    Analogy with some (contemporary) restaurants in which clients have an open view inside the
+    kitchen...
+    The public API is split in two levels :
+    . the "lower" level is the "kitchen view" : define the complete API. Like the kitchen of the
+      restaurant, the decoration and the beauty of the place does not really matter; but the
+      neatness of that place must be irreproachable.
+    . the "upper" level is like the "menu of the diner room" : is a simplification of the API,
+      and is focused on most common usages.
+    Example: conditional declarations (#if / #ifdef) quickly make public interfaces difficult to
+    read and should be placed in the "ad hoc" kitchen interface.
+  + "glue" paradigm: dedicated API meant to fix the approximations and inconsistencies of
+    "standards" - that we MUST get along with...
+    Notice: "universal glue" is an ANTI-PATTERN! (we are deeply engaged against "catchall" design
+    syndrom)
+  + "freeloader": a free-loader is a simple "technique" suitable for very light "singleton"
+    modules. It consists to define the functions directly in the header (.h) file so that we
+    formally get rid of the implementation (.c) file. Such modules are of course to be included
+    in unique and specific place (the main module in general) of application.
+    NB: example of freeloader can be found in "Flint" project...
 
+ "Object oriented" programming in C
+ ----------------------------------
+- Instances and Handles (aka the "pure" objects)
+  The foundational programming concept — the close association of code and data (methods and
+  attributes) - can be easily implemented in C using instances and handles, driven by the philosophy that:
+     "Should only exist object instances !!!"
+  + Instance: This is simply an allocation of a data structure in memory (typically on the heap).
+    Instances are defined strictly within the private section of a module to ensure encapsulation.
+  + Handle: This is nothing more than a pointer variable that references the instance. The handle is the
+    only public definition exposed to the outside world.A natural and essential property of handles is
+    that multiple handles can be attached to a single instance (much like how a single piece of luggage
+    can have multiple physical handles).
+  Remarks: 
+  + As usual, that purist vision - the tendency to view absolutely everything as an object - is a good
+    basic principle. However, the assumption must sometimes be nuanced if we want to avoid nightmarish
+    confusions and complications.
+  + While a metaphor like hands and fingers might explain the connection between data and
+    code more intuitively, let's not overcomplicate things. To keep it simple and avoid further
+    confusion, we will stick to the standard terms: 'objects' and 'methods'."
+  Some object derivations:
+  + Object virtualization. This principle replaces the METHOD virtualization of "classes-based"
+    programming languages. Advantages:
+    . easily implementable in simple C
+    . NO compilation/execution overhead
+    . does NOT undermine the encapsulation principle
+    . more accurate "objects" modelling (NO NEED for hazy "inheritance" principle(s)...)
+    (Drawbacks: NONE)
+  + Unique instance: also known as "singleton" principle... Emphases that even "global"
+    instances (that are unique per process) MUST be formalized as regular instances.
+    (that is referenced via explicit handle)
+    This ensures respect of clear (instanciation and) initialization / execution / destruction
+    cycle.
+  + Pure constructors and destructors. Constructors and destructors are two "special" methods of
+    our objects; their role is purely "technical" and must be clearly distinguished from
+    other "functional" methods... Therefore, from a functional point of view, such methods may
+    not fail. In practice, this means that the C functions which implement constructors and
+    destructors always return the unary status "RETURNED"; any "technical" problem would give
+    rise of an ANOMALY...
+  + Factories: a "factory" instance is meant to create "product" instances.
+    In most cases, we do not distinguish "factory" with "product" instances as objects; the
+    "product" instance constructor remains a method of the "product" object. With the factory
+    paradigm, the "product" constructor just becomes a "functional" method of the "factory"
+    object. The factory paradigm is usefull to make easier arbitrary objects instance creation
+    by other objects. That is, the factory mainly provides an "abstraction" of the paramaters
+    used for the creation of product instances...
+    Our strong recommandation is to resort to the factory paradigm only when necessary...
+
+- Green items and collections:
+  The green item is an intermediate concept of compound data between the bare struct-based data
+  (see subjectication and proto-object concepts below) and the encapsulated data (in "pure object
+  instance"). Green item concept is thus the first amendment of "everything is pure object" holistic
+  vision...
+  See also c-ansi/green.topo
+  
+- Subjectification: Reducing Everything to "me"
 We have already discussed the two most structured forms of data–function association:
-
 the pure object, whose representation is hidden behind an opaque handle and can be accessed only through
-its methods; and nthe green item, whose structure is publicly defined but is nevertheless manipulated
+its methods; and the green item, whose structure is publicly defined but is nevertheless manipulated
 through a coherent family of functions.
 What about the remaining data structures - ordinary structures that do not belong to either category? At
 first sight, they may appear to be merely anonymous collections of data, passed as parameters to unrelated
 functions.
-
-
-The Shift from Anonymous Functions to Contextual Design
-Traditionally, functions that manipulate multiple unrelated structures are designed anonymously.
-For instance, a function operating on both a TITI and a TUTU structure might be written without a
-clear anchor:
-/* Anonymous approach: No clear owner or central context */
-int DoSomethingWithTitiAndTutu(Params p, struct TITI *titi, struct TUTU *tutu);
-While functional, this approach lacks syntactic intent. Subjectification is the process of choosing
-a "major" parameter to serve as the conceptual anchor of the function, treating it as though it
-were a pure object or green item for the duration of that operation.
-The "Me" Principle
-By promoting one structure (e.g., TITI) to the role of the subject, we refactor the function to
-enforce a strict, predictable interface pattern: The subject becomes the first parameter of the
-function. The parameter is systematically named me (passed by value or by pointer depending on
-intent). The function name reflects this ownership.
-/* Subjectified approach: TITI becomes the subject ('me') */
-int TitiDoSomethingWithTutu(struct TITI *me, Params p, struct TUTU *tutu);
-Why Subjectify?
-Subjectification brings strict readability and conceptual uniformity to the entire codebase. It
-bridges the gap between raw data structures and formal objects, ensuring that almost every
-multi-parameter function across your application shares a familiar, predictable, and clean entry pattern.
-
-Using "Subject" and "Subjectification" is an excellent and highly original choice.
-In language and grammar, the "Subject" is the entity performing the action, which perfectly matches
-your code design where me acts as the primary actor executing the method.It neatly avoids
-overlapping with crowded OOP terms like "Traits", "Mixins", or "Extensions", making your architectural
-documentation distinct and intuitive.
-
-
-// Subjectification: Reducing Every Operation to "Me"
-We have already discussed the two most structured forms of data–function association:
-
-the pure object, whose representation is hidden behind an opaque handle and can be accessed only through
-its methods; and nthe green item, whose structure is publicly defined but is nevertheless manipulated
-through a coherent family of functions.
-What about the remaining data structures—ordinary structures that do not belong to either category? At
-first sight, they may appear to be merely anonymous collections of data, passed as parameters to unrelated
-functions.
-
 However, these structures can still be given a clearer conceptual role. Whenever a function primarily
 operates on one of its parameters, that parameter may be designated as the function's subject.
-
 For example, instead of writing:
-int DoSomethingWithTitiAndTutu(
-    struct TITI *titi,
-    struct TUTU *tutu,
-    /* other parameters */
-);
+  int DoSomethingWithTitiAndTutu(struct TITI *titi, struct TUTU *tutu,/* other parameters */);
 we may designate titi as the central parameter and write:
-
-int TitiDoSomethingWithTutu(
-    struct TITI *me,
-    struct TUTU *tutu,
-    /* other parameters */
-);
+  int TitiDoSomethingWithTutu(struct TITI *me,struct TUTU *tutu,/* other parameters */);
 The technical difference is minimal: the subject is placed first in the parameter list, following the
 convention already used for object handles and green-item pointers. The more important difference is
 conceptual. The function is presented as an operation performed by or on TITI, rather than as a completely
 general operation involving two unrelated structures.
-
 This practice may be called subjectification: treating an otherwise ordinary data structure as the explicit
 subject of the operations that primarily concern it.
-
 Subjectification does not make the structure an object. It does not imply data encapsulation, private state,
-dynamic dispatch, or any other specifically object-oriented property. It is simply a naming and organization convention that gives the data structure a recognizable relationship with the functions that operate on it.
-
+dynamic dispatch, or any other specifically object-oriented property. It is simply a naming and organization
+convention that gives the data structure a recognizable relationship with the functions that operate on it.
 Thus, the general pattern becomes:
-
-ReturnType TypeDoSomething(
-    struct TYPE *me,
-    /* other parameters */
-);
+  ReturnType TypeDoSomething(struct TYPE *me,/* other parameters */);
 The name 'me' emphasizes that the first parameter is the principal participant in the operation. It provides
 a lightweight, object-like organization for ordinary C data without claiming that the data structure is a
 formal object or a green item.
-
 In this sense, subjectification extends the "everything revolves around me" principle to structures that
 do not qualify for the more distinguished status of object or green item.
 
 
+- Proto-objects: allow to split complex objects into formal objects within one module.
+  Let's reason on plain example. Suppose that when designing CO "complex object" within eponymous
+  module, we identify SO "simple object" as an independent "sub-responsibility" within CO...
+  + If SO usage can be easily generalized (and resuable by other objets) there is no question ;
+    we simply extract SO (of CO module) and design a real SO object (in a dedicated module)...
+  + otherwise, that is, if SO usage is specific to CO (i.e without potential interest out of
+    CO), we can decide keeping SO inside CO module. Then, again, we make a choice: 
+    . We can design SO exactly like a real object (with strict encapsulation of data). However,
+      since SO and CO are defined in the same module, such encapsulation is technically imperfect
+      (i.e we cannot avoid the 2nd object defined in the module to have knowledge and access to
+      all internals of 1st object defined in the same module)...
+    . We design SO formally as an object (instance and "methods"), but we do not care about real
+      encapsulation (in particular, hidding the instance with handles)... "Public" methods of SO
+      (used by CO) can be even made of single macros instead of functions. Technically, SO
+      instance is not encapsulated; all SO's internals are accessible to CO. However, the point
+      is that formally, we do have encapsulation - the responsibilities of CO and SO are clearly
+      separated in the code...
 
+- Proto-objects: a way to decompose a complex object into internally
+  structured, object-like responsibilities within the same module.
 
-// - Proto-objects: allow to split complex objects into formal objects within one module.
-//   Let's reason on plain example. Suppose that when designing CO "complex object" within eponymous
-//   module, we identify SO "simple object" as an independent "sub-responsibility" within CO...
-//   + If SO usage can be easily generalized (and resuable by other objets) there is no question ;
-//     we simply extract SO (of CO module) and design a real SO object (in a dedicated module)...
-//   + otherwise, that is, if SO usage is specific to CO (i.e without potential interest out of
-//     CO), we can decide keeping SO inside CO module. Then, again, we make a choice: 
-//     . We can design SO exactly like a real object (with strict encapsulation of data). However,
-//       since SO and CO are defined in the same module, such encapsulation is technically imperfect
-//       (i.e we cannot avoid the 2nd object defined in the module to have knowledge and access to
-//       all internals of 1st object defined in the same module)...
-//     . We design SO formally as an object (instance and "methods"), but we do not care about real
-//       encapsulation (in particular, hidding the instance with handles)... "Public" methods of SO
-//       (used by CO) can be even made of single macros instead of functions. Technically, SO
-//       instance is not encapsulated; all SO's internals are accessible to CO. However, the point
-//       is that formally, we do have encapsulation - the responsibilities of CO and SO are clearly
-//       separated in the code...
+  Consider a complex object, CO, implemented by the corresponding CO module.
+  During its design, we may identify a simpler component, SO, responsible for
+  a distinct sub-part of CO's behaviour or state.
 
-// - Proto-objects: a way to decompose a complex object into internally
-//   structured, object-like responsibilities within the same module.
-//
-//   Consider a complex object, CO, implemented by the corresponding CO module.
-//   During its design, we may identify a simpler component, SO, responsible for
-//   a distinct sub-part of CO's behaviour or state.
-//
-//   If SO has a sufficiently general purpose and could reasonably be reused by
-//   other objects or modules, the appropriate solution is straightforward:
-//   extract it from the CO module and implement it as a proper, independent SO
-//   object in its own module.
-//
-//   The more interesting case is when SO is meaningful only as part of CO. Its
-//   responsibilities are real and distinct, but it has no useful existence
-//   outside CO. In that case, keeping SO inside the CO module is usually the
-//   right design. SO may then be treated as a proto-object.
-//
-//   A proto-object is an internal, object-like component: it has its own data
-//   structure and its own set of operations, but it is not intended to provide
-//   an independently usable public abstraction.
-//
-//   Two implementation styles are possible:
-//
-//   + Strict internal-object style
-//
-//     SO may be designed exactly as a proper object, with an opaque instance
-//     representation and a family of SO operations. This can still improve the
-//     local organization of the module.
-//
-//     However, encapsulation is only partial in practice. Since CO and SO are
-//     implemented in the same module, the CO implementation necessarily has
-//     access to SO's private representation. The module boundary protects SO
-//     from external users, but it cannot protect SO from its containing object.
-//
-//   + Lightweight, subjectified style
-//
-//     Alternatively, SO may be represented by an ordinary visible structure,
-//     with operations conventionally organized around it. For example:
-//
-//         int SoInitialize(struct SO *me, ...);
-//         int SoDoSomething(struct SO *me, ...);
-//
-//     In this form, SO is not a pure object: its data need not be hidden behind
-//     a handle, and its operations may even be implemented as macros or inline
-//     helpers rather than ordinary functions.
-//
-//     Nevertheless, SO remains formally separated from CO. Its state belongs
-//     to the SO structure, and the code manipulating that state is expressed as
-//     operations whose principal subject is SO -- conventionally the first
-//     parameter, named `me`.
-//
-//   Proto-objects can therefore be understood as subjectified internal data
-//   structures. They do not necessarily provide strict encapsulation, nor do
-//   they claim the status of independent objects. Their purpose is instead to
-//   make internal responsibilities explicit: CO remains the public object,
-//   while SO is a clearly identified internal subject with its own data and
-//   operations.
-//
-//   The benefit is primarily architectural clarity. Even where strict data
-//   hiding is neither possible nor useful, separating CO and SO responsibilities
-//   prevents the implementation of a complex object from becoming a single
-//   undifferentiated body of data and procedures.
+  If SO has a sufficiently general purpose and could reasonably be reused by
+  other objects or modules, the appropriate solution is straightforward:
+  extract it from the CO module and implement it as a proper, independent SO
+  object in its own module.
+
+  The more interesting case is when SO is meaningful only as part of CO. Its
+  responsibilities are real and distinct, but it has no useful existence
+  outside CO. In that case, keeping SO inside the CO module is usually the
+  right design. SO may then be treated as a proto-object.
+
+  A proto-object is an internal, object-like component: it has its own data
+  structure and its own set of operations, but it is not intended to provide
+  an independently usable public abstraction.
+
+  Two implementation styles are possible:
+  + Strict internal-object style
+    SO may be designed exactly as a proper object, with an opaque instance
+    representation and a family of SO operations. This can still improve the
+    local organization of the module.
+    However, encapsulation is only partial in practice. Since CO and SO are
+    implemented in the same module, the CO implementation necessarily has
+    access to SO's private representation. The module boundary protects SO
+    from external users, but it cannot protect SO from its containing object.
+  + Lightweight, subjectified style
+    Alternatively, SO may be represented by an ordinary visible structure,
+    with operations conventionally organized around it. For example:
+        int SoInitialize(struct SO *me, ...);
+        int SoDoSomething(struct SO *me, ...);
+    In this form, SO is not a pure object: its data need not be hidden behind
+    a handle, and its operations may even be implemented as macros or inline
+    helpers rather than ordinary functions.
+    Nevertheless, SO remains formally separated from CO. Its state belongs
+    to the SO structure, and the code manipulating that state is expressed as
+    operations whose principal subject is SO -- conventionally the first
+    parameter, named `me`.
+
+  Proto-objects can therefore be understood as subjectified internal data
+  structures. They do not necessarily provide strict encapsulation, nor do
+  they claim the status of independent objects. Their purpose is instead to
+  make internal responsibilities explicit: CO remains the public object,
+  while SO is a clearly identified internal subject with its own data and
+  operations.
+
+  The benefit is primarily architectural clarity. Even where strict data
+  hiding is neither possible nor useful, separating CO and SO responsibilities
+  prevents the implementation of a complex object from becoming a single
+  undifferentiated body of data and procedures.
 
 
 Proto-Objects: Intra-Module SubjectificationBefore formalizing the concept of subjectification,
@@ -448,52 +359,50 @@ Proto-ObjectInherited (Matches Parent)Public to Module / MeTransparent: Moves se
 
 
 
-//
-// - Data logical value type vs. data physical content type
-//   Idea: The very simple concept of "data type" is not always an accurate concept...
-//   A distinction must be made between
-//   + the physical composition (or constitution) of the data (its "materialization" in memory) on
-//     one hand,
-//   + the logical value that this data represents (in the program), on the other hand
-//   In computing, we usually define 'types', which are abstractions that allow all sorts of
-//   entities to be associated with each other.
-//   When, in simple cases, we can confuse the physical composition with the logical value of the
-//   data, defining "data types" makes sense.
-//   However, in the 'general' case (for example, when working with databases (*) ), it is no longer
-//   possible to confuse the two aspects (physical and logical) of data. As a result, the very
-//   notion of 'data type' is is effectively meaningless. However, if we make a clear distinction
-//   between the physical composition of a piece of data and its logical value, it makes perfect
-//   sense to be interested in the types of its physical composition on the one hand and its logical
-//   value on the other. 
-//   Thus, two pieces of data d1 and d2 are perfectly - and simply - comparable, provided that their
-//   logical value is of the same type (e.g. a "date") regardless of their physical composition
-//   types, which may be totally different (e.g. "ASCII" and "BINARY").
-//   (*) It is therefore very regrettable that in most database operating languages (SQL in
-//   particular), the 'dual' nature (logical and physical) of all data is overlooked to such an
-//   extent! 
-//
-// - General tips for achieving a roughly acceptable programming quality:
-//   + Empty program model: A simple "trick" to keep in mind to refrain from writing too much
-//     "crap"...
-//     The pure and perfect program exists. It is still unique but universal. This is of course the
-//     "empty" program - without a single line of code. Obviously its practical usefulness is very
-//     limited... To give it a use, we common programmers know no other way than to spoil this
-//     perfect program with our rotten lines of code...
-//   + Have good usage of binary statutes in C-programs (see also c-verities.topo, section "Why do
-//     guys so often harass girls ???") to avoid the following undesirable behaviours :
-//     . Hanging programms (with resource grabbing as major "side effect") may be simple consequence
-//       of a bad re-interpration of 'yes'/'no way' (girl verity perception) binary status as a
-//       'success'/'try again' (guy verity perception). 
-//     . Unexpected crashes may a contrario results of a wrong re-interpreation of 'success'/'try
-//       again' binary status as 'yes'/'no way' (shy people verity perception).
-//       Note: in many applications, there is a often mix of the two confusions....
-//     . Inefficient programs (senile "assitants", etc.)  may be caused by abusive re-interpretation
-//       of 'ok'/'ok, but' binary status into unary 'ok' status (like the European Union, with his
-//       habit of proudly presenting a total FAILURE to reach agreement as a SUCCESS of plenary
-//       agreement - "We unanimously all agreed... that we agree on nothing...")
-//    + More generally, avoid the pitfall of excessive dualisation of the truth. In particular, take 
-//      the time to consider the unary and ternary verities, which are most relevant in many 
-//      situations. (see also c-verities.topo, section 'Verities in computing')
+- Data logical value type vs. data physical content type
+  Idea: The very simple concept of "data type" is not always an accurate concept...
+  A distinction must be made between
+  + the physical composition (or constitution) of the data (its "materialization" in memory) on
+    one hand,
+  + the logical value that this data represents (in the program), on the other hand
+  In computing, we usually define 'types', which are abstractions that allow all sorts of
+  entities to be associated with each other.
+  When, in simple cases, we can confuse the physical composition with the logical value of the
+  data, defining "data types" makes sense.
+  However, in the 'general' case (for example, when working with databases (*) ), it is no longer
+  possible to confuse the two aspects (physical and logical) of data. As a result, the very
+  notion of 'data type' is is effectively meaningless. However, if we make a clear distinction
+  between the physical composition of a piece of data and its logical value, it makes perfect
+  sense to be interested in the types of its physical composition on the one hand and its logical
+  value on the other. 
+  Thus, two pieces of data d1 and d2 are perfectly - and simply - comparable, provided that their
+  logical value is of the same type (e.g. a "date") regardless of their physical composition
+  types, which may be totally different (e.g. "ASCII" and "BINARY").
+  (*) It is therefore very regrettable that in most database operating languages (SQL in
+  particular), the 'dual' nature (logical and physical) of all data is overlooked to such an
+  extent! 
 
+- General tips for achieving a roughly acceptable programming quality:
+  + Empty program model: A simple "trick" to keep in mind to refrain from writing too much
+    "crap"...
+    The pure and perfect program exists. It is still unique but universal. This is of course the
+    "empty" program - without a single line of code. Obviously its practical usefulness is very
+    limited... To give it a use, we common programmers know no other way than to spoil this
+    perfect program with our rotten lines of code...
+  + Have good usage of binary statutes in C-programs (see also c-verities.topo, section "Why do
+    guys so often harass girls ???") to avoid the following undesirable behaviours :
+    . Hanging programms (with resource grabbing as major "side effect") may be simple consequence
+      of a bad re-interpration of 'yes'/'no way' (girl verity perception) binary status as a
+      'success'/'try again' (guy verity perception). 
+    . Unexpected crashes may a contrario results of a wrong re-interpreation of 'success'/'try
+      again' binary status as 'yes'/'no way' (shy people verity perception).
+      Note: in many applications, there is a often mix of the two confusions....
+    . Inefficient programs (senile "assitants", etc.)  may be caused by abusive re-interpretation
+      of 'ok'/'ok, but' binary status into unary 'ok' status (like the European Union, with his
+      habit of proudly presenting a total FAILURE to reach agreement as a SUCCESS of plenary
+      agreement - "We unanimously all agreed... that we agree on nothing...")
+   + More generally, avoid the pitfall of excessive dualisation of the truth. In particular, take 
+     the time to consider the unary and ternary verities, which are most relevant in many 
+     situations. (see also c-verities.topo, section 'Verities in computing')
 
-
+#endif
