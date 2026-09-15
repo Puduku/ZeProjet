@@ -39,11 +39,6 @@ struct G_STRING { // #REF struct-G_STRING
 typedef struct G_STRING *G_STRING_STUFF;
 
 
-// Get g-string's "logical" string. 
-static inline struct P_STRING m_GStringGetLogicalPString(G_STRING_STUFF stuff) {
-  return stuff->cv_pString; 
-} // m_GStringGetLogicalPString 
-
 // #REF GStringCopy
 // Copy (or concatenate...) a string portion into a g-string.
 // ATTENTION: source and destination MAY NOT overlap
@@ -73,8 +68,7 @@ int GStringCopy(G_STRING_STUFF stuff, int n_offset, struct P_STRING pString);
 // See GStringCopy() above
 static inline int m_GStringGCopy(G_STRING_STUFF stuff, int n_offset, G_STRING_STUFF p_gStringStuff) {
   m_DIGGY_BOLLARD()
-  struct P_STRING pString =  m_GStringGetLogicalPString(p_gStringStuff);
-  m_DIGGY_RETURN(GStringCopy(stuff,n_offset,pString))
+  m_DIGGY_RETURN(GStringCopy(stuff,n_offset,p_gStringStuff->cv_pString))
 } // m_GStringGCopy
 
 
@@ -414,7 +408,7 @@ static inline struct GS_KEY om_GsKey4(void* nr_acolytHandle) {\
 //   (see GStringsAddIndex() above) 
 // - ... (variadic parameters) : search key(s) value(s) for other criteria...  
 int GStringsIndexRequest(G_STRINGS_HANDLE cp_handle,
-  char* nf_indexRequestAutomaticBuffer, int criteriaCount, int indexLabel1,
+  char* nf_indexRequestAutomaticBuffer, int criterionCount, int indexLabel1,
   unsigned int indexSeekFlags1, const struct GS_KEY *cps_gKeys1, ...);
 
 

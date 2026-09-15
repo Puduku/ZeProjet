@@ -129,9 +129,12 @@ static char* o_IndexFetchGetGKeysBuffer(char *me, int criterionCountMax) {
 // 
 // Ret: index fetch buffer size
 static int o_IndexFetchBufferSize(int criterionCountMax, int n_gKeySize, int gKeyCountMax) {
-  return  sizeof(struct INDEX_FETCH_HEADER) + o_IndexSequenceSize() +
-    sizeof(struct G_REQUEST_CRITERION)*criterionCountMax + n_gKeySize >= 0?
-    n_gKeySize* gKeyCountMax* criterionCountMax: 0;
+  m_DIGGY_BOLLARD_S()
+m_DIGGY_INFO("criterionCountMax=%d n_gKeySize=%d gKeyCountMax=%d",
+criterionCountMax,n_gKeySize,gKeyCountMax)
+  m_DIGGY_RETURN(sizeof(struct INDEX_FETCH_HEADER) + o_IndexSequenceSize() +
+    sizeof(struct G_REQUEST_CRITERION)*criterionCountMax + (n_gKeySize >= 0?
+    n_gKeySize* gKeyCountMax* criterionCountMax: 0))
 } // o_IndexFetchBufferSize
 
 // Passed:
@@ -665,9 +668,11 @@ int GreenCollectionClear (GREEN_COLLECTION_HANDLE handle) {
 // - COMPLETED__BUT:
 static int o_GreenCollectionSetIndexFetchBufferSize(GREEN_COLLECTION_HANDLE cp_handle) {
   m_DIGGY_BOLLARD()
+m_DIGGY_VAR_D(cp_handle->n_indexFetchBufferSize)
   if (cp_handle->n_indexFetchBufferSize >= 0) m_DIGGY_RETURN(COMPLETED__BUT)
   cp_handle->n_indexFetchBufferSize = o_IndexFetchBufferSize(cp_handle->gRequestCriterionCountMax,
     cp_handle->n_gKeySize, cp_handle->gKeyCountMax);
+m_DIGGY_VAR_D(cp_handle->n_indexFetchBufferSize)
   m_DIGGY_RETURN(COMPLETED__OK)
 } // o_GreenCollectionSetIndexFetchBufferSize
 
@@ -693,6 +698,7 @@ int GreenCollectionAddIndex (GREEN_COLLECTION_HANDLE handle, int gKeyCount,
   if (handle->gKeyCountMax < gKeyCount) handle->gKeyCountMax = gKeyCount;
   if (na_indexFetchBufferSize != NULL) {
     m_ASSERT(o_GreenCollectionSetIndexFetchBufferSize(handle) == COMPLETED__OK)
+m_DIGGY_VAR_D(handle->n_indexFetchBufferSize)
     *na_indexFetchBufferSize = handle->n_indexFetchBufferSize;
   } // if
 
@@ -710,6 +716,7 @@ int GreenCollectionIndexRequestRNew(GREEN_COLLECTION_HANDLE cp_handle,
   if (indexFetchBuffer == NULL) {
     if (cp_handle->nh_indexFetchInternalBuffer == NULL) {
       o_GreenCollectionSetIndexFetchBufferSize(cp_handle);
+m_DIGGY_VAR_D(cp_handle->n_indexFetchBufferSize)
       m_MALLOC(cp_handle->nh_indexFetchInternalBuffer, cp_handle->n_indexFetchBufferSize)
     } // if 
     indexFetchBuffer = cp_handle->nh_indexFetchInternalBuffer;
@@ -747,31 +754,31 @@ int GreenCollectionIndexRequestRAddCriterion(GREEN_COLLECTION_HANDLE cp_handle,
 
 // Public function; see description in .h
 int GreenCollectionIndexRequestV(GREEN_COLLECTION_HANDLE cp_handle,
-  char* nf_indexFetchAutomaticBuffer, int criteriaCount, int indexLabel1,
+  char* nf_indexFetchAutomaticBuffer, int criterionCount, int indexLabel1,
   unsigned int indexSeekFlags1, void *cr_gKeys1, va_list extraCriteria) {
   m_DIGGY_BOLLARD()
 
-  m_ASSERT(criteriaCount > 0)
+  m_ASSERT(criterionCount > 0)
 
   m_TRACK_IF(GreenCollectionIndexRequestRNew(cp_handle,nf_indexFetchAutomaticBuffer) != 
     RETURNED)
 
   unsigned int criteriaOpFlags = ALL_FLAGS_OFF0;
-  if (criteriaCount > 1) criteriaOpFlags = va_arg(extraCriteria,unsigned int);
+  if (criterionCount > 1) criteriaOpFlags = va_arg(extraCriteria,unsigned int);
   int completed = GreenCollectionIndexRequestRAddCriterion(cp_handle,
     nf_indexFetchAutomaticBuffer,
     om_GRequestCriterion(indexLabel1,indexSeekFlags1,cr_gKeys1, criteriaOpFlags),
-    criteriaCount == 1); 
+    criterionCount == 1); 
   switch (completed) { 
   case COMPLETED__OK:
   break; case COMPLETED__BUT:
     completed = COMPLETED__BUT;
   break; default: m_TRACK() } // switch
 
-  int i = 1; for (; i < criteriaCount;  i++) {
+  int i = 1; for (; i < criterionCount;  i++) {
     switch (GreenCollectionIndexRequestRAddCriterion(cp_handle,nf_indexFetchAutomaticBuffer,
       om_GRequestCriterion(va_arg(extraCriteria,int), va_arg(extraCriteria,unsigned int),
-    va_arg(extraCriteria,char *), va_arg(extraCriteria,unsigned int)),criteriaCount == i+1)) {
+    va_arg(extraCriteria,char *), va_arg(extraCriteria,unsigned int)),criterionCount == i+1)) {
     case COMPLETED__OK:
     break; case COMPLETED__BUT:
       completed = COMPLETED__BUT;
@@ -783,7 +790,7 @@ int GreenCollectionIndexRequestV(GREEN_COLLECTION_HANDLE cp_handle,
 
 // Public function; see description in .h
 int GreenCollectionIndexRequest(GREEN_COLLECTION_HANDLE cp_handle,
-  char* nf_indexFetchHeaderAutomaticBuffer, int criteriaCount, int indexLabel1,
+  char* nf_indexFetchHeaderAutomaticBuffer, int criterionCount, int indexLabel1,
   unsigned int indexSeekFlags1, void *cr_gKeys1, ...) {
   m_DIGGY_BOLLARD()
 m_DIGGY_VAR_INDEX_SEEK_FLAGS(indexSeekFlags1)
@@ -791,7 +798,7 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(indexSeekFlags1)
   va_start(extraCriteria,cr_gKeys1);
 
   int completed = GreenCollectionIndexRequestV(cp_handle,nf_indexFetchHeaderAutomaticBuffer,
-    criteriaCount,indexLabel1,indexSeekFlags1,cr_gKeys1,extraCriteria);
+    criterionCount,indexLabel1,indexSeekFlags1,cr_gKeys1,extraCriteria);
   switch (completed) {
   case COMPLETED__OK:
   break; case COMPLETED__BUT:
@@ -812,8 +819,8 @@ int GreenCollectionIndexFetch(GREEN_COLLECTION_HANDLE cp_handle,
   //m_TRACK_IF(GreenCollectionRefreshIndexesInternal(cp_handle,b_TRUE) != RETURNED)
 m_DIGGY_VAR_INDEX_FETCH_FLAGS(indexFetchFlags)
 
-  char *indexFetchBuffer = nf_indexFetchAutomaticBuffer != NULL? nf_indexFetchAutomaticBuffer:
-    cp_handle->nh_indexFetchInternalBuffer;
+  char *indexFetchBuffer = (nf_indexFetchAutomaticBuffer != NULL? nf_indexFetchAutomaticBuffer:
+    cp_handle->nh_indexFetchInternalBuffer);
   m_ASSERT(indexFetchBuffer != NULL)
 
   if (b_FLAGS_ON(indexFetchFlags,INDEX_FETCH_FLAG__RESET)) {

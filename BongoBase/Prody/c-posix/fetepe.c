@@ -1103,7 +1103,7 @@ static int FetepeNListDir (FETEPE_HANDLE handle, const char *p_cmd, const char *
     } // switch
 
     m_TRACK_IF(GreenCollectionClear(handle->data.h_lsLines) != RETURNED)
-    m_TRACK_IF(ParseAsciiLines(m_GStringGetLogicalPString(handle->data.h_lsOutput), -1,NULL,
+    m_TRACK_IF(ParseAsciiLines(handle->data.h_lsOutput->cv_pString, -1,NULL,
       handle->data.h_lsLines) < 0)
     int count = LINE_DELIMITERS_GET_COUNT(handle->data.h_lsLines,NULL);
     m_TRACK_IF(count < 0)

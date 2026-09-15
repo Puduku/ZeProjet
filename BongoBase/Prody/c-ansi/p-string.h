@@ -13,12 +13,7 @@
 #include "c-ansi/alloc.h"
 #include "flint/flags.h"
 
-// SEE ALSO c-flaws.topo, Number -1 
-// The very first aim of the module is to propose to stick once and for all to that CONVENTION.
-// By #including that "module", you tacitly admit the following CONVENTION:
-// #REF Buffer-size-NEVER-zero
-// => CONVENTION <= : the size of a string buffer CANNOT be equal to 0.
-//    ==========
+// PURPOSE: SEE c-flaws.topo, Number -1 
 
 // #REF GOOD_OLD_EMPTY_C_STRING 
 // good old empty C string
@@ -36,7 +31,7 @@ struct P_STRING { // #REF struct-P_STRING
 } ;
 
 // #REF Stop-means-stop
-// stop pointer indicates 1st unsafe position ; depointing such address means possibility of SEGV. 
+// stop pointer indicates 1st unsafe position ; depointing such address is INVALID. 
 // That restriction is particulary important with empty string (stop === start)...
 // Of course, when the string portion is '\0'-terminated (C-string), we can "safely" depoint stop 
 // position (which must correspond to good old '\0' char...)  
@@ -228,6 +223,9 @@ int VerifyCPString(struct P_STRING *a_pString);
 
 // Copy string portions 
 // --------------------
+
+// => CONVENTION <= : the size of a string buffer used for copy CANNOT be equal to 0.
+//    ==========
 
 // Establish the optimal size for destination string buffer in string copy operation. 
 // 

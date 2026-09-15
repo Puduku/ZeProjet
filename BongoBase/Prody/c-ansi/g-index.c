@@ -40,8 +40,7 @@ struct INDEX_SEQUENCE {
 } ;
 
 // Public function; see .h
-int o_IndexSequenceNew(char *meBuffer) {
-  m_DIGGY_BOLLARD()
+int o_IndexSequenceNew(char *meBuffer) { m_DIGGY_BOLLARD()
   struct INDEX_SEQUENCE* mePtr = (struct INDEX_SEQUENCE*) meBuffer;
   mePtr->indexEntryBlockCount2 = 0;
   m_DIGGY_RETURN(RETURNED)
@@ -49,8 +48,7 @@ int o_IndexSequenceNew(char *meBuffer) {
 
 
 // Public function; see .h
-int o_IndexSequenceSize(void) {
-  m_DIGGY_BOLLARD()
+int o_IndexSequenceSize(void) { m_DIGGY_BOLLARD()
   m_DIGGY_RETURN(sizeof(struct INDEX_SEQUENCE))
 } // o_IndexSequenceSize
 
@@ -97,8 +95,7 @@ struct G_INDEX {
 // - -1: anomaly is raised
 static inline int m_GIndexInit(struct G_INDEX* az_me, int itemsPhysicalNumber,
   ENTRY_COMPARE_FUNCTION entryCompareFunction, void* r_entryFunctionsHandle,
-  int indexLabel) {
-  m_DIGGY_BOLLARD_S()
+  int indexLabel) { m_DIGGY_BOLLARD_S()
   m_MALLOC_ARRAY(az_me->hsc_array,itemsPhysicalNumber)
   az_me->count = 0;
   az_me->entryCompareFunction = entryCompareFunction;
@@ -114,8 +111,7 @@ static inline int m_GIndexInit(struct G_INDEX* az_me, int itemsPhysicalNumber,
 // 
 // Ret:
 // - RETURNED: Ok
-static inline int om_GIndexRemove(struct G_INDEX* a_me, int indexEntry) {
-  m_DIGGY_BOLLARD_S()
+static inline int om_GIndexRemove(struct G_INDEX* a_me, int indexEntry) { m_DIGGY_BOLLARD_S()
   memmove(a_me->hsc_array + indexEntry,  a_me->hsc_array + indexEntry + 1,
     sizeof(int) * ((a_me->count -= 1) - indexEntry));
   m_DIGGY_RETURN(RETURNED) 
@@ -142,8 +138,7 @@ static inline int om_GIndexAdd(struct G_INDEX* a_me, int newIndexEntry, int newE
 // 
 // Ret:
 // - RETURNED: Ok
-static inline int om_GIndexClear(struct G_INDEX* a_me) {
-  m_DIGGY_BOLLARD_S()
+static inline int om_GIndexClear(struct G_INDEX* a_me) { m_DIGGY_BOLLARD_S()
   (a_me)->count = 0 ;
   m_DIGGY_RETURN(RETURNED) 
 } // om_GIndexClear
@@ -153,8 +148,7 @@ static inline int om_GIndexClear(struct G_INDEX* a_me) {
 //
 // Ret:
 // number of "active" index entries
-static inline int om_GIndexGetCount(struct G_INDEX* a_me) {
-  m_DIGGY_BOLLARD_S()
+static inline int om_GIndexGetCount(struct G_INDEX* a_me) { m_DIGGY_BOLLARD_S()
   m_DIGGY_RETURN((a_me)->count)
 } // om_GIndexGetCount
 
@@ -217,8 +211,7 @@ static int GIndexCompare(struct G_INDEX* a_me, int aIndexEntry, int n_bEntry, vo
 // - RETURNED
 // - -1: anomaly is raised
 static int GIndexBSearch(struct G_INDEX *a_me, int n_bEntry, void *cr_bGKeys, int *an_indexEntry,
-  int *a_top, struct INDEX_ENTRY_BLOCK *cac_indexEntries) {
-  m_DIGGY_BOLLARD_S()
+  int *a_top, struct INDEX_ENTRY_BLOCK *cac_indexEntries) { m_DIGGY_BOLLARD_S()
   int comparison = UNDEFINED;
   int i = UNDEFINED;
 
@@ -393,8 +386,7 @@ static inline int m_GIndexSequenceCurrent(struct G_INDEX* a_me,
 // - RETURNED: Ok
 // - -1: anomaly is raised
 static inline int m_GIndexSequenceNext(struct G_INDEX* a_me, char b_descending,
-  struct INDEX_SEQUENCE *a_indexSequence, int *an_entry) {
-  m_DIGGY_BOLLARD_S()
+  struct INDEX_SEQUENCE *a_indexSequence, int *an_entry) { m_DIGGY_BOLLARD_S()
   *an_entry = -1; // "disabled" / "No more" a priori
   if (a_indexSequence->indexEntryBlockCount2 > 0) { // "enabled"
     if (b_descending) {
@@ -445,8 +437,7 @@ static inline int m_GIndexSequenceNext(struct G_INDEX* a_me, char b_descending,
 // - COMPLETED__OK:
 // - COMPLETED__BUT: index is corrupted
 // - -1: anomaly is raised
-static int GIndexVerify(struct G_INDEX *a_me) {
-  m_DIGGY_BOLLARD_S()
+static int GIndexVerify(struct G_INDEX *a_me) { m_DIGGY_BOLLARD_S()
   int comparison = UNDEFINED;
 
 #ifdef DIGGY
@@ -506,8 +497,7 @@ static int GIndexVerifyEntry(struct G_INDEX *a_me, int entry, int expectedHits) 
 // 
 // Ret:
 // - RETURNED: Ok
-static inline int om_GIndexFree(struct G_INDEX* ax_me) {
-  m_DIGGY_BOLLARD_S()
+static inline int om_GIndexFree(struct G_INDEX* ax_me) { m_DIGGY_BOLLARD_S()
   free(ax_me->hsc_array);
   m_DIGGY_RETURN(RETURNED)
 } // om_GIndexFree
@@ -586,8 +576,7 @@ static inline int g_GRequestCriteriaRectifyOpFlags(struct G_REQUEST_CRITERION *s
 
 // Public function; see .h
 int GRequestCriteriaAdd(struct G_REQUEST_CRITERION *s_me, int meCountMax, int *a_meCount,
-  struct G_REQUEST_CRITERION criterion, char b_lastCriterion) {
-  m_DIGGY_BOLLARD()
+  struct G_REQUEST_CRITERION criterion, char b_lastCriterion) { m_DIGGY_BOLLARD()
 
   m_ARRAY_ADD_ITEM(s_me, meCountMax, *a_meCount, criterion)
 
@@ -623,8 +612,7 @@ m_STRUCT_C_STACK(GC_EVALUATOR,char)
 //
 // Ret:
 // - RETURNED
-static inline int m_GcEvaluatorReset(struct GC_EVALUATOR* a_me) {
-  m_DIGGY_BOLLARD_S()
+static inline int m_GcEvaluatorReset(struct GC_EVALUATOR* a_me) { m_DIGGY_BOLLARD_S()
   m_C_STACK_CLEAR(*a_me)
   m_C_STACK_PUSH(*a_me,'U'); 
   m_DIGGY_RETURN(RETURNED)
@@ -661,14 +649,13 @@ static inline int m_GcEvaluatorDepth(const struct GC_EVALUATOR* ap_me, int minDe
 // - RETURNED: Ok
 // - -1: unexpected problem; anomaly is raised
 static inline int m_GcEvaluatorIterate(struct GC_EVALUATOR* a_me, signed char nb_passed,
-  int criteriaOpFlags, char *ab_boost) {
-  m_DIGGY_BOLLARD_S()
+  int criteriaOpFlags, char *ab_boost) { m_DIGGY_BOLLARD_S()
   int openBracketCount = om_CriteriaOpFlagsOpenBracketCount(criteriaOpFlags);
   int i = 0; for (; i < openBracketCount; i++) {
     m_C_STACK_PUSH(*a_me,'U')
   } // for
-
   char status; m_C_STACK_PEEK(*a_me,status);
+m_DIGGY_INFO("nb_passed=%d openBracketCount=%d i=%d status=%c",nb_passed,openBracketCount,i,status)
   int closeBracketCount = om_CriteriaOpFlagsCloseBracketCount(criteriaOpFlags);
   *ab_boost = b_FALSE0; // No boost a priori
 
@@ -679,15 +666,17 @@ static inline int m_GcEvaluatorIterate(struct GC_EVALUATOR* a_me, signed char nb
     char termStatus  = status; // a priori
     switch (status) {
     case 'U':
-    case 'V':
+    case 'O': // OR expression
+    case 'A': // AND expression
+      m_ASSERT(nb_passed >= 0)
+      termStatus = (nb_passed? 'V': 'X');
+    break; case 'V':
     case 'X':
-    break; case 'O': // OR expression
-      termStatus = 'X';
-    break; case 'A': // AND expression
-      termStatus = 'V';
     break; default: m_RAISE(ANOMALY__VALUE__D,status)
     } // switch 
+m_DIGGY_VAR_GEN(termStatus,c)
     m_ASSERT(termStatus == 'V' || termStatus == 'X')
+    m_C_STACK_POKE(*a_me,termStatus);
     for (i = 0; i < closeBracketCount; i++) {
       m_C_STACK_POP(*a_me,status);
       m_TRACK_IF(m_GcEvaluatorDepth(a_me,0) < 0)
@@ -703,6 +692,7 @@ static inline int m_GcEvaluatorIterate(struct GC_EVALUATOR* a_me, signed char nb
       break; default: m_RAISE(ANOMALY__VALUE__D,status)
       } // switch 
       m_ASSERT(termStatus == 'V' || termStatus == 'X')
+m_DIGGY_VAR_GEN(termStatus,c)
       m_C_STACK_POKE(*a_me,termStatus)
     } // for
 
@@ -727,6 +717,7 @@ static inline int m_GcEvaluatorIterate(struct GC_EVALUATOR* a_me, signed char nb
     case 'X':
     break; default: m_RAISE(ANOMALY__VALUE__D,status)
     } // switch 
+m_DIGGY_VAR_GEN(status,c)
     m_C_STACK_POKE(*a_me,status)
   } // if
 
@@ -763,8 +754,7 @@ int GIndexesCreateInstance(G_INDEXES_HANDLE *azh_handle,
 
 // ENTRY_COMPARE_FUNCTION
 static int GIndexesEntryCompare (void *r_handle, int indexLabel, int aEntry, int n_bEntry,
-  void *cr_bGKeys) {
-  m_DIGGY_BOLLARD_S()
+  void *cr_bGKeys) { m_DIGGY_BOLLARD_S()
   G_INDEXES_HANDLE handle = (G_INDEXES_HANDLE)r_handle;  
   int comparison = UNDEFINED;
   m_ASSERT(indexLabel < handle->indexesNumber) 
@@ -790,8 +780,7 @@ int GIndexesAddIndex(G_INDEXES_HANDLE handle, int itemsPhysicalNumber, int gKeyC
 } // GIndexesAddIndex
 
 // Public function; see .h
-int GIndexesResize (G_INDEXES_HANDLE handle, int newItemsPhysicalNumber) {
-  m_DIGGY_BOLLARD_S()
+int GIndexesResize (G_INDEXES_HANDLE handle, int newItemsPhysicalNumber) { m_DIGGY_BOLLARD_S()
   int i = 0;
   struct G_INDEX *cs_index = handle->vnhs_indexes;
   for ( ; i < handle->indexesNumber ; i++, cs_index++) {
@@ -802,8 +791,7 @@ int GIndexesResize (G_INDEXES_HANDLE handle, int newItemsPhysicalNumber) {
 } // GIndexesResize
 
 // Public function; see .h
-int GIndexesRemove(G_INDEXES_HANDLE handle, int entry) {
-  m_DIGGY_BOLLARD()
+int GIndexesRemove(G_INDEXES_HANDLE handle, int entry) { m_DIGGY_BOLLARD()
   int n_indexEntry = UNDEFINED, top = UNDEFINED;
   int i = 0;
   struct G_INDEX *s_index = handle->vnhs_indexes;
@@ -818,8 +806,7 @@ int GIndexesRemove(G_INDEXES_HANDLE handle, int entry) {
  } // GIndexesRemove
 
 // Public function; see .h
-int GIndexesAdd(G_INDEXES_HANDLE handle, int entry) {
-  m_DIGGY_BOLLARD()
+int GIndexesAdd(G_INDEXES_HANDLE handle, int entry) { m_DIGGY_BOLLARD()
   int n_indexEntry = UNDEFINED, top = UNDEFINED;
   int i = 0;
   struct G_INDEX *s_index = handle->vnhs_indexes;
@@ -874,8 +861,7 @@ static inline int m_GIndexesEntryEquate(G_INDEXES_HANDLE handle, int indexLabel,
 //   + ANSWER__NO : "A" item and "B" key(s) are NOT similar 
 // - -1: unexpected problem; anomaly is raised
 static int GIndexesSeekEntryEquate(G_INDEXES_HANDLE handle, int indexLabel, int aEntry,
-  unsigned int indexSeekFlags, void *r_bGKeys) {
-  m_DIGGY_BOLLARD_S()
+  unsigned int indexSeekFlags, void *r_bGKeys) { m_DIGGY_BOLLARD_S()
   if (indexSeekFlags == INDEX_SEEK_FLAGS__ANY) return ANSWER__YES;
 
   int answer = ANSWER__NO; // a priori
@@ -910,8 +896,7 @@ static int GIndexesSeekEntryEquate(G_INDEXES_HANDLE handle, int indexLabel, int 
 // Public function; see .h
 int GIndexesSequenceReset(G_INDEXES_HANDLE handle,
   const struct G_REQUEST_CRITERION *ap_1stGRequestCriterion, char b_descending,
-  char *indexSequenceBuffer) {
-  m_DIGGY_BOLLARD_S()
+  char *indexSequenceBuffer) { m_DIGGY_BOLLARD_S()
   m_ASSERT(ap_1stGRequestCriterion->indexLabel < handle->indexesNumber) 
 m_DIGGY_VAR_INDEX_SEEK_FLAGS(ap_1stGRequestCriterion->indexSeekFlags)
   m_TRACK_IF(m_GIndexSequenceReset(handle->vnhs_indexes + ap_1stGRequestCriterion->indexLabel,
@@ -925,8 +910,7 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(ap_1stGRequestCriterion->indexSeekFlags)
 // Public function; see .h
 int GIndexesSequenceNext(G_INDEXES_HANDLE handle,
   const struct G_REQUEST_CRITERION *sp_gRequestCriteria, int gRequestCriterionCount,
-  char b_descending, char *indexSequenceBuffer, int *an_entry) {
-  m_DIGGY_BOLLARD_S()
+  char b_descending, char *indexSequenceBuffer, int *an_entry) { m_DIGGY_BOLLARD_S()
   m_ASSERT(sp_gRequestCriteria[0].indexLabel < handle->indexesNumber) 
   struct INDEX_SEQUENCE *a_indexSequence = (struct INDEX_SEQUENCE*)indexSequenceBuffer;
   struct GC_EVALUATOR gcEvaluator = { UNDEFINED } ;
@@ -957,6 +941,7 @@ int GIndexesSequenceNext(G_INDEXES_HANDLE handle,
       } // for
       m_ASSERT(m_GcEvaluatorDepth(&gcEvaluator,0) == 0) 
       m_C_STACK_PEEK(gcEvaluator,status)
+m_DIGGY_VAR_GEN(status,c)
       m_ASSERT(status == 'V' || status == 'X') 
       if (status == 'V') break; // entry matches criteria
     } else break; // No more entry => finished 
@@ -971,8 +956,7 @@ int GIndexesSequenceNext(G_INDEXES_HANDLE handle,
 // Public function; see .h
 int GIndexesSequenceCurrent(G_INDEXES_HANDLE handle,
   const struct G_REQUEST_CRITERION *sp_gRequestCriteria, const char *p_indexSequenceBuffer,
-  int *an_entry) {
-  m_DIGGY_BOLLARD_S()
+  int *an_entry) { m_DIGGY_BOLLARD_S()
   const struct INDEX_SEQUENCE* ap_indexSequence = (struct INDEX_SEQUENCE*)p_indexSequenceBuffer;
   m_ASSERT(sp_gRequestCriteria[0].indexLabel < handle->indexesNumber) 
   struct G_INDEX *a_index = handle->vnhs_indexes + sp_gRequestCriteria[0].indexLabel;
@@ -984,14 +968,12 @@ int GIndexesSequenceCurrent(G_INDEXES_HANDLE handle,
 
 
 // Public function; see .h
-int GIndexesVerifyEnabled (G_INDEXES_HANDLE handle) {
-  m_DIGGY_BOLLARD_S()
+int GIndexesVerifyEnabled (G_INDEXES_HANDLE handle) { m_DIGGY_BOLLARD_S()
   m_DIGGY_RETURN(handle->indexesNumber > 0?  ANSWER__YES: ANSWER__NO) 
 } // GIndexesVerifyEnabled
 
 // Public function; see .h
-int GIndexesVerify (G_INDEXES_HANDLE handle) {
-  m_DIGGY_BOLLARD_S()
+int GIndexesVerify (G_INDEXES_HANDLE handle) { m_DIGGY_BOLLARD_S()
   int completed = COMPLETED__OK; // a priori
   int i = 0;
   struct G_INDEX *s_index = handle->vnhs_indexes ;
@@ -1012,8 +994,7 @@ m_DIGGY_VAR_D(i)
 } // GIndexesVerify
 
 // Public function; see .h
-int GIndexesVerifyCount (G_INDEXES_HANDLE handle,int *ac_commonCount) {
-  m_DIGGY_BOLLARD_S()
+int GIndexesVerifyCount (G_INDEXES_HANDLE handle,int *ac_commonCount) { m_DIGGY_BOLLARD_S()
   m_ASSERT(handle->indexesNumber > 0)
 
   *ac_commonCount = UNDEFINED; 
@@ -1036,9 +1017,7 @@ int GIndexesVerifyCount (G_INDEXES_HANDLE handle,int *ac_commonCount) {
 } // GIndexesVerifyCount
 
 // Public function; see .h
-int GIndexesVerifyEntry (G_INDEXES_HANDLE handle, int entry, int expectedHits) {
-  m_DIGGY_BOLLARD_S()
-
+int GIndexesVerifyEntry (G_INDEXES_HANDLE handle, int entry, int expectedHits) { m_DIGGY_BOLLARD_S()
   int completed = COMPLETED__OK; // a priori
   int i = 0;
   struct G_INDEX *s_index = handle->vnhs_indexes ;
@@ -1058,8 +1037,7 @@ int GIndexesVerifyEntry (G_INDEXES_HANDLE handle, int entry, int expectedHits) {
 
 
 // Public function; see .h
-int GIndexesClear (G_INDEXES_HANDLE handle) {
-  m_DIGGY_BOLLARD_S()
+int GIndexesClear (G_INDEXES_HANDLE handle) { m_DIGGY_BOLLARD_S()
   int i = 0 ;
   struct G_INDEX *s_index = handle->vnhs_indexes ;
   for ( ; i < handle->indexesNumber ; i++, s_index++) {
@@ -1071,8 +1049,7 @@ int GIndexesClear (G_INDEXES_HANDLE handle) {
 
 
 // Public function; see .h
-int GIndexesDestroyInstance(G_INDEXES_HANDLE xh_handle) {
-  m_DIGGY_BOLLARD()
+int GIndexesDestroyInstance(G_INDEXES_HANDLE xh_handle) { m_DIGGY_BOLLARD()
   int i = 0;
   struct G_INDEX *cs_index = xh_handle->vnhs_indexes;
   for ( ; i < xh_handle->indexesNumber ; i++, cs_index++) {

@@ -32,10 +32,9 @@ static int TestItemHandlerCompare(void *cpr_handle,  char b_frozen,  int indexLa
   TEST_ITEM_STUFF n_bTestItemStuff = (TEST_ITEM_STUFF) npr_bGreenItemStuff;
   int comparison = UNDEFINED; 
   switch (indexLabel) {
-  case ID_INDEX_LABEL: { 
+  case ID_INDEX_LABEL: {
     int aId = aTestItemStuff->id ;
-    int bId = (int)(GENERIC_INTEGER)cr_bGKeys;
-    if (n_bTestItemStuff != NULL) bId = n_bTestItemStuff->id;
+    int bId = (n_bTestItemStuff != NULL? n_bTestItemStuff->id: *(int*)cr_bGKeys);
 // m_DIGGY_INFO("aId=%d, bId=%d",aId,bId)
     comparison = GET_COMPARISON(aId,bId);
   } break; case NAME_INDEX_LABEL: {
@@ -121,15 +120,15 @@ static int TestCount(int expectedTestNumber,  GREEN_COLLECTION_HANDLE handle,  i
 // - handle:
 // - indexFetchFlags:
 // only significant if INDEX_FETCH_FLAG__RESET is ON => BEGIN
-// - c_criteriaCount: 1 or 2
-// - c_indexSeekFlags1: 
-// - cc_idKey1: only significant if INDEX_SEEK_FLAG__ANY is OFF
-// only significant if criteria number == 2 => BEGIN
-// - cc_criteriaOpFlags1 : CRITERIA_OP_FLAG__OR and CRITERIA_OP_FLAG__CLOSE* are not allowed
-// - cc_indexSeekFlags2:
-// - ccc_nameKey2: only significant if INDEX_SEEK_FLAG__ANY is OFF 
-// - cc_criteriaOpFlags2 :
-// only significant if criteria number == 2 <= END 
+//   - c_criterionCount: 1 or 2
+//   - c_indexSeekFlags1: 
+//   - cc_idKey1: (ID_INDEX_LABEL-based key) only significant if INDEX_SEEK_FLAG__ANY is OFF
+//   only significant if criterionCount == 2 => BEGIN
+//     - cc_criteriaOpFlags1 : CRITERIA_OP_FLAG__OR and CRITERIA_OP_FLAG__CLOSE* are not allowed
+//     - cc_indexSeekFlags2:
+//     - ccc_nameKey2: (NAME_INDEX_LABEL-based key) only significant if INDEX_SEEK_FLAG__ANY is OFF 
+//     - cc_criteriaOpFlags2 :
+//   only significant if criterionCount == 2 <= END 
 // only significant if INDEX_FETCH_FLAG__RESET is ON <= END 
 // - expectedResult:
 // - n_expectedId: -1 special value => no fetched item check 
@@ -137,13 +136,14 @@ static int TestCount(int expectedTestNumber,  GREEN_COLLECTION_HANDLE handle,  i
 // - cn_newId: not significant if no fetched item check ; -1 special value => NO update 
 // - cn_newName: not significant if no fetched item check (NULL => NO update)
 static int TestIndexFetch2(int expectedTestNumber,  GREEN_COLLECTION_HANDLE handle,
-  unsigned int indexFetchFlags, int c_criteriaCount, unsigned int c_indexSeekFlags1, int cc_idKey1,
+  unsigned int indexFetchFlags, int c_criterionCount, unsigned int c_indexSeekFlags1, int cc_idKey1,
   unsigned int cc_criteriaOpFlags1, unsigned int cc_indexSeekFlags2, const char * ccc_nameKey2,
   unsigned int cc_criteriaOpFlags2, int expectedResult, int n_expectedId, int c_expectedEntry,
   int cn_newId, const char *cn_newName) {
   m_DIGGY_BOLLARD()
 
   m_ASSERT(expectedTestNumber == ++testNumber)
+  m_ASSERT(c_criterionCount == 1 || c_criterionCount == 2)
   m_DIGGY_VAR_D(testNumber)
 
   static char b_readOnly = b_TRUE;
@@ -156,14 +156,14 @@ static int TestIndexFetch2(int expectedTestNumber,  GREEN_COLLECTION_HANDLE hand
   TEST_ITEM_STUFF nt_testItemStuff = (TEST_ITEM_STUFF)UNDEFINED;
   int n_entry = UNDEFINED;
 m_DIGGY_VAR_INDEX_FETCH_FLAGS(indexFetchFlags)
-  if (b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__RESET)) {
+  if (b_FLAGS_ON(indexFetchFlags,INDEX_FETCH_FLAG__RESET)) {
 m_DIGGY_VAR_INDEX_SEEK_FLAGS(c_indexSeekFlags1)
-    b_readOnly = b_FLAG_SET_ON(indexFetchFlags,INDEX_FETCH_FLAG__READ); 
+    b_readOnly = b_FLAGS_ON(indexFetchFlags,INDEX_FETCH_FLAG__READ); 
 m_DIGGY_VAR_D(cc_idKey1)
     m_ASSERT(GreenCollectionIndexRequest(handle, (char*)NULL,
-      c_criteriaCount, ID_INDEX_LABEL, c_indexSeekFlags1, (void *)(GENERIC_INTEGER)cc_idKey1,
+      c_criterionCount, ID_INDEX_LABEL, c_indexSeekFlags1, &cc_idKey1,
       cc_criteriaOpFlags1, NAME_INDEX_LABEL,cc_indexSeekFlags2,
-      (void *)(GENERIC_INTEGER)ccc_nameKey2, cc_criteriaOpFlags2) == COMPLETED__OK)
+      (void *)ccc_nameKey2, cc_criteriaOpFlags2) == COMPLETED__OK)
   } // if
   int result = GreenCollectionIndexFetch(handle, (char*)NULL,
     indexFetchFlags, (char **)&nt_testItemStuff, &n_entry);
@@ -224,7 +224,8 @@ int main (int argc, char **argv) {
 
   b_diggyGreenCollectionExam = b_TRUE;   
   m_TRACK_IF(GreenCollectionCreateInstance(&handle, BATEAU__EXPECTED_ITEM_COUNT/*2*/,
-    sizeof(struct TEST_ITEM), NULL,TestItemHandlerCompare,NULL,-1,NULL) != RETURNED)
+    sizeof(struct TEST_ITEM), NULL,TestItemHandlerCompare,NULL,sizeof(void *),NULL) !=
+    RETURNED)
 
 
   m_TRACK_IF((ret = GreenCollectionAddIndex(handle,1,(int*)NULL)) < 0) 
@@ -280,7 +281,6 @@ int main (int argc, char **argv) {
     RESULT__FOUND, 3068, 5, -1, NULL) < 0)
   m_TRACK_IF(TestIndexFetch(28,handle, INDEX_FETCH_FLAGS__READ_NEXT,UNDEFINED,UNDEFINED,
     RESULT__NOT_FOUND, -1, UNDEFINED, UNDEFINED, (const char*)UNDEFINED) < 0)
-
   m_TRACK_IF(TestIndexFetch(29,handle, INDEX_FETCH_FLAGS__READ_ONLY|INDEX_FETCH_FLAG__DESCENDING,
     INDEX_SEEK_FLAGS__ANY,UNDEFINED, RESULT__FOUND, 3068, 5, -1, NULL) < 0)
   m_TRACK_IF(TestIndexFetch(30,handle, INDEX_FETCH_FLAGS__READ_NEXT,UNDEFINED,UNDEFINED,

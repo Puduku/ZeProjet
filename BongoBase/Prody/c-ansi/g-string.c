@@ -455,14 +455,14 @@ int GStringsIndexRequestRAddCriterion(G_STRINGS_HANDLE cp_handle,
 
 // Public function : see .h
 int GStringsIndexRequest(G_STRINGS_HANDLE cp_handle,
-  char* nf_indexRequestAutomaticBuffer, int criteriaCount, int indexLabel1,
+  char* nf_indexRequestAutomaticBuffer, int criterionCount, int indexLabel1,
   unsigned int indexSeekFlags1, const struct GS_KEY *cps_gKeys1, ...) {
   m_DIGGY_BOLLARD()
   int completed = UNDEFINED;
   { va_list arguments;
     va_start(arguments,cps_gKeys1);
     m_TRACK_IF((completed = GreenCollectionIndexRequestV(cp_handle->h_greenCollectionHandle,
-      nf_indexRequestAutomaticBuffer, criteriaCount, indexLabel1, indexSeekFlags1,
+      nf_indexRequestAutomaticBuffer, criterionCount, indexLabel1, indexSeekFlags1,
       (void*)cps_gKeys1, arguments)) < 0)
     va_end(arguments) ;
   } // arguments

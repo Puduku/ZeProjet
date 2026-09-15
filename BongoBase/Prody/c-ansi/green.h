@@ -303,12 +303,12 @@ m_DEFINE_ENUM_ALIAS_END()
 //   NULL special address: use internal structure => NOT "thread safe" / "re-entrant"
 //   non NULL: buffer on stack => allows (thread) re-entrancy ; that buffer will be used by 
 //   GreenCollectionIndexFetch() index fetching function... 
-// - int criteriaCount:
+// - int criterionCount:
 // - indexLabel1: (1st criterion) >= 0: see GreenCollectionCreateInstance()
 // - indexSeekFlags1: (1st criterion)
 // - cr_gKeys1:  (1st criterion) search key(s) value(s) of item (regarding index) ;
 //   not significant without actual index seek flag (INDEX_SEEK_FLAGS__ANY)
-// - optional criteria (...) : when criteriaCount > 1
+// - optional criteria (...) : when criterionCount > 1
 //  + criteriaOpFlags1 : CRITERIA_OP_FLAG__OR and CRITERIA_OP_FLAG__CLOSE* are not allowed
 //  + indexLabel2:
 //  + c_indexSeekFlags2:
@@ -324,13 +324,13 @@ m_DEFINE_ENUM_ALIAS_END()
 // - COMPLETED__BUT: request rectified (missing closing brackets, etc.)
 // - -1: unexpected problem ; anomaly is raised
 int GreenCollectionIndexRequest(GREEN_COLLECTION_HANDLE cp_handle,
-  char* nf_indexFetch5AutomaticBuffer, int criteriaCount, int indexLabel1,
+  char* nf_indexFetch5AutomaticBuffer, int criterionCount, int indexLabel1,
   unsigned int indexSeekFlags1, void *cr_gKeys1, ...);
 
 
 // #SEE GreenCollectionIndexRequest <greenItem> <keys>
 int GreenCollectionIndexRequestV(GREEN_COLLECTION_HANDLE cp_handle,
-  char* nf_indexFetch5AutomaticBuffer, int criteriaCount, int indexLabel1,
+  char* nf_indexFetch5AutomaticBuffer, int criterionCount, int indexLabel1,
   unsigned int indexSeekFlags1, void *cr_gKeys1, va_list extraCriteria);
 
 
@@ -378,34 +378,36 @@ enum {
 // #REF enum-INDEX_FETCH
 m_DEFINE_ENUM_ALIAS_BEGIN(m_IndexFetchFlagsImage)
   // - "Compatible" modes:
-  m_ENUM_ALIAS_VAL(INDEX_FETCH_FLAGS__FETCH             ,INDEX_FETCH_FLAG__RESET |
+  m_ENUM_ALIAS_VAL(INDEX_FETCH_FLAGS__FETCH                ,INDEX_FETCH_FLAG__RESET |
     INDEX_FETCH_FLAG__CHANGE | INDEX_FETCH_FLAG__NEXT | INDEX_FETCH_FLAG__SMART) // If not found, do
     // "smart fetch" (*) (**)
-    m_ENUM_ALIAS_VAL(INDEX_FETCH_FLAGS__SEEK_ONLY       ,INDEX_FETCH_FLAG__RESET |
+    m_ENUM_ALIAS_VAL(INDEX_FETCH_FLAGS__SEEK_ONLY          ,INDEX_FETCH_FLAG__RESET |
     INDEX_FETCH_FLAG__CHANGE | INDEX_FETCH_FLAG__NEXT) // No item added if doesn't exist (*)
-  m_ENUM_ALIAS_VAL(INDEX_FETCH_FLAGS__REMOVE            ,INDEX_FETCH_FLAG__RESET |
+  m_ENUM_ALIAS_VAL(INDEX_FETCH_FLAGS__REMOVE               ,INDEX_FETCH_FLAG__RESET |
     INDEX_FETCH_FLAG__REMOVE | INDEX_FETCH_FLAG__NEXT) // Remove from indexes (if exists) (*) (**)
-  m_ENUM_ALIAS_VAL(INDEX_FETCH_FLAGS__READ_ONLY         ,INDEX_FETCH_FLAG__RESET |
+  m_ENUM_ALIAS_VAL(INDEX_FETCH_FLAGS__READ_ONLY            ,INDEX_FETCH_FLAG__RESET |
     INDEX_FETCH_FLAG__READ | INDEX_FETCH_FLAG__NEXT) // No item added if doesn't exist ; this mode
     // actually disables indexes' synchronization and starts "read only" sequence" 
-  m_ENUM_ALIAS_VAL(INDEX_FETCH_FLAGS__READ_NEXT         ,INDEX_FETCH_FLAG__NEXT) // read next
+  m_ENUM_ALIAS_VAL(INDEX_FETCH_FLAGS__READ_ONLY_DESCENDING ,INDEX_FETCH_FLAGS__READ_ONLY |
+    INDEX_FETCH_FLAG__DESCENDING) //
+  m_ENUM_ALIAS_VAL(INDEX_FETCH_FLAGS__READ_NEXT            ,INDEX_FETCH_FLAG__NEXT) // read next
     // item of sequence
   // (*) : breaks select sequence if any
   // (**) : NOT ALLOWED if the collection is "frozen"
   // - "Extended" modes:
-  m_ENUM_ALIAS_VAL(INDEX_FETCH_FLAGS__CURRENT           ,ALL_FLAGS_OFF0)
-  m_ENUM_ALIAS_VAL(INDEX_FETCH_FLAGS__NEXT              ,INDEX_FETCH_FLAG__NEXT) 
+  m_ENUM_ALIAS_VAL(INDEX_FETCH_FLAGS__CURRENT                ,ALL_FLAGS_OFF0)
+  m_ENUM_ALIAS_VAL(INDEX_FETCH_FLAGS__NEXT                   ,INDEX_FETCH_FLAG__NEXT) 
     // Prepare new selection ; NO item fetched (,> always RESULT__NOT_FOUND) :  
-  m_ENUM_ALIAS_VAL(INDEX_FETCH_FLAGS__SELECT            ,INDEX_FETCH_FLAG__RESET |
+  m_ENUM_ALIAS_VAL(INDEX_FETCH_FLAGS__SELECT                 ,INDEX_FETCH_FLAG__RESET |
     INDEX_FETCH_FLAG__CHANGE)
-  m_ENUM_ALIAS_VAL(INDEX_FETCH_FLAGS__SELECT_READ       ,INDEX_FETCH_FLAG__RESET |
+  m_ENUM_ALIAS_VAL(INDEX_FETCH_FLAGS__SELECT_READ            ,INDEX_FETCH_FLAG__RESET |
     INDEX_FETCH_FLAG__READ)
-  m_ENUM_ALIAS_VAL(INDEX_FETCH_FLAGS__RESET             ,INDEX_FETCH_FLAG__RESET)
-  m_ENUM_ALIAS_VAL(INDEX_FETCH_FLAGS__SELECT_DESCENDING ,INDEX_FETCH_FLAG__RESET |
+  m_ENUM_ALIAS_VAL(INDEX_FETCH_FLAGS__RESET                  ,INDEX_FETCH_FLAG__RESET)
+  m_ENUM_ALIAS_VAL(INDEX_FETCH_FLAGS__SELECT_DESCENDING      ,INDEX_FETCH_FLAG__RESET |
     INDEX_FETCH_FLAG__CHANGE | INDEX_FETCH_FLAG__DESCENDING)
   m_ENUM_ALIAS_VAL(INDEX_FETCH_FLAGS__SELECT_READ_DESCENDING ,INDEX_FETCH_FLAG__RESET |
     INDEX_FETCH_FLAG__READ | INDEX_FETCH_FLAG__DESCENDING)
-  m_ENUM_ALIAS_VAL(INDEX_FETCH_FLAGS__RESET_DESCENDING  ,INDEX_FETCH_FLAG__RESET |
+  m_ENUM_ALIAS_VAL(INDEX_FETCH_FLAGS__RESET_DESCENDING       ,INDEX_FETCH_FLAG__RESET |
     INDEX_FETCH_FLAG__DESCENDING)
 m_DEFINE_ENUM_ALIAS_END()
 

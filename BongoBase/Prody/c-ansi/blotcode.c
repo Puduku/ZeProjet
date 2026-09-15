@@ -969,8 +969,8 @@ int BlotcodeExecutorConstructPage (BLOTCODE_EXECUTOR_HANDLE handle,
         handle->h_blotfuncSurrogate,  &blotinstPtr->c_blotval, nc_abandonmentInfo)) {
       case ANSWER__YES: // Blot function completed
         if (handle->h_blotfuncSurrogate->c_copiedLength > 0) {
-          m_TRACK_IF(SuckerFillDButt(outputSuckerHandle, 
-            m_GStringGetLogicalPString(handle->h_blotfuncSurrogate),  NULL) != 0)
+          m_TRACK_IF(SuckerFillDButt(outputSuckerHandle,handle->h_blotfuncSurrogate->cv_pString,
+            NULL) != 0)
         } // if
       break; case ANSWER__NO: // Abandon dynamic construction
         blotinstPtr->b_blotval = b_FALSE0;
