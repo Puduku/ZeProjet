@@ -195,35 +195,35 @@ Programming main patterns and conventions:
   See also c-ansi/green.topo
   
 - Subjectification: Reducing Everything to "me"
-We have already discussed the two most structured forms of data–function association:
-the pure object, whose representation is hidden behind an opaque handle and can be accessed only through
-its methods; and the green item, whose structure is publicly defined but is nevertheless manipulated
-through a coherent family of functions.
-What about the remaining data structures - ordinary structures that do not belong to either category? At
-first sight, they may appear to be merely anonymous collections of data, passed as parameters to unrelated
-functions.
-However, these structures can still be given a clearer conceptual role. Whenever a function primarily
-operates on one of its parameters, that parameter may be designated as the function's subject.
-For example, instead of writing:
-  int DoSomethingWithTitiAndTutu(struct TITI *titi, struct TUTU *tutu,/* other parameters */);
-we may designate titi as the central parameter and write:
-  int TitiDoSomethingWithTutu(struct TITI *me,struct TUTU *tutu,/* other parameters */);
-The technical difference is minimal: the subject is placed first in the parameter list, following the
-convention already used for object handles and green-item pointers. The more important difference is
-conceptual. The function is presented as an operation performed by or on TITI, rather than as a completely
-general operation involving two unrelated structures.
-This practice may be called subjectification: treating an otherwise ordinary data structure as the explicit
-subject of the operations that primarily concern it.
-Subjectification does not make the structure an object. It does not imply data encapsulation, private state,
-dynamic dispatch, or any other specifically object-oriented property. It is simply a naming and organization
-convention that gives the data structure a recognizable relationship with the functions that operate on it.
-Thus, the general pattern becomes:
-  ReturnType TypeDoSomething(struct TYPE *me,/* other parameters */);
-The name 'me' emphasizes that the first parameter is the principal participant in the operation. It provides
-a lightweight, object-like organization for ordinary C data without claiming that the data structure is a
-formal object or a green item.
-In this sense, subjectification extends the "everything revolves around me" principle to structures that
-do not qualify for the more distinguished status of object or green item.
+  We have already discussed the two most structured forms of data–function association: 
+  the pure object, whose representation is hidden behind an opaque handle and can be accessed only through
+  its methods; and the green item, whose structure is publicly defined but is nevertheless manipulated
+  through a coherent family of functions.
+  What about the remaining data structures - ordinary structures that do not belong to either category? At
+  first sight, they may appear to be merely anonymous collections of data, passed as parameters to unrelated
+  functions.
+  However, these structures can still be given a clearer conceptual role. Whenever a function primarily
+  operates on one of its parameters, that parameter may be designated as the function's subject.
+  For example, instead of writing:
+    int DoSomethingWithTitiAndTutu(struct TITI *titi, struct TUTU *tutu,/* other parameters */);
+  we may designate titi as the central parameter and write:
+    int TitiDoSomethingWithTutu(struct TITI *me,struct TUTU *tutu,/* other parameters */);
+  The technical difference is minimal: the subject is placed first in the parameter list, following the
+  convention already used for object handles and green-item pointers. The more important difference is
+  conceptual. The function is presented as an operation performed by or on TITI, rather than as a completely
+  general operation involving two unrelated structures.
+  This practice may be called subjectification: treating an otherwise ordinary data structure as the explicit
+  subject of the operations that primarily concern it.
+  Subjectification does not make the structure an object. It does not imply data encapsulation, private state,
+  dynamic dispatch, or any other specifically object-oriented property. It is simply a naming and organization
+  convention that gives the data structure a recognizable relationship with the functions that operate on it.
+  Thus, the general pattern becomes:
+    ReturnType TypeDoSomething(struct TYPE *me,/* other parameters */);
+  The name 'me' emphasizes that the first parameter is the principal participant in the operation. It provides
+  a lightweight, object-like organization for ordinary C data without claiming that the data structure is a
+  formal object or a green item.
+  In this sense, subjectification extends the "everything revolves around me" principle to structures that
+  do not qualify for the more distinguished status of object or green item.
 
 - Proto-objects: a way to decompose a complex object into internally
   structured, object-like responsibilities within the same module.
@@ -276,27 +276,22 @@ do not qualify for the more distinguished status of object or green item.
   prevents the implementation of a complex object from becoming a single
   undifferentiated body of data and procedures.
 
-
-
 - Recap:
-  +-----------------------------------------------------------+
-  │                    Data Structure Paradigms               │
-  +--------------------+--------------------+-----------------+
-  │ Pure Object        │ Green Item         │ Subject         |
-  │ (Encapsulated)     │ (Public Struct)    │ (Contextual)    │
-  │ Handle-driven      │ Stuff-driven       │ Me-driven       │
-  +--------------------+--------------------+-----------------|
-  |                     Instance Memory                       |
-  +--------------------+--------------------+-----------------|
-  | Heap               | Heap (by principle)| Heap/Stack      |
-  +--------------------+--------------------+-----------------+   
-  How the four paradigms map to memory:
-  Paradigm             Primary Memory Domain    Structural Visibility   Impact of Stack Allocation
-  Pure ObjectHeap      (Traditional)Hiddent / Handle                    High friction: Speeds up execution, but risks stack corruption if internal structure size changes.
-  Green ItemHeap        (By nature)Public / StuffUnnecessary: Designed to be dynamic, long-lived global or shared items.
-  SubjectTransparent    (Stack Preferred)Public / MePerfect harmony: Cleanest way to write object-like C code natively on the stack without encapsulation headaches.
-  Proto-ObjectInherited  (Matches Parent)Public to Module / MeTransparent: Moves seamlessly with the parent Complex Object.
-
+  +--------------------------+--------------------------------------+------------------------+
+  | Paradigm / Compound Data | Architectural Purpose                | Instantiation Location |
+  +--------------------------+--------------------------------------+------------------------+
+  | Pure Objects             | Encapsulated data structures;        | Heap (best technical   |
+  |                          | strict emulation of OOP objects.     | choice)                |
+  +--------------------------+--------------------------------------+------------------------+
+  | Green Items              | Direct association of attributes and | Heap (by principle of  |
+  |                          | methods; no encapsulation.           | green items)           |
+  +--------------------------+--------------------------------------+------------------------+
+  | Subjects                 | Formal association of data and       | Heap / Stack           |
+  |                          | functions only.                      |                        |
+  +--------------------------+--------------------------------------+------------------------+
+  | Proto-Object             |                 Inherited  (Matches Parent)                   |
+  +--------------------------+---------------------------------------------------------------+
+  
 Miscellenuous
 -------------
 TODO : what about our glorious fight against "catchall" design syndrom  ?
