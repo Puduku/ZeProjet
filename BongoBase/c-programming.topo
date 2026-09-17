@@ -296,28 +296,42 @@ Miscellenuous
 -------------
 TODO : what about our glorious fight against "catchall" design syndrom  ?
 
-- Data logical value type vs. data physical content type
-  Idea: The very simple concept of "data type" is not always an accurate concept...
-  A distinction must be made between
-  + the physical composition (or constitution) of the data (its "materialization" in memory) on
-    one hand,
-  + the logical value that this data represents (in the program), on the other hand
-  In computing, we usually define 'types', which are abstractions that allow all sorts of
-  entities to be associated with each other.
-  When, in simple cases, we can confuse the physical composition with the logical value of the
-  data, defining "data types" makes sense.
-  However, in the 'general' case (for example, when working with databases (*) ), it is no longer
-  possible to confuse the two aspects (physical and logical) of data. As a result, the very
-  notion of 'data type' is is effectively meaningless. However, if we make a clear distinction
-  between the physical composition of a piece of data and its logical value, it makes perfect
-  sense to be interested in the types of its physical composition on the one hand and its logical
-  value on the other. 
-  Thus, two pieces of data d1 and d2 are perfectly - and simply - comparable, provided that their
-  logical value is of the same type (e.g. a "date") regardless of their physical composition
-  types, which may be totally different (e.g. "ASCII" and "BINARY").
-  (*) It is therefore very regrettable that in most database operating languages (SQL in
-  particular), the 'dual' nature (logical and physical) of all data is overlooked to such an
-  extent! 
+- The Dual Nature of Data: Logical Types vs. Physical Formats
+  The traditional, monolithic concept of a "data type" is an incomplete abstraction. To accurately
+  reason about data across complex systems, we must decouple its logical value (the abstract
+  meaning within the program's domain) from its physical composition (its concrete materialization
+  in memory or storage).
+  + The Logical Value Type: Defines what the data represents and the valid operations allowed on
+    it by human logic (e.g., a Date, a Temperature, or an Email Address).
+  + The Physical Composition Type: Dictates how the data is encoded in hardware or disk storage
+    (e.g., an ASCII string, a 64-bit float, or a Binary integer).
+  Why the Illusion Works in Everyday Programming
+  In standard, day-to-day programming scenarios, conflating these two aspects into a single
+  monolithic "data type" is not an issue at all. In fact, it is highly efficient. When you
+  declare a simple variable like int counter or float price, the logical value maps so cleanly to
+  the physical memory structure that the distinction is entirely invisible.
+  Because this abstraction works perfectly in these banal situations, it is completely normal that
+  many developers view the separation between logical and physical types as an insignificant,
+  purely academic subtlety.
+  In a self-contained local scope, the physical composition is the logical value.
+
+  Where the Monolithic Concept Breaks Down
+  However, in the general case—most notably when working with databases, distributed systems, or
+  cross - platform APIs - treating these two layers as a single entity completely falls apart.
+  When we cleanly isolate the logical from the physical, data operations become vastly more flexible.
+  Two data points d1 and d2 are perfectly and simply comparable provided that their logical
+  value is of the same type (e.g., both represent the calendar date September 17, 2026),
+  regardless of their physical composition types, which may be totally different (e.g., d1
+  is stored as a raw ISO-8601 ASCII string, while d2 is a Binary Epoch timestamp).
+
+  The Critique of Modern Database Systems
+  It is therefore highly regrettable that mainstream database management languages, particularly
+  SQL, completely overlook this dual nature. By forcing developers to define database columns
+  strictly by their physical storage structures (like VARCHAR or INT) rather than true logical
+  domains, SQL conflates storage with meaning.
+  Because it lacks native, first-class support for logical types independent of physical layouts,
+  it forces the application layer to manually handle domain validations, denying developers true
+  data independence.
 
 - General tips for achieving a roughly acceptable programming quality:
   + Empty program model: A simple "trick" to keep in mind to refrain from writing too much
