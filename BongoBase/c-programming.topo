@@ -333,6 +333,23 @@ TODO : what about our glorious fight against "catchall" design syndrom  ?
   it forces the application layer to manually handle domain validations, denying developers true
   data independence.
 
+
+
+- General Principles for Practical Code Quality
+
+   + The Golden Benchmark: The Empty Program Model
+     A simple psychological brake to stop you from writing over-engineered junk.The only flawless,
+     perfectly secure, and entirely bug-free software in existence is the empty program - a file
+     containing exactly zero lines of code. It is universally compatible, runs instantly, and
+     requires zero maintenance. Unfortunately, its commercial utility is non-existent. To make
+     software actually do something, we common programmers are forced to compromise this perfection
+     by introducing our own messy, error-prone code. Arrogant developers view coding as an
+     act of creation; pragmatic developers recognize it as an act of contamination. Every
+     single line of code you add is a liability, a future bug, and a maintenance burden.
+     Your goal is not to see how much code you can produce, but to see how close you can leave
+     your solution to the pristine efficiency of the empty program.
+
+
 - General tips for achieving a roughly acceptable programming quality:
   + Empty program model: A simple "trick" to keep in mind to refrain from writing too much
     "crap"...
