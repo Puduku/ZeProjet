@@ -349,14 +349,6 @@ TODO : what about our glorious fight against "catchall" design syndrom  ?
      Your goal is not to see how much code you can produce, but to see how close you can leave
      your solution to the pristine efficiency of the empty program.
 
-
-- General tips for achieving a roughly acceptable programming quality:
-  + Empty program model: A simple "trick" to keep in mind to refrain from writing too much
-    "crap"...
-    The pure and perfect program exists. It is still unique but universal. This is of course the
-    "empty" program - without a single line of code. Obviously its practical usefulness is very
-    limited... To give it a use, we common programmers know no other way than to spoil this
-    perfect program with our rotten lines of code...
   + Have good usage of binary statutes in C-programs (see also c-verities.topo, section "Why do
     guys so often harass girls ???") to avoid the following undesirable behaviours :
     . Hanging programms (with resource grabbing as major "side effect") may be simple consequence
