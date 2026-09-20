@@ -95,7 +95,7 @@ static inline bool test_all_bits_u64(uint64_t v, uint64_t m, bool a) { return a 
 //
 // Modified:
 // - mu_me: flag(s) has(ve) been toggled 
-#define m_FLAGS_FLIP(mu_me,u_flags)  (mu_me) ^= (u_flags);
+#define m_FLAGS_FLIP(mu_me,u_flags) (mu_me) ^= (u_flags);
 
 
 // Check whether flag(s) is(are) ON(enabled) 
@@ -113,7 +113,7 @@ static inline bool test_all_bits_u64(uint64_t v, uint64_t m, bool a) { return a 
 // - u_me:
 // - u_flags: flag(s) to check 
 //
-// Ret: TRUE: (all) flag(s) is(are) OFF ; FALSE: flag(s) is(are) ON
+// Ret: TRUE: (all) flag(s) is(are) OFF ; FALSE: (some) flag(s) is(are) ON
 #define b_FLAGS_OFF(u_me,u_flags) (((u_me) & (u_flags)) == 0) 
 
 // Check flag(s) state(ON/OFF - enabled/disabled) 

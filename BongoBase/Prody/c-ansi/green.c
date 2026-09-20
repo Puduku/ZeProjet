@@ -485,6 +485,14 @@ int GreenCollectionRefreshIndexes (GREEN_COLLECTION_HANDLE handle) {
   m_DIGGY_RETURN(RETURNED)
 } // GreenCollectionRefreshIndexes
 
+// hard dump (test/debug purpose)
+int _GreenCollectionHardPullOut (GREEN_COLLECTION_HANDLE handle, char **at_greenArray) {
+  m_DIGGY_BOLLARD()
+
+  *at_greenArray = handle->h_greenArray;
+
+  m_DIGGY_RETURN(handle->itemPhysicalCount)
+} // _GreenCollectionHardPullOut
 
 // Public function; see description in .h
 int GreenCollectionPullOut (GREEN_COLLECTION_HANDLE handle, char **at_greenArray) {
@@ -495,7 +503,7 @@ int GreenCollectionPullOut (GREEN_COLLECTION_HANDLE handle, char **at_greenArray
   m_TRACK_IF(GreenCollectionRefreshIndexesInternal(handle,b_TRUE) != RETURNED)
   // MINIMONITOR: CLEAN
 
-  *at_greenArray  = handle->h_greenArray;
+  *at_greenArray = handle->h_greenArray;
 
   m_DIGGY_RETURN(handle->itemPhysicalCount)
 } // GreenCollectionPullOut

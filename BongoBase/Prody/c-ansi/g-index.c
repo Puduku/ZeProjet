@@ -541,8 +541,8 @@ static inline int g_GRequestCriteriaRectifyOpFlags(struct G_REQUEST_CRITERION *s
           s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__OPEN1)
     } else if (b_FLAGS_ON(s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__AND) && i > 0 &&
       b_FLAGS_ON(s_me[i-1].criteriaOpFlags,CRITERIA_OP_FLAG__OR) &&
-        om_CriteriaOpFlagsOpenBracketCount(s_me[i].criteriaOpFlags) == 0) m_FLAGS_SET_ON(
-          s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__OPEN1)
+      om_CriteriaOpFlagsOpenBracketCount(s_me[i].criteriaOpFlags) == 0) m_FLAGS_SET_ON(
+        s_me[i].criteriaOpFlags,CRITERIA_OP_FLAG__OPEN1)
     depth += om_CriteriaOpFlagsOpenBracketCount(s_me[i].criteriaOpFlags);
     if (depth < om_CriteriaOpFlagsCloseBracketCount(s_me[i].criteriaOpFlags)) {
       // Remove excessive closing brackets
@@ -655,50 +655,51 @@ static inline int m_GcEvaluatorIterate(struct GC_EVALUATOR* a_me, signed char nb
     m_C_STACK_PUSH(*a_me,'U')
   } // for
   char status; m_C_STACK_PEEK(*a_me,status);
-m_DIGGY_INFO("nb_passed=%d openBracketCount=%d i=%d status=%c",nb_passed,openBracketCount,i,status)
   int closeBracketCount = om_CriteriaOpFlagsCloseBracketCount(criteriaOpFlags);
+m_DIGGY_INFO("nb_passed=%d openBracketCount=%d closeBracketCount=%d status=%c",nb_passed,openBracketCount,closeBracketCount,status)
   *ab_boost = b_FALSE0; // No boost a priori
 
-  if (b_FLAGS_OFF(criteriaOpFlags,o_FLAGS2(CRITERIA_OP_FLAG__AND,CRITERIA_OP_FLAG__OR))) {
-    // NO logical op. => last operand 
+  if (b_FLAGS_OFF(criteriaOpFlags,o_FLAGS2(CRITERIA_OP_FLAG__AND,CRITERIA_OP_FLAG__OR)) ||
+    closeBracketCount > 0) {
+    // NO logical AND/OR op. or closing brackets => last operand 
     m_TRACK_IF(m_GcEvaluatorDepth(a_me,closeBracketCount) < 0)
     // Finalize status (on that depth):
-    char termStatus  = status; // a priori
     switch (status) {
     case 'U':
     case 'O': // OR expression
     case 'A': // AND expression
       m_ASSERT(nb_passed >= 0)
-      termStatus = (nb_passed? 'V': 'X');
+      status = (nb_passed? 'V': 'X');
+      m_C_STACK_POKE(*a_me,status);
     break; case 'V':
     case 'X':
     break; default: m_RAISE(ANOMALY__VALUE__D,status)
     } // switch 
-m_DIGGY_VAR_GEN(termStatus,c)
+m_DIGGY_VAR_GEN(status,c)
+    m_ASSERT(status == 'V' || status == 'X')
+  } // if
+  for (i = 0; i < closeBracketCount; i++) {
+    char termStatus; m_C_STACK_PEEK(*a_me,termStatus);
     m_ASSERT(termStatus == 'V' || termStatus == 'X')
-    m_C_STACK_POKE(*a_me,termStatus);
-    for (i = 0; i < closeBracketCount; i++) {
-      m_C_STACK_POP(*a_me,status);
-      m_TRACK_IF(m_GcEvaluatorDepth(a_me,0) < 0)
-      // Finalize status (on that depth):
-      switch (status) {
-      case 'U':
-      case 'V':
-      case 'X':
-        termStatus  = status;
-      break; case 'O': // OR expression
-      case 'A': // AND expression
-        termStatus = (termStatus == 'V'? 'V': 'X');
-      break; default: m_RAISE(ANOMALY__VALUE__D,status)
-      } // switch 
-      m_ASSERT(termStatus == 'V' || termStatus == 'X')
-m_DIGGY_VAR_GEN(termStatus,c)
-      m_C_STACK_POKE(*a_me,termStatus)
-    } // for
+    m_C_STACK_POP(*a_me,status);
+    m_TRACK_IF(m_GcEvaluatorDepth(a_me,0) < 0)
+    // Finalize status (on that depth):
+    switch (status) {
+    case 'U':
+    case 'O': // OR expression
+    case 'A': // AND expression
+      status = termStatus; 
+    break; case 'V':
+    case 'X':
+    break; default: m_RAISE(ANOMALY__VALUE__D,status)
+    } // switch 
+    m_ASSERT(status == 'V' || status == 'X')
+  m_DIGGY_VAR_GEN(termStatus,c)
+    m_C_STACK_POKE(*a_me,status)
+  } // for
 
-  } else { // OR / AND logical op. 
-    m_ASSERT(closeBracketCount == 0)
-
+  if (!b_FLAGS_OFF(criteriaOpFlags,o_FLAGS2(CRITERIA_OP_FLAG__AND,CRITERIA_OP_FLAG__OR))) { 
+    // OR / AND logical op. 
     m_ASSERT(nb_passed >= 0)
     switch (status) {
     case 'U':

@@ -287,8 +287,8 @@ m_DEFINE_ENUM_ALIAS_END()
 
 
 // Ex.
-// x AND (( y OR u OR z) AND ( w OR t))  <== request
-// ^--0---^ ^1-^ ^2-^ ^--3---^ ^4-^ ^5^  <== criteria      
+// x AND (( y OR z OR u ) AND ( v OR t ))  <== request
+// ^-0-^ ^--1--^ ^2-^ ^--3--^ ^-4--^ ^5-^  <== criteria      
 
 // #REF GreenCollectionIndexRequest <greenItem> <keys> 
 // Construct a request for indexed fetch - see GreenCollectionIndexFetch()

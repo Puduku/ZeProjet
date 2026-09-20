@@ -51,6 +51,22 @@ m_DIGGY_VAR_COMPARISON(comparison)
   m_DIGGY_RETURN(comparison)
 } // TestItemHandlerCompare
 
+int _GreenCollectionHardPullOut (GREEN_COLLECTION_HANDLE handle, char **at_greenArray);
+
+//
+static int TestDump(GREEN_COLLECTION_HANDLE handle, int n_maxDisplayedCount) { m_DIGGY_BOLLARD()
+  TEST_ITEM_STUFF t_testItemArray;
+  int physicalCount = _GreenCollectionHardPullOut(handle,(char**)&t_testItemArray);
+  m_TRACK_IF(physicalCount < 0)
+  m_DIGGY_INFO("physicalCount=%d",physicalCount)
+  int displayedCount = physicalCount;
+  if (n_maxDisplayedCount >=0 && n_maxDisplayedCount < displayedCount) displayedCount =
+    n_maxDisplayedCount;
+  int i = 0; for (; i < displayedCount ; i++) {
+    m_DIGGY_INFO("[%d] id=%d n_name=[%s]",i,t_testItemArray[i].id,t_testItemArray[i].n_name) 
+  } // while 
+  m_DIGGY_RETURN(RETURNED)
+} // TestDump
 
 // Passed:
 // - expectedTestNumber:
@@ -367,6 +383,7 @@ int main (int argc, char **argv) {
   m_TRACK_IF(TestIndexFetch(67,handle, INDEX_FETCH_FLAGS__READ_NEXT,UNDEFINED,UNDEFINED,
     RESULT__NOT_FOUND, -1, UNDEFINED, UNDEFINED, (const char*)UNDEFINED) < 0)
 
+  m_TRACK_IF(TestDump(handle,10) != RETURNED) 
   m_TRACK_IF(TestIndexFetch2(68,handle, INDEX_FETCH_FLAGS__READ_ONLY|INDEX_FETCH_FLAG__DESCENDING,
     2, INDEX_SEEK_FLAGS__LESS_EQUAL, 1970, CRITERIA_OP_FLAGS__AND, INDEX_SEEK_FLAGS__EQUAL, "Julie",
     ALL_FLAGS_OFF0, RESULT__FOUND, 1969, 0, -1, NULL) < 0)
