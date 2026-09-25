@@ -236,7 +236,7 @@ And in addition to what has just been stated, let us not forget to mention this 
 flaw in the convention. It imposes byte-by-byte copying and simply prohibits optimizing the
 copying of long character strings. 
 
-Moralité
+Moralité:
 Qualifié en son temps de langage "évolué", le C affiche aujourd'hui une rusticité évidente.
 Pour les puristes que nous sommes, ses notations singulières et sa syntaxe archaïque ne cessent de
 surprendre.
@@ -244,7 +244,7 @@ Pourtant, malgré ses imperfections originelles et une trajectoire parfois chaot
 contre-productive -, le C demeure fondamentalement cohérent. Il reste le meilleur trait d'union
 possible entre l'esprit humain, qui conçoit le code source, et la machine, qui en exécute le binaire.
 Faute de digne successeur capable d'effacer ses tares constitutionnelles, il s'impose toujours comme
-la moins mauvaise référence des langages compilés.
+la moins mauvaise référence des langages compilés. (TODO: what about Rust????)
 En somme, le C est à l'industrie du logiciel ce que Louis XI fut à l'Histoire de France, ou ce que le
 tampon Jex est au ménage :
 " Je suis MOCHE, mais qu'est-ce que je BOSSE ! "
