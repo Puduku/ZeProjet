@@ -2,6 +2,31 @@
 Kant: analyses != syntese
 
 software classes = taxinomy = analysys
+classes (and the inherent mechanism inherintance) are used the pillar concept in object oriented programming. Though seeming pertinent, the very concept concept of class is an abbeation in programming (conception / developement). 
+
+First fallacy : classes (as a concept) are presented as totally unseparable from the basic concept of "object" that is a close association of data (attributes)  and functions (methods). The fundamental principle behind "object" concept is encapsulation.
+The fundamental principle behind "classes" is inheritance. Indeed, as any taxonomy, the classification is based on the idea to make a hierarchic classification of the different according to the "features" they inherit from the parant classes.
+The fallacy is to present the "object" concept as kind of "un-finished" concept (and thus a wobby concept) . From that point of view, the "class" concept would be the totally necessary and unescapable  completion of the concept to make it really consistent. 
+Our point is that it's just the contrary. Only the basic "object" concept is really stable and consistent. The "class" extension is totally hasardous and profound source of confusion.
+The difficulty with the principle of inheritance is that it forces the principle of encapsulation (which should, after all, be inviolable)  to be contorted in all sorts of ways. To illustrate that problem, the best examples is the course of C++ which accross 
+the evolution C++11, ... C++23 ended up to collapse under the burden of specifications. 
+
+Second fallacy: the very idea of object classification has just nothing to with conception.
+To illustrate the principle of OOP, we love (as usual) to make the comparisons with the cars. But, when we think of, this example reveal how pointless "classes" are in conception.
+So, when we design cars as classes, we indeed classify cars in hierarchic classification. Usually, we start with the abstract concept of "vehicle", from which we derive the intermediary concept ("four wheels vehicles", "light vehicles", "human transportation" , etc.) 
+But do such classifications say ANYTHING about the way the cars are desgined and built ? Is there really a factotory that builds generic vehicles and another factory that assembles and tunes that generic vehicles into "for wheels vehicles" etc. ? Same remark about conception . 
+Is that the way engineers conceives actual cars ? 
+However, such car classifications make totaly sense for the governements, when it's about managing the vehicules registrered and circulating in the country. Under that context, such classifications are totally justified,  accurate  and just indispensable.
+But these classification  have absolutly no link we the way the vehicles were desgined and built. To demonstrate that, we just have to remark that it's  totally possible to reorganize the classication of one given vehiclule fleet.
+So, now it's clear that car classification has absolutlly no link with car conception, we can blow up the harmful myth. Object classification Has nothing to do with  object cnception. 
+
+What is the origin of that  dangerous confusion ?
+My theory is the following. There was an unfortunate coincidence in the late 1970s.
+In the fledgling software industry, two (initially independent) developments took place at the same time
+1. The emergence of advanced programming languages (known as "fourth-generation" languages)
+2. The ermegence of graphical interfaces.
+
+
 
 software conception = synthese 
 
