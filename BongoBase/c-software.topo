@@ -2,6 +2,7 @@
 Kant: analyses != syntese
 
 software classes = taxinomy = analysys
+
 classes (and the inherent mechanism inherintance) are used the pillar concept in object oriented programming. Though seeming pertinent, the very concept concept of class is an abbeation in programming (conception / developement). 
 
 First fallacy : classes (as a concept) are presented as totally unseparable from the basic concept of "object" that is a close association of data (attributes)  and functions (methods). The fundamental principle behind "object" concept is encapsulation.
@@ -26,6 +27,19 @@ In the fledgling software industry, two (initially independent) developments too
 1. The emergence of advanced programming languages (known as "fourth-generation" languages)
 2. The ermegence of graphical interfaces.
 
+For "third-generation" languuges, like C, the achievement was (very roughly) the following 
+-procedural/ structured  programming 
+-modular design : programmning  units (source file .c + interface .h) 
+Such languages were sufficient to put in place "basic" OOP (that is support of encapsulation), but people were thus looking
+for the next generation that will embedded more evoluted concepts. But why people quite spontaneously thought to classes ?
+An the same time, thus, people were also working on the futur graphical interfaces. And I believe here is the origin of the confusion.
+When we think about it, the classification, is THE fundamental concept of the graphical user interfaces. It's fundamental, because to be understandable 
+and thus usable by humans, GUI must be intuitive enough to people. And the ONLY way to make complex graphical interface without the people to be
+totally is to present the objects in a logical hierarchy. To design a GUI, we have to design a hierarchy ruled by a inheritance of features. We had to design something based
+on classes, but that does not mean the design itself IS class-based. 
+but probably, when people who were thinking of the fourth generation languages, were thinking of the application, they had exclusivly the implementation of class-based GUI in mind.
+Hence the confusion.
+Indeed, I understood that Many people realy doubted that the new X11/Motif graphical interface could be developpped in simple C, thought it happened of course.
 
 
 software conception = synthese 
