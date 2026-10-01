@@ -53,8 +53,16 @@ m_DIGGY_VAR_COMPARISON(comparison)
 
 int _GreenCollectionHardPullOut (GREEN_COLLECTION_HANDLE handle, char **at_greenArray);
 
+
+
+#define b_CHANGE b_TRUE
+
+
 //
-static int TestDump(GREEN_COLLECTION_HANDLE handle, int n_maxDisplayedCount) { m_DIGGY_BOLLARD()
+static int TestDump(GREEN_COLLECTION_HANDLE handle, int n_maxDisplayedCount, char b_change) {
+  m_DIGGY_BOLLARD()
+  static TEST_ITEM_STUFF nj_lastTestItemArray = NULL; 
+  static int c_lastPhysicalCount = UNDEFINED;
   TEST_ITEM_STUFF t_testItemArray;
   int physicalCount = _GreenCollectionHardPullOut(handle,(char**)&t_testItemArray);
   m_TRACK_IF(physicalCount < 0)
@@ -65,6 +73,15 @@ static int TestDump(GREEN_COLLECTION_HANDLE handle, int n_maxDisplayedCount) { m
   int i = 0; for (; i < displayedCount ; i++) {
     m_DIGGY_INFO("[%d] id=%d n_name=[%s]",i,t_testItemArray[i].id,t_testItemArray[i].n_name) 
   } // while 
+
+  if (nj_lastTestItemArray == NULL) {
+    m_MALLOC_ARRAY(nj_lastTestItemArray,physicalCount) ;
+  } else if (c_lastPhysicalCount != physicalCount) {
+    m_REALLOC_ARRAY(nj_lastTestItemArray,c_lastPhysicalCount = physicalCount);
+  } // if
+  memcpy(nj_lastTestItemArray,t_testItemArray,physicalCount);
+
+
   m_DIGGY_RETURN(RETURNED)
 } // TestDump
 
@@ -383,7 +400,7 @@ int main (int argc, char **argv) {
   m_TRACK_IF(TestIndexFetch(67,handle, INDEX_FETCH_FLAGS__READ_NEXT,UNDEFINED,UNDEFINED,
     RESULT__NOT_FOUND, -1, UNDEFINED, UNDEFINED, (const char*)UNDEFINED) < 0)
 
-  m_TRACK_IF(TestDump(handle,10) != RETURNED) 
+  m_TRACK_IF(TestDump(handle,10,!b_CHANGE) != RETURNED) 
   m_TRACK_IF(TestIndexFetch2(68,handle, INDEX_FETCH_FLAGS__READ_ONLY|INDEX_FETCH_FLAG__DESCENDING,
     2, INDEX_SEEK_FLAGS__LESS_EQUAL, 1970, CRITERIA_OP_FLAGS__AND, INDEX_SEEK_FLAGS__EQUAL, "Julie",
     ALL_FLAGS_OFF0, RESULT__FOUND, 1969, 0, -1, NULL) < 0)

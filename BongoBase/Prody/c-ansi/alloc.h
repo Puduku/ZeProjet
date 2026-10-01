@@ -51,10 +51,10 @@
 //
 // Passed:
 // - muzh_ptr: the pointer to initialize
-// - u_number: the number of elements .
+// - u_count: the number of elements .
 // - u_size: the size of each element.
-#define m_CALLOC(muzh_ptr, /*int*/ u_number, /*int*/ u_size)  m_PERROR_IF((muzh_ptr = \
- calloc(u_number,u_size)) == NULL, BLAME__CALLOC)
+#define m_CALLOC(muzh_ptr, /*int*/ u_count, /*int*/ u_size)  m_PERROR_IF((muzh_ptr = \
+ calloc(u_count,u_size)) == NULL, BLAME__CALLOC)
 
 
 // malloc() wrapper for arrays (of typed elements)
@@ -64,9 +64,9 @@
 //
 // Passed:
 // - mzhs_array: the (array) pointer to initialize
-// - u_number: the number of elements of the array
-#define m_MALLOC_ARRAY(mzhs_array, /*int*/ u_number)  m_PERROR_IF(( (mzhs_array) = \
-  malloc((u_number) * sizeof(*(mzhs_array))) ) == NULL,  BLAME__MALLOC)
+// - u_count: the number of elements of the array
+#define m_MALLOC_ARRAY(mzhs_array, /*int*/ u_count)  m_PERROR_IF(( (mzhs_array) = \
+  malloc((u_count) * sizeof(*(mzhs_array))) ) == NULL,  BLAME__MALLOC)
 
 
 // realloc() wrapper for arrays (of typed elements)
@@ -78,9 +78,9 @@
 // - mnhs_array: the (array) pointer to initialize or to re-initialize
 //   + NULL special value: pure initialization (same result than m_MALLOC_ARRAY() macro)
 //   + non NULL: pointer to current memory block (to resize)
-// - u_number: the (new) number of elements of the array
-#define m_REALLOC_ARRAY(mnhs_array, /*int*/ u_number)  m_PERROR_IF(( (mnhs_array) = \
-  realloc(mnhs_array, (u_number) * sizeof(*(mnhs_array))) ) == NULL,  BLAME__REALLOC)
+// - u_count: the (new) number of elements of the array
+#define m_REALLOC_ARRAY(mnhs_array, /*int*/ u_count)  m_PERROR_IF(( (mnhs_array) = \
+  realloc(mnhs_array, (u_count) * sizeof(*(mnhs_array))) ) == NULL,  BLAME__REALLOC)
 
 
 // malloc() wrapper for "object" instances
