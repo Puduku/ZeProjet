@@ -20,8 +20,8 @@ That is to say:
 - We must also learn to question our programming methods before blaming the language itself.
 Only then can we hope for real progress — and avoid the eternal fiascos of the C++ genre...
 In short, if we sincerely want to move forward—whether we are "conservatives" (by persisting with C) or
-"innovators" (by getting rid of C for good) - we must first point out the flaws that are truly specific to
-the C language.
+"innovators" (by getting rid of C for good) - we must first point out and UNDERSTAND the flaws that are truly
+specific to the C language.
 
 Legend: 
 - (P) Portability issues
