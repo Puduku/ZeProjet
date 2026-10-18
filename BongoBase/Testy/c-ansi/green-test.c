@@ -58,7 +58,10 @@ int _GreenCollectionHardPullOut (GREEN_COLLECTION_HANDLE handle, char **at_green
 #define b_CHANGE b_TRUE
 
 
-//
+// Passed:
+// - handle:
+// - n_maxDisplayedCount: 
+// - b_change: expect change vis-a-vis previous dump ? (TRUE/FLASE) 
 static int TestDump(GREEN_COLLECTION_HANDLE handle, int n_maxDisplayedCount, char b_change) {
   m_DIGGY_BOLLARD()
   static TEST_ITEM_STUFF nj_lastTestItemArray = NULL; 
@@ -74,13 +77,32 @@ static int TestDump(GREEN_COLLECTION_HANDLE handle, int n_maxDisplayedCount, cha
     m_DIGGY_INFO("[%d] id=%d n_name=[%s]",i,t_testItemArray[i].id,t_testItemArray[i].n_name) 
   } // while 
 
+  if (nj_lastTestItemArray != NULL) {
+    m_ASSERT(c_lastPhysicalCount == physicalCount)
+    char b_actualChange = b_FALSE0; // no change so far
+//m_DIGGY_INFO("t_testItemArray=%p nj_lastTestItemArray=%p",t_testItemArray,nj_lastTestItemArray)
+    for (i = 0; i < physicalCount ; i++) {
+//m_DIGGY_INFO("i=%d t_testItemArray[i].n_name=%p nj_lastTestItemArray[i].n_name=%p",i,
+//t_testItemArray[i].n_name,nj_lastTestItemArray[i].n_name)
+      if ((t_testItemArray[i].id != nj_lastTestItemArray[i].id) || (t_testItemArray[i].n_name !=
+        NULL && nj_lastTestItemArray[i].n_name != NULL && strcmp(t_testItemArray[i].n_name,
+         nj_lastTestItemArray[i].n_name) != 0) || (t_testItemArray[i].n_name == NULL &&
+        nj_lastTestItemArray[i].n_name != NULL) || (t_testItemArray[i].n_name != NULL && 
+        nj_lastTestItemArray[i].n_name == NULL)) { 
+          m_DIGGY_INFO("change for: i=%d",i)
+          b_actualChange = b_TRUE;
+        } // if
+    } // for 
+    m_DIGGY_VAR_D(b_change)
+    m_ASSERT(ob_HARMONY(b_change,b_actualChange))
+  } // if
+
   if (nj_lastTestItemArray == NULL) {
-    m_MALLOC_ARRAY(nj_lastTestItemArray,physicalCount) ;
+    m_MALLOC_ARRAY(nj_lastTestItemArray,c_lastPhysicalCount = physicalCount) ;
   } else if (c_lastPhysicalCount != physicalCount) {
     m_REALLOC_ARRAY(nj_lastTestItemArray,c_lastPhysicalCount = physicalCount);
   } // if
-  memcpy(nj_lastTestItemArray,t_testItemArray,physicalCount);
-
+  memcpy(nj_lastTestItemArray,t_testItemArray,physicalCount*sizeof(struct TEST_ITEM));
 
   m_DIGGY_RETURN(RETURNED)
 } // TestDump
@@ -93,8 +115,9 @@ static int TestDump(GREEN_COLLECTION_HANDLE handle, int n_maxDisplayedCount, cha
 // - n_expectedId: -1 special value => no fetched item check 
 // - c_newId: not significant if no fetched item check 
 // - cn_newName: not significant if no fetched item check (NULL => NO update)
-static int TestFetch(int expectedTestNumber,  GREEN_COLLECTION_HANDLE handle,  int n_entry, 
-  int expectedEntry,  int n_expectedId, int c_newId, const char *cn_newName) {
+// - b_change: 
+static int TestFetch(int expectedTestNumber, GREEN_COLLECTION_HANDLE handle,  int n_entry, 
+  int expectedEntry,  int n_expectedId, int c_newId, const char *cn_newName, char b_change) {
   m_DIGGY_BOLLARD()
   m_ASSERT(expectedTestNumber == ++testNumber)
   m_DIGGY_VAR_D(testNumber)
@@ -119,6 +142,7 @@ static int TestFetch(int expectedTestNumber,  GREEN_COLLECTION_HANDLE handle,  i
   int completed = UNDEFINED;
   m_TRACK_IF((completed = GreenCollectionVerifyIndexes(handle)) < 0)  
   m_RAISE_IF(completed != COMPLETED__OK, ANOMALY__CORRUPTED_INDEXES)
+  m_TRACK_IF(TestDump(handle,10,b_change) != RETURNED) 
   m_DIGGY_RETURN(RETURNED)
 } // TestFetch
 
@@ -185,7 +209,7 @@ static int TestIndexFetch2(int expectedTestNumber,  GREEN_COLLECTION_HANDLE hand
     m_ASSERT(indexFetchFlags != INDEX_FETCH_FLAGS__FETCH) 
     m_ASSERT(expectedResult == RESULT__NOT_FOUND) 
   } // if
-
+m_DIGGY_INFO("cc_criteriaOpFlags1=%x cc_criteriaOpFlags2=%x",cc_criteriaOpFlags1,cc_criteriaOpFlags2)
   TEST_ITEM_STUFF nt_testItemStuff = (TEST_ITEM_STUFF)UNDEFINED;
   int n_entry = UNDEFINED;
 m_DIGGY_VAR_INDEX_FETCH_FLAGS(indexFetchFlags)
@@ -266,21 +290,22 @@ int main (int argc, char **argv) {
   m_TRACK_IF((ret = GreenCollectionAddIndex(handle,1,(int*)NULL)) < 0) 
   m_ASSERT(ret == NAME_INDEX_LABEL) 
 
-  m_TRACK_IF(TestFetch(1, handle,-1,0,0,1969,"Julie") < 0)
+  m_TRACK_IF(TestDump(handle,10,b_CHANGE) != RETURNED) // Prime the pump 
+  m_TRACK_IF(TestFetch(1, handle,-1,0,0,1969,"Julie", b_CHANGE) < 0)
   m_TRACK_IF(TestCount(2, handle,1,1969) < 0)
 
-  m_TRACK_IF(TestFetch(3, handle,-1,1,0,1968,NULL) < 0)
+  m_TRACK_IF(TestFetch(3, handle,-1,1,0,1968,NULL, b_CHANGE) < 0)
   m_TRACK_IF(TestCount(4, handle,2,1968) < 0)
 
-  m_TRACK_IF(TestFetch(5, handle,2,2,-1,UNDEFINED,(const char*)UNDEFINED) < 0)
+  m_TRACK_IF(TestFetch(5, handle,2,2,-1,UNDEFINED,(const char*)UNDEFINED, !b_CHANGE) < 0)
 
-  m_TRACK_IF(TestFetch(6, handle,-1,2,0,1967,NULL) < 0)
+  m_TRACK_IF(TestFetch(6, handle,-1,2,0,1967,NULL, b_CHANGE) < 0)
   m_TRACK_IF(TestCount(7, handle,3,1967) < 0)
 
-  m_TRACK_IF(TestFetch(8, handle,-1,3,0,1970,NULL) < 0)
+  m_TRACK_IF(TestFetch(8, handle,-1,3,0,1970,NULL, b_CHANGE) < 0)
   m_TRACK_IF(TestCount(9, handle,4,1970) < 0)
 
-  m_TRACK_IF(TestFetch(10, handle,-1,4,0,1966,NULL) < 0)
+  m_TRACK_IF(TestFetch(10, handle,-1,4,0,1966,NULL, b_CHANGE) < 0)
   m_TRACK_IF(TestCount(11, handle,5,1966) < 0)
 
   m_TRACK_IF(TestIndexFetch(12,handle, INDEX_FETCH_FLAGS__FETCH,INDEX_SEEK_FLAGS__EQUAL,1968,
@@ -291,13 +316,13 @@ int main (int argc, char **argv) {
     RESULT__NOT_FOUND, 0, 5, 3068, NULL) < 0)
   m_TRACK_IF(TestCount(15, handle,6,3068) < 0)
   
-  m_TRACK_IF(TestFetch(16,handle, 1,1,2068,2068,NULL) < 0)
+  m_TRACK_IF(TestFetch(16,handle, 1,1,2068,2068,NULL,b_CHANGE) < 0)
   m_TRACK_IF(TestIndexFetch(17,handle, INDEX_FETCH_FLAGS__REMOVE,INDEX_SEEK_FLAGS__EQUAL,2068,
     RESULT__FOUND, 2068, 1, 2068, NULL) < 0)
   m_TRACK_IF(TestCount(18,handle, 6,3068) < 0)
-  m_TRACK_IF(TestFetch(19,handle, 1,1,-1,UNDEFINED,(const char*)UNDEFINED) < 0)
+  m_TRACK_IF(TestFetch(19,handle, 1,1,-1,UNDEFINED,(const char*)UNDEFINED,!b_CHANGE) < 0)
 
-  m_TRACK_IF(TestFetch(20,handle, -1,1,2068,2068,NULL) < 0)
+  m_TRACK_IF(TestFetch(20,handle, -1,1,2068,2068,NULL,!b_CHANGE) < 0)
   m_TRACK_IF(TestCount(21,handle, 6,3068) < 0)
 
   m_TRACK_IF(TestIndexFetch(22,handle, INDEX_FETCH_FLAGS__READ_ONLY,INDEX_SEEK_FLAGS__ANY,UNDEFINED,
@@ -361,18 +386,18 @@ int main (int argc, char **argv) {
 
   m_TRACK_IF(GreenCollectionClear(handle) != RETURNED) 
 
-  m_TRACK_IF(TestFetch(49, handle,-1,0,1969,1969,NULL) < 0)
+  m_TRACK_IF(TestFetch(49, handle,-1,0,1969,1969,NULL,!b_CHANGE) < 0)
   m_TRACK_IF(TestCount(50, handle,1,1969) < 0)
 
-  m_TRACK_IF(TestFetch(51, handle,-1,1,2068,1968,NULL) < 0)
+  m_TRACK_IF(TestFetch(51, handle,-1,1,2068,1968,NULL,b_CHANGE) < 0)
 
-  m_TRACK_IF(TestFetch(52, handle,-1,2,1967,1969,NULL) < 0)
+  m_TRACK_IF(TestFetch(52, handle,-1,2,1967,1969,NULL,b_CHANGE) < 0)
 
-  m_TRACK_IF(TestFetch(53, handle,-1,3,1970,1970,NULL) < 0)
+  m_TRACK_IF(TestFetch(53, handle,-1,3,1970,1970,NULL,!b_CHANGE) < 0)
 
-  m_TRACK_IF(TestFetch(54, handle,-1,4,1966,1966,NULL) < 0)
+  m_TRACK_IF(TestFetch(54, handle,-1,4,1966,1966,NULL,!b_CHANGE) < 0)
 
-  m_TRACK_IF(TestFetch(55, handle,-1,5,3068,1971,NULL) < 0)
+  m_TRACK_IF(TestFetch(55, handle,-1,5,3068,1971,NULL,b_CHANGE) < 0)
 
   m_TRACK_IF(TestIndexFetch(56,handle, INDEX_FETCH_FLAGS__READ_ONLY,
     INDEX_SEEK_FLAGS__GREATER_EQUAL,1968, RESULT__FOUND, 1968, 1, -1, NULL) < 0)
