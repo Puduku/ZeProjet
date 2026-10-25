@@ -229,6 +229,45 @@ int GreenCollectionFetch(GREEN_COLLECTION_HANDLE cp_handle, int n_entry,
 // - -1: unexpected problem ; anomaly is raised
 int GreenCollectionGetCount(GREEN_COLLECTION_HANDLE cp_handle, char **navntr_greenItemStuff ) ;
 
+// #REF GreenCollectionVerifyPhysicalChanges <green item>
+// Verify whether items physically changed or not.
+// NOTICE: "logical" changes are NOT detected that way
+// 
+// Passed:
+// - handle: see GreenCollectionCreateInstance()
+// - anh_itemCopyArray: NULL if not yet allocated 
+// - *ac_itemCopyPhysicalCount: only significant if allocated 
+//
+// Changed
+// - *anh_itemCopyArray: this copy will be used for next verification 
+// - *ac_itemCopyPhysicalCount: physical item number
+// - *ac_firstEntry: only significant when change located; first change located
+// 
+// return :  
+// - RESULT__FOUND: Found change (at least one) 
+// - RESULT__NOT_FOUND: no change vis-a-vis last check (or the item array has been just created)
+// - -1: unexpected problem ; anomaly is raised
+int GreenCollectionVerifyPhysicalChanges(GREEN_COLLECTION_HANDLE handle,
+  char** anh_itemCopyArray, int* ac_itemCopyPhysicalCount, int *ac_firstEntry) ;
+
+// To be called when you "switch" into "pull out" mode - allows to access to all items of the
+// collection "at the same time" and avoid multiple calls to GreenCollectionFetch() function...
+// NOTICE: You MAY NOT "pull out" the collection if you use index(es).
+//
+// Passed:
+// - handle: see GreenCollectionCreateInstance()
+// - ap_greenArray: green array pointer's address 
+//
+// Changed:
+// - *atp_greenArray: PHYSICAL green array (start address) ; 
+//   NOTICE: (t_) the array is technically valid till a "smart fetch" is operated in the array. 
+//   (See GreenCollectionFetch() and GreenCollectionIndexFetch() functions).
+//
+// Returned:
+// - >= 0: number of PHYSICAL items (> 0)
+// - -1: unexpected problem ; anomaly is raised
+int GreenCollectionPullOut(GREEN_COLLECTION_HANDLE handle,  char **at_greenArray) ;
+
 
 // #REF GreenCollectionAddIndex  <green item> 
 // Add a "formal index" to the collection. Allows to sort and quickly retrieve <green item>s in the
@@ -349,13 +388,6 @@ int GreenCollectionIndexRequestRNew(GREEN_COLLECTION_HANDLE cp_handle,
 int GreenCollectionIndexRequestRAddCriterion(GREEN_COLLECTION_HANDLE cp_handle,
   char* nf_indexFetch5AutomaticBuffer, struct G_REQUEST_CRITERION criterion, char b_lastCriterion);
 
-
-//// Indicates whether key value parameter is significant with index request... 
-//static inline char mb_SignificantGreenCollectionIndexKeys(unsigned int indexSeekFlags) {
-//  m_DIGGY_BOLLARD_S()
-//  m_DIGGY_RETURN (b_FLAGS_OFF(indexSeekFlags,INDEX_SEEK_FLAG__ANY));
-//} // mb_SignificantGreenCollectionIndexKeys
-
      
 enum {
   INDEX_FETCH_FLAG__NEXT       = 0x01, 
@@ -458,7 +490,6 @@ int GreenCollectionIndexFetch(GREEN_COLLECTION_HANDLE cp_handle,
 //        est bien vu par l'index...
 
 
-
 // Refresh the indexes regarding last "fetched" item.
 // You can call that function just after having initialized / updated fetched item's content.
 // However such calls are actually not necessary since indexes synchronization is made
@@ -490,24 +521,6 @@ int GreenCollectionVerifyIndexes(GREEN_COLLECTION_HANDLE handle) ;
 // you are certain using the indexes correctly, you can raise that anomaly...
 #define ANOMALY__CORRUPTED_INDEXES "Index(es) is (are) corrupted!"
 
-
-// To be called when you "switch" into "pull out" mode - allows to access to all items of the
-// collection "at the same time" and avoid multiple calls to GreenCollectionFetch() function...
-// NOTICE: You MAY NOT "pull out" the collection if you use index(es).
-//
-// Passed:
-// - handle: see GreenCollectionCreateInstance()
-// - ap_greenArray: green array pointer's address 
-//
-// Changed:
-// - *atp_greenArray: PHYSICAL green array (start address) ; 
-//   NOTICE: (t_) the array is technically valid till a "smart fetch" is operated in the array. 
-//   (See GreenCollectionFetch() and GreenCollectionIndexFetch() functions).
-//
-// Returned:
-// - >= 0: number of PHYSICAL items (> 0)
-// - -1: unexpected problem ; anomaly is raised
-int GreenCollectionPullOut(GREEN_COLLECTION_HANDLE handle,  char **at_greenArray) ;
 
 // #REF GreenCollectionFreeze
 // "Freeze" the collection:

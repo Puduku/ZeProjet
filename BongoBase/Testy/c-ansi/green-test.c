@@ -64,45 +64,21 @@ int _GreenCollectionHardPullOut (GREEN_COLLECTION_HANDLE handle, char **at_green
 // - b_change: expect change vis-a-vis previous dump ? (TRUE/FLASE) 
 static int TestDump(GREEN_COLLECTION_HANDLE handle, int n_maxDisplayedCount, char b_change) {
   m_DIGGY_BOLLARD()
-  static TEST_ITEM_STUFF nj_lastTestItemArray = NULL; 
-  static int c_lastPhysicalCount = UNDEFINED;
-  TEST_ITEM_STUFF t_testItemArray;
-  int physicalCount = _GreenCollectionHardPullOut(handle,(char**)&t_testItemArray);
-  m_TRACK_IF(physicalCount < 0)
-  m_DIGGY_INFO("physicalCount=%d",physicalCount)
-  int displayedCount = physicalCount;
-  if (n_maxDisplayedCount >=0 && n_maxDisplayedCount < displayedCount) displayedCount =
-    n_maxDisplayedCount;
-  int i = 0; for (; i < displayedCount ; i++) {
-    m_DIGGY_INFO("[%d] id=%d n_name=[%s]",i,t_testItemArray[i].id,t_testItemArray[i].n_name) 
-  } // while 
-
-  if (nj_lastTestItemArray != NULL) {
-    m_ASSERT(c_lastPhysicalCount == physicalCount)
-    char b_actualChange = b_FALSE0; // no change so far
-//m_DIGGY_INFO("t_testItemArray=%p nj_lastTestItemArray=%p",t_testItemArray,nj_lastTestItemArray)
-    for (i = 0; i < physicalCount ; i++) {
-//m_DIGGY_INFO("i=%d t_testItemArray[i].n_name=%p nj_lastTestItemArray[i].n_name=%p",i,
-//t_testItemArray[i].n_name,nj_lastTestItemArray[i].n_name)
-      if ((t_testItemArray[i].id != nj_lastTestItemArray[i].id) || (t_testItemArray[i].n_name !=
-        NULL && nj_lastTestItemArray[i].n_name != NULL && strcmp(t_testItemArray[i].n_name,
-         nj_lastTestItemArray[i].n_name) != 0) || (t_testItemArray[i].n_name == NULL &&
-        nj_lastTestItemArray[i].n_name != NULL) || (t_testItemArray[i].n_name != NULL && 
-        nj_lastTestItemArray[i].n_name == NULL)) { 
-          m_DIGGY_INFO("change for: i=%d",i)
-          b_actualChange = b_TRUE;
-        } // if
-    } // for 
-    m_DIGGY_VAR_D(b_change)
-    m_ASSERT(ob_HARMONY(b_change,b_actualChange))
-  } // if
-
-  if (nj_lastTestItemArray == NULL) {
-    m_MALLOC_ARRAY(nj_lastTestItemArray,c_lastPhysicalCount = physicalCount) ;
-  } else if (c_lastPhysicalCount != physicalCount) {
-    m_REALLOC_ARRAY(nj_lastTestItemArray,c_lastPhysicalCount = physicalCount);
-  } // if
-  memcpy(nj_lastTestItemArray,t_testItemArray,physicalCount*sizeof(struct TEST_ITEM));
+  static TEST_ITEM_STUFF nhj_itemCopyArray = NULL; 
+  static int c_itemCopyPhysicalCount = UNDEFINED;
+  int c_firstEntry = UNDEFINED;
+  int result = GreenCollectionVerifyPhysicalChanges(handle, (char**)&nhj_itemCopyArray,
+    &c_itemCopyPhysicalCount, &c_firstEntry);
+m_DIGGY_INFO("nhj_itemCopyArray=%p",nhj_itemCopyArray)
+  switch (result) {
+  case RESULT__FOUND:
+m_DIGGY_INFO("[%d] id=%d n_name=[%s]",c_firstEntry,nhj_itemCopyArray[c_firstEntry].id,
+nhj_itemCopyArray[c_firstEntry].n_name) 
+    m_ASSERT(b_change)
+  break; case RESULT__NOT_FOUND:
+    m_ASSERT(!b_change)
+  break; default: m_TRACK() 
+  } // switch
 
   m_DIGGY_RETURN(RETURNED)
 } // TestDump
@@ -290,7 +266,7 @@ int main (int argc, char **argv) {
   m_TRACK_IF((ret = GreenCollectionAddIndex(handle,1,(int*)NULL)) < 0) 
   m_ASSERT(ret == NAME_INDEX_LABEL) 
 
-  m_TRACK_IF(TestDump(handle,10,b_CHANGE) != RETURNED) // Prime the pump 
+  m_TRACK_IF(TestDump(handle,10,!b_CHANGE) != RETURNED) // Prime the pump 
   m_TRACK_IF(TestFetch(1, handle,-1,0,0,1969,"Julie", b_CHANGE) < 0)
   m_TRACK_IF(TestCount(2, handle,1,1969) < 0)
 

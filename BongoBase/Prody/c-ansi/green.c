@@ -485,15 +485,6 @@ int GreenCollectionRefreshIndexes (GREEN_COLLECTION_HANDLE handle) {
   m_DIGGY_RETURN(RETURNED)
 } // GreenCollectionRefreshIndexes
 
-// hard dump (test/debug purpose)
-int _GreenCollectionHardPullOut (GREEN_COLLECTION_HANDLE handle, char **at_greenArray) {
-  m_DIGGY_BOLLARD()
-
-  *at_greenArray = handle->h_greenArray;
-
-  m_DIGGY_RETURN(handle->itemPhysicalCount)
-} // _GreenCollectionHardPullOut
-
 // Public function; see description in .h
 int GreenCollectionPullOut (GREEN_COLLECTION_HANDLE handle, char **at_greenArray) {
   m_DIGGY_BOLLARD()
@@ -654,6 +645,40 @@ int GreenCollectionFetch (GREEN_COLLECTION_HANDLE cp_handle, int n_entry,
   m_DIGGY_RETURN(entry)
 } // GreenCollectionFetch
 
+// See .h
+int GreenCollectionVerifyPhysicalChanges(GREEN_COLLECTION_HANDLE handle,
+  char** anh_itemCopyArray, int* ac_itemCopyPhysicalCount, int *ac_firstEntry) {
+  m_DIGGY_BOLLARD()
+m_DIGGY_INFO("handle->itemPhysicalCount=%d *anh_itemCopyArray=%p",handle->itemPhysicalCount,*anh_itemCopyArray)
+  int result = RESULT__NOT_FOUND; // a priori
+
+  if (*anh_itemCopyArray != NULL) {
+    m_ASSERT(*ac_itemCopyPhysicalCount <= handle->itemPhysicalCount)
+    int i = 0; char *ptr = handle->h_greenArray, *ptr2 = *anh_itemCopyArray;
+    for (; i < *ac_itemCopyPhysicalCount; i++, ptr+= handle->greenItemSize, ptr2+= handle->greenItemSize) {
+      if (memcmp(ptr,ptr2,handle->greenItemSize) != 0) {
+m_DIGGY_INFO("change for: i=%d",i)
+	if (result == RESULT__NOT_FOUND) {
+          result = RESULT__FOUND;
+          *ac_firstEntry = i; 
+        } // if
+      } // if
+    } // for 
+    if (result == RESULT__NOT_FOUND && *ac_itemCopyPhysicalCount < handle->itemPhysicalCount) {
+      result = RESULT__FOUND;
+      *ac_firstEntry = i; 
+    } // if
+  } // if
+
+  if (*anh_itemCopyArray == NULL) m_MALLOC_ARRAY(*anh_itemCopyArray,
+    handle->itemPhysicalCount)
+  else if (*ac_itemCopyPhysicalCount != handle->itemPhysicalCount) m_REALLOC_ARRAY(
+    *anh_itemCopyArray,handle->itemPhysicalCount)
+  *ac_itemCopyPhysicalCount = handle->itemPhysicalCount;
+  memcpy(*anh_itemCopyArray,handle->h_greenArray,handle->itemPhysicalCount*handle->greenItemSize);
+
+  m_DIGGY_RETURN(result)
+} // GreenCollectionVerifyPhysicalChanges
 
 // Public function; see description in .h
 int GreenCollectionClear (GREEN_COLLECTION_HANDLE handle) {
