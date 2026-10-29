@@ -651,7 +651,7 @@ int GreenCollectionVerifyPhysicalChanges(GREEN_COLLECTION_HANDLE handle,
   char** anh_itemCopyArray, int* ac_itemCopyPhysicalCount, int *ac_firstEntry) {
   m_DIGGY_BOLLARD()
 m_DIGGY_INFO("handle->itemPhysicalCount=%d *anh_itemCopyArray=%p",handle->itemPhysicalCount,*anh_itemCopyArray)
-  int result = RESULT__NOT_FOUND; // a priori
+  int count = 0; 
 
   if (*anh_itemCopyArray != NULL) {
     m_ASSERT(*ac_itemCopyPhysicalCount <= handle->itemPhysicalCount)
@@ -659,15 +659,11 @@ m_DIGGY_INFO("handle->itemPhysicalCount=%d *anh_itemCopyArray=%p",handle->itemPh
     for (; i < *ac_itemCopyPhysicalCount; i++, ptr+= handle->greenItemSize, ptr2+= handle->greenItemSize) {
       if (memcmp(ptr,ptr2,handle->greenItemSize) != 0) {
 m_DIGGY_INFO("change for: i=%d",i)
-	if (result == RESULT__NOT_FOUND) {
-          result = RESULT__FOUND;
-          *ac_firstEntry = i; 
-        } // if
+        if (count++ == 0) *ac_firstEntry = i; 
       } // if
     } // for 
-    if (result == RESULT__NOT_FOUND && *ac_itemCopyPhysicalCount < handle->itemPhysicalCount) {
-      result = RESULT__FOUND;
-      *ac_firstEntry = i; 
+    if (*ac_itemCopyPhysicalCount < handle->itemPhysicalCount) {
+      if (count++ == 0) *ac_firstEntry = i; 
     } // if
   } // if
 
@@ -678,7 +674,7 @@ m_DIGGY_INFO("change for: i=%d",i)
   *ac_itemCopyPhysicalCount = handle->itemPhysicalCount;
   memcpy(*anh_itemCopyArray,handle->h_greenArray,handle->itemPhysicalCount*handle->greenItemSize);
 
-  m_DIGGY_RETURN(result)
+  m_DIGGY_RETURN(count)
 } // GreenCollectionVerifyPhysicalChanges
 
 // Public function; see description in .h
@@ -905,8 +901,6 @@ m_DIGGY_VAR_INDEX_FETCH_FLAGS(indexFetchFlags)
 int GreenCollectionVerifyIndexes (GREEN_COLLECTION_HANDLE handle) {
   m_DIGGY_BOLLARD()
   // MINIMONITOR: ANY
-//  m_TRACK_IF(GreenCollectionRefreshIndexesInternal(handle,b_TRUE) != RETURNED)
-//  // MINIMONITOR: CLEAN
 
   int completed = COMPLETED__OK; // a priori 
 

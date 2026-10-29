@@ -244,8 +244,7 @@ int GreenCollectionGetCount(GREEN_COLLECTION_HANDLE cp_handle, char **navntr_gre
 // - *ac_firstEntry: only significant when change located; first change located
 // 
 // return :  
-// - RESULT__FOUND: Found change (at least one) 
-// - RESULT__NOT_FOUND: no change vis-a-vis last check (or the item array has been just created)
+// - >= 0: number of items with physical change
 // - -1: unexpected problem ; anomaly is raised
 int GreenCollectionVerifyPhysicalChanges(GREEN_COLLECTION_HANDLE handle,
   char** anh_itemCopyArray, int* ac_itemCopyPhysicalCount, int *ac_firstEntry) ;

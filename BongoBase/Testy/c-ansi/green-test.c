@@ -65,22 +65,21 @@ static int VerifyTestItems(GREEN_COLLECTION_HANDLE handle, char b_change) {
   static TEST_ITEM_STUFF nhj_itemCopyArray = NULL; 
   static int c_itemCopyPhysicalCount = UNDEFINED;
   int c_firstEntry = UNDEFINED;
-  int result = GreenCollectionVerifyPhysicalChanges(handle, (char**)&nhj_itemCopyArray,
+  int count = GreenCollectionVerifyPhysicalChanges(handle, (char**)&nhj_itemCopyArray,
     &c_itemCopyPhysicalCount, &c_firstEntry);
-m_DIGGY_INFO("nhj_itemCopyArray=%p",nhj_itemCopyArray)
-  m_TRACK_IF(result < 0)
-  int i = 0; for (; i < testItemDumpMax && i < c_itemCopyPhysicalCount; i++) {
-    m_DIGGY_INFO("[%d] id=%d n_name=[%s]",i,nhj_itemCopyArray[i].id,nhj_itemCopyArray[i].n_name)
-  } // for
-  switch (result) {
-  case RESULT__FOUND:
-    m_DIGGY_INFO("changed: [%d] id=%d n_name=[%s]",c_firstEntry,nhj_itemCopyArray[c_firstEntry].id,
+  m_TRACK_IF(count < 0)
+  if (testItemDumpMax > 0) {
+    m_DIGGY_INFO("Dump: nhj_itemCopyArray=%p c_itemCopyPhysicalCount=%d",nhj_itemCopyArray,
+      c_itemCopyPhysicalCount)
+    int i = 0; for (; i < testItemDumpMax && i < c_itemCopyPhysicalCount; i++) {
+      m_DIGGY_INFO("[%d] id=%d n_name=[%s]",i,nhj_itemCopyArray[i].id,nhj_itemCopyArray[i].n_name)
+    } // for
+  } // if
+  if (count > 0) {
+    m_DIGGY_INFO("first changed: [%d] id=%d n_name=[%s]",c_firstEntry,nhj_itemCopyArray[c_firstEntry].id,
       nhj_itemCopyArray[c_firstEntry].n_name) 
     m_ASSERT(b_change)
-  break; case RESULT__NOT_FOUND:
-    m_ASSERT(!b_change)
-  break; default: m_TRACK() 
-  } // switch
+  } else m_ASSERT(!b_change)
 
   m_DIGGY_RETURN(RETURNED)
 } // VerifyTestItems
@@ -409,7 +408,6 @@ int main (int argc, char **argv) {
   m_TRACK_IF(TestIndexFetch(67,handle, INDEX_FETCH_FLAGS__READ_NEXT,UNDEFINED,UNDEFINED,
     RESULT__NOT_FOUND, -1, UNDEFINED, UNDEFINED, (const char*)UNDEFINED) < 0)
 
-//  m_TRACK_IF(VerifyTestItems(handle,!b_CHANGE) != RETURNED) 
   m_TRACK_IF(TestIndexFetch2(68,handle, INDEX_FETCH_FLAGS__READ_ONLY|INDEX_FETCH_FLAG__DESCENDING,
     2, INDEX_SEEK_FLAGS__LESS_EQUAL, 1970, CRITERIA_OP_FLAGS__AND, INDEX_SEEK_FLAGS__EQUAL, "Julie",
     ALL_FLAGS_OFF0, RESULT__FOUND, 1969, 0, -1, NULL) < 0)
