@@ -21,7 +21,7 @@
 #include "c-ansi/testy-diggy.h"
 
 
-extern char b_diggyGreenCollectionExam; // TODO: ag virer
+extern int diggyGreenDumpMax; // TODO: ag virer
 
 
 // Index sequence:

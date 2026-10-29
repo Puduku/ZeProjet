@@ -13,7 +13,9 @@
 #include "c-ansi/diggy.h"
 #include "c-ansi/testy-diggy.h"
 
-char b_diggyGreenCollectionExam = b_TRUE; // TODO: ag virer...
+#ifdef DIGGY
+int diggyGIndexDumpMax = 0; // TODO: ag virer...
+#endif
 
 // INDEX SEQUENCE:
 // --------------
@@ -441,12 +443,12 @@ static int GIndexVerify(struct G_INDEX *a_me) { m_DIGGY_BOLLARD_S()
   int comparison = UNDEFINED;
 
 #ifdef DIGGY
-  if (b_diggyGreenCollectionExam) {
-    m_DIGGY_INFO("Exam: a_me->count=%d (indexLabel=%d)",a_me->count,a_me->indexLabel)
-    int i = 0 ; for (; i < a_me->count; i++) {
-      m_DIGGY_INFO("  a_me->hsc_array[%d]=%d",i,a_me->hsc_array[i])
-    } // for
-  } // if 
+if (diggyGIndexDumpMax > 0) {
+  m_DIGGY_INFO("Dump: a_me->count=%d (indexLabel=%d)",a_me->count,a_me->indexLabel)
+  int i = 0 ; for (; i < diggyGIndexDumpMax && i < a_me->count; i++) {
+    m_DIGGY_INFO("  a_me->hsc_array[%d]=%d",i,a_me->hsc_array[i])
+  } // for
+} // if 
 #endif
 
   int j = 1; for (; j < a_me->count; j++) {
@@ -459,6 +461,7 @@ static int GIndexVerify(struct G_INDEX *a_me) { m_DIGGY_BOLLARD_S()
   } // for
 
   if (j < a_me->count) {
+m_DIGGY_VAR_D(j)
     m_DIGGY_RETURN(COMPLETED__BUT)
   } // if
 
@@ -486,8 +489,10 @@ static int GIndexVerifyEntry(struct G_INDEX *a_me, int entry, int expectedHits) 
     if (*s_indexArrayPtr == entry) hits++ ;
   } // for
 
-  if (hits != expectedHits) completed = COMPLETED__BUT;
-
+  if (hits != expectedHits) {
+m_DIGGY_INFO("hits=%d expectedHits=%d",hits,expectedHits)
+    completed = COMPLETED__BUT;
+  } // if
   m_DIGGY_RETURN(completed)
 } // GIndexVerifyEntry 
 
@@ -1006,6 +1011,7 @@ int GIndexesVerifyCount (G_INDEXES_HANDLE handle,int *ac_commonCount) { m_DIGGY_
   for ( ; i < handle->indexesNumber ; i++, s_index++) {
     int thatCount = om_GIndexGetCount(s_index);
     if (n_lastCount != -1 && thatCount != n_lastCount) {
+m_DIGGY_INFO("thatCount=%d n_lastCount=%d",thatCount,n_lastCount)
       completed = COMPLETED__BUT;
       break;
     } // if 

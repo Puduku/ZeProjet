@@ -17,7 +17,7 @@
 
 
 #ifdef DIGGY
-extern char b_diggyGreenCollectionExam ;
+int diggyGreenDumpMax = 0;
 #endif
 
 // ENTRIES_STACK: 
@@ -45,7 +45,10 @@ static int EntriesStackVerifyEntry (const struct ENTRIES_STACK *ap_me, int entry
     if (*entryPtr == entry) hits++ ;
   } // for
 
-  if (hits != expectedHits) completed = COMPLETED__BUT;
+  if (hits != expectedHits) {
+m_DIGGY_INFO("hits=%d expectedHits=%d",hits,expectedHits);
+    completed = COMPLETED__BUT;
+  } // if
 
   m_DIGGY_RETURN(completed)
 } // EntriesStackVerifyEntry 
@@ -53,23 +56,21 @@ static int EntriesStackVerifyEntry (const struct ENTRIES_STACK *ap_me, int entry
 // Passed:
 // - ap_me:
 //
-// Returned
-// - >= 0: number items in the stack 
-// - -1: unexpected problem ; anomaly is raised
-static int EntriesStackVerifyCount (const struct ENTRIES_STACK *ap_me) {
+// Returned: >= 0: number items in the stack 
+static int o_EntriesStackVerifyCount (const struct ENTRIES_STACK *ap_me) {
   m_DIGGY_BOLLARD_S()
 
 #ifdef DIGGY
-  if (b_diggyGreenCollectionExam) {
-    m_DIGGY_INFO("Exam: ap_me->count=%d",ap_me->count)
-    int i = 0; for (; i < ap_me->count; i++) {
+  if (diggyGreenDumpMax > 0) {
+    m_DIGGY_INFO("Dump: ap_me->count=%d",ap_me->count)
+    int i = 0; for (; i < diggyGreenDumpMax && i < ap_me->count; i++) {
       m_DIGGY_INFO("  ap_me->hsc_stack[%d]=%d",i,ap_me->hsc_stack[i])
     } // for
   } // if 
 #endif
 
   m_DIGGY_RETURN(ap_me->count)  
-} // EntriesStackVerifyCount 
+} // o_EntriesStackVerifyCount 
 
 // INDEX_FETCH: 
 // -----------
@@ -849,7 +850,6 @@ int GreenCollectionIndexFetch(GREEN_COLLECTION_HANDLE cp_handle,
   char **acvntr_greenItemStuff, int *nacvn_entry) {
   m_DIGGY_BOLLARD()
   // MINIMONITOR: ANY
-  //m_TRACK_IF(GreenCollectionRefreshIndexesInternal(cp_handle,b_TRUE) != RETURNED)
 m_DIGGY_VAR_INDEX_FETCH_FLAGS(indexFetchFlags)
 
   char *indexFetchBuffer = (nf_indexFetchAutomaticBuffer != NULL? nf_indexFetchAutomaticBuffer:
@@ -905,29 +905,29 @@ m_DIGGY_VAR_INDEX_FETCH_FLAGS(indexFetchFlags)
 int GreenCollectionVerifyIndexes (GREEN_COLLECTION_HANDLE handle) {
   m_DIGGY_BOLLARD()
   // MINIMONITOR: ANY
-  m_TRACK_IF(GreenCollectionRefreshIndexesInternal(handle,b_TRUE) != RETURNED)
-  // MINIMONITOR: CLEAN
+//  m_TRACK_IF(GreenCollectionRefreshIndexesInternal(handle,b_TRUE) != RETURNED)
+//  // MINIMONITOR: CLEAN
 
   int completed = COMPLETED__OK; // a priori 
 
 #ifdef DIGGY
-  if (b_diggyGreenCollectionExam) {
-    m_DIGGY_INFO("Exam: handle->(h_greenArray=%p itemPhysicalCount=%d i_itemCount=%d)",
-      handle->h_greenArray,handle->itemPhysicalCount,handle->i_itemCount)
-    int i = 0 ; for (; i < handle->i_itemCount; i++) {
-      m_DIGGY_INFO("  handle->hsc_flags[%d]=%02x",i,handle->hsc_flags[i])
-    } // for
-  } // if 
+  if (diggyGreenDumpMax > 0) m_DIGGY_INFO(
+    "Dump: handle->(h_greenArray=%p itemPhysicalCount=%d i_itemCount=%d)",
+    handle->h_greenArray,handle->itemPhysicalCount,handle->i_itemCount)
+  int i = 0; for (; i < diggyGreenDumpMax && i < handle->i_itemCount; i++) {
+    m_DIGGY_INFO("  handle->hsc_flags[%d]=%02x",i,handle->hsc_flags[i])
+  } // for
 #endif
 
-  int gapsCount = EntriesStackVerifyCount(&handle->h_gaps);
-  m_TRACK_IF(gapsCount < 0)
+  int gapCount = o_EntriesStackVerifyCount(&handle->h_gaps);
 
+  int fetched4ChangeCount = o_EntriesStackVerifyCount(&handle->h_fetched4ChangeStack);
+ 
   // 1. Are indexes enabled ? (if not, just verify there's no gap 
   switch (GIndexesVerifyEnabled(handle->h_GIndexesHandle)) {
   case ANSWER__YES:
   break; case ANSWER__NO:
-    if (gapsCount != 0) completed = COMPLETED__BUT;
+    if (gapCount != 0) completed = COMPLETED__BUT;
     m_DIGGY_RETURN(completed)
   break; default:
     m_TRACK()
@@ -940,9 +940,14 @@ int GreenCollectionVerifyIndexes (GREEN_COLLECTION_HANDLE handle) {
     completed = GIndexesVerifyCount(handle->h_GIndexesHandle,&c_indexedItemCount);
     m_TRACK_IF(completed < 0)
 m_DIGGY_VAR_D(completed)
-m_DIGGY_INFO("handle->i_itemCount=%d c_indexedItemCount=%d gapsCount=%d",handle->i_itemCount,c_indexedItemCount,gapsCount)
+m_DIGGY_INFO("handle->i_itemCount=%d c_indexedItemCount=%d fetched4ChangeCount=%d gapCount=%d",
+  handle->i_itemCount,c_indexedItemCount,fetched4ChangeCount,gapCount)
     if (completed == COMPLETED__OK) {
-      if (handle->i_itemCount != c_indexedItemCount + gapsCount) completed = COMPLETED__BUT;
+      // c_indexedItemCount : FAMED / ALIVE count
+      // fetched4ChangeCount : ALIEN / ALIVE count
+      // gapCount : * / DEAD count (normally * = ALIEN)
+      if (handle->i_itemCount != c_indexedItemCount + fetched4ChangeCount + gapCount) completed =
+        COMPLETED__BUT;
     } // if
   } // if 
 m_DIGGY_VAR_D(completed)

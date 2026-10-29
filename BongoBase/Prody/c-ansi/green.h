@@ -413,7 +413,7 @@ m_DEFINE_ENUM_ALIAS_BEGIN(m_IndexFetchFlagsImage)
   m_ENUM_ALIAS_VAL(INDEX_FETCH_FLAGS__FETCH                ,INDEX_FETCH_FLAG__RESET |
     INDEX_FETCH_FLAG__CHANGE | INDEX_FETCH_FLAG__NEXT | INDEX_FETCH_FLAG__SMART) // If not found, do
     // "smart fetch" (*) (**)
-    m_ENUM_ALIAS_VAL(INDEX_FETCH_FLAGS__SEEK_ONLY          ,INDEX_FETCH_FLAG__RESET |
+  m_ENUM_ALIAS_VAL(INDEX_FETCH_FLAGS__SEEK_ONLY          ,INDEX_FETCH_FLAG__RESET |
     INDEX_FETCH_FLAG__CHANGE | INDEX_FETCH_FLAG__NEXT) // No item added if doesn't exist (*)
   m_ENUM_ALIAS_VAL(INDEX_FETCH_FLAGS__REMOVE               ,INDEX_FETCH_FLAG__RESET |
     INDEX_FETCH_FLAG__REMOVE | INDEX_FETCH_FLAG__NEXT) // Remove from indexes (if exists) (*) (**)
@@ -429,7 +429,7 @@ m_DEFINE_ENUM_ALIAS_BEGIN(m_IndexFetchFlagsImage)
   // - "Extended" modes:
   m_ENUM_ALIAS_VAL(INDEX_FETCH_FLAGS__CURRENT                ,ALL_FLAGS_OFF0)
   m_ENUM_ALIAS_VAL(INDEX_FETCH_FLAGS__NEXT                   ,INDEX_FETCH_FLAG__NEXT) 
-    // Prepare new selection ; NO item fetched (,> always RESULT__NOT_FOUND) :  
+    // Prepare new fetch sequence ; NO item fetched (always RESULT__NOT_FOUND) :  
   m_ENUM_ALIAS_VAL(INDEX_FETCH_FLAGS__SELECT                 ,INDEX_FETCH_FLAG__RESET |
     INDEX_FETCH_FLAG__CHANGE)
   m_ENUM_ALIAS_VAL(INDEX_FETCH_FLAGS__SELECT_READ            ,INDEX_FETCH_FLAG__RESET |

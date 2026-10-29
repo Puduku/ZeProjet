@@ -15,7 +15,8 @@ struct TEST_ITEM {
 
 typedef struct TEST_ITEM *TEST_ITEM_STUFF; 
 
-extern char b_diggyGreenCollectionExam;   
+extern int diggyGIndexDumpMax;   
+extern int diggyGreenDumpMax;   
 
 static int testNumber = 0;
 
@@ -51,18 +52,15 @@ m_DIGGY_VAR_COMPARISON(comparison)
   m_DIGGY_RETURN(comparison)
 } // TestItemHandlerCompare
 
-int _GreenCollectionHardPullOut (GREEN_COLLECTION_HANDLE handle, char **at_greenArray);
-
-
 
 #define b_CHANGE b_TRUE
 
+static int testItemDumpMax = 10;
 
 // Passed:
 // - handle:
-// - n_maxDisplayedCount: 
 // - b_change: expect change vis-a-vis previous dump ? (TRUE/FLASE) 
-static int TestDump(GREEN_COLLECTION_HANDLE handle, int n_maxDisplayedCount, char b_change) {
+static int VerifyTestItems(GREEN_COLLECTION_HANDLE handle, char b_change) {
   m_DIGGY_BOLLARD()
   static TEST_ITEM_STUFF nhj_itemCopyArray = NULL; 
   static int c_itemCopyPhysicalCount = UNDEFINED;
@@ -70,10 +68,14 @@ static int TestDump(GREEN_COLLECTION_HANDLE handle, int n_maxDisplayedCount, cha
   int result = GreenCollectionVerifyPhysicalChanges(handle, (char**)&nhj_itemCopyArray,
     &c_itemCopyPhysicalCount, &c_firstEntry);
 m_DIGGY_INFO("nhj_itemCopyArray=%p",nhj_itemCopyArray)
+  m_TRACK_IF(result < 0)
+  int i = 0; for (; i < testItemDumpMax && i < c_itemCopyPhysicalCount; i++) {
+    m_DIGGY_INFO("[%d] id=%d n_name=[%s]",i,nhj_itemCopyArray[i].id,nhj_itemCopyArray[i].n_name)
+  } // for
   switch (result) {
   case RESULT__FOUND:
-m_DIGGY_INFO("[%d] id=%d n_name=[%s]",c_firstEntry,nhj_itemCopyArray[c_firstEntry].id,
-nhj_itemCopyArray[c_firstEntry].n_name) 
+    m_DIGGY_INFO("changed: [%d] id=%d n_name=[%s]",c_firstEntry,nhj_itemCopyArray[c_firstEntry].id,
+      nhj_itemCopyArray[c_firstEntry].n_name) 
     m_ASSERT(b_change)
   break; case RESULT__NOT_FOUND:
     m_ASSERT(!b_change)
@@ -81,7 +83,7 @@ nhj_itemCopyArray[c_firstEntry].n_name)
   } // switch
 
   m_DIGGY_RETURN(RETURNED)
-} // TestDump
+} // VerifyTestItems
 
 // Passed:
 // - expectedTestNumber:
@@ -118,7 +120,7 @@ static int TestFetch(int expectedTestNumber, GREEN_COLLECTION_HANDLE handle,  in
   int completed = UNDEFINED;
   m_TRACK_IF((completed = GreenCollectionVerifyIndexes(handle)) < 0)  
   m_RAISE_IF(completed != COMPLETED__OK, ANOMALY__CORRUPTED_INDEXES)
-  m_TRACK_IF(TestDump(handle,10,b_change) != RETURNED) 
+  m_TRACK_IF(VerifyTestItems(handle,b_change) != RETURNED) 
   m_DIGGY_RETURN(RETURNED)
 } // TestFetch
 
@@ -143,6 +145,10 @@ static int TestCount(int expectedTestNumber,  GREEN_COLLECTION_HANDLE handle,  i
     m_ASSERT(nt_testItemStuff == NULL) 
   } // if
 
+  int completed = UNDEFINED;
+  m_TRACK_IF((completed = GreenCollectionVerifyIndexes(handle)) < 0)  
+  m_RAISE_IF(completed != COMPLETED__OK, ANOMALY__CORRUPTED_INDEXES)
+  m_TRACK_IF(VerifyTestItems(handle,!b_CHANGE) != RETURNED) 
   m_DIGGY_RETURN(RETURNED)
   //return RETURNED;
 } // TestCount
@@ -223,6 +229,7 @@ m_DIGGY_INFO("n_entry:%d c_expectedEntry:%d",n_entry,c_expectedEntry)
   int completed = UNDEFINED;
   m_TRACK_IF((completed = GreenCollectionVerifyIndexes(handle)) < 0)  
   m_RAISE_IF(completed != COMPLETED__OK, ANOMALY__CORRUPTED_INDEXES)
+  m_TRACK_IF(VerifyTestItems(handle,indexFetchFlags == INDEX_FETCH_FLAGS__FETCH) != RETURNED) 
 
   m_DIGGY_RETURN(RETURNED)
 } // TestIndexFetch2
@@ -255,7 +262,8 @@ int main (int argc, char **argv) {
 
   GREEN_COLLECTION_HANDLE handle = (GREEN_COLLECTION_HANDLE) UNDEFINED;
 
-  b_diggyGreenCollectionExam = b_TRUE;   
+  diggyGIndexDumpMax = 10;   
+  diggyGreenDumpMax = 10;   
   m_TRACK_IF(GreenCollectionCreateInstance(&handle, BATEAU__EXPECTED_ITEM_COUNT/*2*/,
     sizeof(struct TEST_ITEM), NULL,TestItemHandlerCompare,NULL,sizeof(void *),NULL) !=
     RETURNED)
@@ -266,7 +274,7 @@ int main (int argc, char **argv) {
   m_TRACK_IF((ret = GreenCollectionAddIndex(handle,1,(int*)NULL)) < 0) 
   m_ASSERT(ret == NAME_INDEX_LABEL) 
 
-  m_TRACK_IF(TestDump(handle,10,!b_CHANGE) != RETURNED) // Prime the pump 
+  m_TRACK_IF(VerifyTestItems(handle,!b_CHANGE) != RETURNED) // Prime the pump 
   m_TRACK_IF(TestFetch(1, handle,-1,0,0,1969,"Julie", b_CHANGE) < 0)
   m_TRACK_IF(TestCount(2, handle,1,1969) < 0)
 
@@ -292,7 +300,7 @@ int main (int argc, char **argv) {
     RESULT__NOT_FOUND, 0, 5, 3068, NULL) < 0)
   m_TRACK_IF(TestCount(15, handle,6,3068) < 0)
   
-  m_TRACK_IF(TestFetch(16,handle, 1,1,2068,2068,NULL,b_CHANGE) < 0)
+  m_TRACK_IF(TestFetch(16,handle, 1,1,2068,2068,NULL,!b_CHANGE) < 0)
   m_TRACK_IF(TestIndexFetch(17,handle, INDEX_FETCH_FLAGS__REMOVE,INDEX_SEEK_FLAGS__EQUAL,2068,
     RESULT__FOUND, 2068, 1, 2068, NULL) < 0)
   m_TRACK_IF(TestCount(18,handle, 6,3068) < 0)
@@ -401,7 +409,7 @@ int main (int argc, char **argv) {
   m_TRACK_IF(TestIndexFetch(67,handle, INDEX_FETCH_FLAGS__READ_NEXT,UNDEFINED,UNDEFINED,
     RESULT__NOT_FOUND, -1, UNDEFINED, UNDEFINED, (const char*)UNDEFINED) < 0)
 
-  m_TRACK_IF(TestDump(handle,10,!b_CHANGE) != RETURNED) 
+//  m_TRACK_IF(VerifyTestItems(handle,!b_CHANGE) != RETURNED) 
   m_TRACK_IF(TestIndexFetch2(68,handle, INDEX_FETCH_FLAGS__READ_ONLY|INDEX_FETCH_FLAG__DESCENDING,
     2, INDEX_SEEK_FLAGS__LESS_EQUAL, 1970, CRITERIA_OP_FLAGS__AND, INDEX_SEEK_FLAGS__EQUAL, "Julie",
     ALL_FLAGS_OFF0, RESULT__FOUND, 1969, 0, -1, NULL) < 0)
