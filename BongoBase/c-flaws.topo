@@ -258,10 +258,10 @@ aesthetic consistency - refer right back to Flaw Number 7) complicate this respo
 exponentially. When the true underlying integer type is obscured, predicting an overflow manually
 becomes nearly impossible.
 Adding Insult to Injury
-To put this into historical perspective: my Videopac toy computer from 1978 - running on a primitive
-micro-controller with modest 1-byte integers - properly tracked and reported arithmetic overflows
-via the CPU's hardware flags register. Decades later, modern high-level C simply ignores the
-hardware layer entirely and lets the data corrupt silently.
+To put this into historical perspective: my Videopac toy "computer" from 1978 - running on a
+primitive micro-controller with modest 1-byte integers - properly tracked and reported arithmetic
+overflows via the CPU's hardware flags register. Decades later, modern high-level C simply ignores
+the hardware layer entirely and lets the data corrupt silently.
 This critical vulnerability persists completely unabated in C++. While C++ introduced a
 sophisticated exception-handling framework mimicking languages like Ada, it is entirely useless for
 native integer arithmetic. The standard library defines an overflow_error exception, yet the

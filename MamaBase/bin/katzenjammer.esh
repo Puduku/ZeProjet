@@ -951,13 +951,13 @@ _katzenjammer_SetCreekTarget () {
 #     qualify such dispositions as "good practices", we must however admit that, unfortunately, NO
 #     clear conventions has emerged from that sane resolutions. Hence, and we simply deeply regret
 #     that, we have not found an efficient way to deal with such "smart" commands...)
-# - stderr analyzing: the fact that the command issued - or not - "something" in stderr
-#   "empirically" provides indispensable information to consolidate the real status of the command:
-#   + when there is nothing in stderr:
+# - stderr analyzing: the indication that the command polluted stderr or not "empirically" provides
+#   important information to consolidate the real status of the command:
+#   + when stderr stayed clean:
 #     . with 0 status, conforts the "success" intrepretation...
 #     . with != 0 status: tends to indicate that the nature of the error/warning is more
 #       "functional" than "technical". 
-#   + when there is something in stderr: 
+#   + when stderr has been polluted: 
 #     . with 0 ("success") status, indicates some kind of "warning" but not necessarily
 #       "technical". More precisely, the following (yet totally empiric) split generally "works".
 #       Either means:

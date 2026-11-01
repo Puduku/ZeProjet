@@ -102,7 +102,7 @@ CommandCompileTests () {
         dobjs=("${dobjs[@]}" c-ansi-g-index-diggy.o)
       fi
       if [ "$_te" = "c-ansi-g-string-test" ] ;then
-        dobjs=("${dobjs[@]}" c-ansi-p-string-diggy.o)
+        dobjs=("${dobjs[@]}" c-ansi-p-string-diggy.o c-ansi-green-diggy.o c-ansi-g-index-diggy.o)
       fi
       if [ "$_te" = "c-ansi-blotcode-test" ] ;then
         dobjs=("${dobjs[@]}" c-ansi-p-string-diggy.o)

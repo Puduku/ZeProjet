@@ -1,183 +1,183 @@
 // c-watermarks.topo, version 1.93
 // (c) Atos-Euronext Belgium - 2001, 2002, 2003
 // (c) Puduku - 2023
+#if 0
 
-// "Watermark" indicators
-// ======================
+"Watermark" indicators
+======================
 
-// Simple programming notations - currently adapted to the C-language...
-// Aim: programmer's small reminders to help visual detection of bugs...
-// In C code, what we call a "watermark" is a bunch of small letters (terminated with '_') prefixing 
-// different entity names (mostly variables, but also macros and functions).
-// Each small letter of a watermark corresponds to an individual indicator.
-// The order of the indicators in the watermark reflects the logical dependency (if any)
-// between the indicators of the entity. That is, the "general" indicators appear on "the left"
-// of the watermark whilst "depending" and "specific" indicators are put on "the right" in the
-// watermark.
-// NOTICE: Only use indicators when convinced they help programmers avoid bugs.
-// Anything not useful becomes harmful through visual noise and confusion.
-// Think of these indicators like road signs - essential for safety, wasteful if excessive.
-// However, in actual situations, it appears sometimes necessary to combine up to five indicators
-// in your variables and parameters. These clusters of indicators provide a near-certain
-// indication of areas in the code that need improvement. Until you can put the ideal implementation
-// in place - which may require significant changes - keep these indicators as they are as long as
-// they remain "reasonably" understandable.
+Simple programming notations - currently adapted to the C-language...
+Aim: programmer's small reminders to help visual detection of bugs...
+In C code, what we call a "watermark" is a bunch of small letters (terminated with '_') prefixing
+different entity names (mostly variables, but also macros and functions).
+Each small letter of a watermark corresponds to an individual indicator.
+The order of the indicators in the watermark reflects the logical dependency (if any) between the
+indicators of the entity. That is, the "general" indicators appear on "the left" of the watermark
+whilst "depending" and "specific" indicators are put on "the right" in the watermark.
+NOTICE: Only use indicators when convinced they help programmers avoid bugs.
+Anything not useful becomes harmful through visual noise and confusion. Think of these indicators
+like road signs - essential for safety, wasteful if excessive.
+However, in actual situations, it appears sometimes necessary to combine up to five indicators
+in your variables and parameters. These clusters of indicators provide a near-certain indication of
+areas in the code that need improvement. Until you can put the ideal implementation in place -
+which may require significant changes - keep these indicators as they are as long as they remain
+"reasonably" understandable.
 
-// Legend : (?) => relevance of the indicator is still not clear... 
+Legend : (?) => relevance of the indicator is still not clear... 
 
-// a_ / s_ indicators - "address": the variable is a "pointer".
-//   a_ address of "single" data ; pointer variable can only be "dereferenced" with '*' operator ;
-//     typical usage: parameter modified by function
-//   s_ address of "multiple" data (i.e array) ; 
-//     pointers' arithmetic ('++', etc.) is applicable to such pointer variables (which can also
-//     be "dereferenced" with '[]' operator).
-//     typical usage: loop's control (or "accompanying") variable ; array passing in functions
-//   => Example: (to understand well, see also 'n_' indicator  below)
-//     int s_tab1[10]; // s_ indicator is here not indispensable; we see well that tab1 is an
-//     array !
-//     int sn_tab2[10]; // the 'n' follows the 's'; the nullability applies on all array elements. 
-//     int *ns_tab = s_tab1; // the 'n' precedes the 's'; the nullability applies on the array
-//       // variable pointer. 
+a_ / s_ indicators - "address": the variable is a "pointer".
+  a_ address of "single" data ; pointer variable can only be "dereferenced" with '*' operator ;
+    typical usage: parameter modified by function
+  s_ address of "multiple" data (i.e array) ; 
+    pointers' arithmetic ('++', etc.) is applicable to such pointer variables (which can also be
+    "dereferenced" with '[]' operator).
+    typical usage: loop's control (or "accompanying") variable ; array passing in functions
+  => Example: (to understand well, see also 'n_' indicator  below)
+    int s_tab1[10]; // s_ indicator is here not indispensable; we see well that tab1 is an array!
+    int sn_tab2[10]; // the 'n' follows the 's'; the nullability applies on all array elements. 
+    int *ns_tab = s_tab1; // the 'n' precedes the 's'; the nullability applies on the array
+      // variable pointer. 
 
-// b_ indicator - 'boolean': indicates a variable used to host a boolean value (or a function that
-//   returns a boolean value) ; reminds that:
-//   - "boolean data type" does NOT exist - and HAS NOT to be artificially defined ; boolean
-//     values can be "hosted" by integer variables (and returned by functions) ; but the exact
-//     integer type of such "host" variables is undefined.
-//   - it is inaccurate to use that boolean value with arithmetic comparison operators (in 
-//     particular  == and != ) 
-//   Furthermore, b_ indicator facilitates concise naming of boolean variables. Indeed, b_  
-//   indicator allows not having to express literally the meaning of boolean variables with long 
-//   interrogative clauses. 
+b_ indicator - 'boolean': indicates a variable used to host a boolean value (or a function that
+  returns a boolean value) ; reminds that:
+  - "boolean data type" does NOT exist - and HAS NOT to be artificially defined ; boolean values
+    can be "hosted" by integer variables (and returned by functions) ; but the exact integer type
+    of such "host" variables is undefined.
+  - it is inaccurate to use that boolean value with arithmetic comparison operators (in particular
+     == and != ) 
+  Furthermore, b_ indicator facilitates concise naming of boolean variables. Indeed, b_ indicator
+  allows not having to express literally the meaning of boolean variables with long interrogative
+  clauses. 
 
-// c_ indicator: see n_ indicator
+c_ indicator: see n_ indicator
 
-// d_ indicator: singleton ; one unique object instance can be created for the process. (see also 
-//   p_ indicator about "thread-safety")
+d_ indicator: singleton ; one unique object instance can be created for the process. (see also p_
+   indicator about "thread-safety")
 
-// e_ indicator - "exclusion": ("anti indicator") ; "negates" the next indicator in the watermark.
-//   In particular, when followed with 'n', indicates that the variable (or variable of that type)
-//   cannot be "nullable".
+e_ indicator - "exclusion": ("anti indicator") ; "negates" the next indicator in the watermark.
+  In particular, when followed with 'n', indicates that the variable (or variable of that type)
+  cannot be "nullable".
 
-// f_ indicator - "foreign" / "further": indicates that lifespan of variable exceeds that normally
-//   expected.   
-//   When used in function parameter, indicates that the function "expects" that the lifespan 
-//   of the that parameter (more precisely the resource pointed by the parameter) is not limited
-//   to that function call, and will be used "later".    
-//   => Example :
-//   // fp_name: this string must remain available till "Brol" is destroyed 
-//   int InitBrol (BROL brol, const char *fp_name ,...) ;
-//   // This function may use the string pointed by fp_name :
-//   int UseBrol (BROL brol, ....) ; 
-//   // After "Brol" destruction, fp_name is not necessary anymore...
-//   int DestroyBrol (BROL brol); 
+f_ indicator - "foreign" / "further": indicates that lifespan of variable exceeds that normally
+  expected.   
+  When used in function parameter, indicates that the function "expects" that the lifespan of the
+  that parameter (more precisely the resource pointed by the parameter) is not limited to that
+  function call, and will be used "later".    
+  => Example :
+  // fp_name: this string must remain available till "Brol" is destroyed 
+  int InitBrol (BROL brol, const char *fp_name ,...) ;
+  // This function may use the string pointed by fp_name :
+  int UseBrol (BROL brol, ....); 
+  // After "Brol" destruction, fp_name is not necessary anymore...
+  int DestroyBrol (BROL brol); 
 
-// g_ indicator - "give change for ..." ("surrogate", "substitute", "alias") : remove abstraction of
-//   type definition (stresses that the type definition is well a SUB TYPE definition or an ALIAS -
-//   NOT an abstraction).
-//   Special case: macro used as pure function name alias. 
-//   Example 1. This definition is a pure abstraction: the buffer size may be changed without
-//   requiring other change in the code.
-//     #define BUFFER_SIZE 512
-//   Example 2. This definition is a specialization of the origin 'int' type: it's a base design
-//   choice; changing to another type would imply massive redesign of the code.
-//     typedef int g_PROUT_ID;
-//   Example 3. 'g_Display' is just an alias of 'Print' function name: 
-//     int Print(const char *text); 
-//     #define g_Display Print 
+g_ indicator - "give change for ..." ("surrogate", "substitute", "alias") : remove abstraction of
+  type definition (stresses that the type definition is well a SUB TYPE definition or an ALIAS -
+  NOT an abstraction).
+  Special case: macro used as pure function name alias. 
+  Example 1. This definition is a pure abstraction: the buffer size may be changed without requiring
+  other change in the code.
+    #define BUFFER_SIZE 512
+  Example 2. This definition is a specialization of the origin 'int' type: it's a base design
+  choice; changing to another type would imply massive redesign of the code.
+    typedef int g_PROUT_ID;
+  Example 3. 'g_Display' is just an alias of 'Print' function name: 
+    int Print(const char *text); 
+    #define g_Display Print 
 
-// h_ indicator - 'head' ("representative", "delegate", "proponent", ...): indicates that the
-//   variable is the 'head' handle of some allocated resource or instance. 
-//   NB: 'handle' must be understood in a wide meaning: all these variables are handles :
-//   - file descriptor: allocated resources are process's and system's "open file" entries
-//   - "malloced" memory pointer: allocated resource is part of the heap memory
-//   - formal handles (which are generally pointers to some hidden structure)
-//   The head indicator simply designates among the multiple handles that can point out   
-//   one given instance WHICH ONE is that formally chosen to "represent" the instance. That is,    
-//   by convention, lifespan of the instance is tied to that of its head variable. In particular,
-//   the handle parameter for some instance's creation and destruction functions is necessarily a
-//   head handle...
+h_ indicator - 'head' ("representative", "delegate", "proponent", ...): indicates that the variable
+  is the 'head' handle of some allocated resource or instance. 
+  NB: 'handle' must be understood in a wide meaning: all these variables are handles :
+  - file descriptor: allocated resources are process's and system's "open file" entries
+  - "malloced" memory pointer: allocated resource is part of the heap memory
+  - formal handles (which are generally pointers to some hidden structure)
+  The head indicator simply designates among the multiple handles that can point out one given
+  instance WHICH ONE is that formally chosen to "represent" the instance. That is, by convention,
+  lifespan of the instance is tied to that of its head variable. In particular, the handle parameter
+  for some instance's creation and destruction functions is necessarily a head handle...
 
-// i_ indicator: see v_ indicator
+i_ indicator: see v_ indicator
 
-// j_ indicator - "junk" ("debris" "detritus" "remains" "rubbish" "ruins" "refuse" "garbage" 
-//   "fragments" "crap" "trash" "bits"...) : in combination with h_ and x_ indicators, indicates
-//   uncompleted disallocation (i.e potential memory leak) ; "junk" is supposedly cleared with the 
-//   death of the process. 
+j_ indicator - "junk" ("debris" "detritus" "remains" "rubbish" "ruins" "refuse" "garbage" 
+  "fragments" "crap" "trash" "bits"...) : in combination with h_ and x_ indicators, indicates
+  uncompleted disallocation (i.e potential memory leak) ; "junk" is supposedly cleared with the
+  death of the process. 
 
-// l_ indicator - "lately extension" : indicates a new method that is not "native" to the object passed
-//   as handle. 
+l_ indicator - "lately extension" : indicates a new method that is not "native" to the object passed
+  as handle. 
 
-// m_ 1. (original meaning) : "pure macro" indicator. Indicates that the macro is a "pure" macro of
-//   the pre-processor.
-//   A pure macro leverages all the portable features of the C preprocessor. However, pure macros,
-//   by their very nature, “break” the syntax of the C language. Typically, pure macros mangle the 
-//   ';' instruction terminators.
-//   The absence of this indicator means that the macro is a 'soft' (or 'functional') macro.
-//   A “soft” macro is either a simple constant value, or a construction totally homogeneous to
-//   (and therefore replaceable by) a function (*). Consequently, an unexpanded "soft" macro must
-//   conform to the general syntax of C. In particular, a “soft” macro must not mangle the ';'
-//   instruction terminators.
-//   (*) excepted side effects due to parameters expansion ; see u_ indicator
-//   2. (extended meaning) : inline function (simple discriminant with "regular" functions...)   
+m_ 1. (original meaning) : "pure macro" indicator. Indicates that the macro is a "pure" macro of the
+  pre-processor.
+  A pure macro leverages all the portable features of the C preprocessor. However, pure macros, by
+  their very nature, “break” the syntax of the C language. Typically, pure macros mangle the ';'
+  instruction terminators.
+  The absence of this indicator means that the macro is a 'soft' (or 'functional') macro.
+  A "soft" macro is either a simple constant value, or a construction totally homogeneous to (and
+  therefore replaceable by) a function (*). Consequently, an unexpanded "soft" macro must conform
+  to the general syntax of C. In particular, a “soft” macro must not mangle the ';' instruction
+  terminators.
+  (*) excepted side effects due to parameters expansion ; see u_ indicator
+  2. (extended meaning) : inline function (simple discriminant with "regular" functions...)   
 
-// n_ / c_ indicators
-//   n_ indicator - "nullability" : the variable may take a "special value" (generally -1 or NULL)
-//     to convey the "nullability" of the value.  
-//   c_ indicator - "conditionality": the variable is significant if and only if a certain condition
-/      is verified.
-//   => Example:
-//     char *n_user; // NULL special address - user name not provided: anonymous connection
-//     char *c_password; // NOT significant in anonymous connection 
+n_ / c_ indicators
+  n_ indicator - "nullability" : the variable may take a "special value" (generally -1 or NULL)
+    to convey the "nullability" of the value.  
+  c_ indicator - "conditionality": the variable is significant if and only if a certain condition is
+    verified.
+  => Example:
+    char *n_user; // NULL special address - user name not provided: anonymous connection
+    char *c_password; // NOT significant in anonymous connection 
 
-// o_ indicator:
-//   - as function parameter: indicates that validity of parameter is explicitly checked (?)
-//   - as function: certifies function or macro never raises anomalies... ; 
+o_ indicator:
+  - as function parameter: indicates that validity of parameter is explicitly checked (?)
+  - as function: certifies function or macro never raises anomalies... ; 
 
-// p_ indicator - "protected": in basic cases, warrants protection against modification ; 
-//   in such case, that indicator is often added in coordination with "const" type qualifier... 
-//   In specific cases (POSIX code) "protected" just means "thread safe" (either the instance data
-//   is not changed or is protected by ad hoc mechanism like a mutex)
-//   Note: thread safety is required with singletons (see d_ indicator).  
+p_ indicator - "protected": in basic cases, warrants protection against modification ; 
+  in such case, that indicator is often added in coordination with "const" type qualifier... 
+  In specific cases (POSIX code) "protected" just means "thread safe" (either the instance data is
+  not changed or is protected by ad hoc mechanism like a mutex)
+  Note: thread safety is required with singletons (see d_ indicator).  
 
-// r_ indicator "raw" : in generic programming context - virtual functions, etc., that flag designs
-//   a generic parameter. 'r' indicator acts as "barrier" between generic and specific indicators.
-//   - indicators placed at the left of the raw indicator are "generic" to the parameter 
-//   - indicator cannot exist at the right of the raw indicator 
-//   - however, when a real function implements a generic function, real parameters can overwrite
-//     generic parameters ; for these parameters:
-//     + all generic "left" indicators of the generic parameter are taken back in the specific
-//       parameter
-//     + r indicator disappears in the specific parameter
-//     + specific indicators may be placed at the right of the generic indicators in the specific
-//       parameter
+r_ indicator "raw" : in generic programming context - virtual functions, etc., that flag designs a
+  generic parameter. 'r' indicator acts as "barrier" between generic and specific indicators.
+  - indicators placed at the left of the raw indicator are "generic" to the parameter 
+  - indicator cannot exist at the right of the raw indicator 
+  - however, when a real function implements a generic function, real parameters can overwrite
+    generic parameters ; for these parameters:
+    + all generic "left" indicators of the generic parameter are taken back in the specific
+      parameter
+    + r indicator disappears in the specific parameter
+    + specific indicators may be placed at the right of the generic indicators in the specific
+      parameter
 
-// s_ indicator: see a_ indicator
+s_ indicator: see a_ indicator
 
-// t_ indicator: "transitory" ("passing", "ephemeral", "fleeting", "fugacious", "fugitive", 
-//   "momentary", "transient", "evanescent", "volatile"...) => indicates a POSSIBILITY of reallocation
-//   Indicates that the scope of the variable is more restricted than its lifespan. Typical usage:
-//   fetching items in collections (see c-ansi/green.h) 
+t_ indicator: "transitory" ("passing", "ephemeral", "fleeting", "fugacious", "fugitive", 
+  "momentary", "transient", "evanescent", "volatile"...) => indicates a POSSIBILITY of reallocation
+  Indicates that the scope of the variable is more restricted than its lifespan. Typical usage:
+  fetching items in collections (see c-ansi/green.h) 
 
-// u_ "unicity" indicator (for macro parameters) : warrants that parameter is expanded once and
-//   only once in macro; hence, the macro can be used safely with params with side effects (++,
-//   function calls, etc.)
+u_ "unicity" indicator (for macro parameters) : warrants that parameter is expanded once and only
+  once in macro; hence, the macro can be used safely with params with side effects (++, function
+  calls, etc.)
 
-// v_ / i_ indicators
-//   i_ "inductor": indicates that this variable's value "inducts" that of other 'v_' variables.
-//   v_ "variant" indicator : indicates an information of the variable repeats that contained
-//     somewhere else (see i_ "inductor")
-//   => Practical usage: each time i_ value is changed, v_ value must be updated accordingly ;
-//     v_ value cannot be changed directly...
+v_ / i_ indicators
+  i_ "inductor": indicates that this variable's value "inducts" that of other 'v_' variables.
+  v_ "variant" indicator : indicates an information of the variable repeats that contained somewhere
+    else (see i_ "inductor")
+  => Practical usage: each time i_ value is changed, v_ value must be updated accordingly ; v_ value
+   cannot be changed directly...
 
-// x_ indicator: see z_ indicator
+x_ indicator: see z_ indicator
 
-// z_ / x_ indicators: "creation" / "destruction" (go along with the 'h_' indicator)
-//   z_ : "ex nihilo" ("zero") creation indicator ; used by "instance creation" functions ;
-//     recalls that the passed handle must be uninitialized (i.e "undefined" value)
-//   x_ : destruction indicator ; used by "instance destruction" functions ; recalls that the 
-//     handle is no more "usable" after "instance destruction" function return - the handle
-//     must "vanish" synchronously with the resource.
+z_ / x_ indicators: "creation" / "destruction" (go along with the 'h_' indicator)
+  z_ : "ex nihilo" ("zero") creation indicator ; used by "instance creation" functions ; recalls
+    that the passed handle must be uninitialized (i.e "undefined" value)
+  x_ : destruction indicator ; used by "instance destruction" functions ; recalls that the 
+    handle is no more "usable" after "instance destruction" function return - the handle must
+    "vanish" synchronously with the resource.
 
-// Arbitrary indicator precedence:
-// bu_ mu_ ob_ xh_ zh_
+Arbitrary indicator precedence:
+bu_ mu_ ob_ xh_ zh_
+
+#endif

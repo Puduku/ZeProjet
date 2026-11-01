@@ -1,22 +1,22 @@
 // README.topo, version 1.93
 // (c) Atos-Euronext Belgium - 2001, 2002, 2003
 // (c) 2023 - Puduku
- 
-// => ".topo" files are raw (ASCII) text files. 
-// The purpose is to :
-// - present some general considerations on various topics ("c-flaws.topo" etc.); having 
-//   these "motivations" in mind, one should have a better understanding of the design of
-//   the C code in the project...
-// - provide CONTEXTUAL information to sources (C code) files. 
-// As part of source files "bundle", relevant ".topo" files are to be referenced (with #include
-// directive) by "genuine" header (and sometimes source) files.
-// => Though ".topo" files should never contain source code, such files must be "parsable" by the C
-//    compiler/macro-processor ; hence all text must be wrapped in "C comments"...
-//
-// SUMMARY: Given module called BROL, you want...
-// ...contextual information (What is the purpose of BROL ?) => see "BROL.topo" file 
-//    (Absence of "BROL.topo" indicates "obvious" context; then just look for the short abstract in
-//    "BROL.h"...)
-// ...base technical information (How to use BROL ?) => see "BROL.h" header file
-// (Of course, for "deeper" technical information (How does BROL work (or doesn't work) ?) => see
-// "BROL.c" source file)
+#if 0 
+=> ".topo" files are raw (ASCII) text files. 
+The purpose is to :
+- present some general considerations on various topics ("c-flaws.topo" etc.); having these
+  "motivations" in mind, one should have a better understanding of the design of the C code in the
+  project...
+- provide CONTEXTUAL information to sources (C code) files. 
+As part of source files "bundle", relevant ".topo" files are to be referenced (with #include
+directive) by "genuine" header (and sometimes source) files.
+=> Though ".topo" files should never contain source code, such files must be "parsable" by the C
+compiler/macro-processor ; hence all text must be wrapped in "C comments"...
+
+SUMMARY: Given module called BROL, you want...
+...contextual information (What is the purpose of BROL ?) => see "BROL.topo" file 
+(Absence of "BROL.topo" indicates "evident" context; see brief abstract directly in "BROL.h")
+...base technical information (How to use BROL ?) => see "BROL.h" header file
+(Of course, for "deeper" technical information - How does BROL work (or doesn't work) ? => see
+"BROL.c" source file)
+#endif

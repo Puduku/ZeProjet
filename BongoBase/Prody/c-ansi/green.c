@@ -119,8 +119,9 @@ static struct G_REQUEST_CRITERION* o_IndexFetchGetGRequestCriteriaPtr(char *me) 
 // Passed:
 // - *p_me: index fetch dynamic buffer:
 static char* o_IndexFetchGetGKeysBuffer(char *me, int criterionCountMax) {
-  return me + sizeof(struct INDEX_FETCH_HEADER) + o_IndexSequenceSize() +
-    sizeof(struct G_REQUEST_CRITERION)*criterionCountMax;
+  m_DIGGY_BOLLARD_S()
+  m_DIGGY_RETURN(me + sizeof(struct INDEX_FETCH_HEADER) + o_IndexSequenceSize() +
+    sizeof(struct G_REQUEST_CRITERION)*criterionCountMax)
 } // o_IndexFetchGetGKeysBuffer
 
 // Passed:
@@ -131,8 +132,6 @@ static char* o_IndexFetchGetGKeysBuffer(char *me, int criterionCountMax) {
 // Ret: index fetch buffer size
 static int o_IndexFetchBufferSize(int criterionCountMax, int n_gKeySize, int gKeyCountMax) {
   m_DIGGY_BOLLARD_S()
-m_DIGGY_INFO("criterionCountMax=%d n_gKeySize=%d gKeyCountMax=%d",
-criterionCountMax,n_gKeySize,gKeyCountMax)
   m_DIGGY_RETURN(sizeof(struct INDEX_FETCH_HEADER) + o_IndexSequenceSize() +
     sizeof(struct G_REQUEST_CRITERION)*criterionCountMax + (n_gKeySize >= 0?
     n_gKeySize* gKeyCountMax* criterionCountMax: 0))
@@ -144,9 +143,10 @@ criterionCountMax,n_gKeySize,gKeyCountMax)
 // Changed:
 // - *me:
 static int o_IndexFetchNew(char* me) {
+  m_DIGGY_BOLLARD_S()
   *o_IndexFetchGetHeaderPtr(me) = om_IndexFetchHeaderNew();
   o_IndexSequenceNew(o_IndexFetchGetIndexSequenceBuffer(me));
-  return RETURNED;
+  m_DIGGY_RETURN(RETURNED)
 } // o_IndexFetchNew
 
 // Passed:
@@ -167,16 +167,14 @@ static int o_IndexFetchNew(char* me) {
 static inline int m_IndexFetchAddCriterion(char *me, int criterionCountMax,
   struct G_REQUEST_CRITERION criterion, int n_gKeySize, int gKeyCountMax, char b_lastCriterion) {
   m_DIGGY_BOLLARD_S()
-//  m_TRACK_IF(m_GRequestCriteria5AddCriterion(&a_me->criteria,criterion) != RETURNED)
-
   struct INDEX_FETCH_HEADER *headerPtr = o_IndexFetchGetHeaderPtr(me); 
   m_ASSERT(!headerPtr->b_lastCriterion) 
-
   if (n_gKeySize >= 0) {
     char *gKeysBuffer = o_IndexFetchGetGKeysBuffer(me,criterionCountMax) + n_gKeySize *
       gKeyCountMax * headerPtr->i_criterionCount;
       // value BEFORE increment 
-    memcpy(gKeysBuffer,(const char*)criterion.cr_gKeys, n_gKeySize * gKeyCountMax);
+    if (b_FLAGS_OFF(criterion.indexSeekFlags,INDEX_SEEK_FLAGS__ANY)) 
+      memcpy(gKeysBuffer,(const char*)criterion.cr_gKeys, n_gKeySize * gKeyCountMax);
   } // if
 
   int completed = GRequestCriteriaAdd(o_IndexFetchGetGRequestCriteriaPtr(me),criterionCountMax,

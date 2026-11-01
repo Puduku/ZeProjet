@@ -12,10 +12,10 @@ Landscape:
 - island: all gardens' place (main directory position)
   The island is not so huge. It is easy to find your way around - especially when moving from one
   garden to another.
-  Hence, as long as you stay located in the island, all gardens of the island are simply+
-  referenced with RELATIVE paths.
-  However, out of the island, it's quite "terra incognita"...
-  So, all emplacements outside the island are referenced with ABSOLUTE paths...
+  Hence, as long as you stay located in the island, it's more convevient to refer to the different
+  places (gardens) using RELATIVE paths.
+  However, out of the island, it's quite "terra incognita"... So, it's wise to refer to refer to
+  these external locations with ABSOLUTE paths...
 Main characters:
 - Mama: she's a naive lady, but she's nevertheless the real "boss"... (see 'mama.sh' script)
 - Hans & Fritz: (the katzenjammer kids) are the stars of the series. These two rascals have all
