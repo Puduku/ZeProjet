@@ -169,12 +169,10 @@ static inline int m_IndexFetchAddCriterion(char *me, int criterionCountMax,
   m_DIGGY_BOLLARD_S()
   struct INDEX_FETCH_HEADER *headerPtr = o_IndexFetchGetHeaderPtr(me); 
   m_ASSERT(!headerPtr->b_lastCriterion) 
-  if (n_gKeySize >= 0) {
+  if (n_gKeySize >= 0 && b_FLAGS_OFF(criterion.indexSeekFlags,INDEX_SEEK_FLAGS__ANY)) { 
     char *gKeysBuffer = o_IndexFetchGetGKeysBuffer(me,criterionCountMax) + n_gKeySize *
       gKeyCountMax * headerPtr->i_criterionCount;
-      // value BEFORE increment 
-    if (b_FLAGS_OFF(criterion.indexSeekFlags,INDEX_SEEK_FLAGS__ANY)) 
-      memcpy(gKeysBuffer,(const char*)criterion.cr_gKeys, n_gKeySize * gKeyCountMax);
+    memcpy(gKeysBuffer,(const char*)criterion.cr_gKeys, n_gKeySize * gKeyCountMax);
   } // if
 
   int completed = GRequestCriteriaAdd(o_IndexFetchGetGRequestCriteriaPtr(me),criterionCountMax,

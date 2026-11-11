@@ -523,7 +523,7 @@ int GetBlotvarRValue(g_BLOTVAR_STUFF n_blotvarStuff, int n_as, int c_entry,
   gen_BLOTVAL c_blotval = UNDEFINED; 
   struct P_STRING str = UNDEFINED_P_STRING;
   char cb_fugaciousStr = (char)UNDEFINED;
-
+m_DIGGY_VAR_D(n_as)
   switch (n_as) {
   case -1:
     b_strValue = b_INT_VALUE;
@@ -541,13 +541,14 @@ int GetBlotvarRValue(g_BLOTVAR_STUFF n_blotvarStuff, int n_as, int c_entry,
     c_blotval = n_blotvarStuff != NULL? c_entry: FALSE__BLOTVAL;
   break; case AS__VALUE_STR: // <blotvar strex> 
     b_strValue = b_STR_VALUE;
+m_DIGGY_INFO("n_blotvarStuff=%p",n_blotvarStuff)
     str = n_blotvarStuff != NULL? n_blotvarStuff[g_BLOTVAR_VALUE_ELEMENT].cv_pString:
-      *ap_aTrivialEmptyPString;
-    cb_fugaciousStr = n_blotvarStuff != NULL; 
+      p_aTrivialEmptyPString;
+    cb_fugaciousStr = (n_blotvarStuff != NULL); 
   break; case AS__NAME:  // <blotvar name> 
     b_strValue = b_STR_VALUE,
     str = n_blotvarStuff != NULL? n_blotvarStuff[g_BLOTVAR_NAME_ELEMENT].cv_pString:
-      *ap_aTrivialEmptyPString;
+      p_aTrivialEmptyPString;
     cb_fugaciousStr = n_blotvarStuff != NULL;
   break; default:
     m_RAISE(ANOMALY__VALUE__D,n_as)

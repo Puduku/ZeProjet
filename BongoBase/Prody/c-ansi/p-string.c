@@ -13,7 +13,7 @@
 #include "c-ansi/diggy.h"
 #include "c-ansi/testy-diggy.h"
 
-const struct P_STRING* ap_aTrivialEmptyPString = { 0 } ;  
+const struct P_STRING p_aTrivialEmptyPString = TRIVIAL_EMPTY_P_STRING;
 
 // Public function: see .h
 struct P_STRING o_PString2(const char *p_string, int n_length) {

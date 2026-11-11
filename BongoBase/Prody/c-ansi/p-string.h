@@ -40,12 +40,15 @@ struct P_STRING { // #REF struct-P_STRING
 // Remark: string == stop == NULL (called "trivial" empty string) is thus a VALID representation of
 // empty string portions...
 
-const struct P_STRING *ap_aTrivialEmptyPString ;  
 
 // Assigning string portions
 // -------------------------
 
-#define UNDEFINED_P_STRING { (const char*)UNDEFINED } 
+#define TRIVIAL_EMPTY_P_STRING {.string = NULL, .stop = NULL}
+#define TRIVIAL_EMPTY_P_STRING_PAR TRIVIAL_EMPTY_P_STRING
+const struct P_STRING p_aTrivialEmptyPString ;
+
+#define UNDEFINED_P_STRING { .string = (const char*)UNDEFINED } 
 #define UNDEFINED_P_STRING_PAR (struct P_STRING) UNDEFINED_P_STRING 
 
 
