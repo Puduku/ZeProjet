@@ -900,6 +900,7 @@ int ComputeFormat(int format, struct BLOTEX_VALUE blotexValue, G_STRING_STUFF c_
     if (blotexValue.b_strValue) m_ABANDON_S(EXPECT_INTEX__ABANDONMENT_CAUSE)
     GStringPrintf(c_surrogate,0,"%d", blotexValue.select.c_blotval);
   break; case LS__FORMAT:
+m_DIGGY_VAR_P_STRING(blotexValue.select.c_strex.v_str) 
     if (!blotexValue.b_strValue) m_ABANDON_S(EXPECT_STREX__ABANDONMENT_CAUSE)
     GStringPrintf(c_surrogate,0,FMT_P_STRING,m_P_STRING_2_FMT_ARGS(
       blotexValue.select.c_strex.v_str));

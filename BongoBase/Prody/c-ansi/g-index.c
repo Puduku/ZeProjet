@@ -186,6 +186,7 @@ static int GIndexCompare(struct G_INDEX* a_me, int aIndexEntry, int n_bEntry, vo
   m_DIGGY_BOLLARD_S()
   int comparison = UNDEFINED;
   int aEntry = a_me->hsc_array[aIndexEntry];
+m_DIGGY_VAR_P(cr_bGKeys)
     m_TRACK_IF((comparison = a_me->entryCompareFunction(a_me->r_entryFunctionsHandle,
       a_me->indexLabel, aEntry, n_bEntry,cr_bGKeys)) < 0)
   if (comparison == EQUAL_TO__COMPARISON && n_bEntry != -1)  comparison = 
@@ -223,7 +224,7 @@ static int GIndexBSearch(struct G_INDEX *a_me, int n_bEntry, void *cr_bGKeys, in
   *an_indexEntry = -1;
   while (top - bottom > 1) {
     i =  (top + bottom) >> 1 ;
-
+m_DIGGY_VAR_P(cr_bGKeys)
     m_TRACK_IF((comparison = GIndexCompare(a_me, i,n_bEntry,cr_bGKeys)) < 0)
     switch (comparison) {
     case GREATER_THAN__COMPARISON:
@@ -290,6 +291,7 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(indexSeekFlags)
       int top = UNDEFINED;
       int n_indexEntry = UNDEFINED;
       struct INDEX_ENTRY_BLOCK c_indexEntries; // UNDEFINED
+m_DIGGY_VAR_P(cr_gKeys)
       m_TRACK_IF(GIndexBSearch(a_me, -1,cr_gKeys, &n_indexEntry,&top, &c_indexEntries) != RETURNED);
       switch (indexSeekFlags) {
       case INDEX_SEEK_FLAGS__EQUAL:
@@ -765,6 +767,7 @@ static int GIndexesEntryCompare (void *r_handle, int indexLabel, int aEntry, int
   int comparison = UNDEFINED;
   m_ASSERT(indexLabel < handle->indexesNumber) 
   int j = 0; for ( ; j < handle->vnhs_gKeyCounts[indexLabel] ; j++) {
+m_DIGGY_VAR_P(cr_bGKeys)
     m_TRACK_IF((comparison = handle->entryRawCompareFunction(
       handle->r_entryRawFunctionsHandle, indexLabel, j, aEntry, n_bEntry,cr_bGKeys)) < 0)
     if (comparison != EQUAL_TO__COMPARISON) break ;
@@ -905,6 +908,7 @@ int GIndexesSequenceReset(G_INDEXES_HANDLE handle,
   char *indexSequenceBuffer) { m_DIGGY_BOLLARD_S()
   m_ASSERT(ap_1stGRequestCriterion->indexLabel < handle->indexesNumber) 
 m_DIGGY_VAR_INDEX_SEEK_FLAGS(ap_1stGRequestCriterion->indexSeekFlags)
+m_DIGGY_VAR_P(ap_1stGRequestCriterion->cr_gKeys)
   m_TRACK_IF(m_GIndexSequenceReset(handle->vnhs_indexes + ap_1stGRequestCriterion->indexLabel,
     b_descending, ap_1stGRequestCriterion->indexSeekFlags,
     ap_1stGRequestCriterion->cr_gKeys, (struct INDEX_SEQUENCE*)indexSequenceBuffer) != RETURNED) 

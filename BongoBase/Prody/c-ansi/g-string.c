@@ -294,6 +294,8 @@ m_DIGGY_INFO("indexLabel=%d gKeyRank=%d",indexLabel,gKeyRank)
       ap_gKeySettings->select.intrinsicValueComparison.pr_pStringIntrinsicValueFunctionHandle);
   } else {
     const struct GS_KEY *ap_bGsKey = ((const struct GS_KEY *)cr_bGKeys) + gKeyRank;
+m_DIGGY_VAR_P(ap_bGsKey)
+m_DIGGY_VAR_D((ap_bGsKey)->gsKeysComparison) m_DIGGY_VAR_D(ap_gKeySettings->gsKeysComparison)
     m_BARE_GS_KEY__GS_KEY(bBareGsKey,  ap_gKeySettings->gsKeysComparison,  ap_bGsKey)
   } // if
   
@@ -302,6 +304,9 @@ m_DIGGY_INFO("indexLabel=%d gKeyRank=%d",indexLabel,gKeyRank)
 m_DIGGY_INFO("ap_gKeySettings->gsKeysComparison=%d",ap_gKeySettings->gsKeysComparison)
   switch (ap_gKeySettings->gsKeysComparison) {
   case P_STRING__GS_KEYS_COMPARISON:
+m_DIGGY_VAR_P_STRING(aBareGsKey.cp_pString)
+m_DIGGY_VAR_P_STRING(bBareGsKey.cp_pString)
+m_DIGGY_INFO("aBareGsKey.cp_pString.string=%p  bBareGsKey.cp_pString.string=%p,",aBareGsKey.cp_pString.string,  bBareGsKey.cp_pString.string)
     comparison = ComparePStrings(aBareGsKey.cp_pString,  bBareGsKey.cp_pString,
       ap_gKeySettings->select.pStringComparison.cn_isNeutralCharFunction,
       ap_gKeySettings->select.pStringComparison.cn_toCharFunction,!b_SUB_STRING_2); 
@@ -446,6 +451,7 @@ int GStringsIndexRequestRAddCriterion(G_STRINGS_HANDLE cp_handle,
   char* nf_indexRequestAutomaticBuffer, struct G_REQUEST_CRITERION criterion,
   char b_lastCriterion) {
   m_DIGGY_BOLLARD()
+m_DIGGY_VAR_D(b_lastCriterion)
   int completed = GreenCollectionIndexRequestRAddCriterion(cp_handle->h_greenCollectionHandle,
     nf_indexRequestAutomaticBuffer,criterion,b_lastCriterion); 
   m_TRACK_IF(completed < 0)

@@ -170,9 +170,12 @@ static inline int m_IndexFetchAddCriterion(char *me, int criterionCountMax,
   struct INDEX_FETCH_HEADER *headerPtr = o_IndexFetchGetHeaderPtr(me); 
   m_ASSERT(!headerPtr->b_lastCriterion) 
   if (n_gKeySize >= 0 && b_FLAGS_OFF(criterion.indexSeekFlags,INDEX_SEEK_FLAGS__ANY)) { 
+m_DIGGY_VAR_D(n_gKeySize) m_DIGGY_VAR_D(gKeyCountMax) m_DIGGY_VAR_D(headerPtr->i_criterionCount)
     char *gKeysBuffer = o_IndexFetchGetGKeysBuffer(me,criterionCountMax) + n_gKeySize *
       gKeyCountMax * headerPtr->i_criterionCount;
+m_DIGGY_VAR_P(gKeysBuffer)
     memcpy(gKeysBuffer,(const char*)criterion.cr_gKeys, n_gKeySize * gKeyCountMax);
+    criterion.cr_gKeys = gKeysBuffer;
   } // if
 
   int completed = GRequestCriteriaAdd(o_IndexFetchGetGRequestCriteriaPtr(me),criterionCountMax,
@@ -196,7 +199,9 @@ static inline int m_IndexFetchSequenceReset(char *me, char b_descending, int fet
 
   headerPtr->b_descending = b_descending;
   headerPtr->fetch4 = fetch4;
-  m_TRACK_IF(GIndexesSequenceReset(GIndexesHandle, o_IndexFetchGetGRequestCriteriaPtr(me),
+  const struct G_REQUEST_CRITERION *ap_1stGRequestCriteria = o_IndexFetchGetGRequestCriteriaPtr(me); 
+m_DIGGY_VAR_P(ap_1stGRequestCriteria) ; m_DIGGY_VAR_P(ap_1stGRequestCriteria->cr_gKeys) ; 
+  m_TRACK_IF(GIndexesSequenceReset(GIndexesHandle, ap_1stGRequestCriteria,
     headerPtr->b_descending,o_IndexFetchGetIndexSequenceBuffer(me)) != RETURNED)
   m_DIGGY_RETURN(RETURNED)
 } // m_IndexFetchSequenceReset
@@ -345,7 +350,7 @@ static int GreenCollectionEntryRawCompare (void *r_handle, int indexLabel, int g
   char *r_aGreenItemStuff = r_GREEN_COLLECTION_GET_GREEN_ITEM_STUFF(handle,aEntry);
   char *nr_bGreenItemStuff =
   (n_bEntry == -1? NULL: r_GREEN_COLLECTION_GET_GREEN_ITEM_STUFF(handle,n_bEntry));
-
+m_DIGGY_VAR_P(cr_bGKeys)
   int comparison = handle->greenHandlerCompareFunction(handle->r_greenHandlerHandle,
     handle->b_frozen, indexLabel,gKeyRank, r_aGreenItemStuff, nr_bGreenItemStuff, cr_bGKeys);
   m_TRACK_IF(comparison < 0)
@@ -760,6 +765,7 @@ m_DIGGY_VAR_D(cp_handle->n_indexFetchBufferSize)
 int GreenCollectionIndexRequestRAddCriterion(GREEN_COLLECTION_HANDLE cp_handle,
   char* nf_indexFetchAutomaticBuffer, struct G_REQUEST_CRITERION criterion, char b_lastCriterion) {
   m_DIGGY_BOLLARD()
+m_DIGGY_VAR_D(b_lastCriterion)
 //  m_ASSERT(indexSeekFlags != ALL_FLAGS_OFF0) 
 // TODO: Ensure GreenCollectionIndexRequestRNew() was called properly
   // MINIMONITOR: CLEAN
@@ -854,6 +860,10 @@ m_DIGGY_VAR_INDEX_FETCH_FLAGS(indexFetchFlags)
     int fetch4 = FETCH_4__CHANGE; // a priori
     if (b_FLAGS_ON(indexFetchFlags,INDEX_FETCH_FLAG__READ)) fetch4 = FETCH_4__READ;
     else if (b_FLAGS_ON(indexFetchFlags,INDEX_FETCH_FLAG__REMOVE)) fetch4 = FETCH_4__REMOVE;
+
+const struct G_REQUEST_CRITERION *gRequestCriteriaPtr = o_IndexFetchGetGRequestCriteriaPtr(indexFetchBuffer);
+m_DIGGY_VAR_P(gRequestCriteriaPtr)
+m_DIGGY_VAR_P(gRequestCriteriaPtr->cr_gKeys)
      
     m_TRACK_IF(m_IndexFetchSequenceReset(indexFetchBuffer,b_FLAGS_ON(indexFetchFlags,
       INDEX_FETCH_FLAG__DESCENDING), fetch4, cp_handle->h_GIndexesHandle) != RETURNED) 
@@ -869,7 +879,9 @@ m_DIGGY_VAR_INDEX_FETCH_FLAGS(indexFetchFlags)
     m_TRACK_IF(m_IndexFetchSequenceCurrent(indexFetchBuffer,cp_handle->h_GIndexesHandle,&n_entry) !=
       RETURNED)
   } // if
+m_DIGGY_VAR_D(n_entry)
   if (n_entry != -1) result = RESULT__FOUND; // a priori 
+m_DIGGY_VAR_RESULT(result)
 
   int n_fetch4 = -1 ; // No fetch a priori
   if ((n_entry != -1) || (b_FLAGS_ON(indexFetchFlags,INDEX_FETCH_FLAG__NEXT) &&

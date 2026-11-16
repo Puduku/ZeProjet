@@ -146,7 +146,7 @@ m_DIGGY_INFO("outputGStringStuff->c_copiedLength=%d strlen(ccp_expectedOutput)=%
 
 #define DUMMY_TEMPLATE8 \
   "##<<be.Eval(.Julie$ := \"Beauted\")>>Que la "\
-  "##<<be.OutputF(%s, ?: !$ == \"Julie\" :?+=$)>> du corps est un sublime don"
+  "##<<be.OutputF(%s, ?: !$ == \"Julie\" :?^+=$)>> du corps est un sublime don"
 #define DUMMY_OUTPUT8 "Que la Beauted du corps est un sublime don"
 
 #define DUMMY_TEMPLATE9 \

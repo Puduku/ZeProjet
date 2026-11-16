@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#if 0
 static int Bidon(int cpt) {
   m_DIGGY_BOLLARD()
   cpt++ ;
@@ -19,6 +20,7 @@ static int Bidon(int cpt) {
   Bidon(cpt) ;
   m_DIGGY_RETURN(0);
 } // Bidon
+#endif
 
 int main (int argc, char** argv) {
   unsigned int dgFlags = ParseTestyCommandArguments(argc,argv,MULTITHREADED__TESTY_FLAG) ;

@@ -346,6 +346,8 @@ m_DIGGY_VAR_INDEX_SEEK_FLAGS(indexSeekFlags)
       m_CHECK_ABANDON(ParseBlotregRequestAtomEnd(&subSequence,as,indexSeekFlags,
         &c_criterion, &c_gsKey, blotexValue, nc_abandonmentInfo))
     b_emptySubSequence = ob_EmptySequence(&subSequence);
+m_DIGGY_VAR_P_STRING(subSequence)
+m_DIGGY_VAR_D(b_emptySubSequence)
     switch (g_BlotregIndexRequestRAddCriterion(blotregHandle,NULL,c_criterion,
       b_emptySubSequence)) {
     case COMPLETED__OK:
@@ -406,7 +408,7 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
     // <blotreg op read int> | <blotreg op read str> (R-value)
     m_TRACK_IF(ParseAs(!b_L_VALUE,a_sequence,&cn_as) != RETURNED)
   } // if
-  
+ m_DIGGY_VAR_D(cn_as) 
   if (n_indexFetchFlags >= 0) {
     g_BLOTVAR_STUFF nt_blotvarStuff = (g_BLOTVAR_STUFF)UNDEFINED;
     int c_entry = UNDEFINED;
@@ -414,9 +416,9 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
 m_DIGGY_VAR_INDEX_FETCH_FLAGS(n_indexFetchFlags) 
     switch (g_BlotregIndexFetch(n_blotregHandle,NULL,n_indexFetchFlags,
       &nt_blotvarStuff, &c_entry)) {
-    case RESULT__NOT_FOUND:
+    case RESULT__NOT_FOUND: m_DIGGY_INFO("NOT FOUND")
 m_ASSERT(nt_blotvarStuff == NULL)
-    case RESULT__FOUND:
+    case RESULT__FOUND: m_DIGGY_VAR_P(nt_blotvarStuff)
       m_TRACK_IF(GetBlotvarRValue(nt_blotvarStuff,cn_as,c_entry,
         handle->h_workingGStringsHandle, ac_blotexValue) != RETURNED)
     break; default: m_TRACK()
@@ -782,12 +784,13 @@ m_DIGGY_VAR_P_STRING(*a_sequence)
   m_PREPARE_ABANDON(a_sequence,"<blotex>")
   m_CHECK_ABANDON(BlotexlibExecutorProbeBlotexAtom(handle,a_sequence,ac_blotexValue,
     nc_abandonmentInfo))
-
+m_DIGGY_VAR_P_STRING(ac_blotexValue->select.c_strex.v_str)
   if (ac_blotexValue->b_strValue) {
     if (b_FLAGS_ON(blotexCheckFlags,BLOTEX_CHECK_FLAG__INT_ONLY)) m_ABANDON(
       EXPECT_INTEX__ABANDONMENT_CAUSE)
     m_CHECK_ABANDON(m_BlotexlibExecutorParseFullStrex(handle,a_sequence,ac_blotexValue,
       nc_abandonmentInfo))
+m_DIGGY_VAR_P_STRING(ac_blotexValue->select.c_strex.v_str)
   } else { 
     if (b_FLAGS_ON(blotexCheckFlags,BLOTEX_CHECK_FLAG__STR_ONLY)) m_ABANDON(
       EXPECT_STREX__ABANDONMENT_CAUSE)
