@@ -1,33 +1,45 @@
-ZE PROJET...
- 
-Julie traisna "ZE MEMOIRE" 11 annedes durant - je pense... Elle savait alors qu'elle avait
-procrastined "au delag du raisonnable", ce qui, bien entendu, la gavait fonciegrement...
-Cependant, elle ne baissa pas les bras, et sa persedvedrance finit par payer... "ZE FINALE VERSION"
-de son paved occupe une place de choix, parmi les ouvrages des grands sociologues, psychologues et
-autres philosophes, de la bibliothegque du salon.
-Et son prestigieux diplosme de Maistrise de L'Universited de Montreal est bien mis en valeur dans le
-joli cadre accroched au mur dans le couloir (*).
-Quant ad "ZE PROJET", devrais-je dire "ZE BOULET" ?, qui vedgegte depuis plus de 20 piges, je me sens
-toujours englued dans la phase initiale oug l'on se pose plus de questions que l'on ne trouve de
+# ZE PROJET...
+
+Julie traîna "ZE MÉMOIRE" onze années durant - je pense... Elle savait alors qu'elle avait
+procrastiné "au-delà du raisonnable", ce qui, bien entendu, la gavait foncièrement...
+
+Cependant, elle ne baissa pas les bras, et sa persévérance finit par payer... "ZE FINALE VERSION"
+de son pavé occupe une place de choix, parmi les ouvrages des grands sociologues, psychologues et
+autres philosophes, de la bibliothèque du salon.
+
+Et son prestigieux diplôme de Maîtrise de l'Université de Montréal est bien mis en valeur dans le
+joli cadre accroché au mur dans le couloir (*).
+
+Quant à "ZE PROJET" - devrais-je dire "ZE BOULET" ? -, qui végète depuis plus de 20 piges, je me
+sens toujours englué dans la phase initiale où l'on se pose plus de questions que l'on ne trouve de
 réponses.
-Aussi, j'aimerais pouvoir aller un peu plus vite en besogne; malheureusement je sens bien que degs que
-je m'impose quelque pression - en me fixant notamment de vagues "deadlines", mon cerveau fatigued et
-paresseux renaccle... J'ai donc appris ag me contenter de ces rares fulgurances qui nous redveglent
-fugacement quelques predcieuses bribes de vérité, nous permettant ainsi de jalonner patiemment le long
-chemin vers la Raison... (Ouf!)
-En tout edtat de cause, mon inspiratrice, vrai "cicedrone", celle qui disait "Je ne suis pas
-particuliegrement intelligente - en revanche, je suis (tregs) dedbouillarde.", elle me susurre encore
-parfois dans le creux de l'oreille "ZE IDEE" pour me dedpatouiller... Ainsi, "on avance"...
 
-(*) Bon, il y a quelques annedes, le cadre, en tombant s'est cassed ; je vais bien susr le remplaccer
-"incessamment sous peu"... 
+Aussi, j'aimerais pouvoir aller un peu plus vite en besogne ; malheureusement je sens bien que dès
+que je m'impose quelque pression - en me fixant notamment de vagues "deadlines" -, mon cerveau
+fatigué et paresseux renâcle... J'ai donc appris à me contenter de ces rares fulgurances qui nous
+révèlent fugacement quelques précieuses bribes de vérité, nous permettant ainsi de jalonner
+patiemment le long chemin vers la Raison... (Ouf !)
 
-Main pieces :
--------------
+En tout état de cause, mon inspiratrice, vraie "cicérone", celle qui disait "Je ne suis pas
+particulièrement intelligente - en revanche, je suis (très) débrouillarde.", me susurre encore
+parfois dans le creux de l'oreille "ZE IDÉE" pour me dépatouiller... Ainsi donc, "on fait avancer
+le Schmilblic(k)"...
 
-- FlintBase/ : Installing Flint elementary environement
-  See in particular "IMPORTANT CONVENTIONS" in Flint/GENESEE.TXT
+---
 
-- MamaBase/ : Installing Mama and the Katzenjammer kids' (developement) framework (needs "Flint" environment)
+(*) Bon, il y a quelques années, le cadre, en tombant, s'est cassé ; je vais bien sûr le
+remplacer "incessamment sous peu"...
 
-- BongoBase/ : Installing "Bongo" island - Katzenjammer kids' main project place... (needs "Mama" framework)
+## Main pieces :
+
+- **FlintBase/** : Installing Flint elementary environment.
+  See in particular "IMPORTANT CONVENTIONS" in `Flint/GENESEE.TXT`.
+
+- **MamaBase/** : Installing Mama and the Katzenjammer kids' (development) framework
+  (needs "Flint" environment).
+
+- **BongoBase/** : Installing "Bongo" island - Katzenjammer kids' main project place...
+  (needs "Mama" framework).
+
+
+
