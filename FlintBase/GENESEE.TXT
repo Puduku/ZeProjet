@@ -1,28 +1,28 @@
 ==============================================================================
-GENESEE - (teeny tiny) bits of tips : files and directories naming conventions
+GENESEE - (teeny tiny) bits of tips: files and directories naming conventions
 ==============================================================================
 (c) 2023 - Puduku
 
-Notice: the following principles were conceived for "UNIXes" family files systems. In
-particular, the principles are not applicable to "MS-DOS/Windozes" family files systems ;
-(*) notes remind these incompatibilities... 
+Notice: the following principles were conceived for "UNIXes" family file systems. In
+particular, the principles are not applicable to "MS-DOS/Windozes" family file systems;
+(*) notes remind you of these incompatibilities...
 
 
 1. Directories
 ==============
 
-The purpose is to allow making clear distinction between
-- position directories 
-AND 
-- structure directories 
+The purpose is to allow making a clear distinction between:
+- position directories
+AND
+- structure directories
 
 The tactic consists in defining a distinctive sign for position directories.
 Hence:
-- Structure directories just follows ordinary (tacit) UNIXes file naming convention, that is pure
+- Structure directories just follow the ordinary (tacit) UNIX file naming convention, that is pure
   lower-case names.
-- Position directories follows "non UNIX" file naming convention: name's first letter is in
+- Position directories follow a "non-UNIX" file naming convention: the name's first letter is in
   UPPER-CASE (*).
-(*) In "MS-DOS/Windozes", files names are NOT case sensitive, hence that distinction does not work. 
+(*) In "MS-DOS/Windozes", file names are NOT case-sensitive, hence this distinction does not work.
 
 Dummy example:
 /home/toto/
@@ -35,7 +35,7 @@ Dummy example:
        hiroshima/
        nagasaki/
      +bin/
-       little-boy 
+       little-boy
        fat-man
    +My-recipes/
      +Hungarian-goulash/
@@ -44,106 +44,111 @@ Dummy example:
      +Bourbon-ham-balls/
      +Chicken-zucchini-casserole/
 
-Typically, one defines environment variable that refers to a position directory ; e.g :
+Typically, one defines an environment variable that refers to a position directory; e.g.:
 export PROJECTS=/home/toto/Projects
-Projects location could be be moved in another place; that's why PROJECTS environment variable is really necessary. 
+The Projects location could be moved to another place; that's why the PROJECTS environment
+variable is really necessary.
 export MANHATTAN=$PROJECTS/Manhattan
-Same observation for Manhattan project location.
-It is generally not usefull to create environement variable to refer to a structure directory ; e.g
+Same observation for the Manhattan project location.
+It is generally not useful to create an environment variable to refer to a structure directory;
+e.g.:
 export MANHATTAN_TESTS=$MANHATTAN/tests
-MANHATTAN_TESTS environement variable is clumsy because 'tests' sub-directory is structural to Manhattan project.
-  
-In short, the 'position directories' are the "movable" branches of the tree, whereas the 'structure 
-directories' correspond to the "un-mutable" parts of the tree. The "frontier" between the two 
-concepts remains not so clear... but that does not really matter. The point is simply to get some
-visible beacons in the countryside, so that the orientation (whithin the whole system tree)
-becomes somewhat easier... 
+The MANHATTAN_TESTS environment variable is clumsy because the 'tests' sub-directory is
+structural to the Manhattan project.
 
-  
+In short, 'position directories' are the "movable" branches of the tree, whereas 'structure
+directories' correspond to the "immutable" parts of the tree. The "frontier" between the two
+concepts is not always clear-cut... but that does not really matter. The point is simply to get
+some visible beacons in the countryside, so that orientation (within the whole system tree)
+becomes somewhat easier...
+
 
 2. Executable files
 ===================
 
-Executable files allow execution of eponymous commands (*). 
-This time, we want to make a distinction between
-- extensive commands 
+Executable files allow the execution of eponymous commands (*).
+This time, we want to make a distinction between:
+- extensive commands
 AND
 - exclusive commands
-(*) In "MS-DOS/Windozes", executable files names must be suffixed with a specific trigram (.exe /
+(*) In "MS-DOS/Windozes", executable file names must be suffixed with a specific trigram (.exe /
     .com / .bat ...)
 
 Extensive commands
 ------------------
-Extensive commands are identified by their single name - that is a name without '/' (slash)
-character. 
-Hence, executable files of extensive commands are necessarily located by the PATH environment
+Extensive commands are identified by their single name - that is, a name without a '/' (slash)
+character.
+Hence, executable files of extensive commands are necessarily located via the PATH environment
 variable (*).
-It's worth always placing the executable files under explicit 'bin/' structure directory in the 
-different positions. Yet, that old "unspoken" UNIX-convention lies on a huge non-sense...
-'bin' stands for 'binary', but must be actually understood as 'structure directory containing
-executable files'. Considering the well accepted definition of 'binary' as:  'raw machine, not
-human-readible format', The (double) contradiction is the following:
-1. scripts files are well executable files but are NOT binary
-2. most of binary files are not executable files (e.g: image files)
-Given our choice is to stick to the convention: 'bin/' <=> executable files for extensive command
-directory, we also advise not using bin/ structure directories for binary files that are NOT
-executables !
-Notice: as consequence of these conventions, '.' (current working working) must NOT be referenced
-in the PATH variable (*). 
+It is worth always placing executable files under an explicit 'bin/' structure directory in the
+different positions. Yet, that old "unspoken" UNIX convention relies on a huge nonsense...
+'bin' stands for 'binary', but must actually be understood as 'structure directory containing
+executable files'. Considering the well-accepted definition of 'binary' as 'raw machine, not
+human-readable format', the (double) contradiction is the following:
+1. script files are indeed executable files, yet they are NOT binary;
+2. most binary files are not executable files (e.g., image files).
+Given our choice to stick to the convention 'bin/' <=> 'executable files directory for extensive
+commands', we also advise not using 'bin/' structure directories for binary files that are NOT
+executables!
+Notice: as a consequence of these conventions, '.' (current working directory) must NOT be
+referenced in the PATH variable (*).
 (*) In "MS-DOS/Windozes", executable files present in the working directory are always extensive
     commands.
 
 Exclusive commands
 ------------------
-Exclusive commands are identified by pathnames - that is a name containing at least one '/' (slash)
-character.
-Thus, exclusive commands are tied to particular positions (in a file system). 
-Hence, executable files of exclusive commands are NOT located by the PATH environmental variable. 
-Therefore, executable files of exclusive commands must NOT be placed in 'bin/' structure directory.
-Use case: (based on dummy example above) 
-- We define a formal single name (without '/') command name, like an extensive command, for
-  instance: 'cook' 
-- We create 'cook' executable file in each positions in which we want to apply the command:
-   +MyRecipes/
-     +Hungarian-goulash/
-      cook 
-     +Delicious-apple-salad/
-      cook 
-     +Skillet-herb-bread/
-      cook 
-     +Bourbon-ham-balls/
-      cook 
-     +Chicken-zucchini-casserole/
-      cook 
-  Of course, each "cook" executable file is specific to its position.
-- Executing 'cook' exclusive command:  
-  + 'cook' is normally not executable as extensive command 
-  + 'cook' is executable as exclusive command, hence you are always "obliged" to specify the position
-    of the cook 'instance' you want to execute:
-    [Projects] $ MyRecipes/Hungarian-goulash/cook
-    [MyRecipes] $ Hungarian-goulash/cook
-    [Hungarian-goulash] $ ./cook
-    $ $PROJECTS/MyRecipes/Hungarian-goulash/cook
+Exclusive commands are identified by pathnames - that is, a name containing at least one '/'
+(slash) character.
+Thus, exclusive commands are tied to particular positions (in a file system).
+Hence, executable files of exclusive commands are NOT located via the PATH environment variable.
+Therefore, executable files of exclusive commands must NOT be placed in a 'bin/' structure
+directory.
 
-=> The position of exclusive command defines the "functional" directory of the command...
-   However, there is "no magic"... It's up to the the executable to adapt the working directory 
-   regarding the functional position... 
+Use case (based on the dummy example above):
+- We define a formal single-name (without '/') command name, like an extensive command, for
+  instance: 'cook'
+- We create a 'cook' executable file in each position in which we want to apply the command:
+   +My-recipes/
+     +Hungarian-goulash/
+      cook
+     +Delicious-apple-salad/
+      cook
+     +Skillet-herb-bread/
+      cook
+     +Bourbon-ham-balls/
+      cook
+     +Chicken-zucchini-casserole/
+      cook
+  Of course, each "cook" executable file is specific to its position.
+- Executing the 'cook' exclusive command:
+  + 'cook' is normally not executable as an extensive command.
+  + 'cook' is executable as an exclusive command, hence you are always "obliged" to specify the
+    position of the cook 'instance' you want to execute:
+    [Projects] $ My-recipes/Hungarian-goulash/cook
+    [My-recipes] $ Hungarian-goulash/cook
+    [Hungarian-goulash] $ ./cook
+    $ $PROJECTS/My-recipes/Hungarian-goulash/cook
+
+=> The position of an exclusive command defines the "functional" directory of the command...
+   However, there is "no magic"... It is up to the executable to adapt its working directory
+   regarding the functional position...
 
 Binary executables vs. scripts
 ------------------------------
-In order to make a distinction between binary executables and scripts (bash scripts, etc.) one may
-use the '.sh' suffix to stress that the executable is an editable script.
-For specific interpreters (python, etc.) one should of course use specific suffix (eg. '.py'). 
+In order to make a distinction between binary executables and scripts (bash scripts, etc.), one
+may use the '.sh' suffix to stress that the executable is an editable script.
+For specific interpreters (Python, etc.), one should of course use a specific suffix (e.g., '.py').
 However, from our point of view, it is not necessary to use distinct suffixes for the different
-'flavors' of shell scripts (for instance, '.bash' suffix for bash shell script). That is, in that
-point of view, '.sh' is simple generic contraction for 'shell script'...
+'flavors' of shell scripts (for instance, a '.bash' suffix for a bash shell script). That is, from
+this point of view, '.sh' is a simple generic contraction for 'shell script'...
 
-Shell scripts "extensions"
---------------------------
-We call shell script "extension" any file containing shell commands that one executes with
-'.' or 'source' builtin command. Such scripts extentions are localizable - like executable files -
-by PATH environment variable.
-Thus, these shell script extension files usually “coexist” with real executables inside bin/ structure
-directories. To make it easier to distinguish "shell extensions" from executables, observe the following:
-- remove 'x' permission to "shell extension" files (that permission is not necessary)  
-- define a specific suffix - in our case, we are used to using '.esh' convention...
+Shell script "extensions"
+-------------------------
+We call a shell script "extension" any file containing shell commands that one executes with the
+'.' or 'source' builtin command. Such script extensions are localizable - like executable files -
+via the PATH environment variable.
+Thus, these shell script extension files usually "coexist" with real executables inside 'bin/'
+structure directories. To make it easier to distinguish "shell extensions" from executables,
+observe the following:
+- remove the 'x' permission from "shell extension" files (that permission is not necessary);
+- define a specific suffix - in our case, we are used to using the '.esh' convention...
