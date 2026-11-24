@@ -328,16 +328,18 @@ two major inefficiencies:
 
 
 Moralité:
-Qualifié en son temps de langage "évolué", le C est pourtant caractérisé par sa rusticité. Les
-"puristes" sont particulièrement décontenancés ses notations étranges et sa syntaxe archaïque.
-Pourtant, malgré ses imperfections originelles et une trajectoire parfois chaotique - pour ne pas
-dire contre-productive -, le C demeure fondamentalement cohérent. Il reste le meilleur trait d'union
+Le C a toujours traîné une réputation de langage quelque peu "bancal". Adulé par les vétérans et
+les passionnés de la première heure, il déconcerte souvent les puristes, irrités par ses notations
+étranges et sa syntaxe jugée archaïque.
+Pourtant, malgré ses imperfections originelles et une évolution parfois chaotique — pour ne pas dire
+contre-productive —, le C demeure fondamentalement cohérent. Il reste le meilleur trait d'union
 possible entre l'esprit humain, qui conçoit le code source, et la machine, qui en exécute le
 binaire.
-Faute de digne successeur capable d'effacer ses tares constitutionnelles, il s'impose toujours comme
-la moins mauvaise référence des langages compilés. (TODO: petit point avec Rust)
-En somme, le C est à l'industrie du logiciel ce que Louis XI fut à l'Histoire de France, ou ce que
-le tampon Jex est au ménage :
+Faute de digne successeur capable de gommer ses défauts structurels sans sacrifier sa simplicité, il
+s'impose toujours comme la moins mauvaise référence des langages compilés. (TODO : petit point avec Rust)
+En somme, le C est à l'industrie du logiciel ce que Louis XI fut à l'histoire de France, ou ce que le
+tampon Jex est au ménage :
 " Je suis MOCHE, mais qu'est-ce que je BOSSE ! "
+
 #endif
 
