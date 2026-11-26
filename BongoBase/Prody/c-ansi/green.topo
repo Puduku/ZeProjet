@@ -7,11 +7,11 @@
 // GREEN INSTANCE / GREEN COLLECTION...
 // ====================================
 // 
-// Purpose : strict "data encapsulation" in "classes" - or similar object-oriented paradigm,
-// is a safe (and popular) approach to represent and manage various data entities.   
+// Purpose : strict encapsulation (through "methods") of compound data in "objects" is a safe
+// (and popular) approach to handle compound data as individual entities.   
 // However, that approach is not very efficient when dealing with "collections" of such entities.
-// The idea is to define a simpler model of data entities - the "GREEN ITEM" - that easily aggregates  
-// into collections... 
+// The idea is to define a simpler model of compound data entities - the "GREEN ITEM" - that easily
+// aggregates into collections... 
 
 // 1. GREEN ITEM
 // -------------
