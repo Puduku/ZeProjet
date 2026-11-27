@@ -6,9 +6,9 @@ INTRO: question of perspective...
 ---------------------------------
 Programming perspective (P-level)
 >Versus<
-C-Language perspective (L-level)
+Language perspective (L-level)
  
-'P'rogramming perspective is a tiny but necessary "abstraction" built just above the 'L'anguage
+Programming perspective is a tiny but necessary "abstraction" built just above the Language
 ("grass roots") perspective.
 Our idea is to NOT "reason" directly with C language features, but with more "ad hoc" 
 programming abstractions...
@@ -64,7 +64,7 @@ little to do with 'pure macros' - and yet both are just ordinary macros of the C
 +----------------------------------------------+----------------------------------------------+
 (1) Like 'P' procedures and functions, 'P' technical routines are code CONTAINERS. But
     contrary to procedures and functions, technical routines are NOT (directly) CALLABLE.
-(2) Thus, from 'P'rogramming perspective, types abstractions are somewhat more subtle than
+(2) Thus, from Programming perspective, types abstractions are somewhat more subtle than
     rudimentary "typedef" constructions - that are actually simple names aliasing (*).
     By the way, we question the (in)famous "<type name>_t" types naming convention (like size_t,
     pthread_t, bool_t, etc.) which confines in fact the principle of data abstraction to a
@@ -75,7 +75,7 @@ little to do with 'pure macros' - and yet both are just ordinary macros of the C
     counter-productive...
     (*) to emphasize our point of view, 'typedef' is a CARICATURE of type definition ; the point
     is just to understand and keep in mind the limitations (from 'P' perspective) of that
-    'L'-level mechanism.
+    L-level mechanism.
 (3) that is representation of "shared" data structures (protocol messages, EDI, etc.).
     The method imposes STRICT control of data alignment, structure padding and packing in memory.
     The techniques "of course" exist (#pragma) in C, but generally have very bad impact on
@@ -107,7 +107,7 @@ Programming main patterns and conventions:
        one - in software design. It has to do with the confusion between analytical and
        synthetic thinking (judgement). TODO: cca a l'air passionnant... ag developper!!!... 
 
-- C-Ansi / C-Posix split: the sources are splitted between "c-posix" and "c-ansi"
+- C-Ansi / C-Posix split: the sources are splitted between 'c-posix' and 'c-ansi'
   sub-directories.
   Initially, the motivation was practical: such split eases recuperation of modules usable to
   write stand-alone C-Ansi programs (reminder: pure C-Ansi programs have limitations but offer
@@ -119,26 +119,35 @@ Programming main patterns and conventions:
   our own headers (#include "c-ansi/xxx" and "c-posix/xxx")
 
 - particular APIs:
-  + "kitchen" paradigm: allows to maintain primal simplicity of "enriched" API.
-    Analogy with some (contemporary) restaurants in which clients have an open view inside the
-    kitchen...
-    The public API is split in two levels :
-    . the "lower" level is the "kitchen view" : define the complete API. Like the kitchen of the
-      restaurant, the decoration and the beauty of the place does not really matter; but the
-      neatness of that place must be irreproachable.
-    . the "upper" level is like the "menu of the diner room" : is a simplification of the API,
-      and is focused on most common usages.
-    Example: conditional declarations (#if / #ifdef) quickly make public interfaces difficult to
-    read and should be placed in the "ad hoc" kitchen interface.
-  + "glue" paradigm: dedicated API meant to fix the approximations and inconsistencies of
-    "standards" - that we MUST get along with...
-    Notice: "universal glue" is an ANTI-PATTERN! (we are deeply engaged against "catchall" design
-    syndrom)
-  + "freeloader": a free-loader is a simple "technique" suitable for very light "singleton"
-    modules. It consists to define the functions directly in the header (.h) file so that we
-    formally get rid of the implementation (.c) file. Such modules are of course to be included
-    in unique and specific place (the main module in general) of application.
-    NB: example of freeloader can be found in "Flint" project...
+  + The "Kitchen" Paradigm
+    This paradigm preserves the core simplicity of a feature-rich API by dividing the public
+    interface into two distinct layers. It draws inspiration from modern restaurants with open
+    kitchens, where diners can see into the workspace while still ordering from a curated menu:
+    . The Dining Room (Upper Level): Like a restaurant menu, this layer abstracts away complex
+      implementation details. It offers a streamlined, intuitive interface tailored for the most
+      common use cases.
+    . The Kitchen (Lower Level): This layer exposes the complete, unvarnished API. Just like a
+      restaurant kitchen, aesthetics and convenience take a backseat to functionality—however, its
+      organization and cleanliness must be impeccable.
+    Example: Preprocessor directives (such as #if or #ifdef) quickly clutter public headers and hurt
+    readability. Under this paradigm, those conditional declarations belong in the lower-level
+    "kitchen" interface, keeping the primary "dining room" interface clean and easy to navigate.
+  + The "Glue" Paradigm
+    A "glue" API is a dedicated, single-purpose interface designed to bridge the gaps,
+    approximations, and inconsistencies of external standards that we are forced to work with.
+    Key Rule: "Universal glue" is an anti-pattern. Glue APIs must remain strictly scoped; we strongly
+    reject "catch-all" designs or bloated utility libraries.
+    Example: A tid-glue API dedicated solely to handling conversions between a native tid_t (thread
+    ID) and an opaque pthread_t data type.
+  + The "Freeloader" Paradigm
+    Reserved for rare, specific use cases, the "freeloader" is a lightweight pattern designed for
+    minimal, singleton-style modules. It works by defining functions directly inside the header (.h)
+    file, eliminating the need for a separate implementation (.c) file. Because the implementation
+    lives in the header, these modules must be included in only one specific location—typically the
+    application's main module.
+    Example: In the Flint project, crash-freeloader uses this pattern to handle process recovery
+    following fatal signals (SIGSEGV, SIGBUS, SIGILL, etc.).
+
 
  "Object oriented" programming in C (bah!):
  ------------------------------------------
