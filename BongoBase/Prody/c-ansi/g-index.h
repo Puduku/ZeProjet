@@ -21,142 +21,6 @@
 #include "c-ansi/testy-diggy.h"
 
 
-extern int diggyGreenDumpMax; // TODO: ag virer
-
-
-// Index sequence:
-// ---------------
-
-// Set new index sequence ("disabled" state - disambiguation purpose...)
-// 
-// Passed:
-// - meBuffer:
-//
-// Changed:
-// - *meBuffer:
-// 
-// Ret:
-// - RETURNED: Ok
-int o_IndexSequenceNew(char *meBuffer) ;
-
-// 
-// Ret: index sequence buffer size
-int o_IndexSequenceSize(void);   
-
-
-// G-Request criteria:
-// ------------------
-
-// * Truly index-based seek flags:
-// NOT key-based seek flag: mutually exclusive with other truly index-based seek flags: 
-#define INDEX_SEEK_FLAG__ANY     0x01
-// Key-based seek flags: 
-#define INDEX_SEEK_FLAG__EQUAL   0x02
-#define INDEX_SEEK_FLAG__LESS    0x04
-#define INDEX_SEEK_FLAG__GREATER 0x08 
-// * NON-index based seek flag: mutually exclusive with truly index-based seek flags: 
-#define INDEX_SEEK_FLAG__LIKE    0x10 
- 
-#endif // __C_ANSI_G_INDEX_H_INCLUDED__ == 0
-
-#undef __FLINT_IMAGES_H_INCLUDED__
-#define __FLINT_IMAGES_H_INCLUDED__ __C_ANSI_G_INDEX_H_INCLUDED__
-#include "flint/images.h"
- 
-// #REF enum-INDEX_SEEK
-m_DEFINE_ENUM_ALIAS_BEGIN(m_IndexSeekFlagsImage)
-  // seek in collection regarding index
-  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__ANY           ,INDEX_SEEK_FLAG__ANY)
-  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__EQUAL         ,INDEX_SEEK_FLAG__EQUAL)
-  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__LESS          ,INDEX_SEEK_FLAG__LESS)
-  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__LESS_EQUAL    ,INDEX_SEEK_FLAG__EQUAL | INDEX_SEEK_FLAG__LESS)
-  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__GREATER       ,INDEX_SEEK_FLAG__GREATER)
-  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__GREATER_EQUAL ,INDEX_SEEK_FLAG__EQUAL | INDEX_SEEK_FLAG__GREATER)
-  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__NOT_EQUAL     ,INDEX_SEEK_FLAG__LESS | INDEX_SEEK_FLAG__GREATER)
-  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__LIKE          ,INDEX_SEEK_FLAG__LIKE)
-m_DEFINE_ENUM_ALIAS_END()
-
-#if __C_ANSI_G_INDEX_H_INCLUDED__ == 0
-
-#define CRITERIA_OP_FLAG__CLOSE1      0x001 // Close one bracket before op.
-#define CRITERIA_OP_FLAG__CLOSE2      0x002 // Close two brackets before op.
-#define CRITERIA_OP_FLAG__CLOSE3      0x004 // Close three brackets before op.
-#define CRITERIA_OP_FLAG__AND         0x010 // And op.
-#define CRITERIA_OP_FLAG__OR          0x020 // Or op.
-#define CRITERIA_OP_FLAG__OPEN1       0x100 // Open one bracket after op. 
-#define CRITERIA_OP_FLAG__OPEN2       0x200 // Open two brackets after op. 
-#define CRITERIA_OP_FLAG__OPEN3       0x400 // Open three brackets after op. 
-
-// Passed:
-// - criteriaOpFlags
-static inline int om_CriteriaOpFlagsOpenBracketCount(int me) {
-  if (b_FLAGS_ON(me,CRITERIA_OP_FLAG__OPEN3)) return 3;
-  else if (b_FLAGS_ON(me,CRITERIA_OP_FLAG__OPEN2)) return 2;
-  else if (b_FLAGS_ON(me,CRITERIA_OP_FLAG__OPEN1)) return 1;
-  return 0;
-} // om_CriteriaOpFlagsOpenBracketCount 
-
-// Passed:
-// - criteriaOpFlags
-static inline int om_CriteriaOpFlagsCloseBracketCount(int me) {
-  if (b_FLAGS_ON(me,CRITERIA_OP_FLAG__CLOSE3)) return 3;
-  else if (b_FLAGS_ON(me,CRITERIA_OP_FLAG__CLOSE2)) return 2;
-  else if (b_FLAGS_ON(me,CRITERIA_OP_FLAG__CLOSE1)) return 1;
-  return 0;
-} // om_CriteriaOpFlagsCloseBracketCount 
-
-// May or may be NOT index-based selection:
-struct G_REQUEST_CRITERION {
-  int indexLabel;
-  unsigned int indexSeekFlags;
-  void *cr_gKeys; // Only significant with Key-based seek flag(s)
-  unsigned int criteriaOpFlags;
-} ;
-
-// #REF om_GRequestCriterion <keys>
-// Establish request criterion
-//
-// Passed:
-// - indexLabel:
-// - indexSeekFlags:
-// - cr_gKeys: only significant with Key-based seek flag(s) 
-// - criteriaOpFlags:
-//
-// Returned:
-// - request criterion
-static inline struct G_REQUEST_CRITERION om_GRequestCriterion(int indexLabel,
-  unsigned int indexSeekFlags, void* cr_gKeys, unsigned int criteriaOpFlags) {
-  struct G_REQUEST_CRITERION me = { .indexLabel = indexLabel,
-    .indexSeekFlags = indexSeekFlags, .cr_gKeys = cr_gKeys, .criteriaOpFlags = criteriaOpFlags };
-  return me;
-} // om_GRequestCriterion
-
-
-// Add criterion. When last criterion, ensure the flags are set properly:
-// - first criterion:
-//   + no flag set if unique criterion
-//   + AND (<other criteria) otherwise
-// - other criteria:
-//   + AND op. always wrapped by brackets to ensure precedence over OR op.
-//   + last criterion terninated properly with closing brackets
-//
-// Passed:
-// - s_me: before (potential) rectification...
-// - meCountMax: MAX number of criteria (>= 1)
-// - *a_meCount: number of criteria (>= 1)
-// - criterion:
-// - b_lastCriterion:
-//
-// Changed:
-// - *s_me: possibly rectifed
-// - *a_meCount: number of criteria (>= 1)
-//
-// Ret:
-// - COMPLETED__OK:
-// - COMPLETED__BUT: (only possible when last criterion) rectification was necessary
-int GRequestCriteriaAdd(struct G_REQUEST_CRITERION *s_me, int meCountMax, int *a_meCount,
-  struct G_REQUEST_CRITERION criterion, char b_lastCriterion) ;
-
 // G-Indexes:
 // ---------
 
@@ -219,20 +83,39 @@ int GIndexesCreateInstance(G_INDEXES_HANDLE *azh_handle,
 // - gKeyCount:
 //
 // Return:
-// new index label (technically equal to entry in indexes array)
+// - >= 0: new index label (technically equal to entry in indexes array)
+// - -1: anomaly is raised
 int GIndexesAddIndex(G_INDEXES_HANDLE handle, int itemsPhysicalNumber,
   int gKeyCount) ;
+
+// Return number of indexes
+// Passed:
+// - handle:
+//
+// Ret:
+// - >= 0: number o indexes
+int o_GIndexesGetIndexCount(G_INDEXES_HANDLE handle) ;
+
 
 // Passed:
 // - handle:
 // - newItemsPhysicalNumber:
+//
+// Ret:
+// - RETURNED: Ok
+// - -1: anomaly is raised
 int GIndexesResize (G_INDEXES_HANDLE handle, int newItemsPhysicalNumber) ;
+
 
 // Add reference on item in all indexes (no action if already referenced in some index)
 //
 // Passed:
 // - handle:
 // - entry:
+//
+// Ret:
+// - RETURNED: Ok
+// - -1: anomaly is raised
 int GIndexesAdd(G_INDEXES_HANDLE, int entry) ; 
 
 // Remove reference on item in all indexes (no action if not referenced in some index)
@@ -240,71 +123,108 @@ int GIndexesAdd(G_INDEXES_HANDLE, int entry) ;
 // Passed:
 // - handle:
 // - entry:
+//
+// Ret:
+// - RETURNED: Ok
+// - -1: anomaly is raised
 int GIndexesRemove(G_INDEXES_HANDLE handle, int entry) ;
 
-
-#define b_ASCENDING b_FALSE0
-#define b_DESCENDING b_TRUE
-
-// (re-)set index iterator sequence according to the 1st criterion 
-//
-// Passed:
-// - handle: 
-// - ap_1stGRequestCriterion: "rectified" criteria (see GRequestCriteriaAdd() above)
-// - b_descending:
-//
-// Changed:
-// - *indexSequenceBuffer: sequence is (re-)set ; call GIndexesSequenceNext() to
-//   (re-)play the sequence. 
-//
-// Ret:
-// - RETURNED: Ok
-// - -1: anomaly is raised
-int GIndexesSequenceReset(G_INDEXES_HANDLE handle,
-  const struct G_REQUEST_CRITERION *ap_1stGRequestCriterion, char b_descending,
-  char *indexSequenceBuffer) ; 
-
-// Update index iterator sequence: NEXT.
-//
-// Passed:
-// - handle: 
-// - sp_gRequestCriteria: "rectified" criteria op. flags (see GRequestCriteriaAdd() above)
-// - gRequestCriterionCount
-// - b_descending:
-// - *indexSequenceBuffer : iterator sequence "current"
-//
-// Changed:
-// - *indexSequenceBuffer : iterator sequence "next"
-// - *an_entry: item entry to retrieve : 
-//   + -1 special value : not found, that is "disabled" or "no more"
-//   + >= 0: corresponding entry
-//
-// Ret:
-// - RETURNED: Ok
-// - -1: anomaly is raised
-int GIndexesSequenceNext(G_INDEXES_HANDLE handle,
-  const struct G_REQUEST_CRITERION *sp_gRequestCriteria, int gRequestCriterionCount,
-  char b_descending, char *indexSequenceBuffer, int *an_entry);
-
-
-// Get current entry in index sequence.
+// Return number of items (managed by ALL indexes)  
 //
 // Passed:
 // - handle:
-// - sp_gRequestCriteria: "rectified" criteria op. flags (see GRequestCriteriaAdd() above)
-// - *p_indexSequenceBuffer:
-//
-// Changed:
-// - *an_entry: 
-//   + -1 special value : not found
-//   + >= 0: corresponding entry
 //
 // Ret:
-// - RETURNED: Ok
+// - >= 0: number of items seen by indexes
+int o_GIndexesGetItemCount(G_INDEXES_HANDLE handle) ;
+
+
+// Index entries "block"
+struct INDEX_ENTRY_BLOCK {
+  int first; // >= 0
+  int last; // >= first
+} ;
+
+// Binary search of "B" in index
+//
+// Passed:
+// - handle:
+// - indexLabel: 
+// - n_bEntry: >= 0 => entry in index for "B"
+// - cr_bGKeys: raw key(s) for "B" when entry for "B" not provided
+// - cac_indexEntries: only significant if entry in index is specified for "B". 
+//
+// Modified:
+// - *an_indexEntry: >=0 => found entry in index
+//   -1 => "B" is not referenced in index ("Not found")
+// - *a_top: "best" top index entry established so far ; when "Not found", corresponds to the
+//   closest entry in the index that is on top of "B"
+// - *cac_indexEntries: (when used) only significant if found entry in index; delimit ALL "B"
+//   entries 
+//
+// Ret:
+// - RETURNED
 // - -1: anomaly is raised
-int GIndexesSequenceCurrent(G_INDEXES_HANDLE handle,
-  const struct G_REQUEST_CRITERION *sp_gRequestCriteria, const char *p_indexSequenceBuffer,
-  int *an_entry);
+int GIndexesBSearch(G_INDEXES_HANDLE handle, int indexLabel, int n_bEntry, void *cr_bGKeys,
+  int *an_indexEntry, int *a_top, struct INDEX_ENTRY_BLOCK *cac_indexEntries) ; 
+
+// Passed:
+// - handle:
+// - indexLabel: 
+// - indexEntry:
+//
+// Ret:
+//- >= 0: item entry 
+int o_GIndexesGetItemEntry(G_INDEXES_HANDLE handle, int indexLabel, int indexEntry) ;
+
+
+// * Truly index-based seek flags:
+// NOT key-based seek flag: mutually exclusive with other truly index-based seek flags: 
+#define INDEX_SEEK_FLAG__ANY     0x01
+// Key-based seek flags: 
+#define INDEX_SEEK_FLAG__EQUAL   0x02
+#define INDEX_SEEK_FLAG__LESS    0x04
+#define INDEX_SEEK_FLAG__GREATER 0x08 
+// * NON-index based seek flag: mutually exclusive with truly index-based seek flags: 
+#define INDEX_SEEK_FLAG__LIKE    0x10 
+  
+#endif // __C_ANSI_G_INDEX_H_INCLUDED__ == 0
+
+#undef __FLINT_IMAGES_H_INCLUDED__
+#define __FLINT_IMAGES_H_INCLUDED__ __C_ANSI_G_INDEX_H_INCLUDED__
+#include "flint/images.h"
+
+// #REF enum-INDEX_SEEK
+m_DEFINE_ENUM_ALIAS_BEGIN(m_IndexSeekFlagsImage)
+  // seek in collection regarding index
+  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__ANY           ,INDEX_SEEK_FLAG__ANY)
+  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__EQUAL         ,INDEX_SEEK_FLAG__EQUAL)
+  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__LESS          ,INDEX_SEEK_FLAG__LESS)
+  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__LESS_EQUAL    ,INDEX_SEEK_FLAG__EQUAL | INDEX_SEEK_FLAG__LESS)
+  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__GREATER       ,INDEX_SEEK_FLAG__GREATER)
+  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__GREATER_EQUAL ,INDEX_SEEK_FLAG__EQUAL | INDEX_SEEK_FLAG__GREATER)
+  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__NOT_EQUAL     ,INDEX_SEEK_FLAG__LESS | INDEX_SEEK_FLAG__GREATER)
+  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__LIKE          ,INDEX_SEEK_FLAG__LIKE)
+m_DEFINE_ENUM_ALIAS_END()
+
+#if __C_ANSI_G_INDEX_H_INCLUDED__ == 0
+
+// Perform "equation" of entry with a key. 
+//
+// Passed:
+// - handle:
+// - indexLabel: 
+// - aEntry: "A" entry 
+// - indexSeekFlags: 
+// - r_bGKeys: "B" keys(s) 
+//
+// Returned:
+// - >=0: "equation" between :"A" and "B" with that key component... 
+//   + ANSWER__YES : "A" item and "B" key(s) are similar 
+//   + ANSWER__NO : "A" item and "B" key(s) are NOT similar 
+// - -1: unexpected problem; anomaly is raised
+int GIndexesSeekEntryEquate(G_INDEXES_HANDLE handle, int indexLabel, int aEntry,
+  unsigned int indexSeekFlags, void *r_bGKeys) ; 
 
 
 // Ret:
@@ -349,6 +269,7 @@ int GIndexesVerifyCount (G_INDEXES_HANDLE handle,int *ac_commonCount) ;
 // - -1: unexpected problem ; anomaly is raised
 int GIndexesVerifyEntry (G_INDEXES_HANDLE handle, int entry, int expectedHits) ;
 
+
 // Passed:
 // - handle
 //
@@ -356,6 +277,7 @@ int GIndexesVerifyEntry (G_INDEXES_HANDLE handle, int entry, int expectedHits) ;
 // - RETURNED:
 // - -1: anomaly is raised
 int GIndexesClear (G_INDEXES_HANDLE handle) ;
+
 
 // Passed:
 // - xh_handle:

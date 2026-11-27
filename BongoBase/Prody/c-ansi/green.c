@@ -2,7 +2,6 @@
 // (c) Atos-Euronext Belgium - 2001, 2002, 2003
 
 #include "c-ansi/green.h"
-#include "c-ansi/g-index.h"
 #include "c-ansi/stderr.h"
 #include "c-ansi/alloc.h"
 #include "c-ansi/c-stack.h"
@@ -201,7 +200,7 @@ static inline int m_IndexFetchSequenceReset(char *me, char b_descending, int fet
   headerPtr->fetch4 = fetch4;
   const struct G_REQUEST_CRITERION *ap_1stGRequestCriteria = o_IndexFetchGetGRequestCriteriaPtr(me); 
 m_DIGGY_VAR_P(ap_1stGRequestCriteria) ; m_DIGGY_VAR_P(ap_1stGRequestCriteria->cr_gKeys) ; 
-  m_TRACK_IF(GIndexesSequenceReset(GIndexesHandle, ap_1stGRequestCriteria,
+  m_TRACK_IF(l_GIndexesSequenceReset(GIndexesHandle, ap_1stGRequestCriteria,
     headerPtr->b_descending,o_IndexFetchGetIndexSequenceBuffer(me)) != RETURNED)
   m_DIGGY_RETURN(RETURNED)
 } // m_IndexFetchSequenceReset
@@ -216,7 +215,7 @@ static inline int m_IndexFetchSequenceNext(char *me, G_INDEXES_HANDLE GIndexesHa
   m_DIGGY_BOLLARD_S()
   struct INDEX_FETCH_HEADER *headerPtr = o_IndexFetchGetHeaderPtr(me); 
   m_ASSERT(headerPtr->b_lastCriterion)
-    m_TRACK_IF(GIndexesSequenceNext(GIndexesHandle, o_IndexFetchGetGRequestCriteriaPtr(me),
+    m_TRACK_IF(l_GIndexesSequenceNext(GIndexesHandle, o_IndexFetchGetGRequestCriteriaPtr(me),
       headerPtr->i_criterionCount, headerPtr->b_descending, o_IndexFetchGetIndexSequenceBuffer(me),
       an_entry) != RETURNED)
   m_DIGGY_RETURN(RETURNED)
@@ -231,7 +230,7 @@ static inline int m_IndexFetchSequenceCurrent(char *me, G_INDEXES_HANDLE GIndexe
   int *an_entry) {
   m_DIGGY_BOLLARD_S()
   m_ASSERT(o_IndexFetchGetHeaderPtr(me)->b_lastCriterion)
-    m_TRACK_IF(GIndexesSequenceCurrent(GIndexesHandle, o_IndexFetchGetGRequestCriteriaPtr(me),
+    m_TRACK_IF(l_GIndexesSequenceCurrent(GIndexesHandle, o_IndexFetchGetGRequestCriteriaPtr(me),
       o_IndexFetchGetIndexSequenceBuffer(me),an_entry) != RETURNED)
   m_DIGGY_RETURN(RETURNED)
 } // m_IndexFetchSequenceCurrent

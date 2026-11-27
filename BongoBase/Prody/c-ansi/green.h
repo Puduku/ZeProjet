@@ -13,7 +13,7 @@
 #include "c-ansi/stderr.h"
 #include "c-ansi/types.h"
 #include "flint/flags.h"
-#include "c-ansi/g-index.h"
+#include "c-ansi/g-sequence.h"
 #include "c-ansi/diggy.h"
 
 ////////////////////////////
