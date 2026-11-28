@@ -178,53 +178,37 @@ int GIndexesBSearch(G_INDEXES_HANDLE handle, int indexLabel, int n_bEntry, void 
 int o_GIndexesGetItemEntry(G_INDEXES_HANDLE handle, int indexLabel, int indexEntry) ;
 
 
-// * Truly index-based seek flags:
-// NOT key-based seek flag: mutually exclusive with other truly index-based seek flags: 
-#define INDEX_SEEK_FLAG__ANY     0x01
-// Key-based seek flags: 
-#define INDEX_SEEK_FLAG__EQUAL   0x02
-#define INDEX_SEEK_FLAG__LESS    0x04
-#define INDEX_SEEK_FLAG__GREATER 0x08 
-// * NON-index based seek flag: mutually exclusive with truly index-based seek flags: 
-#define INDEX_SEEK_FLAG__LIKE    0x10 
-  
-#endif // __C_ANSI_G_INDEX_H_INCLUDED__ == 0
-
-#undef __FLINT_IMAGES_H_INCLUDED__
-#define __FLINT_IMAGES_H_INCLUDED__ __C_ANSI_G_INDEX_H_INCLUDED__
-#include "flint/images.h"
-
-// #REF enum-INDEX_SEEK
-m_DEFINE_ENUM_ALIAS_BEGIN(m_IndexSeekFlagsImage)
-  // seek in collection regarding index
-  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__ANY           ,INDEX_SEEK_FLAG__ANY)
-  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__EQUAL         ,INDEX_SEEK_FLAG__EQUAL)
-  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__LESS          ,INDEX_SEEK_FLAG__LESS)
-  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__LESS_EQUAL    ,INDEX_SEEK_FLAG__EQUAL | INDEX_SEEK_FLAG__LESS)
-  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__GREATER       ,INDEX_SEEK_FLAG__GREATER)
-  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__GREATER_EQUAL ,INDEX_SEEK_FLAG__EQUAL | INDEX_SEEK_FLAG__GREATER)
-  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__NOT_EQUAL     ,INDEX_SEEK_FLAG__LESS | INDEX_SEEK_FLAG__GREATER)
-  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__LIKE          ,INDEX_SEEK_FLAG__LIKE)
-m_DEFINE_ENUM_ALIAS_END()
-
-#if __C_ANSI_G_INDEX_H_INCLUDED__ == 0
-
-// Perform "equation" of entry with a key. 
+// Compare two items.
 //
 // Passed:
 // - handle:
-// - indexLabel: 
-// - aEntry: "A" entry 
-// - indexSeekFlags: 
-// - r_bGKeys: "B" keys(s) 
+// - indexLabel:
+// - aEntry: entry for "A"
+// - n_bEntry: >= 0 => entry for "B"
+// - cr_bGKeys: raw key(s) for "B" when entry for "B" not provided
 //
-// Returned:
-// - >=0: "equation" between :"A" and "B" with that key component... 
-//   + ANSWER__YES : "A" item and "B" key(s) are similar 
-//   + ANSWER__NO : "A" item and "B" key(s) are NOT similar 
+// Ret: 
+// - >=0: "comparison" between :"A" and "B" with that key component... 
+//   + LESS_THAN__COMPARISON : "A" 'less than' "B" 
+//   + EQUAL_TO__COMPARISON : "A" and "B" are "identical"
+//   + GREATER_THAN__COMPARISON : "A" 'greater than' "B" 
 // - -1: unexpected problem; anomaly is raised
-int GIndexesSeekEntryEquate(G_INDEXES_HANDLE handle, int indexLabel, int aEntry,
-  unsigned int indexSeekFlags, void *r_bGKeys) ; 
+int GIndexesEntryCompare(G_INDEXES_HANDLE handle, int indexLabel, int aEntry, int n_bEntry,
+  void *cr_bGKeys) ;
+
+// Adequate an item with a key.
+//
+// Passed:
+// - handle:
+// - indexLabel:
+// - aEntry: entry for "A"
+// - r_bGKeys: raw key(s) for "B" 
+//
+// Ret: adequation between "A" (entry) and "B" (key) ?
+// - ANSWER__YES: 
+// - ANSWER__NO: 
+// - -1: unexpected problem; anomaly is raised
+int GIndexesEntryEquate(G_INDEXES_HANDLE handle, int indexLabel, int aEntry, void *r_bGKeys) ;
 
 
 // Ret:

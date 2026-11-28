@@ -341,7 +341,7 @@ int GIndexesCreateInstance(G_INDEXES_HANDLE *azh_handle,
 } // GIndexesCreateInstance
 
 // See ENTRY_COMPARE_FUNCTION
-static int GIndexesEntryCompare (void *r_handle, int indexLabel, int aEntry, int n_bEntry,
+static int GIndexesEntryCompareInternal (void *r_handle, int indexLabel, int aEntry, int n_bEntry,
   void *cr_bGKeys) { m_DIGGY_BOLLARD_S()
   G_INDEXES_HANDLE handle = (G_INDEXES_HANDLE)r_handle;  
   int comparison = UNDEFINED;
@@ -353,7 +353,7 @@ m_DIGGY_VAR_P(cr_bGKeys)
     if (comparison != EQUAL_TO__COMPARISON) break ;
   } // for
   m_DIGGY_RETURN(comparison)
-} // GIndexesEntryCompare
+} // GIndexesEntryCompareInternal
 
 // Public function; see .h
 int GIndexesAddIndex(G_INDEXES_HANDLE handle, int itemPhysicalCount, int gKeyCount) {
@@ -363,7 +363,7 @@ int GIndexesAddIndex(G_INDEXES_HANDLE handle, int itemPhysicalCount, int gKeyCou
   struct G_INDEX *a_index = handle->vnhs_indexes + handle->indexCount ;
 
   handle->vnhs_gKeyCounts[handle->indexCount] = gKeyCount;
-  m_TRACK_IF(m_GIndexInit(a_index, itemPhysicalCount, GIndexesEntryCompare, handle,
+  m_TRACK_IF(m_GIndexInit(a_index, itemPhysicalCount, GIndexesEntryCompareInternal, handle,
     handle->indexCount) != RETURNED)
   m_DIGGY_RETURN(handle->indexCount++)
 } // GIndexesAddIndex
@@ -436,20 +436,15 @@ int o_GIndexesGetItemEntry(G_INDEXES_HANDLE handle, int indexLabel, int indexEnt
   m_DIGGY_RETURN(o_GIndexGetItemEntry(handle->vnhs_indexes + indexLabel,indexEntry))
 } // o_GIndexesGetItemEntry
 
-// Adequate an item with a key.
-//
-// Passed:
-// - handle:
-// - indexLabel:
-// - aEntry: entry for "A"
-// - r_bGKeys: raw key(s) for "B" 
-//
-// Ret: adequation between "A" (entry) and "B" (key) ?
-// - ANSWER__YES: 
-// - ANSWER__NO: 
-// - -1: unexpected problem; anomaly is raised
-static inline int m_GIndexesEntryEquate(G_INDEXES_HANDLE handle, int indexLabel, int aEntry,
-  void *r_bGKeys) { m_DIGGY_BOLLARD_S()
+// Public function; see .h
+int GIndexesEntryCompare(G_INDEXES_HANDLE handle, int indexLabel, int aEntry, int n_bEntry,
+  void *cr_bGKeys) { m_DIGGY_BOLLARD()
+  m_DIGGY_RETURN(GIndexesEntryCompareInternal(handle,indexLabel,aEntry,n_bEntry,cr_bGKeys)) 
+} // GIndexesEntryCompare
+
+// Public function; see .h
+int GIndexesEntryEquate(G_INDEXES_HANDLE handle, int indexLabel, int aEntry, void *r_bGKeys) {
+  m_DIGGY_BOLLARD()
   int answer = UNDEFINED;
   m_ASSERT(indexLabel < handle->indexCount) 
   int j = 0; for ( ; j < handle->vnhs_gKeyCounts[indexLabel] ; j++) {
@@ -459,40 +454,8 @@ static inline int m_GIndexesEntryEquate(G_INDEXES_HANDLE handle, int indexLabel,
   } // for
   
   m_DIGGY_RETURN(answer)
-} // m_GIndexesEntryEquate
+} // GIndexesEntryEquate
 
-// Public function; see .h
-int GIndexesSeekEntryEquate(G_INDEXES_HANDLE handle, int indexLabel, int aEntry,
-  unsigned int indexSeekFlags, void *r_bGKeys) { m_DIGGY_BOLLARD()
-  if (indexSeekFlags == INDEX_SEEK_FLAGS__ANY) return ANSWER__YES;
-
-  int answer = ANSWER__NO; // a priori
-  if (indexSeekFlags != INDEX_SEEK_FLAGS__LIKE) {
-    int comparison = GIndexesEntryCompare(handle, indexLabel, aEntry, -1, r_bGKeys);
-    m_TRACK_IF(comparison < 0)
-    switch (indexSeekFlags) {
-    case INDEX_SEEK_FLAGS__EQUAL:
-      if (comparison == EQUAL_TO__COMPARISON) answer = ANSWER__YES;
-    break; case INDEX_SEEK_FLAGS__LESS:
-      if (comparison == LESS_THAN__COMPARISON) answer = ANSWER__YES;
-    break; case INDEX_SEEK_FLAGS__LESS_EQUAL:
-      if (comparison == LESS_THAN__COMPARISON || comparison == EQUAL_TO__COMPARISON) answer =
-        ANSWER__YES;
-    break; case INDEX_SEEK_FLAGS__GREATER: 
-      if (comparison == GREATER_THAN__COMPARISON) answer = ANSWER__YES;
-    break; case INDEX_SEEK_FLAGS__GREATER_EQUAL:
-      if (comparison == GREATER_THAN__COMPARISON || comparison == EQUAL_TO__COMPARISON) answer =
-        ANSWER__YES;
-    break; case INDEX_SEEK_FLAGS__NOT_EQUAL:
-      if (comparison != EQUAL_TO__COMPARISON) answer = ANSWER__YES;
-    break; default: 
-      m_RAISE(ANOMALY__VALUE__D,indexSeekFlags)
-    } // switch
-  } else { // INDEX_SEEK_FLAGS__LIKE
-    m_TRACK_IF((answer = m_GIndexesEntryEquate(handle,indexLabel, aEntry, r_bGKeys)) < 0)
-  } // if 
-  m_DIGGY_RETURN(answer)
-} // GIndexesSeekEntryEquate
 
 
 // Public function; see .h

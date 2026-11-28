@@ -72,6 +72,37 @@ static inline int om_CriteriaOpFlagsCloseBracketCount(int me) {
   return 0;
 } // om_CriteriaOpFlagsCloseBracketCount 
 
+// * Truly index-based seek flags:
+// NOT key-based seek flag: mutually exclusive with other truly index-based seek flags: 
+#define INDEX_SEEK_FLAG__ANY     0x01
+// Key-based seek flags: 
+#define INDEX_SEEK_FLAG__EQUAL   0x02
+#define INDEX_SEEK_FLAG__LESS    0x04
+#define INDEX_SEEK_FLAG__GREATER 0x08 
+// * NON-index based seek flag: mutually exclusive with truly index-based seek flags: 
+#define INDEX_SEEK_FLAG__LIKE    0x10 
+
+#endif // __C_ANSI_G_SEQUENCE_H_INCLUDED__ == 0
+
+#undef __FLINT_IMAGES_H_INCLUDED__
+#define __FLINT_IMAGES_H_INCLUDED__ __C_ANSI_G_SEQUENCE_H_INCLUDED__
+#include "flint/images.h"
+
+// #REF enum-INDEX_SEEK
+m_DEFINE_ENUM_ALIAS_BEGIN(m_IndexSeekFlagsImage)
+  // seek in collection regarding index
+  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__ANY           ,INDEX_SEEK_FLAG__ANY)
+  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__EQUAL         ,INDEX_SEEK_FLAG__EQUAL)
+  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__LESS          ,INDEX_SEEK_FLAG__LESS)
+  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__LESS_EQUAL    ,INDEX_SEEK_FLAG__EQUAL | INDEX_SEEK_FLAG__LESS)
+  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__GREATER       ,INDEX_SEEK_FLAG__GREATER)
+  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__GREATER_EQUAL ,INDEX_SEEK_FLAG__EQUAL | INDEX_SEEK_FLAG__GREATER)
+  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__NOT_EQUAL     ,INDEX_SEEK_FLAG__LESS | INDEX_SEEK_FLAG__GREATER)
+  m_ENUM_ALIAS_VAL(INDEX_SEEK_FLAGS__LIKE          ,INDEX_SEEK_FLAG__LIKE)
+m_DEFINE_ENUM_ALIAS_END()
+
+#if __C_ANSI_G_SEQUENCE_H_INCLUDED__ == 0
+
 // May or may be NOT index-based selection:
 struct G_REQUEST_CRITERION {
   int indexLabel;

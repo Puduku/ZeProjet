@@ -270,42 +270,32 @@ m_DIGGY_VAR_GEN(status,c)
 } // m_GcEvaluatorIterate
 
 
-// Set NEW index sequence (according to passed "seek params").
-//
-// Passed:
-// - a_me:
-// - b_descending: indicating "direction" of "soft reset" 
-// - indexSeekFlags: seek flags for sequence request ; 
-//   + INDEX_SEEK_FLAGS__ANY : NOT key-based selection 
-//   + other flags : key-based selection
-// - cr_gKeys: search key(s) (significant when key-based selection) 
-//
-// Changed:
-// - a_indexSequence-> : new sequence corresponding to passed "seek values"
-//
-// Ret:
-// - RETURNED: Ok
-// - -1: anomaly is raised
-static inline int ml_GIndexesSequenceResetInternal(G_INDEXES_HANDLE handle, int indexLabel,
-  char b_descending, unsigned int indexSeekFlags, void *cr_gKeys, struct INDEX_SEQUENCE *a_indexSequence) {
-  m_DIGGY_BOLLARD_S()
+// Public function; see .h
+int l_GIndexesSequenceReset(G_INDEXES_HANDLE handle,
+  const struct G_REQUEST_CRITERION *ap_1stGRequestCriterion, char b_descending,
+  char *indexSequenceBuffer) { m_DIGGY_BOLLARD()
+  m_ASSERT(ap_1stGRequestCriterion->indexLabel < o_GIndexesGetIndexCount(handle)) 
+m_DIGGY_VAR_INDEX_SEEK_FLAGS(ap_1stGRequestCriterion->indexSeekFlags)
+m_DIGGY_VAR_P(ap_1stGRequestCriterion->cr_gKeys)
+
+  struct INDEX_SEQUENCE *a_indexSequence = (struct INDEX_SEQUENCE*)indexSequenceBuffer;
   a_indexSequence->indexEntryBlockCount2 = 0; // Empty ("disabled") selection a priori
   int itemCount = o_GIndexesGetItemCount(handle);
   if (itemCount > 0) { 
-m_DIGGY_VAR_INDEX_SEEK_FLAGS(indexSeekFlags)
+m_DIGGY_VAR_INDEX_SEEK_FLAGS(ap_1stGRequestCriterion->indexSeekFlags)
 
     int n_firstIndexEntry = -1; // Not set a priori
     int n_lastIndexEntry = -1; // Not set a priori
-    if (b_FLAGS_ON(indexSeekFlags,INDEX_SEEK_FLAG__ANY)) { // NOT key-based selection
+    if (b_FLAGS_ON(ap_1stGRequestCriterion->indexSeekFlags,INDEX_SEEK_FLAG__ANY)) { // NOT key-based selection
       n_firstIndexEntry = 0; 
     } else { // key-based selection
       int top = UNDEFINED;
       int n_indexEntry = UNDEFINED;
       struct INDEX_ENTRY_BLOCK c_indexEntries; // UNDEFINED
-m_DIGGY_VAR_P(cr_gKeys)
-      m_TRACK_IF(GIndexesBSearch(handle,indexLabel, -1,cr_gKeys, &n_indexEntry,&top,
+m_DIGGY_VAR_P(ap_1stGRequestCriterion->cr_gKeys)
+      m_TRACK_IF(GIndexesBSearch(handle,ap_1stGRequestCriterion->indexLabel, -1,ap_1stGRequestCriterion->cr_gKeys, &n_indexEntry,&top,
         &c_indexEntries) != RETURNED);
-      switch (indexSeekFlags) {
+      switch (ap_1stGRequestCriterion->indexSeekFlags) {
       case INDEX_SEEK_FLAGS__EQUAL:
         if (n_indexEntry != -1) {
           n_firstIndexEntry = c_indexEntries.first;
@@ -331,7 +321,7 @@ m_DIGGY_VAR_P(cr_gKeys)
           if (c_indexEntries.last+1 < itemCount) n_firstIndexEntry = c_indexEntries.last+1;
         } else n_firstIndexEntry = 0; 
       break; default: // INDEX_SEEK_FLAGS__LIKE case 
-        m_RAISE(ANOMALY__VALUE__D,indexSeekFlags)
+        m_RAISE(ANOMALY__VALUE__D,ap_1stGRequestCriterion->indexSeekFlags)
       } // switch
     } // if 
 
@@ -357,21 +347,8 @@ m_DIGGY_VAR_P(cr_gKeys)
   } // if
 
   m_DIGGY_RETURN(RETURNED)
-} // m_GIndexSequenceResetInternal
+} // l_GIndexSequenceReset
 
-// Public function; see .h
-int l_GIndexesSequenceReset(G_INDEXES_HANDLE handle,
-  const struct G_REQUEST_CRITERION *ap_1stGRequestCriterion, char b_descending,
-  char *indexSequenceBuffer) { m_DIGGY_BOLLARD_S()
-  m_ASSERT(ap_1stGRequestCriterion->indexLabel < o_GIndexesGetIndexCount(handle)) 
-m_DIGGY_VAR_INDEX_SEEK_FLAGS(ap_1stGRequestCriterion->indexSeekFlags)
-m_DIGGY_VAR_P(ap_1stGRequestCriterion->cr_gKeys)
-  m_TRACK_IF(ml_GIndexesSequenceResetInternal(handle,ap_1stGRequestCriterion->indexLabel,
-    b_descending, ap_1stGRequestCriterion->indexSeekFlags,
-    ap_1stGRequestCriterion->cr_gKeys, (struct INDEX_SEQUENCE*)indexSequenceBuffer) != RETURNED) 
-
-  m_DIGGY_RETURN(RETURNED)
-} // l_GIndexesSequenceReset
 
 // Update index sequence (NEXT) and get entry 
 //
@@ -433,6 +410,52 @@ static inline int ml_GIndexesSequenceNextInternal(G_INDEXES_HANDLE handle, int i
   m_DIGGY_RETURN(RETURNED)
 } // ml_GIndexesSequenceNextInternal
 
+// Perform "equation" of entry with a key. 
+//
+// Passed:
+// - handle:
+// - indexLabel: 
+// - aEntry: "A" entry 
+// - indexSeekFlags: 
+// - r_bGKeys: "B" keys(s) 
+//
+// Returned:
+// - >=0: "equation" between :"A" and "B" with that key component... 
+//   + ANSWER__YES : "A" item and "B" key(s) are similar 
+//   + ANSWER__NO : "A" item and "B" key(s) are NOT similar 
+// - -1: unexpected problem; anomaly is raised
+static int ml_GIndexesSeekEntryEquate(G_INDEXES_HANDLE handle, int indexLabel, int aEntry,
+  unsigned int indexSeekFlags, void *r_bGKeys) { m_DIGGY_BOLLARD()
+  if (indexSeekFlags == INDEX_SEEK_FLAGS__ANY) return ANSWER__YES;
+
+  int answer = ANSWER__NO; // a priori
+  if (indexSeekFlags != INDEX_SEEK_FLAGS__LIKE) {
+    int comparison = GIndexesEntryCompare(handle, indexLabel, aEntry, -1, r_bGKeys);
+    m_TRACK_IF(comparison < 0)
+    switch (indexSeekFlags) {
+    case INDEX_SEEK_FLAGS__EQUAL:
+      if (comparison == EQUAL_TO__COMPARISON) answer = ANSWER__YES;
+    break; case INDEX_SEEK_FLAGS__LESS:
+      if (comparison == LESS_THAN__COMPARISON) answer = ANSWER__YES;
+    break; case INDEX_SEEK_FLAGS__LESS_EQUAL:
+      if (comparison == LESS_THAN__COMPARISON || comparison == EQUAL_TO__COMPARISON) answer =
+        ANSWER__YES;
+    break; case INDEX_SEEK_FLAGS__GREATER:
+      if (comparison == GREATER_THAN__COMPARISON) answer = ANSWER__YES;
+    break; case INDEX_SEEK_FLAGS__GREATER_EQUAL:
+      if (comparison == GREATER_THAN__COMPARISON || comparison == EQUAL_TO__COMPARISON) answer =
+        ANSWER__YES;
+    break; case INDEX_SEEK_FLAGS__NOT_EQUAL:
+      if (comparison != EQUAL_TO__COMPARISON) answer = ANSWER__YES;
+    break; default:
+      m_RAISE(ANOMALY__VALUE__D,indexSeekFlags)
+    } // switch
+  } else { // INDEX_SEEK_FLAGS__LIKE
+    m_TRACK_IF((answer = GIndexesEntryEquate(handle,indexLabel, aEntry, r_bGKeys)) < 0)
+  } // if 
+  m_DIGGY_RETURN(answer)
+} // ml_GIndexesSeekEntryEquate
+
 // Public function; see .h
 int l_GIndexesSequenceNext(G_INDEXES_HANDLE handle,
   const struct G_REQUEST_CRITERION *sp_gRequestCriteria, int gRequestCriterionCount,
@@ -456,7 +479,7 @@ int l_GIndexesSequenceNext(G_INDEXES_HANDLE handle,
         if (i > 0) {
           if (cb_boost) nb_passed = -1; else {
             int answer = UNDEFINED;
-            m_TRACK_IF((answer = GIndexesSeekEntryEquate(handle,
+            m_TRACK_IF((answer = ml_GIndexesSeekEntryEquate(handle,
               p_gRequestCriterionPtr->indexLabel,*an_entry,
               p_gRequestCriterionPtr->indexSeekFlags, p_gRequestCriterionPtr->cr_gKeys)) < 0)
             nb_passed = (answer == ANSWER__YES);
@@ -478,41 +501,20 @@ m_DIGGY_VAR_GEN(status,c)
   m_DIGGY_RETURN(RETURNED)
 } // l_GIndexesSequenceNext
 
-// Get current entry in index sequence.
-//
-// Passed:
-// - a_me:
-// - ap_indexSequence-> : current state of sequence
-//
-// Changed:
-// - *an_entry: 
-//   + -1 special value : not found, that is "disabled" or "no more"
-//   + >= 0: corresponding entry
-//
-// Ret:
-// - RETURNED: Ok
-// - -1: anomaly is raised
-static inline int ml_GIndexesSequenceCurrentInternal(G_INDEXES_HANDLE handle, int indexLabel,
-  const struct INDEX_SEQUENCE *ap_indexSequence, int *an_entry) {
-
-  if (ap_indexSequence->indexEntryBlockCount2 > 0 && ap_indexSequence->ci_indexEntryCursor >= 
-    ap_indexSequence->indexEntryBlocks2[0].first && ap_indexSequence->ci_indexEntryCursor <=
-    ap_indexSequence->cv_lastIndexEntry)
-    *an_entry = o_GIndexesGetItemEntry(handle,indexLabel,ap_indexSequence->ci_indexEntryCursor);
-  else *an_entry = -1; // No current item 
-
-  return RETURNED;  
-} // ml_GIndexesSequenceCurrentInternal 
 
 // Public function; see .h
 int l_GIndexesSequenceCurrent(G_INDEXES_HANDLE handle,
   const struct G_REQUEST_CRITERION *sp_gRequestCriteria, const char *p_indexSequenceBuffer,
-  int *an_entry) { m_DIGGY_BOLLARD_S()
+  int *an_entry) { m_DIGGY_BOLLARD()
   const struct INDEX_SEQUENCE* ap_indexSequence = (struct INDEX_SEQUENCE*)p_indexSequenceBuffer;
   m_ASSERT(sp_gRequestCriteria[0].indexLabel < o_GIndexesGetIndexCount(handle)) 
   
-  m_TRACK_IF(ml_GIndexesSequenceCurrentInternal(handle,sp_gRequestCriteria[0].indexLabel,
-    ap_indexSequence,an_entry) != RETURNED)
+  if (ap_indexSequence->indexEntryBlockCount2 > 0 && ap_indexSequence->ci_indexEntryCursor >= 
+    ap_indexSequence->indexEntryBlocks2[0].first && ap_indexSequence->ci_indexEntryCursor <=
+    ap_indexSequence->cv_lastIndexEntry)
+    *an_entry = o_GIndexesGetItemEntry(handle,sp_gRequestCriteria[0].indexLabel,
+      ap_indexSequence->ci_indexEntryCursor);
+  else *an_entry = -1; // No current item 
 
   m_DIGGY_RETURN(RETURNED)
 } // l_GIndexesSequenceCurrent
